@@ -1,0 +1,30 @@
+<?php
+/** @var \SM\Sales\Block\Order\Digital\Part\Content $block */
+
+/** @var \SM\Sales\Api\Data\DigitalOrderDataInterface $digitalOrder */
+$digitalOrder = $block->getParentOrder();
+$ext = $digitalOrder->getProductOption()->getExtensionAttributes();
+
+?>
+<div class="shopping-summary">
+    <h5 class="tl-summary"><?= $block->escapeHtml(__('Payment Details')) ?></h5>
+    <div class="dis-flex subtotal">
+        <h4><?= $block->escapeHtml(__('Subtotal')) ?></h4>
+        <h4 class="price"><?= $block->escapeHtml($block->currencyFormat($digitalOrder->getSubTotal())) ?></h4>
+    </div>
+    <?php
+    /** @var \SM\Sales\Block\Order\VoucherDetail $voucherDetailBlock */
+    $voucherDetailBlock = $block->getLayout()->createBlock(\SM\Sales\Block\Order\VoucherDetail::class);
+    $voucherDetailBlock->setParentOrder($digitalOrder);
+    ?>
+    <?= $voucherDetailBlock->toHtml()?>
+    <div class="dis-flex total">
+        <h4><?= $block->escapeHtml(__('Total')) ?></h4>
+        <h4 class="price"><?= $block->escapeHtml($block->currencyFormat($digitalOrder->getGrandTotal())) ?></h4>
+    </div>
+    <?php if (!$block->isMyOrder()):?>
+        <div class="note">
+            <p><?= $digitalOrder->getPaymentMethod() ?></p>
+        </div>
+    <?php endif;?>
+</div>

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <!-- Event for add to cart -->
+    <event name="checkout_cart_product_add_after">
+        <observer name="sm_customprice_observer_set_price_for_item_add" instance="SM\Bundle\Observer\SetPriceForItem"/>
+    </event>
+    <!-- Event for update add to cart -->
+    <event name="checkout_cart_product_update_after">
+        <observer name="sm_customprice_observer_set_price_for_item_update" instance="SM\Bundle\Observer\SetPriceForItem"/>
+    </event>
+</config>

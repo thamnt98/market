@@ -1,0 +1,92 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_Integration
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   JP <jaka.pondan@ctcorpdigital.com>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- DB Model-->
+    <preference for="Trans\Integration\Api\IntegrationChannelRepositoryInterface"
+                type="Trans\Integration\Model\IntegrationChannelRepository" />
+    <preference for="Trans\Integration\Api\Data\IntegrationChannelInterface"
+                type="Trans\Integration\Model\IntegrationChannel" />
+    <preference for="Trans\Integration\Api\Data\IntegrationChannelSearchResultInterface"
+                type="Trans\Integration\Model\IntegrationChannelSearchResult" />\
+
+    <preference for="Trans\Integration\Api\IntegrationChannelMethodRepositoryInterface"
+                type="Trans\Integration\Model\IntegrationChannelMethodRepository" />
+    <preference for="Trans\Integration\Api\Data\IntegrationChannelMethodInterface"
+                type="Trans\Integration\Model\IntegrationChannelMethod" />
+    <preference for="Trans\Integration\Api\Data\IntegrationChannelMethodSearchResultInterface"
+                type="Trans\Integration\Model\IntegrationChannelMethodSearchResult" />
+
+    <preference for="Trans\Integration\Api\IntegrationCommonInterface" type="Trans\Integration\Model\IntegrationCommon" />
+
+    <preference for="Trans\Integration\Api\IntegrationDatabaseInterface" type="Trans\Integration\Model\IntegrationDatabase" />
+    
+    <!-- integration table cleaner -->
+    <preference for="Trans\Integration\Api\IntegrationTableCleanerInterface" type="Trans\Integration\Model\IntegrationTableCleaner" />
+
+
+    <type name="Trans\Integration\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+    <type name="Trans\Integration\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">Integration-info</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="system" xsi:type="object">Trans\Integration\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- admin grid -->
+    <!-- integration_channel grid -->
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="integration_channel_listing_data_source" xsi:type="string">Trans\Integration\Model\ResourceModel\IntegrationChannel\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Trans\Integration\Model\ResourceModel\IntegrationChannel\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">integration_channel</argument>
+            <argument name="eventPrefix" xsi:type="string">trans_integration_channel_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">trans_integration_channel_grid_collection</argument>
+            <argument name="resourceModel" xsi:type="string">\Trans\Integration\Model\ResourceModel\IntegrationChannel</argument>
+        </arguments>
+    </type>
+    <!-- integration_channel grid -->
+
+    <!-- integration_channel_method grid -->
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="integration_channelmethod_listing_data_source" xsi:type="string">Trans\Integration\Model\ResourceModel\IntegrationChannelMethod\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Trans\Integration\Model\ResourceModel\IntegrationChannelMethod\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">integration_channel_method</argument>
+            <argument name="eventPrefix" xsi:type="string">trans_integration_channel_method_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">trans_integration_channel_method_grid_collection</argument>
+            <argument name="resourceModel" xsi:type="string">\Trans\Integration\Model\ResourceModel\IntegrationChannelMethod</argument>
+        </arguments>
+    </type>
+    <!-- integration_channel_method grid -->
+    <!-- end admin grid -->
+</config>

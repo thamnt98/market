@@ -1,0 +1,26 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<?php /** @var $block \Magento\Catalog\Block\Product\Image */ ?>
+<?php
+$product = $block->getProduct();
+/** @var \SM\FlashSale\Helper\Quantity $helper */
+$helper = $this->helper(\SM\FlashSale\Helper\Quantity::class);
+?>
+<span class="product-image-container"
+      style="width:<?= $block->escapeHtmlAttr($block->getWidth()) ?>px;">
+    <span class="product-image-wrapper"
+          style="padding-bottom: <?= ($block->getRatio() * 100) ?>%;">
+        <img class="<?= $block->escapeHtmlAttr($block->getClass()) ?>" loading="lazy"
+            <?= $block->escapeHtmlAttr($block->getCustomAttributes()) ?>
+             src="<?= $block->escapeUrl($block->getImageUrl()) ?>"
+             max-width="<?= $block->escapeHtmlAttr($block->getWidth()) ?>"
+             max-height="<?= $block->escapeHtmlAttr($block->getHeight()) ?>"
+             alt="<?= /* @noEscape */ $block->stripTags($block->getLabel(), null, true) ?>"/></span>
+        <?php if (!is_null($product) && !$helper->isCartPage()):?>
+        <span class="product-stock popular-sale-count-<?php echo $product->getId() ?>" style="display: none"></span>
+        <?php endif;?>
+</span>

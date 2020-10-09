@@ -1,0 +1,16 @@
+<script>
+    require(['jquery', 'Magento_Ui/js/lib/view/utils/async', 'gtmCheckout', 'jquery/jquery-storageapi', 'mage/translate', 'domReady!'],function ($, async, gtmCheckout) {
+        $(window).load(function () {
+            if (typeof dataLayerSourceObjects !== "undefined") {
+                async.async('[data-gtm-message="success"]', function () {
+                    if ($('[data-gtm-message="success"]').text().includes($.mage.__('Your voucher has been applied.'))) {
+                        let dataVoucher = $.localStorage.get('use_voucher_gtm');
+                        //Todo Remove Debug
+                        console.log(dataVoucher);
+                        gtmCheckout.push('use_voucher', dataVoucher);
+                    }
+                });
+            }
+        });
+    });
+</script>

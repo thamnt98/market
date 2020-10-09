@@ -1,0 +1,151 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category SM
+ * @package SM_TodayDeal
+ * @license     http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ *
+ * @author      Chinhvd <chinhvd@smartosc.com>
+ *
+ * @copyright   Copyright (c) SmartOSC. All rights reserved.
+ * @url http://www.smartosc.com/
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="trans_today_deals" resource="default" engine="innodb" comment="Today Deals Table">
+        <column xsi:type="smallint" name="post_id" padding="6" unsigned="false" nullable="false" identity="true"
+                comment="Entity ID"/>
+        <column xsi:type="varchar" name="title" nullable="true" length="255" comment="Post Title"/>
+        <column xsi:type="varchar" length="255" name="thumbnail_name" nullable="true"/>
+        <column xsi:type="varchar" length="255" name="thumbnail_path" nullable="true"/>
+        <column xsi:type="int" name="thumbnail_size" nullable="true"/>
+        <column xsi:type="varchar" name="today_deal_layout" nullable="true" length="255" comment="Today Deals Layout"/>
+        <column xsi:type="text" name="meta_keywords" nullable="true" comment="Today Deals Meta Keywords"/>
+        <column xsi:type="text" name="meta_description" nullable="true" comment="Today Deals Meta Description"/>
+        <column xsi:type="varchar" name="identifier" nullable="true" length="100" comment="Today Deals String Identifier"/>
+        <column xsi:type="varchar" name="content_heading" nullable="true" length="255" comment="Today Deals Content Heading"/>
+        <column xsi:type="mediumtext" name="content" nullable="true" comment="Page Content"/>
+        <column xsi:type="timestamp" name="creation_time" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Today Deals Creation Time"/>
+        <column xsi:type="timestamp" name="update_time" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Today Deals Modification Time"/>
+        <column xsi:type="smallint" name="is_active" padding="6" unsigned="false" nullable="false" identity="false"
+                default="1" comment="Is Page Active"/>
+        <column xsi:type="smallint" name="sort_order" padding="6" unsigned="false" nullable="false" identity="false"
+                default="0" comment="Today Deals Sort Order"/>
+        <column xsi:type="text" name="layout_update_xml" nullable="true" comment="Today Deals Layout Update Content"/>
+        <column xsi:type="varchar" name="custom_theme" nullable="true" length="100" comment="Today Deals Custom Theme"/>
+        <column xsi:type="varchar" name="custom_root_template" nullable="true" length="255"
+                comment="Today Deals Custom Template"/>
+        <column xsi:type="text" name="custom_layout_update_xml" nullable="true"
+                comment="Today Deals Custom Layout Update Content"/>
+        <column xsi:type="varchar" name="layout_update_selected" nullable="true"
+                length="128" comment="Today Deals Custom Layout File"/>
+        <column xsi:type="date" name="custom_theme_from" comment="Today Deals Custom Theme Active From Date"/>
+        <column xsi:type="date" name="custom_theme_to" comment="Today Deals Custom Theme Active To Date"/>
+        <column xsi:type="varchar" name="meta_title" nullable="true" length="255" comment="Today Deals Meta Title"/>
+        <column xsi:type="timestamp" name="publish_from" on_update="false" nullable="true"
+                comment="Mobile Publish Campaign Page From"/>
+        <column xsi:type="timestamp" name="publish_to" on_update="false" nullable="true"
+                comment="Mobile Publish Campaign Page To"/>
+        <column xsi:type="varchar" name="mb_short_title" nullable="true" length="255"
+                comment="Mobile Post Short Title"/>
+        <column xsi:type="text" name="mb_short_description" nullable="true" comment="Mobile Post Short Description"/>
+        <column xsi:type="smallint" name="mb_is_highlighted" padding="6" unsigned="false" nullable="false"
+                identity="false" default="0" comment="Is Highlighted"/>
+        <column xsi:type="int" name="mb_all_products_category" nullable="true"
+                comment="Mobile Post Category All Products"/>
+        <column xsi:type="int" name="mb_most_popular_products_category" nullable="true"
+                comment="Mobile Post Category Most Popular Products"/>
+        <column xsi:type="varchar" name="mb_signature_title" nullable="true" length="255"
+                comment="Mobile Signature Block Title"/>
+        <column xsi:type="text" name="mb_signature_description" nullable="true"
+                comment="Mobile Signature Block Description"/>
+        <column xsi:type="text" name="mb_signature_true_title" nullable="true"
+                comment="Mobile Signature Block True Title"/>
+        <column xsi:type="varchar" name="mb_related_campaigns_block_title" nullable="true" length="255"
+                comment="Mobile Related Campaigns Block Title"/>
+        <column xsi:type="varchar" name="mb_image" nullable="true" length="255" comment="Mobile Image Name"/>
+        <column xsi:type="varchar" name="mb_image_path" nullable="true" comment="Mobile Image Path"/>
+        <column xsi:type="varchar" name="mb_video" nullable="true" length="255" comment="Mobile Video Name"/>
+        <column xsi:type="varchar" name="mb_video_path" nullable="true" comment="Mobile Video Path"/>
+        <column xsi:type="int" name="promo_id" nullable="true" comment="Promotion Id"/>
+        <column xsi:type="varchar" length="255" name="promo_name" nullable="true" comment="Promotion Name"/>
+        <column xsi:type="varchar" length="255" name="promo_creative" nullable="true" comment="Promotion Creative"/>
+
+        <column xsi:type="smallint" name="is_redirect_to_plp" padding="6" unsigned="false" nullable="false"
+                identity="false" default="0" comment="Is Redirect to PLP"/>
+        <column xsi:type="int" name="category_to_redirect" nullable="true"
+                comment="Category to Redirect"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="post_id"/>
+        </constraint>
+        <index referenceId="TODAY_DEALS_IDENTIFIER" indexType="btree">
+            <column name="identifier"/>
+        </index>
+        <index referenceId="TODAY_DEALS_TITLE_META_KEYWORDS_META_DESCRIPTION_IDENTIFIER_CONTENT" indexType="fulltext">
+            <column name="title"/>
+            <column name="meta_keywords"/>
+            <column name="meta_description"/>
+            <column name="identifier"/>
+            <column name="content"/>
+        </index>
+    </table>
+    <table name="trans_today_deals_store" resource="default" engine="innodb" comment="Today Deals To Store Linkage Table">
+        <column xsi:type="smallint" name="post_id" padding="6" unsigned="false" nullable="false" identity="false"
+                comment="Entity ID"/>
+        <column xsi:type="smallint" name="store_id" padding="5" unsigned="true" nullable="false" identity="false"
+                comment="Store ID"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="post_id"/>
+            <column name="store_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="TRANS_TODAY_DEALS_STORE_POST_ID_TODAY_DEALS_POST_ID"
+                    table="trans_today_deals_store"
+                    column="post_id" referenceTable="trans_today_deals" referenceColumn="post_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="TRANS_TODAY_DEALS_STORE_STORE_ID_STORE_STORE_ID"
+                    table="trans_today_deals_store"
+                    column="store_id" referenceTable="store" referenceColumn="store_id" onDelete="CASCADE"/>
+        <index referenceId="TRANS_TODAY_DEALS_STORE_STORE_ID" indexType="btree">
+            <column name="store_id"/>
+        </index>
+    </table>
+    <table name="trans_today_deals_post_product" resource="default" engine="innodb"
+           comment="Today Deal Post To Product Linkage Table">
+        <column xsi:type="smallint" name="post_id" padding="6" unsigned="false" nullable="false" identity="false"
+                comment="Entity ID"/>
+        <column xsi:type="int" name="product_id" padding="10" unsigned="true" nullable="false" identity="false"
+                comment="Product ID"/>
+        <column xsi:type="smallint" name="position" padding="6" unsigned="true" nullable="true" identity="false"
+                comment="Product Position"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="post_id"/>
+            <column name="product_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="TRANS_TODAY_DEALS_POST_PRODUCT_TRANS_TODAY_DEALS_POST_ID"
+                    table="trans_today_deals_post_product" column="post_id" referenceTable="trans_today_deals"
+                    referenceColumn="post_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="TRANS_TODAY_DEALS_POST_PRODUCT_CATALOG_PRODUCT_ENTITY_PRODUCT_ID"
+                    table="trans_today_deals_post_product" column="product_id" referenceTable="catalog_product_entity"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+    </table>
+    <table name="trans_today_deals_related_post" resource="default" engine="innodb"
+           comment="Today Deal Related Campaigns">
+        <column xsi:type="smallint" name="post_id" padding="6" unsigned="false" nullable="false" identity="false"
+                comment="Entity ID"/>
+        <column xsi:type="smallint" name="related_id" padding="6" unsigned="false" nullable="false" identity="false"
+                comment="Related ID"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="post_id"/>
+            <column name="related_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="TRANS_TODAY_DEALS_RELATED_POST_TRANS_TODAY_DEALS_POST_ID"
+                    table="trans_today_deals_related_post" column="post_id" referenceTable="trans_today_deals"
+                    referenceColumn="post_id" onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="TRANS_TODAY_DEALS_RELATED_POST_TRANS_TODAY_DEALS_RELATED_ID"
+                    table="trans_today_deals_related_post" column="related_id" referenceTable="trans_today_deals"
+                    referenceColumn="post_id" onDelete="CASCADE"/>
+    </table>
+</schema>

@@ -1,0 +1,60 @@
+<?php
+/**
+ * Reorder quickly template
+ *
+ * @var $block \SM\Sales\Block\Order\ReorderQuicklyContent
+ */
+
+$parentOrders = $block->getOrders();
+?>
+<?php if (count($parentOrders) > 0):?>
+    <div class="section-reorder smart-reorder">
+        <div class="block-title">
+
+            <strong><?= $block->escapeHtml(__("Reorder Quickly")) ?></strong>
+
+            <a href="<?= $block->getLinkToCompletedOrder()?>" class="section-link link see-all-reorder-quickly"><?= $block->escapeHtml(__("See All")) ?></a>
+        </div>
+        <div class="block-content">
+            <div class="row">
+                <?php
+                /** @var \SM\Sales\Api\Data\ReorderQuickly\OrderDataInterface $orderData */
+                foreach ($parentOrders as $orderData):?>
+                    <div class="col-sm-12 col-lg-4" onclick="location.href ='<?= $block->getLinkToOrderDetail($orderData->getEntityId())?>'" style="cursor: pointer">
+                        <?php $transactionId = ($orderData->getTransactionId() ? $orderData->getTransactionId() : "Not available") ?>
+                        <div class="reorder-card" data-gtm-order-id="<?= $block->escapeHtml($orderData->getEntityId()) ?>" data-gtm-transaction-id="<?= $block->escapeHtml($transactionId) ?>">
+                            <div class="reorder-header">
+                                <span class="reorder-date"><?= $block->escapeHtml($block->timeFormat($orderData->getCreatedAt()))?></span>
+                                <div class="reorder-cost">
+                                    <label><?= $block->escapeHtml(__("Total"))?></label>
+                                    <span><?= $block->escapeHtml($block->currencyFormat($orderData->getGrandTotal()))?></span>
+                                </div>
+                            </div>
+
+                            <div class="reorder-list">
+                                <?php
+                                foreach ($orderData->getItemImages() as $itemImage):?>
+                                    <div class="reorder-item">
+                                        <div class="reorder-itemImage">
+                                            <img src="<?= $itemImage?>">
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                                <?php $left = $orderData->getItemLeft() ?>
+                                <?php if ($left > 0):?>
+                                    <div class="reorder-item reorder-itemlink">
+                                        <a class="link" href>
+                                            +<?= $left ?>
+                                            <br>
+                                            <?= (($left > 1) ? " items" : " item")?>
+                                        </a>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+<?php endif;?>

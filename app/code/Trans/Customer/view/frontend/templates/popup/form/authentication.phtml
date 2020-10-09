@@ -1,0 +1,70 @@
+<?php 
+/**
+ * @category Trans
+ * @package  Trans_Customer
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ * @author   Imam Kusuma <imam.kusuma@ctcorpdigital.com>
+ *
+ * Copyright © 2019 CT Corp Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+?>
+
+<div class="social-login block-container authentication">
+    <div class="social-login-title">
+        <h2 class="login-title"><?= __('Sign In') ?></h2>
+    </div>
+    <div class="block social-login-customer-authentication col-mp mp-12" id="social-login-authentication">
+        <div class="block-content" aria-labelledby="block-customer-login-heading">
+            <!-- <form class="form-customer-login" action="<?php echo $block->getLoginPostUrl(); ?>" method="post" id="social-form-login" data-mage-init='{"validation":{}}'> -->
+            <form class="form-customer-login" id="social-form-login" data-mage-init='{"validation":{}}'>
+                <?= $block->getBlockHtml('formkey') ?>
+                <input type="hidden" name="is_ajax" value="1">
+                <input type="hidden" name="verification_id" value="">
+                <fieldset class="fieldset login" data-hasrequired="<?= __('* Required Fields') ?>">
+                    <?= $block->getChildHtml('form_before_login_fields') ?>
+                    <div class="field email required">
+                        <label class="label" for="social_login_email"><span><?= __('Email or Mobile Phone Number') ?></span></label>
+                        <div class="control">
+                            <input name="username" id="social_login_email" type="text" class="input-text"
+                                   value="<?= $block->escapeHtml($block->getUsername()) ?>"<?php if ($block->isAutocompleteDisabled()) :
+                                        ?> autocomplete="off"<?php endif; ?>
+                                   title="<?= __('Email') ?>"
+                                   data-validate="{required:true}">
+                        </div>
+                    </div>
+                    <div class="field password field-password required" style="display: none;">
+                        <label for="pass" class="label"><span><?= __('Password') ?></span></label>
+                        <div class="control">
+                            <input name="password" id="social_login_pass" type="password"
+                                   class="input-text"
+                                <?= $block->isAutocompleteDisabled() ? ' autocomplete="off"' : '' ?>
+                                   title="<?= __('Password') ?>"
+                                   data-validate="{required:true, 'validate-password':true}">
+                        </div>
+                    </div>
+                    <?= $block->getChildHtml('field.otp') ?>
+                    <?= $block->getChildHtml('form_additional_info') ?>
+                    <div class="actions-toolbar">
+                        <div class="primary">
+                            <button type="button" class="action login primary" id="bnt-social-login-authentication">
+                                <span><?= __('Login') ?></span>
+                            </button>
+                        </div>
+                        <div class="secondary">
+                            <a class="action" href="<?php echo $block->getForgotPasswordUrl() ?>"><span><?= __('Forgot Your Password?') ?></span></a>
+                        </div>
+                    </div>
+                    <div class="actions-toolbar">
+                        <div class="primary">
+                            <a class="action" href="<?php echo $block->getCreateAccountUrl() ?>"><span><?= __('Create New Account?') ?></span></a>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+    </div>
+    <?= $block->getChildHtml('popup.authentication.social') ?>
+</div>
+

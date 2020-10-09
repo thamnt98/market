@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route url="/V1/sms/verification/send" method="POST">
+        <service class="SM\AndromedaSms\Api\SmsVerificationInterface" method="send"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/sms/verification/verify" method="POST">
+        <service class="SM\AndromedaSms\Api\SmsVerificationInterface" method="verify"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/andromeda-test-mode/ma/send/sms/verification/v1.0" method="POST">
+        <service class="SM\AndromedaSms\Api\SmsVerification\TestMode\ManagementInterface" method="send"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/andromeda-test-mode/ma/verify/sms/verification/v1.0" method="POST">
+        <service class="SM\AndromedaSms\Api\SmsVerification\TestMode\ManagementInterface" method="verify"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/andromeda-test-mode/verification-code/:phoneNumber" method="GET">
+        <service class="SM\AndromedaSms\Api\SmsVerification\TestMode\ManagementInterface" method="getVerificationCodeByPhone"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/andromeda-test-mode/token" method="GET">
+        <service class="SM\AndromedaSms\Api\SmsVerification\TestMode\ManagementInterface" method="getToken"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+</routes>

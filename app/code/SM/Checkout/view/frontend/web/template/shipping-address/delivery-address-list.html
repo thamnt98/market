@@ -1,0 +1,36 @@
+<div class="ct-delivery-adrress" data-bind="attr: {id: 'delivery-address-list'}, afterRender: onRenderComplete('delivery-address-list')">
+    <p class="note" data-bind="i18n: 'You can choose a maximum of 2 addresses'"></p>
+    <!-- ko if: isShowAddNewAddress() -->
+        <a class="add-new-address" data-bind="i18n: 'Add New Address', attr: { href: addNewAddressUrl()}"></a>
+    <!-- /ko -->
+    <ul class="list-address">
+        <!-- ko foreach: { data: getAddressList(), as: 'item' } -->
+            <!-- ko if: $parent.isShow(item.customerAddressId) -->
+                <li>
+                    <div class="gr-data">
+                        <h5>
+                            <span data-bind="i18n: item.prefix"></span>
+                            <span data-bind="text: item.firstname + ' ' + item.lastname"></span>
+                            <span data-bind="text: '(' + $parent.getAddressTag(item.customAttributes) + ')'"></span>
+                            <!-- ko if: item.isDefaultShipping() -->
+                                <span class="note-main-adrress" ass="note-main-adrress" data-bind="i18n: 'Main Address'"></span>
+                            <!-- /ko -->
+                        </h5>
+                        <p>
+                            <span data-bind="text: _.values(item.street).join(', ')"></span><br/>
+                            <span data-bind="text: item.customAttributes.district.label"></span>, <span data-bind="text: item.customAttributes.city.value"></span>, <span data-bind="text: item.region"></span>, <span data-bind="text: item.postcode"></span><br/>
+                            <span data-bind="text: $parent.getCountryName(item.countryId)"></span>
+                        </p>
+                    </div>
+                    <!-- ko if: $parent.isSelected(item.customerAddressId) -->
+                        <span class="choose-address"></span>
+                    <!-- /ko -->
+                    <!-- ko ifnot: $parent.isSelected(item.customerAddressId) -->
+                        <button type="submit" class="action secondary" data-bind="i18n: 'Select Address', click: function(){ $parent.selectAddress(item.customerAddressId) }"></button>
+                    <!-- /ko -->
+                </li>
+            <!-- /ko -->
+        <!-- /ko -->
+    </ul>
+</div>
+

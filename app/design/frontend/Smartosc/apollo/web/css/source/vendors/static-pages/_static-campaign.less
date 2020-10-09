@@ -1,0 +1,269 @@
+// /**
+//  * Copyright © Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+//
+//  Common
+//  _____________________________________________
+@color-blue1: #1979c3;
+@media-common: true; // Sets whether to output common styles (true|false)
+
+& when (@media-common = true) {
+    .ambrand-index-index{
+        &.page-layout-cms-full-width{
+            .page-main{
+                max-width: 100%;
+                padding: 0;
+                .column.main{
+                    padding: 0;
+                }
+            }
+        }
+        div.smart-products .product-cards .product-item{
+            width: 100%;
+        }
+
+    }
+
+    //  Today's Deals
+    //  _____________________________________________
+    .todaydeal-index-index{
+        .column.main{
+            padding-bottom: 24px;
+        }
+    }
+    .section-today-deal{
+        margin-top: 25px;
+    }
+
+    .todaydeal-post{
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.5);
+        .lib-css(box-shadow, 0 2px 4px 0 rgba(0,0,0,0.5));
+        margin-bottom: 30px;
+        height: ~'calc(100% - 30px)';
+        .todaydeal-post-image{
+            font-size: 0;
+            display: block;
+        }
+        .todaydeal-post-title{
+            padding: 18px 20px;
+            text-align: center;
+            font-size: 16px;
+            margin:0;
+
+            a{
+                color: @color-black;
+            }
+
+        }
+
+        //Hover item post
+        &:hover{
+            .todaydeal-post-image{
+                opacity: 0.8;
+            }
+            a{
+                color: @color-blue1;
+            }
+        }
+    }
+
+    .todaydeal-post-view{
+        h1,h2,h3{
+            margin-top: 0px;
+            font-family: @font-family-SF-UI-Display-Bold;
+        }
+        [data-content-type="transmart_file"]{
+            video{
+                width:790px;
+                height:368px;
+                border-radius: 18px;
+            }
+            .block-content{
+                display: none;
+            }
+        }
+    }
+
+    .section-campaign-deals{
+
+        figure{
+            [data-element='link']{
+                font-size: 0;
+                border-radius: 10px;
+                overflow: hidden;
+                display: block;
+                box-shadow: 0 2px 4px  rgba(0,0,0,0.5);
+            }
+            figcaption{
+                font-size: 20px;
+                font-weight: 500;
+                padding: 15px 0 0;
+                text-align: center;
+            }
+        }
+    }
+
+    //  Brand Page
+    //  _____________________________________________
+    .ambrand-index-index{
+        h1,h2,h3{
+            margin-top: 0px;
+            font-family: @font-family-SF-UI-Display-Bold;
+        }
+    }
+    .section-healthy-choices{
+        h1,h2,h3{
+            margin-top: 0px;
+            font-family: @font-family-SF-UI-Display-Bold;
+        }
+        figure{
+            box-shadow: 0 2px 4px  rgba(0,0,0,0.5);
+            border-radius: 16px;
+            overflow: hidden;
+            font-size: 0;
+            [data-element='link']{
+                font-size: 0;
+            }
+            figcaption{
+                font-size: 18px;
+                text-align: center;
+                padding: 20px 0;
+            }
+            //Hover item post
+            &:hover{
+                [data-element='link']{
+                    opacity: 0.8;
+                }
+                figcaption{
+                    color: @theme__color__primary;
+                }
+            }
+        }
+    }
+
+    .section-shop-category{
+        figure{
+            border-radius: 12px;
+            figcaption{
+                font-size: 20px;
+                padding: 13px 0;
+            }
+        }
+    }
+
+
+
+}
+
+//  Tablet
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .row-healthyChoice{
+        .pagebuilder-column-group{
+            flex-wrap: wrap;
+        }
+        .pagebuilder-column{
+            flex-basis: 100%;
+            width: 100%;
+        }
+    }
+
+
+}
+//  Desktop (style-l.css)
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__xl) {
+    div.section-today-deal{
+        margin: 28px -16px 0;
+        [class^="col-md"], [class*=" col-md"], [class^="col-md-offset"], [class*=" col-md-offset"]{
+            padding: 0 16px;
+        }
+    }
+
+    .section-campaign-deals{
+        .pagebuilder-column-group{
+            margin: 0 -10px;
+            > .pagebuilder-column{
+                padding: 10px 25px !important;
+            }
+        }
+    }
+    div.section-healthy-choices{
+        .pagebuilder-column-group{
+            margin: 0 -10px;
+            .pagebuilder-column{
+                padding: 10px 20px !important;
+            }
+        }
+        figure{
+            figcaption{
+                font-size: 24px;
+            }
+        }
+    }
+    div.section-shop-category{
+        .pagebuilder-column-group{
+            margin: 0 -40px;
+            .pagebuilder-column{
+                padding:0 50px !important;
+            }
+        }
+    }
+
+    div.smart-products-nowsale{
+        .slick-list{
+            margin-left: -37px;
+        }
+        .slick-list .slick-slide > div{
+            padding: 0 36px;
+        }
+        .slick-next,
+        .slick-prev{
+            width:54px;
+            height: 54px;
+        }
+    }
+
+    div.smart-products-perfec{
+        div.products-grid .product-items{
+            margin-right: -38px;
+        }
+        .product-cards .product-card{
+            padding: 0 36px;
+        }
+
+    }
+
+    div.smart-products-sky{
+        div.products-grid .product-items{
+            margin-left: -38px;
+        }
+        .product-cards .product-card{
+            padding: 0 36px;
+        }
+
+    }
+
+    .row-healthyChoice{
+        h3:first-child,
+        h2:first-child{
+            margin-bottom: 10px;
+        }
+        .pagebuilder-column-group{
+            flex-wrap: wrap;
+        }
+        .pagebuilder-column{
+            flex-basis: inherit;
+            width: 100%;
+        }
+    }
+    .col-healthyChoice{
+        padding-left: 55px !important ;
+    }
+
+}

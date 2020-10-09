@@ -1,0 +1,24 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<div class="text-content" attr="data.main.attributes" css="data.main.css" ko-style="data.main.style">
+    <div class="block-content">
+        <div if="data.contents.html" html="data.contents.html" attr="data.contents.attributes"
+             data-element="contents"
+             class="bypass-html-filter"></div>
+        <a class="link-popup" href="#">
+            <span css="data.link.css"
+                  attr="data.link.attributes"
+                  ko-style="data.link.style" html="data.link.html"></span>
+        </a>
+        <div if="data.terms_and_conditions.html" html="data.terms_and_conditions.html"
+             attr="data.terms_and_conditions.attributes"
+             data-element="terms_and_conditions"
+             id="terms-and-conditions"></div>
+    </div>
+</div>
+

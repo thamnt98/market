@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Widget:etc/widget.xsd">
+    <widget id="selected_categories" class="SM\Theme\Block\Category\Widget\SelectedCategories" is_email_compatible="true"
+            placeholder_image="Magento_Catalog::images/product_widget_new.png" ttl="86400">
+        <label translate="true">Transmart Selected Categories</label>
+        <description translate="true">List of Categories</description>
+        <parameters>
+            <parameter name="title" xsi:type="text" visible="true">
+                <label translate="true">Title</label>
+            </parameter>
+            <parameter name="template" xsi:type="select" required="true" visible="false">
+                <label translate="true">Template</label>
+                <options>
+                    <option name="default" value="SM_Theme::category/widget/selected-categories.phtml" selected="true">
+                        <label translate="true">Default Template</label>
+                    </option>
+                </options>
+            </parameter>
+            <parameter name="categories" xsi:type="block" visible="true" required="true">
+                <label translate="true">Select 3 Categories Default</label>
+                <block class="SM\Theme\Block\Adminhtml\Category\Widget\Chooser" />
+            </parameter>
+            <parameter name="cache_lifetime" xsi:type="text" visible="true">
+                <label translate="true">Cache Lifetime (Seconds)</label>
+                <description translate="true">
+                    <![CDATA[Time in seconds between the widget updates.
+                    <br/>If not set, equals to 86400 seconds (24 hours). To update widget instantly, go to Cache Management and clear Blocks HTML Output cache.
+                    <br/>Widget will not show products that begin to match the specified conditions until cache is refreshed.]]>
+                </description>
+            </parameter>
+        </parameters>
+    </widget>
+    <widget id="reorder_quickly" class="SM\Theme\Block\Order\Widget\ReorderQuickly"
+            is_email_compatible="true"
+            placeholder_image="" ttl="86400">
+        <label translate="true">Transmart Reorder Quickly</label>
+        <description/>
+        <parameters>
+            <parameter name="title" xsi:type="text" visible="true">
+                <label translate="true">Title</label>
+            </parameter>
+            <parameter name="template" xsi:type="select" required="true" visible="false">
+                <label translate="true">Template</label>
+                <options>
+                    <option name="default" value="SM_Theme::order/widget/reorder-quickly.phtml" selected="true">
+                        <label translate="true">Default Template</label>
+                    </option>
+                </options>
+            </parameter>
+            <parameter name="cache_lifetime" xsi:type="text" visible="true">
+                <label translate="true">Cache Lifetime (Seconds)</label>
+                <description translate="true">
+                    <![CDATA[Time in seconds between the widget updates.
+                    <br/>If not set, equals to 86400 seconds (24 hours). To update widget instantly, go to Cache Management and clear Blocks HTML Output cache.
+                    <br/>Widget will not show products that begin to match the specified conditions until cache is refreshed.]]>
+                </description>
+            </parameter>
+        </parameters>
+    </widget>
+    <widget id="surprise_deals" class="SM\Theme\Block\Product\Widget\SurpriseDeals"
+            is_email_compatible="true"
+            placeholder_image="Magento_Catalog::images/product_widget_new.png" ttl="86400">
+        <label translate="true">Transmart Surprise Deals</label>
+        <description translate="true">List of Products</description>
+        <parameters>
+            <parameter name="title" xsi:type="text" visible="true">
+                <label translate="true">Title</label>
+            </parameter>
+            <parameter name="template" xsi:type="select" required="true" visible="false">
+                <label translate="true">Template</label>
+                <options>
+                    <option name="default" value="SM_Theme::product/widget/surprise-deals.phtml" selected="true">
+                        <label translate="true">Default Template</label>
+                    </option>
+                </options>
+            </parameter>
+            <parameter name="condition" xsi:type="conditions" visible="true" required="true" sort_order="10"
+                       class="Magento\CatalogWidget\Block\Product\Widget\Conditions">
+                <label translate="true">Conditions</label>
+            </parameter>
+            <parameter name="day" xsi:type="text" visible="true">
+                <label translate="true">Time(Year/Month/Day)</label>
+            </parameter>
+            <parameter name="time" xsi:type="text" visible="true">
+                <label translate="true">Time(Hours)</label>
+            </parameter>
+            <parameter name="cache_lifetime" xsi:type="text" visible="true">
+                <label translate="true">Cache Lifetime (Seconds)</label>
+                <description translate="true">
+                    <![CDATA[Time in seconds between the widget updates.
+                    <br/>If not set, equals to 86400 seconds (24 hours). To update widget instantly, go to Cache Management and clear Blocks HTML Output cache.
+                    <br/>Widget will not show products that begin to match the specified conditions until cache is refreshed.]]>
+                </description>
+            </parameter>
+            <parameter name="show_review" xsi:type="select" visible="true">
+                <label translate="true">Show Review</label>
+                <options>
+                    <option name="true" value="1" selected="true">
+                        <label translate="true">Yes</label>
+                    </option>
+                    <option name="false" value="0">
+                        <label translate="true">No</label>
+                    </option>
+                </options>
+            </parameter>
+        </parameters>
+    </widget>
+    <widget id="trans_product_carousel" class="SM\Theme\Block\Product\Widget\TransCarousel"
+            is_email_compatible="true"
+            placeholder_image="Magento_Catalog::images/product_widget_new.png" ttl="86400">
+        <label translate="true">Transmart Carousel</label>
+        <description translate="true">List of Products</description>
+        <parameters>
+            <parameter name="title" xsi:type="text" visible="true">
+                <label translate="true">Title</label>
+            </parameter>
+            <parameter name="template" xsi:type="select" required="true" visible="false">
+                <label translate="true">Template</label>
+                <options>
+                    <option name="default" value="SM_Theme::product/widget/trans-carousel.phtml" selected="true">
+                        <label translate="true">Default Template</label>
+                    </option>
+                </options>
+            </parameter>
+            <parameter name="condition" xsi:type="conditions" visible="true" required="true" sort_order="10"
+                       class="Magento\CatalogWidget\Block\Product\Widget\Conditions">
+                <label translate="true">Conditions</label>
+            </parameter>
+            <parameter name="cache_lifetime" xsi:type="text" visible="true">
+                <label translate="true">Cache Lifetime (Seconds)</label>
+                <description translate="true">
+                    <![CDATA[Time in seconds between the widget updates.
+                    <br/>If not set, equals to 86400 seconds (24 hours). To update widget instantly, go to Cache Management and clear Blocks HTML Output cache.
+                    <br/>Widget will not show products that begin to match the specified conditions until cache is refreshed.]]>
+                </description>
+            </parameter>
+        </parameters>
+    </widget>
+    <widget id="trans_sub_categories" class="SM\Theme\Block\Category\Widget\SubCategories"
+            is_email_compatible="true"
+            placeholder_image="Magento_Catalog::images/product_widget_new.png" ttl="86400">
+        <label translate="true">Transmart Sub Categories for Landing Page</label>
+        <description translate="true">List of sub categories</description>
+        <parameters>
+            <parameter name="title" xsi:type="text" visible="true">
+                <label translate="true">Title</label>
+            </parameter>
+            <parameter name="template" xsi:type="select" required="true" visible="false">
+                <label translate="true">Template</label>
+                <options>
+                    <option name="default" value="SM_Theme::landing/sub-categories.phtml" selected="true">
+                        <label translate="true">Default Template</label>
+                    </option>
+                </options>
+            </parameter>
+        </parameters>
+    </widget>
+    <widget id="mgs_lookbook" class="SM\Theme\Block\LookBook\Widget\LookBook">
+        <label translate="true">Hot Spot</label>
+        <description translate="true"></description>
+        <parameters>
+            <parameter name="lookbook_id" xsi:type="block" visible="true" required="true" sort_order="10">
+                <label translate="true">Lookbook</label>
+                <block class="MGS\Lookbook\Block\Adminhtml\Widget\Lookbook">
+                    <data>
+                        <item name="button" xsi:type="array">
+                            <item name="open" xsi:type="string" translate="true">Select Spot...</item>
+                        </item>
+                    </data>
+                </block>
+            </parameter>
+            <parameter name="template" xsi:type="select" visible="true" required="true" sort_order="10">
+                <label translate="true">Template</label>
+                <options>
+                    <option name="default" value="MGS_Lookbook::widget/lookbook.phtml" selected="true">
+                        <label translate="true">Default Template</label>
+                    </option>
+                </options>
+            </parameter>
+        </parameters>
+    </widget>
+    <widget id="mgs_lookbook_slider" class="MGS\Lookbook\Block\Widget\Slider">
+        <label translate="true">Hot Spot Slider</label>
+        <description translate="true"></description>
+        <parameters>
+            <parameter name="slider_id" xsi:type="block" visible="true" required="true" sort_order="10">
+                <label translate="true">Slider</label>
+                <block class="MGS\Lookbook\Block\Adminhtml\Widget\Slider">
+                    <data>
+                        <item name="button" xsi:type="array">
+                            <item name="open" xsi:type="string" translate="true">Select Slider...</item>
+                        </item>
+                    </data>
+                </block>
+            </parameter>
+
+            <parameter name="template" xsi:type="select" visible="true" required="true" sort_order="10">
+                <label translate="true">Template</label>
+                <options>
+                    <option name="default" value="MGS_Lookbook::widget/slider.phtml" selected="true">
+                        <label translate="true">Default Template</label>
+                    </option>
+                </options>
+            </parameter>
+        </parameters>
+    </widget>
+    <widget id="product_special_picks" class="SM\Theme\Block\Widget\SpecialPick"
+            placeholder_image="Magento_Catalog::images/product_widget_new.png">
+        <label translate="true">Transmart Products - Special Picks</label>
+        <description translate="true">List of Products</description>
+        <parameters>
+            <parameter name="uiComponent" xsi:type="text" required="false" visible="false">
+                <label translate="true">UI Component</label>
+                <value>widget_special_pick</value>
+            </parameter>
+            <parameter name="page_size" xsi:type="text" required="true" visible="true">
+                <label translate="true">Number of Products to display</label>
+                <value>5</value>
+            </parameter>
+            <parameter name="show_attributes" xsi:type="multiselect" required="true" visible="true">
+                <label translate="true">Product attributes to show</label>
+                <options>
+                    <option name="name" value="name">
+                        <label translate="true">Name</label>
+                    </option>
+                    <option name="image" value="image">
+                        <label translate="true">Image</label>
+                    </option>
+                    <option name="price" value="price">
+                        <label translate="true">Price</label>
+                    </option>
+                    <option name="learn_more" value="learn_more">
+                        <label translate="true">Learn More Link</label>
+                    </option>
+                </options>
+            </parameter>
+            <parameter name="condition" xsi:type="conditions" visible="true" required="true" sort_order="10"
+                       class="Magento\CatalogWidget\Block\Product\Widget\Conditions">
+                <label translate="true">Conditions</label>
+            </parameter>
+            <parameter name="template" xsi:type="select" required="true" visible="true">
+                <label>Template</label>
+                <options>
+                    <option name="default" value="SM_Theme::product/widget/viewed/grid.phtml" selected="true">
+                        <label translate="true">Viewed Products Grid Template</label>
+                    </option>
+                </options>
+            </parameter>
+        </parameters>
+    </widget>
+</widgets>
+

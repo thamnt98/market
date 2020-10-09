@@ -1,0 +1,88 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+
+    <!-- Inspire Me API-->
+    <route url="/V1/blog/getListArticles" method="GET">
+        <service class="SM\InspireMe\Api\PostRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/blog/getPost" method="GET">
+        <service class="SM\InspireMe\Api\PostRepositoryInterface" method="getPost"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/blog/getMostPopular" method="GET">
+        <service class="SM\InspireMe\Api\PostRepositoryInterface" method="getMostPopular"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/blog/getHomeArticles" method="GET">
+        <service class="SM\InspireMe\Api\PostRepositoryInterface" method="getHomeArticles"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/blog/search/:str" method="GET">
+        <service class="SM\InspireMe\Api\SearchQueryInterface" method="query"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/blog/post/:postId" method="GET">
+        <service class="SM\InspireMe\Api\PostRepositoryInterface" method="getById"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/blog/addSelectedToCart" method="POST">
+        <service class="SM\InspireMe\Api\ProductManagementInterface" method="addSelectedToCart"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/blog/updateViewsCount/:postId" method="PUT">
+        <service class="SM\InspireMe\Api\PostRepositoryInterface" method="updateViewsCount"/>
+        <resources>
+            <resource ref="Mirasvit_Blog::blog_post"/>
+        </resources>
+    </route>
+    <route url="/V1/blog/isShopIngredient" method="GET">
+        <service class="SM\InspireMe\Api\PostRepositoryInterface" method="isShopIngredient"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/blog/getPagingConfig" method="GET">
+        <service class="SM\InspireMe\Api\PostRepositoryInterface" method="getPagingConfig"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/blog/getRelatedProducts/:postId" method="GET">
+        <service class="SM\InspireMe\Api\PostRepositoryInterface" method="getProducts"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <route url="/V1/blog/topic/:id" method="GET">
+        <service class="Mirasvit\Blog\Api\Repository\CategoryRepositoryInterface" method="get"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route url="/V1/blog/getListTopics" method="GET">
+        <service class="SM\InspireMe\Api\TopicRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+</routes>

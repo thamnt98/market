@@ -1,0 +1,22 @@
+<?php
+/** @var \SM\Sales\Block\Order\Item\Options $block */
+
+/** @var \SM\Sales\Api\Data\ItemOptionDataInterface $options */
+$options = $block->getOptions();
+?>
+
+<?php
+/** @var \SM\Sales\Api\Data\ItemOptionDataInterface $option */
+foreach ($options as $option):?>
+    <?php if ($option->getOptionType() == \SM\Sales\Model\ParentOrderRepository::OPTION_TYPE_CONFIGURABLE):?>
+    <p><strong><?= $block->escapeHtml($option->getOptionLabel() . ": ")?></strong><?= $block->escapeHtml($option->getOptionValue())?></p>
+    <?php else:?>
+    <?php
+    $values = json_decode($option->getOptionValue(), true);
+    ?>
+    <?php
+    foreach ($values as $value):?>
+        <p><strong><?= $block->escapeHtml($option->getOptionLabel() . ": ")?></strong><?= $block->escapeHtml($value["qty"] . " x " . $value["title"])?></p>
+    <?php endforeach;?>
+    <?php endif;?>
+<?php endforeach;?>

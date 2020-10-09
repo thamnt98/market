@@ -1,0 +1,42 @@
+<?php
+use Magento\Catalog\Helper\Output;
+use SM\Reports\Block\Product\LatestViewed;
+
+$viewMode = 'grid';
+$imageDisplayArea = 'category_page_grid';
+
+/**
+ * @var Output $helper
+ * @var SM\Catalog\Helper\Data $helperSMCatalog
+ */
+$helper = $this->helper(Output::class);
+$helperSMCatalog = $this->helper('SM\Catalog\Helper\Data');
+
+/** @var LatestViewed $block */
+foreach ($block->getProducts() as $product) {
+    ?>
+    <div class="item product-item-info  product-item--hideCart">
+        <?php $productImage = $block->getImage($product, $imageDisplayArea); ?>
+        <a href="<?= $block->escapeUrl($product->getProductUrl()) ?>"
+           class="product photo product-item-photo"
+           tabindex="-1">
+            <?= $productImage->toHtml() ?>
+        </a>
+        <?= $block->getProductDetailsHtml($product) ?>
+        <?php $percent = $helperSMCatalog->getDiscountPercent($product); ?>
+        <?php $badgeDiscount =  $block->getChildBlock('badge-discount-list')->setProduct($product) ?>
+        <?= $badgeDiscount->toHtml() ?>
+        <div class="product details product-item-details">
+            <strong class="product name product-item-name">
+                <a class="product-item-link"
+                   href="<?= $block->escapeUrl($product->getProductUrl()) ?>">
+                    <?= /* @noEscape */ $helper->productAttribute($product, $product->getName(), 'name') ?>
+                </a>
+            </strong>
+
+            <?= /* @noEscape */ $block->getProductPrice($product) ?>
+            <?= $block->getReviewsSummaryHtml($product, \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW, true) ?>
+        </div>
+    </div>
+<?php
+} ?>

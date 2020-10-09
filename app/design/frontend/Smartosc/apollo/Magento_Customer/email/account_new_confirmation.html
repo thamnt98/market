@@ -1,0 +1,85 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!--@subject {{trans "Please confirm your %store_name account" store_name=$store.frontend_name}} @-->
+<!--@vars {
+"var store.frontend_name":"Store Name",
+"var this.getUrl($store,'customer/account/confirm/',[_query:[id:$customer.id,key:$customer.confirmation,back_url:$back_url],_nosid:1])":"Account Confirmation URL",
+"var this.getUrl($store, 'customer/account/')":"Customer Account URL",
+"var customer.email":"Customer Email",
+"var customer.name":"Customer Name"
+} @-->
+
+{{template config_path="design/email/header_template"}}
+
+<table class="main-table">
+    <tr>
+        <td class="one-column">
+            <table class="greeting" width="100%">
+                <tr>
+                    <td>
+                        <p>
+                            {{trans "Hello"}}
+                            <b>{{var customer.name}},</b>
+                        </p>
+                    </td>
+                </tr>
+            </table>
+            <!--End greeting-->
+            <table class="message-email" width="100%">
+                <tr>
+                    <td>
+                        <p>
+                            {{trans "Thank you for registering on Transmart. Please verify your email address to complete your registration process."}}
+                        </p>
+                    </td>
+                </tr>
+            </table>
+            <!--End Message Email-->
+            <table class="button-message-email" width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td align="center">
+                        <table class="box-verify-email" cellspacing="0" cellpadding="0" >
+                            <tr>
+                                <td class="button">
+                                    <a href="{{var this.getUrl($store,'customer/account/confirm/',[_query:[id:$customer.id,key:$customer.confirmation,back_url:$back_url],_nosid:1])}}" target="_blank" >
+                                        {{trans "Verify My Email"}}
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+            <!--End Button Message email-->
+            <table class="link-to-verify" width="100%" >
+                <tr>
+                    <td>
+                        <p>Or click this link to verify</p>
+                        <a class="link" href="#" >{{var this.getUrl($store,'customer/account/confirm/',[_query:[id:$customer.id,key:$customer.confirmation,back_url:$back_url],_nosid:1])}}</a
+                        >
+                    </td>
+                </tr>
+            </table>
+            <!--End Link To Verify-->
+            <table class="sincerely" width="100%">
+                <tr>
+                    <td>
+                        <p>{{trans "Sincerely"}},</p>
+                        <p
+                                class="signature"
+                        >
+                            <b>{{var store.frontend_name}}</b>
+                        </p>
+                    </td>
+                </tr>
+            </table>
+            <!--End Sincerely-->
+        </td>
+    </tr>
+</table>
+<!--End main table-->
+{{template config_path="design/email/footer_template"}}

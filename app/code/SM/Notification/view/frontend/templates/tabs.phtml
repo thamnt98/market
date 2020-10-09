@@ -1,0 +1,37 @@
+<?php
+/** @var \SM\Notification\Block\Customer\Tabs $block */
+?>
+
+<div class="item title <?= $block->checkTabActive('all') ?>">
+    <a class="switch" href="<?= $block->getUrl("notification", ['tab' => 'all']) ?>"><?= __('All') ?></a>
+</div>
+<?php foreach ($block->getEventTypeList() as $event => $data) : ?>
+    <div class="item title <?= $block->checkTabActive($event) ?>">
+        <a class="switch"
+           href="<?= $block->getUrl("notification", ['tab' => $event]) ?>"><?= $data['name'] ?? $event ?></a>
+    </div>
+<?php endforeach; ?>
+
+<script>
+    require(['jquery'],function ($) {
+        if (typeof dataLayerSourceObjects !== 'undefined') {
+            $('.item.title .switch').on('click', function () {
+                let title = $(this).text();
+                window.dataLayer = window.dataLayer || [];
+                window.dataLayer.push({
+                    'event': 'notification_menu',
+                    'uniqueUserID': dataLayerSourceObjects.customer.uniqueUserID,
+                    'userID': dataLayerSourceObjects.customer.userID,
+                    'customerID': dataLayerSourceObjects.customer.customerID,
+                    'customerType': dataLayerSourceObjects.customer.customerType,
+                    'loyalty': dataLayerSourceObjects.customer.loyalty,
+                    'customerStatus': dataLayerSourceObjects.customer.customerStatus,
+                    'loginType': dataLayerSourceObjects.customer.loginType,
+                    'store_name': dataLayerSourceObjects.customer.storeName,
+                    'store_ID': dataLayerSourceObjects.customer.storeID,
+                    'menu_name': title
+                })
+            })
+        }
+    })
+</script>

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category SM
+ * @package SM_TodayDeal
+ * @license     http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ *
+ * @author      Chinhvd <chinhvd@smartosc.com>
+ *
+ * @copyright   Copyright (c) SmartOSC. All rights reserved.
+ * @url http://www.smartosc.com/
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="page.main.title" remove="true" />
+        <referenceContainer name="main.content" htmlTag="main" htmlClass="page-main-full-width" />
+        <referenceContainer name="content" >
+            <block class="SM\TodayDeal\Block\View"
+                   name="post.view"
+                   template="SM_TodayDeal::post/view.phtml" />
+        </referenceContainer>
+    </body>
+</page>

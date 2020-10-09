@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<!--
+  ~ @project    ct-corp-transmart
+  ~ @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+  ~ @author     Dung Nguyen My <dungnm@smartosc.com>
+  ~ @copyright  Copyright © 2020 SmartOSC. All rights reserved.
+  ~ @url        http://www.smartosc.com
+  -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="sm_jira" translate="label" type="text" sortOrder="140" showInDefault="1" showInWebsite="0" showInStore="0">
+            <label>Jira Service Configuration</label>
+            <tab>transmart</tab>
+            <resource>SM_JiraService::jira_configuration</resource>
+            <group id="account" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Account Login</label>
+                <field id="username" translate="label" type="text" sortOrder="0" showInDefault="1"  showInWebsite="0"
+                       showInStore="0" canRestore="1">
+                    <label>Username</label>
+                </field>
+                <field id="api_token" translate="label" type="text" sortOrder="0" showInDefault="1"  showInWebsite="0"
+                       showInStore="0" canRestore="1">
+                    <label>API Token</label>
+                    <comment>Get on: https://id.atlassian.com/manage-profile/security/api-tokens</comment>
+                </field>
+            </group>
+            <group id="ticket" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Jira Ticket</label>
+                <field id="domain" translate="label" type="text" sortOrder="0" showInDefault="1"  showInWebsite="0"
+                       showInStore="0" canRestore="1">
+                    <label>Jira Server Host</label>
+                </field>
+                <field id="project" translate="label" type="text" sortOrder="0" showInDefault="1"  showInWebsite="0"
+                       showInStore="0" canRestore="1">
+                    <label>Project</label>
+                </field>
+                <field id="assignee" translate="label" type="text" sortOrder="0" showInDefault="1"  showInWebsite="0"
+                       showInStore="0" canRestore="1">
+                    <label>Assignee Name</label>
+                </field>
+                <field id="servicedesk" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Service Desk</label>
+                    <source_model>SM\JiraService\Model\Config\Source\ServiceDesk</source_model>
+                </field>
+                <field id="general" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Request type for General Request</label>
+                    <source_model>SM\JiraService\Model\Config\Source\RequestType</source_model>
+                </field>
+                <field id="return" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Request type for Return Refund</label>
+                    <source_model>SM\JiraService\Model\Config\Source\RequestType</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

@@ -1,0 +1,93 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \Magento\Wishlist\Block\Catalog\Product\View\AddTo\Wishlist $block */
+/** @var \SM\ShoppingList\ViewModel\PDPViewModel $viewModel */
+$product = $block->getProduct();
+$viewModel = $block->getData('shoppingListPDPViewModel');
+$shoppingLists = $viewModel->getShoppingLists();
+$productImage = $viewModel->getProductImage($product);
+$productId = $product->getId();
+$isAddedShoppingList = $viewModel->isAddedShoppingList($productId)? 'true':'false';
+$getAddedItemIdInList = $viewModel->getAddedItemIdInList($productId);
+$shoppingListHelper = $this->helper('SM\ShoppingList\Helper\Data');
+
+?>
+<?php if ($shoppingListHelper->isActiveShoppingList()):?>
+<a class="action towishlist"
+   id="btn-open-add-item"
+   style="cursor: pointer;">
+    <span id="additem-title"><?= $block->escapeHtml(__('Add to Shopping List')) ?></span>
+</a>
+<a class="action towishlist"
+   id="btn-open-remove-item"
+   style="cursor: pointer; display: none;">
+    <span><?= $block->escapeHtml(__('Remove from Shopping List')) ?></span>
+</a>
+
+<div id = "add-item-modal" class="content" style="display: none">
+    <div class="product-info">
+        <img src="<?= $productImage ?>" width="124px" alt="<?= $product->getName()?>"/>
+        <span class="product-name"><?= $block->escapeHtml($product->getName()) ?></span>
+    </div>
+    <form id="form-add-item">
+        <ul class="list-choice" id="list-choice-pdp">
+            <?php
+            /** @var \SM\ShoppingList\Api\Data\ShoppingListDataInterface $list */
+            foreach ($viewModel->getShoppingLists() as $list) :?>
+                <li class="checkbox-custom">
+                    <input type="checkbox" name="selected[]" value="<?= $list->getWishlistId() ?>">
+                    <label><?= $block->escapeHtml($list->getName()) ?></label>
+                </li>
+            <?php endforeach;?>
+        </ul>
+
+        <div class="add-new-wishlist">
+            <a id="open-create-to-add" class="remove-list" style="cursor: pointer">
+                <span><?= $block->escapeHtml(__('Create a List')) ?></span>
+            </a>
+
+            <div id="create-to-add" class="bx-addition-wishlist-name" style="display: none">
+                <label class="label" for="shoppinglist-name-pdp"><?= $block->escapeHtml(__('List Name')) ?></label>
+                <div class="wrap">
+                <input type="text" class="addition-wishlist-name" id="shoppinglist-name-pdp" name="addition_wishlist_name"
+                       placeholder="<?= $block->escapeHtml(__('Type the list name here')) ?>"/>
+                <button type="button" class="add-wishlist-name" id="submit-create-pdp"><span class="apl-ic_plus"><?= $block->escapeHtml(__('Plus')) ?></span></button>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>
+<div id="success-alert-modal" class="content add-success-modal" style="display:none;">
+    <div class="product-info">
+        <img src="<?= $productImage?>" width="124px"  alt="<?= $product->getName() ?>"/>
+        <div class="success-content">
+            <span class="product-name"><?= $block->escapeHtml($product->getName()) ?></span>
+            <h3><?= $block->escapeHtml(__("This item has been added to"))?></h3>
+            <ul id="destination-list" style="list-style-type: none;">
+            </ul>
+        </div>
+    </div>
+    <input type="hidden" data-gtm-pdp="add-to-wishlist">
+</div>
+
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "ItemAdd": {
+                "create_list_url":"<?= $block->getUrl("shoppinglist/ajax/createlist") ?>",
+                "product_id":"<?= $productId ?>",
+                "add_item_url":"<?= $block->getUrl("shoppinglist/ajax/additems") ?>",
+                "store_id":"<?= $viewModel->getStoreId() ?>",
+                "remove_item_url":"<?= $block->getUrl("shoppinglist/ajax/removeitem")?>",
+                "is_added_shopping_list":"<?php echo $isAddedShoppingList ?>",
+                "store_id":"<?= $viewModel->getStoreId() ?>"
+            }
+        }
+    }
+</script>
+<?php endif;?>

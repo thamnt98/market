@@ -1,0 +1,554 @@
+<?xml version="1.0"?>
+<!--
+/**
+* Copyright 2019 aheadWorks. All rights reserved.
+* See LICENSE.txt for license details.
+*/
+-->
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="SM_Checkout::css/daterangepicker.css"/>
+        <css src="SM_Checkout::css/style.css"/>
+    </head>
+    <body>
+        <referenceContainer name="header.panel" remove="true" />
+        <referenceBlock name="header-wrapper" remove="true" />
+        <referenceBlock name="page.main.title" remove="true" />
+        <referenceBlock name="navigation.sections" remove="true" />
+        <referenceContainer name="page.wrapper">
+            <container name="checkout.header.container" as="checkout_header_container" label="Checkout Page Header Container" htmlTag="header" htmlClass="page-header" before="main.content">
+                <container name="checkout.header.wrapper" label="Checkout Page Header" as="checkout_header_wrapper" htmlTag="div" htmlClass="header content"/>
+            </container>
+        </referenceContainer>
+        <move element="logo" destination="checkout.header.wrapper"/>
+        <move element="breadcrumbs" destination="content" before="-" />
+        <referenceBlock name="breadcrumbs">
+            <action method="addCrumb">
+                <argument name="crumbName" xsi:type="string">Home</argument>
+                <argument name="crumbInfo" xsi:type="array">
+                    <item name="title" xsi:type="string">Home</item>
+                    <item name="label" xsi:type="string">Home</item>
+                    <item name="link" xsi:type="string">/</item>
+                </argument>
+            </action>
+            <action method="addCrumb">
+                <argument name="crumbName" xsi:type="string">Shopping Cart</argument>
+                <argument name="crumbInfo" xsi:type="array">
+                    <item name="title" xsi:type="string">Shopping Cart</item>
+                    <item name="label" xsi:type="string" translate="true">Shopping Cart</item>
+                    <item name="link" xsi:type="string">/checkout/cart</item>
+                </argument>
+            </action>
+            <action method="addCrumb">
+                <argument name="crumbName" xsi:type="string">Check Out</argument>
+                <argument name="crumbInfo" xsi:type="array">
+                    <item name="title" xsi:type="string">Check Out</item>
+                    <item name="label" xsi:type="string">Check Out</item>
+                </argument>
+            </action>
+        </referenceBlock>
+        <referenceContainer name="content">
+            <block class="SM\Checkout\Block\Onepage" name="checkout.root" template="SM_Checkout::checkout.phtml"
+                   cacheable="false">
+                <arguments>
+                    <argument name="jsLayout" xsi:type="array">
+                        <item name="types" xsi:type="array">
+                            <item name="form.input" xsi:type="array">
+                                <item name="component" xsi:type="string">Magento_Ui/js/form/element/abstract</item>
+                                <item name="config" xsi:type="array">
+                                    <item name="provider" xsi:type="string">checkoutProvider</item>
+                                    <item name="template" xsi:type="string">ui/form/field</item>
+                                    <item name="elementTmpl" xsi:type="string">ui/form/element/input</item>
+                                </item>
+                            </item>
+                        </item>
+                        <item name="components" xsi:type="array">
+                            <item name="trans-checkout" xsi:type="array">
+                                <item name="component" xsi:type="string">SM_Checkout/js/view/onepage</item>
+                                <item name="config" xsi:type="array">
+                                    <item name="template" xsi:type="string">SM_Checkout/onepage</item>
+                                </item>
+                                <item name="children" xsi:type="array">
+                                    <item name="trans-block-header" xsi:type="array">
+                                        <item name="component" xsi:type="string">SM_Checkout/js/view/header</item>
+                                        <item name="displayArea" xsi:type="string">trans-block-header</item>
+                                        <item name="config" xsi:type="array">
+                                            <item name="template" xsi:type="string">SM_Checkout/view/header</item>
+                                        </item>
+                                    </item>
+                                    <item name="trans-block-main-checkout" xsi:type="array">
+                                        <item name="component" xsi:type="string">uiComponent</item>
+                                        <item name="displayArea" xsi:type="string">trans-block-main-checkout</item>
+                                        <item name="children" xsi:type="array">
+                                            <item name="shipping-block" xsi:type="array">
+                                                <item name="component" xsi:type="string">SM_Checkout/js/view/shipping-step</item>
+                                                <item name="sortOrder" xsi:type="string">1</item>
+                                                <item name="config" xsi:type="array">
+                                                    <item name="template" xsi:type="string">SM_Checkout/shipping</item>
+                                                </item>
+                                                <item name="children" xsi:type="array">
+                                                    <item name="step-config" xsi:type="array">
+                                                        <item name="component" xsi:type="string">uiComponent</item>
+                                                        <item name="children" xsi:type="array">
+                                                            <item name="shipping-rates-validation" xsi:type="array">
+                                                                <item name="children" xsi:type="array">
+                                                                    <!--Step configuration components-->
+                                                                </item>
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                    <item name="delivery-type" xsi:type="array">
+                                                        <item name="component" xsi:type="string">
+                                                            SM_Checkout/js/view/delivery-type
+                                                        </item>
+                                                        <item name="displayArea" xsi:type="string">delivery-type</item>
+                                                    </item>
+                                                    <item name="address-list" xsi:type="array">
+                                                        <item name="component" xsi:type="string">
+                                                            SM_Checkout/js/view/shipping-address/list
+                                                        </item>
+                                                        <item name="displayArea" xsi:type="string">address-list</item>
+                                                    </item>
+                                                    <item name="delivery-address-list" xsi:type="array">
+                                                        <item name="component" xsi:type="string">
+                                                            SM_Checkout/js/view/shipping-address/delivery-address-list
+                                                        </item>
+                                                        <item name="config" xsi:type="array">
+                                                            <item name="template" xsi:type="string">
+                                                                SM_Checkout/shipping-address/delivery-address-list
+                                                            </item>
+                                                        </item>
+                                                        <item name="displayArea" xsi:type="string">
+                                                            delivery-address-list
+                                                        </item>
+                                                    </item>
+                                                    <item name="pickup-address" xsi:type="array">
+                                                        <item name="component" xsi:type="string">
+                                                            SM_Checkout/js/view/shipping-address/pickup-address
+                                                        </item>
+                                                        <item name="config" xsi:type="array">
+                                                            <item name="template" xsi:type="string">
+                                                                SM_Checkout/shipping-address/pickup-address
+                                                            </item>
+                                                        </item>
+                                                        <item name="displayArea" xsi:type="string">pickup-address</item>
+                                                        <item name="children" xsi:type="array">
+
+                                                        </item>
+                                                    </item>
+                                                    <item name="store-pickup-list" xsi:type="array">
+                                                        <item name="component" xsi:type="string">
+                                                            SM_Checkout/js/view/shipping-address/store-pickup-list
+                                                        </item>
+                                                        <item name="config" xsi:type="array">
+                                                            <item name="template" xsi:type="string">
+                                                                SM_Checkout/shipping-address/store-pickup-list
+                                                            </item>
+                                                        </item>
+                                                        <item name="displayArea" xsi:type="string">
+                                                            store-pickup-list
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                            <item name="trans-cart-items-block" xsi:type="array">
+                                                <item name="component" xsi:type="string">SM_Checkout/js/view/shipping-step</item>
+                                                <item name="sortOrder" xsi:type="string">2</item>
+                                                <item name="config" xsi:type="array">
+                                                    <item name="template" xsi:type="string">SM_Checkout/view/cart-items-render</item>
+                                                </item>
+                                                <item name="children" xsi:type="array">
+                                                    <item name="itemsBefore" xsi:type="array">
+                                                        <item name="component" xsi:type="string">uiComponent</item>
+                                                        <item name="displayArea" xsi:type="string">itemsBefore</item>
+                                                        <item name="children" xsi:type="array">
+
+                                                        </item>
+                                                    </item>
+                                                    <item name="cart_items" xsi:type="array">
+                                                        <item name="component" xsi:type="string">
+                                                            Magento_Checkout/js/view/summary/cart-items
+                                                        </item>
+                                                        <item name="displayArea" xsi:type="string">cartItems</item>
+                                                        <item name="config" xsi:type="array">
+                                                            <item name="template" xsi:type="string">
+                                                                SM_Checkout/view/cart-items/cart-items
+                                                            </item>
+                                                        </item>
+                                                        <item name="children" xsi:type="array">
+                                                            <item name="details" xsi:type="array">
+                                                                <item name="component" xsi:type="string">
+                                                                    SM_Checkout/js/view/cart-items/details
+                                                                </item>
+                                                                <item name="config" xsi:type="array">
+                                                                    <item name="template" xsi:type="string">
+                                                                        SM_Checkout/view/cart-items/details
+                                                                    </item>
+                                                                </item>
+                                                                <item name="children" xsi:type="array">
+                                                                    <item name="thumbnail" xsi:type="array">
+                                                                        <item name="component" xsi:type="string">
+                                                                            SM_Checkout/js/view/cart-items/thumbnail
+                                                                        </item>
+                                                                        <item name="config" xsi:type="array">
+                                                                            <item name="template" xsi:type="string">
+                                                                                SM_Checkout/view/cart-items/thumbnail
+                                                                            </item>
+                                                                        </item>
+                                                                        <item name="displayArea" xsi:type="string">
+                                                                            before_details
+                                                                        </item>
+                                                                    </item>
+                                                                    <item name="subtotal" xsi:type="array">
+                                                                        <item name="component" xsi:type="string">
+                                                                            SM_Checkout/js/view/cart-items/subtotal
+                                                                        </item>
+                                                                        <item name="displayArea" xsi:type="string">
+                                                                            after_details
+                                                                        </item>
+                                                                    </item>
+                                                                    <item name="shipping-type" xsi:type="array">
+                                                                        <item name="component" xsi:type="string">
+                                                                            SM_Checkout/js/view/cart-items/shipping-type
+                                                                        </item>
+                                                                        <item name="config" xsi:type="array">
+                                                                            <item name="template" xsi:type="string">
+                                                                                SM_Checkout/view/cart-items/shipping-type
+                                                                            </item>
+                                                                        </item>
+                                                                        <item name="displayArea" xsi:type="string">
+                                                                            shipping_type
+                                                                        </item>
+                                                                    </item>
+                                                                    <item name="message" xsi:type="array">
+                                                                        <item name="component" xsi:type="string">
+                                                                            Magento_Checkout/js/view/summary/item/details/message
+                                                                        </item>
+                                                                        <item name="displayArea" xsi:type="string">
+                                                                            item_message
+                                                                        </item>
+                                                                    </item>
+                                                                </item>
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                    <item name="itemsAfter" xsi:type="array">
+                                                        <item name="component" xsi:type="string">uiComponent</item>
+                                                        <item name="displayArea" xsi:type="string">itemsAfter</item>
+                                                        <item name="children" xsi:type="array">
+                                                            <!-- merge your components here -->
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                            <item name="trans-order-review" xsi:type="array">
+                                                <item name="component" xsi:type="string">uiComponent</item>
+                                                <item name="sortOrder" xsi:type="string">3</item>
+                                                <item name="children" xsi:type="array">
+                                                    <item name="order-summary" xsi:type="array">
+                                                        <item name="component" xsi:type="string">
+                                                            SM_Checkout/js/view/order-summary
+                                                        </item>
+                                                        <item name="config" xsi:type="array">
+                                                            <item name="template" xsi:type="string">
+                                                                SM_Checkout/view/order-summary
+                                                            </item>
+                                                        </item>
+                                                        <item name="sortOrder" xsi:type="string">10</item>
+                                                        <item name="displayArea" xsi:type="string">
+                                                            order-summary
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                            <item name="trans-payment-block" xsi:type="array">
+                                                <item name="component" xsi:type="string">uiComponent</item>
+                                                <item name="sortOrder" xsi:type="string">4</item>
+                                                <item name="children" xsi:type="array">
+                                                    <item name="payment" xsi:type="array">
+                                                        <item name="component" xsi:type="string">
+                                                            SM_Checkout/js/view/payment
+                                                        </item>
+                                                        <item name="config" xsi:type="array">
+                                                            <item name="title" xsi:type="string" translate="true">
+                                                                Payment
+                                                            </item>
+                                                            <item name="sortOrder" xsi:type="string">20</item>
+                                                        </item>
+                                                        <item name="children" xsi:type="array">
+                                                            <item name="renders" xsi:type="array">
+                                                                <item name="component" xsi:type="string">
+                                                                    uiComponent
+                                                                </item>
+                                                                <item name="children" xsi:type="array">
+                                                                    <!-- merge payment method renders here -->
+                                                                </item>
+                                                            </item>
+                                                            <item name="additional-payment-validators"
+                                                                  xsi:type="array">
+                                                                <item name="component" xsi:type="string">
+                                                                    uiComponent
+                                                                </item>
+                                                                <item name="children" xsi:type="array">
+                                                                    <!-- merge payment validators here -->
+                                                                    <item name="email-validator" xsi:type="array">
+                                                                        <item name="component" xsi:type="string">
+                                                                            Magento_Checkout/js/view/payment/email-validator
+                                                                        </item>
+                                                                    </item>
+                                                                </item>
+                                                            </item>
+                                                            <item name="customer-email" xsi:type="array">
+                                                                <item name="component" xsi:type="string">
+                                                                    Magento_Checkout/js/view/form/element/email
+                                                                </item>
+                                                                <item name="displayArea" xsi:type="string">
+                                                                    customer-email
+                                                                </item>
+                                                                <item name="tooltip" xsi:type="array">
+                                                                    <item name="description" xsi:type="string"
+                                                                          translate="true">We'll send your order
+                                                                        confirmation here.
+                                                                    </item>
+                                                                </item>
+                                                                <item name="children" xsi:type="array">
+                                                                    <item name="before-login-form" xsi:type="array">
+                                                                        <item name="component" xsi:type="string">
+                                                                            uiComponent
+                                                                        </item>
+                                                                        <item name="displayArea" xsi:type="string">
+                                                                            before-login-form
+                                                                        </item>
+                                                                        <item name="children" xsi:type="array">
+                                                                            <!-- before login form fields -->
+                                                                        </item>
+                                                                    </item>
+                                                                    <item name="additional-login-form-fields"
+                                                                          xsi:type="array">
+                                                                        <item name="component" xsi:type="string">
+                                                                            uiComponent
+                                                                        </item>
+                                                                        <item name="displayArea" xsi:type="string">
+                                                                            additional-login-form-fields
+                                                                        </item>
+                                                                        <item name="children" xsi:type="array">
+                                                                            <!-- additional login form fields -->
+                                                                        </item>
+                                                                    </item>
+                                                                </item>
+                                                            </item>
+                                                            <item name="beforeMethods" xsi:type="array">
+                                                                <item name="component" xsi:type="string">
+                                                                    uiComponent
+                                                                </item>
+                                                                <item name="displayArea" xsi:type="string">
+                                                                    beforeMethods
+                                                                </item>
+                                                                <item name="children" xsi:type="array">
+                                                                    <!-- merge additional data before payment methods here -->
+                                                                </item>
+                                                                <item name="validation" xsi:type="array">
+                                                                    <item name="validate-select" xsi:type="string">
+                                                                        true
+                                                                    </item>
+                                                                </item>
+                                                                <!-- Value of region_id field is filtered by the value of county_id attribute -->
+                                                                <item name="filterBy" xsi:type="array">
+                                                                    <item name="target" xsi:type="string">
+                                                                        ${ $.provider }:${ $.parentScope }.country_id
+                                                                    </item>
+                                                                    <item name="field" xsi:type="string">
+                                                                        country_id
+                                                                    </item>
+                                                                </item>
+                                                            </item>
+                                                            <item name="payments-list" xsi:type="array">
+                                                                <item name="component" xsi:type="string">
+                                                                    SM_Checkout/js/view/payment/list
+                                                                </item>
+                                                                <item name="displayArea" xsi:type="string">
+                                                                    payments-list
+                                                                </item>
+                                                            </item>
+                                                            <!-- merge your payment methods here -->
+                                                            <item name="afterMethods" xsi:type="array">
+                                                                <item name="component" xsi:type="string">
+                                                                    uiComponent
+                                                                </item>
+                                                                <item name="displayArea" xsi:type="string">
+                                                                    afterMethods
+                                                                </item>
+                                                                <item name="children" xsi:type="array">
+                                                                    <!-- merge additional data after payment methods here -->
+                                                                </item>
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                    <item name="trans-block-cart-totals" xsi:type="array">
+                                        <item name="component" xsi:type="string">uiComponent</item>
+                                        <item name="displayArea" xsi:type="string">trans-block-cart-totals</item>
+                                        <item name="children" xsi:type="array">
+                                            <item name="sidebar" xsi:type="array">
+                                                <item name="sortOrder" xsi:type="string">50</item>
+                                                <item name="component" xsi:type="string">SM_Checkout/js/view/sidebar
+                                                </item>
+                                                <item name="displayArea" xsi:type="string">sidebar</item>
+                                                <item name="config" xsi:type="array">
+                                                    <item name="template" xsi:type="string">SM_Checkout/sidebar</item>
+                                                </item>
+                                                <item name="children" xsi:type="array">
+                                                    <item name="placeorder" xsi:type="array">
+                                                        <item name="component" xsi:type="string">
+                                                            SM_Checkout/js/view/placeorder
+                                                        </item>
+                                                        <item name="displayArea" xsi:type="string">placeorder</item>
+                                                    </item>
+                                                    <item name="summary" xsi:type="array">
+                                                        <item name="component" xsi:type="string">
+                                                            SM_Checkout/js/view/summary
+                                                        </item>
+                                                        <item name="displayArea" xsi:type="string">summary</item>
+                                                        <item name="config" xsi:type="array">
+                                                            <item name="template" xsi:type="string">
+                                                                SM_Checkout/summary
+                                                            </item>
+                                                        </item>
+                                                        <item name="children" xsi:type="array">
+                                                            <item name="virtual_order_detail" xsi:type="array">
+                                                                <item name="component" xsi:type="string">
+                                                                    SM_Checkout/js/view/summary/virtual-order-detail
+                                                                </item>
+                                                                <item name="displayArea" xsi:type="string">virtual_order_detail</item>
+                                                                <item name="config" xsi:type="array">
+                                                                    <item name="template" xsi:type="string">
+                                                                        SM_Checkout/summary/virtual-order-detail
+                                                                    </item>
+                                                                </item>
+                                                            </item>
+                                                            <item name="voucher" xsi:type="array">
+                                                                <item name="component" xsi:type="string">
+                                                                    SM_Checkout/js/view/voucher
+                                                                </item>
+                                                                <item name="displayArea" xsi:type="string">voucher</item>
+                                                                <item name="config" xsi:type="array">
+                                                                    <item name="template" xsi:type="string">
+                                                                        SM_Checkout/voucher
+                                                                    </item>
+                                                                </item>
+                                                            </item>
+                                                            <item name="totals" xsi:type="array">
+                                                                <item name="component" xsi:type="string">
+                                                                    SM_Checkout/js/view/summary/totals
+                                                                </item>
+                                                                <item name="displayArea" xsi:type="string">totals</item>
+                                                                <item name="config" xsi:type="array">
+                                                                    <item name="template" xsi:type="string">
+                                                                        SM_Checkout/summary/totals
+                                                                    </item>
+                                                                </item>
+                                                                <item name="children" xsi:type="array">
+                                                                    <!-- sort order for this totals is configured on admin panel-->
+                                                                    <!-- Stores->Configuration->SALES->Sales->General->Checkout Totals Sort Order -->
+                                                                    <item name="subtotal" xsi:type="array">
+                                                                        <item name="component" xsi:type="string">
+                                                                            SM_Checkout/js/view/summary/subtotal
+                                                                        </item>
+                                                                        <item name="config" xsi:type="array">
+                                                                            <item name="title" xsi:type="string"
+                                                                                  translate="true">Subtotal
+                                                                            </item>
+                                                                        </item>
+                                                                    </item>
+                                                                    <item name="shipping" xsi:type="array">
+                                                                        <item name="component" xsi:type="string">
+                                                                            SM_Checkout/js/view/summary/shipping
+                                                                        </item>
+                                                                    </item>
+                                                                    <item name="service-fee" xsi:type="array">
+                                                                        <item name="sortOrder" xsi:type="string">999</item>
+                                                                        <item name="component" xsi:type="string">Trans_Sprint/js/view/summary/service-fee</item>
+                                                                        <item name="config" xsi:type="array">
+                                                                            <item name="title" xsi:type="string" translate="true">Service Fee</item>
+                                                                        </item>
+                                                                    </item>
+                                                                    <item name="discount-breakdown" xsi:type="array">
+                                                                        <item name="component"  xsi:type="string">
+                                                                            SM_Checkout/js/view/summary/sales-rule
+                                                                        </item>
+                                                                        <item name="config" xsi:type="array">
+                                                                            <item name="amount" xsi:type="array"/>
+                                                                            <item name="selector" xsi:type="string"/>
+                                                                        </item>
+                                                                    </item>
+                                                                    <item name="preview-order" xsi:type="array">
+                                                                        <item name="component" xsi:type="string">
+                                                                            SM_Checkout/js/view/summary/preview-order
+                                                                        </item>
+                                                                        <item name="config" xsi:type="array">
+                                                                            <item name="template" xsi:type="string">
+                                                                                SM_Checkout/summary/preview-order
+                                                                            </item>
+                                                                        </item>
+                                                                    </item>
+                                                                    <item name="grand-total" xsi:type="array">
+                                                                        <item name="component" xsi:type="string">
+                                                                            SM_Checkout/js/view/summary/grand-total
+                                                                        </item>
+                                                                        <item name="config" xsi:type="array">
+                                                                            <item name="title" xsi:type="string"
+                                                                                  translate="true">Total
+                                                                            </item>
+                                                                        </item>
+                                                                    </item>
+                                                                    <item name="discount" xsi:type="array">
+                                                                        <item name="component" xsi:type="string">
+                                                                            SM_Checkout/js/view/summary/discount
+                                                                        </item>
+                                                                    </item>
+                                                                    <item name="order-details" xsi:type="array">
+                                                                        <item name="component" xsi:type="string">
+                                                                            SM_Checkout/js/view/summary/order-details
+                                                                        </item>
+                                                                        <item name="config" xsi:type="array">
+                                                                            <item name="template" xsi:type="string">
+                                                                                SM_Checkout/summary/order-details
+                                                                            </item>
+                                                                        </item>
+                                                                    </item>
+                                                                </item>
+                                                            </item>
+                                                            <item name="itemsAfter" xsi:type="array">
+                                                                <item name="component" xsi:type="string">uiComponent
+                                                                </item>
+                                                                <item name="children" xsi:type="array">
+                                                                    <!-- merge your components here -->
+                                                                </item>
+                                                            </item>
+                                                        </item>
+                                                    </item>
+                                                    <!--items view and giftcard in here -->
+                                                </item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                            <item name="checkoutProvider" xsi:type="array">
+                                <item name="component" xsi:type="string">uiComponent</item>
+                            </item>
+                        </item>
+                    </argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="page.messages">
+            <block class="Magento\Framework\View\Element\Messages" name="messages" as="messages" template="Magento_Theme::messages.phtml" cacheable="false"/>
+        </referenceContainer>
+    </body>
+</page>

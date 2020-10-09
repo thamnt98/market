@@ -1,0 +1,115 @@
+// /**
+//  * Copyright © Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+
+//
+//  Buttons
+//  ---------------------------------------------
+
+@button__font-weight: @font-weight__semibold;
+@button__disabled__opacity: 1;
+
+//  Default = secondary button
+@button__background: transparent;
+@button__font-size: 16px;
+@button__font-family: @font-family-SF-UI-Display-Semibold;
+@button__color: @c-tsm-bright-orange;
+@button__border: 2px solid @c-tsm-bright-orange;
+@button__padding: 10px 15px;
+@button__line-height: 100%;
+@button__hover__border: 2px solid @c-tsm-bright-orange;
+@button__hover__color: @c-tsm-bright-orange;
+@button__hover__background: transparent;
+@button__active__color: @c-tsm-bright-orange;
+@button__active__border: 2px solid @c-tsm-bright-orange;
+@button__active__background: transparent;
+
+//  Primary button
+@button-primary__font-family: @font-family-SF-UI-Display-Semibold;
+@button-primary__font-size: 16px;
+@button-primary__border: none;
+@button-primary__font-weight: @font-weight__semibold;
+@button-primary__color: @color-white;
+@button-primary__padding: 12px 15px;
+@button-primary__line-height: 100%;
+
+@button-primary__hover__border: none;
+@button-primary__hover__color: @color-white;
+
+@button-primary__active__background: @link__hover__color;
+@button-primary__active__border: none;
+@button-primary__active__color: @color-white;
+
+@button-primary__gradient-color-start: @c-tsm-bright-orange;
+@button-primary__gradient-color-end: @c-tsm-yellow;
+
+@button-primary__hover__gradient-color-start: @c-tsm-bright-orange;
+@button-primary__hover__gradient-color-end:@c-tsm-yellow;
+
+@button-primary__active__gradient-color-start: @c-tsm-bright-orange;
+@button-primary__active__gradient-color-end: @c-tsm-yellow;
+
+//  Gradient button
+@button-primary__gradient: true; // [true|false] - button has a gradient background
+@button-primary__gradient-direction: vertical; // button gradient direction if button has a gradient background
+
+//  Button with icon
+@button-icon__line-height: @icon-font__line-height;
+
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+
+    //  Using buttons mixins
+    button,
+    a.action.primary {
+        .lib-css(border-radius, @button__border-radius);
+    }
+
+    a.action.primary {
+        .lib-link-as-button();
+    }
+
+    .action.primary {
+        .lib-button-primary();
+        .lib-css(box-shadow, 0 2px 4px 0 rgba(106,105,104,0.33));
+        min-width: 134px;
+        height: 40px;
+        text-align: center;
+
+        &.disabled {
+            background: @c-tsm-grey5;
+        }
+
+        &:hover {
+            opacity: 0.9;
+        }
+    }
+
+    .action.secondary {
+        min-width: 134px;
+        height: 40px;
+        text-align: center;
+
+        &.disabled {
+            border-color: @c-tsm-grey5;
+            color: @c-tsm-grey5;
+        }
+
+        &:hover {
+            opacity: 0.9;
+        }
+    }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .action.primary {
+        background: @c-tsm-bright-orange;
+        background-image: none;
+    }
+}
+

@@ -1,0 +1,76 @@
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_Installation
+ *
+ * Date: April, 21 2020
+ * Time: 2:47 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<!-- ko if: getTitle() -->
+<div class="label" for="installation-field">
+    <span class="title" data-bind="text: getTitle()" />
+    <span class="dpl-tooltip">
+            <img data-bind="
+                attr: {
+                    'src': getTooltipImg(),
+                    'width': '13',
+                    'height': '16'
+                }
+            " />
+            <span class="tooltip-content" role="tooltip" data-bind="i18n: tooltip" />
+    </span>
+</div>
+<!-- /ko -->
+<div data-bind="attr: {class: 'installation-content' + (isChecked() ? ' active' : '')}">
+    <div class="field is-installation">
+        <div class="control checkbox-custom">
+            <input type="checkbox"
+                   data-bind="
+                            attr: {
+                                'name': usedFieldName + (itemId ? itemId : ''),
+                                'title': title,
+                                'checked': isChecked()
+                            },
+                            event: { change: function(data, event) { changeUsed(event) } }
+                       "
+                   class="checkbox installation-field" />
+            <label data-bind="
+                      i18n: getInstallationFeeText(),
+                      event: { click: function(data, event) { changeUsed(event) } }
+                  "
+            />
+        </div>
+    </div>
+    <div class="field installation-note" data-bind="visible: isChecked()">
+        <div class="control">
+                <textarea data-bind="
+                              attr: {
+                                  'name': noteFieldName + (itemId ? itemId : ''),
+                                  'enable': isChecked(),
+                                  'placeholder': getNotePlaceholder()
+                              },
+                              value: defaultNote,
+                              valueUpdate: 'afterkeydown',
+                              event: { change: function(data, event) { saveNote(event) } }
+                          "
+                          class="text-area installation-note-field"
+                          maxlength="250"
+                          rows="4"
+                          cols="50"></textarea>
+            <div class="note-validate-text" data-bind="text: $t('250 characters maximum')"/>
+        </div>
+    </div>
+</div>
+<!-- ko if: hasRemovePopup -->
+<div class="installation-modal-remove" style="display: none">
+    <div class="modal-content">
+        <div data-bind="text: $t('Are you sure want to remove ' + getFeeText() + ' installation?')"></div>
+        <div data-bind="text: $t('Your note will be automatic removed.')"></div>
+    </div>
+</div>
+<!-- /ko -->

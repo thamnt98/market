@@ -1,0 +1,44 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * @var \Magento\Wishlist\Block\Link $block
+ */
+
+$shoppingListHelper = $this->helper('SM\ShoppingList\Helper\Data');
+
+?>
+<?php if ($shoppingListHelper->isActiveShoppingList()):?>
+<div class="navbar-wishlist navbar-cart jsNavbarWishlist" data-bind="scope: 'wishlist'" data-block="sub-wishlist">
+    <a href="<?= $block->escapeUrl($block->getHref()) ?>" class="btn-icon jsNavbarWishlistButton">
+        <span class="icon ic-wishlist">
+            <!-- ko if: getWishlistCounter() > 0 -->
+            <span class="counter qty empty"
+                  data-bind="css: { empty: !!getWishlistCounter() == false && !isLoading() }, blockLoader: isLoading">
+                <span class="counter-number"><!-- ko text: getWishlistCounter() --><!-- /ko --></span>
+                <span class="counter-label"><!-- ko text: getWishlistCounter() --><!-- /ko --></span>
+            </span>
+            <!-- /ko -->
+        </span>
+    </a>
+</div>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_Ui/js/core/app": {
+                "components": {
+                    "wishlist": {
+                        "component": "Magento_Wishlist/js/view/wishlist"
+                    }
+                }
+            },
+            "Magento_Ui/js/block-loader": "<?= $block->escapeJs(
+                $block->escapeUrl($block->getViewFileUrl('images/loader-1.gif'))
+            ) ?>"
+        }
+    }
+</script>
+<?php endif;?>

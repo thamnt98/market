@@ -1,0 +1,70 @@
+<?php
+/** @var \SM\ShoppingList\Block\MyList\Listing $block */
+$shoppingLists = $block->getShoppingLists();
+?>
+<div class="shopping-lists">
+    <div class="product data items">
+        <div class="item title">
+            <a class="switch" href="<?= $block->getUrl("*") ?>"><?= $block->escapeHtml(__('My Favorites')) ?></a>
+        </div>
+        <div class="item title active">
+            <a class="switch"><?= $block->escapeHtml(__('My Lists')) ?></a>
+        </div>
+        <div id="tab-mylists" class="item content" data-role="content">
+            <?php if (count($shoppingLists) > 1): ?>
+                <div class="mylists-grid wishlist">
+                    <ol class="mylists-items" id="mylists-lists">
+                        <?php
+                        /** @var \SM\ShoppingList\Api\Data\ShoppingListDataInterface $list */
+                        foreach ($shoppingLists as $list): ?>
+                        <?php if (!$list->getIsDefault()) :?>
+                        <li class="mylists-item" id="item_<?= $block->escapeHtmlAttr($list->getWishlistId()) ?>">
+                            <div class="mylists-item-info">
+                                <div class=mylists-item-header">
+                                    <h5 class="mylists-title"><?= $list->getName() ?></h5>
+
+                                    <?php /** @var \SM\ShoppingList\Block\Toolbar $settingBlock */
+                                    $settingBlock = $block->getChildBlock("customer.shoppinglist.mylists.settings")
+                                    ?>
+                                    <?= $settingBlock->setShoppingList($list)->toHtml() ?>
+
+                                </div>
+                            </div>
+                            <div class="mylists-item-content">
+                                <a class="mylists preview-product" href="<?= $block->getUrl("*/*/detail", ["id" => $list->getWishlistId()])?>">
+                                    <?php
+                                    foreach ($list->getItems() as $key => $item): ?>
+                                    <?php
+                                        if ($key > 3) {
+                                            break;
+                                        }
+                                        ?>
+                                        <img src="<?= $item->getCustomAttribute('product_image')->getValue()?>" height="80px"  alt="<?= $list->getName()?>">
+                                    <?php endforeach; ?>
+
+                                    <?php if (count($list->getItems()) == 0): ?>
+                                        <img src="<?= $block->getViewFileUrl('images/shopping-list-empty.png')?>" height="80px"/>
+                                        <h4 style="display: inline-flex; align-items: center;"><?= $block->escapeHtml(__('This list is still empty'))?></h4>
+                                    <?php elseif (count($list->getItems()) > 4): ?>
+                                        <span class="extra-product-count"><?= $block->escapeHtml(__('+ ' . (count($list->getItems()) - 4) . ' more products')) ?></span>
+                                    <?php endif;?>
+                                </a>
+                            </div>
+                        </li>
+                        <?php endif;?>
+                        <?php endforeach; ?>
+                    </ol>
+                </div>
+            <?php else: ?>
+                <div class="no-route shopping-list-empty">
+                    <div class="no-route-info">
+                        <img src="<?=$block->getViewFileUrl('images/shopping-list-empty.png')?>" alt="Your list is still empty" width="401"/>
+                        <h4><?= $block->escapeHtml(__('You haven’t made any lists yet.')) ?><br/>
+                            <?= $block->escapeHtml(__('Create your lists and save your favorite products!')) ?>
+                        </h4>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</div>

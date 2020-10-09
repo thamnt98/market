@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table comment="Mageplaza Bannerslider Banner" engine="innodb" name="mageplaza_bannerslider_banner" resource="default">
+        <column xsi:type="text" name="description" nullable="true" comment="Description"/>
+        <column xsi:type="varchar" name="sub_title" nullable="true" comment="Sub Title"/>
+        <column xsi:type="int" name="promo_id" nullable="true" comment="Promotion Id"/>
+        <column xsi:type="varchar" length="255" name="promo_name" nullable="true" comment="Promotion Name"/>
+        <column xsi:type="varchar" length="255" name="promo_creative" nullable="true" comment="Promotion Creative"/>
+        <column xsi:type="int" name="promo_position" padding="10" unsigned="true" nullable="true" default="0"
+                comment="Promotion Position"/>
+    </table>
+</schema>

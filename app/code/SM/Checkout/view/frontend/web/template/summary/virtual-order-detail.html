@@ -1,0 +1,10 @@
+<span data-bind="i18n: 'Order Details'" class="title"></span>
+<table class="data table table-totals order-digital-details">
+    <caption class="table-caption" data-bind="i18n: 'Order Details'"></caption>
+    <tbody data-bind="foreach: digitalData">
+        <tr class="digital-row">
+            <th class="mark"><span data-bind="text: $data.label"></span></th>
+            <td class="amount"><span data-bind="text: $data.value"></span></td>
+        </tr>
+    </tbody>
+</table>

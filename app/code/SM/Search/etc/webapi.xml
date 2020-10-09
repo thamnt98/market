@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <!-- Search -->
+    <route url="/V1/search/mine" method="GET">
+        <service class="SM\Search\Api\SearchInterface" method="search"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <!-- Latest search -->
+    <route url="/V1/search/mine/latest-search" method="GET">
+        <service class="SM\Search\Api\Repository\SearchQueryPersonalRepositoryInterface" method="getLatest"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/search/mine/delete-search/:queryText" method="DELETE">
+        <service class="SM\Search\Api\Repository\SearchQueryPersonalRepositoryInterface" method="deleteOne"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/search/mine/delete-search/all" method="DELETE">
+        <service class="SM\Search\Api\Repository\SearchQueryPersonalRepositoryInterface" method="deleteAll"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <!-- Popular search -->
+    <route url="/V1/search/popular-search" method="GET">
+        <service class="SM\Search\Api\Repository\SearchQueryRepositoryInterface" method="getPopular"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+    <route url="/V1/search/popular-search/category/:categoryId" method="GET">
+        <service class="SM\Search\Api\Repository\SearchQueryCategoryRepositoryInterface" method="getPopular"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <!-- Suggestion search -->
+    <route url="/V1/search/suggestion" method="GET">
+        <service class="SM\Search\Api\SearchInterface" method="suggest"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+
+    <!-- Product in search no result page    -->
+    <route url="/V1/search/no-result/product" method="GET">
+        <service class="SM\Search\Api\SearchInterface" method="getSuggestProductOnNoResult"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+</routes>

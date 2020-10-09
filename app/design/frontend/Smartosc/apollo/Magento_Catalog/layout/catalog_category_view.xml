@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <container name="ajax.messages">
+            <container name="page.messages" htmlTag="div" htmlClass="page messages">
+                <block class="Magento\Framework\View\Element\Template" name="ajax.message.placeholder" template="Magento_Theme::html/messages.phtml"/>
+                <block class="Magento\Framework\View\Element\Messages" name="messages" as="messages" template="Magento_Theme::messages.phtml"/>
+            </container>
+        </container>
+        <referenceBlock name="page.main.title" remove="true"/>
+        <referenceContainer name="columns.top" remove="true"/>
+        <move element="category.image" destination="content" before="-" />
+        <move element="category.view.container" destination="content" before="-" />
+        <move element="category.description" destination="content" after="category.image" />
+
+        <referenceBlock name="sidebar.additional" remove="true" />
+    </body>
+</page>

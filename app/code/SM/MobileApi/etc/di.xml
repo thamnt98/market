@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Api Model    -->
+    <preference for="SM\MobileApi\Api\HomeInterface" type="SM\MobileApi\Model\HomePage"/>
+    <preference for="SM\MobileApi\Api\ProductInterface" type="SM\MobileApi\Model\Product"/>
+    <preference for="SM\MobileApi\Api\ReOrderQuicklyInterface" type="SM\MobileApi\Model\ReOrderQuickly"/>
+    <preference for="SM\MobileApi\Api\PromoInterface" type="SM\MobileApi\Model\Promo"/>
+    <preference for="SM\MobileApi\Api\Data\Product\SearchInterface" type="SM\MobileApi\Model\Data\Product\Search"/>
+    <preference for="SM\MobileApi\Api\SearchProductInterface" type="SM\MobileApi\Model\Product\Search"/>
+    <preference for="SM\MobileApi\Api\ReviewInterface" type="SM\MobileApi\Model\Review"/>
+    <preference for="SM\MobileApi\Api\CmsManagementInterface" type="SM\MobileApi\Model\CmsManagement"/>
+    <preference for="SM\MobileApi\Api\Data\CartItemInterface" type="SM\MobileApi\Model\Data\CartItem"/>
+
+    <!-- Api Data   -->
+    <preference for="SM\MobileApi\Api\Data\GTM\GTMCartInterface" type="SM\MobileApi\Model\Data\GTM\GTMCart"/>
+    <preference for="SM\MobileApi\Api\Data\GTM\GTMCheckoutInterface" type="SM\MobileApi\Model\Data\GTM\GTMCheckout"/>
+
+    <preference for="SM\MobileApi\Api\Data\Cms\BlockContentInterface" type="SM\MobileApi\Model\Data\Cms\BlockContent"/>
+    <preference for="SM\MobileApi\Api\Data\Catalog\ProductFilterInterface"
+                type="SM\MobileApi\Model\Data\Catalog\ProductFilter"/>
+    <preference for="SM\MobileApi\Api\Data\Catalog\ProductFilterItemInterface"
+                type="SM\MobileApi\Model\Data\Catalog\ProductFilterItem"/>
+    <preference for="SM\MobileApi\Api\Data\Catalog\ProductInterface"
+                type="SM\MobileApi\Model\Data\Catalog\Product"/>
+    <preference for="SM\MobileApi\Api\Data\Catalog\ProductToolbarInterface"
+                type="SM\MobileApi\Model\Data\Catalog\ProductToolbar"/>
+    <preference for="SM\MobileApi\Api\Data\Catalog\ProductToolbarOrderInterface"
+                type="SM\MobileApi\Model\Data\Catalog\ProductToolbarOrder"/>
+    <preference for="SM\MobileApi\Api\StoreInterface"
+                type="SM\MobileApi\Model\Store"/>
+    <preference for="SM\MobileApi\Api\Data\ProductLabel\ProductLabelInterface"
+                type="SM\MobileApi\Model\Data\ProductLabel\Labels"/>
+    <preference for="SM\MobileApi\Api\Data\ProductInstallation\InstallationInterface"
+                type="SM\MobileApi\Model\Data\ProductInstallation\Installation"/>
+    <preference for="\SM\MobileApi\Api\Data\Product\DeliveryReturnInterface"
+                type="SM\MobileApi\Model\Data\Product\DeliveryReturn"/>
+    <preference for="SM\MobileApi\Api\Data\GTM\BasketInterface"
+                type="SM\MobileApi\Model\Data\GTM\Basket"/>
+
+
+    <!-- Override  -->
+    <preference for="SM\MobileApi\Api\CartInterface"
+                type="SM\MobileApi\Model\Cart"/>
+
+    <preference for="Mirasvit\Blog\Model\Post"
+                type="SM\MobileApi\Model\Post"/>
+
+    <preference for="Magento\Quote\Model\Quote\Item\Repository"
+                type="SM\MobileApi\Model\Quote\Item\Repository"/>
+</config>

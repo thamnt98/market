@@ -1,0 +1,100 @@
+ <!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<div class="item-info">
+    <!-- ko foreach: getRegion('before_details') -->
+    <!-- ko template: getTemplate() --><!-- /ko -->
+    <!-- /ko -->
+    <div class="product-item-details">
+        <a class="product-item-name" target="_blank" data-bind="attr: {'href': getProductUrl($parent.item_id), 'title': $parent.name}, html: $parent.name"></a>
+        <!-- ko if: (getType($parent.item_id) == 'bundle')-->
+            <div class="details-qty">
+                <span class="value" data-bind="text: getQty($parent.item_id, $parent.qty)"></span>
+                <span class="label"><!-- ko i18n: 'pcs' --><!-- /ko --></span>
+                <span class="product-weight" data-bind="text: getWeight($parent.item_id, $parent.qty)"></span>
+            </div>
+            <br>
+            <!-- ko if: (JSON.parse($parent.options).length > 0)-->
+            <div class="details-options">
+                <!--ko foreach: JSON.parse($parent.options)-->
+                <p class="option"><span data-bind="text: label"></span><span data-bind="html: value"></span></p>
+                <!-- /ko -->
+            </div>
+            <!-- /ko -->
+        <!-- /ko -->
+        <!-- ko if: (getType($parent.item_id) != 'bundle')-->
+            <!-- ko if: (JSON.parse($parent.options).length > 0)-->
+            <div class="details-options">
+                <!--ko foreach: JSON.parse($parent.options)-->
+                <p class="option"><span data-bind="text: label"></span>: <span data-bind="html: value"></span></p>
+                <!-- /ko -->
+            </div>
+            <!-- /ko -->
+
+            <!-- ko ifnot: (isFreshProduct($parent.item_id))-->
+                <div class="details-qty">
+                    <span class="value" data-bind="text: getQty($parent.item_id, $parent.qty)"></span>
+                    <span class="label"><!-- ko i18n: 'pcs' --><!-- /ko --></span>
+                    <span class="product-weight" data-bind="text: getWeight($parent.item_id, $parent.qty)"></span>
+                </div>
+            <!-- /ko -->
+            <!-- Fresh Product -->
+            <!-- ko if: (isFreshProduct($parent.item_id))-->
+                <div class="details-qty">
+                    <!-- ko if: (isPriceInKg($parent.item_id))-->
+                        <!-- ko if: (isShowPromoPrice($parent.item_id))-->
+                            <span class="old-price" data-bind="text: getFormattedPrice(getFreshBasePrice($parent.item_id))"></span>
+                            <span class="special-price" data-bind="text: getFormattedPrice(getFreshPromoPrice($parent.item_id))"></span>
+
+
+                        <!-- /ko -->
+                        <!-- ko ifnot: (isShowPromoPrice($parent.item_id))-->
+                            <span class="fresh-price" data-bind="text: getFormattedPrice(getPrice($parent.item_id))"></span>
+                        <!-- /ko -->
+                            <br>
+                            <span class="value" data-bind="text: getQty($parent.item_id, $parent.qty)"></span>
+                            <span class="label"><!-- ko i18n: 'x' --><!-- /ko --></span>
+                            <span class="product-weight" data-bind="text: getLabelFreshWeight($parent.item_id)"></span>
+                            <span class="total-weight" data-bind="text: getItemWeight($parent.item_id)"></span>
+                        <!-- /ko -->
+                    <!-- ko ifnot: (isPriceInKg($parent.item_id))-->
+                        <span class="value" data-bind="text: getQty($parent.item_id, $parent.qty)"></span>
+                        <span class="label" data-bind="text: getSoldIn($parent.item_id)"></span>
+                        <span class="product-weight" data-bind="text: getTotalWeight(getQty($parent.item_id, $parent.qty), getFreshWeight($parent.item_id))"></span>
+                    <!-- /ko -->
+                </div>
+            <!-- /ko -->
+        <!-- /ko -->
+
+        <!-- ko foreach: getRegion('item_detail_additional') -->
+            <!-- ko template: getTemplate() --><!-- /ko -->
+        <!-- /ko -->
+
+        <!-- ko foreach: getRegion('shipping_type') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!-- /ko -->
+
+        <!-- ko if: isDisable($parent.item_id) -->
+            <div class="block-remark delivery-remark stock-warning">
+                <span class="apl-tick-warning"></span>
+                <span class="label" data-bind="i18n: 'Product has been removed.'"></span>
+            </div>
+        <!-- /ko -->
+
+        <!-- ko if: isDownStock($parent.item_id, $parent.qty) -->
+            <div class="block-remark delivery-remark stock-warning">
+                <span class="apl-tick-warning"></span>
+                <span class="label" data-bind="i18n: 'Quantity has been adjusted.'"></span>
+            </div>
+        <!-- /ko -->
+
+    </div>
+</div>
+<div class="subtotal">
+    <!-- ko foreach: getRegion('after_details') -->
+    <!-- ko template: getTemplate() --><!-- /ko -->
+    <!-- /ko -->
+</div>

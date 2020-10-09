@@ -1,0 +1,31 @@
+{
+  "name": "trans/integrationcatalogprice",
+  "description": "N/A",
+  "require": {
+    "php": "~7.2.0|~7.3.0",
+    "trans/core": "~1.0.0",
+    "trans/integration": "~1.1.0"
+  },
+  "type": "magento2.3-module",
+  "version": "1.1.0",
+  "license": [
+    "OSL-3.0",
+    "AFL-3.0"
+  ],
+  "authors": [
+    {
+      "name": "Muhammad Rifai",
+      "email": "muhammad.rifai@transdigital.co.id",
+      "homepage": "http://www.ctcorpora.com/",
+      "role": "Developer"
+    }
+  ],
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Trans\\IntegrationCatalogPrice\\": ""
+    }
+  }
+}

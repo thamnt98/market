@@ -1,0 +1,116 @@
+<?php
+/** @var \SM\Sales\Block\Order\Listing\ParentOrderItem $block */
+
+$parentOrder = $block->getParentOrder();
+$classStatus = '';
+if ($parentOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::STATUS_COMPLETE) {
+    $classStatus = 'tpr-top-status';
+}
+?>
+<div class="table-product">
+    <?php if ($parentOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::STATUS_ORDER_CANCELED): ?>
+        <div class="error-message">
+            <span class="icon icon-error"></span>
+            <span class="error"><?= $parentOrder->getCancelMessage() ?></span>
+        </div>
+    <?php endif; ?>
+    <div class="tpr-top">
+        <div class="tpr-top-left">
+            <span class="tl-invoice-number"><?= $block->escapeHtml(__('Reference Number')) ?></span>
+            <h4 data-gtm="<?= $block->escapeHtml($parentOrder->getReferenceNumber()) ?>"><?= $block->escapeHtml(__($parentOrder->getReferenceNumber())) ?></h4>
+            <span class="date"><?= $block->escapeHtml($block->timeFormat($parentOrder->getOrderDate())) ?></span>
+        </div>
+        <div class="bx-total-payment">
+            <span class="tl-invoice-number"><?= $block->escapeHtml(__('Total Payment')) ?></span>
+            <h4 data-gtm="<?= $block->escapeHtml($parentOrder->getTotalPayment()) ?>"><?= $block->escapeHtml(__($block->currencyFormat($parentOrder->getTotalPayment()))) ?></h4>
+        </div>
+        <div class="tpr-top-right <?php echo $classStatus ?>">
+            <a href="<?= $block->getDetailPhysicalUrl($parentOrder->getParentOrderId()) ?>" type="submit"
+               class="action primary"><?= $block->escapeHtml(__('See Details')) ?></a>
+            <?php if ($parentOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::STATUS_COMPLETE): ?>
+                <?php
+                /** @var \SM\Sales\Block\Order\Button\ReorderAll $reorderBlock */
+                $reorderBlock = $block->getChildBlock("sm.sales.order.button.reorder.all");
+                $reorderBlock->setParentOrderId($parentOrder->getParentOrderId());
+                ?>
+                <?= $reorderBlock->toHtml() ?>
+            <?php endif; ?>
+        </div>
+    </div>
+    <ul class="list-items-review">
+        <?php
+        /** @var \SM\Sales\Api\Data\SubOrderDataInterface $subOrder */
+        foreach ($parentOrder->getSubOrders() as $subOrder):?>
+            <?php
+            /** @var \SM\Sales\Api\Data\DetailItemDataInterface $item */
+            $item = current($subOrder->getItems());
+            if (!$item) {
+                continue;
+            }
+            ?>
+            <!--start list item-->
+            <li class="item-review">
+                <div class="item-info">
+                    <a href="<?= $block->escapeHtml($item->getUrl()) ?>"
+                       title="<?= $block->escapeHtml($item->getProductName()) ?>" class="product-item-photo">
+                        <?php if ($subOrder->getStatus() == \SM\Sales\Api\ParentOrderRepositoryInterface::STATUS_CANCELED): ?>
+                            <div class="image-canceled"><span><?= $block->escapeHtml(__("Not Available")) ?></span>
+                            </div>
+                        <?php endif; ?>
+                        <img src="<?= $block->escapeHtml($item->getImageUrl()) ?>" width="110" height="110"
+                             alt="<?= $block->escapeHtml($item->getProductName()) ?>"/>
+                    </a>
+                    <div class="product-item-details">
+                        <a href="<?= $block->escapeHtml($item->getUrl()) ?>"
+                           class="product-item-name"><?= $block->escapeHtml($item->getProductName()) ?></a>
+                        <?php if ($item->getHasOptions()): ?>
+                            <dl class="item-options">
+                                <?php if ($item->getProductType() == \SM\Sales\Model\ParentOrderRepository::OPTION_TYPE_CONFIGURABLE): ?>
+                                    <?php foreach ($item->getOptions() as $key => $option): ?>
+                                        <?php $char = $key != 0 ? ', ' : ''; ?>
+                                        <p><?= $char . $block->escapeHtml($option->getOptionValue()) ?></p>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </dl>
+                        <?php endif; ?>
+                        <?php if ((count($subOrder->getItems()) - 1) > 0): ?>
+                            <?php
+                            $left = count($subOrder->getItems()) - 1;
+                            ?>
+                            <p><?= $block->escapeHtml(__("+" . $left . (($left > 1) ? " items" : " item"))) ?></p>
+                        <?php endif; ?>
+                        <?= $block->getInstallationHtml($item) ?>
+                    </div>
+
+                </div>
+                <div class="box-id-order">
+                    <span class="tl-invoice-number"><?= $block->escapeHtml(__('Order ID')) ?></span>
+                    <h4><?= $block->escapeHtml(__($subOrder->getSubOrderId())) ?></h4>
+                    <span class="tl-invoice-number"><?= $block->escapeHtml(__($subOrder->getShippingMethod())) ?></span>
+                </div>
+                <div class="bx-order-status">
+                    <span class="tl-invoice-number"><?= $block->escapeHtml(__('Status')) ?></span>
+                    <h4 <?= ($subOrder->getStatus() == \SM\Sales\Api\ParentOrderRepositoryInterface::STATUS_CANCELED) ? "class='canceled'" : "" ?>>
+                        <?= $subOrder->getStatusLabel() ?>
+                    </h4>
+                    <?php
+                    /** @var \SM\Sales\Block\Customer\Order\ProgressBar $progressBlock */
+                    $progressBlock = $block->getChildBlock("progress.bar");
+                    $progressBlock
+                        ->setStatus($subOrder->getStatus())
+                        ->setStatusHistories($subOrder->getStatusHistory())
+                        ->setDeliveryMethodCode($subOrder->getShippingMethodCode());
+                    ?>
+                    <?= $progressBlock->toHtml() ?>
+                    <?php
+                    /** @var \SM\Sales\Block\Order\Digital\Part\Content $paymentInfoBlock */
+                    $paymentInfoBlock = $block->getChildBlock("sm.sales.order.listing.item.payment");
+                    $paymentInfoBlock->setParentOrder($parentOrder);
+                    ?>
+                    <?= $paymentInfoBlock->toHtml() ?>
+                </div>
+            </li>
+            <!--ENd start list item-->
+        <?php endforeach; ?>
+    </ul>
+</div>

@@ -1,0 +1,181 @@
+<script>
+    require(['jquery', 'gtmCustomer', 'Magento_Ui/js/lib/view/utils/async', 'mage/url', 'mage/translate', 'jquery/jquery-storageapi', 'domReady!'], function ($, gtmCustomer, async, urlBuilder) {
+        $(window).load(function () {
+            $('.tpr-top-left').find('a').on('click', function () {
+                let data = [];
+                data['referenceNumber'] = $(this).parents().eq(0).attr('data-gtm');
+                data['basket_value'] = Math.round($(this).parents().eq(2).find('.bx-total-payment').find('h4').attr('data-gtm'));
+                gtmCustomer.push('see_invoice_click', data);
+            });
+            $('.back-orderlist').on('click', function () {
+                let data = [];
+                gtmCustomer.push('back_to_order_list', data);
+            });
+            $('[data-gtm-event="reorder-all"]').on('click', function () {
+                let data = {
+                    'referenceNumber': $(this).parents().eq(2).find('.tpr-top-left h4').attr('data-gtm'),
+                    'basket_value': Math.round($(this).parents().eq(2).find('.bx-total-payment h4').attr('data-gtm')),
+                    'orderID': $(this).attr('data-gtm'),
+                    'order_date': $(this).parents().eq(2).find('.tpr-top-left .date').text()
+                };
+                $.localStorage.set('reoder-all-button-detail-gtm', data);
+            });
+            async.async('[data-gtm-message="success"]', function () {
+                if ($('[data-gtm-message="success"]').text().includes($.mage.__('You added all completed order items to your shopping cart'))) {
+                    try {
+                        let data = $.localStorage.get('reoder-all-button-detail-gtm');
+                        //Todo Remove Debug
+                        console.log(data);
+                        if (data) {
+                            gtmCustomer.push('reorder_all_button', data);
+                            $.localStorage.remove('reoder-all-button-detail-gtm');
+                        }
+                    } catch (e) {
+
+                    }
+                }
+                if ($('[data-gtm-message="success"]').text().includes($.mage.__('Order has been completed.'))) {
+                    try {
+                        let data = $.localStorage.get('complete_order');
+                        //Todo Remove Debug
+                        console.log(data);
+                        if (data) {
+                            gtmCustomer.push('complete_order', data);
+                            $.localStorage.remove('complete_order');
+                        }
+                    } catch (e) {
+
+                    }
+                }
+                if ($('[data-gtm-message="success"]').text().includes($.mage.__('to cart'))) {
+                    try {
+                        let data = $.localStorage.get('reorder_item');
+                        //Todo Remove Debug
+                        console.log(data);
+                        if (data) {
+                            gtmCustomer.push('reorder_click', data);
+                            $.localStorage.remove('reorder_item');
+                        }
+                    } catch (e) {
+
+                    }
+                }
+            });
+            $('[data-gtm-event="track_order_click"]').on('click', function () {
+                let data = [];
+                data['referenceNumber'] = $('.tpr-top-left h4').attr('data-gtm');
+                data['basket_value'] = Math.round($('.total-payment-detail h4').attr('data-gtm'));
+                data['orderID'] = $(this).attr('data-gtm');
+                data['tracking_number'] = $(this).closest('.tracking-order').find('h4').text();
+                gtmCustomer.push('track_order_click', data);
+            });
+            $('[data-gtm-event="reorder-item"]').each(function () {
+                $(this).on('click', function () {
+                    let self = $(this);
+                    let productSku = $(this).attr('data-gtm');
+                    if (productSku) {
+                        let productSkus = [];
+                        let dataProduct = {
+                            'productSku' : productSku
+                        };
+                        productSkus.push(dataProduct);
+                        let data = {
+                            'productsInfo' : productSkus
+                        }
+                        $.ajax({
+                            type: 'POST',
+                            url: urlBuilder.build('sm_gtm/gtm/product'),
+                            data: data,
+                            dataType: "json",
+                            async: true,
+                            success: function (result) {
+                                if (result) {
+                                    let productInfo = [];
+                                    $.each(result, function(key, value){
+                                        try {
+                                            let product = JSON.parse(value);
+                                            productInfo.push(product);
+                                        } catch (e) {
+
+                                        }
+                                    });
+                                    let infoGtm = {
+                                        'referenceNumber' : $('.tpr-top-left h4').attr('data-gtm'),
+                                        'basket_value' : Math.round($('.total-payment-detail h4').attr('data-gtm')),
+                                        'orderID' : $('[data-gtm-event="reorder-all"]').attr('data-gtm'),
+                                        'delivery_method' : self.closest('.order-detail-content').find('.order-delivery-method h4').text(),
+                                        'delivery_fee' : self.closest('.order-detail-content').find('[data-gtm-event="fee"]').attr('data-gtm'),
+                                        'product' : productInfo
+                                    }
+                                    //Todo Remove Debug
+                                    console.log(infoGtm);
+                                    $.localStorage.set('reorder_item', infoGtm);
+
+                                }
+                            },
+                            error: function () {
+                                //window.location.href='<?//= $block->getUrl('transcheckout')?>//';
+                            }
+                        });
+                    }
+                });
+            });
+            $('[data-gtm-event="complete-order"]').each(function () {
+                $(this).on('click', function () {
+                    let self = $(this);
+                    let productSkus = [];
+
+                    $(this).closest('.order-detail-content').find('[data-gtm-event="complete-order-item"]').each(function () {
+                        let data = {
+                            'productSku' : $(this).attr('data-gtm'),
+                        };
+                        productSkus.push(data);
+                    });
+
+                    let data = {
+                        'productsInfo' : productSkus
+                    };
+
+                    $.ajax({
+                        type: 'POST',
+                        url: urlBuilder.build('sm_gtm/gtm/product'),
+                        data: data,
+                        dataType: "json",
+                        async: true,
+                        success: function (result) {
+                            if (result) {
+                                let productInfo = [];
+                                $.each(result, function(key, value){
+                                    try {
+                                        let product = JSON.parse(value);
+                                        productInfo.push(product);
+                                    } catch (e) {
+
+                                    }
+                                });
+                                let infoGtm = {
+                                    'referenceNumber' : $('.tpr-top-left h4').attr('data-gtm'),
+                                    'basket_value' : Math.round($('.total-payment-detail h4').attr('data-gtm')),
+                                    'orderID' : $('[data-gtm-event="order-id"]').attr('data-gtm'),
+                                    'delivery_method' : self.closest('.order-detail-content').find('.order-delivery-method h4').text(),
+                                    'delivery_fee' : self.closest('.order-detail-content').find('[data-gtm-event="fee"]').attr('data-gtm'),
+                                    'orderStatus' : self.attr('data-gtm'),
+                                    'product' : productInfo
+                                }
+                                //Todo Remove Debug
+                                console.log(infoGtm);
+                                $.localStorage.set('complete_order', infoGtm);
+                            }
+                        },
+                        error: function () {
+                            //window.location.href='<?//= $block->getUrl('transcheckout')?>//';
+                        }
+                    });
+                });
+            });
+            $('.help-order-form').on('click', function () {
+                $.localStorage.set('order_help_form', 1);
+            });
+        });
+    });
+</script>

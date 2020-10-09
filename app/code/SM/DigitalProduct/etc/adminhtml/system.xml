@@ -1,0 +1,153 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="transmart" sortOrder="999" translate="label">
+            <label>transmart</label>
+        </tab>
+        <section id="digital_product" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10"
+                 translate="label">
+            <label>Digital Product</label>
+            <tab>transmart</tab>
+            <resource>SM_DigitalProduct::config_sm_digitalproduct</resource>
+            <group id="general" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label">
+                <label>General</label>
+                <field id="enable" showInDefault="1" sortOrder="10" translate="label" type="select">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="c0_category" showInDefault="1" sortOrder="10" translate="label" type="select">
+                    <label>Digital Category</label>
+                    <source_model>SM\DigitalProduct\Model\Source\MagentoCategory\Options</source_model>
+                    <comment>Select a category from magento category</comment>
+                </field>
+                <field id="home_page" showInDefault="1" sortOrder="20"
+                       translate="label" type="select">
+                    <label>Digital Home Page</label>
+                    <source_model>SM\DigitalProduct\Model\Source\Options\DigitalTypes</source_model>
+                    <comment>Please make sure the page is enable.</comment>
+                </field>
+                <field id="cms_content" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30"
+                       translate="label" type="select">
+                    <label>Top Block Content (Web only)</label>
+                    <source_model>SM\DigitalProduct\Model\Source\CmsBlocks\Options</source_model>
+                    <comment>
+                        <![CDATA[For Mobile, Please setting the images under Content -> Mobile Banner Sliders]]>
+                    </comment>
+                </field>
+            </group>
+            <group id="quick_transaction" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label">
+                <label>Quick Transaction</label>
+                <field id="limit" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label"
+                       type="text">
+                    <label>Max Number of Transactions to Show</label>
+                    <frontend_class>validate-digits required-entry</frontend_class>
+                </field>
+            </group>
+            <group id="topup" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label">
+                <label>Top Up</label>
+                <field id="is_active" showInDefault="1" sortOrder="10" translate="label" type="select">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="title" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label"
+                       type="text">
+                    <label>Title</label>
+                    <frontend_class>required-entry</frontend_class>
+                </field>
+                <field id="image" translate="label comment" type="image" sortOrder="30" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Thumbnail</label>
+                    <backend_model>SM\DigitalProduct\Model\Config\Backend\Image</backend_model>
+                    <base_url type="media" scope_info="1">sm/digitalproduct</base_url>
+                </field>
+                <field id="how_to_buy_block" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40"
+                       translate="label" type="select">
+                    <label>How to buy Content (Web only)</label>
+                    <source_model>SM\DigitalProduct\Model\Source\CmsBLocks\Options</source_model>
+                    <comment>Select a CMS block under "Content -> Elements -> Blocks"</comment>
+                </field>
+                <field id="how_to_buy_block_mb" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40"
+                       translate="label" type="select">
+                    <label>How to buy Content (Mobile only)</label>
+                    <source_model>SM\DigitalProduct\Model\Source\CmsBLocks\Options</source_model>
+                    <comment>Select a CMS block under "Content -> Elements -> Blocks"</comment>
+                </field>
+            </group>
+            <group id="mobilepackage" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40"
+                   translate="label">
+                <label>Mobile Package</label>
+                <field id="is_active" showInDefault="1" sortOrder="10" translate="label" type="select">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="title" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label"
+                       type="text">
+                    <label>Title</label>
+                    <frontend_class>required-entry</frontend_class>
+                </field>
+                <field id="image" translate="label comment" type="image" sortOrder="30" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Thumbnail</label>
+                    <backend_model>SM\DigitalProduct\Model\Config\Backend\Image</backend_model>
+                    <base_url type="media" scope_info="1">sm/digitalproduct</base_url>
+                </field>
+                <field id="how_to_buy_block" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40"
+                       translate="label comment" type="select">
+                    <label>How to buy Content (Web only)</label>
+                    <source_model>SM\DigitalProduct\Model\Source\CmsBLocks\Options</source_model>
+                    <comment>Select a CMS block under "Content -> Elements -> Blocks"</comment>
+                </field>
+                <field id="how_to_buy_block_mb" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40"
+                       translate="label" type="select">
+                    <label>How to buy Content (Mobile only)</label>
+                    <source_model>SM\DigitalProduct\Model\Source\CmsBLocks\Options</source_model>
+                    <comment>Select a CMS block under "Content -> Elements -> Blocks"</comment>
+                </field>
+            </group>
+            <group id="electricity" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50"
+                   translate="label">
+                <label>PLN Electricity</label>
+                <field id="is_active" showInDefault="1" sortOrder="10" translate="label" type="select">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="title" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20" translate="label"
+                       type="text">
+                    <label>Title</label>
+                    <frontend_class>required-entry</frontend_class>
+                </field>
+                <field id="image" translate="label comment" type="image" sortOrder="30" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Thumbnail</label>
+                    <backend_model>SM\DigitalProduct\Model\Config\Backend\Image</backend_model>
+                    <base_url type="media" scope_info="1">sm/digitalproduct</base_url>
+                </field>
+                <field id="operator_icon" translate="label comment" type="image" sortOrder="30" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Operator Icon</label>
+                    <backend_model>SM\DigitalProduct\Model\Config\Backend\Image</backend_model>
+                    <base_url type="media" scope_info="1">sm/digitalproduct</base_url>
+                </field>
+                <field id="how_to_buy_block" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40"
+                       translate="label" type="select">
+                    <label>How to buy Content (Web only)</label>
+                    <source_model>SM\DigitalProduct\Model\Source\CmsBLocks\Options</source_model>
+                    <comment>Select a CMS block under "Content -> Elements -> Blocks"</comment>
+                </field>
+                <field id="how_to_buy_block_mb" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40"
+                       translate="label" type="select">
+                    <label>How to buy Content - Token (Mobile only)</label>
+                    <source_model>SM\DigitalProduct\Model\Source\CmsBLocks\Options</source_model>
+                    <comment>Select a CMS block under "Content -> Elements -> Blocks"</comment>
+                </field>
+                <field id="how_to_buy_block_bill_mb" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40"
+                       translate="label" type="select">
+                    <label>How to buy Content - Bill (Mobile only)</label>
+                    <source_model>SM\DigitalProduct\Model\Source\CmsBLocks\Options</source_model>
+                    <comment>Select a CMS block under "Content -> Elements -> Blocks"</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

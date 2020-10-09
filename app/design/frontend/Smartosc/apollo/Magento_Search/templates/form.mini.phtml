@@ -1,0 +1,104 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundThis
+?>
+<?php
+/** @var $block \SM\Search\Block\Form\MiniForm */
+/** @var $helper \Magento\Search\Helper\Data */
+$helper = $this->helper(\Magento\Search\Helper\Data::class);
+?>
+<div class="block block-search navbar-search">
+    <div class="block block-content navbar-search-group">
+        <form class="form minisearch" id="search_mini_form" action="<?= $block->escapeUrl($helper->getResultUrl()) ?>" method="get">
+            <div class="field search">
+                <label class="label" for="search" data-role="minisearch-label">
+                    <span><?= $block->escapeHtml(__('Search')) ?></span>
+                </label>
+                <div class="control">
+                    <label class="label-search-cat"><?= $block->escapeHtml(__('All')) ?></label>
+                    <?php $categories = $block->getCategories() ?>
+                    <ul name="<?php echo $block::CATEGORY_FIELD_NAME ?>" class="jsResizeSelect search-cat" style="display: none">
+                        <li class="item-cat" value=""><?php echo __('All') ?></li>
+                        <?php foreach ($categories as $categoryData) : ?>
+                            <li class="item-cat" value="<?php echo $categoryData['entity_id'] ?>"
+                                <?php if ($block->isSelectedCategory($categoryData)) : ?>
+                                selected="selected"
+                                <?php endif; ?>
+                            >
+                                <?php echo $categoryData['name'] ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                    <input id="cat-search" type="hidden" name="cat" label="" value=""/>
+                    <input id="search"
+                           data-mage-init='{"quickSearch":{
+                                "formSelector":"#search_mini_form",
+                                "url":"<?= $block->escapeUrl($helper->getSuggestUrl())?>",
+                                "destinationSelector":"#search_autocomplete",
+                                "minSearchLength":"<?= $block->escapeHtml($helper->getMinQueryLength()) ?>"}
+                           }'
+                           type="text"
+                           name="<?= $block->escapeHtmlAttr($helper->getQueryParamName()) ?>"
+                           value="<?= $block->escapeHtml($helper->getEscapedQueryText()) ?>"
+                           placeholder="<?= $block->escapeHtmlAttr(__('What would you like to shop?')) ?>"
+                           class="input-text"
+                           maxlength="<?= $block->escapeHtmlAttr($helper->getMaxQueryLength()) ?>"
+                           role="combobox"
+                           aria-haspopup="false"
+                           aria-autocomplete="both"
+                           autocomplete="off"
+                           aria-expanded="false"/>
+                    <div id="search_autocomplete" class="search-autocomplete"></div>
+                    <div class="search-additional-wrap">
+                        <div class="latest-search">
+                            <div class="head-wrap">
+                                <label><?= __('Latest Search') ?></label>
+                                <span class="delete-all"
+                                      data-gtm-event="<?= \SM\GTM\Helper\Data::SEARCH_LATEST_DELETE_ALL_CLICK_EVENT_NAME ?>">
+                                    <?= __('Delete All') ?>
+                                </span>
+                            </div>
+                            <div class="content-wrap"></div>
+                        </div>
+                        <div class="popular-search">
+                            <div class="head-wrap">
+                                <label><?= __('Popular Search') ?></label>
+                            </div>
+                            <div class="content-wrap"></div>
+                        </div>
+                        <div class="latest-viewed-product">
+                            <div class="head-wrap suggestion-products__title">
+                                <label><?= __('Recommendations for You') ?></label>
+                            </div>
+                            <div class="content-wrap suggestion-products__content cart"></div>
+                        </div>
+                    </div>
+                    <?= $block->getChildHtml() ?>
+                </div>
+            </div>
+            <div class="actions">
+                <button type="submit"
+                    title="<?= $block->escapeHtmlAttr(__('Search')) ?>"
+                    class="action search"
+                    aria-label="Search"
+                >
+                    <span><?= $block->escapeHtml(__('Search')) ?></span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    require(
+        [
+            'SearchMiniForm'
+        ],
+        function( SearchMiniForm) {
+            SearchMiniForm.init();
+        });
+</script>

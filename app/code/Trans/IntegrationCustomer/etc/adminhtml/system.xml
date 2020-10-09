@@ -1,0 +1,103 @@
+<?xml version="1.0"?>
+<!--  
+/**
+ * @category Trans
+ * @package  Trans_Integration
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Imam Kusuma <imam.kusuma@ctcorpdigital.com>
+ *
+ * Copyright © 2019 CT Corp Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="integration" translate="label" type="text" sortOrder="1000" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Customer Integration</label>
+            <tab>trans</tab>
+            <resource>Trans_Integration::integrationconfig</resource>
+            <group id="centralize" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1" translate="label">
+                <label>CDB</label>
+                <group id="general" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="11" translate="label">
+                    <label>General</label>
+                    <field id="enabled_sms_verification" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enable SMS Verification</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>integration/centralize/enabled_sms_verification</config_path>
+                    </field>
+                    <field id="apiurl_prod" type="select" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="2" translate="label">
+                        <label>API URL Production</label>
+                        <source_model>Trans\Integration\Model\Config\Source\BaseUrl</source_model>
+                        <config_path>integration/centralize/api_url_prod</config_path>
+                    </field>
+                    <field id="apiurl_dev" type="select" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="2" translate="label">
+                        <label>API URL Development</label>
+                        <validate>required-entry</validate>
+                        <source_model>Trans\Integration\Model\Config\Source\BaseUrl</source_model>
+                        <config_path>integration/centralize/api_url_dev</config_path>
+                    </field>
+                    <field id="apikey" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="2" translate="label"
+                           type="text">
+                        <label>API Key</label>
+                        <validate>required-entry</validate>
+                        <config_path>integration/centralize/api_key</config_path>
+                    </field>
+                    <field id="bearer_token" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="2" translate="label"
+                           type="text">
+                        <label>Admin Bearer Token</label>
+                        <validate>required-entry</validate>
+                        <config_path>integration/centralize/admin_bearer_token</config_path>
+                        <comment>get admin token bearer from /V1/integration/admin/token</comment>
+                    </field>
+                    <field id="centralize_env" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>CDB Environment</label>
+                        <source_model>Trans\Integration\Model\Config\Source\Env</source_model>
+                        <config_path>integration/centralize/centralize_env</config_path>
+                    </field>
+                </group>
+                <group id="verification" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="11" translate="label">
+                    <label>Verification</label>
+                    <field id="enabled_static_code" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Enable Static OTP Code</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                        <config_path>integration/centralize/enabled_static_otp</config_path>
+                    </field>
+                    <field id="static_otp_code" type="text" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Static OTP Code</label>
+                        <config_path>integration/centralize/static_otp_code</config_path>
+                    </field>
+                    <field id="send_sms_verifcation" type="text" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Send SMS Verification URL Path</label>
+                        <config_path>integration/centralize/send_sms_verifcation</config_path>
+                    </field>
+                    <field id="verify_sms_verifcation" type="text" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Verify SMS Verification URL Path</label>
+                        <config_path>integration/centralize/verify_sms_verification</config_path>
+                    </field>
+                </group>
+                <group id="customer" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="11" translate="label">
+                    <label>Customer</label>
+                    <field id="check_data_customer" type="text" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Check Data Customer URL Path</label>
+                        <config_path>integration/centralize/check_data_customer</config_path>
+                    </field>
+                    <field id="customer_detail_url" type="text" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Get Customer Detail URL Path</label>
+                        <config_path>integration/centralize/customer_detail_url</config_path>
+                    </field>
+                    <field id="customer_new_register" type="text" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Send New Customer URL Path</label>
+                        <config_path>integration/centralize/customer_new_register</config_path>
+                    </field>
+                    <field id="customer_update_integration" type="text" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Send Update Customer URL Path</label>
+                        <config_path>integration/centralize/customer_update_integration</config_path>
+                    </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

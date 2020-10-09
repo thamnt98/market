@@ -1,0 +1,14 @@
+{
+    "salesrule_coupon": {
+        "column": {
+            "customer_id": true
+        }
+    },
+    "salesrule" : {
+        "column": {
+            "discount_text": true,
+            "discount_note": true,
+            "area": true
+        }
+    }
+}

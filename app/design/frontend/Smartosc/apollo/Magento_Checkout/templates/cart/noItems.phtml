@@ -1,0 +1,38 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**  @var $block \Magento\Checkout\Block\Cart */
+?>
+<!--<div class="cart-empty">
+    <?/*= $block->getChildHtml('checkout_cart_empty_widget') */?>
+    <p><?/*= $block->escapeHtml(__('You have no items in your shopping cart.')) */?></p>
+    <p><?/*= $block->escapeHtml(
+        __(
+            'Click <a href="%1">here</a> to continue shopping.',
+            $block->escapeUrl($block->getContinueShoppingUrl())
+        ),
+        ['a']
+    ) */?>
+    </p>
+    <?/*= $block->getChildHtml('shopping.cart.table.after') */?>
+</div>-->
+
+<div class="no-route cart-empty">
+    <div class="no-route-info">
+        <img src="<?=$block->getViewFileUrl('images/shopping-cart-empty.png')?>" alt="Your cart is empty" width="375"/>
+        <h4><?= $block->escapeHtml(__('Your cart is empty.')) ?><br/>
+            <?= $block->escapeHtml(__('It’s a good day to shop! Start adding products now.')) ?></h4>
+        <a href="<?= $block->escapeUrl($block->getContinueShoppingUrl()) ?>" class="action primary"><?= $block->escapeHtml(__('Shop Now')) ?></a>
+    </div>
+    <?= $block->getChildHtml('shopping.cart.table.after') ?>
+</div>
+<script type="text/x-magento-init">
+{
+    "*": {
+        "Magento_Checkout/js/empty-cart": {}
+    }
+}
+</script>

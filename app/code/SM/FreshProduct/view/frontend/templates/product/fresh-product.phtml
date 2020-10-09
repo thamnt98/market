@@ -1,0 +1,40 @@
+<?php /** @var $block \SM\FreshProduct\Block\Product\View */ ?>
+<?php
+$product = $block->getProduct();
+$freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
+?>
+
+<?php if ($block->isFreshProduct($product)) : ?>
+    <?php if ($block->isPriceInKg($product)) : ?>
+        <div class="fresh-product-detail">
+            <?php if ($freshHelper->isShowPromoPrice($product)) : ?>
+            <div class="price-box">
+                <span class="old-price">
+                                <?= $block->escapeHtml($freshHelper->formatPrice($freshHelper->getBasePrice($product)) . ' / kg') ?>
+                            </span>
+                <span class="special-price">
+                                <?= $block->escapeHtml($freshHelper->formatPrice($freshHelper->getPromoPrice($product)) . ' / kg') ?>
+                            </span>
+            </div>
+                <script>
+                    require([
+                        'jquery',
+                    ], function ($) {
+                        $(window).load(function () {
+                            $('.original-price').hide();
+                        });
+                    });
+                </script>
+            <?php else : ?>
+                <span class="price-box"><?= $block->escapeHtml($freshHelper->getPricePerKg($product) . ' / kg') ?></span>
+            <?php endif; ?>
+            <div class="block-remark tooltip">
+                <label class="remark"><?= $block->escapeHtml('Weight & final price will be adjusted after weighing.') ?></label>
+                <span class="dpl-tooltip">
+                     <span class="apl-tick-info"></span>
+                    <pre class="tooltip-content" role="tooltip"><?= $block->escapeHtml(__($freshHelper->getTooltip()))?></pre>
+                </span>
+            </div>
+        </div>
+    <?php endif; ?>
+<?php endif; ?>

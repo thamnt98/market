@@ -1,0 +1,218 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="SM\DigitalProduct\Api\CategoryRepositoryInterface"
+                type="SM\DigitalProduct\Model\CategoryRepository"/>
+    <preference for="SM\DigitalProduct\Api\Data\CategoryInterface" type="SM\DigitalProduct\Model\Category"/>
+    <preference for="SM\DigitalProduct\Api\Data\SubCategoryDataInterface"
+                type="SM\DigitalProduct\Model\Data\SubCategoryData"/>
+    <virtualType name="SM\DigitalProduct\Model\ResourceModel\Category\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">sm_digitalproduct_category</argument>
+            <argument name="resourceModel" xsi:type="string">SM\DigitalProduct\Model\ResourceModel\Category\Collection
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="sm_digitalproduct_category_listing_data_source" xsi:type="string">
+                    SM\DigitalProduct\Model\ResourceModel\Category\Grid\Collection
+                </item>
+                <item name="sm_digitalproduct_operator_icon_listing_data_source" xsi:type="string">
+                    SM\DigitalProduct\Model\ResourceModel\OperatorIcon\Grid\Collection
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <preference for="SM\DigitalProduct\Api\Data\CategoryContentInterface"
+                type="SM\DigitalProduct\Model\CategoryContent"/>
+
+    <preference for="SM\DigitalProduct\Api\OperatorIconRepositoryInterface"
+                type="SM\DigitalProduct\Model\OperatorIconRepository"/>
+    <preference for="SM\DigitalProduct\Api\Data\OperatorIconInterface" type="SM\DigitalProduct\Model\OperatorIcon"/>
+    <preference for="SM\DigitalProduct\Api\Data\OperatorIconSearchResultsInterface"
+                type="Magento\Framework\Api\SearchResults"/>
+    <virtualType name="SM\DigitalProduct\Model\ResourceModel\OperatorIcon\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">sm_digitalproduct_operator_icon</argument>
+            <argument name="resourceModel" xsi:type="string">
+                SM\DigitalProduct\Model\ResourceModel\OperatorIcon\Collection
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <preference for="SM\DigitalProduct\Api\DigitalProductRepositoryInterface"
+                type="SM\DigitalProduct\Model\DigitalProductRepository"/>
+    <preference for="SM\DigitalProduct\Api\Data\C1CategoryDataInterface"
+                type="SM\DigitalProduct\Model\Data\C1CategoryData"/>
+    <preference for="SM\DigitalProduct\Api\Data\OperatorDataInterface"
+                type="SM\DigitalProduct\Model\Data\OperatorData"/>
+    <preference for="SM\DigitalProduct\Api\Data\CustomerInfoDataInterface"
+                type="SM\DigitalProduct\Model\Data\CustomerInfoData"/>
+
+    <preference for="SM\DigitalProduct\Api\Data\Inquire\InquireElectricityPrePaidDataInterface"
+                type="SM\DigitalProduct\Model\Data\Inquire\InquireElectricityPrePaidData"/>
+    <preference for="SM\DigitalProduct\Api\Data\Inquire\InquireElectricityPostPaidDataInterface"
+                type="SM\DigitalProduct\Model\Data\Inquire\InquireElectricityPostPaidData"/>
+    <preference for="SM\DigitalProduct\Api\Data\Inquire\ElectricityPostPaidBillDataInterface"
+                type="SM\DigitalProduct\Model\Data\Inquire\ElectricityPostPaidBillData"/>
+
+    <preference for="SM\DigitalProduct\Api\CartRepositoryInterface" type="SM\DigitalProduct\Model\Cart\CartRepository"/>
+
+    <preference for="SM\DigitalProduct\Api\Data\DigitalInterface"
+                type="SM\DigitalProduct\Model\Cart\Data\Digital"/>
+    <preference for="SM\DigitalProduct\Api\Data\DigitalTransactionInterface"
+                type="SM\DigitalProduct\Model\Cart\Data\DigitalTransaction"/>
+    <preference for="SM\DigitalProduct\Api\OrderRepositoryInterface"
+                type="SM\DigitalProduct\Model\Order\OrderRepository"/>
+    <preference for="SM\DigitalProduct\Api\Data\Order\DigitalProductInterface"
+                type="SM\DigitalProduct\Model\Order\Item\DigitalProductData"/>
+    <preference for="SM\DigitalProduct\Api\ReorderRepositoryInterface"
+                type="\SM\DigitalProduct\Model\Cart\ReOrderRepository"/>
+
+    <type name="Magento\Quote\Model\Quote\Item\Repository">
+        <arguments>
+            <argument name="cartItemProcessors" xsi:type="array">
+                <item name="virtual" xsi:type="object">SM\DigitalProduct\Model\Cart\VirtualProcessor\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Sales\Model\Order\ProductOption">
+        <arguments>
+            <argument name="processorPool" xsi:type="array">
+                <item name="virtual" xsi:type="object">SM\DigitalProduct\Model\Order\Item\VirtualProcessor\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Sales\Api\OrderItemRepositoryInterface">
+        <arguments>
+            <argument name="processorPool" xsi:type="array">
+                <item name="virtual" xsi:type="object">SM\DigitalProduct\Model\Order\Item\VirtualProcessor\Proxy</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="\SM\DigitalProduct\Model\Cart\ReOrderRepository">
+        <arguments>
+            <argument name="processorPool" xsi:type="array">
+                <item name="electricity_token" xsi:type="object">
+                    \SM\DigitalProduct\Model\Api\Electricity\ElectricityToken
+                </item>
+                <item name="electricity_bill" xsi:type="object">
+                    \SM\DigitalProduct\Model\Api\Electricity\ElectricityBill
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="\SM\DigitalProduct\Model\Api\Electricity\ElectricityToken">
+        <arguments>
+            <argument name="inquireClass" xsi:type="object">
+                \SM\DigitalProduct\Model\Api\Inquire\ElectricityToken
+            </argument>
+            <argument name="inquireMethod" xsi:type="string">inquire</argument>
+        </arguments>
+    </type>
+
+    <type name="\SM\DigitalProduct\Model\Api\Electricity\ElectricityBill">
+        <arguments>
+            <argument name="inquireClass" xsi:type="object">
+                \SM\DigitalProduct\Model\Api\Inquire\ElectricityBill
+            </argument>
+            <argument name="inquireMethod" xsi:type="string">inquire</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="Magento\Sales\Model\ResourceModel\Order\Grid" type="Magento\Sales\Model\ResourceModel\Grid">
+        <arguments>
+            <argument name="columns" xsi:type="array">
+                <item name="digital_transaction_fail" xsi:type="string">sales_order.digital_transaction_fail</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Magento\Sales\Model\ResourceModel\Order\Grid" type="Magento\Sales\Model\ResourceModel\Grid">
+        <arguments>
+            <argument name="columns" xsi:type="array">
+                <item name="digital_transaction_fail" xsi:type="string">sales_order.digital_transaction_fail</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!--  Inquire  -->
+    <preference for="SM\DigitalProduct\Api\InquireRepositoryInterface"
+                type="SM\DigitalProduct\Model\InquireRepository"/>
+
+    <preference for="\SM\DigitalProduct\Api\Inquire\ElectricityTokenInterface"
+                type="\SM\DigitalProduct\Model\Api\Inquire\ElectricityToken"/>
+    <preference for="\SM\DigitalProduct\Api\Inquire\ElectricityBillInterface"
+                type="\SM\DigitalProduct\Model\Api\Inquire\ElectricityBill"/>
+    <preference for="\SM\DigitalProduct\Api\Inquire\Data\ElectricityTokenInterface"
+                type="\SM\DigitalProduct\Model\Api\Inquire\Data\ElectricityToken"/>
+    <preference for="\SM\DigitalProduct\Api\Inquire\Data\ElectricityBillInterface"
+                type="\SM\DigitalProduct\Model\Api\Inquire\Data\ElectricityBill"/>
+
+    <!--  Inquire Pdam Data  -->
+    <preference for="SM\DigitalProduct\Api\Data\Inquire\InquirePdamDataInterface"
+                type="SM\DigitalProduct\Model\Data\Inquire\InquirePdamData"/>
+    <preference for="SM\DigitalProduct\Api\Data\Inquire\PdamBillDataInterface"
+                type="SM\DigitalProduct\Model\Data\Inquire\PdamBillData"/>
+    <preference for="SM\DigitalProduct\Api\Data\Inquire\PdamDetailFeeDataInterface"
+                type="SM\DigitalProduct\Model\Data\Inquire\PdamDetailFeeData"/>
+    <preference for="SM\DigitalProduct\Api\Data\Inquire\PdamDetailUsageDataInterface"
+                type="SM\DigitalProduct\Model\Data\Inquire\PdamDetailUsageData"/>
+
+    <!--  Inquire Bpjs Data  -->
+    <preference for="SM\DigitalProduct\Api\Data\Inquire\InquireBpjsDataInterface"
+                type="SM\DigitalProduct\Model\Data\Inquire\InquireBpjsData"/>
+
+    <!--  Inquire Mobile Postpaid Data  -->
+    <preference for="SM\DigitalProduct\Api\Data\Inquire\InquireMobilePostpaidDataInterface"
+                type="SM\DigitalProduct\Model\Data\Inquire\InquireMobilePostpaidData"/>
+
+    <!-- Inquire Telkom Data-->
+    <preference for="SM\DigitalProduct\Api\Data\Inquire\InquireTelkomDataInterface"
+                type="SM\DigitalProduct\Model\Data\Inquire\InquireTelkomData"/>
+
+    <!--  Transaction Repository  -->
+    <preference for="SM\DigitalProduct\Api\TransactionRepositoryInterface"
+                type="SM\DigitalProduct\Model\TransactionRepository"/>
+
+    <!--  Transaction Data API  (use for pln postpaid, telkom, mobile postpaid)-->
+    <preference for="SM\DigitalProduct\Api\Data\Transaction\TransactionDataInterface"
+                type="SM\DigitalProduct\Model\Data\Transaction\TransactionData"/>
+
+    <!--  Product Id Data for Mobile top up, package  -->
+    <preference for="SM\DigitalProduct\Api\Data\Transaction\MobileProductIdDataInterface"
+                type="SM\DigitalProduct\Model\Data\Transaction\MobileProductIdData"/>
+
+    <!--  Product Id Data  -->
+    <preference for="SM\DigitalProduct\Api\Data\Transaction\ProductIdDataInterface"
+                type="SM\DigitalProduct\Model\Data\Transaction\ProductIdData"/>
+
+    <!--  Transaction Data for mobile top up, package  -->
+    <preference for="SM\DigitalProduct\Api\Data\Transaction\TransactionMobileDataInterface"
+                type="SM\DigitalProduct\Model\Data\Transaction\TransactionMobileData"/>
+
+    <!--  Transaction Data for pln prepaid  -->
+    <preference for="SM\DigitalProduct\Api\Data\Transaction\TransactionElectricityPrePaidDataInterface"
+                type="SM\DigitalProduct\Model\Data\Transaction\TransactionElectricityPrePaidData"/>
+
+    <!--  Transaction Data for pdam  -->
+    <preference for="SM\DigitalProduct\Api\Data\Transaction\TransactionPdamDataInterface"
+                type="SM\DigitalProduct\Model\Data\Transaction\TransactionPdamData"/>
+
+    <!--  Transaction Data for bpjs  -->
+    <preference for="SM\DigitalProduct\Api\Data\Transaction\TransactionBpjsDataInterface"
+                type="SM\DigitalProduct\Model\Data\Transaction\TransactionBpjsData"/>
+
+    <!-- New -->
+    <preference for="\SM\DigitalProduct\Api\Data\ProductInterface" type="\SM\DigitalProduct\Model\Data\Product"/>
+    <preference for="SM\DigitalProduct\Api\SliderRepositoryInterface" type="\SM\DigitalProduct\Model\SliderRepository"/>
+    <preference for="\SM\DigitalProduct\Api\CategoryContentRepositoryInterface"
+                type="\SM\DigitalProduct\Model\CategoryContentRepository"/>
+</config>

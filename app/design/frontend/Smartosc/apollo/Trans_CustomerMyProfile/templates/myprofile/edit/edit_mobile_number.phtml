@@ -1,0 +1,83 @@
+<?php
+
+/**
+ * SMCommerce
+ *
+ * @category  Trans
+ * @package   Trans_CustomerMyProfile
+ *
+ * Date: April, 25 2020
+ * Time: 8:26 AM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ */
+?>
+<?php /** @var $block \Trans\CustomerMyProfile\Block\MyProfile\Edit\EditMobileNumber */ ?>
+<?php
+$countdownTime = $block->getVerificationCodeExpiredIn();
+$telephone = $block->getTelephone();
+?>
+<form class="form form-edit-account" action="<?= $block->escapeUrl($block->getUrl('customermyprofile/mobile/save')) ?>" method="post" id="form-edit-telephone" enctype="multipart/form-data" data-mage-init='{"validation": {}}' autocomplete="off">
+    <?= $block->getBlockHtml('formkey') ?>
+    <legend class="legend"><span><?= $block->escapeHtml(__('Edit Mobile Number')) ?></span></legend><br>
+    <fieldset class="fieldset change-telephone">
+        <div class="row">
+            <div class="col-12 col-md-12 col-lg-7 col-sm-7 field telephone required">
+                <label class="label" for="te"><span><?= $block->escapeHtml(__('Mobile Number')) ?></span></label>
+                <div class="control">
+                    <input type="text" name="telephone" id="telephone" autocomplete="off"
+                           value="<?= $block->escapeHtmlAttr($telephone) ?>"
+                           title="<?= $block->escapeHtmlAttr(__('Mobile Number')) ?>"
+                           class="input-text required-entry"
+                           data-validate="{required:true, 'validate-number':true, 'validate-phone':true, 'validate-length':true, 'minlength':10, 'maxlength':16}"
+                           data-msg-validate-phone="<?= $block->escapeHtmlAttr(__('Make sure you follow the format')) ?>"
+                           data-msg-minlength="<?= $block->escapeHtmlAttr(__('Make sure you follow the format')) ?>"
+                           data-msg-maxlength="<?= $block->escapeHtmlAttr(__('Make sure you follow the format')) ?>"
+                    />
+                    <p class="resend-verification enable" action="send"><?= $block->escapeHtml(__('Send verification code')) ?></p>
+                </div>
+                <div class="trans-message-error telephone-msg"></div>
+                <div class="txt-bottom-verify clearfix" style="display: none">
+                    <span class="txt-count">
+                        <span class="message-send"><?= $block->escapeHtml(__('Verification code sent.')) ?> </span>
+                        <span class="txt-second"><?= sprintf(__('You can try resending code in <span>%s</span> second(s).'), $countdownTime) ?></span>
+                    </span>
+                </div>
+            </div>
+            <div class="col-12 col-md-12 col-lg-3 col-sm-4  field-otp field required" >
+                <label class="label" for="te"><span><?= $block->escapeHtml(__('Verification Code')) ?></span></label>
+                <div class="control">
+                    <input id="otp-field" type="text" name="otp" minlength="6" maxlength="6" class="input-text required-entry" data-validate="{required:true, 'validate-digits':true, 'validate-length':true}"/>
+                </div>
+                <div class="trans-message-error otp-msg"></div>
+        </div>
+        </div>
+    </fieldset>
+
+    <div class="actions-toolbar">
+        <a href="<?= $block->getUrl('customer/account') ?>" class="profile-cancel action">
+            <?= $block->escapeHtml(__('Cancel')) ?>
+        </a>
+        <button type="submit" class="profile-save primary action"><?= $block->escapeHtml(__('Save')) ?></button>
+    </div>
+</form>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Trans_CustomerMyProfile/js/telephone": {
+                "formSelector": "#form-edit-telephone",
+                "telephoneSelector": "#form-edit-telephone input[name=telephone]",
+                "otpSelector": "#form-edit-telephone input[name=otp]",
+                "telephone": "<?= $block->escapeHtmlAttr($telephone); ?>",
+                "sendOTPSelector": "#form-edit-telephone .resend-verification",
+                "resetButtonSelector": "#form-edit-telephone button.profile-cancel",
+                "telephoneMsg": "#form-edit-telephone .telephone-msg",
+                "otpMsg": "#form-edit-telephone .otp-msg",
+                "countdownSelector": "#form-edit-telephone .txt-bottom-verify",
+                "countdownTime": <?= $countdownTime; ?>
+            }
+        }
+    }
+</script>

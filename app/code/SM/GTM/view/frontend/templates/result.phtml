@@ -1,0 +1,14 @@
+<script>
+    require(['jquery', 'Magento_Ui/js/lib/view/utils/async', 'gtmCustomer', 'domReady!'],function ($, async, gtmCustomer) {
+        $(window).load(function () {
+            if(typeof dataLayerSourceObjects !== 'undefined') {
+                async.async('.search.suggest', function () {
+                    let data = [];
+                    data['query'] = "<?= $block->getRequest()->getParam('q') ?>";
+                    data['suggested_query'] = $('.search.suggest').find('.suggest-word').text().trim();
+                    gtmCustomer.push('suggested_search_plp', data);
+                });
+            }
+        });
+    });
+</script>

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<?php
+/** @var \SM\MobileApi\Block\Product\Image360 $block */
+$images = $block->get360Image();
+?>
+
+<html lang="en">
+<head>
+    <script type="text/javascript" src="https://code.$.com/$-3.5.1.min.js"></script>
+    <style>
+        img {
+            display: inline;
+            min-width: 100%;
+            max-width: 100%
+        }
+
+        li {
+            margin: 10px 0px;
+        }
+
+        iframe {
+            display: block;
+            min-width: 100%;
+            max-width: 100%;
+            margin: 10px 0px;
+        }
+
+        h3 {
+            font-family: ProxyBold, serif
+        }
+
+        a {
+            color: #b6b6b6;
+        }
+
+        body, body * {
+            word-wrap: break-word;
+            max-width: 100%;
+        }
+    </style>
+    <title>Image 360</title>
+</head>
+<body>
+<div style="text-align: center;">
+    <div id="product" style="min-width: 100%;max-width: 100%; margin: 10px 0px; overflow: hidden;">
+        <?php foreach ($images as $image) {?>
+            <img src='<?= $image?>' alt="360 Image"/>
+        <?php } ?>
+    </div>
+</div>
+<!--Code by Luis Fuho -->
+<script type="text/javascript">
+    require([
+        'jquery',
+        'domReady!'
+    ], function ($) {
+
+        $.fn.j360 = function (options) {
+            var defaults = {
+                clicked: false,
+                currImg: 1
+            };
+            var options = $.extend(defaults, options);
+            return this.each(function () {
+                var $obj = $(this);
+                var aImages = {};
+                $obj.css({
+                    'margin-left': 'auto',
+                    'margin-right': 'auto',
+                    'text-align': 'center',
+                    'overflow': 'hidden'
+                });
+
+                $overlay = $obj.clone(true);
+                $overlay.html('<img src="<?php echo $block->getViewFileUrl('SM_MobileApi::images/loader.gif'); ?>" class="loader" />');
+                $overlay.attr('id', 'view_overlay');
+                $overlay.css({
+                    'position': 'absolute',
+                    'z-index': '5',
+                    'top': $obj.offset().top,
+                    'left': $obj.offset().left,
+                    'background': '#fff'
+                });
+                $obj.after($overlay);
+                $obj.after('<div id="colors_ctrls"></div>');
+                $('#colors_ctrls').css({
+                    'width': $obj.width(),
+                    'position': 'absolute',
+                    'z-index': '5',
+                    'top': $obj.offset().top + $obj.height - 50,
+                    'left': $obj.offset().left
+                });
+
+                var imageTotal = 0;
+                $('img', $obj).each(function () {
+                    aImages[++imageTotal] = $(this).attr('src');
+                    preload($(this).attr('src'));
+                });
+
+                var imageCount = 0;
+
+                $('.preload_img').on("load", function () {
+                    if (++imageCount == imageTotal) {
+                        $overlay.animate({
+                            'filter': 'alpha(Opacity=0)',
+                            'opacity': 0
+                        }, 500);
+                        $obj.html('<img src="' + aImages[1] + '" />');
+                        $overlay.bind('mousedown touchstart', function (e) {
+                            if (e.type == "touchstart") {
+                                options.currPos = window.event.touches[0].pageX;
+                            } else {
+                                options.currPos = e.pageX;
+                            }
+                            options.clicked = true;
+                            return false;
+                        });
+                        $(document).bind('mouseup touchend', function () {
+                            options.clicked = false;
+                        });
+                        $(document).bind('mousemove touchmove', function (e) {
+                            if (options.clicked) {
+                                var pageX;
+                                if (e.type == "touchmove") {
+                                    pageX = window.event.targetTouches[0].pageX;
+                                } else {
+                                    pageX = e.pageX;
+                                }
+
+                                var width_step = 4;
+                                if (Math.abs(options.currPos - pageX) >= width_step) {
+                                    if (options.currPos - pageX >= width_step) {
+                                        options.currImg++;
+                                        if (options.currImg > imageTotal) {
+                                            options.currImg = 1;
+                                        }
+                                    } else {
+                                        options.currImg--;
+                                        if (options.currImg < 1) {
+                                            options.currImg = imageTotal;
+                                        }
+                                    }
+                                    options.currPos = pageX;
+                                    $obj.html('<img src="' + aImages[options.currImg] + '" />');
+                                }
+                            }
+                        });
+                    }
+                });
+
+                if (isBrowser("msie") || isBrowser("mozilla") || isBrowser("opera") || isBrowser("safari")) {
+                    $(window).resize(function () {
+                        onresizeFunc($obj, $overlay);
+                    });
+                } else {
+                    var supportsOrientationChange = "onorientationchange" in window,
+                        orientationEvent = supportsOrientationChange ? "orientationchange" : "resize";
+                    window.addEventListener(orientationEvent, function () {
+                        onresizeFunc($obj, $overlay);
+                    }, false);
+                }
+                onresizeFunc($obj, $overlay)
+
+            });
+        };
+
+        function onresizeFunc($obj, $overlay) {
+            $overlay.css({
+                'margin-top': 0,
+                'top': $obj.offset().top,
+                'left': $obj.offset().left
+            });
+
+            jQuery('#colors_ctrls').css({
+                'top': $obj.offset().top + $obj.height - 50,
+                'left': $obj.offset().left
+            });
+        }
+
+        function isBrowser($browser) {
+            return navigator.userAgent.search($browser) > -1;
+        }
+
+        function preload(image) {
+            if (typeof document.body == "undefined") return;
+            try {
+                var div = document.createElement("div");
+                var s = div.style;
+                s.position = "absolute";
+                s.top = s.left = 0;
+                s.visibility = "hidden";
+                document.body.appendChild(div);
+                div.innerHTML = "<img class=preload_img src=" + image + " />";
+            } catch (e) {
+                // Error. Do nothing.
+            }
+        }
+
+    });
+</script>
+<script type="text/javascript">
+    require([
+        'jquery',
+        'domReady!'
+    ], function ($) {
+
+        $(document).ready(function () {
+            $('#product').j360();
+        });
+
+    });
+</script>
+</body>
+</html>

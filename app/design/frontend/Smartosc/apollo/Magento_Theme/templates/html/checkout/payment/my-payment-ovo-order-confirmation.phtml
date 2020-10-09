@@ -1,0 +1,89 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<div class="wrapper-payment">
+    <div class="logo-bank">
+        <img src='<?= $block->getViewFileUrl('images/order-confirmed.png'); ?>' alt=""  width="461" height="406" />
+    </div>
+
+    <div class="success-payment">
+        <p class="status-payment"><?= $block->escapeHtml(__('Order Confirmed')) ?></p>
+        <p class="text-label-body">01 Nov 2019 | 07:20</p>
+    </div>
+    <div class="order-info">
+        <div class="">
+            <label class="text-label-body"><?= $block->escapeHtml(__('Total Payment')) ?></label>
+            <p class="text-body">RP 1.499.000</p>
+        </div>
+        <div class="total-payment payment-method">
+            <label class="text-label-body"><?= $block->escapeHtml(__('Payment Method')) ?></label>
+            <div class="virtual-account">
+                <img src='<?= $block->getViewFileUrl('images/ovo-bg-gray.png'); ?>' alt=""  width="150" height="55" />
+            </div>
+        </div>
+        <div class="invoice-number">
+            <label class="text-label-body"><?= $block->escapeHtml(__('Transaction ID')) ?></label>
+            <p class="text-body">ID0839203803</p>
+        </div>
+    </div>
+    <div class="block-payment product-purchased">
+        <div class="block-header product-header">
+            <p><?= $block->escapeHtml(__('Product Purchased')) ?></p>
+        </div>
+        <div class="block-content product-content">
+            <ul>
+                <?php for ($i=0; $i < 3; $i++):?>
+                    <li>
+                        <img src='<?= $block->getViewFileUrl('images/order-confirmed.png'); ?>' alt=""  width="93" height="74" />
+                        <div class="info-product">
+                            <p>Onitsuka Tiger Mexico 66 (Kill Bill)</p>
+                            <span>1 pcs (6 kg)</span>
+                        </div>
+                    </li>
+                <?php endfor; ?>
+            </ul>
+        </div>
+        <div class="block-footer product-footer">
+            <a class="" href="#">+ 2 more products</a>
+        </div>
+    </div>
+    <div class="block-payment bill-paid-details">
+        <div class="block-header">
+            <p><?= $block->escapeHtml(__('Bill Paid Details')) ?></p>
+        </div>
+        <div class="block-content bill-paid-content">
+            <div class="item">
+                <span class="title-item">Subtotal (3 items)</span>
+                <span class="info-item">Rp 1.499.000</span>
+            </div>
+            <div class="item">
+                <span class="title-item">Delivery Fee</span>
+                <span class="info-item">Rp 56.000</span>
+            </div>
+            <div class="item">
+                <span class="title-item">Voucher</span>
+                <span class="info-item">- Rp 50.000</span>
+            </div>
+            <div class="item">
+                <span class="title-item">Bank Mega 10% Discount</span>
+                <span class="info-item">- Rp 50.000</span>
+            </div>
+        </div>
+        <div class="block-footer bill-paid-footer">
+            <div class="total">
+                <span class="title-total">Total</span>
+                <span class="info-total">Rp 1.449.000</span>
+            </div>
+            <div class="note">
+                <p>OVO</p>
+            </div>
+        </div>
+    </div>
+    <div class="check-payment-row">
+        <button class="btn-outline-secondary" type="button">Check Payment Status</button>
+        <button class="action primary" type="button">Back to Home</button>
+    </div>
+</div>

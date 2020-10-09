@@ -1,0 +1,98 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_Customer
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ * @author   Imam Kusuma <imam.kusuma@ctcorpdigital.com>
+ * @edited   J.P <jaka.pondan@ctcorpdigital.com>
+ *
+ * Copyright © 2019 CT Corp Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+	<type name="Trans\Customer\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+    <type name="Trans\Customer\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">customer_log</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="system" xsi:type="object">Trans\Customer\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </type>
+
+	<!-- login post -->
+    <!--<type name="Magento\Customer\Controller\Account\LoginPost">
+		<plugin name="phone_number_login" type="Trans\Customer\Plugin\Customer\Controller\Account\LoginPost" />
+	</type>
+
+	<type name="Magento\Customer\Controller\Ajax\Login">
+		<plugin name="popup_login_ajax" type="Trans\Customer\Plugin\Customer\Controller\Ajax\Login" />
+	</type>-->
+    <!-- end login post -->
+
+    <!-- register post -->
+	<!--<type name="Magento\Customer\Controller\Account\CreatePost">
+		<plugin name="validate_phone_register" type="Trans\Customer\Plugin\Customer\Controller\Account\CreatePost" />
+	</type>-->
+	<!-- end register post -->
+
+	<!--<type name="Magento\Customer\Controller\Account\ForgotPasswordPost">
+		<plugin name="forgotpassword_customer" type="Trans\Customer\Plugin\Customer\Controller\Account\ForgotPasswordPost" />
+	</type>-->
+
+	<!-- edit post -->
+
+	<!-- fullname field -->
+
+	<preference for="Magento\Customer\Block\Widget\Name" type="Trans\Customer\Preference\Customer\Block\Widget\Name" />
+	<type name="Magento\Customer\Controller\Account\EditPost">
+		<plugin name="edit_customer" type="Trans\Customer\Plugin\Customer\Controller\Account\EditPost" />
+	</type>
+	<!-- end fullname field -->
+
+	<!--<preference for="Mageplaza\SocialLogin\Block\Form\Login" type="Trans\Customer\Preference\SocialLogin\Block\Form\Login" />-->
+
+	<type name="Magento\Customer\Helper\View">
+		<plugin name="customer_helper" type="Trans\Customer\Plugin\Customer\Helper\View" />
+	</type>
+
+	<!--<type name="Magento\Customer\Model\AccountManagement">
+		<plugin name="customer_authenticate_locked" type="Trans\Customer\Plugin\Customer\Model\AccountManagement" />
+	</type>-->
+
+	<preference for="Trans\Customer\Api\AccountManagementInterface" type="Trans\Customer\Model\AccountManagement" />
+
+	<preference for="Magento\Customer\Model\Data\Customer" type="Trans\Customer\Preference\Customer\Model\Data\Customer" />
+	<preference for="Magento\Customer\Model\Data\Address" type="Trans\Customer\Preference\Customer\Model\Data\Address" />
+    <!--	Integration Customer-->
+    <preference for="Trans\Customer\Api\CustomerIntegrationInterface" type="Trans\Customer\Model\CustomerIntegration" />
+    <preference for="Trans\Customer\Api\Data\CustomerIntegrationResponseInterface" type="Trans\Customer\Model\CustomerIntegrationResponse" />
+    <preference for="Trans\Customer\Api\Data\CustomerIntegrationDataInterface" type="Trans\Customer\Model\CustomerIntegrationData" />
+    <preference for="Trans\Customer\Api\Data\CustomerIntegrationValidationsInterface" type="Trans\Customer\Model\CustomerIntegrationValidations" />
+
+    <!-- My Address  -->
+    <preference for="Magento\Customer\Controller\Address\Index" type="Trans\Customer\Controller\Address\Index" />
+    <preference for="Magento\Customer\Controller\Address\Delete" type="Trans\Customer\Controller\Address\Delete" />
+    <preference for="Magento\Customer\Controller\Address\NewAction" type="Trans\Customer\Controller\Address\NewAction" />
+    <preference for="Magento\Customer\Controller\Address\FormPost" type="Trans\Customer\Controller\Address\FormPost" />
+    <preference for="Magento\Customer\Block\Address\Grid" type="Trans\Customer\Block\Address\Grid" />
+    <preference for="Magento\Customer\Block\Address\Edit" type="Trans\Customer\Block\Address\Edit" />
+    <type name="Magento\Customer\Controller\Address\FormPost">
+        <plugin name="trans_customer_default_address" type="Trans\Customer\Plugin\Customer\Controller\Address\FormPost" />
+    </type>
+    <!-- end my address  -->
+
+    <!--<preference for="Magento\Customer\Block\Form\Register" type="Trans\Customer\Preference\Customer\Block\Form\Register" />-->
+
+    <type name="Magento\Customer\Block\Account\Navigation">
+        <plugin name="add_class_to_customer_link" type="Trans\Customer\Plugin\Customer\Block\Account\Navigation" />
+    </type>
+</config>

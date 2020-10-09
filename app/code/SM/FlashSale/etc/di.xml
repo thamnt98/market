@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magento\CatalogEvent\Observer\ApplyEventOnQuoteItemSetQty"
+                type="SM\FlashSale\Observer\ApplyEventOnQuoteItemSetQty" />
+
+    <preference for="Magento\CatalogEvent\Observer\ApplyEventOnQuoteItemSetProduct"
+                type="SM\FlashSale\Observer\ApplyEventOnQuoteItemSetProduct" />
+
+    <preference for="Magento\CatalogEvent\Observer\ApplyIsSalableToProduct"
+                type="SM\FlashSale\Observer\ApplyIsSalableToProduct" />
+
+    <preference for="Magento\CatalogEvent\Observer\ProductEventApplier"
+                type="SM\FlashSale\Observer\ProductEventApplier" />
+
+    <preference for="Magento\CatalogEvent\Controller\Adminhtml\Catalog\Event\Save"
+                type="SM\FlashSale\Controller\Adminhtml\Catalog\Event\Save" />
+
+    <preference for="Magento\CatalogEvent\Cron\StatusChecker"
+                type="SM\FlashSale\Cron\StatusChecker" />
+
+    <type name="Magento\Quote\Model\Quote\Item\ToOrderItem">
+        <plugin name="CheckSaleQuantity"
+                type="SM\FlashSale\Plugin\CheckSaleQuantity"/>
+    </type>
+
+    <preference for="SM\FlashSale\Api\FlashSaleEventInterface" type="SM\FlashSale\Model\FlashSaleEvent"/>
+
+    <preference for="SM\FlashSale\Api\Data\FlashSaleDateInterface" type="SM\FlashSale\Model\FlashSaleDate"/>
+
+    <preference for="Magento\CatalogEvent\Model\ResourceModel\Event"
+                type="SM\FlashSale\Model\ResourceModel\Event" />
+
+    <preference for="Magento\Checkout\Controller\Cart\Add"
+                type="SM\FlashSale\Controller\Cart\Add" />
+    <preference for="Magento\Quote\Model\Quote\Address\Total\Subtotal"
+                type="SM\FlashSale\Override\Magento\Quote\Model\Quote\Address\Total\Subtotal" />
+</config>

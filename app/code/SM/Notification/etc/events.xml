@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="catalog_product_save_after">
+        <observer name="SMNotificationObserverEventProductInShoppingListOnSale"
+                  instance="SM\Notification\Observer\EventProductInShoppingListOnSale" />
+    </event>
+    <event name="catalog_product_save_before">
+        <observer name="SMNotificationObserverEventProductBackToStock"
+                  instance="SM\Notification\Observer\EventProductBackToStock" />
+    </event>
+    <event name="sales_order_save_after">
+        <observer name="SM_Notification::OrderSaveAfter"
+                  instance="SM\Notification\Observer\Order\SaveAfter" />
+    </event>
+    <event name="sales_quote_item_save_before">
+        <observer name="SM_Notification::QuoteItemSaveAfter"
+                  instance="SM\Notification\Observer\QuoteItemSaveBefore" />
+    </event>
+</config>

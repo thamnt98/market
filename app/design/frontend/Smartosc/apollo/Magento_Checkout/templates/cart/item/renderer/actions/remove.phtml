@@ -1,0 +1,25 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var $block \Magento\Checkout\Block\Cart\Item\Renderer\Actions\Remove */
+if ($item = $block->getItem()) {
+    if ($product = $item->getProduct()) {
+        $productId = $product->getId();
+    }
+}
+?>
+<a href="#"
+   title="<?= $block->escapeHtmlAttr(__('Remove item')) ?>"
+   class="action action-delete"
+   <?php if (!empty($productId)) : ?>
+       data-gtm-event="removeFromCart"
+       data-gtm-product-id="<?= $block->escapeHtml($productId) ?>"
+   <?php endif; ?>
+   data-post='<?= /* @noEscape */ $block->getDeletePostJson() ?>'>
+    <span>
+        <?= $block->escapeHtml(__('Remove item')) ?>
+    </span>
+</a>

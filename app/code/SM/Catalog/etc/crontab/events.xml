@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="catalog_product_save_before">
+        <observer name="trans_catalog_product_save_before" instance="SM\Catalog\Observer\ProductSaveAfter" />
+    </event>
+    <event name="catalog_category_save_before">
+        <observer name="trans_catalog_category_save_before" instance="SM\Catalog\Observer\CategorySaveBefore" />
+    </event>
+    <event name="catalog_category_save_after">
+        <observer name="trans_catalog_category_save_after" instance="SM\Catalog\Observer\CategorySaveAfter" />
+    </event>
+</config>
+

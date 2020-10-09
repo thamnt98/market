@@ -1,0 +1,120 @@
+<?php
+/**
+ * @category Trans
+ * @package  Trans_CustomerMyProfile
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Dwi Septha Kurniawan <septha.kurniawan@transdigital.co.id>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+
+// @codingStandardsIgnoreFile
+?>
+<div class="block block-dashboard-info">
+    <div class="block-title">
+        <strong><?= $block->escapeHtml(__('Personal Information')) ?></strong>
+        <a class="action edit primary" href="<?= $block->escapeUrl($block->getUrl('customermyprofile/myprofile/editpersonalinformation')) ?>">
+            <span><?= $block->escapeHtml(__('Edit')) ?></span>
+        </a>
+    </div>
+    <div class="block-content block-content-personal-information">
+        <div class="field field-name-profile-picture">
+            <form class="form" action="<?= $block->escapeUrl($block->getUrl('customer/account/editPost')) ?>" method="post" id="form-validate-picture" enctype="multipart/form-data" data-hasrequired="<?= $block->escapeHtmlAttr(__('* Required Fields')) ?>" autocomplete="off">
+
+                <div class="profile-picture">
+                    <label for="profile_picture" class="image-photo-profile">
+                        <img src="<?php echo $block->getProfilePicture(); ?>" width="150px" height="150px" alt="profile-picture" title="<?= $block->escapeHtml(__('Edit Profile Picture')) ?>" class="profile-picture-image"/>
+                        <div class="profile-picture-overlay">
+                            <div class="profile-picture-text"><?= $block->escapeHtml(__('Edit')) ?></div>
+                        </div>
+                    </label>
+                    <div class="add-photo-profile">
+                        <label for="profile_picture" id="add-photo-profile"><?= $block->escapeHtml(__('Upload photo')) ?></label>
+                    </div>
+                </div>
+
+                <div class="control">
+                    <input type="file" id="profile_picture" name="profile_picture" value="" title="<?= $block->escapeHtml(__('Profile Picture')) ?>" class="profile-picture-input validate-picture-type validate-picture-size" />
+                </div>
+                <input type="hidden" name="update_profile_picture" value="1">
+            </form>
+        </div>
+        <div class="field field-content-profile-information">
+            <div class="box-title">
+                <span><?= $block->escapeHtml(__('Full name')) ?></span>
+            </div>
+            <div class="box-content">
+                <p data-gtm="fullName"><?= $block->escapeHtml($block->getFullName()) ?></p>
+            </div>
+            <div class="box-title">
+                <span><?= $block->escapeHtml(__('Date of Birth')) ?></span>
+            </div>
+            <div class="box-content">
+                <p data-gtm="DOB"><?= $block->escapeHtml($block->getDateOfBirth()) ?></p>
+            </div>
+            <div class="gender-maritalStatus-content">
+                <div class="gender-content">
+                    <div class="box-title">
+                        <span><?= $block->escapeHtml(__('Gender')) ?></span>
+                    </div>
+                    <div class="box-content">
+                        <p data-gtm="Gender"><?= $block->escapeHtml(__($block->getGenderLabel())) ?></p>
+                    </div>
+                </div>
+                <div class="marital-status-content">
+                    <div class="box-title">
+                        <span><?= $block->escapeHtml(__('Marital Status')) ?></span>
+                    </div>
+                    <div class="box-content">
+                        <p data-gtm="marital_status"><?= $block->escapeHtml(__($block->getMaritalStatusLabel())) ?></p>
+                    </div>
+                </div>
+            </div>
+            <div class="box-title">
+                <span><?= $block->escapeHtml(__('KTP Number')) ?></span>
+            </div>
+            <div class="box-content">
+                <p data-gtm="ktp_no"><?= $block->escapeHtml($block->getNik()) ?></p>
+            </div>
+            <?php
+            if (isset($_GET['omni'])) {
+            ?>
+            <div class="box-title">
+                <span><?= $block->escapeHtml(__('Omni Store Code')) ?></span>
+            </div>
+            <div class="box-content">
+                <p><?= $block->escapeHtml($block->getOmniStoreId()) ?></p>
+            </div>
+            <?php
+            }
+            ?>
+        </div>
+
+    </div>
+</div>
+
+<script type="text/x-magento-init">
+    {
+        "*" : {
+             "validateprofilepicturejs": {}
+        }
+    }
+</script>
+<script>
+    require([
+        "jquery",
+        "mage/mage"
+    ], function($){
+        var dataForm = $('#form-validate-picture');
+        var ignore = 'null';
+
+        dataForm.mage('validation', {
+            ignore: ignore ? ':hidden:not(' + ignore + ')' : ':hidden'
+        });
+
+    });
+    window.getMaxsizePicture = '<?php /* @escapeNotVerified */ echo $block->getConfigMaxsize(); ?>';
+</script>

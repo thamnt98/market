@@ -1,0 +1,40 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<div if="hasData()"
+     class="smart-products product-special-picks" css="additionalClasses">
+    <div class="block-title">
+        <strong role="heading"
+                aria-level="2"
+                text="label"/>
+    </div>
+    <div class="products-grid grid">
+            <ol class="product-cards widget-product-grid row">
+                <li class="product-card col-xs-6 col-sm-4" repeat="foreach: filteredRows, item: '$row'">
+                    <div class="product-item product-item-info product-item--hideCart" data-container="product-list">
+                        <div class="product-item-photo-wrapper">
+                            <fastForEach args="data: getRegion('general-area'), as: '$col'" >
+                                <render args="$col.getBody()"/>
+                            </fastForEach>
+                        </div>
+
+                        <div class="product details product-item-details">
+                            <fastForEach args="data: getRegion('details-area'), as: '$col'" >
+                                <render args="$col.getBody()"/>
+                            </fastForEach>
+
+                            <div if="getRegion('description-area')().length"
+                                 class="product-item-description">
+                                <fastForEach args="data: getRegion('description-area'), as: '$col'" >
+                                    <render args="$col.getBody()"/>
+                                </fastForEach>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            </ol>
+    </div>
+</div>

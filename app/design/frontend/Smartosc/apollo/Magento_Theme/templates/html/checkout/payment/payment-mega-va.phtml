@@ -1,0 +1,151 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<div class="wrapper-payment">
+    <h2 class="text-header"><?= $block->escapeHtml(__('Transfer Bank Mega Virtual Account')) ?></h2>
+    <div class="wrapper-payment-time">
+        <img class="oval-blue" src='<?= $block->getViewFileUrl('images/oval-blue.png'); ?>' alt=""/>
+        <img class="oval-brown" src='<?= $block->getViewFileUrl('images/oval-brown-2.png'); ?>' alt=""/>
+        <label class="text-label-body label-payment-time"><?= $block->escapeHtml(__('Please make your payment in')) ?></label>
+        <div id="timer">
+            <div id="hours"></div>
+            <div id="minutes"></div>
+            <div id="seconds"></div>
+        </div>
+        <p class="warning-payment-time"><?= $block->escapeHtml(__('Your payment is due by Thursday, 14 November 2019 06:38 PM')) ?></p>
+    </div>
+
+    <div class="total-payment">
+        <label class="text-label-body"><?= $block->escapeHtml(__('Total Payment')) ?></label>
+        <p class="text-body">RP 1.499.000</p>
+    </div>
+
+    <div class="account-number">
+        <label class="text-label-body"><?= $block->escapeHtml(__('Bank Mego Virtual Account Number')) ?></label>
+        <p class="text-body">091289374838</p>
+        <span class="text-link-body coppy-number"><?= $block->escapeHtml(__('Copy Number')) ?></span>
+        <span class="text-link-body"><?= $block->escapeHtml(__('Visit Website')) ?></span>
+    </div>
+
+    <div class="logo-bank">
+        <img src='<?= $block->getViewFileUrl('images/bank-mega.png'); ?>' alt=""  width="173" height="101" />
+    </div>
+
+    <div class="invoice-number">
+        <label class="text-label-body"><?= $block->escapeHtml(__('Invoice Number')) ?></label>
+        <p class="text-body">INV2890283920</p>
+    </div>
+
+    <div id="accordion">
+        <label class="text-label-body"><?= $block->escapeHtml(__('How to Pay with Bank Mega Virtual Account')) ?></label>
+        <div data-role="collapsible" class="title-accordion">
+            <div data-role="trigger" class="arrow-title">
+                <span >Bank Mega ATM</span>
+            </div>
+        </div>
+        <div data-role="content" class="content-accordion">
+            <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
+                et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+                aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+                dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui o
+                fficia deserunt mollit anim id est laborum.
+            </p>
+        </div>
+
+        <div data-role="collapsible" class="title-accordion">
+            <div data-role="trigger" class="arrow-title">
+                <span>Mega Mobile App</span>
+            </div>
+        </div>
+        <div data-role="content" class="content-accordion">
+            <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
+                et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+                aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+                dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui o
+                fficia deserunt mollit anim id est laborum.
+            </p>
+        </div>
+
+        <div data-role="collapsible" class="title-accordion">
+            <div data-role="trigger" class="arrow-title">
+                <span >Mega Internet</span>
+            </div>
+        </div>
+        <div data-role="content" class="content-accordion">
+            <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
+                et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+                aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+                dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui o
+                fficia deserunt mollit anim id est laborum.
+            </p>
+        </div>
+
+        <div data-role="collapsible" class="title-accordion">
+            <div data-role="trigger" class="arrow-title">
+                <span >Bank Mega Branch Office</span>
+            </div>
+        </div>
+        <div data-role="content" class="content-accordion">
+            <p>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore
+                et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+                aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum
+                dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui o
+                fficia deserunt mollit anim id est laborum.
+            </p>
+        </div>
+    </div>
+    <div class="check-payment-col">
+        <button class="btn-outline-secondary" type="button">Check Payment Status</button>
+        <button class="action primary" type="button">Back to Home</button>
+    </div>
+</div>
+<script type="text/javascript">
+    require(
+        [
+            'jquery',
+            'accordion',
+            'domReady!'
+        ],
+        function($) {
+            var accordion = $("#accordion");
+            accordion.accordion();
+            //time
+            // Set the date we're counting down to
+            var countDownDate = new Date("Apr 4, 2021 12:12:25").getTime();
+
+            // Update the count down every 1 second
+            var x = setInterval(function() {
+
+                // Get today's date and time
+                var now = new Date().getTime();
+
+                // Find the distance between now and the count down date
+                var distance = countDownDate - now;
+
+                // Time calculations for days, hours, minutes and seconds
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                // Output the result in an element with id="demo"
+                // document.getElementById("timer").innerHTML = hours + " hours : "
+                //     + minutes + "minutes : " + seconds + "seconds";
+                $("#hours").html("<span class='number-time'>"+ hours +"</span>" + "<span class='text-time'> hours </span>" + "<span class='two-dots'> : </span>");
+                $("#minutes").html("<span class='number-time'>"+ minutes +"</span>" + "<span class='text-time'> minutes </span>" + "<span class='two-dots'> : </span>");
+                $("#seconds").html("<span class='number-time'>"+ seconds +"</span>"  + "<span class='text-time'> seconds </span>");
+                // If the count down is over, write some text
+                if (distance < 0) {
+                    clearInterval(x);
+                    document.getElementById("timer").innerHTML = "EXPIRED";
+                }
+            }, 1000);
+        }
+    );
+</script>

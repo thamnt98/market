@@ -1,0 +1,152 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+?>
+<div class="new-checkout">
+    <div class="bx-apply-voucher" data-trigger="apply-voucher">
+        <img src='<?= $block->getViewFileUrl('images/svg-icons/Voucher.svg'); ?>' alt=""  width="30" height="18" />
+        <span><?= $block->escapeHtml(__('Apply your voucher'))?></span>
+        <span class="action primary total-voucher"><?= $block->escapeHtml(__('5 Vouchers'))?></span>
+        <!--<a href="#" class="bt-add"><?/*= $block->escapeHtml(__('Add'))*/?></a>-->
+    </div>
+    <div class="bx-remove-voucher">
+        <div class="til-code">
+            <span class="tile-voucher"><?= $block->escapeHtml(__('GROC4520'))?></span>
+            <span class="code-voucher"><?= $block->escapeHtml(__('- Rp 50.000 '))?></span>
+        </div>
+        <div class="apply-remove">
+            <span class="applied-vouver"><span class="voucher-icon"></span><?= $block->escapeHtml(__('Applied '))?></span>
+            <a href="#" class="bt-remove"><span class="apl-Remove"></span></a>
+        </div>
+    </div>
+</div>
+
+<div data-bind="mageInit: {
+    'Magento_Ui/js/modal/modal':{
+    'type': 'popup',
+    'title': 'Apply Voucher',
+    'trigger': '[data-trigger=apply-voucher]',
+    'modalClass': 'pp-apply-voucher',
+    'responsive': true
+    }}">
+    <div class="ct-apply-voucher">
+        <div class="gr-search-ck">
+            <input type="text" class="input-text"  placeholder="Find promos and discounts" />
+            <button type="submit" class="action secondary"><?= $block->escapeHtml(__('Search')) ?></button>
+        </div>
+        <div class="list-voucher">
+            <h5 class="list-voucher-tilte"><?= $block->escapeHtml(__('You have 6 voucher(s)')) ?></h5>
+            <ul class="list-items scrollbar">
+                <li class="item-voucher">
+                    <div class="inner">
+                        <span class="time-use-voucher"><?= $block->escapeHtml(__('3 hours')) ?></span>
+                        <img src='<?= $block->getViewFileUrl('images/svg-icons/Voucher.svg'); ?>' alt=""  width="337" height="200" />
+                        <div class="item-voucher-detail">
+                            <p class="description" data-trigger="apply-voucher-detail"><?= $block->escapeHtml(__('Rp 100.000 voucher without minimum purchase')) ?></p>
+                            <span class="valid-until"><?= $block->escapeHtml(__('Valid until 1 Nov 2019')) ?></span>
+                            <button class="action primary small"><?= $block->escapeHtml(__('User')) ?></button>
+                        </div>
+                    </div>
+                </li>
+                <li class="item-voucher">
+                    <div class="inner">
+                        <span class="time-use-voucher"><?= $block->escapeHtml(__('3 hours')) ?></span>
+                        <img src='<?= $block->getViewFileUrl('images/svg-icons/Voucher.svg'); ?>' alt=""  width="337" height="200" />
+                        <div class="item-voucher-detail">
+                            <p class="description"><?= $block->escapeHtml(__('Rp 100.000 voucher without minimum purchase')) ?></p>
+                            <span class="valid-until"><?= $block->escapeHtml(__('Valid until 1 Nov 2019')) ?></span>
+                            <button class="action primary small"><?= $block->escapeHtml(__('User')) ?></button>
+                        </div>
+                    </div>
+                </li>
+                <li class="item-voucher">
+                    <div class="inner">
+                        <span class="time-use-voucher"><?= $block->escapeHtml(__('3 hours')) ?></span>
+                        <img src='<?= $block->getViewFileUrl('images/svg-icons/Voucher.svg'); ?>' alt=""  width="337" height="200" />
+                        <div class="item-voucher-detail">
+                            <p class="description"><?= $block->escapeHtml(__('Rp 100.000 voucher without minimum purchase')) ?></p>
+                            <span class="valid-until"><?= $block->escapeHtml(__('Valid until 1 Nov 2019')) ?></span>
+                            <button class="action primary small"><?= $block->escapeHtml(__('User')) ?></button>
+                        </div>
+                    </div>
+                </li>
+                <li class="item-voucher">
+                    <div class="inner">
+                        <span class="time-use-voucher"><?= $block->escapeHtml(__('3 hours')) ?></span>
+                        <img src='<?= $block->getViewFileUrl('images/svg-icons/Voucher.svg'); ?>' alt=""  width="337" height="200" />
+                        <div class="item-voucher-detail">
+                            <p class="description"><?= $block->escapeHtml(__('Rp 100.000 voucher without minimum purchase')) ?></p>
+                            <span class="valid-until"><?= $block->escapeHtml(__('Valid until 1 Nov 2019')) ?></span>
+                            <button class="action primary small"><?= $block->escapeHtml(__('User')) ?></button>
+                        </div>
+                    </div>
+                </li>
+                <li class="item-voucher">
+                    <div class="inner">
+                        <span class="time-use-voucher"><?= $block->escapeHtml(__('3 hours')) ?></span>
+                        <img src='<?= $block->getViewFileUrl('images/svg-icons/Voucher.svg'); ?>' alt=""  width="337" height="200" />
+                        <div class="item-voucher-detail">
+                            <p class="description"><?= $block->escapeHtml(__('Rp 100.000 voucher without minimum purchase')) ?></p>
+                            <span class="valid-until"><?= $block->escapeHtml(__('Valid until 1 Nov 2019')) ?></span>
+                            <button class="action primary small"><?= $block->escapeHtml(__('User')) ?></button>
+                        </div>
+                    </div>
+                </li>
+                <li class="item-voucher">
+                    <div class="inner">
+                        <span class="time-use-voucher"><?= $block->escapeHtml(__('3 hours')) ?></span>
+                        <img src='<?= $block->getViewFileUrl('images/svg-icons/Voucher.svg'); ?>' alt=""  width="337" height="200" />
+                        <div class="item-voucher-detail">
+                            <p class="description"><?= $block->escapeHtml(__('Rp 100.000 voucher without minimum purchase')) ?></p>
+                            <span class="valid-until"><?= $block->escapeHtml(__('Valid until 1 Nov 2019')) ?></span>
+                            <button class="action primary small"><?= $block->escapeHtml(__('User')) ?></button>
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div data-bind="mageInit: {
+    'Magento_Ui/js/modal/modal':{
+    'type': 'popup',
+    'title': 'Apply Voucher',
+    'trigger': '[data-trigger=apply-voucher-detail]',
+    'modalClass': 'pp-apply-voucher-detail',
+    'responsive': true
+    }}">
+    <div class="ct-apply-voucher">
+        <div class="banner-voucher-detail">
+            <img src='<?= $block->getViewFileUrl('images/svg-icons/Voucher.svg'); ?>' alt="" />
+        </div>
+        <div class="voucher-ct-detail">
+            <div class="wrap">
+                <p class="description"><?= $block->escapeHtml(__('Rp 100.000 voucher without minimum purchase')) ?></p>
+                <span class="valid-until"><?= $block->escapeHtml(__('Valid until 1 Nov 2019')) ?></span>
+            </div>
+            <button class="action primary"><?= $block->escapeHtml(__('User')) ?></button>
+        </div>
+        <div class="term-how-use scrollbar">
+            <div class="box-term">
+                <h4><?= $block->escapeHtml(__('Terms & Conditions:')) ?></h4>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elited do eiusmod tempor incididunt ut labore
+                    et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea.
+                    Commodo consequauis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore.
+                    Fugiat nulla pariatuxcepteur sint occaecat cupidatat non proidentun.</p>
+            </div>
+            <div class="box-how-use">
+                <h4><?= $block->escapeHtml(__('How to Use:')) ?></h4>
+                <ol>
+                    <li> Lorem ipsum dolor sit amet, consectetur adipiscing elited do eiusmod tempor incididunt ut labore </li>
+                    <li> Lorem ipsum dolor sit amet, consectetur adipiscing elited do eiusmod tempor incididunt ut labore </li>
+                    <li> Lorem ipsum dolor sit amet, consectetur adipiscing elited do eiusmod tempor incididunt ut labore </li>
+                    <li> Lorem ipsum dolor sit amet, consectetur adipiscing elited do eiusmod tempor incididunt ut labore </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>

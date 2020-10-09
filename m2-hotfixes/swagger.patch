@@ -1,0 +1,339 @@
+diff --git a/vendor/amasty/module-shop-by-base/Api/Data/OptionSettingInterface.php b/vendor/amasty/module-shop-by-base/Api/Data/OptionSettingInterface.php
+index a7f5d3d1c..dd1dce775 100644
+--- a/vendor/amasty/module-shop-by-base/Api/Data/OptionSettingInterface.php
++++ b/vendor/amasty/module-shop-by-base/Api/Data/OptionSettingInterface.php
+@@ -108,103 +108,103 @@ interface OptionSettingInterface
+     public function getSliderPosition();
+ 
+     /**
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function getSmallImageAlt();
+ 
+     /**
+      * @param string $description
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function setDescription($description);
+ 
+     /**
+      * @param string $filterCode
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function setFilterCode($filterCode);
+ 
+     /**
+      * @param int $isFeatured
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function setIsFeatured($isFeatured);
+ 
+     /**
+      * @param string $image
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function setImage($image);
+ 
+     /**
+      * @param string $image
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function setSliderImage($image);
+ 
+     /**
+      * @param string $alt
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function setSmallImageAlt($alt);
+ 
+     /**
+      * @param int $id
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function setId($id);
+ 
+     /**
+      * @param int $id
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function setStoreId($id);
+ 
+     /**
+      * @param int $value
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function setValue($value);
+ 
+     /**
+      * @param string $metaDescription
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function setMetaDescription($metaDescription);
+ 
+     /**
+      * @param string $metaKeywords
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function setMetaKeywords($metaKeywords);
+ 
+     /**
+      * @param string $metaTitle
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function setMetaTitle($metaTitle);
+ 
+     /**
+      * @param string $title
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function setTitle($title);
+ 
+     /**
+      * @param int|null $id
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function setTopCmsBlockId($id);
+ 
+     /**
+      * @param int|null $id
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function setBottomCmsBlockId($id);
+ 
+     /**
+      * @param int $pos
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function setSliderPosition($pos);
+ 
+@@ -228,13 +228,13 @@ interface OptionSettingInterface
+     public function getImagePath($isSlider);
+ 
+     /**
+-     * @return null|string
++     * @return string|null
+      */
+     public function getImageUrl();
+ 
+     /**
+      * @param bool $strict
+-     * @return null|string
++     * @return string|null
+      */
+     public function getSliderImageUrl($strict = false);
+ 
+@@ -242,7 +242,7 @@ interface OptionSettingInterface
+      * @param string $filterCode
+      * @param int $optionId
+      * @param int $storeId
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function getByParams($filterCode, $optionId, $storeId);
+ 
+@@ -256,7 +256,7 @@ interface OptionSettingInterface
+      * @param int $optionId
+      * @param int $storeId
+      * @param array $data
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function saveData($filterCode, $optionId, $storeId, $data);
+ }
+diff --git a/vendor/amasty/module-shop-by-base/Api/Data/OptionSettingRepositoryInterface.php b/vendor/amasty/module-shop-by-base/Api/Data/OptionSettingRepositoryInterface.php
+index fb58c1c05..1eb540f34 100644
+--- a/vendor/amasty/module-shop-by-base/Api/Data/OptionSettingRepositoryInterface.php
++++ b/vendor/amasty/module-shop-by-base/Api/Data/OptionSettingRepositoryInterface.php
+@@ -14,7 +14,7 @@ interface OptionSettingRepositoryInterface
+ {
+     /**
+      * @param int $id
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      * @throws NoSuchEntityException
+      */
+     public function get($id);
+@@ -23,12 +23,12 @@ interface OptionSettingRepositoryInterface
+      * @param string $filterCode
+      * @param int $optionId
+      * @param int $storeId
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function getByParams($filterCode, $optionId, $storeId);
+ 
+     /**
+-     * @param OptionSettingInterface $optionSetting
++     * @param \Amasty\ShopbyBase\Api\Data\OptionSettingInterface $optionSetting
+      * @return OptionSettingRepositoryInterface
+      */
+     public function save(OptionSettingInterface $optionSetting);
+diff --git a/vendor/amasty/module-shop-by-base/Helper/OptionSetting.php b/vendor/amasty/module-shop-by-base/Helper/OptionSetting.php
+index 93e477eb5..ca276bb0e 100644
+--- a/vendor/amasty/module-shop-by-base/Helper/OptionSetting.php
++++ b/vendor/amasty/module-shop-by-base/Helper/OptionSetting.php
+@@ -63,7 +63,7 @@ class OptionSetting extends \Magento\Framework\App\Helper\AbstractHelper
+      * @param string $value
+      * @param string $filterCode
+      * @param int $storeId
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function getSettingByValue($value, $filterCode, $storeId)
+     {
+@@ -96,9 +96,9 @@ class OptionSetting extends \Magento\Framework\App\Helper\AbstractHelper
+     /**
+      * @param $attribute
+      * @param $value
+-     * @param OptionSettingInterface $setting
++     * @param \Amasty\ShopbyBase\Api\Data\OptionSettingInterface $setting
+      *
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function applyDataFromOption($attribute, $value, OptionSettingInterface $setting)
+     {
+@@ -113,7 +113,7 @@ class OptionSetting extends \Magento\Framework\App\Helper\AbstractHelper
+     }
+ 
+     /**
+-     * @param OptionSettingInterface $setting
++     * @param \Amasty\ShopbyBase\Api\Data\OptionSettingInterface $setting
+      * @param AttributeOptionInterface $option
+      * @return $this
+      */
+diff --git a/vendor/amasty/module-shop-by-base/Model/OptionSetting.php b/vendor/amasty/module-shop-by-base/Model/OptionSetting.php
+index def6fa36a..ba3199c69 100644
+--- a/vendor/amasty/module-shop-by-base/Model/OptionSetting.php
++++ b/vendor/amasty/module-shop-by-base/Model/OptionSetting.php
+@@ -518,7 +518,7 @@ class OptionSetting extends \Magento\Framework\Model\AbstractModel implements Op
+      * @param string $filterCode
+      * @param int $optionId
+      * @param int $storeId
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function getByParams($filterCode, $optionId, $storeId)
+     {
+@@ -546,7 +546,7 @@ class OptionSetting extends \Magento\Framework\Model\AbstractModel implements Op
+      * @param int $optionId
+      * @param int $storeId
+      * @param array $data
+-     * @return OptionSettingInterface|\Magento\Framework\DataObject
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface|\Magento\Framework\DataObject
+      */
+     public function saveData($filterCode, $optionId, $storeId, $data)
+     {
+diff --git a/vendor/amasty/module-shop-by-base/Model/OptionSettingFactory.php b/vendor/amasty/module-shop-by-base/Model/OptionSettingFactory.php
+index 7380cacaa..5bf4be817 100644
+--- a/vendor/amasty/module-shop-by-base/Model/OptionSettingFactory.php
++++ b/vendor/amasty/module-shop-by-base/Model/OptionSettingFactory.php
+@@ -33,7 +33,7 @@ class OptionSettingFactory
+      * Provide Option Setting instance
+      *
+      * @param array $arguments
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      * @throws \UnexpectedValueException
+      */
+     public function create(array $arguments = [])
+diff --git a/vendor/amasty/module-shop-by-base/Model/OptionSettingRepository.php b/vendor/amasty/module-shop-by-base/Model/OptionSettingRepository.php
+index 853e58db4..b2dbab365 100644
+--- a/vendor/amasty/module-shop-by-base/Model/OptionSettingRepository.php
++++ b/vendor/amasty/module-shop-by-base/Model/OptionSettingRepository.php
+@@ -53,7 +53,7 @@ class OptionSettingRepository implements OptionSettingRepositoryInterface
+ 
+     /**
+      * @param int $id
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      * @throws NoSuchEntityException
+      */
+     public function get($id)
+@@ -71,7 +71,7 @@ class OptionSettingRepository implements OptionSettingRepositoryInterface
+      * @param string $filterCode
+      * @param int $optionId
+      * @param int $storeId
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function getByParams($filterCode, $optionId, $storeId)
+     {
+@@ -110,7 +110,7 @@ class OptionSettingRepository implements OptionSettingRepositoryInterface
+     }
+ 
+     /**
+-     * @param OptionSettingInterface $optionSetting
++     * @param \Amasty\ShopbyBase\Api\Data\OptionSettingInterface $optionSetting
+      * @return $this
+      */
+     public function save(OptionSettingInterface $optionSetting)
+diff --git a/vendor/amasty/module-shop-by-brand/Block/Widget/BrandList.php b/vendor/amasty/module-shop-by-brand/Block/Widget/BrandList.php
+index 0c01186a5..a9baa3b7d 100644
+--- a/vendor/amasty/module-shop-by-brand/Block/Widget/BrandList.php
++++ b/vendor/amasty/module-shop-by-brand/Block/Widget/BrandList.php
+@@ -132,7 +132,7 @@ class BrandList extends BrandListAbstract implements \Magento\Widget\Block\Block
+ 
+     /**
+      * @param \Magento\Eav\Model\Entity\Attribute\Option $option
+-     * @param OptionSettingInterface $setting
++     * @param \Amasty\ShopbyBase\Api\Data\OptionSettingInterface $setting
+      * @return array
+      */
+     protected function getItemData(Option $option, OptionSettingInterface $setting)
+diff --git a/vendor/amasty/module-shop-by-brand/Block/Widget/BrandListAbstract.php b/vendor/amasty/module-shop-by-brand/Block/Widget/BrandListAbstract.php
+index b2edcb1aa..bb2241896 100644
+--- a/vendor/amasty/module-shop-by-brand/Block/Widget/BrandListAbstract.php
++++ b/vendor/amasty/module-shop-by-brand/Block/Widget/BrandListAbstract.php
+@@ -145,7 +145,7 @@ abstract class BrandListAbstract extends \Magento\Framework\View\Element\Templat
+ 
+     /**
+      * @param int $value
+-     * @return OptionSettingInterface
++     * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     private function getBrandOptionSettingByValue($value)
+     {
+diff --git a/vendor/amasty/module-shop-by-brand/Block/Widget/BrandSlider.php b/vendor/amasty/module-shop-by-brand/Block/Widget/BrandSlider.php
+index 04f3a8bcf..006747c9e 100644
+--- a/vendor/amasty/module-shop-by-brand/Block/Widget/BrandSlider.php
++++ b/vendor/amasty/module-shop-by-brand/Block/Widget/BrandSlider.php
+@@ -37,7 +37,7 @@ class BrandSlider extends BrandListAbstract implements \Magento\Widget\Block\Blo
+ 
+     /**
+      * @param \Magento\Eav\Model\Entity\Attribute\Option $option
+-     * @param OptionSettingInterface $setting
++     * @param \Amasty\ShopbyBase\Api\Data\OptionSettingInterface $setting
+      *
+      * @return array
+      */
+diff --git a/vendor/amasty/module-shop-by-brand/Helper/Content.php b/vendor/amasty/module-shop-by-brand/Helper/Content.php
+index 54b652107..0cb4dd6f8 100644
+--- a/vendor/amasty/module-shop-by-brand/Helper/Content.php
++++ b/vendor/amasty/module-shop-by-brand/Helper/Content.php
+@@ -67,7 +67,7 @@ class Content extends AbstractHelper
+ 
+     /**
+      * Get current Brand.
+-     * @return null|OptionSettingInterface
++     * @return null|\Amasty\ShopbyBase\Api\Data\OptionSettingInterface
+      */
+     public function getCurrentBranding()
+     {

@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_DigitalProduct
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Imam Kusuma <imam.kusuma@transdigital.co.id>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../Config/etc/system_file.xsd">
+    <system>
+    	<section id="digitalproduct" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Digital Product Setting</label>
+            <tab>trans</tab>
+            <resource>Trans_DigitalProduct::digital_product</resource>
+            <group id="altera" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Altera Config</label>
+                <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="is_production" translate="label" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Is Production</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <group id="altera_staging" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                	<label>Staging Setting</label>
+                	<field id="base_url_staging" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                    	<label>API URL</label>
+                    	<comment>**Required**</comment>
+                    	<config_path>digitalproduct/altera/base_url_staging</config_path>
+                	</field>
+                	<field id="username_staging" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                    	<label>Username</label>
+                    	<comment>**Required**</comment>
+                    	<config_path>digitalproduct/altera/username_staging</config_path>
+                	</field>
+                	<field id="secret_staging" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                    	<label>Secret Key</label>
+                    	<comment>**Required**</comment>
+                    	<config_path>digitalproduct/altera/secret_staging</config_path>
+                	</field>
+            	</group>
+            	<group id="altera_production" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                	<label>Production Setting</label>
+                	<field id="base_url_production" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                    	<label>Production URL</label>
+                    	<comment>**Required**</comment>
+                    	<config_path>digitalproduct/altera/base_url_production</config_path>
+                	</field>
+                	<field id="username_production" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                    	<label>Username</label>
+                    	<comment>**Required**</comment>
+                    	<config_path>digitalproduct/altera/username_production</config_path>
+                	</field>
+                	<field id="secret_production" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                    	<label>Secret Key</label>
+                    	<comment>**Required**</comment>
+                    	<config_path>digitalproduct/altera/secret_production</config_path>
+                	</field>
+            	</group>
+            </group>
+        </section>
+    </system>
+</config>

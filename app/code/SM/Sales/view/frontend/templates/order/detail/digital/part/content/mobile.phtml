@@ -1,0 +1,37 @@
+<?php
+/** @var \SM\Sales\Block\Order\Digital\Part\Content $block */
+
+/** @var \SM\Sales\Api\Data\DigitalOrderDataInterface $digitalOrder */
+$digitalOrder = $block->getParentOrder();
+$ext = $digitalOrder->getProductOption()->getExtensionAttributes();
+?>
+<div class="bx-order-status bx-order-status-digital">
+    <div class="od-delivery-address">
+        <div class="tracking-order-service">
+            <span class="service-type"><?= $block->escapeHtml(__('Service Type')) ?></span>
+            <h4><?= $ext->getDigitalData()->getDigital()->getServiceType() ?></h4>
+        </div>
+        <div class="product-name">
+            <span class="delivery-address"><?= $block->escapeHtml(__('Product Name')) ?></span>
+            <h4><?= $digitalOrder->getProductName() ?></h4>
+        </div>
+    </div>
+    <div class="tracking-order">
+        <div class="mobile-number">
+            <span class="delivery-address"><?= $block->escapeHtml(__('Mobile Number')) ?></span>
+            <h4><?= $ext->getDigitalData()->getDigital()->getMobileNumber() ?></h4>
+        </div>
+        <?php if ($digitalOrder->getStatus() == \SM\Sales\Api\ParentOrderRepositoryInterface::STATUS_COMPLETE):?>
+            <div class="serial-number">
+                <span class="delivery-address"><?= $block->escapeHtml(__('Serial Number')) ?></span>
+                <h4><?= $ext->getDigitalData()->getDigitalTransaction()->getSerialNumber() ?></h4>
+            </div>
+        <?php endif;?>
+    </div>
+    <div class="od-delivery-address-last">
+        <div class="operator">
+            <span class="delivery-address"><?= $block->escapeHtml(__('Operator')) ?></span>
+            <h4><?= $ext->getDigitalData()->getDigital()->getOperator() ?></h4>
+        </div>
+    </div>
+</div>

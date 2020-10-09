@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_LayeredNavigation
+ *
+ * Date: April, 25 2020
+ * Time: 5:19 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Amasty\Shopby\Model\Layer\Filter\Category"
+                type="SM\LayeredNavigation\Model\AmastyShopby\Layer\Filter\Category"/>
+    <preference for="Amasty\Shopby\Model\Layer\Filter\Rating"
+                type="SM\LayeredNavigation\Model\AmastyShopby\Layer\Filter\Rating"/>
+    <preference for="SM\CustomPrice\Model\Layer\Filter\Price"
+                type="SM\LayeredNavigation\Model\AmastyShopby\Layer\Filter\Price"/>
+    <preference for="Amasty\Shopby\Model\Layer\Filter\OnSale"
+                type="SM\LayeredNavigation\Model\AmastyShopby\Layer\Filter\OnSale"/>
+    <preference for="Amasty\Shopby\Plugin\Elasticsearch\Model\Adapter\AdditionalFieldMapper"
+                type="SM\LayeredNavigation\Plugin\AmastyShopby\Elasticsearch\Model\Adapter\AdditionalFieldMapper"/>
+    <preference for="Amasty\Shopby\Plugin\Elasticsearch\Model\Adapter\AdditionalDataMapper"
+                type="SM\LayeredNavigation\Plugin\AmastyShopby\Elasticsearch\Model\Adapter\AdditionalDataMapper"/>
+    <preference for="Amasty\Shopby\Plugin\Elasticsearch\Model\Adapter\AdditionalBatchDataMapper"
+                type="SM\LayeredNavigation\Plugin\AmastyShopby\Elasticsearch\Model\Adapter\AdditionalBatchDataMapper"/>
+
+    <!-- Amasty Shopby Plugin -->
+    <type name="Amasty\Shopby\Model\ResourceModel\Fulltext\Collection">
+        <plugin name="add_catalog_permissions_information"
+                type="Amasty\Shopby\Plugin\ElasticsearchCatalogPermissions\Plugin\AddCategoryPermissionsToCollectionPlugin" />
+    </type>
+    <type name="Amasty\Shopby\Model\Layer\FilterList">
+        <plugin name="SM_LayeredNavigation::AmastyFilterListPlugin"
+                type="SM\LayeredNavigation\Plugin\AmastyShopby\Model\Layer\FilterList"/>
+    </type>
+    <type name="Amasty\Shopby\Model\Layer\Filter\Attribute">
+        <plugin name="SM_LayeredNavigation::AmastyFilterAttributePlugin"
+                type="SM\LayeredNavigation\Plugin\AmastyShopby\Model\Layer\Filter\Attribute"/>
+    </type>
+
+    <!-- Elasticsearch Plugin -->
+    <type name="Magento\Elasticsearch\SearchAdapter\Aggregation\Builder\Term">
+        <plugin name="Amasty_Shopby::AggregationTermAddTotals"
+                type="Amasty\Shopby\Plugin\Elasticsearch\SearchAdapter\Aggregation\Builder\Term"/>
+    </type>
+    <type name="Magento\Elasticsearch\Model\Adapter\BatchDataMapper\ProductDataMapper">
+        <plugin name="SM_LayeredNavigation::EsIndexProductMapper" sortOrder="999"
+                type="SM\LayeredNavigation\Plugin\MagentoElasticsearch\Model\Adapter\BatchDataMapper\ProductDataMapper"/>
+    </type>
+    <type name="Magento\Elasticsearch\Elasticsearch5\Model\Adapter\FieldMapper\ProductFieldMapper">
+        <plugin name="SM_LayeredNavigation::EsProductFieldMapper"
+                type="SM\LayeredNavigation\Plugin\MagentoElasticsearch\Elasticsearch5\Model\Adapter\FieldMapper\ProductFieldMapper"/>
+    </type>
+
+    <type name="Magento\Catalog\Model\Layer\Filter\Category">
+        <plugin name="change_name_filter_category"
+                type="SM\LayeredNavigation\Plugin\Category\Model\Layer\Filter\Category" />
+    </type>
+
+</config>

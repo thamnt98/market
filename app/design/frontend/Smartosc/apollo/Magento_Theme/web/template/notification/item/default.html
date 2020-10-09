@@ -1,0 +1,29 @@
+<li class="item notification notification-item" data-role="notification-item">
+    <div class="notification">
+        <!-- ko if: notification_has_url -->
+        <a data-bind="attr: {href: notification_url, title: notification_name}" tabindex="-1" class="notification-item-photo">
+            <!-- ko foreach: $parent.getRegion('itemImage') -->
+            <!-- ko template: {name: getTemplate(), data: item.notification_image} --><!-- /ko -->
+            <!-- /ko -->
+        </a>
+        <!-- /ko -->
+        <!-- ko ifnot: notification_has_url -->
+        <span class="notification-item-photo">
+            <!-- ko foreach: $parent.getRegion('itemImage') -->
+            <!-- ko template: {name: getTemplate(), data: item.notification_image} --><!-- /ko -->
+            <!-- /ko -->
+        </span>
+        <!-- /ko -->
+
+        <div class="notification-item-details">
+            <strong class="notification-item-name">
+                <!-- ko if: notification_has_url -->
+                <a data-bind="attr: {href: notification_url}, html: notification_name"></a>
+                <!-- /ko -->
+                <!-- ko ifnot: notification_has_url -->
+                <!-- ko text: notification_name --><!-- /ko -->
+                <!-- /ko -->
+            </strong>
+        </div>
+    </div>
+</li>

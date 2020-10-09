@@ -1,0 +1,33 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \Magento\Review\Block\Form $block */
+
+$formBlock = $block->getChildBlock("product.review.form.detail");
+/** @var \SM\Review\ViewModel\ReviewViewModel $reviewViewModel */
+$reviewViewModel = $formBlock->getData("reviewViewModel");
+
+/** @var \Magento\Catalog\Model\Product $product */
+$product = $block->getProductInfo();
+
+
+?>
+<div class="block review-add" id="write-review-pdp" style="display: none;">
+    <div class="block-content">
+        <?php if ($block->getAllowWriteReviewFlag()) : ?>
+            <?php
+            /** @var \SM\Review\Block\Customer\Form\Detail $formBlock */
+            $formBlock->setProduct($product); ?>
+            <?= $block->getChildHtml("product.review.form.detail");?>
+        <?php else : ?>
+        <div class="message info notlogged" id="review-form">
+            <div>
+                <?= $block->escapeHtml(__('Only registered users can write reviews. Please <a href="%1">Sign in</a> or <a href="%2">create an account</a>', $block->getLoginLink(), $block->getRegisterUrl()), ['a']) ?>
+            </div>
+        </div>
+        <?php endif ?>
+    </div>
+</div>

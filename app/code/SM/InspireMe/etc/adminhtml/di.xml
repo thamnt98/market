@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+  ~ @project    ct-corp-transmart
+  ~ @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+  ~ @author     Duc Nguyen Hoang <ducnh2@smartosc.com>
+  ~ @copyright  Copyright © 2020 SmartOSC. All rights reserved.
+  ~ @url        http://www.smartosc.com
+  -->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Override -->
+    <preference for="Mirasvit\Blog\Controller\Adminhtml\Post\Save" type="SM\InspireMe\Controller\Adminhtml\Post\Save"/>
+    <preference for="Mirasvit\Blog\Controller\Adminhtml\Category\Index"
+                type="SM\InspireMe\Controller\Adminhtml\Category\Index"/>
+    <preference for="Mirasvit\Blog\Controller\Adminhtml\Category" type="SM\InspireMe\Controller\Adminhtml\Category"/>
+    <preference for="Mirasvit\Blog\Controller\Adminhtml\Category\Edit"
+                type="SM\InspireMe\Controller\Adminhtml\Category\Edit"/>
+    <preference for="Mirasvit\Blog\Controller\Adminhtml\Category\Save"
+                type="SM\InspireMe\Controller\Adminhtml\Category\Save"/>
+    <preference for="Mirasvit\Blog\Block\Adminhtml\Category\Edit\Tab\General"
+                type="SM\InspireMe\Block\Adminhtml\Category\Edit\Tab\General"/>
+    <preference for="Mirasvit\Blog\Ui\Post\Form\DataProvider" type="SM\InspireMe\Ui\Post\Form\DataProvider"/>
+
+    <!-- Plugin -->
+    <type name="Mirasvit\Blog\Ui\Component\Listing\Column\PostActions">
+        <plugin name="sm_inspireme_ui_component_listing_column_postActions"
+                type="SM\InspireMe\Plugin\Mirasvit\Blog\Ui\Component\Listing\Column\PostActions"
+                sortOrder="10"
+        />
+    </type>
+</config>

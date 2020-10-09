@@ -1,0 +1,152 @@
+<?php
+/**
+ * @category    SM
+ * @package     SM_Customer
+ * @license     http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ *
+ * @author      Nam Nguyen <namnd2@smartosc.com>
+ *
+ * @copyright   Copyright (c) SmartOSC. All rights reserved.
+ * @url http://www.smartosc.com/
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var \Magento\Customer\Block\Address\Grid $block */
+$customerAddressView = $block->getData('customer_address');
+$customer = $block->getCustomer();
+?>
+<?php
+/** @var $viewModel \Trans\Customer\ViewModel\CustomerAddress */
+$viewModel = $block->getViewModel();
+?>
+<div class="block block-addresses-list">
+    <div class="actions-toolbar">
+        <h1 class="page-title">
+            <span class="base" data-ui-id="page-title-wrapper">My Address</span>
+        </h1>
+        <button type="button" role="add-address" title="<?= $block->escapeHtmlAttr(__('Add New Address')) ?>" class="action primary add"><span><?= $block->escapeHtml(__('Add Address')) ?></span></button>
+    </div>
+    <div class="block-content">
+        <?php
+            $defaultBilling = false;
+            $defaultBillingId = 0;
+            if ($customer->getDefaultBilling()) {
+                $defaultBillingId = $customer->getDefaultBilling();
+                $defaultBilling = $block->getLayout()->createBlock(\Magento\Customer\Block\Address\Book::class)->getAddressById($defaultBillingId);
+            }
+        ?>
+        <div class="table-wrapper additional-addresses">
+            <table class="data table table-additional-addresses-items history" id="additional-addresses-table">
+                <thead>
+                <tr>
+                    <th scope="col" class="col address"><?= $block->escapeHtml(__('Address')) ?></th>
+                    <th scope="col" class="col recipient"><?= $block->escapeHtml(__('Recipient')) ?></th>
+                    <th scope="col" class="col actions"> </th>
+                </tr>
+                </thead>
+                <tbody>
+                    <?php if ($defaultBilling): ?>
+                        <?php foreach ($viewModel->getAddressCollection($customer) as $address) : ?>
+                            <?php
+                                $cityName = ($address->getCity() != '') ? $viewModel->getCityName($address->getCity()) : '';
+                                $districtName = ($address->getDistrict() != '') ? $viewModel->getDistrictName($address->getDistrict()) : '';
+                            ?>
+                            <tr>
+                                <td data-th="<?= $block->escapeHtmlAttr(__('Address')) ?>" class="col address">
+                                    <?php if($defaultBillingId == $address->getId()):?>
+                                        <span class="address-tag main-address-color"><?= $block->escapeHtml($address->getAddressTag())?></span>
+                                    <?php else:?>
+                                        <span class="address-tag other-address-color"><?= $block->escapeHtml($address->getAddressTag())?></span>
+                                    <?php endif?>
+                                    <p class="street"><?= $block->escapeHtml($viewModel->getStreet($address)) ?></p>
+                                    <p class="district"><?= $block->escapeHtml($districtName) ?></p>
+                                    <p class="city"><?= $block->escapeHtml($cityName) ?></p>
+                                    <p class="province"><?= $block->escapeHtml($address->getRegion()) ?></p>
+                                    <p class="zipcode"><?= $block->escapeHtml($address->getPostcode()) ?></p>
+                                    <p class="address-details"><?= $block->escapeHtml($viewModel->getAddressDetail($address)) ?></p>
+                                    <?php if (!$address->getPinpointLocation() || $address->getPinpointLocation() == ''): ?>
+                                        <p class="pinpoint">
+                                            <img src='<?= $block->getViewFileUrl('images/svg-icons/MyAddress.svg'); ?>' alt=""  width="15" height="20" />
+                                            <?= $block->escapeHtml(__('Pinpoint Not Available')) ?>
+                                        </p>
+                                    <?php endif; ?>
+                                </td>
+                                <td data-th="<?= $block->escapeHtmlAttr(__('Recipient')) ?>" class="col recipient">
+                                    <p class="name"><?= $block->escapeHtml($block->getFullName($address)) ?></p>
+                                    <p><?= $block->escapeHtml($address->getTelephone()) ?></p>
+                                </td>
+                                <td data-th="<?= $block->escapeHtmlAttr(__('Actions')) ?>" class="col actions">
+                                    <?php if ($defaultBillingId == $address->getId()): ?>
+                                        <p class="main-address"><?= $block->escapeHtml(__('Main Address')) ?></p>
+                                    <?php else: ?>
+                                        <a class="set-main-address" href="#" data-post='<?= $viewModel->getDeleteAddressParams($block->getUrl('customer/address/setdefault'), ['id' => $address->getId()]) ?>' data-action="set-main-address">
+                                            <p class="set-main-address"><?= $block->escapeHtml(__('Set as Main Address')) ?></p>
+                                        </a>
+                                    <?php endif; ?>
+                                    <div>
+                                        <a class="action edit" href="<?= $block->escapeUrl($block->getUrl('customer/address/edit', ['id' => $address->getId()])) ?>"><span><?= $block->escapeHtml(__('Edit')) ?></span></a>
+                                        <a class="action delete<?php if ($defaultBillingId == $address->getId()): ?> disabled<?php endif;?>" href="#"
+                                           <?php if ($defaultBillingId != $address->getId()): ?>role="delete-address" data-address="<?= $block->escapeHtmlAttr($address->getId()) ?><?php endif;?>">
+                                            <span><?= $block->escapeHtml(__('Delete')) ?></span>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="col col-line" colspan="3"><div class="line"></div></td>
+                            </tr>
+                        <?php endforeach;?>
+                    <?php else: ?>
+                        <?php
+                            $cityName = ($block->getCityAddress($customer) != '') ? $viewModel->getCityName($block->getCityAddress($customer)) : '';
+                            $districtName = ($block->getDistrictAddress($customer) != '') ? $viewModel->getDistrictName($block->getDistrictAddress($customer)) : '';
+                        ?>
+                        <tr>
+                            <td class="col-message-address" colspan="3" >
+                                <p class="message-non-address-content">
+                                    <img src='<?= $block->getViewFileUrl('images/svg-icons/Warning.svg'); ?>' alt=""  width="15" height="20" />
+                                    <?= $block->escapeHtml(__('To ensure we send your orders correctly, please complete your address.')) ?>
+                                </p>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td data-th="<?= $block->escapeHtmlAttr(__('Address')) ?>" class="col address">
+                                <p class="address-tag main-address-color"><?= $block->escapeHtml(__('Home')) ?></p>
+                                <p class="district"><?= $block->escapeHtml($districtName) ?></p>
+                                <p class="city"><?= $block->escapeHtml($cityName) ?></p>
+                                <p class="pinpoint">
+                                    <img src='<?= $block->getViewFileUrl('images/svg-icons/MyAddress.svg'); ?>' alt=""  width="15" height="20" />
+                                    <?= $block->escapeHtml(__('Pinpoint Not Available')) ?>
+                                </p>
+                            </td>
+                            <td data-th="<?= $block->escapeHtmlAttr(__('Recipient')) ?>" class="col recipient">
+                                <p class="name" ><?= $block->escapeHtml($block->getFullName($customer)) ?></p>
+                                <p><?= $block->escapeHtml($block->getTelephoneNumber($customer)) ?></p>
+                            </td>
+                            <td data-th="<?= $block->escapeHtmlAttr(__('Actions')) ?>" class="col actions">
+                                <p class="main-address"><?= $block->escapeHtml(__('Main Address')) ?></p>
+                                <div>
+                                    <a class="action edit" href="<?= $block->escapeUrl($block->getUrl('customer/address/new')) ?>"><span><?= $block->escapeHtml(__('Edit')) ?></span></a>
+                                    <a class="action delete disabled" href="#"><span><?= $block->escapeHtml(__('Delete')) ?></span></a>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<script type="text/x-magento-init">
+    {
+        ".page-main": {
+            "address": {
+                "deleteAddress": "td a[role='delete-address']",
+                "deleteUrlPrefix": "<?= $block->escapeJs($block->escapeUrl($block->getDeleteUrl())) ?>id/",
+                "addAddress": "button[role='add-address']",
+                "addAddressLocation": "<?= $block->escapeJs($block->escapeUrl($block->getAddAddressUrl())) ?>"
+            }
+        }
+    }
+</script>

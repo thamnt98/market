@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
+    <template id="sm_review_email_post_email_template"
+              label="Review Approved"
+              file="review_approved_email_template.html" type="html"
+              module="SM_Review" area="frontend"/>
+    <template id="sm_review_email_edit_email_template"
+              label="Edit Review Approved"
+              file="edit_review_approved_email_template.html" type="html"
+              module="SM_Review" area="frontend"/>
+    <template id="sm_review_email_submit_email_template"
+              label="Submit Review"
+              file="review_submit_email_template.html" type="html"
+              module="SM_Review" area="frontend"/>
+</config>

@@ -1,0 +1,121 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+
+
+<div class="my-giftRegistry">
+    <div class="giftRegistry-content">
+
+        <div class="block block-dashboard-info">
+            <div class="block-title">
+                <strong>Email &amp; Mobile Number</strong>
+            </div>
+            <div class="block-content box-content-email-mobileNumber">
+                <table class="table-content-email-mobileNumber">
+                    <tbody><tr>
+                        <td class="td-fist-child w-60">
+                            <div class="box-title">
+                                <span>Email address</span>
+                            </div>
+                            <div class="box-content">
+                                <p>huelt+03@gmail.com</p>
+                            </div>
+                        </td>
+                        <td class="td-fist-child w-25">
+                            <label id="verified_email" class="label-status verified">
+                                Verified                    </label>
+                        </td>
+                        <td class="td-fist-child w-15">
+                            <a class="action edit" href="https://transmart.local/customermyprofile/myprofile/editemail/">
+                                <span>Edit</span>
+                            </a>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>
+                            <div class="box-title">
+                                <span>Mobile Number</span>
+                            </div>
+                            <div class="box-content">
+                                <p>086287438754</p>
+                            </div>
+                        </td>
+                        <td>
+                            <label id="verified_mobile_number" class="label-status verified">
+                                Verified
+                            </label>
+                        </td>
+                        <td>
+                            <a class="action edit" href="https://transmart.local/customermyprofile/myprofile/editmobilenumber/">
+                                <span>Edit</span>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody></table>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+    require(
+        [
+            'jquery',
+            'Magento_Ui/js/modal/modal'
+        ],
+        function(
+            $,
+            modal
+        ) {
+            var options = {
+                type: 'popup',
+                responsive: true,
+                innerScroll: true,
+                title: $.mage.__('Create a Registry'),
+                modalClass: 'modal-popup-small',
+                buttons: [{
+                    text: $.mage.__('Cancel'),
+                    class: 'action secondary',
+                    click: function () {
+                        this.closeModal();
+
+                    }
+                },
+                {
+                    text: $.mage.__('Create'),
+                    class: 'action primary',
+                    click: function () {
+                        //this.closeModal();
+                    }
+                }]
+            };
+
+            const createRegister = $('.create-registry-modal');
+            const popup = modal(options, createRegister);
+            const createRegistrybutton = $('.createRegistry--button');
+
+            $(".giftRegistry-post").click(function() {
+                createRegister.modal('openModal');
+            });
+
+            $(createRegistrybutton).click(function() {
+                const $parent = $(this).parent();
+                if ($parent.hasClass('active')) return;
+                else{
+                    $(this).children('input[type="radio"]').prop("checked", true);
+                    $parent.addClass('active').siblings().removeClass('active');
+                }
+
+            });
+
+
+        }
+    );
+</script>

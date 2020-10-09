@@ -1,0 +1,122 @@
+<?php
+/**
+ * @project    ct-corp-transmart
+ * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @author     Duc Nguyen Hoang <ducnh2@smartosc.com>
+ * @copyright  Copyright © 2020 SmartOSC. All rights reserved.
+ * @url        http://www.smartosc.com
+ */
+
+/** @var \SM\InspireMe\Block\Widget\InspireMe $block */
+$postCollection = $block->getPostCollection();
+?>
+<div class="section-inspire-me">
+    <div class="block-title">
+        <strong><?= $block->escapeHtml(__($block->getData('title'))) ?></strong>
+        <a class="section-link inspire-see-all"
+           href="<?= $block->escapeUrl($block->getSeeAllUrl()) ?>"
+           data-gtm-event="<?= \SM\InspireMe\Helper\Data::GTM_POST_ALL_VIEW_EVENT_NAME ?>"
+        >
+            <?= $block->escapeHtml(__('See All')) ?>
+        </a>
+    </div>
+    <div class="block-content">
+        <?php if ($postCollection->getSize()): ?>
+            <div class="blockInspire" id="inspire-me-block">
+                <div class="row">
+                    <?php /** @var \Mirasvit\Blog\Model\Post $firstPost */ ?>
+                    <?php $firstPost = $postCollection->getFirstItem() ; ?>
+                    <div class="col-xs-12 col-lg-6 inspire-grid-big">
+                        <div class="inspire-card">
+
+                                <?php if ($block->getHomeImageUrl($firstPost)): ?>
+                                <a class="fade-img"
+                                   href="<?= $block->escapeUrl($firstPost->getUrl()) ?>"
+                                   title="<?= $block->escapeHtmlAttr($firstPost->getName()) ?>"
+                                   data-gtm-event="<?= \SM\InspireMe\Helper\Data::GTM_POST_EVENT_NAME ?>"
+                                   data-gtm='<?= $block->escapeHtml($block->getGtm($firstPost)) ?>'
+                                   data-gtm-name="<?= \SM\InspireMe\Helper\Data::GTM_POST_DATA_NAME ?>"
+                                >
+                                        <div class="inspire-image card-img-container">
+                                            <img class="lazy-loaded" loading="lazy" width="580" height="550"
+                                                 src="<?= $block->escapeUrl($block->getImageResize($firstPost->getData(\SM\InspireMe\Helper\Data::POST_DATA_HOME_IMAGE), 580, 550)) ?>"
+                                                 alt="<?= $block->escapeHtmlAttr($firstPost->getName()) ?>">
+                                        </div>
+                                </a>
+                                <?php endif; ?>
+
+                                <div class="inspire-info">
+                                    <div class="inspire-title">
+                                        <a
+                                           href="<?= $block->escapeUrl($firstPost->getUrl()) ?>"
+                                           title="<?= $block->escapeHtmlAttr($firstPost->getName()) ?>"
+                                           data-gtm-event="<?= \SM\InspireMe\Helper\Data::GTM_POST_EVENT_NAME ?>"
+                                           data-gtm='<?= $block->escapeHtml($block->getGtm($firstPost)) ?>'
+                                           data-gtm-name="<?= \SM\InspireMe\Helper\Data::GTM_POST_DATA_NAME ?>"
+                                        >
+                                        <?= $block->escapeHtml($firstPost->getName()) ?>
+                                        </a>
+                                    </div>
+                                    <div class="inspire-description">
+                                        <?= $block->escapeHtml($firstPost->getShortContent()) ?>
+                                    </div>
+                                </div>
+
+                        </div>
+                    </div>
+                    <div class="col-xs-12 col-lg-6 inspire-grid-wrapper">
+                        <div class="row">
+                            <?php $postCount = 0; ?>
+                            <?php /** @var \Mirasvit\Blog\Model\Post $post */ ?>
+                            <?php foreach ($postCollection as $post): ?>
+                                <?php if ($postCount++ == 0) {
+                                    continue;
+                                } ?>
+                                <div class="col-xs-12 col-md-6">
+                                    <div class="inspire-card">
+
+                                            <?php if ($block->getHomeImageUrl($post)): ?>
+                                            <a class="fade-img"
+                                               href="<?= $block->escapeUrl($post->getUrl()) ?>"
+                                               title="<?= $block->escapeHtmlAttr($post->getName()) ?>"
+                                               data-gtm-event="<?= \SM\InspireMe\Helper\Data::GTM_POST_EVENT_NAME ?>"
+                                               data-gtm='<?= $block->escapeHtml($block->getGtm($post)) ?>'
+                                               data-gtm-name="<?= \SM\InspireMe\Helper\Data::GTM_POST_DATA_NAME ?>"
+                                            >
+                                                    <div class="card-img-container">
+                                                        <img class="lazy-loaded" loading="lazy" width="360" height="225"
+                                                             src="<?= $block->escapeUrl($block->getImageResize($post->getData(\SM\InspireMe\Helper\Data::POST_DATA_HOME_IMAGE), 360, 225)) ?>"
+                                                             alt="<?= $block->escapeHtmlAttr($post->getName()) ?>">
+                                                    </div>
+                                            </a>
+                                            <?php endif; ?>
+                                            <div class="inspire-info">
+                                                <div class="inspire-title">
+                                                    <a class="fade-img"
+                                                       href="<?= $block->escapeUrl($post->getUrl()) ?>"
+                                                       title="<?= $block->escapeHtmlAttr($post->getName()) ?>"
+                                                       data-gtm-event="<?= \SM\InspireMe\Helper\Data::GTM_POST_EVENT_NAME ?>"
+                                                       data-gtm='<?= $block->escapeHtml($block->getGtm($post)) ?>'
+                                                       data-gtm-name="<?= \SM\InspireMe\Helper\Data::GTM_POST_DATA_NAME ?>"
+                                                    >
+                                                    <?= $block->escapeHtml($post->getName()) ?>
+                                                    </a>
+                                                </div>
+                                                <div class="inspire-description">
+                                                    <?= $block->escapeHtml($post->getShortContent()) ?>
+                                                </div>
+                                            </div>
+
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+
+
+

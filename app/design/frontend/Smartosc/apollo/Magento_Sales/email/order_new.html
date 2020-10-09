@@ -1,0 +1,290 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!--@subject {{trans "Your Order Confirmation (Reference number: %order_increment)" order_increment=$additional_data.order_increment}} @-->
+<!--@vars {
+"var formattedBillingAddress|raw":"Billing Address",
+"var order_data.email_customer_note|escape|nl2br":"Email Order Note",
+"var order.increment_id":"Order Id",
+"layout handle=\"sales_email_order_items\" order=$order area=\"frontend\"":"Order Items Grid",
+"var payment_html|raw":"Payment Details",
+"var formattedShippingAddress|raw":"Shipping Address",
+"var order.shipping_description":"Shipping Description",
+"var shipping_msg":"Shipping message",
+"var created_at_formatted":"Order Created At (datetime)",
+"var store.frontend_name":"Store Frontend Name",
+"var store_phone":"Store Phone",
+"var store_email":"Store Email",
+"var store_hours":"Store Hours",
+"var this.getUrl($store,'customer/account/',[_nosid:1])":"Customer Account URL",
+"var order_data.is_not_virtual":"Order Type",
+"var order":"Order",
+"var order_data.customer_name":"Customer Name"
+"var additional_data.order_increment":"Reference Number"
+"var additional_data.order_total":"Total"
+"var additional_data.payment_method_title":"Payment Method Title"
+"var additional_data.order_url":"Order Url"
+"var additional_data.is_va":"Is Virtual Account"
+"var additional_data.is_cc":"Is Credit Card"
+"var additional_data.is_store_pick_up":"Is Store Pick Up"
+"var additional_data.delivery_method":"Delivery Method"
+
+} @-->
+{{template config_path="design/email/header_template"}}
+<table class="greeting" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "Hello"}}
+                <b>{{trans "%customer_name," customer_name=$order_data.customer_name}}</b>
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End greeting-->
+<table class="message-email-2" width="100%">
+    <tr>
+        <td>
+            {{if additional_data.is_va}}
+            <p>
+                {{trans "Thank you for
+                shopping at Transmart.
+                We have received your
+                order with %payment_method_title payment. Please
+                make your payment before " payment_method_title=$additional_data.payment_method_title}}
+                {{trans '<span class="no-link">%created_at</span>' created_at=$created_at_formatted |raw}}.
+            </p>
+            <p>
+                {{trans "Reference Number: %order_increment" order_increment=$additional_data.order_increment}}
+            </p>
+            <p>
+                {{trans "Total: Rp %order_total" order_total=$additional_data.order_total}}
+            </p>
+            <p>
+                {{trans "Virtual Account number: %va_number" va_number=$additional_data.virtual_account_number}}
+            </p>
+            {{else}}
+            <p>
+                {{trans "Thank you for shopping at Transmart. We are currently preparing your order to be delivered to your address/picked up at the selected store."}}
+            </p>
+            <br>
+            <br>
+            <p>
+                {{trans "Reference Number: %order_increment" order_increment=$additional_data.order_increment}}
+            </p>
+            <p>
+                {{trans "Total: Rp %order_total" order_total=$additional_data.order_total}}
+            </p>
+            <p>
+                {{trans "Payment Method: %payment_method_title" payment_method_title=$additional_data.payment_method_title}}
+            </p>
+            {{/if}}
+        </td>
+    </tr>
+</table>
+<!--End Message Email 2-->
+<table class="list-deliver">
+    <tbody>
+    <tr>
+        <td class="two-column">
+            <table>
+                <tbody>
+                <tr>
+                    <td class="one-of-two-column">
+                        <table class="total">
+                            <tbody>
+                            <tr>
+                                <td class="inner-td">
+                                    {{depend order_data.is_not_virtual}}
+                                    <table class="content">
+                                        <tbody>
+                                        <tr>
+                                            <td class="title">
+                                                {{if additional_data.is_store_pick_up}}
+                                                <p>
+                                                    {{trans "Store Information"}}
+                                                </p>
+                                                {{else}}
+                                                <p>
+                                                    {{trans "Deliver to"}}
+                                                </p>
+                                                {{/if}}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="description">
+                                                {{var formattedShippingAddress|raw}}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    {{/depend}}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td class="one-of-two-column">
+                        <table class="total">
+                            <tbody>
+                            <tr>
+                                <td class="inner-td">
+                                    {{depend order_data.is_not_virtual}}
+                                    <table class="content">
+                                        <tbody>
+                                        <tr>
+                                            <td class="title">
+                                                <p>
+                                                    {{trans "Delivery method"}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="description">
+                                                <p>
+                                                    {{var additional_data.delivery_method}}
+                                                </p>
+                                                {{if shipping_msg}}
+                                                <p>{{var shipping_msg}}</p>
+                                                {{/if}}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    {{/depend}}
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<!--End List deliver-->
+{{layout handle="sales_email_order_items" order=$order area="frontend"}}
+<!-- End order detail-->
+<table class="message-email" width="100%">
+    <tr>
+        <td>
+            <p>
+            {{trans
+            'To see your order status, please go to <a href="%order_url" class="blue">My Order</a>'
+
+            order_url="$additional_data.order_url"
+            |raw}}
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Message Email-->
+{{depend additional_data.is_va}}
+<table class="how-to-pay">
+    <tr>
+        <td>
+            <p class="h2">
+                {{trans "How to Pay with BCA Virtual Account"}}
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td class="guide">
+            <table>
+                <tr>
+                    <td class="title-guide">
+                        <p>
+                            {{trans "BCA ATM"}}
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="content-guide">
+                        <p>
+                            {{trans "1. Insert your ATM BCA card and enter your PIN."}}
+                        </p>
+                        <p>
+                            {{trans "2. Choose Other Transactions"}}
+                        </p>
+                        <p>
+                            {{trans "3. Choose Transfer."}}
+                        </p>
+                        <p>
+                            {{trans "4. Choose to BCA Virtual Account."}}
+                        </p>
+                        <p>
+                            {{trans "5. Enter the BCA Virtual Account number shown on your Transmart page. Choose Right."}}
+                        </p>
+                        <p>
+                            {{trans "6. Make sure the amount of payment and other infomation are correct, then choose Right."}}
+                        </p>
+                        <p>
+                            {{trans "7. Choose Yes to validate your payment."}}
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td class="guide">
+            <table>
+                <tr>
+                    <td class="title-guide">
+                        <p>
+                            {{trans "m-BCA"}}
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="content-guide">
+                        <p>
+                            {{trans "1. Insert your ATM BCA card and enter your PIN."}}
+                        </p>
+                        <p>
+                            {{trans "2. Choose Other Transactions"}}
+                        </p>
+                        <p>
+                            {{trans "3. Choose Transfer."}}
+                        </p>
+                        <p>
+                            {{trans "4. Choose to BCA Virtual Account."}}
+                        </p>
+                        <p>
+                            {{trans "5. Enter the BCA Virtual Account number shown on your Transmart page. Choose Right."}}
+                        </p>
+                        <p>
+                            {{trans "6. Make sure the amount of payment and other infomation are correct, then choose Right."}}
+                        </p>
+                        <p>
+                            {{trans "7. Choose Yes to validate your payment."}}
+                        </p>
+                        <p>
+                            {{trans "8. Choose Yes to validate your payment."}}
+                        </p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+{{/depend}}
+<!--End How To Pay-->
+<table class="sincerely" width="100%">
+    <tr>
+        <td>
+            <p>{{trans "Sincerely"}},</p>
+            <p class="signature">
+                <b>{{var
+                    store.frontend_name}}</b>
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Sincerely-->
+{{template config_path="design/email/footer_template"}}

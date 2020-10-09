@@ -1,0 +1,15 @@
+<?php
+/** @var \SM\Sales\Block\Customer\Order\ProgressBar $block */
+
+$statuses = $block->processStatusHistory();
+?>
+
+<div class="progress-bar-status">
+    <div class="progress-bar-status">
+        <?php foreach ($statuses as $key => $status):?>
+            <div class="wrap-status status-<?= $key?> <?= $status["active"] ?>">
+                <span class="svg-icon <?= $status["svg"] ?>"></span>
+            </div>
+        <?php endforeach;?>
+    </div>
+</div>

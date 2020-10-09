@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_Notification
+ *
+ * Date: June, 02 2020
+ * Time: 5:35 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/queue.xsd">
+    <broker topic="sm.notification.sms" exchange="magento" type="amqp">
+        <queue name="sm.notification.sms" consumer="sm.notification.sms"
+               consumerInstance="Magento\Framework\MessageQueue\Consumer"
+               handler="SM\Notification\Model\Notification\Consumer\Sms::process"/>
+    </broker>
+    <broker topic="sm.notification.email" exchange="magento" type="amqp">
+        <queue name="sm.notification.email" consumer="sm.notification.email"
+               consumerInstance="Magento\Framework\MessageQueue\Consumer"
+               handler="SM\Notification\Model\Notification\Consumer\Email::process"/>
+    </broker>
+    <broker topic="sm.notification.push" exchange="magento" type="amqp">
+        <queue name="sm.notification.push" consumer="sm.notification.push"
+               consumerInstance="Magento\Framework\MessageQueue\Consumer"
+               handler="SM\Notification\Model\Notification\Consumer\Push::process"/>
+    </broker>
+</config>

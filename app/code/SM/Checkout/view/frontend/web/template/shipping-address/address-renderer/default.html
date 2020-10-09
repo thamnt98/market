@@ -1,0 +1,92 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!-- ko if: isSelected(address().customerAddressId) -->
+    <li class="shipping-address-item" data-bind="css: { notify: notify(address()) }">
+        <div class="inner">
+            <div class="head">
+                <!-- ko if: getAddressTag() != '' -->
+                <span class="status" data-bind="text: getAddressTag()"></span>
+                <!-- /ko -->
+                <!-- ko ifnot: isAddressComplete() -->
+                    <a class="complete-address-link" data-bind="i18n: 'Edit', attr: { href: getEditAddressUrl(address().customerAddressId) }"></a>
+                <!-- /ko -->
+                <!-- ko if: isMaxAddress() -->
+                <span class="apl-Remove" data-bind="click: function(){ deleteSelectedAddress(address().customerAddressId) }"></span>
+                <!-- /ko -->
+            </div>
+            <h4>
+                <text args="address().prefix"/> <text args="address().firstname"/> <text args="address().middlename"/>
+                <text args="address().lastname"/> <text args="address().suffix"/><br/>
+            </h4>
+            <p class="da-detail">
+                <!-- ko if: isAddressComplete() -->
+                <text args="_.values(address().street).join(', ')"/><br/>
+                <!-- /ko -->
+                <text args="address().customAttributes.district.value "/>, <text args="address().customAttributes.city.value "/>, <span text="address().region"></span>
+                <!-- ko if: isAddressComplete() -->
+                <text args="address().postcode"/>
+                <!-- /ko -->
+                <br/>
+                <a if="address().telephone" attr="'href': 'tel:' + address().telephone" text="'+'+address().telephone"></a><br/>
+            </p>
+            <!-- ko if: isAddressComplete() -->
+                <a class="change" href="#" data-bind="click: function(){ changeAddress(address().customerAddressId) }, i18n: 'Change'"></a>
+                <!-- ko ifnot: isMaxAddress() -->
+                    <span class="line">|</span>
+                    <a  class="sendtwo-address" href="#" data-bind="click: function(){ addMoreSelectedAddress(address().customerAddressId) }, i18n: '+ Send To 2 Addresses'"></a>
+                    <!-- ko if: isShow() -->
+                        <p  class="title-delivery-method" data-bind="i18n: 'Delivery Method'"></p>
+                        <select data-bind="attr: {'name': 'order-delivery-method'}, value: selectSingleShippingMethod, foreach: deliveryMethodListSingle">
+                            <option data-bind="attr: { disabled: $parent.isDisable(value), value: value }, i18n: label"></option>
+                        </select>
+                        <!-- ko if: isError -->
+                            <!-- ko ifnot: showNotify(address()) -->
+                                <p class="error-message abc"><!-- ko i18n: 'OAR: shipping method not available' --><!-- /ko --></p>
+                            <!-- /ko -->
+                        <!-- /ko -->
+                        <!-- ko if: isShowSelectDateTime() -->
+                            <div class="store-pickup-datetime">
+                                <div class="store-pickup-date">
+                                    <p class="delivery-date-label" data-bind="i18n: 'Delivery Date'"></p>
+                                    <input readonly type="text" class="input-text" style="width: auto" name="single-schedule-date" data-bind="value: singleScheduleDate" afterRender="renderDate('single-schedule-date')"/>
+                                </div>
+                                <div class="store-pickup-time" data-bind="event: { mouseleave: closeTimeSlotList() }">
+                                    <p class="delivery-time-label" data-bind="i18n: 'Delivery Time'"></p>
+                                    <div class="wrap-timeslot">
+                                    <input readonly type="text" class="input-text _has-timepicker" style="width: auto" name="single-schedule-time" data-bind="click: function(){ openTimeSlotList() }, value: singleScheduleTime" afterRender="preSelectTimeSlot()"/>
+                                    <!-- ko if: timeSlotListStatus-->
+                                    <ul class="time-slot" data-bind="foreach: timeSlot">
+                                        <li class="time-slot-item" data-bind="css: { selected: $parent.timeSlotSelected($data) }, text: $data, click: function(){ $parent.selectTimeSlot($data) }"></li>
+                                    </ul>
+                                    <!-- /ko -->
+                                    </div>
+                                </div>
+                            </div>
+                        <!-- /ko -->
+                    <!-- /ko -->
+                <!-- /ko -->
+            <!-- /ko -->
+            <!-- ko ifnot: isAddressComplete() -->
+                <!-- ko if: isShow() -->
+                    <p  class="title-delivery-method" data-bind="i18n: 'Delivery Method'"></p>
+                    <select data-bind="attr: {'name': 'order-delivery-method'}, value: selectSingleShippingMethod, foreach: deliveryMethodListSingle">
+                        <option data-bind="attr: { disabled: $parent.isDisable(value), value: value }, i18n: label"></option>
+                    </select>
+                    <!-- ko if: showNotify(address()) -->
+                    <p class="error-message"><!-- ko i18n: 'shipping method not available' --><!-- /ko --></p>
+                    <!-- /ko -->
+                <!-- /ko -->
+            <!-- /ko -->
+        </div>
+        <!-- ko if: showNotify(address()) -->
+            <div class="block-remark delivery-remark shipping-address-notify">
+                <span class="apl-tick-warning"></span>
+                <span class="shipping-address-label" data-bind="html: window.checkoutConfig.shipping_address_notify"></span>
+            </div>
+        <!-- /ko -->
+    </li>
+<!-- /ko -->

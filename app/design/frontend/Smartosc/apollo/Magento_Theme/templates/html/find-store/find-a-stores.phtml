@@ -1,0 +1,48 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+?>
+<div class="find-store">
+    <div class="modal-content-stores">
+        <div class="modal-header">
+            <div class="modal-header-location">
+                <span class="apl-Location"></span>
+                <span class="modal-title">Find a Store</span>
+            </div>
+            <div class="input-group">
+                <div class="input-group-find-stores">
+                    <input type="text" class="form-control input-location-stores" aria-label="Amount (to the nearest dollar)" placeholder="Type in a location to find the nearest stores">
+                    <span class="icon-search"></span>
+                </div>
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button">Find Stores</button>
+                </div>
+            </div>
+            <p class="or-use-current-locat">or use <a href="#">Current Location</a></p>
+        </div>
+        <div class="modal-body">
+            <h5 class="title">Store List</h5>
+            <div class="list-group scrollbar">
+                <ul class="force-overflow">
+                    <?php for ($i = 0; $i < 5; $i++): ?>
+                    <li class="list-group-item">
+                        <div class="list-group-title">
+                            <h6>Transmart Carrefour ITC Kuningan</h6>
+                        </div>
+                        <p>Hypermarket - ITC Kuningan, Mall Ambasador</p>
+                        <p>Jl. Prof Dr Satrio, RT 11/RW 4</p>
+                        <p>Open until 10.00 PM</p>
+                        <div class="direction">
+                            <span class="apl-ArrowIcon"></span>
+                            <span>10Km</span>
+                        </div>
+                    </li>
+                    <?php endfor ?>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

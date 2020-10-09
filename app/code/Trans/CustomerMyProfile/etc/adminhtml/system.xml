@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_CustomerMyProfile
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Dwi Septha Kurniawan <septha.kurniawan@transdigital.co.id>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="customersetting" translate="label" type="text" sortOrder="1000" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Customer</label>
+            <tab>trans</tab>
+            <resource>Trans_CustomerMyProfile::config</resource>
+            <group id="generalsetting" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1"
+                   translate="label">
+                <label>General Setting</label>
+                <field id="diabledobregister" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Disable DOB Attribute on Resgister</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="diablegenderregister" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Disable Gender Attribute on Resgister</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="myprofilesetting" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1"
+                   translate="label">
+                <label>Customer My Profile Setting</label>
+                <field id="profilepicturemaxsize" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1" translate="label"
+                       type="text">
+                    <label>Maximum File Size Profile Picture</label>
+                    <validate>validate-number</validate>
+                    <comment>Default Configruation Max. 1MB</comment>
+                </field>
+                <field id="dob_change_limit" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1" translate="label"
+                       type="text">
+                    <label>Date of Birth change limit</label>
+                    <validate>required-entry validate-digits validate-greater-than-zero</validate>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

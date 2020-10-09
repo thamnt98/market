@@ -1,0 +1,181 @@
+<?php
+/**
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_GroupProduct
+ *
+ * Date: May, 13 2020
+ * Time: 10:56 AM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ */ ?>
+
+<?php /** @var $block \SM\GroupProduct\Block\Product\View\Group */ ?>
+<?php $block->setPreconfiguredValue() ?>
+<?php $product = $block->getProduct() ?>
+<?php $childrenProducts = $block->getChildAvailable(); ?>
+
+<div class="table-wrapper grouped">
+    <table class="table data grouped"
+           id="super-product-table"
+           data-mage-init='{ "Magento_GroupedProduct/js/product-ids-resolver": {} }'>
+        <caption class="table-caption"><?= $block->escapeHtml(__('Grouped product items')) ?></caption>
+        <thead>
+        <tr>
+            <th class="col item" scope="col"><?= $block->escapeHtml(__('Included in This Product')) ?></th>
+            <?php if ($product->isSaleable()) : ?>
+                <th class="col qty" scope="col"><?= $block->escapeHtml(__('Quantity')) ?></th>
+            <?php endif; ?>
+        </tr>
+        </thead>
+
+        <tbody>
+        <?php if (count($childrenProducts)) : ?>
+            <?php foreach ($childrenProducts as $item) : ?>
+            <tr>
+                <td data-th="<?= $block->escapeHtml(__('Product Name')) ?>" class="col item">
+                    <div class="grouped-item">
+                        <div class="grouped-info">
+                            <strong class="product-item-name"><?= /* @escapeNotVerified */
+                                $block->escapeHtml($item->getName()) ?></strong>
+                            <?php if ($block->getCanShowProductPrice($item)): ?>
+                                <?php if ($item->getTypeId() == 'simple'):?>
+                                <div class="price-box price-final_price">
+                                    <span class="price-container price-final_price tax weee">
+                                        <span class="price-wrapper"><?= $block->formatPriceSimple($item->getFinalPrice()); ?></span>
+                                    </span>
+                                </div>
+                                <?php else: ?>
+                                    <?= $block->getProductPrice($item) ?>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                        </div>
+                        <div class="grouped-super">
+                            <div class="swatch-opt"
+                                 data-option-id="<?= $item->getId() ?>"
+                                 data-role="swatch-options-<?= $item->getId() ?>">
+                            </div>
+                            <div class="swatch-opt-price"
+                                 data-role="swatch-options-price-<?= $item->getId() ?>">
+                            </div>
+                            <div class="product-custom-options-<?= $item->getId() ?>">
+                            </div>
+                        </div>
+                    </div>
+                </td>
+                <td data-th="<?= $block->escapeHtml(__('Qty')) ?>" class="col qty">
+                    <div class="qty-block">
+                        <span class="decrease-qty">
+                            <span data-bind="i18n: '-'"></span>
+                        </span>
+
+                        <div class="control qty">
+                            <input type="number"
+                                   name="super_group[<?= $block->escapeHtmlAttr($item->getId()) ?>]"
+                                   data-selector="super_group[<?= $block->escapeHtmlAttr($item->getId()) ?>]"
+                                   value="<?= $block->escapeHtmlAttr($item->getQty() * 1) ?>"
+                                   title="<?= $block->escapeHtmlAttr(__('Qty')) ?>"
+                                   class="input-text qty item-input-qty"
+                                   data-item-price="<?= $item->getFinalPrice() ?>"
+                                   data-item-id="<?= $item->getId() ?>"
+                                   readonly
+                                   min="0"
+                                   max="99"
+                                   data-validate="{'validate-grouped-qty':'#super-product-table'}"
+                                   data-errors-message-box="#validation-message-box"/>
+                        </div>
+
+                        <span class="increase-qty">
+                            <span data-bind="i18n: '+'"></span>
+                        </span>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div class="delivery-info">
+                        <div class="available-delivery delivery-info-item">
+                            <div class="title">
+                                <span class="apl-ic-delivery-short"></span> <?= $block->escapeHtml(__('Available for Delivery')) ?>
+                            </div>
+                            <a href="#" id="delivery-btn-<?= $item->getId() ?>" class="delivery-info link">
+                                <?= $block->escapeHtml(__('Delivery info')) ?>
+                            </a>
+                        </div>
+                        <?php if ($block->getIsWarehouse($item)) : ?>
+                        <div class="available-pickup delivery-info-item">
+                            <div class="title">
+                                <span class="apl-ic-pickup"></span> <?= $block->escapeHtml(__('Available for Pick Up')) ?>
+                            </div>
+                            <a href="#" id="store-pickup-btn-<?= $item->getId() ?>" class="store-info link">
+                                <?= $block->escapeHtml(__('Store info')) . '(' . $block->getIsWarehouse($item) . ' Stores)' ?>
+                            </a>
+                        </div>
+                        <?php endif;?>
+                    </div>
+                </td>
+            </tr>
+        <?php if ($block->getCanShowProductPrice($item) &&
+            trim($block->getProductPriceHtml($item, \Magento\Catalog\Pricing\Price\TierPrice::PRICE_CODE))
+        ) : ?>
+            <tr class="row-tier-price">
+                <td colspan="2">
+                    <?= $block->getProductPriceHtml($item, \Magento\Catalog\Pricing\Price\TierPrice::PRICE_CODE) ?>
+                </td>
+            </tr>
+        <?php endif; ?>
+
+            <script type="text/x-magento-init">
+                {
+                    "[data-role=swatch-options-<?= $item->getId() ?>]": {
+                        "SM_GroupProduct/js/swatch-renderer": {
+                            "defaultProduct": "<?= $block->getDefaultConfigurableId($item); ?>",
+                            "jsonConfig": <?= $block->getJsonConfig($item); ?>,
+                            "jsonSwatchConfig": <?= $block->getJsonSwatchConfig($item); ?>,
+                            "mediaCallback": "<?= $item->getMediaCallback() ?>",
+                            "defaultQty": <?= $item->getQty() ?>,
+                            "selectorProductPrice": "[data-product-id=<?= $item->getId() ?>][data-role=priceBox]",
+                            "slyOldPriceSelector": "[data-product-id=<?= $item->getId() ?>][data-role=priceBox] .sly-old-price",
+                            "normalPriceLabelSelector": "[data-product-id=<?= $item->getId() ?>] .normal-price .price-label"
+                        }
+                    }
+                }
+            </script>
+
+            <!-- Delivery Method Popup -->
+            <?= $block->getDeliveryPopupHtml($item) ?>
+
+            <!-- Store Pickup Popup -->
+            <?= $block->getStorePickupPopupHtml($item) ?>
+        <?php endforeach; ?>
+        <?php else : ?>
+            <tr>
+                <td class="unavailable" colspan="2">
+                    <?= $block->escapeHtml(__('No options of this product are available.')) ?>
+                </td>
+            </tr>
+        <?php endif; ?>
+        </tbody>
+    </table>
+</div>
+<div id="group-total-price" class="group-total-price">
+    <div class="title"><?= __('Total Price') ?></div>
+    <div class="total-price" data-total="<?= $block->escapeHtmlAttr($block->getDefaultTotalPrice()) ?>">
+        <?= $block->getDefaultTotalPriceTxt() ?>
+    </div>
+</div>
+<div id="validation-message-box"></div>
+
+<script type="text/x-magento-init">
+    {
+        "*" : {
+            "Magento_Swatches/js/catalog-add-to-cart": {},
+            "SM_GroupProduct/js/product/view/option-update": {
+                "formatPrice": <?= $block->getFormatPrice() ?>
+            }
+        }
+    }
+</script>

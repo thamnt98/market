@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_IntegrationOrder
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Muhammad Randy <muhammad.randy@transdigital.co.id>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="integrationorder" translate="label" type="text" sortOrder="1000" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Order Management System</label>
+            <tab>trans</tab>
+            <resource>Trans_Integration::config</resource>
+            <group id="oms_integration" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>OMS Integration</label>
+                <field id="oms_base_url" translate="label" type="text" sortOrder="88" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Base URL</label>
+                </field>
+                <field id="oms_header_dest" translate="label" type="text" sortOrder="88" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Header Destination</label>
+                </field>
+                <field id="oms_merchant_id" translate="label" type="text" sortOrder="88" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Merchant ID</label>
+                </field>
+                <field id="oms_login_path" translate="label" type="text" sortOrder="88" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Login API</label>
+                </field>
+                <field id="oms_token" translate="label" type="text" sortOrder="88" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>OMS Token</label>
+                </field>
+                <field id="oms_order_path" translate="label" type="text" sortOrder="88" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Create Order API</label>
+                </field>
+                <field id="oms_oar_path" translate="label" type="text" sortOrder="88" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Get OAR API</label>
+                </field>
+                <field id="oms_payment_path" translate="label" type="text" sortOrder="88" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Get Payment Status API</label>
+                </field>
+                <field id="oms_return_path" translate="label" type="text" sortOrder="88" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Get Return API</label>
+                </field>
+            </group>
+            <group id="update_order_status_oms" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Update Order Status</label>
+                    <group id="in_process_status" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>In Process</label>
+                        <field id="number_status_in_process" translate="label" type="text" sortOrder="88" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Status Order Mapping</label>
+                        <comment>OMS Status Order In Process Number</comment>
+                        </field>
+                        <field id="in_process_status_order" translate="label" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Status</label>
+                        <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                        </field>
+                    </group>
+                    <group id="in_delivery_status" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>In Delivery</label>
+                        <field id="number_status_in_delivery" translate="label" type="text" sortOrder="88" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Status Order Mapping</label>
+                        <comment>OMS Status Order In Delivery Number</comment>
+                        </field>
+                        <field id="in_delivery_status_order" translate="label" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Status</label>
+                        <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                        </field>
+                    </group>
+                    <group id="delivered_status" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Delivered</label>
+                        <field id="number_status_delivered" translate="label" type="text" sortOrder="88" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Status Order Mapping</label>
+                        <comment>OMS Status Order Delivered Number</comment>
+                        </field>
+                        <field id="delivered_status_order" translate="label" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Status</label>
+                        <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                        </field>
+                    </group>
+                    <group id="order_canceled_status" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Order Canceled</label>
+                        <field id="number_status_order_canceled" translate="label" type="text" sortOrder="88" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Status Order Mapping</label>
+                        <comment>OMS Status Order Canceled Number</comment>
+                        </field>
+                        <field id="order_canceled_status_order" translate="label" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Status</label>
+                        <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                        </field>
+                    </group>
+                    <group id="pickup_by_customer_status" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Pickup By Customer</label>
+                        <field id="number_pickup_by_customer" translate="label" type="text" sortOrder="88" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Status Order Mapping</label>
+                        <comment>OMS Status Order Pickup By Customer</comment>
+                        </field>
+                        <field id="pickup_by_customer_status_order" translate="label" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Status</label>
+                        <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                        </field>
+                    </group>
+                    <group id="in_transit_status" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>In Transit</label>
+                        <field id="number_in_transit" translate="label" type="text" sortOrder="88" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Status Order Mapping</label>
+                        <comment>OMS Status Order In Transit Number</comment>
+                        </field>
+                        <field id="in_transit_status_order" translate="label" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Status</label>
+                        <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                        </field>
+                    </group>
+                    <group id="in_process_waiting_pickup_status" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>In Process - Waiting For Pickup</label>
+                        <field id="number_in_process_waiting_pickup" translate="label" type="text" sortOrder="88" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Status Order Mapping</label>
+                        <comment>OMS Status Order In Process Waiting For Pickup Number</comment>
+                        </field>
+                        <field id="in_process_waiting_pickup_status_order" translate="label" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Status</label>
+                        <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+                        </field>
+                    </group>
+            </group>    
+        </section>
+    </system>
+</config>

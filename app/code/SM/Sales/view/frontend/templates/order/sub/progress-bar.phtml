@@ -1,0 +1,18 @@
+<?php
+/** @var \SM\Sales\Block\Customer\Order\ProgressBar $block */
+
+$statuses = $block->processStatusHistory();
+?>
+
+<div class="bx-order-status">
+    <h5 class="tl-status"><?= $block->escapeHtml(__('Status')) ?></h5>
+    <div class="progress-bar-status">
+        <?php foreach ($statuses as $key => $status):?>
+            <div class="wrap-status <?= $status["active"]?>">
+                <span class="svg-icon <?= $status["svg"] ?>"></span>
+                <span class="status-text"><?= $status["label"] ?></span>
+                <span class="status-date"><?= ($status["date"] ? $block->timeFormat($status["date"]) : "") ?></span>
+            </div>
+        <?php endforeach;?>
+    </div>
+</div>

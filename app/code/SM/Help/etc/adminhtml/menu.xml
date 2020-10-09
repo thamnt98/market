@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!--
+  ~ @project    ct-corp-transmart
+  ~ @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+  ~ @author     Duc Nguyen Hoang <ducnh2@smartosc.com>
+  ~ @copyright  Copyright © 2020 SmartOSC. All rights reserved.
+  ~ @url        http://www.smartosc.com
+  -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="SM_Help::help" title="Help" module="SM_Help" sortOrder="110"
+             resource="SM_Help::help" parent="Magento_Backend::content"/>
+        <add id="SM_Help::topic" title="Manage Topics" module="SM_Help" sortOrder="10"
+             parent="SM_Help::help" action="sm_help/topic/index" resource="SM_Help::topic"/>
+        <add id="SM_Help::question" title="Manage Question" module="SM_Help" sortOrder="20"
+             parent="SM_Help::help" action="sm_help/question/index" resource="SM_Help::question"/>
+        <add id="SM_Help::configuration" title="Configuration" module="SM_Help" sortOrder="70"
+             parent="SM_Help::help" action="adminhtml/system_config/edit/section/sm_help"
+             resource="SM_Help::configuration"/>
+    </menu>
+</config>

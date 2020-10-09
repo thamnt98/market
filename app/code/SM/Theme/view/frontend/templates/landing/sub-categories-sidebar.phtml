@@ -1,0 +1,88 @@
+<?php /** @var $block \SM\Theme\Block\Category\Landing\SubCategory */ ?>
+<?php
+    /** @var \SM\Catalog\ViewModel\SubCategories $viewModel */
+    $viewModel = $block->getData('viewModel');
+    $subCategories = $viewModel->getSubCategories();
+    $count = 0;
+?>
+<?php if ($subCategories = $viewModel->getSubCategories()): ?>
+    <div class="block block-subcategories active">
+
+        <div class="block-title filter-options-title">
+            <strong><?= $block->escapeHtml(__('Shop by Category')) ?></strong>
+        </div>
+        <div class="block-content">
+
+            <ul class="navList blank" id="category-list">
+                <?php foreach ($subCategories->children as $category) : ?>
+                    <li class="navList-item">
+                        <a href="<?= $block->escapeUrl($category->url); ?>"
+                           class="sub-categories"
+                           title="<?=$block->escapeHtmlAttr($category->name)?>"
+                           data-gtm-event="<?= \SM\GTM\Helper\Data::CATE_LANDING_SUB_CLICK_EVENT_NAME ?>"
+                           data-gtm='{"shop_category":"<?= $subCategories->name ?>", "menu_name":"<?= $category->name ?>"}'
+                           data-gtm-name="<?= \SM\GTM\Helper\Data::CATEGORY_KEY_NAME ?>"
+                        >
+                            <p class="category-name">
+                                <?= $block->escapeHtml($category->name); ?>
+                            </p>
+                        </a>
+                    </li>
+                <?php endforeach; ?>
+            </ul>
+
+            <div class="navList-seeall">
+                <a href="<?= $block->escapeUrl($subCategories->url) ?>" title="<?= $block->escapeHtmlAttr($subCategories->name)?>">
+                    <?= __('See All ') . $block->escapeHtml($subCategories->name) ?>
+                </a>
+            </div>
+
+    </div>
+<script>
+    require(
+        [
+            'jquery',
+        ],
+        function ($) {
+            $('.filter-options-title',$('.block-subcategories')).on('click', function() {
+                $(this).parents().toggleClass('active');
+                $('#category-list').toggle();
+            });
+            const subcategorieslitmit = 10,
+                  show_subcategorieslitmit = subcategorieslitmit-1 ,
+                   categoryList = $('#category-list > li');
+
+            if(subcategorieslitmit < $(categoryList).length) $('#category-list').append('<li class="navList-item navList-viewmore"><?= __('View more ')?></li>');
+
+            $(categoryList).each(function(i){
+                if(i>show_subcategorieslitmit){
+                    $(this).css('display', 'none');
+                }
+            });
+            $("#category-list .navList-viewmore").on("click", function () {
+
+                if($(this).hasClass('open')){
+                    $(categoryList).each(function (i) {
+                        if(i> show_subcategorieslitmit){
+                            $(this).css('display', 'none');
+                        }
+                    });
+                    $(this).removeClass('open');
+                    $(this).html('<?= __('View more ')?>');
+                }else{
+                    $(categoryList).each(function (i) {
+                        if(i> show_subcategorieslitmit){
+                            $(this).css('display', '');
+                        }
+                    });
+                    $(this).addClass('open');
+                    $(this).html('<?= __('View less ')?>');
+                }
+
+
+            });
+
+            }
+         );
+</script>
+        <?php endif ?>

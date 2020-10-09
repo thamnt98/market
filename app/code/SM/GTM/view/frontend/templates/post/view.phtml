@@ -1,0 +1,255 @@
+<script>
+    require(['jquery', 'Magento_Ui/js/lib/view/utils/async', 'gtmInspireMe', 'gtmProduct', 'mage/translate'],function ($, async, gtmInspireMe, gtmProduct) {
+        window.eventCreate = window.eventCreate || {};
+        $(window).load(function () {
+            function countWords(str) {
+                str = str.replace(/(^\s*)|(\s*$)/gi,"");
+                str = str.replace(/[ ]{2,}/gi," ");
+                str = str.replace(/\n /,"\n");
+                return str.split(' ').length;
+            }
+            if(typeof dataLayerSourceObjects !== "undefined"){
+                async.async('[data-gtm-event="article_engagement"]',function () {
+                    let current = $('[data-gtm-event="article_engagement"]');
+                    let data =  current.attr('data-gtm');
+                    if (data) {
+                        try {
+                            data = JSON.parse(data);
+                        } catch (e) {
+
+                        }
+                        if(!current.text())
+                        {
+                            data['content_length'] = 0;
+                        } else {
+                            data['content_length'] = countWords(current.text());
+                        }
+
+                        gtmInspireMe.push('article_engagement',data);
+
+                        async.async('[data-gtm-pdp-social-share="messenger"]', function () {
+                            if (!eventCreate['[data-gtm-pdp-social-share="messenger"]']) {
+                                eventCreate['[data-gtm-pdp-social-share="messenger"]'] = 0;
+                            }
+
+                            let current = $($('[data-gtm-pdp-social-share="messenger"]')[eventCreate['[data-gtm-pdp-social-share="messenger"]']]);
+                            $(current).find('a').on('click', function () {
+                                data['social_media'] = "Messenger";
+                                gtmInspireMe.push('share_article', data);
+                            });
+                            eventCreate['[data-gtm-pdp-social-share="messenger"]']++;
+                        });
+
+                        async.async('[data-gtm-pdp-social-share="facebook"]', function () {
+                            if (!eventCreate['[data-gtm-pdp-social-share="facebook"]']) {
+                                eventCreate['[data-gtm-pdp-social-share="facebook"]'] = 0;
+                            }
+
+                            let current = $($('[data-gtm-pdp-social-share="facebook"]')[eventCreate['[data-gtm-pdp-social-share="facebook"]']]);
+                            $(current).find('a').on('click', function () {
+                                data['social_media'] = "Facebook";
+                                gtmInspireMe.push('share_article', data);
+                            });
+                            eventCreate['[data-gtm-pdp-social-share="facebook"]']++;
+                        });
+
+                        async.async('[data-gtm-pdp-social-share="googleplus"]', function () {
+                            if (!eventCreate['[data-gtm-pdp-social-share="googleplus"]']) {
+                                eventCreate['[data-gtm-pdp-social-share="googleplus"]'] = 0;
+                            }
+
+                            let current = $($('[data-gtm-pdp-social-share="googleplus"]')[eventCreate['[data-gtm-pdp-social-share="googleplus"]']]);
+                            $(current).find('a').on('click', function () {
+                                data['social_media'] = "Google+";
+                                gtmInspireMe.push('share_article', data);
+                            });
+                            eventCreate['[data-gtm-pdp-social-share="googleplus"]']++;
+                        });
+
+                        async.async('[data-gtm-pdp-social-share="pinterest"]', function () {
+                            if (!eventCreate['[data-gtm-pdp-social-share="pinterest"]']) {
+                                eventCreate['[data-gtm-pdp-social-share="pinterest"]'] = 0;
+                            }
+
+                            let current = $($('[data-gtm-pdp-social-share="pinterest"]')[eventCreate['[data-gtm-pdp-social-share="pinterest"]']]);
+                            $(current).find('a').on('click', function () {
+                                data['social_media'] = "Pinterest";
+                                gtmInspireMe.push('share_article', data);
+                            });
+                            eventCreate['[data-gtm-pdp-social-share="pinterest"]']++;
+                        });
+
+                        async.async('[data-gtm-pdp-social-share="twitter"]', function () {
+                            if (!eventCreate['[data-gtm-pdp-social-share="twitter"]']) {
+                                eventCreate['[data-gtm-pdp-social-share="twitter"]'] = 0;
+                            }
+
+                            let current = $($('[data-gtm-pdp-social-share="twitter"]')[eventCreate['[data-gtm-pdp-social-share="twitter"]']]);
+                            $(current).find('a').on('click', function () {
+                                data['social_media'] = "Twitter";
+                                gtmInspireMe.push('share_article', data);
+                            });
+                            eventCreate['[data-gtm-pdp-social-share="twitter"]']++;
+                        });
+
+                        async.async('[data-gtm-event="product_click"]', function () {
+                            if (!eventCreate['[data-gtm-event="product_click"]']) {
+                                eventCreate['[data-gtm-event="product_click"]'] = 0;
+                            }
+                            let current = $($('[data-gtm-event="product_click"]')[eventCreate['[data-gtm-event="product_click"]']]);
+                            $(current).on('click', function (e) {
+                                e.preventDefault();
+                                let data_product_inspireme = $(this).attr('data-gtm-product');
+                                let url = $(this).attr('href');
+                                if (data_product_inspireme) {
+                                    try {
+                                        data_product_inspireme = JSON.parse(data_product_inspireme);
+                                        data_product_inspireme['list'] = $(this).attr('data-gtm-list');
+                                        data_product_inspireme['position'] = $(this).attr('data-gtm-position');
+                                        data_product_inspireme['eventCallback'] = function () {
+                                            document.location = url;
+                                        };
+                                        gtmProduct.push('productClick', data_product_inspireme);
+                                    } catch (e) {
+                                        window.location = url;
+                                    }
+
+                                } else {
+                                    window.location = url;
+                                }
+                            });
+                            eventCreate['[data-gtm-event="product_click"]']++;
+                        });
+
+                        async.async('[data-gtm-event="product_view"]', function () {
+                            if (!eventCreate['[data-gtm-event="product_view"]']) {
+                                eventCreate['[data-gtm-event="product_view"]'] = 0;
+                            }
+                            let current = $($('[data-gtm-event="product_view"]')[eventCreate['[data-gtm-event="product_view"]']]);
+                            let data_product_inspireme = $(current).attr('data-gtm-product');
+                            if (data_product_inspireme) {
+                                try {
+                                    data_product_inspireme = JSON.parse(data_product_inspireme);
+                                    data_product_inspireme['list'] = $(current).attr('data-gtm-list');
+                                    data_product_inspireme['position'] = $(current).attr('data-gtm-position');
+                                    gtmProduct.push('product_view', data_product_inspireme);
+                                } catch (e) {
+
+                                }
+                            }
+                            eventCreate['[data-gtm-event="product_view"]']++;
+                        });
+
+                        async.async('[data-gtm-event="product_click_no_redirect"]', function () {
+                            if (!eventCreate['[data-gtm-event="product_click_no_redirect"]']) {
+                                eventCreate['[data-gtm-event="product_click_no_redirect"]'] = 0;
+                            }
+                            let current = $($('[data-gtm-event="product_click_no_redirect"]')[eventCreate['[data-gtm-event="product_click_no_redirect"]']]);
+                            $(current).on('click', function (e) {
+                                //Todo Change After Discussion
+                                // e.preventDefault();
+                                let data_product_inspireme = $(this).attr('data-gtm-product');
+                                //Todo Change After Discussion
+                                // let url = $(this).attr('href');
+                                if (data_product_inspireme) {
+                                    try {
+                                        data_product_inspireme = JSON.parse(data_product_inspireme);
+                                        data_product_inspireme['list'] = $(this).attr('data-gtm-list');
+                                        data_product_inspireme['position'] = $(this).attr('data-gtm-position');
+                                        data_product_inspireme['eventCallback'] = function () {
+                                            //Todo Change After Discussion
+                                            //document.location = url;
+                                        };
+                                        if(e.target.getAttribute('data-gtm-event') === 'product_click_no_redirect') {
+                                            gtmProduct.push('productClick', data_product_inspireme);
+                                        }
+                                    } catch (e) {
+
+                                    }
+                                } else {
+                                    //Todo Change After Discussion
+                                    //window.location = url;
+                                }
+                            });
+                            eventCreate['[data-gtm-event="product_click_no_redirect"]']++;
+                        });
+
+                        async.async('[data-gtm-event="addToCart"]', function () {
+                            if (!eventCreate['[data-gtm-event="addToCart"]']) {
+                                eventCreate['[data-gtm-event="addToCart"]'] = 0;
+                            }
+                            let current = $($('[data-gtm-event="addToCart"]')[eventCreate['[data-gtm-event="addToCart"]']]);
+                            $(current).on('click', function (e) {
+                                window.data_gtm_add_to_cart = $(this).attr('data-gtm-product');
+                                if (window.data_gtm_add_to_cart) {
+                                    try {
+                                        window.data_gtm_add_to_cart = JSON.parse(window.data_gtm_add_to_cart);
+                                    } catch (e) {
+
+                                    }
+                                }
+                            });
+                            eventCreate['[data-gtm-event="addToCart"]']++;
+                        });
+
+                        async.async('[data-gtm-message="success"]', function () {
+                            if ($('[data-gtm-message="success"]').text().includes($.mage.__('shopping cart'))) {
+                                window.data_gtm_add_to_cart = window.data_gtm_add_to_cart || [];
+                                if (window.data_gtm_add_to_cart) {
+                                    window.data_gtm_add_to_cart['quantity'] = 1;
+                                    gtmProduct.push('addToCart', window.data_gtm_add_to_cart);
+                                }
+                            }
+
+                            if ($('[data-gtm-message="success"]').text().includes($.mage.__('All selected products has been added to cart!'))) {
+                                $('[data-gtm-event="product_view"]').each(function () {
+                                    try {
+                                        let data = JSON.parse($(this).attr('data-gtm-product'));
+                                        data['quantity'] = 1;
+                                        gtmProduct.push('addToCart', data);
+                                    } catch (e) {
+
+                                    }
+                                });
+                            }
+                        });
+
+                        async.async('[data-gtm-event="seeDetails_product_inspireMe"]', function () {
+                            if (!eventCreate['[data-gtm-event="seeDetails_product_inspireMe"]']) {
+                                eventCreate['[data-gtm-event="seeDetails_product_inspireMe"]'] = 0;
+                            }
+                            let current = $($('[data-gtm-event="seeDetails_product_inspireMe"]')[eventCreate['[data-gtm-event="seeDetails_product_inspireMe"]']]);
+                            $(current).on('click', function (e) {
+                                //Todo Change After Discussion
+                                // e.preventDefault();
+                                let data_product_inspireme = $(this).attr('data-gtm-product');
+                                //Todo Change After Discussion
+                                // let url = $(this).attr('href');
+                                if (data_product_inspireme) {
+                                    try {
+                                        data_product_inspireme = JSON.parse(data_product_inspireme);
+                                        data_product_inspireme['list'] = $(this).attr('data-gtm-list');
+                                        data_product_inspireme['position'] = $(this).attr('data-gtm-position');
+                                        data_product_inspireme['eventCallback'] = function () {
+                                            //Todo Change After Discussion
+                                            //document.location = url;
+                                        };
+                                        if(e.target.getAttribute('data-gtm-event') === 'seeDetails_product_inspireMe') {
+                                            gtmProduct.push('seeDetails_product_inspireMe', data_product_inspireme);
+                                        }
+                                    } catch (e) {
+
+                                    }
+                                } else {
+                                    //Todo Change After Discussion
+                                    //window.location = url;
+                                }
+                            });
+                            eventCreate['[data-gtm-event="seeDetails_product_inspireMe"]']++;
+                        });
+                    }
+                });
+            }
+        });
+    });
+</script>

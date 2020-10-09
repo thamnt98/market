@@ -1,0 +1,34 @@
+<?php
+//@codingStandardsIgnoreFile
+
+/** @var Meta $block */
+// solve error with template minification
+use Mirasvit\Blog\Block\Post\Meta;
+
+$embedJs = '//';
+$embedJs .= $block->getDisqusShortname() . '.disqus.com/embed.js';
+?>
+
+<?php if ($block->getCommentProvider() == 'disqus'): ?>
+    <div id="disqus_thread"></div>
+    <script>
+        var disqus_config = function () {
+            this.page.url = '<?=$block->getPost()->getUrl() ?>';
+            this.page.identifier = '<?=$block->getPost()->getUrlKey() ?>';
+        };
+        (function () {
+            var d = document, s = d.createElement('script');
+
+            s.src = '<?= $embedJs ?>';
+
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+<?php endif ?>
+
+
+<?php if ($block->getCommentProvider() == 'facebook'): ?>
+    <div class="fb-comments" data-href="<?= $block->getPost()->getUrl() ?>"
+         data-numposts="5" width="100%"></div>
+<?php endif ?>

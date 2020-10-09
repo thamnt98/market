@@ -1,0 +1,91 @@
+<?php
+/** @var \SM\ShoppingList\Block\View $block */
+/** @var \SM\ShoppingList\Api\Data\ShoppingListDataInterface $shoppingList */
+$shoppingList = $block->getShoppingList();
+$helper = $this->helper('SM\Catalog\Helper\Data');
+?>
+<div class="shopping-lists">
+    <div class="product data items">
+        <div id="my-favorites-sp" class="item title <?php if ($block->isDefaultList()) {
+    echo "active";
+} ?>">
+            <a class="switch" href="<?= $block->getUrl("*") ?>"><?= $block->escapeHtml(__('My Favorites')) ?></a>
+        </div>
+        <div id="my-list-sp" class="item title <?php if (!$block->isDefaultList()) {
+    echo "active";
+} ?>">
+            <a class="switch" href="<?= $block->getUrl("*/mylist") ?>"><?= $block->escapeHtml(__('My Lists')) ?></a>
+        </div>
+        <div class="item content" data-role="content" id="tab-myfavorites">
+            <div class="products-grid wishlist" id="default-items-wrapper">
+
+                <?php
+                /** @var \SM\ShoppingList\Block\Toolbar $toolbarBlock */
+                $toolbarBlock = $block->getChildBlock('customer.list.item.toolbar');
+                $toolbarBlock->setShoppingList($shoppingList);
+                ?>
+                <?= $toolbarBlock->toHtml() ?>
+                <?php if (count($block->getItems())): ?>
+                    <ol class="product-items">
+                        <?php
+                        $shoppingLists = $block->getShoppingLists();
+                        /** @var \SM\ShoppingList\Api\Data\ShoppingListItemDataInterface $item */
+                        foreach ($block->getItems() as $item): ?>
+                            <?php $product = $block->getProduct($item); ?>
+                        <?php if ($helper->isProductStockStatus($product->getId())): ?>
+                            <li id="list-item-<?= $item->getWishlistItemId()?>" data-row="product-item" class="item product product-item">
+                                <div class="product-item-info" data-container="product-grid">
+                                    <?php
+                                    /** @var \SM\ShoppingList\Block\Item\Column\Info $infoBlock */
+                                    $infoBlock = $block->getChildBlock("customer.list.item.info");?>
+                                    <?= $infoBlock->setItem($item)->setProductLabel($product)->toHtml(); ?>
+                                    <?php
+                                    /** @var \SM\ShoppingList\Block\Item\Column\Info $cartBlock */
+                                    $cartBlock = $block->getChildBlock("customer.list.item.cart");
+                                    ?>
+                                    <?= $cartBlock->setItem($item)->setProduct($product)->toHtml(); ?>
+                                    <?php
+                                    /** @var \SM\ShoppingList\Block\Item\Column\Actions $actionBlock */
+                                    $actionBlock = $block->getChildBlock("customer.list.item.actions");
+                                    ?>
+                                    <?= $actionBlock->setItem($item)->setShoppingLists($shoppingLists)->setProduct($product)->setItems($block->getItems())->toHtml(); ?>
+                                </div>
+                            </li>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    </ol>
+                <?php else: ?>
+                    <?php if ($block->getRequest()->getParam("key")): ?>
+                        <div class="no-route shopping-list-empty">
+                            <div class="no-route-info">
+                                <img src="<?=$block->getViewFileUrl('images/shopping-list-empty.png')?>" alt="<?= __('Your list is still empty') ?>" width="401"/>
+                                <h4><?= $block->escapeHtml(__("Sorry, we can't find it here.")) ?></h4>
+                                <h4><?= $block->escapeHtml(__("But no worries. Try again with other keyword")) ?></h4>
+                                <h4><?= $block->escapeHtml(__("or browse our recommendations.")) ?></h4>
+                            </div>
+                        </div>
+                    <?php else: ?>
+
+                        <div class="no-route shopping-list-empty"
+                             <?php if ($shoppingList) : ?>
+                             data-gtm-list-name="<?= $shoppingList->getName() ?>"
+                            <?php endif; ?>>
+                            <div class="no-route-info">
+                                <img src="<?=$block->getViewFileUrl('images/shopping-list-empty.png')?>" alt="<?= __('Your list is still empty') ?>" width="401"/>
+                                <h4><?= $block->escapeHtml(__('Your list is still empty.')) ?><br/>
+                                    <?= $block->escapeHtml(__('Save your favorite products simply with the Shopping List button!')) ?></h4>
+                                <button type="button" name="do"
+                                        title="<?= $block->escapeHtml(__('Browse Products')) ?>"
+                                        class="action primary browse-products"
+                                        onclick="location.href = '<?= $block->getUrl()?>'">
+                                    <span><?= $block->escapeHtml(__('Browse Products')) ?></span>
+                                </button>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
+</div>

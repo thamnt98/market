@@ -1,0 +1,178 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="sm_customer" translate="label" sortOrder="100" showInDefault="1" showInWebsite="0"
+                 showInStore="0">
+            <label>Customer</label>
+            <tab>transmart</tab>
+            <resource>SM_Customer::configuration</resource>
+            <group id="verify_email" translate="label" sortOrder="70" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Verify Email</label>
+                <field id="template" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1"
+                       showInStore="1" canRestore="1">
+                    <label>Verify Email Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="sender" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0"
+                       showInStore="0" canRestore="1">
+                    <label>Sender From</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
+            </group>
+            <group id="registration_success_email" translate="label" sortOrder="80" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Registration Success Email</label>
+                <field id="template" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1"
+                       showInStore="1" canRestore="1">
+                    <label>Registration Success Email Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="sender" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0"
+                       showInStore="0" canRestore="1">
+                    <label>Sender From</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
+            </group>
+            <group id="change_email_notification" translate="label" sortOrder="90" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Change Email Notification</label>
+                <field id="template" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1"
+                       showInStore="1" canRestore="1">
+                    <label>Change Email Notification Email Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="sender" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0"
+                       showInStore="0" canRestore="1">
+                    <label>Sender From</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
+            </group>
+            <group id="change_password_notification" translate="label" sortOrder="90" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Change Password Notification</label>
+                <field id="template" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1"
+                       showInStore="1" canRestore="1">
+                    <label>Change Password Notification Email Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="sender" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0"
+                       showInStore="0" canRestore="1">
+                    <label>Sender From</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
+            </group>
+            <group id="change_telephone_notification" translate="label" sortOrder="100" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <label>Change Telephone Notification</label>
+                <field id="template" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1"
+                       showInStore="1" canRestore="1">
+                    <label>Change Telephone Notification Email Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="sender" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0"
+                       showInStore="0" canRestore="1">
+                    <label>Sender From</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
+            </group>
+            <group id="change_personal_information_notification" translate="label" sortOrder="110" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <label>Change Personal Information Notification</label>
+                <field id="template" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1"
+                       showInStore="1" canRestore="1">
+                    <label>Change Personal Information Notification Email Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="sender" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0"
+                       showInStore="0" canRestore="1">
+                    <label>Sender From</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
+            </group>
+            <group id="recovery" translate="label" sortOrder="120" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Recovery</label>
+                <field id="lockout_failures" translate="label" type="text" sortOrder="0" showInDefault="1"
+                       showInWebsite="0" showInStore="0" canRestore="1">
+                    <label>Maximum Login Failures to Lockout Account</label>
+                    <validate>required-entry validate-digits validate-zero-or-greater</validate>
+                    <comment>Use 0 to disable account locking.</comment>
+                </field>
+                <field id="lockout_threshold" translate="label" type="text" sortOrder="0" showInDefault="1"
+                       showInWebsite="0" showInStore="0" canRestore="1">
+                    <label>Lockout Time (minutes)</label>
+                    <validate>required-entry validate-digits validate-greater-than-zero</validate>
+                    <comment>Account will be unlocked after provided time.</comment>
+                </field>
+                <field id="template" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1"
+                       showInStore="1" canRestore="1">
+                    <label>Recovery Email Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="lock" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1"
+                       showInStore="1" canRestore="1">
+                    <label>Lock Notification Email Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="success_email" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1"
+                       showInStore="1" canRestore="1">
+                    <label>Recovery Success Email Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="sender" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0"
+                       showInStore="0" canRestore="1">
+                    <label>Sender From</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
+                <field id="telephone" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0"
+                       showInStore="0" canRestore="1">
+                    <label>Sender Telephone</label>
+                </field>
+            </group>
+            <group id="deletion" translate="label" sortOrder="120" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Deletion</label>
+                <field id="confirmation" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1"
+                       showInStore="1" canRestore="1">
+                    <label>Account Deletion Confirmation</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="success" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1"
+                       showInStore="1" canRestore="1">
+                    <label>Account Deletion Success</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="sender" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0"
+                       showInStore="0" canRestore="1">
+                    <label>Sender From</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
+            </group>
+            <group id="customer_address_limit" translate="label" sortOrder="130" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Customer Address Limit</label>
+                <field id="limit" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1"
+                       showInStore="1" canRestore="1">
+                    <label>Customer Address Limit</label>
+                    <validate>validate-greater-than-zero validate-digits required-entry</validate>
+                </field>
+            </group>
+            <group id="terms_privacy" translate="label" sortOrder="140" showInDefault="1" showInWebsite="1"
+                   showInStore="0">
+                <label>Setup Terms and Privacy</label>
+                <field id="terms_conditions" translate="label" type="select" sortOrder="0" showInDefault="1"
+                       showInWebsite="1" showInStore="0">
+                    <label>Terms Of Use</label>
+                    <source_model>Magento\Cms\Model\Config\Source\Block</source_model>
+                </field>
+                <field id="privacy_policy"  translate="label" type="select" sortOrder="10" showInDefault="1"
+                       showInWebsite="1" showInStore="0">
+                    <label>Privacy Policy</label>
+                    <source_model>Magento\Cms\Model\Config\Source\Block</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

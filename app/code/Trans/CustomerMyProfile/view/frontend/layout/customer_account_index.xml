@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category    SM
+ * @package     SM_Customer
+ * @license     http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ *
+ * @author      Nam Nguyen <namnd2@smartosc.com>
+ *
+ * @copyright   Copyright (c) SmartOSC. All rights reserved.
+ * @url http://www.smartosc.com/
+ */
+
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns-left"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="page.main.title">
+            <action method="setPageTitle">
+                <argument translate="true" name="title" xsi:type="string">My Profile</argument>
+            </action>
+        </referenceBlock>
+        <referenceContainer name="content">
+            <block class="Trans\CustomerMyProfile\Block\MyProfile\PersonalInformation"
+                   name="customermyprofile.myprofile.info"
+                   template="Trans_CustomerMyProfile::myprofile/personal_information.phtml" cacheable="false"/>
+            <block class="Trans\CustomerMyProfile\Block\MyProfile\EmailAndTelephone"
+                   name="customermyprofile.myprofile.emailandtelephone"
+                   template="Trans_CustomerMyProfile::myprofile/email_and_telephone.phtml" cacheable="false"/>
+            <block class="Magento\Framework\View\Element\Template" name="customermyprofile.myprofile.password"
+                   template="Trans_CustomerMyProfile::myprofile/password.phtml" cacheable="false"/>
+        </referenceContainer>
+        <referenceBlock name="customer_account_dashboard_info" remove="true"/>
+        <referenceBlock name="customer_account_dashboard_info1" remove="true"/>
+        <referenceBlock name="customer_account_dashboard_top" remove="true"/>
+        <referenceBlock name="customer_account_dashboard_address" remove="true"/>
+        <referenceBlock name="customer_edit" remove="true"/>
+        <referenceBlock name="customermyprofile.myprofile.changepassword" remove="true"/>
+        <referenceBlock name="customermyprofile.myprofile.editemail" remove="true"/>
+        <referenceBlock name="customermyprofile.myprofile.editmobilenumber" remove="true"/>
+    </body>
+</page>

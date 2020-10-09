@@ -1,0 +1,29 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ *
+ * @var $block \Magento\Customer\Block\Account\Forgotpassword
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var \Trans\Customer\Block\Account\Locked $block */
+?>
+
+<?php 
+$customer = $block->getCustomer();
+?>
+
+<div>
+    <?php echo __('Your account has been locked.') ?>
+</div>
+
+<div>
+    <?php echo __('Recovery account?.'); ?>
+
+    <ul>
+        <li><a href="<?php echo $block->getRecoveryUrl('email') ?>"><?php echo __('via email'); ?> <?php echo $customer['email'] ?></a></li>
+        <li><a href="<?php echo $block->getRecoveryUrl('telephone') ?>"><?php echo __('via phone number'); ?> <?php echo $customer['telephone']; ?></a></li>
+    </ul>
+</div>

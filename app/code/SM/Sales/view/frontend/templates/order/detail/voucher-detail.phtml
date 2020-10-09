@@ -1,0 +1,26 @@
+<?php
+
+/** @var \SM\Sales\Block\Order\VoucherDetail $block */
+
+/** @var \SM\Sales\Api\Data\ParentOrderDataInterface $parentOrder */
+$parentOrder = $block->getParentOrder();
+
+?>
+<?php if (count($parentOrder->getVoucherDetail()) > 0):?>
+    <?php foreach ($parentOrder->getVoucherDetail() as $voucherDetail):?>
+        <div class="dis-flex subtotal voucher">
+            <h4><?= $block->escapeHtml($voucherDetail->getRuleName()) ?></h4>
+            <h4 class="price"><?= $block->escapeHtml($block->currencyFormat($voucherDetail->getRuleAmount())) ?></h4>
+        </div>
+    <?php endforeach;?>
+<?php else:?>
+    <div class="dis-flex voucher-promo-discount">
+        <?php if ($block->isMyOrder()):?>
+            <h4><?= $block->escapeHtml(__('Voucher/Promo/Discount')) ?></h4>
+            <h4 class="price"><?= $block->escapeHtml(0) ?></h4>
+        <?php else:?>
+            <h4><?= $block->escapeHtml(__('Voucher')) ?></h4>
+            <h4 class="price"><?= $block->escapeHtml("- " . $block->currencyFormat(0)) ?></h4>
+        <?php endif;?>
+    </div>
+<?php endif;?>

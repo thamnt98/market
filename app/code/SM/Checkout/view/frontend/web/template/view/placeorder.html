@@ -1,0 +1,26 @@
+<!--next step payment-->
+<!-- ko if: isStepShipping-->
+<div class="actions-toolbar">
+    <div class="primary">
+        <button class="action-primary" type="submit" data-gtm-event="checkout-step-2" data-bind="css: { disabled: disableGoPaymentButton() }, click: function(){ nextPayment() }">
+            <span data-bind="i18n: buttonTitle"></span>
+        </button>
+    </div>
+</div>
+<!-- /ko -->
+<!--place order-->
+<!-- ko if: isStepPayment-->
+<div class="actions-toolbar">
+    <span class="accept-terms hidden">
+        <span data-bind="i18n: 'By clicking \'Pay\', I agree to the '"></span>
+        <a href="/help/terms-conditions" data-bind="i18n: 'Terms & Conditions'"></a>.
+    </span>
+    <div class="primary">
+        <button class="action-primary custom-placeorder-button disabled" type="submit"
+                data-bind="click: placeOrder">
+            <span data-bind="i18n: 'Pay'"></span>
+        </button>
+    </div>
+</div>
+<!-- /ko -->
+

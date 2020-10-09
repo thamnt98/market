@@ -1,0 +1,198 @@
+// /**
+//  * Copyright © Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+//
+//  Common
+//  _____________________________________________
+
+@media-common: true; // Sets whether to output common styles (true|false)
+@color-border-selectCategory: #e9e9e9;
+
+& when (@media-common = true) {
+
+    img,
+    object,
+    video,
+    embed {
+        max-height: inherit;
+        max-width: 100%;
+    }
+
+    // UTILITIES
+    .linkColor(@linkColor:@color-black,@linkColorHover: @color-textBase){
+        color: @linkColor;
+        &:hover{color: @linkColorHover;}
+    }
+
+
+
+    div.selected-categories{
+        .block-title{
+            margin-bottom: 16px;
+        }
+
+        .product-item-info,
+        .category-item-info {
+            width: auto;
+            padding: 0;
+            text-align: center;
+            .product-item-photo{
+                display: block;
+            }
+            .name{
+                margin-top: 1rem;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                .linkColor(@c-tsm-grey6,@c-tsm-blue);
+            }
+            //Product Hover
+            &:hover{
+                img{
+                    opacity: 0.9;
+                }
+                .name{
+                    color:@c-tsm-blue;
+                }
+
+            }
+        }
+
+        .category-item-info{
+            .category.name{
+                margin-top: 2rem;
+                font-size: 16px;
+            }
+            .category-image{
+                height: 110px;
+
+            }
+
+        }
+
+        .price-final_price{
+            padding-top: 8px;
+            margin:0;
+            .price-box{
+                margin:0;
+            }
+            .price{
+                color: @c-tsm-orange;
+            }
+        }
+    }
+
+    //Transmart Products - Special Picks
+    div.product-special-picks{
+        .block-title{
+            margin-bottom: 16px;
+        }
+        .product-cards {
+            .product-card{
+                margin-bottom: 0;
+
+            }
+            .product-item-info{
+                padding: 0;
+                border: none;
+            }
+            .product-item-photo-wrapper{
+                padding: 0 15px;
+            }
+
+        }
+    }
+
+}
+
+//
+//  Mobile (style-m.css)
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+
+    //Block Free Pick Up
+    .selected-categories{
+        padding-right: 0px;
+        border-top: 8px solid @color-border-selectCategory;
+        padding-top: 15px;
+        margin: 0 -20px;
+        padding: 15px 20px 0;
+    }
+
+
+    div.selected-categories.category-list{
+        ol.list {
+            margin: 0 -5px 20px;
+            .item {
+                padding: 0 5px;
+                border: none;
+            }
+        }
+    }
+
+
+}
+
+//  Tablets  (style-l.css)
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+
+    .product-special-picks{
+        .product-item-info{
+            .product-item-name{
+                font-size: 16px;
+            }
+        }
+    }
+
+    .selected-categories{
+        .list {
+            margin: 0 ;
+            .item {
+                padding: 0 5px;
+                border: none;
+            }
+        }
+    }
+
+}
+
+//  Desktop (style-l.css)
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__xl) {
+    .selected-categories{
+        min-height:260px;
+        padding-right: 20px;
+        border-right: 2px solid @color-gray89;
+    }
+    .product-special-picks{
+        .product-item-info{
+            .product-item-name{
+                font-size: 16px;
+            }
+        }
+    }
+    .selected-categories{
+        .list.items {
+            margin:0;
+            .item {
+                padding:  10px;
+            }
+        }
+    }
+
+
+
+    //Transmart Products - Special Picks
+    div.product-special-picks{
+        .block-title{
+            padding: 0 10px;
+        }
+
+    }
+
+}

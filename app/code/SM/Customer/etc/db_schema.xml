@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_Customer
+ *
+ * Date: June, 08 2020
+ * Time: 1:51 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table comment="Smart - Customer Devices Table" engine="innodb" name="sm_customer_devices"
+           resource="default">
+        <column comment="ID" identity="true" name="id"
+                nullable="false" padding="6" unsigned="true" xsi:type="smallint" />
+        <column name="customer_id" xsi:type="int" padding="10" unsigned="true"
+                nullable="false" identity="false" />
+        <column name="device_id" length="255" nullable="false" xsi:type="varchar" />
+        <column name="type" length="255" nullable="true" xsi:type="varchar" />
+        <column name="token" length="255" nullable="true" xsi:type="varchar" />
+        <constraint referenceId="PRIMARY" xsi:type="primary">
+            <column name="id"/>
+        </constraint>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"/>
+        <constraint xsi:type="foreign" referenceId="CUSTOMER_DEVICES_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID"
+                    table="customer_devices" column="customer_id" referenceTable="customer_entity"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="CUSTOMER_ID_DEVICE_ID">
+            <column name="customer_id" />
+            <column name="device_id" />
+        </constraint>
+    </table>
+
+    <table name="oauth_token" resource="default" engine="innodb" comment="OAuth Tokens">
+        <column xsi:type="varchar" name="reset_password_token" nullable="true" length="32"
+                comment="Reset Password Token"/>
+        <column xsi:type="timestamp" name="expires_reset_token" on_update="false" nullable="true"
+                comment="Expires Reset Token"/>
+    </table>
+
+    <table name="quote_address" resource="default" engine="innodb" comment="Quote Address">
+        <column xsi:type="int" name="district" nullable="true"
+                comment="District"/>
+    </table>
+
+    <table name="sale_order_address" resource="default" engine="innodb" comment="Sale Flat Order Address">
+        <column xsi:type="int" name="district" nullable="true"
+                comment="District"/>
+    </table>
+</schema>

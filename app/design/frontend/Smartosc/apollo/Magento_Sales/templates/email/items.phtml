@@ -1,0 +1,91 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// phpcs:disable Magento2.Templates.ThisInTemplate
+
+/** @var $block \Magento\Sales\Block\Order\Email\Items */
+?>
+<?php $_order = $block->getOrder() ?>
+<?php if ($_order) : ?>
+    <?php $_items = $_order->getAllItems(); ?>
+    <table class="order-detail">
+        <tr>
+            <td class="title-order-detail">
+                <p>
+                    <?= $block->escapeHtml(__('Your Order Details')) ?>
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td class="inner-td">
+                <table class="content-order-detail">
+                    <thead>
+                        <tr>
+                            <td class="title-td-1 title-td">
+                                <p class="pl-10">
+                                    <?= $block->escapeHtml(__(' No.')) ?>
+                                </p>
+                            </td>
+                            <td class="title-td-2 title-td item-info">
+                                <p>
+                                    <?= $block->escapeHtml(__('Product')) ?>
+                                </p>
+                            </td>
+                            <td class="title-td-3 title-td item-qty">
+                                <p>
+                                    <?= $block->escapeHtml(__('Qty')) ?>
+                                </p>
+                            </td>
+                            <td class="title-td-4 title-td text-right item-price">
+                                <p class="pr-15">
+                                    <?= $block->escapeHtml(__('Price')) ?>
+                                </p>
+                            </td>
+                        </tr>
+                    </thead>
+                    <?php foreach ($_items as $_item) : ?>
+                        <?php if (!$_item->getParentItem()) : ?>
+                            <tbody>
+                                <?= $block->getItemHtml($_item) ?>
+                                <tr>
+                                    <td colspan="4">
+                                        <hr class="hr"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                    <!--Done-->
+                    <tfoot class="order-totals">
+                        <?= $block->getChildHtml('order_totals') ?>
+                    </tfoot>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <!--End order-detail-->
+    <?php if ($this->helper(\Magento\GiftMessage\Helper\Message::class)
+            ->isMessagesAllowed('order', $_order, $_order->getStore())
+        && $_order->getGiftMessageId()
+    ) : ?>
+        <?php $_giftMessage = $this->helper(\Magento\GiftMessage\Helper\Message::class)
+            ->getGiftMessage($_order->getGiftMessageId()); ?>
+        <?php if ($_giftMessage) : ?>
+            <br />
+            <table class="message-gift">
+                <tr>
+                    <td>
+                        <h3><?= $block->escapeHtml(__('Gift Message for this Order')) ?></h3>
+                        <strong><?= $block->escapeHtml(__('From:')) ?></strong> <?= $block->escapeHtml($_giftMessage->getSender()) ?>
+                        <br /><strong><?= $block->escapeHtml(__('To:')) ?></strong> <?= $block->escapeHtml($_giftMessage->getRecipient()) ?>
+                        <br /><strong><?= $block->escapeHtml(__('Message:')) ?></strong>
+                        <br /><?= $block->escapeHtml($_giftMessage->getMessage()) ?>
+                    </td>
+                </tr>
+            </table>
+        <?php endif; ?>
+    <?php endif; ?>
+<?php endif; ?>

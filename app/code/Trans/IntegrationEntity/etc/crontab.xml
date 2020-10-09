@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_IntegrationEntity
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   JP <jaka.pondan@ctcorpdigital.com>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="ims_stores">
+
+        <job name="integration_ims_get_store_update" instance="Trans\IntegrationEntity\Cron\Ims\Get\StoreUpdate" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
+        <job name="integration_ims_save_store" instance="Trans\IntegrationEntity\Cron\Ims\Save\StoreSave" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
+    </group>
+    <group id="assign_sources">
+        <job name="assign_ready_sources" instance="Trans\IntegrationEntity\Cron\Ims\Save\AssignSource" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
+    </group>
+    <group id="pim_product_attribute">
+        <job name="integration_pim_check_product_attribute" instance="Trans\IntegrationEntity\Cron\Pim\Check\ProductAttribute" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
+        <job name="integration_pim_get_product_attribute" instance="Trans\IntegrationEntity\Cron\Pim\Get\ProductAttribute" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
+        <job name="integration_pim_save_product_attribute" instance="Trans\IntegrationEntity\Cron\Pim\Save\ProductAttribute" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
+    </group>
+    <group id="pim_product_attribute_set">
+        <job name="integration_pim_check_product_attribute_set" instance="Trans\IntegrationEntity\Cron\Pim\Check\ProductAttributeSet" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
+        <job name="integration_pim_get_product_attribute_set" instance="Trans\IntegrationEntity\Cron\Pim\Get\ProductAttributeSet" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
+        <job name="integration_pim_save_product_attribute_set" instance="Trans\IntegrationEntity\Cron\Pim\Save\ProductAttributeSet" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
+    </group>
+</config>

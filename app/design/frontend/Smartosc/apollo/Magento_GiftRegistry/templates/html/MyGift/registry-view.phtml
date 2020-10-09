@@ -1,0 +1,154 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+
+
+<div class="my-giftRegistry">
+    <div class=" block-giftRegistry-user">
+        <div class="giftRegistry-info--heading">
+            <h3>Joni & Judy’s Wedding</h3>
+            <div class="giftRegistry-info--heading__share">
+                <ul class="listgift-share">
+                    <li>
+                        <a href="#">Edit Registry</a>
+                    </li>
+                    <li>
+                        <a href="#" class="giftRegistry-heading--share">Share this registry</a>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+        <div class="giftRegistry-info--content">
+            <div class="row">
+                <div class="col-xs-12 col-lg-3">
+                    <div class="box-content-gift box-content-gift--nobackground">
+                        <p>Wedding Date</p>
+                        <h3>12 January 2020</h3>
+                    </div>
+                </div>
+                <div class="col-xs-4 col-md-4 col-lg-3">
+                    <div class="box-content-gift box-content-gift--background">
+                        <p>Days to Go</p>
+                        <h3>20</h3>
+                    </div>
+                </div>
+                <div class="col-xs-4 col-md-4 col-lg-3">
+                    <div class="box-content-gift box-content-gift--background">
+                        <p>Gifts Purchased</p>
+                        <h3>0</h3>
+                    </div>
+                </div>
+                <div class="col-xs-4 col-md-4 col-lg-3">
+                    <div class="box-content-gift box-content-gift--background">
+                        <p>Gifts Remaining</p>
+                        <h3>3</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+    <div class="block-giftRegistry-additem">
+        <div class="giftRegistry-additem-heading">
+            <h3>Let's start adding items to your registry</h3>
+            <p>
+                We make gifting easy for you and your guests. Follow these simple steps to add the products of your dream:
+            </p>
+        </div>
+        <div class="giftRegistry-additem--content">
+            <div class="box-gift-steps">
+                <div class="row">
+                    <div class="col-sm-12 col-lg-4">
+                        <div class="box-gift-icons">
+
+                        </div>
+                        <p>
+                            1. Discover our products or find our gift inspiration. Simply click <a href="giftregistry/index/"> Add to Registry</a> on your favorite ones.
+                        </p>
+                    </div>
+                    <div class="col-sm-12 col-lg-4">
+                        <div class="box-gift-icons">
+
+                        </div>
+                        <p>
+                            2. Set the quantity, choose your registry and save it.
+                        </p>
+                    </div>
+                    <div class="col-sm-12 col-lg-4">
+                        <div class="box-gift-icons">
+
+                        </div>
+                        <p>
+                            3. Share this registry to your guests and let the shopping spree begin!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="block-giftRegistry-browse">
+        <div class="giftRegistry-browse-heading">
+            <h3>Wedding Gifts Inspiration</h3>
+           <a href="#" class="action pagebuilder-button-secondary">
+               Browse Products
+           </a>
+        </div>
+    </div>
+</div>
+
+
+<div class="share-registry-modal" style="display:none;">
+    <p>Copy this link to your invitation and let the guests know about this registry.</p>
+
+    <form action="#"  class="form-createRegistry">
+        <div class="field form-inline">
+            <div class="control">
+                <input name="shareinput" placeholder="http://transmart.com/weddingregistry/joni&judy" title="Phone Number" value="" class="input-text" type="text" >
+            </div>
+            <button type="submit" class="profile-save secondary action">Copy</button>
+        </div>
+
+
+    </form>
+    <p>Or share on your social media.</p>
+</div>
+<script>
+    require(
+        [
+            'jquery',
+            'Magento_Ui/js/modal/modal'
+        ],
+        function(
+            $,
+            modal
+        ) {
+            var options = {
+                type: 'popup',
+                responsive: true,
+                innerScroll: true,
+                title: 'Share Your Registry',
+                modalClass: 'modal-popup-small',
+                buttons: []
+
+            };
+
+            const createRegister = $('.share-registry-modal');
+            const popup = modal(options, createRegister);
+
+            $(".giftRegistry-heading--share").click(function() {
+                createRegister.modal('openModal');
+            });
+
+
+
+
+        }
+    );
+</script>

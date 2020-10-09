@@ -1,0 +1,71 @@
+<?php
+/** @var \SM\DigitalProduct\Block\MobilePostPaid\Index $block */
+
+?>
+
+<div class="digital-product-billing">
+    <?php
+    /** @var \SM\DigitalProduct\Block\Banner $bannerBlock */
+    $bannerBlock = $block->getChildBlock("digitalproduct.banner");
+    ?>
+    <?= $bannerBlock->toHtml()?>
+    <div class="product data items">
+        <?php
+        /** @var \SM\DigitalProduct\Block\Tab $tabBlock */
+        $tabBlock = $block->getChildBlock("digitalproduct.tab");
+        $tabBlock->setTab(\SM\DigitalProduct\Model\CategoryRepository::MOBILE_POSTPAID);
+        ?>
+        <?= $tabBlock->toHtml()?>
+        <div id="mobile-postpaid" class="item content mobile-postpaid" data-role="content">
+
+    <!-- content-end------->
+
+    <h3 class="title-head-ct">Pay Mobile Postpaid Bill</h3>
+
+    <div class="dpl-select sl-operator">
+        <label class="label-input">Operator</label>
+        <div class="sortby-dropdown shoplist-sortby">
+                    <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+                        <span><?= $block->escapeHtml('XL') ?></span>
+                    </span>
+            <ul class="dropdown">
+                <li class="item">XL</li>
+                <li class="item">XL</li>
+            </ul>
+        </div>
+    </div>
+
+    <label class="label-input">Mobile Number<span class="dpl-tooltip"><a href="#" aria-describedby="tooltip-8" >
+                        <img src='<?= $block->getViewFileUrl('images/info.svg'); ?>' alt=""  width="13" height="16" /></a>
+                    <span class="tooltip-content" id="tooltip-8" role="tooltip">Your mobile number or
+the number used for your modem.</span></span></label>
+
+    <div class="wrap-input">
+        <input class="input-text" type="text" placeholder="Example: 0817039300" />
+        <img src="https://via.placeholder.com/51x51.png" alt="" />
+    </div>
+
+
+    <div class="dpb-bottom-price dpb-price-noprice">
+        <a href="#" class="action primary">Check My Bill</a>
+    </div>
+
+    <div class="dpb-policy">
+        <div class="dpb-title-head"><h3><?= $block->escapeHtml(__('How to Pay Mobile Postpaid Bill')) ?></h3></div>
+        <div class="dpd-policy-content">
+            <p>Mobile postpaid payment is now safer and more convenient with Transmart. Do your mobile postpaid payment online and stay connected. Below are the steps to do this transaction.</p>
+            <ol>
+                <li>Go to Transmart website.</li>
+                <li>Choose Top Up & Bills category on the homepage.</li>
+                <li>Go to Mobile Postpaid menu.</li>
+                <li>Select your operator and enter your mobile or modem number.</li>
+                <li>Tap or click "Go to Payment" button.</li>
+                <li>Select your payment method and please make the payment.</li>
+            </ol>
+            <p>You can pay your other bills through Transmart. From PLN electricity bill, PDAM water bill, BPJS bill, to Telkom bill; these payments can be done online. Try topping up you mobile number, mobile package and electricity online too in our Top Up & Bills menu. Everything is brought to you in secure payment options: virtual account, credit card, debit card and instant payment.</p>
+        </div>
+    </div>
+    <!-- content-end------->
+</div>
+    </div>
+</div>

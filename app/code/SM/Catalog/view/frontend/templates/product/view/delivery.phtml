@@ -1,0 +1,61 @@
+<?php
+/**
+ * SMCommerce
+ *
+ * Date: May, 14 2020
+ * Time: 2:06 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ */ ?>
+<?php /** @var $block \SM\Catalog\Block\Product\Delivery */ ?>
+<?php $product = $block->getProduct() ?>
+<?php if ($product): ?>
+    <div class="block-container-object-php block-container-delivery"
+         id="delivery-popup-<?= $block->escapeHtmlAttr($product->getId()) ?>"
+         style="display: none;"
+    >
+        <div class="block-content" aria-labelledby="block-product-delivery-heading">
+            <fieldset class="fieldset delivery">
+                <div class="pdp-delivery">
+                    <div class="title">
+                        <span class="apl-delivery"></span><?php /* @escapeNotVerified */
+                        echo __('Available Delivery Methods') ?>
+                    </div>
+                    <ul class="items-delivery">
+                        <?php foreach ($block->getMethods() as $key => $item): ?>
+                            <li class="item-delivery"><?php /* @escapeNotVerified */
+                                echo $item['label'] ?></li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+    <script>
+        require(
+            [
+                'jquery',
+                'Magento_Ui/js/modal/modal'
+            ],
+            function ($, modal) {
+                "use strict";
+
+                let $block  = $('#delivery-popup-<?= $block->escapeHtmlAttr($product->getId()) ?>'),
+                    options = {
+                        type            : 'popup',
+                        responsive      : true,
+                        innerScroll     : false,
+                        buttons         : [],
+                        modalClass      : 'block-container-delivery',
+                        clickableOverlay: false
+                    };
+
+                modal(options, $block);
+                $('#delivery-btn-<?= $product->getId() ?>').click(function () {
+                    $block.modal('openModal');
+                });
+            });
+    </script>
+<?php endif ?>

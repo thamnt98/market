@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\InventoryIndexer\Indexer\SourceItem\SourceItemIndexer">
+        <plugin name="bundle_product_source_index"
+                type="SM\InventoryBundleProductIndexer\Plugin\InventoryIndexer\SourceItemIndexerPlugin" sortOrder="50"/>
+    </type>
+    <type name="Magento\InventoryIndexer\Indexer\Stock\StockIndexer">
+        <plugin name="bundle_product_stokc_index"
+                type="SM\InventoryBundleProductIndexer\Plugin\InventoryIndexer\StockIndexerPlugin" sortOrder="50"/>
+    </type>
+
+  <type name="SM\InventoryBundleProductIndexer\Indexer\Stock\StockIndexer">
+        <arguments>
+            <argument name="indexHandler" xsi:type="object">Magento\InventoryIndexer\Indexer\IndexHandler</argument>
+            <argument name="indexStructure" xsi:type="object">Magento\InventoryIndexer\Indexer\IndexStructure</argument>
+        </arguments>
+    </type>
+
+    <type name="SM\InventoryBundleProductIndexer\Indexer\SourceItem\SourceItemIndexer">
+        <arguments>
+            <argument name="indexHandler" xsi:type="object">Magento\InventoryIndexer\Indexer\IndexHandler</argument>
+            <argument name="indexStructure" xsi:type="object">Magento\InventoryIndexer\Indexer\IndexStructure</argument>
+        </arguments>
+    </type>
+    <type name="SM\InventoryBundleProductIndexer\Indexer\SourceItem\SiblingSkuListInStockProvider">
+        <arguments>
+            <argument name="tableNameSourceItem" xsi:type="const">Magento\Inventory\Model\ResourceModel\SourceItem::TABLE_NAME_SOURCE_ITEM</argument>
+            <argument name="tableNameStockSourceLink" xsi:type="const">Magento\Inventory\Model\ResourceModel\StockSourceLink::TABLE_NAME_STOCK_SOURCE_LINK</argument>
+        </arguments>
+    </type>
+</config>

@@ -1,0 +1,32 @@
+<div class="field-control" css="'_with-tooltip': $data.tooltip">
+    <div class="file-uploader" data-role="drop-zone">
+        <div class="file-uploader-area">
+            <input type="file" afterRender="onElementRender" attr="id: uid, name: inputName"
+                   disable="disabled"/>
+            <label class="file-uploader-button action-default" attr="for: uid" translate="'Upload'" style="display: none"/>
+
+            <span class="file-uploader-spinner"/>
+            <render args="fallbackResetTpl" if="$data.showFallbackReset && $data.isDifferedFromDefault"/>
+        </div>
+
+        <render args="tooltipTpl" if="$data.tooltip"/>
+
+        <div class="field-note" if="$data.notice" attr="id: noticeId">
+            <span html="notice"/>
+        </div>
+
+        <each args="data: value, as: '$file'" render="$parent.getPreviewTmpl($file)"/>
+
+        <div class="field review-field-image file-uploader-summary" data-bind="visible: value().length < 3">
+            <label class="label file-uploader-placeholder"
+                   attr="for: uid"
+                   css="'placeholder-' + placeholderType">
+                <span translate="'Image'"></span>
+            </label>
+            <div class="control">
+
+            </div>
+        </div>
+    </div>
+    <render args="$data.service.template" if="$data.hasService()"/>
+</div>

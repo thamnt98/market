@@ -1,0 +1,140 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<?php /** @var SM\Help\Block\Help\MainPage $block */ ?>
+
+<div class="help-pages">
+    <div class="help-top">
+        <h1><?= $block->escapeHtml(__('Hello! Need help?'))?></h1>
+        <p><?= $block->escapeHtml(__('Find the answers and solutions right here.'))?></p>
+        <?= $block->getChildHtml('help.search') ?>
+    </div>
+    <div class="row content-top">
+        <div class="col-xs-12 col-lg-6 ct-top-left">
+            <h2><?= $block->escapeHtml(__('Popular Questions'))?></h2>
+            <ol class="help-list-question">
+                <?php $questions = $block->getTopQuestion() ?>
+                <?php if (!is_null($questions)) :
+                    $index = 0;
+                    ?>
+                    <?php /** @var \SM\Help\Model\Question $question */?>
+                    <?php foreach ($questions as  $question  ) : $index ++;?>
+                        <li>
+                            <a href="<?= $block->escapeUrl($question->getUrl())?>">
+
+                                <?= $index .'. '.$block->escapeHtml($question->getTitle())?>
+                            </a>
+                        </li>
+                    <?php endforeach; ?>
+                <?php endif; ?>
+            </ol>
+        </div>
+        <?php $contactUsBlock = $block->getContactUsBlock(); ?>
+        <?php if (!is_null($contactUsBlock)) : ?>
+        <div class="col-xs-12 col-lg-6 ct-top-right">
+            <div class="inner">
+                <?= /* @noEscape */ $block->getBlockContent($contactUsBlock) ?>
+            </div>
+        </div>
+        <?php endif; ?>
+    </div>
+    <div class="content-bottom">
+        <h2><?= $block->escapeHtml(__('Find Information by Topic'))?></h2>
+        <div class="row">
+            <?php $topics = $block->getFirstLevelTopics() ?>
+            <?php if (count($topics)) : ?>
+                <?php /** @var \SM\Help\Model\Topic $topic */?>
+                <?php foreach ($topics as $topic) : ?>
+                <div class="col-sm-6 col-lg-4">
+                    <a href="<?= $block->escapeUrl($topic->getUrl()) ?>" class="inner">
+                        <?php if ($topic->getImage()) : ?>
+                            <img src="<?= $block->escapeUrl($topic->getImageUrl()) ?>" alt=""  width="50" height="50" />
+                        <?php endif; ?>
+                        <div class="gr-text">
+                            <h4><?= $block->escapeHtml($topic->getName())?></h4>
+                            <p><?= $block->escapeHtml($topic->getDescription())?></p>
+                        </div>
+                    </a>
+                </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+            <div class="col-sm-6 col-lg-4">
+                <a href="<?= $block->getUrl('help/contactus') ?>" class="inner">
+                    <img src='<?= $block->escapeUrl($block->getViewFileUrl('images/topic-icon-9.png')); ?>' width="50" height="50">
+                    <div class="gr-text">
+                        <h4><?= $block->escapeHtml(__('Contact Us'))?></h4>
+                        <p><?= $block->escapeHtml(__('Reach us for any questions or issues')) ?></p>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    require(['jquery'],function ($) {
+        if (typeof dataLayerSourceObjects !== 'undefined') {
+            window.dataLayer = window.dataLayer || [];
+            $('.help-pages .content-bottom .row .col-sm-6.col-lg-4').on('click', function () {
+                let item = $('.inner .gr-text h4');
+                let menuName = $(this).children().find(item).text();
+                window.dataLayer.push({
+                    'event': 'information_by_topic',
+                    'uniqueUserID': dataLayerSourceObjects.customer.uniqueUserID,
+                    'userID': dataLayerSourceObjects.customer.userID,
+                    'customerID': dataLayerSourceObjects.customer.customerID,
+                    'customerType': dataLayerSourceObjects.customer.customerType,
+                    'loyalty': dataLayerSourceObjects.customer.loyalty,
+                    'customerStatus': dataLayerSourceObjects.customer.customerStatus,
+                    'loginType': dataLayerSourceObjects.customer.loginType,
+                    'store_name': dataLayerSourceObjects.customer.storeName,
+                    'store_ID': dataLayerSourceObjects.customer.storeID,
+                    'menu_name': menuName
+                })
+            })
+            $('.help-pages .row.content-top .ct-top-left .help-list-question li').on('click', function () {
+                let query = $(this).text();
+                pushData('popularQuestions_help_query', query);
+            })
+
+            $('.help-pages .help-search.sortby-dropdown .control a').on('click', function () {
+                let query = $(this).parent().find('input').val();
+                pushData('search_help', query);
+            })
+
+            $('.help-pages .row.content-top .ct-top-right button.pagebuilder-banner-button.pagebuilder-button-primary').on('click', function () {
+                window.dataLayer.push({
+                    'event': 'contact_us_help',
+                    'uniqueUserID': dataLayerSourceObjects.customer.uniqueUserID,
+                    'userID': dataLayerSourceObjects.customer.userID,
+                    'customerID': dataLayerSourceObjects.customer.customerID,
+                    'customerType': dataLayerSourceObjects.customer.customerType,
+                    'loyalty': dataLayerSourceObjects.customer.loyalty,
+                    'customerStatus': dataLayerSourceObjects.customer.customerStatus,
+                    'loginType': dataLayerSourceObjects.customer.loginType,
+                    'store_name': dataLayerSourceObjects.customer.storeName,
+                    'store_ID': dataLayerSourceObjects.customer.storeID
+                })
+            })
+
+
+            function pushData(eventName, query) {
+                window.dataLayer.push({
+                    'event': eventName,
+                    'uniqueUserID': dataLayerSourceObjects.customer.uniqueUserID,
+                    'userID': dataLayerSourceObjects.customer.userID,
+                    'customerID': dataLayerSourceObjects.customer.customerID,
+                    'customerType': dataLayerSourceObjects.customer.customerType,
+                    'loyalty': dataLayerSourceObjects.customer.loyalty,
+                    'customerStatus': dataLayerSourceObjects.customer.customerStatus,
+                    'loginType': dataLayerSourceObjects.customer.loginType,
+                    'store_name': dataLayerSourceObjects.customer.storeName,
+                    'store_ID': dataLayerSourceObjects.customer.storeID,
+                    'query': $.trim(query)
+                })
+            }
+        }
+    })
+</script>

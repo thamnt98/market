@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="shoppinglist_share_history" resource="default" engine="innodb" comment="Customer search history">
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="true"
+                comment="Entity ID"/>
+        <column xsi:type="int" name="customer_id" padding="10" unsigned="true" nullable="false" comment="Customer ID"/>
+        <column xsi:type="varchar" name="sharing_code" nullable="true" length="32" comment="Used Sharing Code"/>
+        <column xsi:type="varchar" name="new_sharing_code" nullable="true" length="32" comment="Used Sharing Code"/>
+        <column xsi:type="int" name="shoppinglist_id" padding="10" unsigned="true" nullable="false" comment="Shopping List ID"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="SHOPPINGLIST_SHARE_HISTORY_SHOPPINGLIST_ID_WISHLIST_WISHLIST_ID" table="shoppinglist_share_history"
+                    column="shoppinglist_id" referenceTable="wishlist" referenceColumn="wishlist_id" onDelete="CASCADE"/>
+    </table>
+</schema>

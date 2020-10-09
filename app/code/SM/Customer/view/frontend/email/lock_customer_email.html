@@ -1,0 +1,64 @@
+<!--@subject {{trans "Sorry, your Transmart account has been locked"}} @-->
+<!--@vars {
+"var name":"Customer Name",
+"var limit":"Limit",
+"var token":"Token",
+"var contact":"Contact"
+} @-->
+{{template config_path="design/email/header_template"}}
+<table class="greeting" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "Hello"}}
+                <b>{{var name}},</b>
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End greeting-->
+<table class="message-email" width="100%">
+    <tr>
+        <td>
+            <p>{{trans "Your Transmart account has been temporarily locked because you have exceeded the maximum number of attempts to sign in."}}</p>
+            <p>{{trans "Click the button below to recover your account"}}</p>
+        </td>
+    </tr>
+</table>
+<!--End Message Email-->
+<table cellpadding="0" cellspacing="0" class="button-message-email" width="100%">
+    <tr>
+        <td align="center">
+            <table cellpadding="0" cellspacing="0" class="box-verify-email">
+                <tr>
+                    <td class="button">
+                        <a href="{{var token}}" target="_blank">{{trans "Recover My Account"}}</a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+<!--End Button Message email-->
+<table class="link-to-verify" width="100%">
+    <tr>
+        <td>
+            <p>{{trans "or contact Transmart Customer Service at %contact" contact=$contact}}</p>
+        </td>
+    </tr>
+</table>
+<!--End Link To Verify-->
+
+<table class="sincerely" width="100%">
+    <tr>
+        <td>
+            <p>{{trans "Sincerely"}},</p>
+            <p class="signature">
+                <b>{{var
+                    store.frontend_name}}</b>
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Sincerely-->
+{{template config_path="design/email/footer_template"}}

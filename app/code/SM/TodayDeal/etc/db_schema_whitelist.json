@@ -1,0 +1,93 @@
+{
+    "trans_today_deals": {
+        "column": {
+            "post_id": true,
+            "title": true,
+            "thumbnail_name": true,
+            "thumbnail_path": true,
+            "thumbnail_size": true,
+            "today_deal_layout": true,
+            "meta_keywords": true,
+            "meta_description": true,
+            "identifier": true,
+            "content_heading": true,
+            "content": true,
+            "creation_time": true,
+            "update_time": true,
+            "is_active": true,
+            "sort_order": true,
+            "layout_update_xml": true,
+            "custom_theme": true,
+            "custom_root_template": true,
+            "custom_layout_update_xml": true,
+            "layout_update_selected": true,
+            "custom_theme_from": true,
+            "custom_theme_to": true,
+            "meta_title": true,
+            "publish_from": true,
+            "publish_to": true,
+            "mb_short_title": true,
+            "mb_short_description": true,
+            "mb_is_highlighted": true,
+            "mb_all_products_category": true,
+            "mb_most_popular_products_category": true,
+            "mb_signature_true_title": true,
+            "mb_signature_description": true,
+            "mb_related_campaigns_block_title": true,
+            "mb_image": true,
+            "mb_image_path": true,
+            "mb_video": true,
+            "mb_video_path": true,
+            "is_surprise_deal": true,
+            "mb_surprise_deal_terms": true,
+            "mb_signature_title": true,
+            "promo_id": true,
+            "promo_name": true,
+            "promo_creative": true
+        },
+        "index": {
+            "TRANS_TODAY_DEALS_IDENTIFIER": true,
+            "FTI_2B322AE96DB33E5AE7CD79D947079296": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "trans_today_deals_store": {
+        "column": {
+            "post_id": true,
+            "store_id": true
+        },
+        "index": {
+            "TRANS_TODAY_DEALS_STORE_STORE_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "TRANS_TODAY_DEALS_STORE_POST_ID_TRANS_TODAY_DEALS_POST_ID": true,
+            "TRANS_TODAY_DEALS_STORE_STORE_ID_STORE_STORE_ID": true
+        }
+    },
+    "trans_today_deals_post_product": {
+        "column": {
+            "post_id": true,
+            "product_id": true,
+            "position": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "TRANS_TODAY_DEALS_POST_PRODUCT_POST_ID_TRANS_TODAY_DEALS_POST_ID": true,
+            "TRANS_TODAY_DEALS_POST_PRD_PRD_ID_CAT_PRD_ENTT_ENTT_ID": true
+        }
+    },
+    "trans_today_deals_related_post": {
+        "column": {
+            "post_id": true,
+            "related_id": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "TRANS_TODAY_DEALS_RELATED_POST_POST_ID_TRANS_TODAY_DEALS_POST_ID": true,
+            "FK_92377355A523E55B8FB6D34472D17CC2": true
+        }
+    }
+}

@@ -1,0 +1,21 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<div class="wrapper-payment">
+    <div class="logo-bank">
+        <img src='<?= $block->getViewFileUrl('images/payment-pailed.png'); ?>' alt=""  width="461" height="470" />
+    </div>
+
+    <div class="failed-payment">
+        <p class="status-payment"><?= $block->escapeHtml(__('Payment Failed')) ?></p>
+        <p class="text-label-body">Oh no! We cannot proccess your payment.</p>
+        <p class="text-label-body">Check your Payment Details and Try Again.</p>
+    </div>
+
+    <div class="check-payment-col">
+        <button class="action primary" type="button">Try Again</button>
+    </div>
+</div>

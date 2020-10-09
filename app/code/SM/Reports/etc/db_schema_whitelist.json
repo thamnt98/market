@@ -1,0 +1,25 @@
+{
+    "report_viewed_product_summary": {
+        "column": {
+            "entity_id": true,
+            "product_id": true,
+            "popularity": true,
+            "store_id": true,
+            "customer_id": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "REPORT_VIEWED_PRODUCT_SUMMARY_PRODUCT_ID": true,
+            "REPORT_VIEWED_PRODUCT_SUMMARY_CUSTOMER_ID": true,
+            "REPORT_VIEWED_PRODUCT_SUMMARY_STORE_ID": true,
+            "REPORT_VIEWED_PRODUCT_SUMMARY_CUSTOMER_ID_STORE_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "REPORT_VIEWED_PRODUCT_SUMMARY_STORE_ID_STORE_STORE_ID": true,
+            "REPORT_VIEWED_PRD_SUMMARY_CSTR_ID_CSTR_ENTT_ENTT_ID": true,
+            "REPORT_VIEWED_PRODUCT_SUMMARY_PRODUCT_ID_STORE_ID_CUSTOMER_ID": true
+        }
+    }
+}

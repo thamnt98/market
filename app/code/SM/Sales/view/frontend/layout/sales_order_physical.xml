@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="abstract_detail"/>
+    <referenceBlock name="breadcrumbs">
+        <action method="addCrumb">
+            <argument name="crumbName" xsi:type="string">My Orders</argument>
+            <argument name="crumbInfo" xsi:type="array">
+                <item name="title" xsi:type="string">My Orders</item>
+                <item name="label" xsi:type="string" translate="true">My Orders</item>
+                <item name="link" xsi:type="string">/sales/order/history</item>
+            </argument>
+        </action>
+        <action method="addCrumb">
+            <argument name="crumbName" xsi:type="string">Order Details</argument>
+            <argument name="crumbInfo" xsi:type="array">
+                <item name="title" xsi:type="string">Order Details</item>
+                <item name="label" xsi:type="string" translate="true">Order Details</item>
+            </argument>
+        </action>
+    </referenceBlock>
+    <body>
+        <referenceContainer name="content">
+            <block class="SM\Sales\Block\Order\Physical\Detail" name="sm.sales.order.detail" template="SM_Sales::order/detail/physical/detail.phtml">
+                <block class="SM\Sales\Block\Order\Item\Options" name="sm.sales.order.detail.item.options" template="SM_Sales::order/options.phtml"/>
+                <block class="SM\Sales\Block\Order\Button\ReorderItem" name="sm.sales.order.detail.reorder" template="SM_Sales::order/item/reorder.phtml"/>
+                <block class="SM\Sales\Block\Customer\Order\ProgressBar" name="sm.sales.order.detail.progress.bar" template="SM_Sales::order/sub/progress-bar.phtml"/>
+                <block class="SM\Sales\Block\Order\Digital\Part\Content" name="sm.sales.order.detail.payment" template="SM_Sales::order/payment-info.phtml"/>
+                <block class="SM\FreshProduct\Block\Order\Item" name="fresh.item" template="SM_FreshProduct::order/fresh-order-item.phtml"/>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

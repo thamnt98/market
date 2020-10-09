@@ -1,0 +1,49 @@
+
+<?php /** @var $block \SM\Installation\Block\Form */ ?>
+<?php $default = $block->getDefaultData() ?>
+<div class="fieldset installation-block" id="installation-block-<?= $block->getData('item_id') ?>" data-bind="scope:'installation<?= $block->getData('item_id') ?>'">
+    <div class="installation-content" id="installation-content-<?= $block->getData('item_id') ?>">
+        <div class="field is-installation">
+            <div class="control checkbox-custom">
+                <input type="checkbox"
+                       id="is-installation-<?= $block->getData('item_id') ?>"
+                       class="checkbox installation-field" />
+                <label for="is-installation-<?= $block->getData('item_id') ?>"><?= $block->escapeHtml(__('Add Free Installation')) ?></label>
+            </div>
+        </div>
+        <div class="field installation-note" id="field-installation-note-<?= $block->getData('item_id') ?>" style="display: none">
+            <div class="control">
+                <textarea id="installation-note-<?= $block->getData('item_id') ?>"
+                          class="text-area installation-note-field"
+                          maxlength="250"
+                          rows="4"
+                          cols="50"><?= $default['defaultNote'] ? $block->escapeHtml(__($default['defaultNote'])) : '' ?></textarea>
+                <div class="note-validate-text"><?= $block->escapeHtml(__('250 characters maximum')) ?></div>
+            </div>
+        </div>
+    </div>
+    <div class="installation-modal-remove" id="installation-modal-remove-<?= $block->getData('item_id') ?>" style="display: none">
+        <div class="modal-content">
+            <div><?= $block->escapeHtml(__('Are you sure want to remove free installation?')) ?></div>
+            <div><?= $block->escapeHtml(__('Your note will be automatic removed.')) ?></div>
+        </div>
+    </div>
+    <script type="text/x-magento-init">
+        {
+            "*": {
+                "SM_Installation/js/cart": {
+                            "itemId"        : <?= $block->getData('item_id') ?? 0 ?>,
+                            "productId"     : <?= $block->getProduct() ? $block->getProduct()->getId() : 0 ?>,
+                            "title"         : "<?= $block->escapeHtml($block->getTitle()) ?>",
+                            "tooltip"       : "<?= $block->escapeHtml($block->getTooltip()) ?>",
+                            "defaultNote"   : "<?= $default['defaultNote'] ?? '' ?>",
+                            "defaultChecked": <?= $block->escapeHtml($default['defaultChecked'] ?? 'false') ?>,
+                            "fee"           : <?= $block->getInstallationFee() ?>,
+                            "hasRemovePopup": <?= $block->hasRemovePopup() ?>,
+                            "tooltipUrl"    : "<?= /* @noEscape */ $block->getViewFileUrl('images/info.svg') ?>",
+                            "removePopup"   : "<?= null ?>"
+                }
+            }
+        }
+    </script>
+</div>

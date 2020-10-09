@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <fieldset name="rule_information" sortOrder="10">
+        <field name="day_of_week">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Day of Week</item>
+                    <item name="dataType" xsi:type="string">text</item>
+                    <item name="formElement" xsi:type="string">input</item>
+                    <item name="source" xsi:type="string">sales_rule</item>
+                    <item name="dataScope" xsi:type="string">day_of_week</item>
+                    <item name="notice" xsi:type="string" translate="true">1 = Monday, 2 = Tuesday,... 7 = Sunday</item>
+                    <item name="sortOrder" xsi:type="number">5</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="less-than-equals-to" xsi:type="number">7</rule>
+                    <rule name="greater-than-equals-to" xsi:type="number">1</rule>
+                </validation>
+            </settings>
+        </field>
+        <field name="coupon_type">
+            <settings>
+                <switcherConfig>
+                    <rules>
+                        <rule name="0">
+                            <actions>
+                                <action name="3">
+                                    <target>sales_rule_form.sales_rule_form.rule_information.is_suggestion</target>
+                                    <callback>show</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="1">
+                            <value>2</value>
+                            <actions>
+                                <action name="3">
+                                    <target>sales_rule_form.sales_rule_form.rule_information.is_suggestion</target>
+                                    <callback>hide</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="2">
+                            <actions>
+                                <action name="3">
+                                    <target>sales_rule_form.sales_rule_form.rule_information.is_suggestion</target>
+                                    <callback>hide</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                    </rules>
+                </switcherConfig>
+            </settings>
+        </field>
+        <field name="is_suggestion" sortOrder="10" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">sales_rule</item>
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <dataScope>is_suggestion</dataScope>
+                <label translate="true">Show Suggestion on Cart</label>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+    </fieldset>
+    <fieldset name="actions">
+        <field name="amrulesrule[skip_rule]">
+            <settings>
+                <visible>false</visible>
+                <disabled>false</disabled>
+            </settings>
+        </field>
+        <field name="skip_special" sortOrder="20" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">sales_rule</item>
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>boolean</dataType>
+                <dataScope>skip_special</dataScope>
+                <label translate="true">Skip with Special Price</label>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="voucher_reward" sortOrder="20" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">sales_rule</item>
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <switcherConfig>
+                    <rules>
+                        <rule name="0">
+                            <value>0</value>
+                            <actions>
+                                <action name="0">
+                                    <target>sales_rule_form.sales_rule_form.actions.reward_rule</target>
+                                    <callback>hide</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="1">
+                            <value>1</value>
+                            <actions>
+                                <action name="0">
+                                    <target>sales_rule_form.sales_rule_form.actions.reward_rule</target>
+                                    <callback>show</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                    </rules>
+                    <enabled>true</enabled>
+                </switcherConfig>
+                <dataType>boolean</dataType>
+                <dataScope>voucher_reward</dataScope>
+                <label translate="true">Voucher Reward</label>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <valueMap>
+                            <map name="false" xsi:type="number">0</map>
+                            <map name="true" xsi:type="number">1</map>
+                        </valueMap>
+                        <prefer>toggle</prefer>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="reward_rule" sortOrder="21" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">sales_rule</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>int</dataType>
+                <dataScope>reward_rule</dataScope>
+                <label translate="true">Reward Rule</label>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                      <options class="\SM\Promotion\Model\Source\RewardRule"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+    </fieldset>
+</form>

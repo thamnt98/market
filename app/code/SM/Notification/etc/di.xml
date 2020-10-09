@@ -1,0 +1,83 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- API Define -->
+    <preference for="SM\Notification\Api\NotificationSettingRepositoryInterface"
+                type="SM\Notification\Model\NotificationSettingRepository" />
+    <preference for="SM\Notification\Api\Data\NotificationTypeInterface"
+                type="SM\Notification\Model\Data\NotificationTypeInterface" />
+    <preference for="SM\Notification\Api\Data\NotificationSettingInterface"
+                type="SM\Notification\Model\Data\NotificationSetting" />
+    <preference for="SM\Notification\Api\Data\NotificationSetting\ParentItemInterface"
+                type="SM\Notification\Model\Data\Notification\ParentItem" />
+    <preference for="SM\Notification\Api\Data\NotificationSetting\ChildItemInterface"
+                type="SM\Notification\Model\Data\Notification\ChildItem" />
+    <preference for="SM\Notification\Api\CustomerMessageRepositoryInterface"
+                type="SM\Notification\Model\CustomerMessageRepository" />
+    <preference for="SM\Notification\Api\Data\CustomerMessageInterface"
+                type="SM\Notification\Model\Data\CustomerMessage" />
+    <preference for="SM\Notification\Api\CustomerMessageResultInterface"
+                type="SM\Notification\Model\CustomerMessageResult" />
+    <preference for="SM\Notification\Api\Data\Queue\EmailInterface"
+                type="SM\Notification\Model\Data\Queue\Email" />
+    <preference for="SM\Notification\Api\Data\Queue\PushDeviceInterface"
+                type="SM\Notification\Model\Data\Queue\Push" />
+    <preference for="SM\Notification\Api\Data\Queue\SmsInterface"
+                type="SM\Notification\Model\Data\Queue\Sms" />
+
+
+
+    <!-- SM Define params -->
+    <type name="SM\Notification\Plugin\Trans_Sprint\Model\PaymentNotify">
+        <arguments>
+            <argument name="logger" xsi:type="object">SM\Notification\Model\Logger</argument>
+        </arguments>
+    </type>
+    <virtualType name="SM\Notification\Model\Logger\Debug" type="Magento\Framework\Logger\Handler\Base">
+        <arguments>
+            <argument name="fileName" xsi:type="string">/var/log/sm_notification.log</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SM\Notification\Model\Logger" type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="debug" xsi:type="object">SM\Notification\Model\Logger\Debug</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="SM\Notification\Cron\AbstractGenerate">
+        <arguments>
+            <argument name="logger" xsi:type="object">SM\Notification\Model\Logger</argument>
+        </arguments>
+    </type>
+    <type name="SM\Notification\Cron\Sync\AbstractSync">
+        <arguments>
+            <argument name="logger" xsi:type="object">SM\Notification\Model\Logger</argument>
+        </arguments>
+    </type>
+    <type name="SM\Notification\Model\Notification\Consumer\AbstractConsumer">
+        <arguments>
+            <argument name="logger" xsi:type="object">SM\Notification\Model\Logger</argument>
+        </arguments>
+    </type>
+    <type name="SM\Notification\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+    <type name="SM\Notification\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">LoggerNotification</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="system" xsi:type="object">SM\Notification\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </type>
+
+
+
+    <!-- Plugins -->
+    <type name="Trans\Sprint\Api\PaymentNotifyInterface">
+        <plugin name="SM_Notification::SprintPaymentNotify"
+                type="SM\Notification\Plugin\Trans_Sprint\Model\PaymentNotify" />
+    </type>
+</config>

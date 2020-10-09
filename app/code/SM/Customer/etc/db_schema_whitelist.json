@@ -1,0 +1,33 @@
+{
+    "quote_address": {
+        "column": {
+            "district": true
+        }
+    },
+    "sale_order_address": {
+        "column": {
+            "district": true
+        }
+    },
+    "sm_customer_devices": {
+        "column": {
+            "id": true,
+            "customer_id": true,
+            "device_id": true,
+            "type": true,
+            "token": true,
+            "created_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "SM_CUSTOMER_DEVICES_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID": true,
+            "SM_CUSTOMER_DEVICES_CUSTOMER_ID_DEVICE_ID": true
+        }
+    },
+    "oauth_token": {
+        "column": {
+            "reset_password_token": true,
+            "expires_reset_token": true
+        }
+    }
+}

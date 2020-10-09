@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+	<acl>
+		<resources>
+			<resource id="Magento_Backend::admin">
+				<resource id="Magento_Backend::stores">
+					<resource id="Magento_Backend::stores_settings">
+						<resource id="Magento_Config::config">
+							<resource id="SM_DigitalProduct::config_sm_digitalproduct" title="Configuration"/>
+						</resource>
+					</resource>
+				</resource>
+				<resource id="SM_DigitalProduct::category" sortOrder="10" title="category">
+					<resource id="SM_DigitalProduct::category_save" sortOrder="10" title="Save category"/>
+					<resource id="SM_DigitalProduct::category_delete" sortOrder="20" title="Delete category"/>
+					<resource id="SM_DigitalProduct::category_update" sortOrder="30" title="Update category"/>
+					<resource id="SM_DigitalProduct::category_view" sortOrder="40" title="View category"/>
+				</resource>
+				<resource id="SM_DigitalProduct::operator_icon" sortOrder="10" title="Operator Icon">
+					<resource id="SM_DigitalProduct::operator_icon_save" sortOrder="10" title="Save operator_icon"/>
+					<resource id="SM_DigitalProduct::operator_icon_delete" sortOrder="20" title="Delete operator_icon"/>
+					<resource id="SM_DigitalProduct::operator_icon_update" sortOrder="30" title="Update operator_icon"/>
+					<resource id="SM_DigitalProduct::operator_icon_view" sortOrder="40" title="View operator_icon"/>
+				</resource>
+			</resource>
+		</resources>
+	</acl>
+</config>

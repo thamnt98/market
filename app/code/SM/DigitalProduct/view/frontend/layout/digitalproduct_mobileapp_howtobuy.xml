@@ -1,0 +1,18 @@
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="empty"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <remove src="requirejs/require.js"/>
+        <remove src="mage/requirejs/mixins.js"/>
+        <remove src="requirejs-config.js"/>
+        <remove src="SM_Theme::js/loading-size.js"/>
+        <remove src="mage/polyfill.js"/>
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block class="Magento\Framework\View\Element\Template" name="how_to_buy_content"
+                   template="SM_DigitalProduct::mobileapp/how-to-buy.phtml"/>
+        </referenceContainer>
+        <referenceContainer name="before.body.end" remove="true"/>
+        <referenceContainer name="after.body.start" remove="true"/>
+    </body>
+</page>

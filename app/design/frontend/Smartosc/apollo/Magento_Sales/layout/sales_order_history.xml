@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  Magento
+ * @package   Magento_Sales
+ *
+ * Date: April, 24 2020
+ * Time: 5:29 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="breadcrumbs">
+            <action method="addCrumb">
+                <argument name="crumbName" xsi:type="string">My Orders</argument>
+                <argument name="crumbInfo" xsi:type="array">
+                    <item name="title" xsi:type="string" translate="true">My Orders</item>
+                    <item name="label" xsi:type="string" translate="true">My Orders</item>
+                </argument>
+            </action>
+        </referenceBlock>
+    </body>
+</page>

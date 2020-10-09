@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="catalog_search" translate="label" sortOrder="200" showInDefault="1" showInWebsite="0"
+                 showInStore="0">
+            <label>Catalog Search</label>
+            <tab>transmart</tab>
+            <resource>SM_Search::configuration</resource>
+            <group id="global_search" translate="label" sortOrder="0" showInDefault="1" showInWebsite="0"
+                   showInStore="0">
+                <label>Global Search</label>
+                <field id="debug" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>Debug Query</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="search_by_id" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>Search by ID</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="latest_search" translate="label" sortOrder="10" showInDefault="1" showInWebsite="0"
+                   showInStore="0">
+                <label>Latest Search</label>
+                <field id="size" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>Size</label>
+                </field>
+            </group>
+            <group id="popular_search" translate="label" sortOrder="20" showInDefault="1" showInWebsite="0"
+                   showInStore="0">
+                <label>Popular Search</label>
+                <field id="size" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>Size</label>
+                </field>
+            </group>
+            <group id="suggestion" translate="label" sortOrder="20" showInDefault="1" showInWebsite="0"
+                   showInStore="0">
+                <label>Suggestions</label>
+                <field id="main_category_limit" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>C0 Categories Limit</label>
+                </field>
+            </group>
+            <group id="search_no_result_page" translate="label" sortOrder="20" showInDefault="1" showInWebsite="0"
+                   showInStore="0">
+                <label>Search No Result Page</label>
+                <field id="suggest_category" sortOrder="10"  type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Suggest Category Id</label>
+                    <comment>Using for get product in search no result page</comment>
+                    <validate>validate-zero-or-greater validate-digits</validate>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

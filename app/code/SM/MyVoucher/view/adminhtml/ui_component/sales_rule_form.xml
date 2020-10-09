@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <fieldset name="rule_information" sortOrder="10">
+
+        <field name="voucher_image">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">string</item>
+                    <item name="label" xsi:type="string" translate="true">Voucher Image</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="formElement" xsi:type="string">fileUploader</item>
+                    <item name="elementTmpl" xsi:type="string">ui/form/element/uploader/uploader</item>
+                    <item name="previewTmpl" xsi:type="string">Magento_Catalog/image-preview</item>
+                    <item name="required" xsi:type="boolean">false</item>
+                    <item name="sortOrder" xsi:type="number">40</item>
+                    <item name="uploaderConfig" xsi:type="array">
+                        <item name="url" xsi:type="url" path="adminvoucher/voucher/upload"/>
+                    </item>
+                    <item name="allowedExtensions" xsi:type="string">jpeg jpg png</item>
+                    <item name="notice" xsi:type="string" translate="true">
+                        <![CDATA[
+                            Allowed file types: jpeg, jpg, png.<br/>
+                            Image's size is 251 x 151.
+                        ]]>
+                    </item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="how_to_use" template="ui/form/field" sortOrder="60" formElement="wysiwyg">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="wysiwygConfigData" xsi:type="array">
+                        <item name="height" xsi:type="string">100px</item>
+                        <item name="add_variables" xsi:type="boolean">false</item>
+                        <item name="add_widgets" xsi:type="boolean">false</item>
+                        <item name="add_images" xsi:type="boolean">false</item>
+                        <item name="add_directives" xsi:type="boolean">false</item>
+                        <item name="is_pagebuilder_enabled" xsi:type="boolean">false</item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label>How To Use</label>
+                <dataScope>how_to_use</dataScope>
+            </settings>
+            <formElements>
+                <wysiwyg>
+                    <settings>
+                        <rows>8</rows>
+                        <wysiwyg>true</wysiwyg>
+                    </settings>
+                </wysiwyg>
+            </formElements>
+        </field>
+
+        <field name="term_condition" template="ui/form/field" sortOrder="60" formElement="wysiwyg">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="wysiwygConfigData" xsi:type="array">
+                        <item name="height" xsi:type="string">100px</item>
+                        <item name="add_variables" xsi:type="boolean">false</item>
+                        <item name="add_widgets" xsi:type="boolean">false</item>
+                        <item name="add_images" xsi:type="boolean">false</item>
+                        <item name="add_directives" xsi:type="boolean">false</item>
+                        <item name="is_pagebuilder_enabled" xsi:type="boolean">false</item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label>Terms and Condition</label>
+                <dataScope>term_condition</dataScope>
+            </settings>
+            <formElements>
+                <wysiwyg>
+                    <settings>
+                        <rows>8</rows>
+                        <wysiwyg>true</wysiwyg>
+                    </settings>
+                </wysiwyg>
+            </formElements>
+        </field>
+
+        <field name="discount_text" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">discount_text</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Discount Amount Text</label>
+                <visible>true</visible>
+                <dataScope>discount_text</dataScope>
+            </settings>
+        </field>
+
+        <field name="discount_note" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">discount_note</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Discount Note</label>
+                <visible>true</visible>
+                <dataScope>discount_note</dataScope>
+            </settings>
+        </field>
+        <field name="area" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">area</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Discount Area</label>
+                <visible>true</visible>
+                <dataScope>area</dataScope>
+            </settings>
+        </field>
+        <field name="front_redirect_url" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">front_redirect_url</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Frontend Redirect Url</label>
+                <visible>true</visible>
+                <dataScope>front_redirect_url</dataScope>
+            </settings>
+        </field>
+        <field name="mobile_redirect_area" formElement="select">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Mobile Redirect To</label>
+                <dataScope>mobile_redirect_area</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="SM\MyVoucher\Model\Source\MobileRedirect\RedirectOption"/>
+                        <caption translate="true">-- Please Select --</caption>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="mobile_redirect" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">mobile_redirect</item>
+                    <item name="notice" xsi:type="string" translate="true">
+                        Please use SKU if the redirect area is Product Page And use ID if redirect area are Campaign and Category
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Mobile Redirect ID</label>
+                <visible>true</visible>
+                <dataScope>mobile_redirect</dataScope>
+            </settings>
+        </field>
+    </fieldset>
+</form>

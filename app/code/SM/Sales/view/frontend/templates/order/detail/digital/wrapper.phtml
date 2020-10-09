@@ -1,0 +1,122 @@
+<?php
+/** @var \SM\Sales\Block\Order\Digital\Detail $block */
+
+/** @var \SM\Sales\Api\Data\DigitalOrderDataInterface $digitalOrder */
+$digitalOrder = $block->getParentOrder();
+$serviceType = $digitalOrder->getProductOption()->getExtensionAttributes()->getDigitalData()->getServiceType();
+?>
+<?php if ($digitalOrder):?>
+    <div class="my-order order-detail order-detail-digital">
+        <div class="dis-flex title-order-detail">
+            <a href="<?= $block->getUrl("*/*/history")?>" class="back-orderlist"><?= $block->escapeHtml(__('Back to order list')) ?></a>
+        </div>
+        <div class="table-product">
+            <div class="tpr-top">
+                <div class="tpr-top-left">
+                    <span class="tl-invoice-number"><?= $block->escapeHtml(__('Reference Number')) ?></span>
+                    <h4>
+                        <?= $block->escapeHtml(__($digitalOrder->getReferenceNumber())) ?>
+                        <?php if ($digitalOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::STATUS_COMPLETE):?>
+                            <a href="<?= $block->getUrl("*/invoice/view/id/" . $digitalOrder->getParentOrderId())?>" target="_blank">
+                                <?= $block->escapeHtml(__('See Invoice')) ?>
+                            </a>
+                        <?php endif; ?>
+                    </h4>
+                    <span class="date"><?= $block->escapeHtml(__($block->timeFormat($digitalOrder->getCreatedAt()))) ?></span>
+                </div>
+                <div class="bx-total-payment total-payment-detail">
+                    <span class="tl-invoice-number"><?= $block->escapeHtml(__('Total Payment')) ?></span>
+                    <h4><?= $block->escapeHtml(__($block->currencyFormat($digitalOrder->getGrandTotal()))) ?></h4>
+                    <span class="date"><?= $block->escapeHtml(__('Payment Method: ' . $digitalOrder->getPaymentMethod())) ?></span>
+                </div>
+                <div class="tpr-top-right">
+                    <?php if ($digitalOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::STATUS_COMPLETE ||
+                        $digitalOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::STATUS_CANCELED):?>
+                        <button
+                            type="button" class="pagebuilder-slide-button pagebuilder-button-secondary quick-transaction-item"
+                            data-buy-request='<?= $digitalOrder->getBuyRequest() ?>'
+                            data-sku='<?= $digitalOrder->getSku() ?>'
+                            data-price='<?= $digitalOrder->getPrice() ?>'>
+                            <?php if (in_array($serviceType, [
+                                \SM\DigitalProduct\Helper\Category\Data::TOP_UP_VALUE,
+                                \SM\DigitalProduct\Helper\Category\Data::MOBILE_PACKAGE_INTERNET_VALUE,
+                                \SM\DigitalProduct\Helper\Category\Data::ELECTRICITY_TOKEN_VALUE
+                            ])):?>
+                            <?= $block->escapeHtml(__('Reorder')) ?>
+                        <?php else: ?>
+                            <?= $block->escapeHtml(__('Check Bill')) ?>
+                        <?php endif;?>
+                        </button>
+                    <?php endif;?>
+                </div>
+            </div>
+            <div class="order-detail-content order-detail-content-digital">
+                <div class="dis-flex order-detail-ct-top">
+                    <div class="order-id">
+                        <span class="order-id-info"><?= $block->escapeHtml(__('Order ID')) ?></span>
+                        <h4><?= $block->escapeHtml(__($digitalOrder->getReferenceOrderId())) ?></h4>
+                    </div>
+                    <div class="order-delivery-method">
+                        <span class="order-id-info"><?= $block->escapeHtml(__('Status')) ?></span>
+                        <?php if (in_array($digitalOrder->getStatus(),
+                            [\SM\Sales\Api\ParentOrderRepositoryInterface::STATUS_CANCELED,
+                                \SM\Sales\Api\ParentOrderRepositoryInterface::STATUS_PENDING_PAYMENT
+                            ])):?>
+
+                            <h4 class="red"><?= $block->escapeHtml(__($digitalOrder->getStatusLabel())) ?></h4>
+                        <?php else:?>
+                            <h4 class="green"><?= $block->escapeHtml(__($digitalOrder->getStatusLabel())) ?></h4>
+                        <?php endif;?>
+                    </div>
+                    <?php
+                    /** @var \SM\Sales\Block\Order\Digital\Part\Content $paymentInfoBlock */
+                    $paymentInfoBlock = $block->getChildBlock("sm.sales.order.detail.payment");
+                    $paymentInfoBlock->setParentOrder($digitalOrder);
+                    ?>
+                    <?= $paymentInfoBlock->toHtml() ?>
+                </div>
+                <?php
+                /** @var \SM\Sales\Block\Order\Digital\Part\Content $contentBlock */
+                $contentBlock = $block->getLayout()->createBlock(\SM\Sales\Block\Order\Digital\Part\Content::class);
+                $contentBlock->setParentOrder($digitalOrder);
+                ?>
+                <?php if ($serviceType == \SM\DigitalProduct\Helper\Category\Data::ELECTRICITY_TOKEN_VALUE):?>
+                    <?php
+                    $contentBlock->setTemplate(\SM\Sales\Block\Order\Digital\Part\Content::TEMPLATE_CONTENT_PLN_TOKEN)
+                    ?>
+                <?php elseif ($serviceType == \SM\DigitalProduct\Helper\Category\Data::ELECTRICITY_BILL_VALUE):?>
+                    <?php
+                    $contentBlock->setTemplate(\SM\Sales\Block\Order\Digital\Part\Content::TEMPLATE_CONTENT_PLN_BILL)
+                    ?>
+                <?php else:?>
+                    <?php
+                    $contentBlock->setTemplate(\SM\Sales\Block\Order\Digital\Part\Content::TEMPLATE_CONTENT_MOBILE)
+                    ?>
+                <?php endif;?>
+                <?= $contentBlock->toHtml()?>
+            </div>
+            <!-- shopping summary-->
+            <?php if ($serviceType == \SM\DigitalProduct\Helper\Category\Data::ELECTRICITY_TOKEN_VALUE):?>
+                <?php
+                $contentBlock->setTemplate(\SM\Sales\Block\Order\Digital\Part\Content::TEMPLATE_SUMMARY_PLN_TOKEN)
+                ?>
+            <?php elseif ($serviceType == \SM\DigitalProduct\Helper\Category\Data::ELECTRICITY_BILL_VALUE):?>
+                <?php
+                $contentBlock->setTemplate(\SM\Sales\Block\Order\Digital\Part\Content::TEMPLATE_SUMMARY_PLN_BILL)
+                ?>
+            <?php else:?>
+                <?php
+                $contentBlock->setTemplate(\SM\Sales\Block\Order\Digital\Part\Content::TEMPLATE_SUMMARY_MOBILE)
+                ?>
+            <?php endif;?>
+            <?= $contentBlock->toHtml()?>
+        </div>
+    </div>
+    <script type="text/x-magento-init">
+    {
+        "*": {
+            "SM_DigitalProduct/js/reorder":{}
+        }
+    }
+    </script>
+<?php endif;?>

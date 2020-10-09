@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  Amasty
+ * @package   Amasty_Promo
+ *
+ * Date: September, 22 2020
+ * Time: 11:21 AM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="ampromo.items">
+            <block class="Magento\Catalog\Block\Product\ProductList\Item\Container" name="gift.product.addto" as="addto">
+                <block class="Magento\Wishlist\Block\Catalog\Product\ProductList\Item\AddTo\Wishlist"
+                       name="catalogsearch.product.addto.wishlist" as="wishlist" before="compare"
+                       template="Magento_Wishlist::catalog/product/list/addto/wishlist.phtml"/>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

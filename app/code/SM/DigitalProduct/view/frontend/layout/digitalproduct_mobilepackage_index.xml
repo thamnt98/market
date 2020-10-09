@@ -1,0 +1,9 @@
+<?xml version="1.0" ?>
+<page layout="1column" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="digitalproduct_index_index"/>
+    <body>
+		<referenceContainer name="content">
+            <block class="SM\DigitalProduct\Block\MobilePackage\Index" name="mobilepackage.index" as="mobiletopup" template="SM_DigitalProduct::mobilepackage/main.phtml"/>
+        </referenceContainer>
+	</body>
+</page>

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Api/etc/extension_attributes.xsd">
+    <extension_attributes for="Magento\Quote\Api\Data\ProductOptionInterface">
+        <attribute code="digital" type="SM\DigitalProduct\Api\Data\DigitalInterface"/>
+        <attribute code="service_type" type="string"/>
+        <attribute code="digital_transaction" type="SM\DigitalProduct\Api\Data\DigitalTransactionInterface"/>
+    </extension_attributes>
+    <extension_attributes for="Magento\Catalog\Api\Data\ProductOptionInterface">
+        <attribute code="digital_data" type="SM\DigitalProduct\Api\Data\Order\DigitalProductInterface"/>
+    </extension_attributes>
+</config>

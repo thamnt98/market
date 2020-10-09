@@ -1,0 +1,234 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route url="/V1/customers/me/createAddress" method="POST">
+        <service class="SM\Checkout\Api\AccountManagementInterface" method="save"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/trans-checkout/me/estimateShippingMethod" method="POST">
+        <service class="SM\Checkout\Api\MultiShippingInterface" method="saveShippingItems"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/trans-checkout/me/placeorder" method="POST">
+        <service class="SM\Checkout\Api\MultiShippingInterface" method="placeOrder"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/trans-checkout/mobile/placeorder" method="POST">
+        <service class="SM\Checkout\Api\MultiShippingInterface" method="placeOrderMobile"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/trans-checkout/mobile/savepayment" method="POST">
+        <service class="SM\Checkout\Api\MultiShippingInterface" method="saveMobilePayment"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/trans-checkout/me/savepayment" method="POST">
+        <service class="SM\Checkout\Api\MultiShippingInterface" method="savePayment"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/trans-checkout/me/applyvoucher" method="POST">
+        <service class="SM\Checkout\Api\VoucherInterface" method="applyVoucher"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/trans-checkout/me/removevoucher" method="POST">
+        <service class="SM\Checkout\Api\VoucherInterface" method="remove"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/carts/mine/items/selectAll" method="POST">
+        <service class="SM\Checkout\Api\CartUpdateRepositoryInterface" method="selectAll"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/carts/mine/items/removeIds" method="POST">
+        <service class="SM\Checkout\Api\CartUpdateRepositoryInterface" method="removeIds"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/carts/mine/items/selectItem" method="POST">
+        <service class="SM\Checkout\Api\CartUpdateRepositoryInterface" method="selectItem"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/carts/mine/items/updateItem" method="POST">
+        <service class="SM\Checkout\Api\CartUpdateRepositoryInterface" method="updateSelectedItem"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/trans-checkout/me/previewOrder" method="POST">
+        <service class="SM\Checkout\Api\MultiShippingInterface" method="previewOrder"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/trans-checkout/searchStore" method="POST">
+        <service class="SM\Checkout\Api\MultiShippingInterface" method="searchStore"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <route url="/V1/payment/get-instalment-term" method="POST">
+        <service class="SM\Checkout\Api\PaymentInterface" method="getInstalmentTerm"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/order/status" method="GET">
+        <service class="SM\Checkout\Api\OrderInterface" method="getStatus"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/trans-checkout/resetPaymentFail" method="POST">
+        <service class="SM\Checkout\Api\MultiShippingInterface" method="resetPaymentFail"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/trans-checkout/digitalDetail" method="POST">
+        <service class="SM\Checkout\Api\MultiShippingInterface" method="digitalDetail"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <!--mobile api-->
+    <route url="/V1/trans-checkout/checkout" method="GET">
+        <service class="SM\Checkout\Api\MultiShippingMobileInterface" method="initCheckout"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/trans-checkout/storeFullFill" method="POST">
+        <service class="SM\Checkout\Api\MultiShippingMobileInterface" method="getStorePickUpSourceFullFill"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/trans-checkout/estimateShippingMethod" method="POST">
+        <service class="SM\Checkout\Api\MultiShippingMobileInterface" method="saveShippingItems"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/trans-checkout/previewOrder" method="POST">
+        <service class="SM\Checkout\Api\MultiShippingMobileInterface" method="previewOrder"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/trans-checkout/dateTimeConfig" method="POST">
+        <service class="SM\Checkout\Api\MultiShippingMobileInterface" method="getDateTimeConfig"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <route url="/V1/trans-checkout/mobileSearchStore" method="POST">
+        <service class="SM\Checkout\Api\MultiShippingMobileInterface" method="searchStore"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/trans-checkout/applyVoucher" method="POST">
+        <service class="SM\Checkout\Api\MultiShippingMobileInterface" method="applyVoucher"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+</routes>

@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ @project    ct-corp-transmart
+  ~ @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+  ~ @author     Duc Nguyen Hoang <ducnh2@smartosc.com>
+  ~ @copyright  Copyright © 2020 SmartOSC. All rights reserved.
+  ~ @url        http://www.smartosc.com
+  -->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="sm_help" showInDefault="1" showInWebsite="1" showInStore="1" type="text" translate="label"
+                 sortOrder="400">
+            <label>Help</label>
+            <tab>transmart</tab>
+            <resource>SM_Help::configurations</resource>
+
+            <group id="main_page" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="10">
+                <label>Main Help Page</label>
+
+                <field id="top_faq" translate="label" type="multiselect" sortOrder="10" showInDefault="1"
+                       showInWebsite="1" showInStore="0">
+                    <label>Top FAQs</label>
+                    <source_model>SM\Help\Model\Config\Source\Question</source_model>
+                </field>
+                <field id="topic_show_tab" translate="label" type="multiselect" sortOrder="15" showInDefault="1"
+                       showInWebsite="1">
+                    <label>Topic Show Tab Delivery and Return</label>
+                    <source_model>SM\Help\Model\Config\Source\Topic</source_model>
+                </field>
+                <field id="contact_us_block" translate="label" type="select" sortOrder="20" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Contact Us Block</label>
+                    <source_model>Magento\Cms\Model\Config\Source\Block</source_model>
+                </field>
+                <field id="contact_us_my_order" translate="label" type="select" sortOrder="25" showInDefault="1"
+                       showInWebsite="1">
+                    <label>Select Contact Us My Order</label>
+                    <source_model>SM\Help\Model\Config\Source\Topic</source_model>
+                </field>
+                <field id="contact_us_return_refund" translate="label" type="select" sortOrder="30" showInDefault="1"
+                       showInWebsite="1">
+                    <label>Select Contact Us Return Refund</label>
+                    <source_model>SM\Help\Model\Config\Source\Topic</source_model>
+                </field>
+            </group>
+            <group id="seo" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="50">
+                <label>Search Engine Optimization</label>
+
+                <field id="base_route" translate="label" type="text" sortOrder="10" showInDefault="1">
+                    <label>Base URL</label>
+                </field>
+                <field id="topic_url_suffix" translate="label" type="text" sortOrder="60" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>URL Suffix for Topic</label>
+                </field>
+                <field id="question_url_suffix" translate="label" type="text" sortOrder="70" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>URL Suffix for Question</label>
+                </field>
+            </group>
+            <group id="email" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Email Option</label>
+                <field id="sender" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Email Sender</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
+                <field id="template" translate="label" type="select" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Email Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    <comment>Email template is chosen based on theme fallback when "Default" option is selected.</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+<default>
+    <carriers>
+        <transshipping>
+            <active>1</active>
+            <sallowspecific>0</sallowspecific>
+            <model>SM\Checkout\Model\Carrier\TransShipping</model>
+            <name>Trans Shipping Method</name>
+            <price>0.00</price>
+            <title>Trans Shipping Method</title>
+            <specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.</specificerrmsg>
+            <handling_type>F</handling_type>
+            <showmethod>1</showmethod>
+        </transshipping>
+        <store_pickup>
+            <active>1</active>
+            <title>Store Pick Up Method</title>
+            <name>Store Pick Up Method</name>
+            <model>SM\Checkout\Model\Carrier\StorePickUp</model>
+            <price>0.00</price>
+            <specificerrmsg>This shipping method is not available. To use this shipping method, please contact us.</specificerrmsg>
+            <sallowspecific>0</sallowspecific>
+            <date_limit>7</date_limit>
+            <today_time_start>3</today_time_start>
+            <nextday_time_start>10</nextday_time_start>
+            <time_end>19</time_end>
+        </store_pickup>
+    </carriers>
+    <sm_payment>
+        <general>
+            <time_display_confirm_page>3</time_display_confirm_page>
+        </general>
+        <credit_card>
+            <minimum_amount>10000</minimum_amount>
+            <payment_success_page_time>3</payment_success_page_time>
+        </credit_card>
+        <virtual_account>
+            <minimum_amount>10000</minimum_amount>
+            <sprint_bca_va>
+                <website></website>
+            </sprint_bca_va>
+        </virtual_account>
+    </sm_payment>
+    <sm_checkout>
+        <checkout_oar>
+            <oar_active>0</oar_active>
+        </checkout_oar>
+        <checkout_order_summary>
+            <active>0</active>
+        </checkout_order_summary>
+    </sm_checkout>
+    <sm_checkout_fulfillment>
+        <general>
+            <active>1</active>
+        </general>
+    </sm_checkout_fulfillment>
+</default>
+</config>

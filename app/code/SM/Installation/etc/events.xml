@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_Installation
+ *
+ * Date: April, 21 2020
+ * Time: 2:47 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="checkout_cart_product_add_after">
+        <observer name="sm_installation_add_product_cart_after" instance="SM\Installation\Observer\AfterAddProductCart"/>
+    </event>
+</config>

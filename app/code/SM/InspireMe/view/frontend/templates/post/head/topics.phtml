@@ -1,0 +1,51 @@
+<?php
+/**
+ * @project    ct-corp-transmart
+ * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @author     Duc Nguyen Hoang <ducnh2@smartosc.com>
+ * @copyright  Copyright © 2020 SmartOSC. All rights reserved.
+ * @url        http://www.smartosc.com
+ */
+
+/** @var \Mirasvit\Blog\Block\Sidebar\CategoryTree $block */
+$currentCategory = $block->getCurrentCategory();
+?>
+<div class=" filter-dropdown post-filter">
+    <form action="#" id="post-filter" class="sortby-dropdown">
+
+        <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+            <span>
+                <?= ($currentCategory !== null ? $block->escapeHtml($currentCategory->getName()) : __('All Topics')) ?>
+            </span>
+        </span>
+
+        <ul class="dropdown" data-role="sorter">
+            <li class="radio-custom">
+                <input type="radio" id="topic-all" name="topic" <?= ($currentCategory === null ? 'checked' : '') ?>
+                       value="<?= $block->escapeUrl($block->getIndexUrl())?>"/>
+                <label for="topic-all"><?= $block->escapeHtml(__('All Topics')) ?></label>
+            </li>
+
+            <?php $categoryCollection = $block->getTree() ?>
+            <?php /** @var \Mirasvit\Blog\Model\Category $category */ ?>
+            <?php foreach ($categoryCollection as $category): ?>
+                <li class="radio-custom">
+                    <input type="radio" id="topic-<?= $category->getId() ?>" name="topic"
+                           data-gtm="<?= $block->escapeUrl($category->getName()) ?>"
+                           value="<?= $block->escapeUrl($category->getUrl()) ?>"
+                           <?= ($currentCategory !== null && $currentCategory->getId() === $category->getId() ? 'checked' : '') ?>
+                    />
+                    <label for="topic-<?= $category->getId() ?>"><?= $category->getName() ?></label>
+                </li>
+            <?php endforeach; ?>
+
+        </ul>
+    </form>
+</div>
+<script type="text/x-magento-init">
+{
+    "*": {
+        "filterInspirePost": {}
+    }
+}
+</script>

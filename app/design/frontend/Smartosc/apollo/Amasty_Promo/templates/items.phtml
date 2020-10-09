@@ -1,0 +1,130 @@
+<?php
+/**
+ * SMCommerce
+ *
+ * Date: September, 21 2020
+ * Time: 6:21 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ */ ?>
+<?php /** @var $block \SM\Promotion\Override\AmastyPromo\Block\Items */ ?>
+
+<?php
+/** @var \Magento\Catalog\Model\Product[] $products */
+$products = $block->getItems();
+$isShowPrice = $block->getShowPriceInPopup();
+$isShowReview = $block->isShowProductReview();
+?>
+
+<div class="ampromo-carousel-product products-grid"  data-ampromo-js="popup-products">
+    <div class="ampromo-gallery product-items" data-count="<?= count($products) ?>" data-role="ampromo-gallery" >
+        <?php foreach ($products as $product) : ?>
+            <?php
+            /** @var \Magento\Catalog\Model\Product $product */
+            $product = $block->getProductById($product->getId());
+            $isVisible = $product->getVisibility() != Magento\Catalog\Model\Product\Visibility::VISIBILITY_NOT_VISIBLE;
+            $optionsBlock = $block->getChildBlock($product->getTypeId() . '_prototype');
+            ?>
+            <div class="ampromo-item product-item"
+                 data-product-id="<?= (int)$product->getId() ?>"
+                 data-product-sku="<?= $block->escapeHtml($product->getSku()) ?>"
+            >   <div class="product-card">
+
+                    <div class="product-item-info">
+                        <a href="<?= $block->escapeUrl($product->getProductUrl()) ?>"
+                           class="product photo product-item-photo"
+                            <?= $isVisible ? '' : 'readonly' ?>
+                        >
+                            <img src="<?= $block->escapeUrl($block->getProductImageUrl($product)) ?>"
+                                 width="160"
+                                 height="160"
+                                 class="ampromo-item-image"
+                                 alt="<?= $block->escapeHtml($block->stripTags($product->getName(), null, true)) ?>"/>
+                        </a>
+                        <div class="product details product-item-details">
+                            <strong class="product name product-item-name">
+                                <a title="<?= $block->escapeHtml($product->getName()) ?>"
+                                   href="<?= $block->escapeUrl($product->getProductUrl()) ?>"
+                                    <?= $isVisible ? '' : 'readonly' ?>
+                                >
+                                    <?= $block->escapeHtml($product->getName()) ?>
+                                </a>
+                            </strong>
+                            <form method="POST"
+                                  action="<?= $block->escapeUrl($block->getFormActionUrl()) ?>"
+                                  data-role="ampromo-items-form"
+                                  data-ampromo-js="form-item"
+                                  class="ampromo-items-form"
+                                  id="ampromo_items_form-<?= $product->getId() ?>">
+                                <input type="hidden"
+                                       name="<?= \Magento\Framework\App\Action\Action::PARAM_NAME_URL_ENCODED; ?>"
+                                       value="<?= $block->escapeHtml($block->getCurrentBase64Url()) ?>">
+                                <input type="hidden" name="isPromoItems" value="true" />
+                                <input type="hidden" name="product_id" value="<?= $product->getId() ?>"/>
+
+                                <?php if ($isShowPrice) : ?>
+                                    <div class="price-box price-final_price">
+                                        <div class="price-base-price price-box-<?= (int)$product->getId() ?>"
+                                             data-product-id="<?= (int)$product->getId() ?>"
+                                             data-role="priceBox">
+                                            <span class="price-container price-base-price tax weee">
+                                                <span id="product-price-<?= (int)$product->getId() ?>"
+                                                      data-price-amount="<?= $block->escapeHtml($block->getProductPrice($product)) ?>"
+                                                      data-price-type="basePrice"
+                                                      class="price-wrapper">
+                                                    <span class="price"><?= $block->escapeHtml($block->getPriceTxt($product->getPrice())) ?></span>
+                                                </span>
+                                            </span>
+                                        </div>
+									</span>
+
+                                    </div>
+                                <?php endif; ?>
+
+                                <?php if ($isShowReview) : ?>
+                                    <?= /* @noEscape */ $block->getReviewsSummaryHtml($product) ?>
+                                <?php endif; ?>
+                                <div class="ampromo-options" id="ampromo-options">
+                                    <fieldset class="fieldset" tabindex="0">
+                                        <?= $block->getOptionsHtml($product) ?>
+                                    </fieldset>
+                                </div>
+                            </form>
+                            <?php if ($addTo = $block->getAddToHtml($product)): ?>
+                                <div class="product-item-inner">
+                                    <div class="product actions product-item-actions">
+                                        <div data-role="add-to-links" class="actions-secondary">
+                                            <?= $addTo ?>
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endif ?>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="gift-radio-btn">
+                    <input type="radio" name="selected_gift" value="ampromo_items_form-<?= $product->getId() ?>"/>
+                </div>
+                <?php if ($product->getTypeId() !== \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) : ?>
+                    <script>
+                        require([
+                            'jquery',
+                            'Amasty_Promo/js/price-updater'
+                        ], function ($) {
+                            $('[data-role=ampromo-overlay]').on('init.ampopup', function () {
+                                $('.ampromo-items-content').ampromoPriceUpdater({
+                                    productId: <?= (int)$product->getId() ?>,
+                                    priceConfig: <?= $block->getJsonConfig($product) ?>
+                                });
+                            });
+                        });
+                    </script>
+                <?php endif; ?>
+            </div>
+        <?php endforeach ?>
+    </div>
+</div>

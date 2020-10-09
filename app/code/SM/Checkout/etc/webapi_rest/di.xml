@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Quote\Model\Quote">
+        <plugin name="trans_model_quote_plugin" type="SM\Checkout\Plugin\Api\Quote\Model\Quote" sortOrder="99"/>
+    </type>
+    <type name="Magento\Quote\Model\Quote\Item\CartItemPersister">
+        <plugin name="sm_checkout_quote_item_persister" type="SM\Checkout\Plugin\Quote\Model\Item\CartItemPersister"
+                sortOrder="99"/>
+    </type>
+    <preference for="SM\Checkout\Api\Data\CartItemDataInterface" type="SM\Checkout\Model\Cart\Item\Data"/>
+    <preference for="SM\Checkout\Api\Data\CartItem\InstallationInterface"
+                type="SM\Checkout\Model\Cart\Item\Data\Installation"/>
+    <type name="Magento\Quote\Model\PaymentMethodManagement">
+        <plugin name="trans_payment_method_management" sortOrder="30" disabled="false"
+                type="\SM\Checkout\Plugin\Quote\Model\PaymentMethodManagement"/>
+    </type>
+    <type name="Magento\Quote\Api\CartManagementInterface">
+        <plugin name="sm_transcheckout_clear_multi_address" type="SM\Checkout\Plugin\Quote\Api\CartManagement" sortOrder="50"/>
+    </type>
+</config>

@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_Sprint
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Imam Kusuma <imam.kusuma@transdigital.co.id>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- Logger Start -->
+    <type name="Trans\Sprint\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+
+    <type name="Trans\Sprint\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">sprintlog</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="system" xsi:type="object">Trans\Sprint\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </type>
+    <!-- Logger End -->
+
+    <preference for="Trans\Sprint\Api\SprintResponseRepositoryInterface" type="Trans\Sprint\Model\SprintResponseRepository" />
+    <preference for="Trans\Sprint\Api\Data\SprintResponseInterface" type="Trans\Sprint\Model\SprintResponse" />
+    <preference for="Trans\Sprint\Api\SprintPaymentFlagRepositoryInterface" type="Trans\Sprint\Model\SprintPaymentFlagRepository" />
+    <preference for="Trans\Sprint\Api\Data\SprintPaymentFlagInterface" type="Trans\Sprint\Model\SprintPaymentFlag" />
+    <preference for="Trans\Sprint\Api\PaymentNotifyInterface" type="Trans\Sprint\Model\PaymentNotify" />
+    
+    <preference for="Trans\Sprint\Model\ResourceModel\SprintResponse\CollectionFactoryInterface" type="Trans\Sprint\Model\ResourceModel\SprintResponse\CollectionFactory" />
+
+    <!-- save klik bca user id to quote -->
+    <type name="Magento\Checkout\Model\PaymentInformationManagement">
+        <plugin name="saveKlikBcaUserIdToQuote" type="Trans\Sprint\Plugin\Checkout\Model\PaymentInformationManagement" />
+    </type>
+    <!--  -->
+
+    <!-- <type name="Trans\Sprint\Model\Payment\BcaKlikpay">
+        <plugin name="hideByOrderTotal" type="Trans\Sprint\Plugin\Sprint\Model\Payment\BcaKlikpay" />
+    </type> -->
+
+    <!-- handle pending order from sprint -->
+    <preference for="Magento\Checkout\Block\Onepage\Success" type="Trans\Sprint\Block\Frontend\Onepage\Success"/>
+    <type name="Magento\Checkout\Controller\Onepage\Success">
+        <plugin name="CheckoutSuccess" type="Trans\Sprint\Plugin\Checkout\Controller\Onepage\Success" />
+    </type>
+
+    <!-- Bin Model-->
+    <preference for="Trans\Sprint\Api\Data\BankInterface" type="Trans\Sprint\Model\Bank" />
+    <preference for="Trans\Sprint\Api\BankRepositoryInterface" type="Trans\Sprint\Model\BankRepository" />
+
+    <preference for="Trans\Sprint\Api\Data\BankBinInterface" type="Trans\Sprint\Model\BankBin" />
+    <preference for="Trans\Sprint\Api\BankBinRepositoryInterface" type="Trans\Sprint\Model\BankBinRepository" />
+    <preference for="Trans\Sprint\Api\ServiceFeeInterface" type="Trans\Sprint\Model\ServiceFee" />
+    <preference for="Trans\Sprint\Api\Data\SprintCustomerTokenizationInterface" type="Trans\Sprint\Model\CustomerTokenization" />
+    <preference for="Trans\Sprint\Api\SprintCustomerTokenizationRepositoryInterface" type="Trans\Sprint\Model\CustomerTokenizationRepository" />
+    <preference for="Trans\Sprint\Api\AutoCancelInterface" type="Trans\Sprint\Model\Order\AutoCancel" />
+
+</config>

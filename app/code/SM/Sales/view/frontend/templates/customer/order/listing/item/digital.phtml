@@ -1,0 +1,118 @@
+<?php
+/** @var \SM\Sales\Block\Order\Listing\ParentOrderItem $block */
+
+$parentOrder = $block->getParentOrder();
+?>
+
+<?php if (isset(array_values($parentOrder->getSubOrders())[0])):?>
+    <?php
+    /** @var \SM\Sales\Api\Data\SubOrderDataInterface $subOrder */
+    $subOrder = array_values($parentOrder->getSubOrders())[0] ?>
+    <?php if (isset(array_values($subOrder->getItems())[0])):?>
+        <?php
+        /** @var \SM\Sales\Api\Data\DetailItemDataInterface $item */
+        $item = current($subOrder->getItems());
+        $productOption = $item->getProductOption();
+        $digitalData = $productOption->getExtensionAttributes()->getDigitalData();
+        $serviceType = $digitalData->getServiceType();
+        $classStatus = '';
+        if ($parentOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::STATUS_COMPLETE ||
+            $parentOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::STATUS_CANCELED){
+            $classStatus = 'tpr-top-status';
+        }
+        ?>
+        <div class="table-product">
+            <div class="tpr-top">
+                <div class="tpr-top-left">
+                    <span class="tl-invoice-number"><?= $block->escapeHtml(__('Reference Number')) ?></span>
+                    <h4 data-gtm="<?= $block->escapeHtml($parentOrder->getReferenceNumber()) ?>"><?= $block->escapeHtml(__($parentOrder->getReferenceNumber())) ?></h4>
+                    <span class="date"><?= $block->escapeHtml($block->timeFormat($parentOrder->getOrderDate()))?></span>
+                </div>
+                <div class="bx-total-payment">
+                    <span class="tl-invoice-number"><?= $block->escapeHtml(__('Total Payment')) ?></span>
+                    <h4 data-gtm="<?= $block->escapeHtml($parentOrder->getTotalPayment()) ?>"><?= $block->escapeHtml(__($block->currencyFormat($parentOrder->getTotalPayment()))) ?></h4>
+                </div>
+                <div class="tpr-top-right  <?php echo $classStatus ?>">
+                    <a href="<?= $block->getDetailDigitalUrl($subOrder->getId())?>" type="submit" class="action
+                    primary"><?= $block->escapeHtml(__('See Details')) ?></a>
+                    <?php if ($parentOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::STATUS_COMPLETE ||
+                            $parentOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::STATUS_CANCELED):?>
+                        <button
+                            type="button" class="action secondary quick-transaction-item"
+                            data-buy-request='<?= $item->getBuyRequest() ?>'
+                            data-sku='<?= $item->getSku() ?>'
+                            data-price='<?= $item->getPrice() ?>'>
+                            <?php if (in_array($serviceType, [
+                                \SM\DigitalProduct\Helper\Category\Data::TOP_UP_VALUE,
+                                \SM\DigitalProduct\Helper\Category\Data::MOBILE_PACKAGE_INTERNET_VALUE,
+                                \SM\DigitalProduct\Helper\Category\Data::ELECTRICITY_TOKEN_VALUE
+                            ])):?>
+                                <?= $block->escapeHtml(__('Reorder')) ?>
+                            <?php else: ?>
+                                <?= $block->escapeHtml(__('Check Bill')) ?>
+                            <?php endif;?>
+                        </button>
+                    <?php endif;?>
+                </div>
+            </div>
+            <ul class="list-items-review">
+                <li class="item-review digital">
+                    <div class="item-info">
+                        <a href="#" title="<?= $block->escapeHtml($item->getProductName())?>" class="product-item-photo">
+                            <?php if (!is_null($digitalData->getDigitalTransaction()->getOperatorImage())):?>
+                                <img src="<?= $digitalData->getDigitalTransaction()->getOperatorImage() ?>" width="110" alt="<?= $block->escapeHtml($item->getProductName())?>" />
+                            <?php else:?>
+                                <img src="<?= $block->escapeHtml($item->getImageUrl())?>" width="110"  alt="<?= $block->escapeHtml($item->getProductName())?>" />
+                            <?php endif;?>
+                        </a>
+                        <div class="product-item-details">
+                            <h4><?= $digitalData->getDigital()->getServiceType() ?></h4>
+                            <?php if ($serviceType == \SM\DigitalProduct\Helper\Category\Data::ELECTRICITY_TOKEN_VALUE) : ?>
+                                <h4 class="name"><?= $item->getProductName() ?></h4>
+                                <span class="additional-1">
+                                    <?= $digitalData->getDigital()->getCustomerId() ?>
+                                </span>
+                            <?php elseif ($serviceType == \SM\DigitalProduct\Helper\Category\Data::ELECTRICITY_BILL_VALUE) : ?>
+                                <h4 class="name">
+                                    <?= $digitalData->getDigital()->getPeriod() ?>
+                                </h4>
+                                <span class="additional-1">
+                                    <?= $digitalData->getDigital()->getCustomerId() ?>
+                                </span>
+                            <?php else: ?>
+                                <h4 class="name"><?= $item->getProductName() ?></h4>
+                                <span class="additional-1">
+                                    <?= $digitalData->getDigital()->getMobileNumber() ?>
+                                </span>
+                            <?php endif;?>
+                        </div>
+                    </div>
+                    <div class="box-id-order">
+                        <span class="tl-invoice-number"><?= $block->escapeHtml(__('Order ID')) ?></span>
+                        <h4><?= $block->escapeHtml(__($subOrder->getSubOrderId())) ?></h4>
+                    </div>
+                    <div class="bx-order-status">
+                        <span class="tl-invoice-number"><?= $block->escapeHtml(__('Status')) ?></span>
+                        <?php if (in_array(
+                                        $subOrder->getStatus(),
+                                        [\SM\Sales\Api\ParentOrderRepositoryInterface::STATUS_CANCELED,
+                                \SM\Sales\Api\ParentOrderRepositoryInterface::STATUS_PENDING_PAYMENT
+                            ]
+                                    )) : ?>
+
+                            <h4 class="red"><?= $block->escapeHtml(__($subOrder->getStatusLabel())) ?></h4>
+                        <?php else:?>
+                            <h4 class="green"><?= $block->escapeHtml(__($subOrder->getStatusLabel())) ?></h4>
+                        <?php endif;?>
+                        <?php
+                        /** @var \SM\Sales\Block\Order\Digital\Part\Content $paymentInfoBlock */
+                        $paymentInfoBlock = $block->getChildBlock("sm.sales.order.listing.item.payment");
+                        $paymentInfoBlock->setParentOrder($parentOrder);
+                        ?>
+                        <?= $paymentInfoBlock->toHtml() ?>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    <?php endif;?>
+<?php endif;?>

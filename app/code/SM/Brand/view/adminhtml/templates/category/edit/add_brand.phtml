@@ -1,0 +1,24 @@
+<?php
+/**
+ * @category SM
+ * @package SM_Brand
+ * @license     http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @author      Chinhvd <chinhvd@smartosc.com>
+ * @copyright   Copyright (c) SmartOSC. All rights reserved.
+ * @url http://www.smartosc.com/
+ */
+?>
+<?php /** @var $block \Magento\Framework\View\Element\Template */ ?>
+<div data-role="catalog_category_add_brand_content" class="admin__old" style="display:none">
+    <div class="admin__data-grid-outer-wrap"
+         data-bind="scope: 'sm_brand_add_brand_listing.sm_brand_add_brand_listing'">
+        <div data-role="spinner"
+             data-component="sm_brand_add_brand_listing.sm_brand_add_brand_listing.sm_brand_add_brand_listing_columns"
+             class="admin__data-grid-loading-mask">
+            <div class="spinner">
+                <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            </div>
+        </div>
+        <!-- ko template: getTemplate() --><!-- /ko -->
+    </div>
+</div>

@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_LayeredNavigation
+ *
+ * Date: April, 25 2020
+ * Time: 5:19 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="catalog.category.add.attribute_filter.content"
+                   template="SM_LayeredNavigation::category/edit/add_attribute.phtml" />
+        </referenceContainer>
+        <block class="SM\LayeredNavigation\Block\Adminhtml\Category\FilterList"
+               name="category.form.assign_attribute"
+               template="SM_LayeredNavigation::category/edit/filter_list.phtml">
+            <block class="SM\LayeredNavigation\Block\Adminhtml\Category\Tab\FilterList\Grid"
+                   name="category.form.assign_attribute.grid" as="grid"/>
+            <block class="Magento\Backend\Block\Widget\Button" name="category.form.assign_attribute.add_attribute_button"
+                   as="add_attribute_filter_btn">
+                <arguments>
+                    <argument name="id" xsi:type="string">category_add_attribute_filter_btn</argument>
+                    <argument name="label" translate="true" xsi:type="string">Add Filter Attribute</argument>
+                    <argument name="class" xsi:type="string">secondary add-attributes</argument>
+                </arguments>
+            </block>
+        </block>
+    </body>
+</page>

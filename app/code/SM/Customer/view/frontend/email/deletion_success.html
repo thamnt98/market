@@ -1,0 +1,57 @@
+<!--@subject {{trans "Your Transmart account has been deleted. See you," customer.name}} @-->
+<!--@vars {
+"var name":"Customer Name",
+"var telephone":"Customer Telephone"
+} @-->
+{{template config_path="design/email/header_template"}}
+<table class="banner">
+    <tr>
+        <td align="center">
+            <img width="400px" src="{{view url='images/email-template/store-deletion.png'}}" alt="store-deletion" />
+        </td>
+    </tr>
+</table>
+<!--End Banner-->
+<table class="greeting" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "Hi"}}
+                <b>{{var name}},</b>
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End greeting-->
+<table class="message-email" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "Your request to delete your Transmart account has been approved. Your account has been deleted. We will miss you."}}
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Message Email-->
+<table class="message-email-3" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "Please remember, we will always welcome you back anytime with"}} <u>{{trans "a different email address and mobile number!"}}</u> {{trans "Simply register again to enjoy our fun shopping experience and get all you need from Transmart."}}
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Message Email 2-->
+<table class="sincerely" width="100%">
+    <tr>
+        <td>
+            <p>{{trans "Sincerely"}},</p>
+            <p class="signature">
+                <b>{{var store.frontend_name}}</b>
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Sincerely-->
+{{template config_path="design/email/footer_template"}}

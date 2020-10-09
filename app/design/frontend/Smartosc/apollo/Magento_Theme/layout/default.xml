@@ -1,0 +1,203 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <link src="SM_Theme::js/loading-size.js"/>
+    </head>
+    <body>
+        <referenceBlock name="footer_links" remove="true"/>
+        <referenceBlock name="form.subscribe" remove="true"/>
+        <referenceBlock name="store_switcher" remove="true"/>
+        <referenceBlock name="catalog.compare.link" remove="true"/>
+        <!-- Header -->
+        <referenceBlock name="logo">
+            <arguments>
+                <argument name="logo_img_width" xsi:type="number">160</argument>
+                <argument name="logo_img_height" xsi:type="number">25</argument>
+            </arguments>
+        </referenceBlock>
+        <referenceContainer name="header.panel">
+            <block class="Magento\Framework\View\Element\Template" name="header.app.link"
+                   template="Magento_Theme::header/app-link.phtml">
+                <arguments>
+                    <argument name="viewModel" xsi:type="object">SM\Theme\ViewModel\Generic</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+        <referenceContainer name="header-wrapper">
+            <block class="Magento\Wishlist\Block\Link" name="wish-list-icon" after="minicart"
+                   template="Magento_Wishlist::header-link.phtml"/>
+            <block class="SM\Notification\Block\Header\Sidebar" name="notification-icon" after="wish-list-icon"
+                   template="Magento_Theme::header/notification.phtml">
+                <arguments>
+                    <argument name="jsLayout" xsi:type="array">
+                        <item name="types" xsi:type="array"/>
+                        <item name="components" xsi:type="array">
+                            <item name="notification_content" xsi:type="array">
+                                <!-- In Progress -->
+                                <item name="component" xsi:type="string">Magento_Theme/js/view/notification</item>
+                                <item name="config" xsi:type="array">
+                                    <item name="template" xsi:type="string">Magento_Theme/notification/content</item>
+                                    <!-- Render items -->
+                                    <item name="itemRenderer" xsi:type="array">
+                                        <item name="default" xsi:type="string">defaultRenderer</item>
+                                    </item>
+                                </item>
+                                <!-- Render items -->
+                                <item name="children" xsi:type="array">
+                                    <item name="item.renderer" xsi:type="array">
+                                        <item name="component" xsi:type="string">uiComponent</item>
+                                        <item name="config" xsi:type="array">
+                                            <!-- In Progress -->
+                                            <item name="displayArea" xsi:type="string">defaultRenderer</item>
+                                            <item name="template" xsi:type="string">Magento_Theme/notification/item/default</item>
+                                        </item>
+                                        <item name="children" xsi:type="array">
+                                            <item name="item.image" xsi:type="array">
+                                                <!-- Almost Done -->
+                                                <item name="component" xsi:type="string">Magento_Theme/js/view/item/image</item>
+                                                <item name="config" xsi:type="array">
+                                                    <!-- Done -->
+                                                    <item name="template" xsi:type="string">Magento_Theme/notification/item/image</item>
+                                                    <item name="displayArea" xsi:type="string">itemImage</item>
+                                                </item>
+                                            </item>
+                                        </item>
+                                    </item>
+                                </item>
+                            </item>
+                        </item>
+                    </argument>
+                </arguments>
+            </block>
+            <block class="Magento\Framework\View\Element\Template" name="find-in-stores" after="notification-icon"
+                   template="Magento_Theme::header/find-in-stores.phtml"/>
+        </referenceContainer>
+        <move element="header.links" destination="header-wrapper" after="-"/>
+        <referenceBlock name="authorization-link-login">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Magento_Customer::account/link/sign-in.phtml</argument>
+            </action>
+        </referenceBlock>
+        <referenceBlock name="register-link">
+            <arguments>
+                <argument name="label" xsi:type="string" translate="true">Register</argument>
+                <argument name="class" xsi:type="string">register-link</argument>
+            </arguments>
+        </referenceBlock>
+        <referenceBlock name="top.links">
+            <block class="Magento\Customer\Block\Account\AuthorizationLink" name="header" as="header" before="-"
+                   template="Magento_Theme::html/header.phtml"/>
+
+            <block class="SM\Theme\Block\Account\Links" name="my-orders-link">
+                <arguments>
+                    <argument name="label" xsi:type="string" translate="true">My Orders</argument>
+                    <argument name="class" xsi:type="string">link my-orders</argument>
+                    <argument name="sortOrder" xsi:type="number">90</argument>
+                    <argument name="path" xsi:type="string">sales/order/history</argument>
+                </arguments>
+            </block>
+<!--            <block class="SM\Theme\Block\Account\Links" name="ct-cash-link">-->
+<!--                <arguments>-->
+<!--                    <argument name="label" xsi:type="string" translate="true">CT Cash</argument>-->
+<!--                    <argument name="class" xsi:type="string">link ct-cash</argument>-->
+<!--                    <argument name="sortOrder" xsi:type="number">80</argument>-->
+<!--                    <argument name="path" xsi:type="string">#</argument>-->
+<!--                </arguments>-->
+<!--            </block>-->
+            <block class="SM\Theme\Block\Account\Links" name="my-reviews-link">
+                <arguments>
+                    <argument name="label" xsi:type="string" translate="true">My Reviews</argument>
+                    <argument name="class" xsi:type="string">link my-reviews</argument>
+                    <argument name="sortOrder" xsi:type="number">60</argument>
+                    <argument name="path" xsi:type="string">review/customer/list</argument>
+                </arguments>
+            </block>
+<!--            <block class="SM\Theme\Block\Account\Links" name="subscriptions-link">-->
+<!--                <arguments>-->
+<!--                    <argument name="label" xsi:type="string" translate="true">Subscriptions</argument>-->
+<!--                    <argument name="class" xsi:type="string">link subscription</argument>-->
+<!--                    <argument name="sortOrder" xsi:type="number">50</argument>-->
+<!--                    <argument name="path" xsi:type="string">#</argument>-->
+<!--                </arguments>-->
+<!--            </block>-->
+            <block class="SM\Theme\Block\Account\Links" name="notification-settings-link">
+                <arguments>
+                    <argument name="label" xsi:type="string" translate="true">Notification Settings</argument>
+                    <argument name="class" xsi:type="string">link notification-settings</argument>
+                    <argument name="sortOrder" xsi:type="number">40</argument>
+                    <argument name="path" xsi:type="string">notification/setting</argument>
+                </arguments>
+            </block>
+<!--            <block class="SM\Theme\Block\Account\Links" name="gift-registry-link">-->
+<!--                <arguments>-->
+<!--                    <argument name="label" xsi:type="string" translate="true">Gift Registry</argument>-->
+<!--                    <argument name="class" xsi:type="string">link gift-registry</argument>-->
+<!--                    <argument name="sortOrder" xsi:type="number">30</argument>-->
+<!--                    <argument name="path" xsi:type="string">#</argument>-->
+<!--                </arguments>-->
+<!--            </block>-->
+            <block class="SM\Theme\Block\Account\Links" name="points-vouchers-link">
+                <arguments>
+                    <argument name="label" xsi:type="string" translate="true">My Vouchers</argument>
+                    <argument name="class" xsi:type="string">link points-vouchers</argument>
+                    <argument name="sortOrder" xsi:type="number">20</argument>
+                    <argument name="path" xsi:type="string">myvoucher/voucher</argument>
+                </arguments>
+            </block>
+            <referenceBlock name="authorization-link">
+                <arguments>
+                    <argument name="sortOrder" xsi:type="number">10</argument>
+                    <argument name="path" xsi:type="string">#</argument>
+                </arguments>
+            </referenceBlock>
+        </referenceBlock>
+        <referenceContainer name="footer">
+            <block class="Magento\Cms\Block\Block" name="footer-content">
+                <arguments>
+                    <argument name="block_id" xsi:type="string">footer-content</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+
+        <referenceBlock name="invitation_link_top" remove="true"/>
+        <referenceContainer name="page.top">
+            <referenceBlock name="navigation.sections">
+                <referenceBlock name="store.links" remove="true"/>
+                <referenceBlock name="store.settings" remove="true"/>
+                <referenceBlock name="store.menu">
+                    <block class="Magento\Customer\Block\Account\Navigation" name="nav.top.links2"  before="-">
+                        <arguments>
+                            <argument name="css_class" xsi:type="string">nav-header links </argument>
+                        </arguments>
+
+                        <block class="Magento\Customer\Block\Account\AuthorizationLink" name="nav.my-account"
+                               template="Magento_Theme::html/header.phtml"/>
+                    </block>
+                    <block class="Magento\Customer\Block\Account\Navigation" name="nav.top.links"  after="-">
+                        <arguments>
+                            <argument name="css_class" xsi:type="string">nav-header links </argument>
+                        </arguments>
+                        <block class="Magento\Customer\Block\Account\AuthorizationLink" name="nav.authorization-link"
+                               template="Magento_Customer::account/link/authorization.phtml"/>
+                    </block>
+                </referenceBlock>
+            </referenceBlock>
+        </referenceContainer>
+
+        <move element="store.settings.language" destination="store.menu" after="-"/>
+        <referenceContainer name="header.container">
+            <block class="SM\Theme\Block\Page\Loading" name="custom-home-page-loading"
+                   template="Magento_Theme::page/homepageloading/homepageloading.phtml"/>
+        </referenceContainer>
+        <referenceContainer name="before.body.end">
+            <block class="Magento\Framework\View\Element\Template" name="flash-sale.js" template="SM_FlashSale::product/flash_sale_js.phtml" />
+        </referenceContainer>
+    </body>
+</page>

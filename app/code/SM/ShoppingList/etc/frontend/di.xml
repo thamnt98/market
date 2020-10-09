@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- modifier   -->
+    <preference for="Magento\MultipleWishlist\Block\Link" type="SM\ShoppingList\Modifier\ShoppingListLink" />
+    <preference for="Magento\Wishlist\Model\Wishlist" type="SM\ShoppingList\Modifier\ShoppingListLoad" />
+
+    <type name="Magento\Wishlist\Helper\Data">
+        <plugin type="SM\ShoppingList\Plugin\ShoppingListData" name="wishlist_data_plugin"/>
+    </type>
+
+    <type name="Magento\MultipleWishlist\Helper\Data">
+        <plugin type="SM\ShoppingList\Plugin\WishlistData" name="wishlist_data"/>
+    </type>
+
+    <type name="Magento\Wishlist\Block\Link">
+        <plugin type="SM\ShoppingList\Plugin\Link" name="link_plugin"/>
+    </type>
+
+    <type name="Magento\Framework\View\Element\Message\MessageConfigurationsPool">
+        <arguments>
+            <argument name="configurationsMap" xsi:type="array">
+                <item name="addShoppingListMessageSuccessItem" xsi:type="array">
+                    <item name="renderer" xsi:type="const">\Magento\Framework\View\Element\Message\Renderer\BlockRenderer::CODE</item>
+                    <item name="data" xsi:type="array">
+                        <item name="template" xsi:type="string">SM_ShoppingList::messages/success-item.phtml</item>
+                    </item>
+                </item>
+                <item name="addShoppingListMessageSuccessItems" xsi:type="array">
+                    <item name="renderer" xsi:type="const">\Magento\Framework\View\Element\Message\Renderer\BlockRenderer::CODE</item>
+                    <item name="data" xsi:type="array">
+                        <item name="template" xsi:type="string">SM_ShoppingList::messages/success-items.phtml</item>
+                    </item>
+                </item>
+                <item name="removeShoppingListMessageItem" xsi:type="array">
+                    <item name="renderer" xsi:type="const">\Magento\Framework\View\Element\Message\Renderer\BlockRenderer::CODE</item>
+                    <item name="data" xsi:type="array">
+                        <item name="template" xsi:type="string">SM_ShoppingList::messages/remove-item.phtml</item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+</config>

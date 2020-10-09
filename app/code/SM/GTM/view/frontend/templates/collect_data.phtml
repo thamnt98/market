@@ -1,0 +1,392 @@
+<?php
+/** @var \SM\GTM\Block\Page\EntryPoint $block */
+?>
+<script type="text/javascript" async>
+    let dataLayerSourceObjects = <?php echo $block->getDataLayerSourceObjects();?>;
+    let dataLayerTemplates = <?php echo $block->getDataLayerTemplates();?>;
+    if (typeof dataLayerSourceObjects !== 'undefined')
+        dataLayerSourceObjects['page'] = <?php echo $block->getBreadcrumbs(); ?>;
+</script>
+
+<script type="text/x-magento-init">
+{
+    "*": {
+        "SM_GTM/js/gtm/template-processor": {}
+    }
+}
+</script>
+
+<script type="text/javascript">
+    require(['jquery', 'mage/url', 'Magento_Ui/js/lib/view/utils/async', 'moment', 'domReady!'], function ($, url, async, moment) {
+        $(window).load(function () {
+            setTimeout(function () {
+                $.ajax({
+                    url:  url.build('sm_gtm/gtm/collectquote'),
+                    type: 'get',
+                    dataType: 'json',
+                    success: function (data) {
+                        dataLayerSourceObjects['quote'] = data.quote;
+                    }
+                });
+            },2000);
+            window.eventCreate = window.eventCreate || {};
+            let pushGTM = (eventName, data = null) => {
+                if (typeof dataLayerSourceObjects !== 'undefined' && dataLayerSourceObjects.customer.loginType !== "null") {
+                    window.dataLayer = window.dataLayer || [];
+                    switch (eventName) {
+                        case "bottom_navigation":
+                            window.dataLayer.push({
+                                'event': "bottom_navigation",
+                                'uniqueUserID': dataLayerSourceObjects.customer.uniqueUserID,
+                                'userID': dataLayerSourceObjects.customer.userID,
+                                'customerID': dataLayerSourceObjects.customer.customerID,
+                                'customerType': dataLayerSourceObjects.customer.customerType,
+                                'loyalty': dataLayerSourceObjects.customer.loyalty,
+                                'customerStatus': dataLayerSourceObjects.customer.customerStatus,
+                                'loginType': dataLayerSourceObjects.customer.loginType,
+                                'store_name': dataLayerSourceObjects.customer.storeName,
+                                'store_ID': dataLayerSourceObjects.customer.storeID,
+                                'menu_name': data['menuName'],
+                                'sub_menu': data['subMenu']
+                            });
+                            break;
+                        case "social_media_engagement":
+                            window.dataLayer.push({
+                                'event': "social_media_engagement",
+                                'uniqueUserID': dataLayerSourceObjects.customer.uniqueUserID,
+                                'userID': dataLayerSourceObjects.customer.userID,
+                                'customerID': dataLayerSourceObjects.customer.customerID,
+                                'customerType': dataLayerSourceObjects.customer.customerType,
+                                'loyalty': dataLayerSourceObjects.customer.loyalty,
+                                'customerStatus': dataLayerSourceObjects.customer.customerStatus,
+                                'loginType': dataLayerSourceObjects.customer.loginType,
+                                'store_name': dataLayerSourceObjects.customer.storeName,
+                                'store_ID': dataLayerSourceObjects.customer.storeID,
+                                'social_media': data['socialMedia']
+                            });
+                            break;
+                        case "reorder_quickly":
+                            window.dataLayer.push({
+                                'event': "reorder_quickly",
+                                'uniqueUserID': dataLayerSourceObjects.customer.uniqueUserID,
+                                'userID': dataLayerSourceObjects.customer.userID,
+                                'customerID': dataLayerSourceObjects.customer.customerID,
+                                'customerType': dataLayerSourceObjects.customer.customerType,
+                                'loyalty': dataLayerSourceObjects.customer.loyalty,
+                                'customerStatus': dataLayerSourceObjects.customer.customerStatus,
+                                'loginType': dataLayerSourceObjects.customer.loginType,
+                                'store_name': dataLayerSourceObjects.customer.storeName,
+                                'store_id': dataLayerSourceObjects.customer.storeID,
+                                'orderID': data['orderID'],
+                                'transaction_ID': data['transactionID'],
+                                'totalPrice': data['totalPrice']
+                            });
+                            break;
+                        case "sortBy_PLP":
+                            window.dataLayer.push({
+                                'event': "sortBy_PLP",
+                                'uniqueUserID': dataLayerSourceObjects.customer.uniqueUserID,
+                                'userID': dataLayerSourceObjects.customer.userID,
+                                'customerID': dataLayerSourceObjects.customer.customerID,
+                                'customerType': dataLayerSourceObjects.customer.customerType,
+                                'loyalty': dataLayerSourceObjects.customer.loyalty,
+                                'customerStatus': dataLayerSourceObjects.customer.customerStatus,
+                                'loginType': dataLayerSourceObjects.customer.loginType,
+                                'store_name': dataLayerSourceObjects.customer.storeName,
+                                'store_id': dataLayerSourceObjects.customer.storeID,
+                                'shop_category': dataLayerSourceObjects.category.menu_category,
+                                'sortBy_name': data['sortBy_name']
+                            });
+                            break;
+                        case "notification_details":
+                            window.dataLayer.push({
+                                'event': "notification_details",
+                                'uniqueUserID': dataLayerSourceObjects.customer.uniqueUserID,
+                                'userID': dataLayerSourceObjects.customer.userID,
+                                'customerID': dataLayerSourceObjects.customer.customerID,
+                                'customerType': dataLayerSourceObjects.customer.customerType,
+                                'loyalty': dataLayerSourceObjects.customer.loyalty,
+                                'customerStatus': dataLayerSourceObjects.customer.customerStatus,
+                                'loginType': dataLayerSourceObjects.customer.loginType,
+                                'menu_name': data['menuName'],
+                                'submenu_name': data['subMenu'],
+                                'store_name': dataLayerSourceObjects.customer.storeName,
+                                'store_ID': dataLayerSourceObjects.customer.storeID
+                            });
+                            break;
+                        case "promotionClick":
+                            window.dataLayer.push({
+                                'event': "promotionClick",
+                                'uniqueUserID': dataLayerSourceObjects.customer.uniqueUserID,
+                                'userID': dataLayerSourceObjects.customer.userID,
+                                'customerID': dataLayerSourceObjects.customer.customerID,
+                                'customerType': dataLayerSourceObjects.customer.customerType,
+                                'loyalty': dataLayerSourceObjects.customer.loyalty,
+                                'customerStatus': dataLayerSourceObjects.customer.customerStatus,
+                                'loginType': dataLayerSourceObjects.customer.loginType,
+                                'ecommerce': {
+                                    'promoClick': {
+                                        'promotions': [
+                                            {
+                                                'id': data['promoId'],
+                                                'name': data['promoName'],
+                                                'creative': data['promoCreative'],
+                                                'position': data['promoPosition']
+                                            }
+                                        ]
+                                    }
+                                },
+                                'eventCallback': data['eventCallBack']
+                            });
+                            break;
+                        case "promotionImpressions":
+                            window.dataLayer.push({
+                                'event': "promotionImpressions",
+                                'uniqueUserID': dataLayerSourceObjects.customer.uniqueUserID,
+                                'userID': dataLayerSourceObjects.customer.userID,
+                                'customerID': dataLayerSourceObjects.customer.customerID,
+                                'customerType': dataLayerSourceObjects.customer.customerType,
+                                'loyalty': dataLayerSourceObjects.customer.loyalty,
+                                'customerStatus': dataLayerSourceObjects.customer.customerStatus,
+                                'loginType': dataLayerSourceObjects.customer.loginType,
+                                'ecommerce': {
+                                    'promoView': {
+                                        'promotions': [
+                                            {
+                                                'id': data['promoId'],
+                                                'name': data['promoName'],
+                                                'creative': data['promoCreative'],
+                                                'position': data['promoPosition']
+                                            }
+                                        ]
+                                    }
+                                }
+                            });
+                            break;
+                        case "did_not_exist_page":
+                        case "search_not_found_page":
+                        case "cart_empty_page":
+                        case "inProgress_order_empty_page":
+                        case "complete_order_empty_page":
+                        case "to_be_reviewed_empty_page":
+                        case "reviewed_empty_page":
+                        case "my_vouchers_empty":
+                        case "under_maintenance_page":
+                            window.dataLayer.push({
+                                'event': eventName,
+                                'uniqueUserID': dataLayerSourceObjects.customer.uniqueUserID,
+                                'userID': dataLayerSourceObjects.customer.userID,
+                                'customerID': dataLayerSourceObjects.customer.customerID,
+                                'customerType': dataLayerSourceObjects.customer.customerType,
+                                'loyalty': dataLayerSourceObjects.customer.loyalty,
+                                'customerStatus': dataLayerSourceObjects.customer.customerStatus,
+                                'loginType': dataLayerSourceObjects.customer.loginType,
+                                'store_name': dataLayerSourceObjects.customer.storeName,
+                                'store_ID': dataLayerSourceObjects.customer.storeID,
+                                'timestamp': moment().format('DD\/MM\/YYYY HH:mm:ss')
+                            });
+                            break;
+                        case "shopping_list_empty_page":
+                            window.dataLayer.push({
+                                'event': eventName,
+                                'uniqueUserID': dataLayerSourceObjects.customer.uniqueUserID,
+                                'userID': dataLayerSourceObjects.customer.userID,
+                                'customerID': dataLayerSourceObjects.customer.customerID,
+                                'customerType': dataLayerSourceObjects.customer.customerType,
+                                'loyalty': dataLayerSourceObjects.customer.loyalty,
+                                'customerStatus': dataLayerSourceObjects.customer.customerStatus,
+                                'loginType': dataLayerSourceObjects.customer.loginType,
+                                'store_name': dataLayerSourceObjects.customer.storeName,
+                                'store_ID': dataLayerSourceObjects.customer.storeID,
+                                'timestamp': moment().format('DD\/MM\/YYYY HH:mm:ss'),
+                                'shoppingList_name': data['menuName']
+                            });
+                            break;
+                        case "shop_by_category":
+                            window.dataLayer.push({
+                                'event': eventName,
+                                'uniqueUserID': dataLayerSourceObjects.customer.uniqueUserID,
+                                'userID': dataLayerSourceObjects.customer.userID,
+                                'customerID': dataLayerSourceObjects.customer.customerID,
+                                'customerType': dataLayerSourceObjects.customer.customerType,
+                                'loyalty': dataLayerSourceObjects.customer.loyalty,
+                                'customerStatus': dataLayerSourceObjects.customer.customerStatus,
+                                'loginType': dataLayerSourceObjects.customer.loginType,
+                                'store_name': dataLayerSourceObjects.customer.storeName,
+                                'store_ID': dataLayerSourceObjects.customer.storeID,
+                                'category_name': data['shop_category'],
+                                'menu_name': data['menu_name']
+                            });
+                            break;
+                    }
+                }
+            };
+
+            $('.footer-site-list').find('a').each(function () {
+                $(this).on('click', function () {
+                    if ($(this).attr('href').search("facebook") >= 0) {
+                        let data = [];
+                        data['socialMedia'] = "Facebook";
+                        pushGTM("social_media_engagement", data);
+                    } else if ($(this).attr('href').search("instagram") >= 0) {
+                        let data = [];
+                        data['socialMedia'] = "Instagram";
+                        pushGTM("social_media_engagement", data);
+                    } else if ($(this).attr('href').search("twitter") >= 0) {
+                        let data = [];
+                        data['socialMedia'] = "Twitter";
+                        pushGTM("social_media_engagement", data);
+                    } else if ($(this).attr('href').search("youtube") >= 0) {
+                        let data = [];
+                        data['socialMedia'] = "Youtube";
+                        pushGTM("social_media_engagement", data);
+                    } else {
+                        let data = [];
+                        data['menuName'] = $(this).parents().eq(1).find('.footer-site-heading').text().trim();;
+                        data['subMenu'] = $(this).html().trim().replace(/&amp;/g, '&');
+                        pushGTM("bottom_navigation", data);
+                    }
+                });
+            });
+
+            $('.reorder-card').click(function () {
+                let data = [];
+                data['orderID'] = $(this).attr('data-gtm-order-id');
+                data['transactionID'] = $(this).attr('data-gtm-transaction-id');
+                data['totalPrice'] = $(this).find('.reorder-cost span').html().replace(/\D/g, '');
+                pushGTM("reorder_quickly", data);
+            });
+
+            $('.sortby-dropdown.shoplist-sortby').find('li:not(.selected)').each(function () {
+                $(this).on('click', function () {
+                    let data = [];
+                    data['sortBy_name'] = $(this).find('label').text().trim();
+                    pushGTM("sortBy_PLP", data);
+                })
+            });
+
+            $('select#sorter.sorter-options:first').on('change', function () {
+                let data = [];
+                data['sortBy_name'] = $(this).children("option:selected").text().trim();
+                pushGTM("sortBy_PLP", data);
+            });
+
+            async.async('.item.notification-item', function () {
+                if (!eventCreate['.item.notification-item']) {
+                    eventCreate['.item.notification-item'] = 0;
+                }
+                let current = $($('.item.notification-item')[eventCreate['.item.notification-item']]);
+                $(current).on('click', function () {
+                    let data = [];
+                    data['menuName'] = $('.active[data-gtm-event="notification-detail"]').text().replace(/\d+/g, '').trim();
+                    data['subMenu'] = $(this).find('.notification-item-name').text();
+                    pushGTM("notification_details", data);
+                });
+                eventCreate['.item.notification-item']++;
+            });
+
+            async.async('.slick-slide[data-slick-index]', function () {
+                if (!eventCreate['.slick-slide[data-slick-index]']) {
+                    eventCreate['.slick-slide[data-slick-index]'] = 0;
+                }
+                let current = $($('.slick-slide[data-slick-index]')[eventCreate['.slick-slide[data-slick-index]']]);
+                if (!$(current).hasClass("slick-cloned")) {
+                    $(current).on('click', function (e) {
+                        let dataSlide = $(this).find('[data-content-type="slide"]').data();
+                        if (dataSlide) {
+                            let data = [];
+                            data['promoId'] = dataSlide.promoId;
+                            data['promoName'] = dataSlide.promoName;
+                            data['promoCreative'] = dataSlide.promoCreative;
+                            data['promoPosition'] = ($(this).attr('data-slick-index') * 1) + 1;
+                            let url = $(this).find('a').attr('href');
+                            data['eventCallBack'] = function() {
+                                document.location = url;
+                            }
+                            pushGTM("promotionClick", data);
+                        }
+                    });
+                    let currentData = $(current).find('[data-content-type="slide"]').data();
+                    if (currentData) {
+                        let data = [];
+                        data['promoId'] = currentData.promoId;
+                        data['promoName'] = currentData.promoName;
+                        data['promoCreative'] = currentData.promoCreative;
+                        data['promoPosition'] = ($(current).attr('data-slick-index') * 1) + 1;
+                        pushGTM("promotionImpressions", data);
+                    }
+                }
+                eventCreate['.slick-slide[data-slick-index]']++;
+            });
+
+            async.async('.no-route', function () {
+                if ($('.no-route').hasClass("cart-empty")) {
+                    pushGTM("cart_empty_page");
+                } else if ($('.no-route').hasClass("shopping-list-empty")) {
+                    let data = [];
+                    let shoppingListName = $('.no-route').attr('data-gtm-list-name');
+                    if (shoppingListName) {
+                        pushGTM("shopping_list_empty_page", data);
+                    }
+                } else if ($('.no-route').hasClass("order-in-process")) {
+                    pushGTM("inProgress_order_empty_page");
+                } else if ($('.no-route').hasClass("order-in-complete")) {
+                    pushGTM("complete_order_empty_page");
+                } else if ($('.no-route').hasClass("to_be_reviewed_empty_page")) {
+                    pushGTM("to_be_reviewed_empty_page");
+                } else if ($('.no-route').hasClass("reviewed_empty_page")) {
+                    pushGTM("reviewed_empty_page");
+                } else if ($('.no-route').hasClass("my-vouchers-empty")) {
+                    pushGTM("my_vouchers_empty");
+                } else if ($('.no-route').hasClass("service-unaviable")) {
+                    pushGTM("under_maintenance_page");
+                } else {
+                    pushGTM("did_not_exist_page");
+                }
+            });
+
+            async.async('.search.no-result', function () {
+                pushGTM("search_not_found_page");
+            });
+
+            $('[data-promo-name="shop-by-category"]').each(function () {
+                $(this).on('click', function () {
+                    try {
+                        let data = JSON.parse($(this).attr('data-promo-creative'));
+                        pushGTM('shop_by_category', data);
+                    } catch (e) {
+
+                    }
+                });
+            });
+            $('.gtm-shop-by-category a').each(function () {
+                $(this).on('click', function () {
+                    let data = [];
+                    data['menu_name'] = $(this).text();
+                    data['shop_category'] = dataLayerSourceObjects.page.pageCategory;
+                    pushGTM('shop_by_category', data);
+                });
+            });
+            $('.gtm-promotion').each(function () {
+                $(this).on('click', function () {
+                    let data = [];
+                    data['promoId'] = $(this).attr('data-promo-id');
+                    data['promoName'] = $(this).attr('data-promo-name');
+                    data['promoCreative'] = $(this).attr('data-promo-creative');
+                    data['promoPosition'] = 1
+                    let url = $(this).find('a').attr('href');
+                    data['eventCallBack'] = function() {
+                        document.location = url;
+                    }
+                    pushGTM("promotionClick", data);
+                });
+                let data = [];
+                data['promoId'] = $(this).attr('data-promo-id');
+                data['promoName'] = $(this).attr('data-promo-name');
+                data['promoCreative'] = $(this).attr('data-promo-creative');
+                data['promoPosition'] = 1
+                pushGTM("promotionImpressions", data);
+            });
+        });
+    });
+</script>

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+  ~ @project    ct-corp-transmart
+  ~ @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+  ~ @author     Dung Nguyen My <dungnm@smartosc.com>
+  ~ @copyright  Copyright © 2020 SmartOSC. All rights reserved.
+  ~ @url        http://www.smartosc.com
+  -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="SM_JiraService" setup_version="1.0.0">
+        <sequence>
+            <module name="SM_Setup"/>
+            <module name="SM_Help"/>
+        </sequence>
+    </module>
+</config>

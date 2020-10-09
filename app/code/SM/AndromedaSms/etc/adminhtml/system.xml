@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="andromeda_api" translate="label" sortOrder="999" showInDefault="1" showInWebsite="0"
+                 showInStore="0">
+            <group id="sms_verification" translate="label" sortOrder="20" showInDefault="1" showInWebsite="0"
+                   showInStore="0">
+                <label>SMS Verification</label>
+                <field id="language" translate="label" type="text" sortOrder="10" showInDefault="1"  showInWebsite="0"
+                       showInStore="0">
+                    <label>Language</label>
+                    <comment>id: bahasa (default), en: english</comment>
+                </field>
+                <field id="verification_code_expired_in" translate="label" type="text" sortOrder="20" showInDefault="1"  showInWebsite="0"
+                       showInStore="0">
+                    <label>Verification Code Expired In</label>
+                    <comment>seconds</comment>
+                </field>
+                <field id="lock_after_number_of_failed" translate="label" type="text" sortOrder="30" showInDefault="1"  showInWebsite="0"
+                       showInStore="0">
+                    <label>Lock After Number of Failed</label>
+                </field>
+                <field id="unlock_after_number_of_hours" translate="label" type="text" sortOrder="40" showInDefault="1"  showInWebsite="0"
+                       showInStore="0">
+                    <label>Unlock After number of Hours</label>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

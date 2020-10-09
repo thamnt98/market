@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_DigitalProduct
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Muhammad Rifai <muhammad.rifai@ctcorpdigital.com>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route url="/V1/digitalproduct/altera/inquire/electricity" method="POST">
+        <service class="Trans\DigitalProduct\Api\DigitalProductInquireInterface" method="electricity"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/digitalproduct/altera/inquire/electricitypostpaid" method="POST">
+        <service class="Trans\DigitalProduct\Api\DigitalProductInquireInterface" method="electricityPostpaid"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/digitalproduct/altera/inquire/bpjs" method="POST">
+        <service class="Trans\DigitalProduct\Api\DigitalProductInquireInterface" method="bpjsKesehatan"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/digitalproduct/altera/inquire/telkompostpaid" method="POST">
+        <service class="Trans\DigitalProduct\Api\DigitalProductInquireInterface" method="telkomPostpaid"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/digitalproduct/altera/inquire/pdam" method="POST">
+        <service class="Trans\DigitalProduct\Api\DigitalProductInquireInterface" method="pdam"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/digitalproduct/altera/inquire/mobilepostpaid" method="POST">
+        <service class="Trans\DigitalProduct\Api\DigitalProductInquireInterface" method="mobilePostpaid"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/digitalproduct/altera/transaction/electricity" method="POST">
+        <service class="Trans\DigitalProduct\Api\DigitalProductTransactionInterface" method="electricity"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/digitalproduct/altera/transaction/electricitypostpaid" method="POST">
+        <service class="Trans\DigitalProduct\Api\DigitalProductTransactionInterface" method="electricityPostpaid"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/digitalproduct/altera/transaction/bpjs" method="POST">
+        <service class="Trans\DigitalProduct\Api\DigitalProductTransactionInterface" method="bpjsKesehatan"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/digitalproduct/altera/transaction/telkompostpaid" method="POST">
+        <service class="Trans\DigitalProduct\Api\DigitalProductTransactionInterface" method="telkomPostpaid"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/digitalproduct/altera/transaction/pdam" method="POST">
+        <service class="Trans\DigitalProduct\Api\DigitalProductTransactionInterface" method="pdam"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/digitalproduct/altera/transaction/mobile" method="POST">
+        <service class="Trans\DigitalProduct\Api\DigitalProductTransactionInterface" method="mobile"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/digitalproduct/altera/transaction/mobilepostpaid" method="POST">
+        <service class="Trans\DigitalProduct\Api\DigitalProductTransactionInterface" method="mobilePostpaid"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+
+</routes>

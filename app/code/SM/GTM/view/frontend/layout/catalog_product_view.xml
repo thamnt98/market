@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page layout="1column" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="Magento\Catalog\Block\Product\View" name="gtm-product"
+                   template="SM_GTM::product/view.phtml" ifconfig="sm_gtm/general/is_active" after="-">
+                <arguments>
+                    <argument name="gtm_view_model" xsi:type="object">SM\GTM\Block\Product\View</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+        <referenceBlock name="catalog.product.related">
+            <arguments>
+                <argument name="gtm_view_model" xsi:type="object">SM\GTM\Block\Product\View</argument>
+            </arguments>
+        </referenceBlock>
+        <referenceBlock name="product.info.upsell">
+        <arguments>
+            <argument name="gtm_view_model" xsi:type="object">SM\GTM\Block\Product\View</argument>
+        </arguments>
+    </referenceBlock>
+    </body>
+</page>

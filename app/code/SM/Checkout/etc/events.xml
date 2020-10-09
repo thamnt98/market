@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="sales_model_service_quote_submit_before">
+        <observer name="adjust_mainorder_data" instance="SM\Checkout\Observer\BeforeCreateMainOrder" />
+        <observer name="add_order_reference_number" instance="SM\Checkout\Observer\SetDataToMainOrder" />
+    </event>
+    <event name="controller_action_predispatch_checkout_cart_index">
+        <observer name="remove_outofstock_items" instance="SM\Checkout\Observer\RemoveItemsOutOfStock" />
+    </event>
+    <event name="checkout_submit_all_after">
+        <observer name="create_suborder_from_mainorder" instance="SM\Checkout\Observer\CreateSubOrders" />
+    </event>
+    <event name="sales_quote_payment_import_data_before">
+        <observer name="magento_customerbalance" disabled="true"/>
+        <observer name="magento_reward" disabled="true"/>
+    </event>
+    <event name="sales_order_invoice_save_before">
+        <observer name="add_invoice_reference_number" instance="SM\Checkout\Observer\SetDataToInvoice" />
+    </event>
+<!--    <event name="sales_quote_address_collect_totals_before">
+        <observer name="sm_trancheckout_quote_address_collect" instance="SM\Checkout\Observer\QuoteAddressCollect" />
+    </event>-->
+    <event name="trans_sprint_payment_success_update_before">
+        <observer name="sm_trancheckout_payment_success_update_after"
+                  instance="\SM\Checkout\Observer\DigitalProduct\PaymentSuccessUpdateBefore" />
+    </event>
+
+    <event name="controller_action_predispatch">
+        <observer name="sm_transcheckout_active_items"
+                  instance="\SM\Checkout\Observer\ActiveItems" />
+    </event>
+</config>

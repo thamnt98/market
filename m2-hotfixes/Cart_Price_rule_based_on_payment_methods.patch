@@ -1,0 +1,869 @@
+diff --git a/vendor/magento/module-checkout/view/frontend/web/js/action/select-payment-method.js b/vendor/magento/module-checkout/view/frontend/web/js/action/select-payment-method.js
+index 34f170074979..5adbd9356a8d 100644
+--- a/vendor/magento/module-checkout/view/frontend/web/js/action/select-payment-method.js
++++ b/vendor/magento/module-checkout/view/frontend/web/js/action/select-payment-method.js
+@@ -7,7 +7,7 @@
+  * @api
+  */
+ define([
+-    '../model/quote'
++    'Magento_Checkout/js/model/quote'
+ ], function (quote) {
+     'use strict';
+
+diff --git a/vendor/magento/module-checkout-agreements/Model/Checkout/Plugin/GuestValidation.php b/vendor/magento/module-checkout-agreements/Model/Checkout/Plugin/GuestValidation.php
+index fbceca090670..95330c9d0138 100644
+--- a/vendor/magento/module-checkout-agreements/Model/Checkout/Plugin/GuestValidation.php
++++ b/vendor/magento/module-checkout-agreements/Model/Checkout/Plugin/GuestValidation.php
+@@ -11,7 +11,7 @@
+ use Magento\CheckoutAgreements\Model\Api\SearchCriteria\ActiveStoreAgreementsFilter;
+
+ /**
+- * Class GuestValidation
++ * Guest checkout agreements validation.
+  *
+  * Plugin that checks if checkout agreement enabled and validates all agreements.
+  * Current plugin is duplicate from Magento\CheckoutAgreements\Model\Checkout\Plugin\Validation due to different
+@@ -58,6 +58,8 @@ public function __construct(
+     }
+
+     /**
++     * Validates agreements before save payment information and  order placing.
++     *
+      * @param \Magento\Checkout\Api\GuestPaymentInformationManagementInterface $subject
+      * @param string $cartId
+      * @param string $email
+@@ -80,28 +82,8 @@ public function beforeSavePaymentInformationAndPlaceOrder(
+     }
+
+     /**
+-     * @param \Magento\Checkout\Api\GuestPaymentInformationManagementInterface $subject
+-     * @param string $cartId
+-     * @param string $email
+-     * @param \Magento\Quote\Api\Data\PaymentInterface $paymentMethod
+-     * @param \Magento\Quote\Api\Data\AddressInterface|null $billingAddress
+-     * @throws \Magento\Framework\Exception\CouldNotSaveException
+-     * @return void
+-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+-     */
+-    public function beforeSavePaymentInformation(
+-        \Magento\Checkout\Api\GuestPaymentInformationManagementInterface $subject,
+-        $cartId,
+-        $email,
+-        \Magento\Quote\Api\Data\PaymentInterface $paymentMethod,
+-        \Magento\Quote\Api\Data\AddressInterface $billingAddress = null
+-    ) {
+-        if ($this->isAgreementEnabled()) {
+-            $this->validateAgreements($paymentMethod);
+-        }
+-    }
+-
+-    /**
++     * Validates agreements.
++     *
+      * @param \Magento\Quote\Api\Data\PaymentInterface $paymentMethod
+      * @throws \Magento\Framework\Exception\CouldNotSaveException
+      * @return void
+@@ -123,7 +105,8 @@ private function validateAgreements(\Magento\Quote\Api\Data\PaymentInterface $pa
+     }
+
+     /**
+-     * Verify if agreement validation needed
++     * Verify if agreement validation needed.
++     *
+      * @return bool
+      */
+     private function isAgreementEnabled()
+diff --git a/vendor/magento/module-checkout-agreements/Model/Checkout/Plugin/Validation.php b/vendor/magento/module-checkout-agreements/Model/Checkout/Plugin/Validation.php
+index 67e2a6c9ec33..04f625238d24 100644
+--- a/vendor/magento/module-checkout-agreements/Model/Checkout/Plugin/Validation.php
++++ b/vendor/magento/module-checkout-agreements/Model/Checkout/Plugin/Validation.php
+@@ -11,19 +11,19 @@
+ use Magento\CheckoutAgreements\Model\Api\SearchCriteria\ActiveStoreAgreementsFilter;
+
+ /**
+- * Class Validation
++ * Checkout agreements validation.
+  */
+ class Validation
+ {
+     /**
+      * @var \Magento\Framework\App\Config\ScopeConfigInterface
+      */
+-    protected $scopeConfiguration;
++    private $scopeConfiguration;
+
+     /**
+      * @var \Magento\Checkout\Api\AgreementsValidatorInterface
+      */
+-    protected $agreementsValidator;
++    private $agreementsValidator;
+
+     /**
+      * @var \Magento\CheckoutAgreements\Api\CheckoutAgreementsListInterface
+@@ -54,6 +54,8 @@ public function __construct(
+     }
+
+     /**
++     * Validates agreements before save payment information and  order placing.
++     *
+      * @param \Magento\Checkout\Api\PaymentInformationManagementInterface $subject
+      * @param int $cartId
+      * @param \Magento\Quote\Api\Data\PaymentInterface $paymentMethod
+@@ -74,31 +76,13 @@ public function beforeSavePaymentInformationAndPlaceOrder(
+     }
+
+     /**
+-     * @param \Magento\Checkout\Api\PaymentInformationManagementInterface $subject
+-     * @param int $cartId
+-     * @param \Magento\Quote\Api\Data\PaymentInterface $paymentMethod
+-     * @param \Magento\Quote\Api\Data\AddressInterface|null $billingAddress
+-     * @throws \Magento\Framework\Exception\CouldNotSaveException
+-     * @return void
+-     * @SuppressWarnings(PHPMD.UnusedFormalParameter)
+-     */
+-    public function beforeSavePaymentInformation(
+-        \Magento\Checkout\Api\PaymentInformationManagementInterface $subject,
+-        $cartId,
+-        \Magento\Quote\Api\Data\PaymentInterface $paymentMethod,
+-        \Magento\Quote\Api\Data\AddressInterface $billingAddress = null
+-    ) {
+-        if ($this->isAgreementEnabled()) {
+-            $this->validateAgreements($paymentMethod);
+-        }
+-    }
+-
+-    /**
++     * Validates agreements.
++     *
+      * @param \Magento\Quote\Api\Data\PaymentInterface $paymentMethod
+      * @throws \Magento\Framework\Exception\CouldNotSaveException
+      * @return void
+      */
+-    protected function validateAgreements(\Magento\Quote\Api\Data\PaymentInterface $paymentMethod)
++    private function validateAgreements(\Magento\Quote\Api\Data\PaymentInterface $paymentMethod)
+     {
+         $agreements = $paymentMethod->getExtensionAttributes() === null
+             ? []
+@@ -115,10 +99,11 @@ protected function validateAgreements(\Magento\Quote\Api\Data\PaymentInterface $
+     }
+
+     /**
+-     * Verify if agreement validation needed
++     * Verify if agreement validation needed.
++     *
+      * @return bool
+      */
+-    protected function isAgreementEnabled()
++    private function isAgreementEnabled()
+     {
+         $isAgreementsEnabled = $this->scopeConfiguration->isSetFlag(
+             AgreementsProvider::PATH_ENABLED,
+diff --git a/vendor/magento/module-checkout-agreements/Test/Unit/Model/Checkout/Plugin/GuestValidationTest.php b/vendor/magento/module-checkout-agreements/Test/Unit/Model/Checkout/Plugin/GuestValidationTest.php
+index 3d7b910c7abc..b685d3edff27 100644
+--- a/vendor/magento/module-checkout-agreements/Test/Unit/Model/Checkout/Plugin/GuestValidationTest.php
++++ b/vendor/magento/module-checkout-agreements/Test/Unit/Model/Checkout/Plugin/GuestValidationTest.php
+@@ -10,7 +10,6 @@
+ use Magento\Store\Model\ScopeInterface;
+
+ /**
+- * Class GuestValidationTest
+  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+  */
+ class GuestValidationTest extends \PHPUnit\Framework\TestCase
+@@ -109,7 +108,7 @@ public function testBeforeSavePaymentInformationAndPlaceOrder()
+         $this->paymentMock->expects(static::atLeastOnce())
+             ->method('getExtensionAttributes')
+             ->willReturn($this->extensionAttributesMock);
+-        $this->model->beforeSavePaymentInformation(
++        $this->model->beforeSavePaymentInformationAndPlaceOrder(
+             $this->subjectMock,
+             $cartId,
+             $email,
+@@ -144,7 +143,7 @@ public function testBeforeSavePaymentInformationAndPlaceOrderIfAgreementsNotVali
+         $this->paymentMock->expects(static::atLeastOnce())
+             ->method('getExtensionAttributes')
+             ->willReturn($this->extensionAttributesMock);
+-        $this->model->beforeSavePaymentInformation(
++        $this->model->beforeSavePaymentInformationAndPlaceOrder(
+             $this->subjectMock,
+             $cartId,
+             $email,
+@@ -156,36 +155,4 @@ public function testBeforeSavePaymentInformationAndPlaceOrderIfAgreementsNotVali
+             "The order wasn't placed. First, agree to the terms and conditions, then try placing your order again."
+         );
+     }
+-
+-    public function testBeforeSavePaymentInformation()
+-    {
+-        $cartId = 100;
+-        $email = 'email@example.com';
+-        $agreements = [1, 2, 3];
+-        $this->scopeConfigMock
+-            ->expects($this->once())
+-            ->method('isSetFlag')
+-            ->with(AgreementsProvider::PATH_ENABLED, ScopeInterface::SCOPE_STORE)
+-            ->willReturn(true);
+-        $searchCriteriaMock = $this->createMock(\Magento\Framework\Api\SearchCriteria::class);
+-        $this->agreementsFilterMock->expects($this->once())
+-            ->method('buildSearchCriteria')
+-            ->willReturn($searchCriteriaMock);
+-        $this->checkoutAgreementsListMock->expects($this->once())
+-            ->method('getList')
+-            ->with($searchCriteriaMock)
+-            ->willReturn([1]);
+-        $this->extensionAttributesMock->expects($this->once())->method('getAgreementIds')->willReturn($agreements);
+-        $this->agreementsValidatorMock->expects($this->once())->method('isValid')->with($agreements)->willReturn(true);
+-        $this->paymentMock->expects(static::atLeastOnce())
+-            ->method('getExtensionAttributes')
+-            ->willReturn($this->extensionAttributesMock);
+-        $this->model->beforeSavePaymentInformation(
+-            $this->subjectMock,
+-            $cartId,
+-            $email,
+-            $this->paymentMock,
+-            $this->addressMock
+-        );
+-    }
+ }
+diff --git a/vendor/magento/module-checkout-agreements/Test/Unit/Model/Checkout/Plugin/ValidationTest.php b/vendor/magento/module-checkout-agreements/Test/Unit/Model/Checkout/Plugin/ValidationTest.php
+index 7f11fad20240..d3422ae6a889 100644
+--- a/vendor/magento/module-checkout-agreements/Test/Unit/Model/Checkout/Plugin/ValidationTest.php
++++ b/vendor/magento/module-checkout-agreements/Test/Unit/Model/Checkout/Plugin/ValidationTest.php
+@@ -10,7 +10,6 @@
+ use Magento\Store\Model\ScopeInterface;
+
+ /**
+- * Class ValidationTest
+  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+  */
+ class ValidationTest extends \PHPUnit\Framework\TestCase
+@@ -108,7 +107,12 @@ public function testBeforeSavePaymentInformationAndPlaceOrder()
+         $this->paymentMock->expects(static::atLeastOnce())
+             ->method('getExtensionAttributes')
+             ->willReturn($this->extensionAttributesMock);
+-        $this->model->beforeSavePaymentInformation($this->subjectMock, $cartId, $this->paymentMock, $this->addressMock);
++        $this->model->beforeSavePaymentInformationAndPlaceOrder(
++            $this->subjectMock,
++            $cartId,
++            $this->paymentMock,
++            $this->addressMock
++        );
+     }
+
+     /**
+@@ -136,35 +140,15 @@ public function testBeforeSavePaymentInformationAndPlaceOrderIfAgreementsNotVali
+         $this->paymentMock->expects(static::atLeastOnce())
+             ->method('getExtensionAttributes')
+             ->willReturn($this->extensionAttributesMock);
+-        $this->model->beforeSavePaymentInformation($this->subjectMock, $cartId, $this->paymentMock, $this->addressMock);
++        $this->model->beforeSavePaymentInformationAndPlaceOrder(
++            $this->subjectMock,
++            $cartId,
++            $this->paymentMock,
++            $this->addressMock
++        );
+
+         $this->expectExceptionMessage(
+             "The order wasn't placed. First, agree to the terms and conditions, then try placing your order again."
+         );
+     }
+-
+-    public function testBeforeSavePaymentInformation()
+-    {
+-        $cartId = 100;
+-        $agreements = [1, 2, 3];
+-        $this->scopeConfigMock
+-            ->expects($this->once())
+-            ->method('isSetFlag')
+-            ->with(AgreementsProvider::PATH_ENABLED, ScopeInterface::SCOPE_STORE)
+-            ->willReturn(true);
+-        $searchCriteriaMock = $this->createMock(\Magento\Framework\Api\SearchCriteria::class);
+-        $this->agreementsFilterMock->expects($this->once())
+-            ->method('buildSearchCriteria')
+-            ->willReturn($searchCriteriaMock);
+-        $this->checkoutAgreementsListMock->expects($this->once())
+-            ->method('getList')
+-            ->with($searchCriteriaMock)
+-            ->willReturn([1]);
+-        $this->extensionAttributesMock->expects($this->once())->method('getAgreementIds')->willReturn($agreements);
+-        $this->agreementsValidatorMock->expects($this->once())->method('isValid')->with($agreements)->willReturn(true);
+-        $this->paymentMock->expects(static::atLeastOnce())
+-            ->method('getExtensionAttributes')
+-            ->willReturn($this->extensionAttributesMock);
+-        $this->model->beforeSavePaymentInformation($this->subjectMock, $cartId, $this->paymentMock, $this->addressMock);
+-    }
+ }
+diff --git a/vendor/magento/module-sales-rule/Block/Adminhtml/Promo/Quote/Edit/Tab/Conditions.php b/vendor/magento/module-sales-rule/Block/Adminhtml/Promo/Quote/Edit/Tab/Conditions.php
+index 1038f289eada..ff905bf5cb9f 100644
+--- a/vendor/magento/module-sales-rule/Block/Adminhtml/Promo/Quote/Edit/Tab/Conditions.php
++++ b/vendor/magento/module-sales-rule/Block/Adminhtml/Promo/Quote/Edit/Tab/Conditions.php
+@@ -3,10 +3,19 @@
+  * Copyright © Magento, Inc. All rights reserved.
+  * See COPYING.txt for license details.
+  */
++declare(strict_types=1);
++
+ namespace Magento\SalesRule\Block\Adminhtml\Promo\Quote\Edit\Tab;
+
+ use Magento\Framework\App\ObjectManager;
++use Magento\Framework\Data\Form\Element\Fieldset;
++use Magento\SalesRule\Model\Rule;
+
++/**
++ * Block for rendering Conditions tab on Sales Rules creation page.
++ *
++ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
++ */
+ class Conditions extends \Magento\Backend\Block\Widget\Form\Generic implements
+     \Magento\Ui\Component\Layout\Tabs\TabInterface
+ {
+@@ -33,8 +42,6 @@ class Conditions extends \Magento\Backend\Block\Widget\Form\Generic implements
+     private $ruleFactory;
+
+     /**
+-     * Constructor
+-     *
+      * @param \Magento\Backend\Block\Template\Context $context
+      * @param \Magento\Framework\Registry $registry
+      * @param \Magento\Framework\Data\FormFactory $formFactory
+@@ -60,7 +67,8 @@ public function __construct(
+     }
+
+     /**
+-     * {@inheritdoc}
++     * @inheritdoc
++     *
+      * @codeCoverageIgnore
+      */
+     public function getTabClass()
+@@ -69,7 +77,7 @@ public function getTabClass()
+     }
+
+     /**
+-     * {@inheritdoc}
++     * @inheritdoc
+      */
+     public function getTabUrl()
+     {
+@@ -77,7 +85,7 @@ public function getTabUrl()
+     }
+
+     /**
+-     * {@inheritdoc}
++     * @inheritdoc
+      */
+     public function isAjaxLoaded()
+     {
+@@ -85,7 +93,7 @@ public function isAjaxLoaded()
+     }
+
+     /**
+-     * {@inheritdoc}
++     * @inheritdoc
+      */
+     public function getTabLabel()
+     {
+@@ -93,7 +101,7 @@ public function getTabLabel()
+     }
+
+     /**
+-     * {@inheritdoc}
++     * @inheritdoc
+      */
+     public function getTabTitle()
+     {
+@@ -101,7 +109,7 @@ public function getTabTitle()
+     }
+
+     /**
+-     * {@inheritdoc}
++     * @inheritdoc
+      */
+     public function canShowTab()
+     {
+@@ -109,7 +117,7 @@ public function canShowTab()
+     }
+
+     /**
+-     * {@inheritdoc}
++     * @inheritdoc
+      */
+     public function isHidden()
+     {
+@@ -133,7 +141,7 @@ protected function _prepareForm()
+     /**
+      * Handles addition of conditions tab to supplied form.
+      *
+-     * @param \Magento\SalesRule\Model\Rule $model
++     * @param Rule $model
+      * @param string $fieldsetId
+      * @param string $formName
+      * @return \Magento\Framework\Data\Form
+diff --git a/vendor/magento/module-sales-rule/Model/Quote/Discount.php b/vendor/magento/module-sales-rule/Model/Quote/Discount.php
+index 69abac8309f9..a580a8f9d2ea 100644
+--- a/vendor/magento/module-sales-rule/Model/Quote/Discount.php
++++ b/vendor/magento/module-sales-rule/Model/Quote/Discount.php
+@@ -85,6 +85,7 @@ public function __construct(
+      * @param \Magento\Quote\Model\Quote\Address\Total $total
+      * @return $this
+      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
++     * @SuppressWarnings(PHPMD.NPathComplexity)
+      */
+     public function collect(
+         \Magento\Quote\Model\Quote $quote,
+@@ -95,6 +96,11 @@ public function collect(
+
+         $store = $this->storeManager->getStore($quote->getStoreId());
+         $address = $shippingAssignment->getShipping()->getAddress();
++
++        if ($quote->currentPaymentWasSet()) {
++            $address->setPaymentMethod($quote->getPayment()->getMethod());
++        }
++
+         $this->calculator->reset($address);
+
+         $items = $shippingAssignment->getItems();
+diff --git a/vendor/magento/module-sales-rule/Model/Rule/Condition/Address.php b/vendor/magento/module-sales-rule/Model/Rule/Condition/Address.php
+index 29cdf34c5a78..cf6301cb31a9 100644
+--- a/vendor/magento/module-sales-rule/Model/Rule/Condition/Address.php
++++ b/vendor/magento/module-sales-rule/Model/Rule/Condition/Address.php
+@@ -65,6 +65,7 @@ public function loadAttributeOptions()
+             'base_subtotal' => __('Subtotal'),
+             'total_qty' => __('Total Items Quantity'),
+             'weight' => __('Total Weight'),
++            'payment_method' => __('Payment Method'),
+             'shipping_method' => __('Shipping Method'),
+             'postcode' => __('Shipping Postcode'),
+             'region' => __('Shipping Region'),
+diff --git a/vendor/magento/module-sales-rule/Test/Mftf/ActionGroup/StorefrontApplyDiscountCodeActionGroup.xml b/vendor/magento/module-sales-rule/Test/Mftf/ActionGroup/StorefrontApplyDiscountCodeActionGroup.xml
+index 063409e9fc7e..3cf96a8b3dc0 100644
+--- a/vendor/magento/module-sales-rule/Test/Mftf/ActionGroup/StorefrontApplyDiscountCodeActionGroup.xml
++++ b/vendor/magento/module-sales-rule/Test/Mftf/ActionGroup/StorefrontApplyDiscountCodeActionGroup.xml
+@@ -15,7 +15,7 @@
+         <click selector="{{DiscountSection.DiscountTab}}" stepKey="clickToAddDiscount"/>
+         <fillField selector="{{DiscountSection.DiscountInput}}" userInput="{{discountCode}}" stepKey="fillFieldDiscountCode"/>
+         <click selector="{{DiscountSection.ApplyCodeBtn}}" stepKey="clickToApplyDiscount"/>
+-        <waitForPageLoad stepKey="waitForDiscountToBeAdded"/>
++        <waitForElement selector="{{DiscountSection.DiscountVerificationMsg}}" time="30" stepKey="waitForDiscountToBeAdded"/>
+         <see selector="{{DiscountSection.DiscountVerificationMsg}}" userInput="Your coupon was successfully applied" stepKey="assertDiscountApplyMessage"/>
+     </actionGroup>
+ </actionGroups>
+diff --git a/vendor/magento/module-sales-rule/view/frontend/requirejs-config.js b/vendor/magento/module-sales-rule/view/frontend/requirejs-config.js
+new file mode 100644
+index 000000000000..13b701c6fe65
+--- /dev/null
++++ b/vendor/magento/module-sales-rule/view/frontend/requirejs-config.js
+@@ -0,0 +1,14 @@
++/**
++ * Copyright © Magento, Inc. All rights reserved.
++ * See COPYING.txt for license details.
++ */
++
++var config = {
++    config: {
++        mixins: {
++            'Magento_Checkout/js/action/select-payment-method': {
++                'Magento_SalesRule/js/action/select-payment-method-mixin': true
++            }
++        }
++    }
++};
+diff --git a/vendor/magento/module-sales-rule/view/frontend/web/js/action/select-payment-method-mixin.js b/vendor/magento/module-sales-rule/view/frontend/web/js/action/select-payment-method-mixin.js
+new file mode 100644
+index 000000000000..50d54d4e5978
+--- /dev/null
++++ b/vendor/magento/module-sales-rule/view/frontend/web/js/action/select-payment-method-mixin.js
+@@ -0,0 +1,50 @@
++/**
++ * Copyright © Magento, Inc. All rights reserved.
++ * See COPYING.txt for license details.
++ */
++define([
++    'jquery',
++    'mage/utils/wrapper',
++    'Magento_Checkout/js/model/quote',
++    'Magento_SalesRule/js/model/payment/discount-messages',
++    'Magento_Checkout/js/action/set-payment-information',
++    'Magento_Checkout/js/action/get-totals',
++    'Magento_SalesRule/js/model/coupon'
++], function ($, wrapper, quote, messageContainer, setPaymentInformationAction, getTotalsAction, coupon) {
++    'use strict';
++
++    return function (selectPaymentMethodAction) {
++
++        return wrapper.wrap(selectPaymentMethodAction, function (originalSelectPaymentMethodAction, paymentMethod) {
++
++            originalSelectPaymentMethodAction(paymentMethod);
++
++            $.when(
++                setPaymentInformationAction(
++                    messageContainer,
++                    {
++                        method: paymentMethod.method
++                    }
++                )
++            ).done(
++                function () {
++                    var deferred = $.Deferred(),
++
++                        /**
++                         * Update coupon form.
++                         */
++                        updateCouponCallback = function () {
++                            if (quote.totals() && !quote.totals()['coupon_code']) {
++                                coupon.setCouponCode('');
++                                coupon.setIsApplied(false);
++                            }
++                        };
++
++                    getTotalsAction([], deferred);
++                    $.when(deferred).done(updateCouponCallback);
++                }
++            );
++        });
++    };
++
++});
+diff --git a/vendor/magento/module-sales-rule/view/frontend/web/js/model/coupon.js b/vendor/magento/module-sales-rule/view/frontend/web/js/model/coupon.js
+new file mode 100644
+index 000000000000..1e3e057bbb40
+--- /dev/null
++++ b/vendor/magento/module-sales-rule/view/frontend/web/js/model/coupon.js
+@@ -0,0 +1,49 @@
++/**
++ * Copyright © Magento, Inc. All rights reserved.
++ * See COPYING.txt for license details.
++ */
++/**
++ * Coupon model.
++ */
++define([
++    'ko',
++    'domReady!'
++], function (ko) {
++    'use strict';
++
++    var couponCode = ko.observable(null),
++        isApplied = ko.observable(null);
++
++    return {
++        couponCode: couponCode,
++        isApplied: isApplied,
++
++        /**
++         * @return {*}
++         */
++        getCouponCode: function () {
++            return couponCode;
++        },
++
++        /**
++         * @return {Boolean}
++         */
++        getIsApplied: function () {
++            return isApplied;
++        },
++
++        /**
++         * @param {*} couponCodeValue
++         */
++        setCouponCode: function (couponCodeValue) {
++            couponCode(couponCodeValue);
++        },
++
++        /**
++         * @param {Boolean} isAppliedValue
++         */
++        setIsApplied: function (isAppliedValue) {
++            isApplied(isAppliedValue);
++        }
++    };
++});
+diff --git a/vendor/magento/module-sales-rule/view/frontend/web/js/view/payment/discount.js b/vendor/magento/module-sales-rule/view/frontend/web/js/view/payment/discount.js
+index d2902d8863f3..9c83cb7ba40b 100644
+--- a/vendor/magento/module-sales-rule/view/frontend/web/js/view/payment/discount.js
++++ b/vendor/magento/module-sales-rule/view/frontend/web/js/view/payment/discount.js
+@@ -9,18 +9,19 @@ define([
+     'uiComponent',
+     'Magento_Checkout/js/model/quote',
+     'Magento_SalesRule/js/action/set-coupon-code',
+-    'Magento_SalesRule/js/action/cancel-coupon'
+-], function ($, ko, Component, quote, setCouponCodeAction, cancelCouponAction) {
++    'Magento_SalesRule/js/action/cancel-coupon',
++    'Magento_SalesRule/js/model/coupon'
++], function ($, ko, Component, quote, setCouponCodeAction, cancelCouponAction, coupon) {
+     'use strict';
+
+     var totals = quote.getTotals(),
+-        couponCode = ko.observable(null),
+-        isApplied;
++        couponCode = coupon.getCouponCode(),
++        isApplied = coupon.getIsApplied();
+
+     if (totals()) {
+         couponCode(totals()['coupon_code']);
+     }
+-    isApplied = ko.observable(couponCode() != null);
++    isApplied(couponCode() != null);
+
+     return Component.extend({
+         defaults: {
+diff --git a/vendor/magento/magento2-base/dev/tests/integration/testsuite/Magento/SalesRule/Model/Rule/Condition/AddressTest.php b/vendor/magento/magento2-base/dev/tests/integration/testsuite/Magento/SalesRule/Model/Rule/Condition/AddressTest.php
+new file mode 100644
+index 000000000000..17730262d2df
+--- /dev/null
++++ b/vendor/magento/magento2-base/dev/tests/integration/testsuite/Magento/SalesRule/Model/Rule/Condition/AddressTest.php
+@@ -0,0 +1,50 @@
++<?php
++/**
++ * Copyright © Magento, Inc. All rights reserved.
++ * See COPYING.txt for license details.
++ */
++namespace Magento\SalesRule\Model\Rule\Condition;
++
++use Magento\TestFramework\Helper\Bootstrap;
++use PHPUnit\Framework\TestCase;
++
++/**
++ * Test for \Magento\SalesRule\Model\Rule\Condition\Address.
++ */
++class AddressTest extends TestCase
++{
++    use ConditionHelper;
++
++    /**
++     * @var \Magento\Framework\ObjectManagerInterface
++     */
++    private $objectManager;
++
++    /**
++     * @inheritDoc
++     */
++    protected function setUp()
++    {
++        $this->objectManager = Bootstrap::getObjectManager();
++    }
++
++    /**
++     * Tests cart price rule validation.
++     *
++     * @magentoDbIsolation enabled
++     * @magentoAppIsolation enabled
++     * @magentoConfigFixture default_store payment/checkmo/active 1
++     * @magentoDataFixture Magento/SalesRule/_files/rules_payment_method.php
++     * @magentoDataFixture Magento/Checkout/_files/quote_with_payment_saved.php
++     */
++    public function testValidateRule()
++    {
++        $quote = $this->getQuote('test_order_1_with_payment');
++        $rule = $this->getSalesRule('50% Off on Checkmo Payment Method');
++
++        $this->assertTrue(
++            $rule->validate($quote->getBillingAddress()),
++            'Cart price rule validation failed.'
++        );
++    }
++}
+diff --git a/vendor/magento/magento2-base/dev/tests/integration/testsuite/Magento/SalesRule/Model/Rule/Condition/ConditionHelper.php b/vendor/magento/magento2-base/dev/tests/integration/testsuite/Magento/SalesRule/Model/Rule/Condition/ConditionHelper.php
+new file mode 100644
+index 000000000000..e857ab902fcc
+--- /dev/null
++++ b/vendor/magento/magento2-base/dev/tests/integration/testsuite/Magento/SalesRule/Model/Rule/Condition/ConditionHelper.php
+@@ -0,0 +1,62 @@
++<?php
++/**
++ * Copyright © Magento, Inc. All rights reserved.
++ * See COPYING.txt for license details.
++ */
++namespace Magento\SalesRule\Model\Rule\Condition;
++
++use Magento\Framework\Api\SearchCriteriaBuilder;
++use Magento\Quote\Api\CartRepositoryInterface;
++use Magento\Quote\Api\Data\CartInterface;
++use Magento\SalesRule\Api\RuleRepositoryInterface;
++
++/**
++ * Helper class for testing cart price rule conditions.
++ */
++trait ConditionHelper
++{
++    /**
++     * Gets quote by reserved order id.
++     *
++     * @param string $reservedOrderId
++     * @return CartInterface
++     */
++    private function getQuote($reservedOrderId)
++    {
++        /** @var SearchCriteriaBuilder $searchCriteriaBuilder */
++        $searchCriteriaBuilder = $this->objectManager->get(SearchCriteriaBuilder::class);
++        $searchCriteria = $searchCriteriaBuilder->addFilter('reserved_order_id', $reservedOrderId)
++            ->create();
++
++        /** @var CartRepositoryInterface $quoteRepository */
++        $quoteRepository = $this->objectManager->get(CartRepositoryInterface::class);
++        $items = $quoteRepository->getList($searchCriteria)->getItems();
++        return array_pop($items);
++    }
++
++    /**
++     * Gets rule by name.
++     *
++     * @param string $name
++     * @return \Magento\SalesRule\Model\Rule
++     * @throws \Magento\Framework\Exception\InputException
++     * @throws \Magento\Framework\Exception\NoSuchEntityException
++     */
++    private function getSalesRule(string $name): \Magento\SalesRule\Model\Rule
++    {
++        /** @var SearchCriteriaBuilder $searchCriteriaBuilder */
++        $searchCriteriaBuilder = $this->objectManager->get(SearchCriteriaBuilder::class);
++        $searchCriteria = $searchCriteriaBuilder->addFilter('name', $name)
++            ->create();
++
++        /** @var CartRepositoryInterface $quoteRepository */
++        $ruleRepository = $this->objectManager->get(RuleRepositoryInterface::class);
++        $items = $ruleRepository->getList($searchCriteria)->getItems();
++
++        $rule = array_pop($items);
++        /** @var \Magento\SalesRule\Model\Converter\ToModel $converter */
++        $converter = $this->objectManager->get(\Magento\SalesRule\Model\Converter\ToModel::class);
++
++        return $converter->toModel($rule);
++    }
++}
+diff --git a/vendor/magento/magento2-base/dev/tests/integration/testsuite/Magento/SalesRule/Model/Rule/Condition/ProductTest.php b/vendor/magento/magento2-base/dev/tests/integration/testsuite/Magento/SalesRule/Model/Rule/Condition/ProductTest.php
+index 70fa11fc78c8..917ff085f742 100644
+--- a/vendor/magento/magento2-base/dev/tests/integration/testsuite/Magento/SalesRule/Model/Rule/Condition/ProductTest.php
++++ b/vendor/magento/magento2-base/dev/tests/integration/testsuite/Magento/SalesRule/Model/Rule/Condition/ProductTest.php
+@@ -6,21 +6,21 @@
+
+ namespace Magento\SalesRule\Model\Rule\Condition;
+
+-use Magento\Quote\Api\CartRepositoryInterface;
+-use Magento\Framework\Api\SearchCriteriaBuilder;
+-use Magento\Quote\Api\Data\CartInterface;
+-use Magento\SalesRule\Api\RuleRepositoryInterface;
+-
+ /**
+  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+  */
+ class ProductTest extends \PHPUnit\Framework\TestCase
+ {
++    use ConditionHelper;
++
+     /**
+      * @var \Magento\Framework\ObjectManagerInterface
+      */
+     private $objectManager;
+
++    /**
++     * @inheritDoc
++     */
+     protected function setUp()
+     {
+         $this->objectManager = \Magento\TestFramework\Helper\Bootstrap::getObjectManager();
+@@ -127,49 +127,4 @@ public function testValidateQtySalesRuleWithConfigurable()
+             $rule->validate($quote->getBillingAddress())
+         );
+     }
+-
+-    /**
+-     * Gets quote by reserved order id.
+-     *
+-     * @param string $reservedOrderId
+-     * @return CartInterface
+-     */
+-    private function getQuote($reservedOrderId)
+-    {
+-        /** @var SearchCriteriaBuilder $searchCriteriaBuilder */
+-        $searchCriteriaBuilder = $this->objectManager->get(SearchCriteriaBuilder::class);
+-        $searchCriteria = $searchCriteriaBuilder->addFilter('reserved_order_id', $reservedOrderId)
+-            ->create();
+-
+-        /** @var CartRepositoryInterface $quoteRepository */
+-        $quoteRepository = $this->objectManager->get(CartRepositoryInterface::class);
+-        $items = $quoteRepository->getList($searchCriteria)->getItems();
+-        return array_pop($items);
+-    }
+-
+-    /**
+-     * Gets rule by name.
+-     *
+-     * @param string $name
+-     * @return \Magento\SalesRule\Model\Rule
+-     * @throws \Magento\Framework\Exception\InputException
+-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+-     */
+-    private function getSalesRule(string $name): \Magento\SalesRule\Model\Rule
+-    {
+-        /** @var SearchCriteriaBuilder $searchCriteriaBuilder */
+-        $searchCriteriaBuilder = $this->objectManager->get(SearchCriteriaBuilder::class);
+-        $searchCriteria = $searchCriteriaBuilder->addFilter('name', $name)
+-            ->create();
+-
+-        /** @var CartRepositoryInterface $quoteRepository */
+-        $ruleRepository = $this->objectManager->get(RuleRepositoryInterface::class);
+-        $items = $ruleRepository->getList($searchCriteria)->getItems();
+-
+-        $rule = array_pop($items);
+-        /** @var \Magento\SalesRule\Model\Converter\ToModel $converter */
+-        $converter = $this->objectManager->get(\Magento\SalesRule\Model\Converter\ToModel::class);
+-
+-        return $converter->toModel($rule);
+-    }
+ }
+diff --git a/vendor/magento/magento2-base/dev/tests/integration/testsuite/Magento/SalesRule/_files/rules_payment_method.php b/vendor/magento/magento2-base/dev/tests/integration/testsuite/Magento/SalesRule/_files/rules_payment_method.php
+new file mode 100644
+index 000000000000..25f208d34d8e
+--- /dev/null
++++ b/vendor/magento/magento2-base/dev/tests/integration/testsuite/Magento/SalesRule/_files/rules_payment_method.php
+@@ -0,0 +1,47 @@
++<?php
++/**
++ * Copyright © Magento, Inc. All rights reserved.
++ * See COPYING.txt for license details.
++ */
++
++use Magento\TestFramework\Helper\Bootstrap;
++
++/** @var \Magento\SalesRule\Model\Rule $rule */
++$salesRule = Bootstrap::getObjectManager()->create(\Magento\SalesRule\Model\Rule::class);
++$salesRule->setData(
++    [
++        'name' => '50% Off on Checkmo Payment Method',
++        'is_active' => 1,
++        'customer_group_ids' => [\Magento\Customer\Model\GroupManagement::NOT_LOGGED_IN_ID],
++        'coupon_type' => \Magento\SalesRule\Model\Rule::COUPON_TYPE_NO_COUPON,
++        'simple_action' => 'by_percent',
++        'discount_amount' => 50,
++        'discount_step' => 0,
++        'stop_rules_processing' => 1,
++        'website_ids' => [
++            Bootstrap::getObjectManager()->get(
++                \Magento\Store\Model\StoreManagerInterface::class
++            )->getWebsite()->getId()
++        ]
++    ]
++);
++
++$salesRule->getConditions()->loadArray([
++    'type' => \Magento\SalesRule\Model\Rule\Condition\Combine::class,
++    'attribute' => null,
++    'operator' => null,
++    'value' => '1',
++    'is_value_processed' => null,
++    'aggregator' => 'any',
++    'conditions' =>
++        [
++            [
++                'type' => \Magento\SalesRule\Model\Rule\Condition\Address::class,
++                'attribute' => 'payment_method',
++                'operator' => '==',
++                'value' => 'checkmo'
++            ],
++        ],
++]);
++
++$salesRule->save();

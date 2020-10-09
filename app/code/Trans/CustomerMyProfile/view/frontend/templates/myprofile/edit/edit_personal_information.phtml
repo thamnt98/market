@@ -1,0 +1,211 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var \Magento\Customer\Block\Form\Edit $block */
+?>
+<?php
+/** @var $viewModel \Trans\CustomerMyProfile\ViewModel\MyProfile */
+$viewModel = $block->getViewModel();
+?>
+<?php
+$customer = $block->getCustomer();
+if ($customer->getFirstname() == $customer->getLastname()) {
+    $name = $customer->getFirstname();
+} else {
+    $name = $customer->getFirstname() . ' ' . $customer->getLastname();
+}
+$profilePicture = $viewModel->getProfilePicture($customer);
+$customerData = ['profile_picture' => $profilePicture, 'fullname' => $name, 'dob' => '', 'gender' => '', 'marital_status' => '', 'nik' => $viewModel->getNik($customer)];
+?>
+<form class="form form-edit-account" action="<?= /* @noEscape */ $block->getUrl('customer/account/editPost') ?>" method="post" id="form-validate" enctype="multipart/form-data" data-hasrequired="<?= $block->escapeHtmlAttr(__('* Required Fields')) ?>" autocomplete="off">
+    <?= $block->getBlockHtml('formkey') ?>
+    <legend class="legend"><span><?= $block->escapeHtml(__('Edit Personal Information')) ?></span></legend>
+    <div class="profile-wrap-picture-detail">
+        <div class="profile-picture">
+            <label for="profile_picture" class="image-photo-profile">
+                <img src="<?= $profilePicture; ?>" width="150px" height="150px" alt="profile-picture" tEdit Personal Informationitle="<?= $block->escapeHtml(__('Edit Profile Picture')) ?>" class="profile-picture-image"/>
+                <div class="profile-picture-overlay">
+                    <div class="profile-picture-text"><?= $block->escapeHtml(__('Edit')) ?></div>
+                </div>
+            </label>
+            <div class="add-photo-profile">
+                <label for="profile_picture" id="add-photo-profile"><?= $block->escapeHtml(__('Upload Photo')) ?></label>
+            </div>
+            <div class="control">
+                <input type="file" id="profile_picture" name="profile_picture" value="" title="<?= $block->escapeHtml(__('Profile Picture')) ?>" class="profile-picture-input validate-picture-type validate-picture-size" />
+            </div>
+        </div>
+
+        <div class="profile-detail">
+            <!--Name-->
+            <?= $block->getLayout()->createBlock(\Magento\Customer\Block\Widget\Name::class)->setObject($block->getCustomer())->toHtml() ?>
+
+            <!--Date of Birth-->
+            <?php $_dob = $block->getLayout()->createBlock(\Magento\Customer\Block\Widget\Dob::class) ?>
+            <?php if ($_dob->isEnabled()) : ?>
+                <?php $_dob->setDate($block->getCustomer()->getDob()); ?>
+                <?php $customerData['dob'] = $_dob->getMonth() . '/' . $_dob->getDay() . '/' . $_dob->getYear(); ?>
+                <div class="field birthday fieldset">
+                    <label class="label" for="birthday">
+                        <span><?= /* @escapeNotVerified */ $block->escapeHtml($_dob->getStoreLabel('dob')); ?></span>
+                    </label>
+                    <div class="control">
+                        <input type="hidden" name="dob" id="dob" value="<?= $block->escapeHtmlAttr($customerData['dob']); ?>" autocomplete="off">
+                    </div>
+                </div>
+            <?php endif ?>
+
+            <!--Gender-->
+            <?php $_gender = $block->getLayout()->createBlock(\Magento\Customer\Block\Widget\Gender::class) ?>
+            <?php if ($_gender->isEnabled()) : ?>
+                <div class="field gender fieldset">
+                    <label class="label" for="gender">
+                        <span><?= /* @escapeNotVerified */ $block->escapeHtml($_gender->getStoreLabel('gender')); ?></span>
+                    </label>
+                    <div class="control">
+                        <?php $options = $_gender->getGenderOptions(); ?>
+                        <?php $value = $viewModel->getGenderValue($customer); ?>
+                        <?php foreach ($options as $option): ?>
+                            <?php if($option->getValue() == '' || $option->getValue() == 3) continue; ?>
+                            <li class="choice radio-custom">
+                                <input type="radio"
+                                       class="radio"
+                                       id="gender-option-<?= /* @escapeNotVerified */ $block->escapeHtmlAttr($option->getValue()); ?>"
+                                       name="gender"
+                                       data-selector="gender"
+                                       data-validate="{'required-radio':true}"
+                                    <?php if ($option->getValue() == $value) {$customerData['gender'] = $option->getValue(); echo ' checked="checked"';} ?>
+                                       value="<?= /* @escapeNotVerified */ $block->escapeHtmlAttr($option->getValue()); ?>"/>
+                                <label class="label"
+                                       for="gender-option-<?= /* @escapeNotVerified */ $block->escapeHtmlAttr($option->getValue()); ?>">
+                                    <span><?= /* @escapeNotVerified */ $block->escapeHtml($option->getLabel()); ?></span>
+                                </label>
+                            </li>
+                        <?php endforeach;?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <!--Marital Status-->
+            <div class="field maritalstatus fieldset">
+                <label class="label" for="maritalstatus">
+                    <span><?= /* @escapeNotVerified */ $block->escapeHtml(__('Marital Status'))?></span>
+                </label>
+                <div class="control">
+                    <?php $options = $viewModel->getMaritalStatusOptions(); ?>
+                    <?php $value = $viewModel->getMaritalStatusValue($customer); ?>
+                    <?php foreach ($options as $option): ?>
+                        <?php if(!$option['value']) continue; ?>
+                        <li class="choice radio-custom">
+                            <input type="radio"
+                                   class="radio"
+                                   id="marital-status-option-<?= /* @escapeNotVerified */ $block->escapeHtmlAttr($option['value']); ?>"
+                                   name="marital_status"
+                                   data-selector="marital_status"
+                                   data-validate="{'required-radio':true}"
+                                <?php if ($option['value'] == $value) {$customerData['marital_status'] = $option['value']; echo ' checked="checked"';} ?>
+                                   value="<?= /* @escapeNotVerified */ $block->escapeHtmlAttr($option['value']); ?>"/>
+                            <label class="label"
+                                   for="marital-status-option-<?= /* @escapeNotVerified */ $block->escapeHtmlAttr($option['value']); ?>">
+                                <span><?= /* @escapeNotVerified */ $block->escapeHtml($option['label']); ?></span>
+                            </label>
+                        </li>
+                    <?php endforeach;?>
+                </div>
+            </div>
+
+            <!--Tax-->
+            <?php $_taxvat = $block->getLayout()->createBlock(\Magento\Customer\Block\Widget\Taxvat::class) ?>
+            <?php if ($_taxvat->isEnabled()) : ?>
+                <?= $_taxvat->setTaxvat($block->getCustomer()->getTaxvat())->toHtml() ?>
+            <?php endif ?>
+
+            <!--Custom Attribute-->
+            <?php $userDefinedAttributes = $block->getLayout()->getBlock('customer_form_user_attributes'); ?>
+            <?php if ($userDefinedAttributes) :?>
+                <?php $userDefinedAttributes->setEntityType('customer')->setShowContainer(false);?>
+                <?php $block->restoreSessionData($userDefinedAttributes->getMetadataForm());?>
+                <?= $userDefinedAttributes->toHtml() ?>
+            <?php endif;?>
+            <?= /* @noEscape */ $block->getChildHtml('form_fields_before_in_form') ?>
+        </div>
+    </div>
+    <div class="actions-toolbar">
+        <button type="button" class="profile-cancel"><?= $block->escapeHtml(__('Cancel')) ?></button>
+        <button type="submit" class="profile-save primary action"><?= $block->escapeHtml(__('Save')) ?></button>
+    </div>
+</form>
+<script>
+    require([
+        "jquery",
+        "mage/mage"
+    ], function($){
+        var dataForm = $('#form-validate');
+        var ignore = <?= /* @noEscape */ $_dob->isEnabled() ? '\'input[id$="full"]\'' : 'null' ?>;
+
+        dataForm.mage('validation', {
+            <?php if ($_dob->isEnabled()) : ?>
+            errorPlacement: function(error, element) {
+                if (element.prop('id').search('full') !== -1) {
+                    var dobElement = $(element).parents('.customer-dob'),
+                        errorClass = error.prop('class');
+                    error.insertAfter(element.parent());
+                    dobElement.find('.validate-custom').addClass(errorClass)
+                        .after('<div class="' + errorClass + '"></div>');
+                }
+                else {
+                    error.insertAfter(element);
+                }
+            },
+            ignore: ':hidden:not(' + ignore + ')'
+            <?php else : ?>
+            ignore: ignore ? ':hidden:not(' + ignore + ')' : ':hidden'
+            <?php endif ?>
+        });
+
+    });
+</script>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_CustomerCustomAttributes/validation": {
+                "ignore": <?= (int) ($_dob->isEnabled() || $userDefinedAttributes->hasUserDefinedAttributes()) ?>,
+                "hasUserDefinedAttributes": <?= (int) $userDefinedAttributes->hasUserDefinedAttributes() ?>,
+                "isDobEnabled": <?= (int) $_dob->isEnabled() ?>,
+                "mixins": [
+                    "Magento_CustomerCustomAttributes/error-placement",
+                    "Magento_CustomerCustomAttributes/validation-ignore"
+                ]
+            }
+        }
+    }
+</script>
+<script type="text/x-magento-init">
+    {
+        "*" : {
+             "validateprofilepicturejs": {}
+        }
+    }
+</script>
+<script type="text/x-magento-init">
+        {
+            "*": {
+                "Trans_CustomerMyProfile/js/profile": {
+                    "dob": "#form-validate input[name=dob]",
+                    "picturePreview": "#form-validate .profile-picture-image",
+                    "picture": "#form-validate input[name=profile_picture]",
+                    "default": "<?= $customerData['dob']; ?>",
+                    "reset": "#form-validate button.profile-cancel",
+                    "customer": <?= json_encode($customerData); ?>
+                }
+            }
+        }
+</script>
+<script>
+    window.getMaxsizePicture = '<?php /* @escapeNotVerified */ echo $block->getConfigMaxsize(); ?>';
+</script>

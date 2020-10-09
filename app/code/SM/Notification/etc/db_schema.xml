@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="sm_notification_msg" resource="default" engine="innodb" comment="SmartOSC Notification Message">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="ID"/>
+        <column xsi:type="tinyint" name="admin_type" nullable="true" comment="Customer Type Create on Admin"/>
+        <column xsi:type="varchar" name="event" length="25" nullable="false" comment="Event Type"/>
+        <column xsi:type="varchar" name="title" length="255" nullable="true" comment="Title"/>
+        <column xsi:type="text" name="content" nullable="true" comment="Content"/>
+        <column xsi:type="varchar" name="image" nullable="true" length="255" comment="Image"/>
+        <column xsi:type="text" name="params" nullable="true" comment="Params"/>
+        <column xsi:type="varchar" name="redirect_type" length="50" nullable="true" comment="Redirect Type"/>
+        <column xsi:type="varchar" name="redirect_id" length="50" nullable="true" comment="Redirect Type ID"/>
+        <column xsi:type="timestamp" name="start_date" on_update="false" nullable="true" comment="Start Date"/>
+        <column xsi:type="timestamp" name="end_date" on_update="false" nullable="true" comment="End Date"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false"
+                default="CURRENT_TIMESTAMP" comment="Creation Time"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <index referenceId="SM_NOTIFICATION_MSG_FULLTEXT_TITLE" indexType="fulltext">
+            <column name="title"/>
+        </index>
+        <index referenceId="SM_NOTIFICATION_MSG_FULLTEXT_CONTENT" indexType="fulltext">
+            <column name="content"/>
+        </index>
+    </table>
+
+    <table name="sm_notification_customer" resource="default" engine="innodb" comment="SmartOSC Notification Customer">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="ID"/>
+        <column xsi:type="int" name="message_id" padding="10" unsigned="true" nullable="false" comment="Message ID"/>
+        <column xsi:type="int" name="customer_id" padding="10" unsigned="true" nullable="false" comment="Customer ID"/>
+        <column xsi:type="boolean" name="is_read" nullable="false" default="0" comment="Is Read"/>
+        <column xsi:type="tinyint" name="push_status" default="0" comment="Push Device Status"/>
+        <column xsi:type="tinyint" name="email_status" default="0" comment="Send Email Status"/>
+        <column xsi:type="tinyint" name="sms_status" default="0" comment="Send Sms Status"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="false" nullable="false"
+                default="CURRENT_TIMESTAMP" comment="Update Time"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="SM_NOTIFICATION_CUSTOMER_MESSAGE_ID_SM_NOTIFICATION_MSG_ID"
+                    table="sm_notification_customer" column="message_id"
+                    referenceTable="sm_notification_msg" referenceColumn="id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="SM_NOTIFICATION_CUSTOMER_MESSAGE_ID_CUSTOMER_ENTITY_ENTITY_ID"
+                    table="sm_notification_customer" column="customer_id"
+                    referenceTable="customer_entity" referenceColumn="entity_id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="unique" referenceId="SM_NOTIFICATION_CUSTOMER_MESSAGE_ID_CUSTOMER_ID">
+            <column name="message_id"/>
+            <column name="customer_id"/>
+        </constraint>
+    </table>
+
+    <table name="sm_notification_push" resource="default" engine="innodb" comment="SmartOSC Notification Type Push">
+        <column xsi:type="int" name="message_id" padding="10" unsigned="true" nullable="false" comment="Message ID"/>
+        <column xsi:type="varchar" name="title" length="255" nullable="false" comment="Title"/>
+        <column xsi:type="text" name="content" nullable="false" comment="Content"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="message_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="SM_NOTIFICATION_PUSH_MESSAGE_ID_SM_NOTIFICATION_MSG_ID"
+                    table="sm_notification_push" column="message_id"
+                    referenceTable="sm_notification_msg" referenceColumn="id"
+                    onDelete="CASCADE"/>
+    </table>
+
+    <table name="sm_notification_sms" resource="default" engine="innodb" comment="SmartOSC Notification Type SMS">
+        <column xsi:type="int" name="message_id" padding="10" unsigned="true" nullable="false" comment="Message ID"/>
+        <column xsi:type="text" name="content" nullable="false" comment="Content"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="message_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="SM_NOTIFICATION_CHAT_MESSAGE_ID_SM_NOTIFICATION_MSG_ID"
+                    table="sm_notification_chat" column="message_id"
+                    referenceTable="sm_notification_msg" referenceColumn="id"
+                    onDelete="CASCADE"/>
+    </table>
+
+    <table name="sm_notification_email" resource="default" engine="innodb" comment="SmartOSC Notification Type Email">
+        <column xsi:type="int" name="message_id" padding="10" unsigned="true" nullable="false" comment="Message ID"/>
+        <column xsi:type="varchar" name="subject" length="255" nullable="false" comment="Subject"/>
+        <column xsi:type="varchar" name="template_id" nullable="false" length="255" comment="Email Template ID"/>
+        <column xsi:type="text" name="params" nullable="true" comment="Email Params"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="message_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="SM_NOTIFICATION_EMAIL_MESSAGE_ID_SM_NOTIFICATION_MSG_ID"
+                    table="sm_notification_email" column="message_id"
+                    referenceTable="sm_notification_msg" referenceColumn="id"
+                    onDelete="CASCADE"/>
+    </table>
+
+    <table name="sm_notification_customer_setting" resource="default" engine="innodb" comment="Notification Setting Default Value">
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Notification Setting Entity ID"/>
+        <column xsi:type="varchar" name="parent_code" nullable="true" comment="Notification Setting Parent Code"/>
+        <column xsi:type="varchar" length="100" name="code" nullable="false" comment="Notification Setting Code"/>
+        <column xsi:type="varchar" length="100" name="name" nullable="false" comment="Notification Setting Name"/>
+        <column xsi:type="tinyint" name="default_value" nullable="false" default="0" comment="Default Value"/>
+        <column xsi:type="varchar" length="100" name="message_type" nullable="true" comment="Message Type"/>
+        <column xsi:type="varchar" length="100" name="event_type" nullable="true" comment="Event Type"/>
+        <!--    Status:
+            "all"  => All;
+            "web"    => Notification in app;
+            "mobile" => Notification push;
+        -->
+        <column xsi:type="varchar" length="20" name="area" nullable="false" default="all" comment="Notification Setting Area"/>
+        <column xsi:type="varchar" length="200" name="tab" nullable="true" default="all" comment="Notification Setting Tab"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Creation Time"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Update Time"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+
+    <table name="sm_notification_trigger_event" resource="default"
+           engine="innodb" comment="Notification Trigger Event">
+        <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="ID"/>
+        <column xsi:type="varchar" name="event_type" length="25" nullable="false" comment="Event Type"/>
+        <column xsi:type="int" name="event_id" padding="10"
+                unsigned="true" nullable="false" comment="Event ID"/>
+        <column xsi:type="varchar" name="event_name" length="50" nullable="false" comment="Event Type"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Creation At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+    </table>
+
+    <table name="quote_item">
+        <column xsi:type="datetime" name="qty_updated_at" nullable="false" on_update="false"
+                onCreate="migrateDataFrom(updated_at)" default="CURRENT_TIMESTAMP" comment="Quantity Updated Date" />
+    </table>
+</schema>

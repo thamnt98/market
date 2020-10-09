@@ -1,0 +1,37 @@
+<!--
+/**
+ * @category Trans
+ * @package  Trans_Sprint
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Imam Kusuma <imam.kusuma@transdigital.co.id>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<?php /* @var $block \Trans\Sprint\Block\Frontend\Onepage\Success */?>
+
+<div class="checkout-success">
+    <?php if ($block->checkPaymentChannel() === 'virtual_account'):?>
+        <p class="name-thankyou-succes">
+            <?= $block->escapeHtml(__('Please make the payment in')) ?>
+            <p><b><?= $block->escapeHtml($block->getExpireDate()) ?></b></p>
+        </p>
+        <div class="va-wrap-success">
+            <div class="sprint-total-ammount-success">
+                <p><?= $block->escapeHtml(__('Total')) ?></p>
+                <p><b><?= $block->escapeHtml($block->getGrandTotal()) ?></b></p>
+            </div>
+            <div class="your-payment-code-number">
+                <p><?= $block->escapeHtml(__('%1 number', $block->getPaymentChannelName())) ?></p>
+                <p><b><?= $block->escapeHtml($block->getPaycode()) ?></b></p>
+                <div class="click-copyva" id="clickCopyVa" data-clipboard-text="<?= $block->escapeHtml($block->getPaycode()) ?>">
+                    <u><?= $block->escapeHtml(__('Copy Number ')) ?></u>
+                </div>
+            </div>
+        </div>
+    <?php endif; ?>
+</div>
+

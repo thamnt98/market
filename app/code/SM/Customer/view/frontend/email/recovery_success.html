@@ -1,0 +1,48 @@
+<!--@subject {{trans "Your Transmart account is back!"}} @-->
+<!--@vars {
+"var name":"Customer Name",
+"var token":"Token"
+} @-->
+{{template config_path="design/email/header_template"}}
+<table class="greeting" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "Hi"}}
+                <b>{{var name}},</b>
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End greeting-->
+<table class="message-email" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "Congratulations. Your Transmart account has been recovered."}}
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Message Email-->
+<table class="message-email" width="100%">
+    <tr>
+        <td>
+            <p>{{trans "We don't want you to go through this anymore. So we strongly suggest you to change your password to avoid getting locked again. Keep your account safe and secured!"}}</p>
+        </td>
+    </tr>
+</table>
+<!--End Message Email-->
+<table class="sincerely" width="100%">
+    <tr>
+        <td>
+            <p>{{trans "Sincerely"}},</p>
+            <p class="signature">
+                <b>{{var
+                    store.frontend_name}}</b>
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Sincerely-->
+{{template config_path="design/email/footer_template"}}

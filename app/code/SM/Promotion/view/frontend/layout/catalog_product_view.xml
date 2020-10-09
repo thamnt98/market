@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_Promotion
+ *
+ * Date: June, 22 2020
+ * Time: 5:57 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="product.info.price">
+            <block class="SM\Promotion\Block\Catalog\Product\View\PromoLabel"
+                   name="product.info.promo"
+                   template="SM_Promotion::catalog/product/view/promoLabel.phtml"
+                   after="pdp-badge-discount" />
+        </referenceContainer>
+    </body>
+</page>

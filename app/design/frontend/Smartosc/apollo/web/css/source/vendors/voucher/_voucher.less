@@ -1,0 +1,193 @@
+// /**
+//  * Copyright © Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+
+
+& when (@media-common = true) {
+    .pp-apply-voucher-detail {
+        h2.tl-voucher-detail {
+             margin-top:-@indent__s;
+            font-family: @font-family-SF-UI-Display-Bold;
+        }
+        .ct-apply-voucher {
+            position: relative;
+            .time-use-voucher {
+                background: @c-tsm-red2;
+                padding: @indent__xs @indent__s;
+                color: @color-white;
+                position: absolute;
+                left: 0;
+            }
+        }
+    }
+
+    .wrapper-voucher {
+        .bg-voucher{
+           /* background: linear-gradient(180deg, #5B105E 0%, #952D8F 100%);
+            border-radius: 20px;
+            padding: 60px 0 70px 50px;*/
+            position: relative;
+            img {
+                border-radius: 20px;
+               width: 100%;
+            }
+        }
+        .title-content {
+            position: absolute;
+            padding: 60px 0 70px 50px;
+            top: 0;
+            left: 0;
+            p{
+                color: @color-white;
+                font-weight: bold;
+            }
+            p.name{
+                font-size: 36px;
+                line-height: 43px;
+                margin-bottom: 10px;
+            }
+            p.price{
+                font-size: 60px;
+                line-height: 71px;
+            }
+        }
+        .voucher-detail{
+            border: 1px solid @c-tsm-grey3;
+            border-radius: 16px;
+            position: relative;
+            height: 100%;
+
+            .voucher-detail-title{
+                border-bottom: 1px solid @c-tsm-grey3;
+                p {
+                    color: @c-tsm-grey6;
+                    font-size: 24px;
+                    font-family: @font-family-SF-UI-Display-Semibold;
+                    line-height: 29px;
+                    margin: 0;
+                    padding: 20px;
+                }
+            }
+            .voucher-detail-content{
+                padding: 20px;
+                ul.list-group{
+                    list-style: none;
+                    padding-left: 0;
+                    .list-group-item{
+                        display: flex;
+                        justify-content: flex-start;
+                        img {
+                            margin-right: @indent__s;
+                        }
+                        span{
+                            color: @c-tsm-grey5;
+                            font-size: 14px;
+                            font-weight: 500;
+                        }
+                        .apl-ic_bank-card {
+                            color: @c-tsm-grey5;
+                            .lib-font-size(18);
+                            margin-right: @indent__s;
+
+                            &:before {
+                                color: @c-tsm-grey5;
+                                font-weight: normal;
+                            }
+                        }
+                    }
+                }
+            }
+            .primary{
+                text-align: center;
+                button {
+                    width: ~'calc(100% - 40px)';
+                    position: absolute;
+                    left: @indent__base;
+                    bottom: @indent__l;
+                    &.action.primary[disabled="disabled"]{
+                        background: @c-tsm-grey5;
+                    }
+                }
+            }
+        }
+        .minium-purchase{
+            font-size: 24px;
+            font-family: @font-family-SF-UI-Display-Semibold;
+            line-height: 29px;
+            color: @c-tsm-grey6;
+            margin-top: 40px;
+        }
+        .product.data.items {
+            margin-top: 20px;
+            .item.title {
+                a {
+                    padding-left: 40px;
+                    padding-right: 40px;
+                }
+                > .switch{
+                    border-bottom: 3px solid @c-tsm-grey2;
+                }
+                &.active > .switch{
+                    border-bottom: 3px solid @c-tsm-orange2;
+                }
+            }
+            .item.content{
+                border-top: none;
+                padding: 25px;
+                font-family: SF UI Display Regular;
+            }
+        }
+    }
+}
+
+
+//
+//  Mobile (style-m.css)
+//  _____________________________________________
+//@screen__s = 639
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__s){
+    .wrapper-voucher{
+        .title-content{
+            .name{
+                font-size: 30px;
+            }
+            .price{
+                font-size: 50px;
+            }
+        }
+        .voucher-left,
+        .voucher-right{
+            width: 100%;
+        }
+    }
+}
+// @screen__m = 767
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m){
+    .wrapper-voucher{
+        .bg-voucher{
+            margin-bottom: 20px;
+        }
+    }
+}
+
+//
+//  Desktop (style-l.css)
+//  _____________________________________________
+// @screen__m = 1024
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__l) {
+    .wrapper-voucher{
+        .bg-voucher{
+            margin-bottom: 0;
+        }
+    }
+}
+// @screen__m = 768
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .wrapper-voucher{
+        .bg-voucher{
+            margin-bottom: 20px;
+        }
+    }
+}

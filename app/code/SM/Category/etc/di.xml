@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="SM\Category\Api\CategoryInterface" type="SM\Category\Model\Catalog"/>
+    <preference for="Magento\Catalog\Controller\Adminhtml\Category\Save"
+                type="SM\Category\Controller\Adminhtml\Category\Save"/>
+    <preference for="SM\Category\Api\Data\Catalog\CategoryMetaDataInterface"
+                type="SM\Category\Model\Data\Catalog\CategoryMetaData"/>
+</config>

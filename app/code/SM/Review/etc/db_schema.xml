@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="review_image" resource="default" engine="innodb" comment="Review Image ">
+        <column xsi:type="bigint" name="id" padding="20" unsigned="true" nullable="false" identity="true"
+                comment="Review Image Id"/>
+        <column xsi:type="bigint" name="review_id" padding="20" unsigned="true" nullable="false"
+                comment="Review ID"/>
+        <column xsi:type="text" name="image" nullable="false" comment="Image Data"/>
+        <column xsi:type="smallint" name="is_edit" padding="6" unsigned="true" nullable="false" default="0"
+                comment="Is Edit"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="REVIEW_REVIEW_ID_REVIEW_IMAGE_REVIEW_ID"
+                    table="review_image" column="review_id" referenceTable="review"
+                    referenceColumn="review_id" onDelete="CASCADE"/>
+    </table>
+    <table name="review" resource="default" engine="innodb" comment="Review base information">
+        <column xsi:type="smallint" name="is_email_sent" padding="5" unsigned="true" nullable="false" default="0" comment="Email Status"/>
+        <column xsi:type="int" name="invoice_id" padding="10" unsigned="true" nullable="false" identity="false"
+                comment="Invoice ID" disabled="true"/>
+        <column xsi:type="int" name="order_id" padding="10" unsigned="true" nullable="false" identity="false"
+                comment="Order ID"/>
+        <constraint xsi:type="foreign" referenceId="REVIEW_INVOICE_ID_SALES_INVOICE_ENTITY_ID"
+                    table="review" column="invoice_id" referenceTable="sales_invoice"
+                    referenceColumn="entity_id" onDelete="CASCADE" disabled="true"/>
+        <constraint xsi:type="foreign" referenceId="REVIEW_ORDER_ID_SALES_ORDER_ENTITY_ID"
+                    table="review" column="order_id" referenceTable="sales_order"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+    </table>
+
+    <table name="sm_review_edit" resource="default" engine="innodb" comment="Review Content Edit">
+        <column xsi:type="bigint" name="entity_id" padding="20" unsigned="true" nullable="false" identity="true"
+                comment="Review Edit Id"/>
+        <column xsi:type="bigint" name="review_id" padding="20" unsigned="true" nullable="false"
+                comment="Review ID"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Review create date"/>
+        <column xsi:type="varchar" name="title" nullable="false" length="256" comment="Title"/>
+        <column xsi:type="text" name="detail" nullable="false" comment="Detail description"/>
+        <column xsi:type="smallint" name="vote_value" padding="6" unsigned="false" nullable="false"
+                default="0" comment="Vote option value"/>
+        <column xsi:type="smallint" name="image_changed" padding="6" unsigned="false" nullable="false" default="0"
+                comment="Image Status"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="REVIEW_REVIEW_ID_SM_REVIEW_EDIT_REVIEW_ID"
+                    table="sm_review_edit" column="review_id" referenceTable="review"
+                    referenceColumn="review_id" onDelete="CASCADE"/>
+    </table>
+
+    <table name="review_detail" resource="default" engine="innodb" comment="Review detail information">
+        <column xsi:type="varchar" name="title" nullable="false" length="256" comment="Title"/>
+    </table>
+</schema>

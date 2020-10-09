@@ -1,0 +1,37 @@
+<?php
+/**
+ * @category    Magento
+ * @package     Magento_Catalog
+ * @license     http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ *
+ * @author      Logan Ta <phuongtt2@smartosc.com>
+ *
+ * @copyright   Copyright (c) SmartOSC. All rights reserved.
+ * @url http://www.smartosc.com/
+ */
+/** @var \SM\Catalog\Block\Product\View $block */
+$method = $block->getDeliveryMethod();
+?>
+<div class="block-container-object-php block-container-delivery" id="pdp-delivery-connect" style="display: none;">
+    <div class="block-content" aria-labelledby="block-product-delivery-heading">
+        <fieldset class="fieldset delivery">
+            <div class="pdp-delivery">
+                <div class="title">
+                    <span class="apl-delivery"></span><?php /* @escapeNotVerified */ echo __('Available Delivery Methods') ?>
+                </div>
+                <ul class="items-delivery">
+                    <?php foreach($method as $key => $item):?>
+                        <li class="item-delivery"><?php /* @escapeNotVerified */echo $item['label'] ?></li>
+                    <?php endforeach;?>
+                </ul>
+            </div>
+        </fieldset>
+    </div>
+</div>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_Catalog/js/pdp/delivery": {}
+        }
+    }
+</script>

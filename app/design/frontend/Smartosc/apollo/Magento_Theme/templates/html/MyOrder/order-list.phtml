@@ -1,0 +1,241 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<div class="my-order my-order-list">
+    <h2><?= $block->escapeHtml(__('Order List')) ?></h2>
+    <!--start tab-->
+    <div class="product data items"
+         data-mage-init='{"mage/tabs": {"openedState": "active", "animate": {"duration": 100}, "active": 1}}'>
+        <!--start inprogress-->
+        <div class="item title" data-role="collapsible">
+            <a class="switch" data-toggle="trigger" href="#tab-inprogress">
+                <?= $block->escapeHtml(__('In progress')) ?>
+            </a>
+        </div>
+        <div id="tab-inprogress" class="item content inprogress" data-role="content">
+            <!--top toolbar-->
+            <div class="headtab-toolbar">
+                <div class="gr-filter">
+                    <div class="sortby-dropdown">
+                        <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+                            <span><?= $block->escapeHtml('Sort by') ?></span>
+                        </span>
+                        <ul class="dropdown">
+                            <li class="item radio-custom">
+                                <input type="radio" name="recent" checked/>
+                                <label for="recent"><?= $block->escapeHtml('Recent') ?></label>
+                            </li>
+                            <li class="item radio-custom">
+                                <input type="radio" name="previous"/>
+                                <label for="previous"><?= $block->escapeHtml('Previous') ?></label>
+                            </li>
+                        </ul>
+                    </div>
+                    <a href="#" class="reset-filter"><?= $block->escapeHtml('Reset filter') ?></a>
+                </div>
+                <!-- search box---->
+                <div class="shoplist-search">
+                    <div class="control">
+                        <a href="#"><span class="apl-ic_search"></span></a>
+                        <input id="search" type="text" name="q" value=""
+                               placeholder="<?= $block->escapeHtml(__('Search by invoice number, product name or product code'))?>"
+                               class="input-text" maxlength="128" role="combobox" aria-haspopup="false"
+                               aria-autocomplete="both" autocomplete="off" aria-expanded="true"/>
+                    </div>
+                </div>
+                <!-- search box---->
+            </div>
+            <!--end toolbar-->
+            <div class="table-product">
+                    <div class="tpr-top">
+                        <div class="tpr-top-left">
+                            <span class="tl-invoice-number"><?= $block->escapeHtml(__('Reference Number')) ?></span>
+                            <h4><?= $block->escapeHtml(__('984759371923')) ?></h4>
+                            <span class="date">28 Oct 2019 | 20:00 PM</span>
+                        </div>
+                        <div class="bx-total-payment">
+                            <span class="tl-invoice-number"><?= $block->escapeHtml(__('Total Payment')) ?></span>
+                            <h4><?= $block->escapeHtml(__('Rp 1.738.500')) ?></h4>
+                        </div>
+                        <div class="tpr-top-right">
+                            <button type="submit" class="action primary"><?= $block->escapeHtml(__('See Details')) ?></button>
+                        </div>
+                    </div>
+                    <ul class="list-items-review">
+                       <!--start list item-->
+                        <li class="item-review">
+                            <div class="item-info">
+                                <a href="#" title="thaole1233" class="product-item-photo">
+                                    <img src="https://apollo11-dev.ctdigital.id/media/catalog/product/cache/6410bdb417f1097c90b11783ebe3d82c/2/_/2_1_1.jpg" width="110" height="110" alt="thaole1233" />
+                                </a>
+                                <div class="product-item-details">
+                                    <a href="https://apollo11-dev.ctdigital.id/thaole1233.html" class="product-item-name">Onitsuka Tiger Mexico 66 (Kill Bill)</a>
+                                </div>
+                            </div>
+                            <div class="box-id-order">
+                                <span class="tl-invoice-number"><?= $block->escapeHtml(__('Order ID')) ?></span>
+                                <h4><?= $block->escapeHtml(__('ID/29038324')) ?></h4>
+                                <span class="tl-invoice-number"><?= $block->escapeHtml(__('Same Day')) ?></span>
+                            </div>
+                            <div class="bx-order-status">
+                                <span class="tl-invoice-number"><?= $block->escapeHtml(__('Status')) ?></span>
+                                <h4><?= $block->escapeHtml(__('In Process')) ?></h4>
+                                <div class="progress-bar-status">
+                                    <div class="wrap-status status-waiting-payment active">
+                                        <span class="svg-icon svg-icon-WaitingForPaymentGrey"></span>
+                                    </div>
+                                    <div class="wrap-status status-process active">
+                                        <span class="svg-icon svg-icon-InProcessGrey"></span>
+                                    </div>
+                                    <div class="wrap-status status-delivery active">
+                                        <span class="svg-icon svg-icon-InDeliveryGrey"></span>
+                                    </div>
+                                    <div class="wrap-status status-received active">
+                                        <span class="svg-icon svg-icon-OrderReceivedGrey"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <!--ENd start list item-->
+
+                        <!--start list item-->
+                        <li class="item-review">
+                            <div class="item-info">
+                                <a href="#" title="thaole1233" class="product-item-photo">
+                                    <img src="https://apollo11-dev.ctdigital.id/media/catalog/product/cache/6410bdb417f1097c90b11783ebe3d82c/2/_/2_1_1.jpg" width="110" height="110" alt="thaole1233" />
+                                </a>
+                                <div class="product-item-details">
+                                    <a href="https://apollo11-dev.ctdigital.id/thaole1233.html" class="product-item-name">Onitsuka Tiger Mexico 66 (Kill Bill)</a>
+                                </div>
+                            </div>
+                            <div class="box-id-order">
+                                <span class="tl-invoice-number"><?= $block->escapeHtml(__('Order ID')) ?></span>
+                                <h4><?= $block->escapeHtml(__('ID/29038324')) ?></h4>
+                                <span class="tl-invoice-number"><?= $block->escapeHtml(__('Same Day')) ?></span>
+                            </div>
+                            <div class="bx-order-status">
+                                <span class="tl-invoice-number"><?= $block->escapeHtml(__('Status')) ?></span>
+                                <h4><?= $block->escapeHtml(__('In Process')) ?></h4>
+                                <div class="progress-bar-status">
+                                    <div class="wrap-status status-waiting-payment active">
+                                        <span class="svg-icon svg-icon-WaitingForPaymentGrey"></span>
+                                    </div>
+                                    <div class="wrap-status status-process active">
+                                        <span class="svg-icon svg-icon-InProcessGrey"></span>
+                                    </div>
+                                    <div class="wrap-status status-delivery active">
+                                        <span class="svg-icon svg-icon-PickUpGrey"></span>
+                                    </div>
+                                    <div class="wrap-status status-received active">
+                                        <span class="svg-icon svg-icon-OrderReceivedGrey"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        <!--ENd start list item-->
+                    </ul>
+                </div>
+
+           <!-- End table-->
+        </div>
+        <!--start inprogress-->
+        <!--start completed-->
+        <div class="item title" data-role="collapsible">
+            <a class="switch" data-toggle="trigger" href="#tab-completed">
+                <?= $block->escapeHtml(__('Completed')) ?>
+            </a>
+        </div>
+        <div id="tab-completed" class="item content completed" data-role="content">
+            <!--top toolbar-->
+            <div class="headtab-toolbar">
+                <div class="gr-filter">
+                    <div class="sortby-dropdown">
+                        <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+                            <span><?= $block->escapeHtml('Sort by') ?></span>
+                        </span>
+                        <ul class="dropdown">
+                            <li class="item radio-custom">
+                                <input type="radio" name="recent" checked/>
+                                <label for="recent"><?= $block->escapeHtml('Recent') ?></label>
+                            </li>
+                            <li class="item radio-custom">
+                                <input type="radio" name="previous"/>
+                                <label for="previous"><?= $block->escapeHtml('Previous') ?></label>
+                            </li>
+                        </ul>
+                    </div>
+                    <a href="#" class="reset-filter"><?= $block->escapeHtml('Reset filter') ?></a>
+                </div>
+                <!-- search box---->
+                <div class="shoplist-search">
+                    <div class="control">
+                        <a href="#"><span class="apl-ic_search"></span></a>
+                        <input id="search" type="text" name="q" value=""
+                               placeholder="<?= $block->escapeHtml(__('Search by invoice number, product name or product code'))?>"
+                               class="input-text" maxlength="128" role="combobox" aria-haspopup="false"
+                               aria-autocomplete="both" autocomplete="off" aria-expanded="true"/>
+                    </div>
+                </div>
+                <!-- search box---->
+            </div>
+            <!--end toolbar-->
+            <div class="table-product">
+                <div class="tpr-top">
+                    <div class="tpr-top-left">
+                        <span class="tl-invoice-number"><?= $block->escapeHtml(__('Reference Number')) ?></span>
+                        <h4><?= $block->escapeHtml(__('984759371923')) ?></h4>
+                        <span class="date">28 Oct 2019 | 20:00 PM</span>
+                    </div>
+                    <div class="bx-total-payment">
+                        <span class="tl-invoice-number"><?= $block->escapeHtml(__('Total Payment')) ?></span>
+                        <h4><?= $block->escapeHtml(__('Rp 1.738.500')) ?></h4>
+                    </div>
+                    <div class="tpr-top-right">
+                        <button type="submit" class="action primary"><?= $block->escapeHtml(__('See Details')) ?></button>
+                        <a href="#" class="reorder-all"><?= $block->escapeHtml(__('Reorder all')) ?></a>
+                    </div>
+                </div>
+                <ul class="list-items-review">
+                        <li class="item-review">
+                            <div class="item-info">
+                                <a href="#" title="thaole1233" class="product-item-photo">
+                                    <img src="https://apollo11-dev.ctdigital.id/media/catalog/product/cache/6410bdb417f1097c90b11783ebe3d82c/2/_/2_1_1.jpg" width="110" height="110" alt="thaole1233" />
+                                </a>
+                                <div class="product-item-details">
+                                    <a href="https://apollo11-dev.ctdigital.id/thaole1233.html" class="product-item-name">Onitsuka Tiger Mexico 66 (Kill Bill)</a>
+                                </div>
+                            </div>
+                            <div class="box-id-order">
+                                <span class="tl-invoice-number"><?= $block->escapeHtml(__('Order ID')) ?></span>
+                                <h4><?= $block->escapeHtml(__('ID/29038324')) ?></h4>
+                                <span class="tl-invoice-number"><?= $block->escapeHtml(__('Same Day')) ?></span>
+                            </div>
+                            <div class="bx-order-status">
+                                <span class="tl-invoice-number"><?= $block->escapeHtml(__('Status')) ?></span>
+                                <h4><?= $block->escapeHtml(__('In Process')) ?></h4>
+                                <div class="progress-bar-status">
+                                    <div class="wrap-status status-waiting-payment active">
+                                        <span class="svg-icon svg-icon-WaitingForPaymentGrey"></span>
+                                    </div>
+                                    <div class="wrap-status status-process active">
+                                        <span class="svg-icon svg-icon-InProcessGrey"></span>
+                                    </div>
+                                    <div class="wrap-status status-delivery">
+                                        <span class="svg-icon svg-icon-InDeliveryGrey"></span>
+                                    </div>
+                                    <div class="wrap-status status-received">
+                                        <span class="svg-icon svg-icon-OrderReceivedGrey"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                </ul>
+            </div>
+        </div>
+        <!--start completed-->
+    </div>
+    <!--ENnd start tab-->
+</div>

@@ -1,0 +1,450 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!--@subject {{trans "Welcome to %store_name" store_name=$store.frontend_name}} @-->
+<!--@vars {
+"var store.frontend_name":"Store Name",
+"var this.getUrl($store,'customer/account/',[_nosid:1])":"Customer Account URL",
+"var this.getUrl($store,'customer/account/createPassword/',[_query:[id:$customer.id,token:$customer.rp_token],_nosid:1])":"Password Reset URL",
+"var customer.email":"Customer Email",
+"var customer.name":"Customer Name"
+} @-->
+{{template config_path="design/email/header_template"}}
+
+<table class="main-table">
+    <tr>
+        <td class="one-column">
+            <table class="greeting" width="100%">
+                <tr>
+                    <td>
+                        <p>
+                            {{trans "Hello "}}<b
+                        >{{var customer.name}},</b
+                        >
+                        </p>
+                    </td>
+                </tr>
+            </table>
+            <!--End greeting-->
+            <table class="message-email" width="100%">
+                <tr>
+                    <td>
+                        <p>
+                            {{trans "Congratulations! You have successfully registered your Transmart account. The extraordinary shopping experience is now in front of you."}}
+                        </p>
+                    </td>
+                </tr>
+            </table>
+            <!--End Mesage Email-->
+            <table class="shop-online-anytime">
+                <tr>
+                    <td class="three-column">
+                        <table>
+                            <tbody>
+                            <tr>
+                                <td
+                                        class="one-of-three-column"
+                                >
+                                    <table
+                                            class="shop-online"
+                                            width="100%"
+                                    >
+                                        <tbody>
+                                        <tr>
+                                            <td
+                                                    class="inner-td"
+                                            >
+                                                <table
+                                                        class="content"
+                                                >
+                                                    <tbody>
+                                                    <tr>
+                                                        <td
+                                                                class="image"
+                                                        >
+                                                            <img
+                                                                    alt="shop-online"
+                                                                    src="https://cdn.shopify.com/s/files/1/0252/6298/1229/files/shop-online.png?v=1588752598"
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <!--End Shop Online-->
+                                </td>
+                                <td
+                                        class="one-of-three-column"
+                                >
+                                    <table
+                                            class="all-you-need"
+                                            width="100%"
+                                    >
+                                        <tbody>
+                                        <tr>
+                                            <td
+                                                    class="inner-td"
+                                            >
+                                                <table
+                                                        class="content"
+                                                >
+                                                    <tbody>
+                                                    <tr>
+                                                        <td
+                                                                class="image"
+                                                        >
+                                                            <img
+                                                                    alt="all-you-need"
+                                                                    src="https://cdn.shopify.com/s/files/1/0252/6298/1229/files/all-you-need.png?v=1588752598"
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <!--End All Need-->
+                                </td>
+                                <td
+                                        class="one-of-three-column"
+                                >
+                                    <table
+                                            class="deliver"
+                                            width="100%"
+                                    >
+                                        <tbody>
+                                        <tr>
+                                            <td
+                                                    class="inner-td"
+                                            >
+                                                <table
+                                                        class="content"
+                                                >
+                                                    <tbody>
+                                                    <tr>
+                                                        <td
+                                                                class="image"
+                                                        >
+                                                            <img
+                                                                    alt="deliver"
+                                                                    src="https://cdn.shopify.com/s/files/1/0252/6298/1229/files/deliver.png?v=1588752598"
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <!--End Deliver-->
+                                </td>
+                            </tr>
+                            <tr>
+                                <td
+                                        class="one-of-three-column"
+                                >
+                                    <table
+                                            class="shop-online"
+                                            width="100%"
+                                    >
+                                        <tbody>
+                                        <tr>
+                                            <td
+                                                    class="inner-td"
+                                            >
+                                                <table
+                                                        class="content"
+                                                >
+                                                    <tbody>
+                                                    <tr>
+                                                        <td
+                                                                class="text"
+                                                        >
+                                                            <p>
+                                                                Shop
+                                                                online
+                                                                anytime
+                                                            </p>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <!--End Shop Online-->
+                                </td>
+                                <td
+                                        class="one-of-three-column"
+                                >
+                                    <table
+                                            class="all-you-need"
+                                            width="100%"
+                                    >
+                                        <tbody>
+                                        <tr>
+                                            <td
+                                                    class="inner-td"
+                                            >
+                                                <table
+                                                        class="content"
+                                                >
+                                                    <tbody>
+                                                    <tr>
+                                                        <td
+                                                                class="text"
+                                                        >
+                                                            <p>
+                                                                All
+                                                                you
+                                                                need
+                                                                is<br />
+                                                                avalible
+                                                                here
+                                                            </p>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <!--End All Need-->
+                                </td>
+                                <td
+                                        class="one-of-three-column"
+                                >
+                                    <table
+                                            class="deliver"
+                                            width="100%"
+                                    >
+                                        <tbody>
+                                        <tr>
+                                            <td
+                                                    class="inner-td"
+                                            >
+                                                <table
+                                                        class="content"
+                                                >
+                                                    <tbody>
+                                                    <tr>
+                                                        <td
+                                                                class="text"
+                                                        >
+                                                            <p>
+                                                                Shop
+                                                                the
+                                                                way
+                                                                you<br />
+                                                                want:
+                                                                pickup,
+                                                                deliver,<br />
+                                                                or
+                                                                split
+                                                                order
+                                                            </p>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                    <!--End Deliver-->
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <!--End Third Of Three Column-->
+                    </td>
+                    <!-- End Three Column-->
+                </tr>
+                <tr>
+                    <td class="two-column">
+                        <table>
+                            <tbody>
+                            <tr>
+                                <td
+                                        class="one-of-two-column"
+                                        align="center"
+                                >
+                                    <table
+                                            class="discount"
+                                    >
+                                        <tbody>
+                                        <tr>
+                                            <td
+                                                    class="inner-td"
+                                            >
+                                                <table
+                                                        class="content"
+                                                >
+                                                    <tbody>
+                                                    <tr>
+                                                        <td
+                                                                class="image"
+                                                        >
+                                                            <img
+                                                                    alt="discount"
+                                                                    src="https://cdn.shopify.com/s/files/1/0252/6298/1229/files/discount.png?v=1588752598"
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                                <td
+                                        class="one-of-two-column"
+                                        align="left"
+                                >
+                                    <table
+                                            class="authenticity"
+                                    >
+                                        <tbody>
+                                        <tr>
+                                            <td
+                                                    class="inner-td"
+                                            >
+                                                <table
+                                                        class="content"
+                                                >
+                                                    <tbody>
+                                                    <tr>
+                                                        <td
+                                                                class="image"
+                                                        >
+                                                            <img
+                                                                    alt="authenticity"
+                                                                    src="https://cdn.shopify.com/s/files/1/0252/6298/1229/files/authenticity.png?v=1588752749"
+                                                            />
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td
+                                        class="one-of-two-column"
+                                        align="center"
+                                >
+                                    <table
+                                            class="discount"
+                                    >
+                                        <tbody>
+                                        <tr>
+                                            <td
+                                                    class="inner-td"
+                                            >
+                                                <table
+                                                        class="content"
+                                                >
+                                                    <tbody>
+                                                    <tr>
+                                                        <td
+                                                                class="text"
+                                                        >
+                                                            <p>
+                                                                Enjoy
+                                                                10%
+                                                                Bank
+                                                                Mega
+                                                                <br />discount
+                                                                everyday
+                                                            </p>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                                <td
+                                        class="one-of-two-column"
+                                        align="left"
+                                >
+                                    <table
+                                            class="authenticity"
+                                    >
+                                        <tbody>
+                                        <tr>
+                                            <td
+                                                    class="inner-td"
+                                            >
+                                                <table
+                                                        class="content"
+                                                >
+                                                    <tbody>
+                                                    <tr>
+                                                        <td
+                                                                class="text"
+                                                        >
+                                                            <p>
+                                                                Product
+                                                                authenticity<br />
+                                                                guaranteed
+                                                            </p>
+                                                        </td>
+                                                    </tr>
+                                                    </tbody>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <!-- End Three Column-->
+                </tr>
+            </table>
+            <!--End Shop Online Now-->
+            <table class="happy-shoping" width="100%">
+                <tr>
+                    <td>
+                        <p>Happy Shoping!</p>
+                    </td>
+                </tr>
+            </table>
+            <!--End Happy Shoping-->
+            <table class="sincerely" width="100%">
+                <tr>
+                    <td>
+                        <p>{{trans "Sincerely"}},</p>
+                        <p class="signature">
+                            <b>{{var store.frontend_name}}</b>
+                        </p>
+                    </td>
+                </tr>
+            </table>
+            <!--End Sincerely-->
+        </td>
+    </tr>
+</table>
+<!--End Wrapper-->
+
+{{template config_path="design/email/footer_template"}}

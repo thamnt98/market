@@ -1,0 +1,287 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route method="POST" url="/V1/transcustomer">
+        <service class="SM\Customer\Api\TransCustomerRepositoryInterface" method="transSave"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/transcustomer/me" method="PUT" soapOperation="saveSelf">
+        <service class="SM\Customer\Api\TransCustomerRepositoryInterface" method="transSave"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/uniqueemail/" method="POST">
+        <service class="SM\Customer\Api\TransCustomerRepositoryInterface" method="uniqueEmail"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/uniquephone/" method="POST">
+        <service class="SM\Customer\Api\TransCustomerRepositoryInterface" method="uniquePhone"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+
+    <route url="/V1/transcustomer/social/token" method="POST">
+        <service class="SM\Customer\Api\CustomerTokenServiceInterface" method="createCustomerAccessToken"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/customers/getHashPassword" method="POST">
+        <service class="Magento\Customer\Api\AccountManagementInterface" method="getPasswordHash"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/customers/existUser" method="POST">
+        <service class="SM\Customer\Api\TransCustomerProfileInterface" method="isExistUser"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/customers/sendVerificationLink" method="POST">
+        <service class="SM\Customer\Api\TransCustomerProfileInterface" method="sendVerificationLink"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <!-- Change password for web version   -->
+    <route url="/V1/customers/changePassword" method="POST">
+        <service class="SM\Customer\Api\TransCustomerProfileInterface" method="changePassword"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <!-- Change password for mobile version -->
+    <route url="/V1/customers/me/changePassword" method="PUT">
+        <service class="SM\Customer\Api\TransCustomerProfileInterface" method="changePasswordMobile"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <!-- Customer Login Api   -->
+    <route url="/V1/customers/verifyEmail" method="POST">
+        <service class="SM\Customer\Api\TransCustomerRepositoryInterface" method="verifyEmail"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/customers/verifyPhone" method="POST">
+        <service class="SM\Customer\Api\TransCustomerManagementInterface" method="verifyPhone"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/customers/loginByEmail" method="POST">
+        <service class="SM\Customer\Api\TransCustomerManagementInterface" method="loginByEmail"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/customers/loginByPhone" method="POST">
+        <service class="SM\Customer\Api\TransCustomerManagementInterface" method="loginByPhone"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/customers/resetPasswordByPhone" method="POST">
+        <service class="SM\Customer\Api\TransCustomerManagementInterface" method="resetPasswordByPhoneNumber"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/customers/login/face-id" method="POST">
+        <service class="SM\Customer\Api\TransCustomerManagementInterface" method="loginByFaceId"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <!-- Email   -->
+    <route url="/V1/customers/sendVerifyEmail" method="POST">
+        <service class="SM\Customer\Api\TransCustomerManagementInterface" method="sendEmailVerify"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <!-- Recovery Account   -->
+    <route url="/V1/customers/recoveryAccount/phone" method="POST">
+        <service class="SM\Customer\Api\TransCustomerManagementInterface" method="recoveryAccountWithPhone"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/customers/recoveryAccount/email" method="POST">
+        <service class="SM\Customer\Api\TransCustomerManagementInterface" method="recoveryAccountWithEmail"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/customers/recoveryAccount/resetPassword" method="POST">
+        <service class="SM\Customer\Api\TransCustomerManagementInterface" method="resetPasswordRecovery"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <!-- Customer Upload Image   -->
+    <route url="/V1/customers/me/media" method="POST">
+        <service class="SM\Customer\Api\TransCustomerProfileInterface" method="uploadCustomerAvatar"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/customers/me/media/test" method="POST">
+        <service class="SM\FileManagement\Api\UploadImageInterface" method="uploadImage"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+
+    <!-- Add/Edit Customer Address   -->
+    <route url="/V1/transcustomer/me/address" method="PUT">
+        <service class="SM\Customer\Api\AddressManagementInterface" method="save"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <!-- Delete Address   -->
+    <route url="/V1/transcustomer/me/address/:addressId" method="DELETE">
+        <service class="SM\Customer\Api\AddressManagementInterface" method="delete"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <!-- Validate Maximum Addresses Created -->
+    <route url="/V1/transcustomer/validateMaxAddress" method="POST">
+        <service class="SM\Customer\Api\AddressManagementInterface" method="validateMaxAddress"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <!-- Validate Limit Dob Change -->
+    <route url="/V1/transcustomer/limitChangeDob" method="POST">
+        <service class="SM\Customer\Api\TransCustomerProfileInterface" method="limitChangeDob"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <!-- Customer Device Api -->
+    <route method="POST" url="/V1/customer/device/save">
+        <service class="SM\Customer\Api\CustomerDeviceRepositoryInterface" method="save" />
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+    <route method="PUT" url="/V1/customer/device/save">
+        <service class="SM\Customer\Api\CustomerDeviceRepositoryInterface" method="save" />
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+    <route method="GET" url="/V1/customer/device/get">
+        <service class="SM\Customer\Api\CustomerDeviceRepositoryInterface" method="getList" />
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+    <route method="GET" url="/V1/customer/device/get/:id">
+        <service class="SM\Customer\Api\CustomerDeviceRepositoryInterface" method="get" />
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+    <route method="DELETE" url="/V1/customer/device/delete/:id">
+        <service class="SM\Customer\Api\CustomerDeviceRepositoryInterface" method="deleteById" />
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+    <route method="DELETE" url="/V1/customer/:customerId/device/:deviceId/delete">
+        <service class="SM\Customer\Api\CustomerDeviceRepositoryInterface" method="deleteByDeviceId" />
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route method="GET" url="/V1/customer/getProvince">
+        <service class="SM\Customer\Api\ProvinceInterface" method="getList" />
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <route url="/V1/customers/me" method="GET" soapOperation="getSelf">
+        <service class="SM\Customer\Api\CustomerInterface" method="getInfo"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <!-- End Customer Device Api -->
+</routes>

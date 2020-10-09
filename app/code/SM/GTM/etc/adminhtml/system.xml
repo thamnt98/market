@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="sm_gtm" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1"
+                 showInStore="1">
+            <resource>SM_GTM::configuration</resource>
+            <label>Google Tag Manager</label>
+            <tab>transmart</tab>
+            <group id="general" translate="label" showInStore="1" showInWebsite="1" showInDefault="1" sortOrder="10">
+                <label>General Options</label>
+                <field id="is_active" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1"
+                       translate="label comment" type="select">
+                    <label>Enable</label>
+                    <comment>Enable GTM customization</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <if_module_enabled>Magento_GoogleTagManager</if_module_enabled>
+                </field>
+            </group>
+
+            <group id="gtm_variables" showInStore="1" showInWebsite="1" showInDefault="1" translate="label comment"
+                   sortOrder="10">
+                <label>GTM Variables and Mappings</label>
+                <comment><!--@TODO: Append HTML vao dau de huong dan cac ban--></comment>
+                <field id="variables" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Custom Variables</label>
+                    <frontend_model>SM\GTM\Block\Adminhtml\System\Form\Field\GTM\Variables</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

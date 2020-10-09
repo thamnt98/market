@@ -1,0 +1,151 @@
+// /**
+//  * Copyright © Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+    .product.data.items {
+        .lib-data-accordion();
+        margin-bottom: @indent__base;
+       /* margin-left: -@layout__width-xs-indent;
+        margin-right: -@layout__width-xs-indent;*/
+
+        .item.title {
+            a {
+                position: relative;
+                cursor: pointer;
+                .lib-icon-font(
+                    @_icon-font-content: @icon-down,
+                    @_icon-font-size: @font-size__base,
+                    @_icon-font-line-height: @icon-font__line-height,
+                    @_icon-font-color: @icon-font__color,
+                    @_icon-font-color-hover: @icon-font__color-hover,
+                    @_icon-font-color-active: @icon-font__color-active,
+                    @_icon-font-margin: @icon-font__margin,
+                    @_icon-font-vertical-align: @icon-font__vertical-align,
+                    @_icon-font-position: after,
+                    @_icon-font-display: false
+                );
+
+                &:after {
+                    position: absolute;
+                    right: @accordion-control__padding-right;
+                    top: @accordion-control__padding-top;
+                }
+            }
+
+            &.active a {
+                &:after {
+                    content: @icon-up;
+                }
+            }
+
+        }
+
+        .value p {
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+
+        .table-wrapper {
+            margin: 0;
+        }
+    }
+}
+
+//
+//  Desktop
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .product.data.items {
+        .lib-data-tabs();
+        border-bottom: 0;
+        margin-left: 0;
+        margin-right: 0;
+
+        .item.title a {
+            &:after {
+                display: none;
+            }
+        }
+    }
+
+    .product.data.items {
+        .item {
+            &.title {
+                > .switch {
+                    border:none;
+                    background-color:transparent;
+                    color: @c-tsm-grey5;
+                    font-family: @font-family-SF-UI-Display-Bold;
+                    text-transform: none;
+                    .lib-font-size(16);
+                    padding-bottom: 15px;
+
+                }
+                &.active {
+                    > .switch {
+                        border-bottom:3px solid @c-tsm-orange2;
+                        color: @c-tsm-orange2;
+                        padding-bottom: 15px;
+                        span {
+                            color: @c-tsm-orange2;
+                        }
+                        &:focus, &:hover {
+                            padding-bottom: 15px;
+                        }
+
+                    }
+                }
+                &:not(.disabled) {
+                    .switch {
+                        &:active {
+                            padding-bottom: 15px;
+                        }
+                    }
+                }
+
+            }
+            &.content {
+                border:0;
+                border-top:3px solid #c5c1c1;
+                padding: 0;
+                margin-top: 56px;
+            }
+        }
+    }
+    .tab-wrap {
+        display: flex;
+    }
+}
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .product.data.items {
+        .item.title {
+            > .switch {
+                padding: 1px 15px 1px;
+                border-bottom:2px solid @color-gray90;
+            }
+            &.active {
+                > .switch {
+                    border-bottom:2px solid @c-tsm-orange2;
+                    color: @c-tsm-orange2;
+                    span {
+                        color: @c-tsm-orange2;
+                    }
+
+                }
+            }
+        }
+
+         .item.content {
+            padding: 10px 0px 0px;
+        }
+    }
+}

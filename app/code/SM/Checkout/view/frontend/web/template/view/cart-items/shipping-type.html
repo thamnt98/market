@@ -1,0 +1,67 @@
+<!-- ko if: showShippingAddressPerItem -->
+<div class="shipping-address-per-item new-checkout-head">
+    <!-- ko if: deliveryPerItem -->
+    <div class="delivery-per-item">
+        <!-- ko if: isShowAddress && addressTagList()().length > 1-->
+        <div class="choose-address">
+            <p class="choose-address-label" data-bind="i18n: 'Choose Address'"></p>
+            <a href="#" data-bind="click: function(){ deliveryTypeClick($parents[1].item_id, '0') }, css: {'hidden': showAllShippingType, 'active': isActive($parents[1].item_id, '0')}">
+                <span class="cirl-checkbox"></span>
+                <input class="hidden" data-bind="attr: {'type': 'radio', 'name': 'delivery-type-per-item[' + $parents[1].item_id + ']', 'value': 0}, checked: isChecked($parents[1].item_id)" />
+            </a>
+            <select data-bind="attr: {'name': 'address-per-item[' + $parents[1].item_id + ']'}, disable: disableDelivery($parents[1].item_id), options: addressTagList(), optionsText: 'label', optionsValue: 'value', value: addressSelected($parents[1].item_id)"></select>
+        </div>
+        <!-- /ko -->
+        <div class="delivery-method">
+            <p class="delivery-method-label" data-bind="i18n: 'Delivery Method'"></p>
+            <!-- ko if: !isShowAddress || addressTagList()().length < 2-->
+            <a href="#" data-bind="click: function(){ deliveryTypeClick($parents[1].item_id, '0') }, css: {'hidden': showAllShippingType, 'active': isActive($parents[1].item_id, '0')}">
+                <span class="cirl-checkbox"></span>
+                <input class="hidden" data-bind="attr: {'type': 'radio', 'name': 'delivery-type-per-item[' + $parents[1].item_id + ']', 'value': 0}, checked: isChecked($parents[1].item_id)" />
+            </a>
+            <!-- /ko -->
+            <select data-bind="value: selectShippingMethod($parents[1].item_id), foreach: getDeliveryMethodList($parents[1].item_id)">
+                <option data-bind="attr: { disabled: $parent.isDisable($parents[2].item_id, value), value: value }, text: label"></option>
+            </select>
+            <!-- ko if: isError($parents[1].item_id) -->
+                <p class="error-message" data-bind="i18n: 'OAR: shipping method not available'"></p>
+            <!-- /ko -->
+        </div>
+    </div>
+    <!-- ko if: isShowSelectDateTime($parents[1].item_id) -->
+    <div class="store-pickup-datetime">
+        <div class="store-pickup-date">
+            <p class="delivery-date-label" data-bind="i18n: 'Delivery Date'"></p>
+            <input readonly type="text" class="input-text delivery-date-input" style="width: auto" data-bind="attr: {name: 'schedule-date' + $parents[1].item_id}, value: selectScheduleDate($parents[1].item_id)" afterRender="renderDate('schedule-date' + $parents[1].item_id, $parents[1].item_id)"/>
+        </div>
+        <div class="store-pickup-time" data-bind="event: { mouseleave: closeTimeSlotList($parents[1].item_id) }">
+            <p class="delivery-time-label" data-bind="i18n: 'Delivery Time'"></p>
+            <div class="wrap-timeslot">
+                <input readonly type="text" class="input-text delivery-time-input _has-timepicker" style="width: auto" data-bind="attr: {name: 'schedule-time' + $parents[1].item_id}, click: function(){ openTimeSlotList($parents[1].item_id) }, value: selectScheduleTime($parents[1].item_id)" afterRender="preSelectTimeSlot($parents[1].item_id)"/>
+                <!-- ko if: timeSlotListStatusPerItem($parents[1].item_id)-->
+                <ul class="time-slot" data-bind="foreach: timeSlot">
+                    <li class="time-slot-item" data-bind="css: { selected: $parent.timeSlotSelected($parents[2].item_id, $data) }, text: $data, click: function(){ $parent.selectTimeSlot($parents[2].item_id, $data) }"></li>
+                </ul>
+                <!-- /ko -->
+            </div>
+        </div>
+    </div>
+    <!-- /ko -->
+    <!-- /ko -->
+    <!-- ko if: storePickUpPerItem -->
+    <div class="store-pickup-per-item">
+        <p class="store-pickup-label" data-bind="i18n: 'Pick Up in Store'"></p>
+        <div class="store-pickup-block">
+            <a href="#" data-bind="click: function(){ deliveryTypeClick($parents[1].item_id, '1') }, css: {'hidden': showAllShippingType, 'active': isActive($parents[1].item_id, '1')}">
+                <span class="cirl-checkbox"></span>
+                <input class="hidden" data-bind="attr: {'type': 'radio', 'name': 'delivery-type-per-item[' + $parents[1].item_id + ']', 'value': 1}, checked: isChecked($parents[1].item_id)" />
+            </a>
+            <p class="store-name" data-bind="text: storePickUp"></p>
+            <!-- ko ifnot: isFullFill($parents[1].item_id)-->
+            <p class="not-full multiple" data-bind="i18n: 'Not Full Fill Order. Please Select Other store!'"></p>
+            <!-- /ko -->
+        </div>
+    </div>
+    <!-- /ko -->
+</div>
+<!-- /ko -->

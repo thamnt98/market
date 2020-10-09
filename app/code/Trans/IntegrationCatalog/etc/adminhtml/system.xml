@@ -1,0 +1,47 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_IntegrationCatalog
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author  Ilma Dinnia Alghani <ilma.dinnia@transdigital.co.id>
+ * @author  Anan Fauzi <anan.fauzi@transdigital.co.id>
+ *
+ * Copyright © 2020 CT Corp Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../Config/etc/system_file.xsd">
+    <system>
+        <section id="product_association_date" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Product Association End Date</label>
+            <tab>trans</tab>
+            <resource>Trans_IntegrationCatalog::config_modulename</resource>
+            <group id="general" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General Settings</label>
+                <!-- date picker field code end date-->
+                <field id="to_date" translate="label comment" sortOrder="4" type="text" showInDefault="1" showInStore="1" >
+                    <label>End Date Product Association</label>
+                    <!-- here we pass class where we create date picker-->
+                    <frontend_model>Trans\IntegrationCatalog\Block\DatePicker</frontend_model>
+                </field>
+                <!-- date picker field code end-->
+            </group>
+        </section>
+
+        <!-- @anan.fauzi <add total synch data for configurable image cron -->
+        <section id="synch_configurable_product" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Configurable Product Synch</label>
+            <tab>trans</tab>
+            <resource>Trans_IntegrationCatalog::config_modulename</resource>
+            <group id="general" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General Settings</label>
+                <field id="synch_image_cron_total_data" translate="label" sortOrder="4" type="text" showInDefault="1" showInStore="1" >
+                    <label>Synch Image Total Cron Data</label>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

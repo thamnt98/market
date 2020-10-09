@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+  role="img"
+  width="381"
+  height="261"
+  aria-labelledby="loading-aria"
+  viewBox="0 0 381 261"
+  preserveAspectRatio="none"
+>
+  <title id="loading-aria">Loading...</title>
+  <rect
+    x="0"
+    y="0"
+    width="100%"
+    height="100%"
+    clip-path="url(#clip-path)"
+    style='fill: url("#fill");'
+  ></rect>
+
+    <rect
+        x="128"
+        y="235"
+        width="97"
+        height="11"
+        clip-path="url(#clip-path)"
+        style='fill: url("#fill3");'
+    ></rect>
+    <rect
+        x="1"
+        y="235"
+        width="97"
+        height="11"
+        clip-path="url(#clip-path)"
+        style='fill: url("#fill5");'
+    ></rect>
+    <rect
+        x="255"
+        y="235"
+        width="97"
+        height="11"
+        clip-path="url(#clip-path)"
+        style='fill: url("#fill4");'
+    ></rect>
+
+    <rect
+        x="255"
+        y="210"
+        width="97"
+        height="11"
+        clip-path="url(#clip-path)"
+        style='fill: url("#fill2");'
+    ></rect>
+
+    <rect
+        x="128"
+        y="210"
+        width="97"
+        height="11"
+        clip-path="url(#clip-path)"
+        style='fill: url("#fill6");'
+    ></rect>
+
+    <rect
+        x="0"
+        y="210"
+        width="97"
+        height="11"
+        clip-path="url(#clip-path)"
+        style='fill: url("#fill7");'
+    ></rect>
+
+  <defs>
+    <clipPath id="clip-path">
+        <rect x="10" y="0" rx="8" ry="8" width="238" height="27" />
+        <rect x="0" y="60" rx="8" ry="8" width="97" height="102" />
+        <rect x="127" y="60" rx="8" ry="8" width="97" height="102" />
+        <rect x="254" y="60" rx="8" ry="8" width="97" height="102" />
+        <rect x="0" y="180" rx="8" ry="8" width="97" height="15" />
+        <rect x="128" y="180" rx="8" ry="8" width="97" height="15" />
+        <rect x="255" y="180" rx="8" ry="8" width="97" height="15" />
+        <rect x="0" y="210" rx="8" ry="8" width="97" height="11" />
+        <rect x="128" y="210" rx="8" ry="8" width="97" height="11" />
+        <rect x="255" y="210" rx="8" ry="8" width="97" height="11" />
+        <rect x="1" y="235" rx="8" ry="8" width="97" height="11" />
+        <rect x="128" y="235" rx="8" ry="8" width="97" height="11" />
+        <rect x="255" y="235" rx="8" ry="8" width="97" height="11" />
+    </clipPath>
+    <linearGradient id="fill">
+      <stop
+        offset="0.599964"
+        stop-color="#e4e3e3"
+        stop-opacity="1"
+      >
+        <animate
+          attributeName="offset"
+          values="-2; -2; 1"
+          keyTimes="0; 0.25; 1"
+          dur="2s"
+          repeatCount="indefinite"
+        ></animate>
+      </stop>
+      <stop
+        offset="1.59996"
+        stop-color="#fbfbfb"
+        stop-opacity="1"
+      >
+        <animate
+          attributeName="offset"
+          values="-1; -1; 2"
+          keyTimes="0; 0.25; 1"
+          dur="2s"
+          repeatCount="indefinite"
+        ></animate>
+      </stop>
+      <stop
+        offset="2.59996"
+        stop-color="#e4e3e3"
+        stop-opacity="1"
+      >
+        <animate
+          attributeName="offset"
+          values="0; 0; 3"
+          keyTimes="0; 0.25; 1"
+          dur="2s"
+          repeatCount="indefinite"
+        ></animate>
+      </stop>
+    </linearGradient>
+
+
+      <linearGradient id="fill2">
+          <stop
+              offset="0.599964"
+              stop-color="#ffca77"
+              stop-opacity="1"
+          >
+              <animate
+                  attributeName="offset"
+                  values="-2; -2; 1"
+                  keyTimes="0; 0.25; 1"
+                  dur="2s"
+                  repeatCount="indefinite"
+              ></animate>
+          </stop>
+          <stop
+              offset="1.59996"
+              stop-color="#fbfbfb"
+              stop-opacity="1"
+          >
+              <animate
+                  attributeName="offset"
+                  values="-1; -1; 2"
+                  keyTimes="0; 0.25; 1"
+                  dur="2s"
+                  repeatCount="indefinite"
+              ></animate>
+          </stop>
+          <stop
+              offset="2.59996"
+              stop-color="#e4e3e3"
+              stop-opacity="1"
+          >
+              <animate
+                  attributeName="offset"
+                  values="0; 0; 3"
+                  keyTimes="0; 0.25; 1"
+                  dur="2s"
+                  repeatCount="indefinite"
+              ></animate>
+          </stop>
+      </linearGradient>
+
+      <linearGradient id="fill3">
+          <stop
+              offset="0.599964"
+              stop-color="#ffc2c2"
+              stop-opacity="1"
+          >
+              <animate
+                  attributeName="offset"
+                  values="-2; -2; 1"
+                  keyTimes="0; 0.25; 1"
+                  dur="2s"
+                  repeatCount="indefinite"
+              ></animate>
+          </stop>
+          <stop
+              offset="1.59996"
+              stop-color="#fbfbfb"
+              stop-opacity="1"
+          >
+              <animate
+                  attributeName="offset"
+                  values="-1; -1; 2"
+                  keyTimes="0; 0.25; 1"
+                  dur="2s"
+                  repeatCount="indefinite"
+              ></animate>
+          </stop>
+          <stop
+              offset="2.59996"
+              stop-color="#e4e3e3"
+              stop-opacity="1"
+          >
+              <animate
+                  attributeName="offset"
+                  values="0; 0; 3"
+                  keyTimes="0; 0.25; 1"
+                  dur="2s"
+                  repeatCount="indefinite"
+              ></animate>
+          </stop>
+      </linearGradient>
+
+      <linearGradient id="fill4">
+          <stop
+              offset="0.599964"
+              stop-color="#ffc2c2"
+              stop-opacity="1"
+          >
+              <animate
+                  attributeName="offset"
+                  values="-2; -2; 1"
+                  keyTimes="0; 0.25; 1"
+                  dur="2s"
+                  repeatCount="indefinite"
+              ></animate>
+          </stop>
+          <stop
+              offset="1.59996"
+              stop-color="#fbfbfb"
+              stop-opacity="1"
+          >
+              <animate
+                  attributeName="offset"
+                  values="-1; -1; 2"
+                  keyTimes="0; 0.25; 1"
+                  dur="2s"
+                  repeatCount="indefinite"
+              ></animate>
+          </stop>
+          <stop
+              offset="2.59996"
+              stop-color="#e4e3e3"
+              stop-opacity="1"
+          >
+              <animate
+                  attributeName="offset"
+                  values="0; 0; 3"
+                  keyTimes="0; 0.25; 1"
+                  dur="2s"
+                  repeatCount="indefinite"
+              ></animate>
+          </stop>
+      </linearGradient>
+
+      <linearGradient id="fill5">
+          <stop
+              offset="0.599964"
+              stop-color="#ffc2c2"
+              stop-opacity="1"
+          >
+              <animate
+                  attributeName="offset"
+                  values="-2; -2; 1"
+                  keyTimes="0; 0.25; 1"
+                  dur="2s"
+                  repeatCount="indefinite"
+              ></animate>
+          </stop>
+          <stop
+              offset="1.59996"
+              stop-color="#fbfbfb"
+              stop-opacity="1"
+          >
+              <animate
+                  attributeName="offset"
+                  values="-1; -1; 2"
+                  keyTimes="0; 0.25; 1"
+                  dur="2s"
+                  repeatCount="indefinite"
+              ></animate>
+          </stop>
+          <stop
+              offset="2.59996"
+              stop-color="#e4e3e3"
+              stop-opacity="1"
+          >
+              <animate
+                  attributeName="offset"
+                  values="0; 0; 3"
+                  keyTimes="0; 0.25; 1"
+                  dur="2s"
+                  repeatCount="indefinite"
+              ></animate>
+          </stop>
+      </linearGradient>
+
+      <linearGradient id="fill6">
+          <stop
+              offset="0.599964"
+              stop-color="#ffca77"
+              stop-opacity="1"
+          >
+              <animate
+                  attributeName="offset"
+                  values="-2; -2; 1"
+                  keyTimes="0; 0.25; 1"
+                  dur="2s"
+                  repeatCount="indefinite"
+              ></animate>
+          </stop>
+          <stop
+              offset="1.59996"
+              stop-color="#fbfbfb"
+              stop-opacity="1"
+          >
+              <animate
+                  attributeName="offset"
+                  values="-1; -1; 2"
+                  keyTimes="0; 0.25; 1"
+                  dur="2s"
+                  repeatCount="indefinite"
+              ></animate>
+          </stop>
+          <stop
+              offset="2.59996"
+              stop-color="#e4e3e3"
+              stop-opacity="1"
+          >
+              <animate
+                  attributeName="offset"
+                  values="0; 0; 3"
+                  keyTimes="0; 0.25; 1"
+                  dur="2s"
+                  repeatCount="indefinite"
+              ></animate>
+          </stop>
+      </linearGradient>
+
+      <linearGradient id="fill7">
+          <stop
+              offset="0.599964"
+              stop-color="#ffca77"
+              stop-opacity="1"
+          >
+              <animate
+                  attributeName="offset"
+                  values="-2; -2; 1"
+                  keyTimes="0; 0.25; 1"
+                  dur="2s"
+                  repeatCount="indefinite"
+              ></animate>
+          </stop>
+          <stop
+              offset="1.59996"
+              stop-color="#fbfbfb"
+              stop-opacity="1"
+          >
+              <animate
+                  attributeName="offset"
+                  values="-1; -1; 2"
+                  keyTimes="0; 0.25; 1"
+                  dur="2s"
+                  repeatCount="indefinite"
+              ></animate>
+          </stop>
+          <stop
+              offset="2.59996"
+              stop-color="#e4e3e3"
+              stop-opacity="1"
+          >
+              <animate
+                  attributeName="offset"
+                  values="0; 0; 3"
+                  keyTimes="0; 0.25; 1"
+                  dur="2s"
+                  repeatCount="indefinite"
+              ></animate>
+          </stop>
+      </linearGradient>
+  </defs>
+</svg>

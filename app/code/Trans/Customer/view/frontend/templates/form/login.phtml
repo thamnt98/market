@@ -1,0 +1,239 @@
+<?php
+/**
+ * @category Trans
+ * @package  Trans_Customer
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Original Imam Kusuma <imam.kusuma@transdigital.co.id>
+ * @author   Another  Dwi Septha Kurniawan <septha.kurniawan@transdigital.co.id>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var \Magento\Customer\Block\Form\Login $block */
+?>
+<div class="block block-customer-login">
+    <div class="block-title">
+        <strong id="block-customer-login-heading" role="heading" aria-level="2"><?= $block->escapeHtml(__('Registered Customers')) ?></strong>
+    </div>
+    <div class="block-content" aria-labelledby="block-customer-login-heading">
+        <form class="form form-login"
+              action="<?= $block->escapeUrl($block->getPostActionUrl()) ?>"
+              method="post"
+              id="login-form"
+              data-mage-init='{"validation":{}}'>
+            <?= $block->getBlockHtml('formkey') ?>
+            <fieldset class="fieldset login" data-hasrequired="<?= $block->escapeHtml(__('* Required Fields')) ?>">
+                <div class="field note"><?= $block->escapeHtml(__('If you have an account, sign in with your email address or phone number.')) ?></div>
+                <div class="field username required">
+                    <label class="label" for="username"><span><?= $block->escapeHtml(__('Email or Phone Number')) ?></span></label>
+                    <div class="control">
+                        <input name="login[username]" value="<?= $block->escapeHtmlAttr($block->getUsername()) ?>" <?php if ($block->isAutocompleteDisabled()): ?> autocomplete="off"<?php endif; ?> id="username" type="text" class="input-text" title="<?= $block->escapeHtmlAttr(__('Username')) ?>" data-mage-init='{"mage/trim-input":{}}' data-validate="{required:true}">
+                    </div>
+                </div>
+                <?= $block->getChildHtml('field.otp') ?>
+                <div class="field password required field-password-login" style="display: none;">
+                    <label for="pass" class="label"><span><?= $block->escapeHtml(__('Password')) ?></span></label>
+                    <div class="control">
+                        <input name="login[password]" type="password" <?php if ($block->isAutocompleteDisabled()): ?> autocomplete="off"<?php endif; ?> class="input-text" id="pass" title="<?= $block->escapeHtmlAttr(__('Password')) ?>" data-validate="{required:true}">
+                    </div>
+                </div>
+                <?= $block->getChildHtml('form_additional_info') ?>
+                <div class="actions-toolbar">
+                    <div class="primary"><button type="submit" class="action login primary" name="send" id="send2"><span><?= $block->escapeHtml(__('Sign In')) ?></span></button></div>
+                    <div class="secondary"><a class="action remind" href="<?= $block->escapeUrl($block->getForgotPasswordUrl()) ?>"><span><?= $block->escapeHtml(__('Forgot Your Password?')) ?></span></a></div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</div>
+
+<script>
+    // <![CDATA[
+    require(
+    [
+        'jquery',
+        'mage/storage',
+        'mage/url',
+        'mage/translate',
+        'jquery/ui',
+        'jquery/validate',
+        'mage/translate'
+    ],
+    function ($, storage, urlBuilder) {
+        'use strict';
+        var options = {
+            formLogin: '.form-login',
+            passwordField: 'input[name="login[password]"]',
+            usernameField: 'input[name="login[username]"]',
+            passwordOuter: '.field-password-login',
+            otpOuter: '.field-otp',
+            username: '',
+            typeEmail: 'email',
+            typePhone: 'phone'
+        }
+
+        // console.log(options.usernameField);
+        $(options.usernameField).change(function() {
+            options.username = $(options.usernameField).val();
+            processUsername();
+        });
+
+        function processUsername(args) {
+            var username = $(options.usernameField).val(); 
+            options.username = username;
+            checkUsername();
+        }
+
+        function checkUsername() {
+            $('.wrapper-msg .message').html('');
+            $('.wrapper-msg').hide();
+            $('#username').removeClass();
+            $('#username').addClass('input-text');            
+            $("#username-error").remove();
+            $(options.passwordOuter).hide();
+            $(options.otpOuter).hide();
+            
+            var username = options.username, email, phone, type = options.typeEmail, html;
+            var emailReg = /^[A-Z0-9._%+-]+@([A-Z0-9-]+\.)+[A-Z]{2,4}$/i;
+            var intRegex = /[0-9 -()+]+$/;
+            var phoneNumberRegex = /^(0|08|08[0-9]{1,13})$/;
+            
+            type = checkUsernameType();
+
+            if(type == options.typeEmail) {
+                if(username == ''){
+                    html = $.mage.__('This is a required field.');
+                    $('#username').after('<div for="username" generated="true" class="mage-error" id="username-error" style="display: block;">'+html+'</div>');
+                    $('#username').addClass('mage-error');
+                    $('#username').focus();
+                    return false;
+                }
+
+                if(!emailReg.test(username))
+                {   
+                    html = $.mage.__('Please enter a valid email address. For example johndoe@domain.com.');
+                    $('#username').after('<div for="username" generated="true" class="mage-error" id="username-error" style="display: block;">'+html+'</div>');
+                    $('#username').addClass('mage-error');
+                    $('#username').addClass('validate-format-email');
+                    $('#username').focus();
+                    return false;
+                }
+                $(options.passwordOuter).show();
+            }
+
+            if(type == options.typePhone) {
+                if((username.length < 6) || (!intRegex.test(username)))
+                {
+                    html = $.mage.__('Please enter a valid phone number.');
+                    $('#username').after('<div for="username" generated="true" class="mage-error" id="username-error">'+html+'</div>');
+                    $('#username').addClass('mage-error');
+                    $('#username').addClass('validate-phone-number');
+                    $('#username').focus();
+                    return false;
+                }
+
+                if(!phoneNumberRegex.test(username))
+                {
+                    html = $.mage.__('Please enter format mobile number (ex. 08xxxxxxxx) in this field.');
+                    $('#username').after('<div for="username" generated="true" class="mage-error" id="username-error">'+html+'</div>');
+                    $('#username').addClass('mage-error');
+                    $('#username').addClass('validate-format-phone-number');
+                    $('#username').focus();
+                    return false;
+                }
+                sendVerification();
+            }
+        }
+
+        function sendVerification() {
+            $('.wrapper-msg .message').html('');
+            $('.wrapper-msg').hide();
+            var url = urlBuilder.build('rest/default/V1/customer/send-sms-verification', {}), telephone, postData, verification, isNeedCheck = 1, checkphone;
+
+            telephone = $('input[name="username"]').val(); //get username value
+
+            if(!telephone) {
+                telephone = $('input[name="login[username]"]').val(); //get username value
+            }
+            
+            postData = '{"telephone":"' + telephone + '", "isNeedCheck": ' + isNeedCheck + '}';
+            
+            verification = $.parseJSON(
+                $.ajax({
+                    type: 'post',
+                    showLoader: true,
+                    url: url,
+                    data: postData,
+                    contentType: 'application/json',
+                    cache: false,
+                    async: false
+                }).responseText
+            );
+
+            verification = $.parseJSON(verification);
+            
+            if(!verification.error) {
+                $('input[name="verification_id"]').val(verification.verification_id);
+                $(options.otpOuter).show();
+            } else {
+                var msg = verification.message ? verification.message : $.mage.__('Send verification code failed. Please make sure your phone number is valid and active.');
+                if (verification.message.error_message){
+                    msg = verification.message.error_message;
+                } 
+                $('.wrapper-msg .message').html(msg);
+                $('.wrapper-msg').show();
+                $(options.otpOuter).hide();
+            }
+        }
+
+        /**
+         * Check username are email or phone number 
+         */
+        function checkUsernameType() {
+            var type = options.typeEmail, intRegex = /[0-9 -()+]+$/;
+
+            if(intRegex.test(options.username)) { type = options.typePhone; }
+
+            return type;
+        }
+
+        /**
+         * Validation Email & Mobile Number
+         */
+        //validate format mobile number      
+        $.validator.addMethod(
+        'validate-format-phone-number', function (v, elm) {
+            
+            return v.match(/^(0|08|08[0-9]{1,13})$/);
+
+        }, $.mage.__('Please enter format mobile number (ex. 08xxxxxxxx) in this field.'));
+        
+        //validate mobile number      
+        $.validator.addMethod(
+        'validate-phone-number', function (v, elm) {
+            
+            if(v.length < 6){
+                return false;
+            }
+            return v.match(/[0-9 -()+]+$/);
+
+        }, $.mage.__('Please enter a valid phone number.'));
+        
+        //validate format email      
+        $.validator.addMethod(
+        'validate-format-email', function (v, elm) {
+            
+            return v.match(/^[A-Z0-9._%+-]+@([A-Z0-9-]+\.)+[A-Z]{2,4}$/i);
+
+        }, $.mage.__('Please enter a valid email address. For example johndoe@domain.com.'));
+        
+        
+    });
+    // ]]>
+</script>
+

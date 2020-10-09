@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Magento_Backend::brand_settings" title="Brands" module="Trans_Brand" sortOrder="40"  resource="Magento_Backend::brand_settings" />
+        <add id="Trans_Brand::brand" title="Manage Brands" module="Trans_Brand" sortOrder="0" parent="Magento_Backend::brand_settings" action="brands" resource="Trans_Brand::brand"/>
+    </menu>
+</config>

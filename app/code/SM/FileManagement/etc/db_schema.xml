@@ -1,0 +1,18 @@
+<?xml version="1.0" ?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table comment="SM File Management" engine="innodb" name="sm_filemanagement_file" resource="default">
+        <column comment="Entity Id" identity="true" name="file_id" nullable="false" padding="6" unsigned="false"
+                xsi:type="smallint"/>
+        <constraint referenceId="PRIMARY" xsi:type="primary">
+            <column name="file_id"/>
+        </constraint>
+        <column length="255" name="title" nullable="false" xsi:type="varchar"/>
+        <column length="255" name="file_name" nullable="false" xsi:type="varchar"/>
+        <column length="255" name="file_path" nullable="false" xsi:type="varchar"/>
+        <column name="file_size" nullable="false" xsi:type="int"/>
+        <column length="255" name="thumbnail_name" nullable="false" xsi:type="varchar"/>
+        <column length="255" name="thumbnail_path" nullable="false" xsi:type="varchar"/>
+        <column name="thumbnail_size" nullable="false" xsi:type="int"/>
+    </table>
+</schema>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg">
+  <desc>Created with Lunacy</desc>
+  <g id="Group" transform="translate(0.5 0.5)">
+    <path d="M15.5 31C24.0604 31 31 24.0604 31 15.5C31 6.93959 24.0604 0 15.5 0C6.93959 0 0 6.93959 0 15.5C0 24.0604 6.93959 31 15.5 31Z" id="Oval-Copy-14" fill="#3EBE26" stroke="none" />
+    <g id="noun_package-received_2509691" transform="translate(8 5.646973)">
+      <path d="M0 0L2 0L2 4L0 4L0 0Z" transform="translate(0 15)" id="Rectangle" fill="#FFFFFF" stroke="none" />
+      <path d="M0 6C0.873872 5.40833 4.51254 5.70172 6.28991 5.88753C6.92186 5.9511 7.54394 5.7115 7.96359 5.24696L10.8173 2.08322C10.8864 2.00987 10.9308 1.91208 10.9407 1.81428C11.3554 -1.56461 9.45954 0.811859 9.45954 0.811859L7.50938 3.03186C7.25758 3.32036 6.85768 3.43282 6.48739 3.33014L3.76209 2.54287C8.32894 1.76538 5.92456 0.645604 5.92456 0.645604L2.62655 0.645604C2.33526 0.645604 2.05878 0.77274 1.87117 0.992784L0 3.18833L0 6Z" transform="translate(3 12)" id="Path" fill="#FFFFFF" stroke="none" />
+      <g id="Group" transform="translate(3 0)">
+        <path d="M7.35455 1.14L3.67727 0L0 1.14L3.67273 2.14L7.35455 1.14Z" transform="translate(1.322727 0.035)" id="Path" fill="#FFFFFF" stroke="none" />
+        <path d="M5.14545 1.315L5.15 1.315L10 0L10 8.465L5 10.075L0 8.465L0 0L4.89091 1.33Q4.94545 1.345 5 1.345C5.01818 1.345 5.03182 1.335 5.05 1.335C5.06818 1.33 5.09091 1.33 5.10909 1.325L5.14545 1.315ZM5 8.78C5.25 8.78 5.45455 8.555 5.45455 8.28L5.45455 2.595C5.45455 2.32 5.25 2.095 5 2.095C4.75 2.095 4.54545 2.32 4.54545 2.595L4.54545 8.28C4.54545 8.555 4.75 8.78 5 8.78Z" transform="translate(0 1.845)" id="Shape" fill="#FFFFFF" fill-rule="evenodd" stroke="none" />
+      </g>
+    </g>
+  </g>
+</svg>

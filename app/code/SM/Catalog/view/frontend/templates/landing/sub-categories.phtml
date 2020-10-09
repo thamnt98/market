@@ -1,0 +1,46 @@
+<?php
+/**
+ * @var $block \Magento\Framework\View\Element\Template
+ * @var $viewModel \SM\Catalog\ViewModel\SubCategories
+ */
+?>
+<?php
+    $viewModel = $block->getData('viewModel');
+    $category = $block->getCurrentCategory();
+
+    $subCategories = $viewModel->getSubCategories($category);
+?>
+<?php if ($subCategories): ?>
+    <div class="section-subcategories">
+        <h2 class="header-title">
+            <?= $block->escapeHtml(__('Categories')) ?>
+        </h2>
+        <div class="section-content lading-page-sub-categories">
+            <div class="subcategories-slider slick-carousel">
+                <?php foreach ($subCategories->children as $category) : ?>
+                    <div class="subcategories-item ">
+                        <a href="<?= $block->escapeUrl($category->url); ?>"
+                           class="sub-categories"
+                           title="<?=$block->escapeHtmlAttr($category->name)?>"
+                           data-gtm-event="<?= \SM\GTM\Helper\Data::CATE_LANDING_SUB_CLICK_EVENT_NAME ?>"
+                           data-gtm='{"shop_category":"<?= $subCategories->name ?>", "menu_name":"<?= $category->name ?>"}'
+                           data-gtm-name="<?= \SM\GTM\Helper\Data::CATEGORY_KEY_NAME ?>"
+                        >
+                            <?php if ($category->thumbnail): ?>
+                            <div class="product-image-container">
+                                <div class="product-image-wrapper">
+                                    <img class="product-image-photo" src="<?= $viewModel->getImageResize($category->thumbnail,128)?>" title="<?= $block->escapeHtmlAttr($category->name)?>" alt="<?= $block->escapeHtmlAttr($category->name)?>">
+                                </div>
+                            </div>
+
+                            <?php endif ?>
+                            <p class="category-name">
+                                <?= $block->escapeHtml($category->name); ?>
+                            </p>
+                        </a>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </div>
+<?php endif ?>

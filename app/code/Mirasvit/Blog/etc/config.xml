@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <blog>
+            <appearance>
+                <menu_title>Blog MX</menu_title>
+                <blog_name>Blog MX</blog_name>
+                <date_format>F j, Y</date_format>
+            </appearance>
+
+            <display>
+                <main_menu>1</main_menu>
+                <enable_excerpts>1</enable_excerpts>
+                <excerpt_size>350</excerpt_size>
+            </display>
+
+            <comments>
+                <provider>disqus</provider>
+                <disqus_shortname>magento2-blog</disqus_shortname>
+            </comments>
+
+            <seo>
+                <base_route>blog</base_route>
+                <base_meta_title>Blog MX</base_meta_title>
+                <base_meta_description>Blog MX</base_meta_description>
+                <base_meta_keywords>Blog MX</base_meta_keywords>
+                <post_url_suffix>.html</post_url_suffix>
+                <category_url_suffix>.html</category_url_suffix>
+            </seo>
+
+            <sharing>
+                <enable_addthis>1</enable_addthis>
+            </sharing>
+        </blog>
+    </default>
+</config>

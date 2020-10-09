@@ -1,0 +1,128 @@
+<?xml version="1.0"?>
+<!--
+  ~ @project    ct-corp-transmart
+  ~ @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+  ~ @author     Duc Nguyen Hoang <ducnh2@smartosc.com>
+  ~ @copyright  Copyright © 2020 SmartOSC. All rights reserved.
+  ~ @url        http://www.smartosc.com
+  -->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Override -->
+    <preference for="Mirasvit\Blog\Block\Post\PostList\Toolbar" type="SM\InspireMe\Block\Post\PostList\Toolbar"/>
+    <preference for="Mirasvit\Blog\Block\Post\PostList" type="SM\InspireMe\Block\Post\PostList"/>
+    <preference for="Mirasvit\Blog\Block\Post\View\RelatedProducts"
+                type="SM\InspireMe\Block\Post\View\RelatedProducts"/>
+    <preference for="Mirasvit\Blog\Block\Sidebar\Search" type="SM\InspireMe\Block\Sidebar\Search"/>
+    <preference for="Mirasvit\Blog\Block\Search\Result" type="SM\InspireMe\Block\Search\Result"/>
+    <preference for="Mirasvit\Blog\Block\Post\View" type="SM\InspireMe\Block\Post\View"/>
+    <preference for="Mirasvit\Blog\Block\Category\View" type="SM\InspireMe\Block\Category\View"/>
+    <preference for="Mirasvit\Blog\Block\Sidebar\CategoryTree" type="SM\InspireMe\Block\Sidebar\CategoryTree"/>
+
+    <!-- Plugin -->
+    <type name="Mirasvit\Blog\Model\ResourceModel\Post">
+        <plugin name="sm_blog_post_resource_model_plugin"
+                type="SM\InspireMe\Plugin\Model\ResourceModel\Post"
+                sortOrder="10"
+        />
+    </type>
+
+    <!-- Ui Component -->
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="blog_category_listing_data_source" xsi:type="string">
+                    SM\InspireMe\Model\ResourceModel\Category\Grid\Collection
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="SM\InspireMe\Model\ResourceModel\Category\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">mst_blog_category_entity</argument>
+            <argument name="eventPrefix" xsi:type="string">blog_category_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">category_grid_collection</argument>
+            <argument name="resourceModel" xsi:type="string">Mirasvit\Blog\Model\ResourceModel\Category</argument>
+        </arguments>
+    </type>
+
+    <!--    API   -->
+    <preference for="SM\InspireMe\Api\PostRepositoryInterface" type="SM\InspireMe\Model\Repository\Post"/>
+    <preference for="SM\InspireMe\Api\ProductManagementInterface"
+                type="SM\InspireMe\Model\Repository\ProductManagement"/>
+    <preference for="SM\InspireMe\Api\Data\ArticleSearchResultsInterface"
+                type="SM\InspireMe\Model\Data\ArticleSearchResults"/>
+    <preference for="SM\InspireMe\Api\Data\PostListingInterface"
+                type="SM\InspireMe\Model\Data\PostListing"/>
+    <preference for="SM\InspireMe\Api\Data\TopicSearchResultsInterface"
+                type="SM\InspireMe\Model\Data\TopicSearchResults"/>
+    <preference for="SM\InspireMe\Api\Data\ArticleFilterInterface"
+                type="SM\InspireMe\Model\Data\ArticleFilter"/>
+    <preference for="SM\InspireMe\Api\Data\RelatedProductsInterface" type="SM\InspireMe\Model\Data\RelatedProducts"/>
+    <preference for="SM\InspireMe\Api\Data\PinDetailInterface" type="SM\InspireMe\Model\Data\PinDetail"/>
+    <preference for="SM\InspireMe\Api\Data\LookbookDetailInterface"
+                type="SM\InspireMe\Model\Data\LookbookDetailInterface"/>
+    <preference for="SM\InspireMe\Api\Data\ProductAddToCartInterface"
+                type="SM\InspireMe\Model\Data\ProductAddToCart"/>
+    <preference for="SM\InspireMe\Api\Data\PinProductInterface" type="SM\InspireMe\Model\Data\PinProduct"/>
+
+    <preference for="Mirasvit\Blog\Model\ResourceModel\Post\Collection"
+                type="SM\InspireMe\Model\ResourceModel\Post\Collection"/>
+    <preference for="SM\InspireMe\Api\SearchQueryInterface" type="SM\InspireMe\Model\Api\SearchQuery"/>
+    <preference for="SM\InspireMe\Api\TopicRepositoryInterface"
+                type="SM\InspireMe\Model\Repository\TopicRepository"/>
+
+    <preference for="SM\InspireMe\Api\Data\PostTopicInterface"
+                type="SM\InspireMe\Model\Data\PostTopic"/>
+
+    <virtualType name="SM\InspireMe\Model\Api\SearchCriteria\CollectionProcessor\PostFilterProcessor"
+                 type="Magento\Eav\Model\Api\SearchCriteria\CollectionProcessor\FilterProcessor">
+        <arguments>
+            <argument name="customFilters" xsi:type="array">
+                <item name="category_id" xsi:type="object">
+                    SM\InspireMe\Model\Api\SearchCriteria\CollectionProcessor\FilterProcessor\ArticleTopicFilter
+                </item>
+                <item name="tag_id" xsi:type="object">
+                    SM\InspireMe\Model\Api\SearchCriteria\CollectionProcessor\FilterProcessor\ArticleTagFilter
+                </item>
+                <item name="search" xsi:type="object">
+                    SM\InspireMe\Model\Api\SearchCriteria\CollectionProcessor\FilterProcessor\SearchFilter
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SM\InspireMe\Model\Api\SearchCriteria\PostCollectionProcessor"
+                 type="Magento\Eav\Model\Api\SearchCriteria\CollectionProcessor">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="filters" xsi:type="object">SM\InspireMe\Model\Api\SearchCriteria\CollectionProcessor\PostFilterProcessor</item>
+                <item name="sorting" xsi:type="object">Magento\Framework\Api\SearchCriteria\CollectionProcessor\SortingProcessor</item>
+                <item name="pagination" xsi:type="object">Magento\Framework\Api\SearchCriteria\CollectionProcessor\PaginationProcessor</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="SM\InspireMe\Model\Repository\Post">
+        <arguments>
+            <argument name="collectionProcessor" xsi:type="object">SM\InspireMe\Model\Api\SearchCriteria\PostCollectionProcessor</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="SM\InspireMe\Model\Api\SearchCriteria\CollectionProcessor\TopicFilterProcessor"
+                 type="Magento\Eav\Model\Api\SearchCriteria\CollectionProcessor\FilterProcessor"/>
+    <virtualType name="SM\InspireMe\Model\Api\SearchCriteria\TopicCollectionProcessor"
+                 type="Magento\Eav\Model\Api\SearchCriteria\CollectionProcessor">
+        <arguments>
+            <argument name="processors" xsi:type="array">
+                <item name="filters" xsi:type="object">SM\InspireMe\Model\Api\SearchCriteria\CollectionProcessor\TopicFilterProcessor</item>
+                <item name="sorting" xsi:type="object">Magento\Framework\Api\SearchCriteria\CollectionProcessor\SortingProcessor</item>
+                <item name="pagination" xsi:type="object">Magento\Framework\Api\SearchCriteria\CollectionProcessor\PaginationProcessor</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="SM\InspireMe\Model\Repository\TopicRepository">
+        <arguments>
+            <argument name="collectionProcessor" xsi:type="object">SM\InspireMe\Model\Api\SearchCriteria\TopicCollectionProcessor</argument>
+        </arguments>
+    </type>
+</config>

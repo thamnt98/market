@@ -1,0 +1,40 @@
+<!-- ko if: isShow()-->
+    <!-- ko if:hasAddress -->
+    <div class="box-delivery-address">
+        <h3 data-bind="i18n: 'Store Selection'"></h3>
+        <ul class="one-address"> <!--if multi address add class multi-address-->
+            <li>
+                <div class="inner">
+                    <h4 data-bind="html: currentStoreName"></h4>
+                    <p class="da-detail" data-bind="html: currentStoreAddress"></p>
+                    <!-- ko ifnot: isFullFill-->
+                        <p class="not-full single" data-bind="i18n: 'Not Full Fill Order. Please Select Other store!'"></p>
+                    <!-- /ko -->
+                    <div class="gr-change-adress">
+                        <a href="#" class="bt-change" data-bind="click: addStore, i18n:'Change Store'"></a>
+                    </div>
+                    <div class="store-pickup-datetime">
+                        <h4 data-bind="i18n: 'Select Pickup Date & Time'"></h4>
+                        <input readonly type="text" class="input-text" id="store-pickup-date" style="width: auto" name="store-pickup-date" data-bind="value: storePickUpDate" afterRender="renderDate('store-pickup-date')"/>
+                        <div class="store-pickup-time" data-bind="event: { mouseleave: closeTimeSlotList() }">
+                            <div class="wrap-timeslot">
+                            <input readonly type="text" class="input-text _has-timepicker" id="store-pickup-time" style="width: auto" name="store-pickup-time" data-bind="click: function(){ openTimeSlotList() }, value: storePickUpTime" afterRender="preSelectTimeSlot()"/>
+                            <!-- ko if: timeSlotListStatus-->
+                            <ul class="time-slot" data-bind="foreach: timeSlot">
+                                <li class="time-slot-item" data-bind="css: { selected: $parent.timeSlotSelected($data) }, text: $data, click: function(){ $parent.selectTimeSlot($data) }"></li>
+                            </ul>
+                            <!-- /ko -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <!-- /ko -->
+
+    <!-- ko foreach: getRegion('store-pickup-list') -->
+    <!-- ko template: getTemplate() --><!-- /ko -->
+    <!--/ko-->
+<!--/ko-->

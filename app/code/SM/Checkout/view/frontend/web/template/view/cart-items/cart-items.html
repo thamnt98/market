@@ -1,0 +1,13 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<div class="checkout-list-items">
+    <!-- ko foreach: items() -->
+        <div class="item" data-bind="css: { disabled: $parent.isDisable($data.item_id)}">
+            <each args="$parent.elems()" render=""/>
+        </div>
+    <!-- /ko -->
+</div>

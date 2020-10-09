@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd"
+      layout="1column">
+
+    <body>
+        <referenceBlock name="blog.post.list">
+            <arguments>
+                <argument name="gtm_view_model" xsi:type="object">SM\GTM\Block\Post\PostList</argument>
+            </arguments>
+        </referenceBlock>
+    </body>
+</page>

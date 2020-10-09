@@ -1,0 +1,99 @@
+<?php /** @var $block \SM\MyVoucher\Block\Customer\MyVoucherDetail */ ?>
+<?php $voucher = $block->getVoucher(); ?>
+<div class="wrapper-voucher">
+    <div class="row">
+        <div class="col-lg-8 col-md-12 col-sm-12 voucher-left">
+            <div class="bg-voucher">
+                <img src='<?= $block->getImageUrl(); ?>' alt="<?= $voucher->getName() ?>" />
+                <div class="title-content">
+                    <p class="name"><?= __('VOUCHER') ?></p>
+                    <p class="price"><?= $voucher->getDiscountText() ?></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-12 col-sm-12 voucher-right">
+            <div class="voucher-detail">
+                <div class="voucher-detail-title">
+                    <p><?= __('Voucher Details') ?></p>
+                </div>
+                <div class="voucher-detail-content">
+                    <ul class="list-group">
+                        <?php if ($voucher->getToDate()) : ?>
+                            <li class="list-group-item">
+                                <img src='<?= $block->getViewFileUrl('images/svg-icons/Date.svg'); ?>' alt=""  width="18" height="20" />
+                                <span><?= $block->getToDate($voucher) ?></span>
+                            </li>
+                        <?php endif; ?>
+                        <?php if ($voucher->getDiscountNote()) : ?>
+                            <li class="list-group-item">
+                                <span class="apl-ic_bank-card"></span>
+                                <span><?= $voucher->getDiscountNote() ?></span>
+                            </li>
+                        <?php endif; ?>
+                    </ul>
+                    <div class="primary">
+                        <button id="apply-voucher" <?= $voucher->getAvailable() ? '' : 'disabled="disabled"' ?>
+                                class="action primary" type="button" title="<?= __('Use voucher') ?>">
+                            <span><?= __('Use Voucher') ?></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <p class="minium-purchase"><?= $voucher->getName() ?></p>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="product data items"
+             data-mage-init='{
+                "mage/tabs": {
+                    "openedState": "active",
+                    "animate": {"duration": 100}, "active": 0, "disabledState": "disabled"}
+                }'
+            >
+                <div class="item title" data-role="collapsible">
+                    <a class="switch" data-toggle="trigger" href="#how-to-use">
+                        <?= __('How to Use') ?>
+                    </a>
+                </div>
+                <div id="how-to-use" class="item content" data-role="content">
+                    <?= $voucher->getHowToUse() ?>
+                </div>
+
+                <div class="item title" data-role="collapsible">
+                    <a class="switch" data-toggle="trigger" href="#terms-conditions">
+                        <?= __('Terms & Conditions') ?>
+                    </a>
+                </div>
+                <div id="terms-conditions" class="item content" data-role="content">
+                    <?= $voucher->getTermCondition() ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?php if ($voucher->getAvailable()) : ?>
+<script>
+    require([
+        'jquery',
+        'mage/url',
+        'mage/storage',
+        'Magento_Ui/js/model/messageList'
+    ], function ($, urlBuilder, storage, messageList) {
+        $('#apply-voucher').click(function () {
+            $('body').loader('show');
+            storage.post(
+                urlBuilder.build('rest/V1/trans-checkout/me/applyvoucher'),
+                JSON.stringify({cartId: '<?= $block->getQuoteId() ?>', couponCode: '<?= $voucher->getCode() ?>'}),
+                false
+            ).always(function () {
+                messageList.addSuccessMessage({message: "<?= __('Your voucher has been applied.') ?>"});
+                window.location.href = '<?= $voucher->getRedirectUrl() ?>';
+            });
+        });
+    });
+</script>
+<?php endif; ?>

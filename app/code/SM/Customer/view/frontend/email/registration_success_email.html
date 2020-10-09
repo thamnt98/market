@@ -1,0 +1,314 @@
+<!--@subject {{trans "Your Transmart account is ready. Happy shopping!"}} @-->
+<!--@vars {
+"var name":"Customer Name",
+"var email":"Customer Email"
+} @-->
+{{template config_path="design/email/header_template"}}
+
+<table class="greeting" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "Hello"}}
+                <b>{{var name}},</b>
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End greeting-->
+<table class="message-email" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "Congratulations! You have successfully registered your Transmart account. The extraordinary shopping experience is now in front of you."}}
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Message Email-->
+
+<table class="shop-online-anytime">
+    <tr>
+        <td class="three-column">
+            <table>
+                <tbody>
+                <tr>
+                    <td class="one-of-three-column">
+                        <table class="shop-online" width="100%">
+                            <tbody>
+                            <tr>
+                                <td class="inner-td">
+                                    <table class="content">
+                                        <tbody>
+                                        <tr>
+                                            <td class="image">
+                                                <img alt="shop-online" src="{{view url='images/email-template/shop-online.png'}}"/>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <!--End Shop Online-->
+                    </td>
+                    <td class="one-of-three-column">
+                        <table class="all-you-need" width="100%">
+                            <tbody>
+                            <tr>
+                                <td class="inner-td">
+                                    <table class="content">
+                                        <tbody>
+                                        <tr>
+                                            <td class="image">
+                                                <img alt="all-you-need" src="{{view url='images/email-template/all-you-need.png'}}"/>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <!--End All Need-->
+                    </td>
+                    <td class="one-of-three-column">
+                        <table class="deliver" width="100%">
+                            <tbody>
+                            <tr>
+                                <td class="inner-td">
+                                    <table class="content">
+                                        <tbody>
+                                        <tr>
+                                            <td class="image">
+                                                <img alt="deliver" src="{{view url='images/email-template/deliver.png'}}"/>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <!--End Deliver-->
+                    </td>
+                </tr>
+                <tr>
+                    <td class="one-of-three-column">
+                        <table class="shop-online" width="100%">
+                            <tbody>
+                            <tr>
+                                <td class="inner-td">
+                                    <table class="content">
+                                        <tbody>
+                                        <tr>
+                                            <td class="text">
+                                                <p>
+                                                    Shop
+                                                    online
+                                                    anytime
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <!--End Shop Online-->
+                    </td>
+                    <td class="one-of-three-column">
+                        <table class="all-you-need" width="100%">
+                            <tbody>
+                            <tr>
+                                <td class="inner-td">
+                                    <table class="content">
+                                        <tbody>
+                                        <tr>
+                                            <td class="text">
+                                                <p>
+                                                    All
+                                                    you
+                                                    need
+                                                    is<br/>
+                                                    available
+                                                    here
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <!--End All Need-->
+                    </td>
+                    <td class="one-of-three-column">
+                        <table class="deliver" width="100%">
+                            <tbody>
+                            <tr>
+                                <td class="inner-td">
+                                    <table class="content">
+                                        <tbody>
+                                        <tr>
+                                            <td class="text">
+                                                <p>
+                                                    Shop
+                                                    the
+                                                    way
+                                                    you<br/>
+                                                    want:
+                                                    pick up,
+                                                    deliver,<br/>
+                                                    or
+                                                    split
+                                                    order
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <!--End Deliver-->
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <!--End Third Of Three Column-->
+        </td>
+        <!-- End Three Column-->
+    </tr>
+    <tr>
+        <td class="two-column">
+            <table>
+                <tbody>
+                <tr>
+                    <td align="center" class="one-of-two-column">
+                        <table class="discount">
+                            <tbody>
+                            <tr>
+                                <td class="inner-td">
+                                    <table class="content">
+                                        <tbody>
+                                        <tr>
+                                            <td class="image">
+                                                <img alt="discount" src="{{view url='images/email-template/discount.png'}}"/>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td align="left" class="one-of-two-column">
+                        <table class="authenticity">
+                            <tbody>
+                            <tr>
+                                <td class="inner-td">
+                                    <table class="content">
+                                        <tbody>
+                                        <tr>
+                                            <td class="image">
+                                                <img alt="authenticity" src="{{view url='images/email-template/authenticity.png'}}"/>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center" class="one-of-two-column">
+                        <table class="discount">
+                            <tbody>
+                            <tr>
+                                <td class="inner-td">
+                                    <table class="content">
+                                        <tbody>
+                                        <tr>
+                                            <td class="text">
+                                                <p>
+                                                    Enjoy
+                                                    10%
+                                                    Bank
+                                                    Mega
+                                                    <br/>discount
+                                                    everyday
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td align="left" class="one-of-two-column">
+                        <table class="authenticity">
+                            <tbody>
+                            <tr>
+                                <td class="inner-td">
+                                    <table class="content">
+                                        <tbody>
+                                        <tr>
+                                            <td class="text">
+                                                <p>
+                                                    Product
+                                                    authenticity<br/>
+                                                    guaranteed
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+        <!-- End Three Column-->
+    </tr>
+</table>
+<!--End Shop Online Anytime-->
+
+<table class="message-email" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "Happy shopping!"}}
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Message Email-->
+
+<table class="sincerely" width="100%">
+    <tr>
+        <td>
+            <p>{{trans "Sincerely"}},</p>
+            <p class="signature">
+                <b>{{var
+                    store.frontend_name}}</b>
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Sincerely-->
+
+{{template config_path="design/email/footer_template"}}

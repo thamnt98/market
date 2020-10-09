@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magento\Review\Block\Adminhtml\Edit\Form" type="SM\Review\Modifier\Adminhtml\ReviewFormEdit" />
+
+    <type name="Magento\Bundle\Model\ResourceModel\Selection">
+        <plugin type="SM\Bundle\Plugin\ProductModel" name="bundle_selection_resource_model_plugin" sortOrder="100"/>
+    </type>
+</config>

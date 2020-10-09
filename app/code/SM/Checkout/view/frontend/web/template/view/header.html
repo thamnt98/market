@@ -1,0 +1,8 @@
+<div class="page-title-wrapper">
+    <h1 class="page-title">
+        <span class="base" data-ui-id="page-title-wrapper" data-bind="text: getPageTitle()"></span>
+    </h1>
+    <!-- ko if: isStepPreviewOrder-->
+        <p class="back-to-checkout" data-bind="i18n: 'Back to Checkout', click: function(){ backToCheckout() }"></p>
+    <!--/ko-->
+</div>

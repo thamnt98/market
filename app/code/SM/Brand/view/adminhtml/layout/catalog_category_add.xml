@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category SM
+ * @package SM_Brand
+ * @license     http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @author      Chinhvd <chinhvd@smartosc.com>
+ * @copyright   Copyright (c) SmartOSC. All rights reserved.
+ * @url http://www.smartosc.com/
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="catalog.category.add.brand.content"
+                   template="SM_Brand::category/edit/add_brand.phtml" />
+        </referenceContainer>
+        <block class="SM\Brand\Block\Adminhtml\Category\BrandList"
+               name="category.form.assign_brand"
+               template="SM_Brand::category/edit/brand_list.phtml">
+            <block class="SM\Brand\Block\Adminhtml\Category\Tab\BrandList\Grid"
+                   name="category.form.assign_brand.grid" as="grid"/>
+            <block class="Magento\Backend\Block\Widget\Button" name="category.form.assign_brand.add_brand_button"
+                   as="add_brand_btn">
+                <arguments>
+                    <argument name="id" xsi:type="string">category_add_brand_btn</argument>
+                    <argument name="label" translate="true" xsi:type="string">Add Brand</argument>
+                    <argument name="class" xsi:type="string">secondary add-brand</argument>
+                </arguments>
+            </block>
+        </block>
+    </body>
+</page>

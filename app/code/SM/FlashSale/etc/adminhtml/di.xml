@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magento\CatalogEvent\Block\Adminhtml\Event\Edit\Category" type="SM\FlashSale\Block\Adminhtml\Event\Edit\Category" />
+    <preference for="Magento\CatalogEvent\Block\Adminhtml\Event\Edit\Form"
+                type="SM\FlashSale\Block\Adminhtml\Event\Edit\Form"/>
+
+    <type name="Magento\CatalogEvent\Model\Event">
+        <plugin name="ValidateTime"
+                type="SM\FlashSale\Plugin\Event"/>
+    </type>
+
+    <virtualType name="Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="flashsale_qty" xsi:type="array">
+                    <item name="class" xsi:type="string">SM\FlashSale\Ui\DataProvider\Product\Form\Modifier\FlashQty</item>
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+                <item name="flashsale_qty_per_customer" xsi:type="array">
+                    <item name="class" xsi:type="string">SM\FlashSale\Ui\DataProvider\Product\Form\Modifier\FlashQty</item>
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+</config>

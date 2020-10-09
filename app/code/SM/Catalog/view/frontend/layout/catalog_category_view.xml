@@ -1,0 +1,31 @@
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="category.image" remove="true"/>
+        <referenceContainer name="category.view.container">
+            <block class="Magento\Catalog\Block\Category\View" name="landing.content.subcategories"
+                   template="SM_Catalog::landing/sub-categories.phtml" after="category.cms">
+                <arguments>
+                    <argument name="viewModel" xsi:type="object">SM\Catalog\ViewModel\SubCategories</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+        <referenceBlock name="category.product.type.details.renderers">
+            <block class="SM\Catalog\Block\Product\ProductList\Item\Details\ChildrenLabel"
+                   name="category.product.type.details.renderers.configurable" as="configurable"
+                   template="SM_Catalog::product/listing/children-label.phtml">
+            </block>
+            <block class="SM\Catalog\Block\Product\ProductList\Item\Details\ChildrenLabel"
+                   name="category.product.type.details.renderers.bundle" as="bundle"
+                   template="SM_Catalog::product/listing/children-label.phtml">
+            </block>
+            <block class="SM\Catalog\Block\Product\ProductList\Item\Details\ChildrenLabel"
+                   name="category.product.type.details.renderers.grouped" as="grouped"
+                   template="SM_Catalog::product/listing/children-label.phtml">
+            </block>
+        </referenceBlock>
+        <referenceContainer name="category.products.list">
+            <!--badge discount list-->
+            <block class="SM\Catalog\Block\Product\ProductList\Item\AddTo\Iteminfo" name="badge-discount-list" template="SM_Catalog::product/listing/badge-discount-list.phtml" before="-"/>
+        </referenceContainer>
+    </body>
+</page>

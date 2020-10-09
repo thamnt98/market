@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- add condition calculate & get item selected -->
+    <type name="Magento\Quote\Model\Quote">
+        <plugin name="trans_model_quote_plugin" type="SM\Checkout\Plugin\Quote\Model\Quote"/>
+    </type>
+    <type name="Magento\Quote\Model\Quote\Item\CartItemPersister">
+        <plugin name="sm_checkout_quote_item_persister" type="SM\Checkout\Plugin\Quote\Model\Item\CartItemPersister"
+                sortOrder="99"/>
+    </type>
+    <type name="Magento\Checkout\Block\Cart">
+        <plugin name="SM_Checkout::CartItems"
+                type="SM\Checkout\Plugin\Magento\Checkout\Block\Cart" />
+    </type>
+    <type name="Magento\Checkout\Block\Cart\Grid">
+        <plugin name="SM_Checkout::CartItems"
+                type="SM\Checkout\Plugin\Magento\Checkout\Block\Cart" />
+    </type>
+    <type name="Magento\Checkout\Block\Cart\Sidebar">
+        <plugin name="disable_dropdown_minicart_cartpage"
+                type="SM\Checkout\Plugin\Magento\Checkout\Block\Cart\Sidebar" disabled="true"/>
+    </type>
+    <type name="SM\Checkout\Block\Onepage">
+        <plugin name="sm_checkout_config" type="SM\Checkout\Plugin\Checkout\Block\Onepage"/>
+    </type>
+
+    <type name="Magento\Checkout\CustomerData\ItemPool">
+        <plugin name="sm_checkout_item_pool" type="SM\Checkout\Plugin\CustomerData\ItemPoolPlugin" />
+    </type>
+    <preference for="Amasty\Promo\Plugin\Model\CustomerData\Cart" type="SM\Checkout\Preference\Amasty\Promo\Plugin\Model\CustomerData\Cart"/>
+    <type name="Magento\Checkout\CustomerData\Cart">
+        <plugin name="SM_Checkout::CustomerData_Cart" type="SM\Checkout\Plugin\CustomerData\Cart"/>
+    </type>
+
+<!--    <type name="\Magento\Checkout\Model\Session">
+        <plugin name="checkout_model_session" type="\SM\Checkout\Plugin\Checkout\Model\Session" sortOrder="50"/>
+    </type>-->
+    <type name="Magento\Checkout\Model\CompositeConfigProvider">
+        <arguments>
+            <argument name="configProviders" xsi:type="array">
+                <item name="sm_payment_config_provider" xsi:type="object">SM\Checkout\Model\Payment\PaymentConfigProvider</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Checkout\Controller\Cart">
+        <plugin name="sm_transcheckout_reset_delivery_flag" type="SM\Checkout\Plugin\Checkout\Controller\CartPlugin" sortOrder="50" />
+    </type>
+<!--    <type name="Magento\Checkout\Controller\Cart\Index">-->
+<!--        <plugin name="SM_Checkout::UnsetMultiShippingAndPayment"-->
+<!--                type="SM\Checkout\Plugin\MagentoCheckout\Controller\Cart" sortOrder="0" />-->
+<!--    </type>-->
+</config>

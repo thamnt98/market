@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd"
+      layout="1column">
+
+    <update handle="blog_default"/>
+    <body>
+
+        <referenceBlock name="blog.category.view">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Mirasvit_Blog::category/view.phtml</argument>
+            </action>
+        </referenceBlock>
+
+        <referenceBlock name="blog.post.list">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">SM_InspireMe::post/listing.phtml</argument>
+            </action>
+        </referenceBlock>
+
+        <referenceBlock name="breadcrumbs" >
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">SM_InspireMe::html/breadcrumbs.phtml</argument>
+            </action>
+            <block class="Mirasvit\Blog\Block\Post\PostList\Toolbar" name="blog.post.list.head" as="blog.post.list.head"
+                   template="SM_InspireMe::post/headtab.phtml">
+            </block>
+        </referenceBlock>
+
+        <referenceBlock name="blog.post.list.toolbar">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">SM_InspireMe::post/toolbar.phtml</argument>
+            </action>
+        </referenceBlock>
+
+        <referenceContainer name="blog.post.list.additional" remove="true"/>
+        <referenceBlock name="page.main.title" remove="true" />
+    </body>
+</page>

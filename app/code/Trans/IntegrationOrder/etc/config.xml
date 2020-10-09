@@ -1,0 +1,61 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_IntegrationOrder
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Muhammad Randy <muhammad.randy@transdigital.co.id>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <integrationorder>
+            <oms_integration>
+                <oms_base_url>https://oms-tm-api-stg.ctdigital.id</oms_base_url>
+                <oms_header_dest>omega</oms_header_dest>
+                <oms_merchant_id>TRTLMRT001</oms_merchant_id>
+                <oms_login_path>/login</oms_login_path>
+                <oms_order_path>/v1/orders</oms_order_path>
+                <oms_oar_path>/v1/orderallocation</oms_oar_path>
+                <oms_payment_path>/v1/payment</oms_payment_path>
+                <oms_return_path>/v1/orderreturn</oms_return_path>
+                <oms_token>eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlIjoiYWRtaW5AY3QuY28uaWQiLCJleHAiOjE2NjY5MzAyNTYsImlkIjo1LCJuIjoiQWRtaW4iLCJyIjoic3VwZXJhZG1pbiJ9.keiVaZBtypgvtI8EiADwvPt--X67KAOw_3d_8_AgY-M</oms_token>
+            </oms_integration>
+            <update_order_status_oms>
+                <in_process_status>
+                    <number_status_in_process>11</number_status_in_process>
+                    <in_process_status_order/>
+                </in_process_status>
+                <in_delivery_status>
+                    <number_status_in_delivery>31</number_status_in_delivery>
+                    <in_delivery_status_order/>
+                </in_delivery_status>
+                <delivered_status>
+                    <number_status_delivered>41</number_status_delivered>
+                    <delivered_status_order/>
+                </delivered_status>
+                <order_canceled_status>
+                    <number_status_order_canceled>91</number_status_order_canceled>
+                    <order_canceled_status_order/>
+                </order_canceled_status>
+                <pickup_by_customer_status>
+                    <number_pickup_by_customer>51</number_pickup_by_customer>
+                    <pickup_by_customer_status_order/>
+                </pickup_by_customer_status>
+                <in_transit_status>
+                    <number_in_transit>32</number_in_transit>
+                    <in_transit_status_order/>
+                </in_transit_status>
+                <in_process_waiting_pickup_status>
+                    <number_in_process_waiting_pickup>21</number_in_process_waiting_pickup>
+                    <in_process_waiting_pickup_status_order/>
+                </in_process_waiting_pickup_status>
+            </update_order_status_oms>
+        </integrationorder>
+    </default>
+</config>

@@ -1,0 +1,168 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// phpcs:disable Magento2.Templates.ThisInTemplate
+// phpcs:disable Magento2.Files.LineLength.MaxExceeded
+
+/** @var $block \Magento\Checkout\Block\Cart\Item\Renderer */
+
+$_item = $block->getItem();
+$product = $_item->getProduct();
+$canApplyMsrp = false;
+/** @var SM\Checkout\ViewModel\CartItem $viewModel */
+$viewModel = $block->getData('viewModel');
+$itemStock = $viewModel->getItemStock($product->getId(), $_item);
+$isGift = $viewModel->isGiftItem($_item);
+$freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
+?>
+<tbody class="cart item">
+<tr class="item-info">
+    <td class="col select-item">
+        <div class="checkbox-custom">
+            <input type="checkbox" id="itemid-<?= $_item->getId() ?>" class="item-checked" data-gtm-product-id="<?= $block->escapeHtml($product->getId()) ?>" name="<?= $_item->getId() ?>" <?php if($_item->getIsActive()){ echo 'checked=true';}?> />
+            <label for="recent"><?= $block->escapeHtml('') ?></label>
+        </div>
+    </td>
+    <td data-th="<?= $block->escapeHtmlAttr(__('Item')) ?>" class="col item">
+        <?php $percent = $viewModel->getDiscountPercent($block->getItem()) ?>
+        <?php if (!empty($percent)): ?>
+            <div class="disc-percent-list">
+                <span class="product-sale">
+                    <?= $block->escapeHtml(__('%1% OFF', $percent)); ?>
+                </span>
+            </div>
+        <?php endif; ?>
+        <?php if ($block->hasProductUrl()) : ?>
+        <a href="<?= $block->escapeUrl($block->getProductUrl()) ?>"
+           title="<?= $block->escapeHtmlAttr($block->getProductName()) ?>"
+           tabindex="-1"
+           class="product-item-photo">
+            <?php else : ?>
+            <span class="product-item-photo">
+            <?php endif; ?>
+            <?= $block->getImage($block->getProductForThumbnail(), 'cart_page_product_thumbnail')->toHtml() ?>
+            <?php if ($block->hasProductUrl()) : ?>
+        </a>
+    <?php else : ?>
+        </span>
+    <?php endif; ?>
+        <div class="product details product-item-details <?php if($product->getTypeId() == 'bundle') { echo 'bundle-item';} ?>">
+            <strong class="product-item-name">
+                <?php if ($block->hasProductUrl()) : ?>
+                    <a href="<?= $block->escapeUrl($block->getProductUrl()) ?>"><?= $block->escapeHtml($block->getProductName()) ?></a>
+                <?php else : ?>
+                    <?= $block->escapeHtml($block->getProductName()) ?>
+                <?php endif; ?>
+            </strong>
+            <?php if ($_options = $block->getOptionList()) : ?>
+                <dl class="item-options">
+                    <?php foreach ($_options as $_option) : ?>
+                        <?php $_formatedOptionValue = $block->getFormatedOptionValue($_option) ?>
+                        <dt><?= $block->escapeHtml($_option['label']) ?></dt>
+                        <dd>
+                            <?php if (isset($_formatedOptionValue['full_view'])) : ?>
+                                <?= $block->escapeHtml($_formatedOptionValue['full_view']) ?>
+                            <?php else : ?>
+                                <?= $block->escapeHtml($_formatedOptionValue['value'], ['span', 'a']) ?>
+                            <?php endif; ?>
+                        </dd>
+                    <?php endforeach; ?>
+                </dl>
+            <?php endif; ?>
+            <?php /** @var $installationBlock \SM\Installation\Block\Form */ ?>
+            <?php $installationBlock = $block->getLayout()->getBlock('product.info.form.installation') ?>
+
+            <?php if ($messages = $block->getMessages()) : ?>
+                <?php foreach ($messages as $message) : ?>
+                    <div class="cart item message <?= $block->escapeHtmlAttr($message['type']) ?>">
+                        <div><?= $block->escapeHtml($message['text']) ?></div>
+                    </div>
+                <?php endforeach; ?>
+            <?php endif; ?>
+            <?php $addInfoBlock = $block->getProductAdditionalInformationBlock(); ?>
+            <?php if ($addInfoBlock) : ?>
+                <?= $addInfoBlock->setItem($_item)->toHtml() ?>
+            <?php endif; ?>
+        </div>
+        <?php if ($installationBlock) : ?>
+            <?= $installationBlock->setData('item_id', $_item->getId())->setProduct($_item->getProduct())->toHtml() ?>
+        <?php endif; ?>
+    </td>
+
+    <td class="col qty" data-th="<?= $block->escapeHtmlAttr(__('Qty')) ?>">
+        <div class="field qty">
+            <label class="text-qlty"><?= $block->escapeHtmlAttr(__('Quantity')) ?></label>
+            <div class="control qty">
+                <a id="subtract-cart-item-<?= $block->escapeHtmlAttr($_item->getId()) ?>"
+                   class="subtract-cart-item decrease-qty <?= $viewModel->isEnableQtyDecrease($_item) ? '' : 'disabled' ?>"
+                   itemId="<?= $_item->getId() ?>"
+                    <?= $viewModel->isEnableQtyDecrease($_item) ? '' : 'readonly="true"' ?>
+                >
+                    <span data-bind="i18n: '-'">-</span>
+                </a>
+                <label for="cart-<?= $block->escapeHtmlAttr($_item->getId()) ?>-qty">
+                    <span class="label"><?= $block->escapeHtml(__('Qty')) ?></span>
+                    <input id="cart-qty-<?= $block->escapeHtmlAttr($_item->getId()) ?>"
+                           name="cart[<?= $block->escapeHtmlAttr($_item->getId()) ?>][qty]"
+                           data-cart-item-id="<?= $block->escapeHtmlAttr($_item->getSku()) ?>"
+                           value="<?= $block->escapeHtmlAttr($block->getQty()) ?>"
+                           type="number"
+                           size="4"
+                           step="any"
+                           readonly
+                           title="<?= $block->escapeHtmlAttr(__('Qty')) ?>"
+                           class="input-text qty qty_in_cart"
+                           data-validate="{required:true}"
+                           data-role="cart-item-qty"/>
+                </label>
+                <a id="add-cart-item-<?= $block->escapeHtmlAttr($_item->getId()) ?>"
+                   data-bind="attr: {
+                            'data-cart-item': + <?= $block->escapeHtmlAttr($_item->getId()) ?>,
+                            title: '+'
+                            }"
+                   itemId="<?= $_item->getId() ?>"
+                   class="add-cart-item increase-qty <?= $viewModel->isEnableQtyIncrease($_item, $itemStock) ? '' : 'disabled' ?>"
+                   itemstock="<?php echo $itemStock; ?>"
+                    <?= $viewModel->isEnableQtyIncrease($_item, $itemStock) ? '' : 'readonly="true"' ?>
+                >
+                    <span class="instock-<?= $_item->getId() ?>" data-bind="i18n: '+'">+</span>
+                    <span class="out-stock-<?= $_item->getId() ?> dpl-tooltip" style="display:none">
+                            <span data-bind="i18n: '+'">+</span>
+                            <span class="tooltip-content" id="tooltip-1" role="tooltip">
+                                <?= __('Sorry, you have reached the maximum number of items for this product.') ?>
+                            </span>
+                        </span>
+                </a>
+            </div>
+        </div>
+    </td>
+
+    <td class="col subtotal" data-th="<?= $block->escapeHtmlAttr(__('Subtotal')) ?>">
+        <?php if ($canApplyMsrp) : ?>
+            <span class="cart msrp subtotal">--</span>
+        <?php else : ?>
+            <?= $block->getRowTotalHtml($_item) ?>
+        <?php endif; ?>
+
+        <?php /** @var $freshBlock \SM\FreshProduct\Block\Product\View */ ?>
+        <?php $freshBlock = $block->getLayout()->getBlock('checkout.item.price.fresh') ?>
+
+        <?php if ($freshBlock) : ?>
+            <?= $freshBlock->setProduct($_item->getProduct())->toHtml() ?>
+        <?php endif; ?>
+
+
+    </td>
+</tr>
+<tr class="item-actions">
+    <td colspan="4">
+        <div class="actions-toolbar">
+            <?= /* @noEscape */
+            $block->getActions($_item) ?>
+        </div>
+    </td>
+</tr>
+</tbody>

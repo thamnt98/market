@@ -1,0 +1,138 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+
+
+<div class="giftMainList">
+    <?php
+    echo $this->getLayout()
+        ->createBlock('Magento\Cms\Block\Block')
+        ->setBlockId('gift-sharedme')
+        ->toHtml();
+    ?>
+
+
+    <div class="block-giftRegistry-list">
+        <div class="giftRegistry-list-heading">
+            <h3>Your Registry List</h3>
+        </div>
+        <div class="giftRegistry-list--content">
+            <div class="box-gift-list">
+                <div class="row">
+                    <div class="col-xs-12 col-xl-6">
+                        <div class=" widget block-dashboard-info">
+                            <div class="block-title">
+                                <strong>Joni & Judy's Wedding</strong>
+                                <span class="block-title-days">100 days to go</span>
+                            </div>
+                            <div class="block-content">
+                                <div class="row">
+                                    <div class="box-gift-listLeft col-xs-12 col-lg-8">
+                                        <ul class="listgift-share">
+                                            <li><img src="http://placehold.jp/90x60.png"></li>
+                                            <li><img src="http://placehold.jp/80x60.png"></li>
+                                            <li><img src="http://placehold.jp/80x60.png"></li>
+                                        </ul>
+                                    </div>
+                                    <div class="box-gift-listRight col-xs-12 col-lg-4">
+                                        <div class="tox-progress circle-wrap"
+                                             data-size="120"
+                                             data-thickness="12"
+                                             data-color="#FB971F"
+                                             data-background="#E9E6E6"
+                                             data-progress="45"
+                                             data-speed="3000">
+                                            <div class="tox-progress-content is-open" data-vcenter="false">
+                                                <h3>1/4</h3>
+                                                <p>Purchased</p>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-xs-12 col-xl-6">
+                        <div class=" widget block-dashboard-info">
+                            <div class="block-title">
+                                <strong>Mother’s Birthday</strong>
+                                <span class="block-title-days">150 days to go</span>
+
+                            </div>
+                            <div class="block-content">
+                                <div class="row">
+                                    <div class="box-gift-listLeft col-xs-12 col-lg-8">
+                                        <p>
+                                            What would you like to get on your special day? Add your dream gifts in this registry.
+                                        </p>
+                                    </div>
+                                    <div class="box-gift-listRight col-xs-12 col-lg-4">
+                                        <div class="tox-progress circle-wrap"
+                                             data-size="120"
+                                             data-thickness="12"
+                                             data-color="#FB971F"
+                                             data-background="#E9E6E6"
+                                             data-progress="0"
+                                             data-speed="3000">
+                                            <div class="tox-progress-content" data-vcenter="false">
+                                                <h3>0/0</h3>
+                                                <p>Purchased</p>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="block-giftRegistry-terms">
+        <div class="block widget block-dashboard-info">
+            <div class="block-title">
+                <strong>Terms & Conditions of Gift Registry</strong>
+            </div>
+            <div class="block-content">
+                <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+                </p>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    require(
+        [
+            'jquery',
+        ],
+        function(
+            $,
+            modal
+        ) {
+            ToxProgress.create();
+            ToxProgress.animate();
+
+
+
+
+        }
+    );
+</script>

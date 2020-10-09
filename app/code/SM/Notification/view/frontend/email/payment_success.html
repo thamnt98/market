@@ -1,0 +1,227 @@
+<!--@subject {{trans "Payment for your order is successful (Reference number: %order_increment)" order_increment=$order.getIncrementId()}} @-->
+<!--@vars {
+"var formattedBillingAddress|raw":"Billing Address",
+"layout handle=\"sales_email_order_items\" order=$order area=\"frontend\"":"Order Items Grid",
+"var formattedShippingAddress|raw":"Shipping Address",
+"var this.getUrl($store,'customer/account/',[_nosid:1])":"Order Digital URL",
+"var this.getUrl($store,'customer/account/',[_nosid:1])":"Order Physical URL"
+"var store.frontend_name":"Store Frontend Name"
+
+} @-->
+{{template config_path="design/email/header_template"}}
+<table class="greeting" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "Hello %customer_name" customer_name=$order.getCustomerName()}}
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End greeting-->
+<table class="message-email-2" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "Thank you for shopping in Transmart. The payment for your order (reference number: %order_id) has been accepted." order_id=$order.getIncrementId()}}
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Message Email 2-->
+<table class="list-deliver">
+    <tbody>
+    <tr>
+        <td class="two-column">
+            <table>
+                <tbody>
+                <tr>
+                    <td class="one-of-two-column">
+                        <table class="total">
+                            <tbody>
+                            <tr>
+                                <td class="inner-td">
+                                    <table class="content">
+                                        <tbody>
+                                        <tr>
+                                            <td class="title">
+                                                <p>
+                                                    {{trans "Total"}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="description">
+                                                {{"%total", total=$order.getGrandTotal()}}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="inner-td">
+                                    <table class="content">
+                                        <tbody>
+                                        <tr>
+                                            <td class="title">
+                                                <p>
+                                                    {{trans "Payment Method"}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="description">
+                                                {{"%payment_method", payment_method=$order.getPayment().getMethod()}}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="inner-td">
+                                    <table class="content">
+                                        <tbody>
+                                        <tr>
+                                            <td class="title">
+                                                <p>
+                                                    {{trans "Deliver to"}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="description">
+                                                {{var formattedShippingAddress|raw}}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td class="one-of-two-column">
+                        <table class="total">
+                            <tbody>
+                            <tr>
+                                <td class="inner-td">
+                                    <table class="content">
+                                        <tbody>
+                                        <tr>
+                                            <td class="title">
+                                                <p>
+                                                    {{trans "Status"}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="description">
+                                                <p>
+                                                    {{"%status", status=$order.getStatus()}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="inner-td">
+                                    <table class="content">
+                                        <tbody>
+                                        <tr>
+                                            <td class="title">
+                                                <p>
+                                                    {{trans "Payment Time"}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="description">
+                                                <p>
+                                                    {{"%payment_time", payment_time=$order.getCreatedAt()}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="inner-td">
+                                    <table class="content">
+                                        <tbody>
+                                        <tr>
+                                            <td class="title">
+                                                <p>
+                                                    {{trans "Delivery method"}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="description">
+                                                <p>
+                                                    {{var additional_data.delivery_method}}
+                                                </p>
+                                                {{if shipping_msg}}
+                                                <p>{{var shipping_msg}}</p>
+                                                {{/if}}
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<!--End List deliver-->
+{{layout handle="sales_email_order_items" order=$order area="frontend"}}
+<!-- End order detail-->
+<table class="message-email" width="100%">
+    <tr>
+        <td>
+            {{if $order.getIsVirtual()}}
+            <p>
+                {{trans
+            'To see your order status, please go to <a href="%order_url" class="blue">My Order</a>'
+
+                order_url=$this.getUrl($store,'sales/order/digital/',[_query:[id:$order.getId()],_nosid:1])
+                |raw
+            </p>
+            {{else}}
+            <p>
+                {{trans
+            'To see your order status, please go to <a href="%order_url" class="blue">My Order</a>'
+
+                order_url=$this.getUrl($store,'sales/order/physical/',[_query:[id:$order.getId()],_nosid:1])
+                |raw}}
+            </p>
+            {{/if}}
+        </td>
+    </tr>
+</table>
+<!--End Message Email-->
+
+<table class="sincerely" width="100%">
+    <tr>
+        <td>
+            <p>{{trans "Sincerely"}},</p>
+            <p class="signature">
+                <b>{{var
+                store.frontend_name}}</b>
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Sincerely-->
+{{template config_path="design/email/footer_template"}}

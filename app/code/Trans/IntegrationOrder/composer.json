@@ -1,0 +1,30 @@
+{
+  "name": "trans/integrationorder",
+  "description": "N/A",
+  "require": {
+    "php": "~7.2.0|~7.3.0",
+    "trans/integration": "~3.0.0"
+  },
+  "type": "magento2.3-module",
+  "version": "3.0.0",
+  "license": [
+    "OSL-3.0",
+    "AFL-3.0"
+  ],
+  "authors": [
+    {
+      "name": "Muhammad Randy",
+      "email": "muhammad.randy@transdigital.co.id",
+      "homepage": "http://www.ctcorpora.com/",
+      "role": "Developer"
+    }
+  ],
+  "autoload": {
+    "files": [
+      "registration.php"
+    ],
+    "psr-4": {
+      "Trans\\IntegrationOrder\\": ""
+    }
+  }
+}

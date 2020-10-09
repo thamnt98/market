@@ -1,0 +1,56 @@
+<?php
+/**  @var \SM\Notification\Block\Customer\NotificationSetting $block */
+?>
+<div class="block block-notification-setting">
+    <div class="block-content block-notification-settings-content">
+        <form action="/notification/setting/save" method="POST">
+            <?php
+            $listNoti = $block->getListNotificationSetting();
+            foreach ($listNoti as $row):
+                if (sizeof($row['type']) > 1) {
+                    $class = 'container-three-col';
+                } else {
+                    if ($row['type'][0] == 'email') {
+                        $class = 'container-two-col';
+                    } else {
+                        $class = 'container-two-col-special';
+                    }
+                }
+                ?>
+                <div class="block-item <?= $class ?>">
+                    <div class="block-item-title">
+                        <div class="title <?= $class != 'container-two-col' ? 'col-1' : '' ?>">
+                            <p><?= $row['name'] ?></p>
+                        </div>
+                        <?php foreach ($row['type'] as $key => $type) : ?>
+                            <div class="title <?= $class != 'container-two-col' ? 'col-' . ($key + 2) : '' ?>">
+                                <p><?= ucfirst($type) ?></p>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <div class="block-item-content">
+                        <?php foreach ($row['child'] as $name => $child) : ?>
+                            <div class="item">
+                                <div class="content <?= $class != 'container-two-col' ? 'col-1' : '' ?>">
+                                    <p><?= $name ?></p>
+                                </div>
+                                <?php foreach ($child as $key => $item) : ?>
+                                    <div class="content <?= $class != 'container-two-col' ? 'col-' . ($key + 2) : '' ?>">
+                                        <div class="checkbox-custom">
+                                            <input type="checkbox"
+                                                   name="item[<?= $item['id'] ?>]" <?= $item['value'] ? 'checked' : '' ?> />
+                                            <label></label>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+            <div>
+                <button type="submit"><?= __('Save') ?></button>
+            </div>
+        </form>
+    </div>
+</div>

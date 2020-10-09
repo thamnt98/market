@@ -1,0 +1,21 @@
+<?php
+/** @var \SM\DigitalProduct\Block\Index\HowToBuy $block */
+?>
+
+<?php if (is_null($block->getHowToBuyIdentifier())):?>
+    <p><?= $block->escapeHtml(__("There is no day without internet! From updating social media, chatting, reading online news, to online shopping, mobile package is your daily need.
+                        Make sure you always have internet connection by purchasing your online quota from Transmart.
+                        You can get every internet package from all operators here. Choose your data plan and get it with easy steps."))?></p>
+    <ol>
+        <li><?= $block->escapeHtml(__("Go to Transmart website."))?></li>
+        <li><?= $block->escapeHtml(__("Choose Top Up & Bills category on the homepage."))?></li>
+        <li><?= $block->escapeHtml(__("Go to Mobile Package menu."))?></li>
+        <li><?= $block->escapeHtml(__("Enter your mobile number or modem number, then choose the nominal."))?></li>
+        <li><?= $block->escapeHtml(__('Tap or click "Buy" button.'))?></li>
+        <li><?= $block->escapeHtml(__("Select your payment method and please make the payment. "))?></li>
+    </ol>
+    <p><?= $block->escapeHtml(__("Need to top up your mobile number for an important call? Or do you need to pay PLN electricity, PDAM water, BPJS, postpaid and Telkom bills?
+                        You can do it all with Transmart. Entrust your transactions with us. With secure and easy payment, we will make your life easier."))?></p>
+<?php else:?>
+    <?= $block->getLayout()->createBlock(\Magento\Cms\Block\Block::class)->setBlockId($block->getHowToBuyIdentifier())->toHtml();?>
+<?php endif;?>

@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="view.addto.wishlist" remove="true"/>
+        <referenceContainer name="content">
+            <referenceContainer name="product.info.social">
+                <block class="Magento\Wishlist\Block\Catalog\Product\View\AddTo\Wishlist" name="view.addto.shoppinglist"
+                       template="SM_ShoppingList::catalog/product/view/addto/wishlist.phtml" after="-">
+                    <arguments>
+                        <argument name="shoppingListPDPViewModel" xsi:type="object">SM\ShoppingList\ViewModel\PDPViewModel</argument>
+                    </arguments>
+                </block>
+            </referenceContainer>
+        </referenceContainer>
+    </body>
+</page>

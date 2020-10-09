@@ -1,0 +1,13 @@
+<?php if ($block->getLayout()->getBlock('blog.post.list')->getPostCollection()->getSize()) : ?>
+<script>
+    require(['jquery', 'gtmInspireMe', 'domReady!'],function ($, gtm) {
+        $(window).load(function () {
+            if (typeof dataLayerSourceObjects !== 'undefined') {
+                let data = [];
+                data['inspire_me_load'] = 'inspire_me_load';
+                gtm.push('inspire_me_load', data);
+            }
+        });
+    })
+</script>
+<?php endif; ?>

@@ -1,0 +1,25 @@
+<?php
+/** @var \SM\Sales\Block\Order\Button\ReorderAll $block */
+?>
+
+<form id="form-reorder-all-<?= $block->getParentOrderId()?>" action="<?= $block->getReorderAllUrl()?>" method="post">
+    <input type="hidden" name="parent_order_id" value="<?= $block->getParentOrderId() ?>"/>
+    <a type="button" data-gtm-event="reorder-all" data-gtm="<?= $block->escapeHtml($block->getParentOrderId()) ?>" id="btn-reorder-all-<?= $block->getParentOrderId()?>" class="action secondary pagebuilder-slide-button pagebuilder-button-secondary"><?= $block->escapeHtml(__('Reorder all')) ?></a>
+</form>
+
+<div id="confirm-reorder-all-<?= $block->getParentOrderId()?>" class="content" style="display:none;">
+    <span class="remove-wishlist-verify">
+        <span><?= $block->escapeHtml(__('Are you sure you want to reorder all items in this order? '))?></span><br>
+        <span><?= $block->escapeHtml(__('By confirming, all products will be added to your cart. '))?></span>
+    </span>
+</div>
+
+<script type="text/x-magento-init">
+{
+    "*": {
+        "ListingReorderAll": {
+            "parent_order_id" : "<?= $block->getParentOrderId()?>"
+        }
+    }
+}
+</script>

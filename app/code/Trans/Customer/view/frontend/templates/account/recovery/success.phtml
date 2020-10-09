@@ -1,0 +1,20 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ *
+ * @var $block \Magento\Customer\Block\Account\Forgotpassword
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var \Trans\Customer\Block\Account\Locked $block */
+?>
+
+<div>
+    <p><?php echo __('Recovery account success.') ?></p>
+    <ul>
+        <li><p><?php echo __('You can continue shopping by click this <a href="%1">link</a>, or', $block->getHomeUrl()); ?></p></li>
+        <li><p><?php echo __('You can set new password by click this this <a href="%1">link</a> or use <a href="%2">forgot password</a>', $block->getResetPasswordUrl(), $block->getForgotPasswordUrl()); ?></p></li>
+    </ul>
+</div>

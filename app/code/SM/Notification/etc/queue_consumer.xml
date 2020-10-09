@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_Notification
+ *
+ * Date: June, 02 2020
+ * Time: 4:20 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/consumer.xsd">
+    <consumer name="sm.notification.email" queue="sm.notification.email" connection="amqp" maxMessages="5000"
+              consumerInstance="Magento\Framework\MessageQueue\Consumer"
+              handler="SM\Notification\Model\Notification\Consumer\Email::process" />
+    <consumer name="sm.notification.sms" queue="sm.notification.sms" connection="amqp" maxMessages="5000"
+              consumerInstance="Magento\Framework\MessageQueue\Consumer"
+              handler="SM\Notification\Model\Notification\Consumer\Sms::process" />
+    <consumer name="sm.notification.push" queue="sm.notification.push" connection="amqp" maxMessages="5000"
+              consumerInstance="Magento\Framework\MessageQueue\Consumer"
+              handler="SM\Notification\Model\Notification\Consumer\Push::process" />
+</config>

@@ -1,0 +1,98 @@
+<?xml version="1.0"?>
+<!--
+  ~ @project    ct-corp-transmart
+  ~ @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+  ~ @author     Duc Nguyen Hoang <ducnh2@smartosc.com>
+  ~ @copyright  Copyright © 2020 SmartOSC. All rights reserved.
+  ~ @url        http://www.smartosc.com
+  -->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- API -->
+    <preference for="SM\Help\Api\Data\TopicInterface" type="SM\Help\Model\Topic"/>
+    <preference for="SM\Help\Api\TopicRepositoryInterface" type="SM\Help\Model\TopicRepository"/>
+    <preference for="SM\Help\Api\Data\TopicSearchResultsInterface" type="SM\Help\Model\TopicSearchResults"/>
+    <preference for="SM\Help\Api\Data\QuestionInterface" type="SM\Help\Model\Question"/>
+    <preference for="SM\Help\Api\QuestionRepositoryInterface" type="SM\Help\Model\QuestionRepository"/>
+    <preference for="SM\Help\Api\SearchRepositoryInterface" type="SM\Help\Model\SearchRepository"/>
+    <preference for="SM\Help\Api\Data\SearchResultsInterface" type="SM\Help\Model\SearchResults"/>
+    <preference for="SM\Help\Api\Data\SearchQuestionInterface" type="SM\Help\Model\SearchQuestion"/>
+    <preference for="SM\Help\Api\ContactRepositoryInterface" type="SM\Help\Model\ContactRepository"/>
+
+    <!-- Ui Component -->
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="sm_help_topic_listing_data_source" xsi:type="string">
+                    SM\Help\Model\ResourceModel\Topic\Grid\Collection
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="SM\Help\Model\ResourceModel\Topic\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">sm_help_topic</argument>
+            <argument name="resourceModel" xsi:type="string">SM\Help\Model\ResourceModel\Topic</argument>
+        </arguments>
+    </virtualType>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="sm_help_question_listing_data_source" xsi:type="string">
+                    SM\Help\Model\ResourceModel\Question\Grid\Collection
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="SM\Help\Model\ResourceModel\Question\Grid\Collection"
+                 type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">sm_help_question</argument>
+            <argument name="resourceModel" xsi:type="string">SM\Help\Model\ResourceModel\Question</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\Model\Entity\RepositoryFactory">
+        <arguments>
+            <argument name="entities" xsi:type="array">
+                <item name="SM\Help\Api\Data\QuestionInterface" xsi:type="string">SM\Help\Api\QuestionRepositoryInterface</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\EntityManager\MetadataPool">
+        <arguments>
+            <argument name="metadata" xsi:type="array">
+                <item name="SM\Help\Api\Data\QuestionInterface" xsi:type="array">
+                    <item name="entityTableName" xsi:type="string">sm_help_question</item>
+                    <item name="identifierField" xsi:type="string">question_id</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\EntityManager\Operation\ExtensionPool">
+        <arguments>
+            <argument name="extensionActions" xsi:type="array">
+                <item name="SM\Help\Api\Data\QuestionInterface" xsi:type="array">
+                    <item name="read" xsi:type="array">
+                        <item name="storeReader" xsi:type="string">SM\Help\Model\ResourceModel\Question\Relation\Store\ReadHandler</item>
+                    </item>
+                    <item name="create" xsi:type="array">
+                        <item name="storeCreator" xsi:type="string">SM\Help\Model\ResourceModel\Question\Relation\Store\SaveHandler</item>
+                    </item>
+                    <item name="update" xsi:type="array">
+                        <item name="storeUpdater" xsi:type="string">SM\Help\Model\ResourceModel\Question\Relation\Store\SaveHandler</item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\EntityManager\HydratorPool">
+        <arguments>
+            <argument name="hydrators" xsi:type="array">
+                <item name="SM\Help\Api\Data\QuestionInterface" xsi:type="string">Magento\Framework\EntityManager\AbstractModelHydrator</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

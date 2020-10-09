@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="trans_reports" translate="label" sortOrder="210" showInDefault="1" showInWebsite="0"
+                 showInStore="0">
+            <label>Reports</label>
+            <tab>transmart</tab>
+            <resource>SM_Reports::configuration</resource>
+            <group id="product" translate="label" sortOrder="10" showInDefault="1" showInWebsite="0"
+                   showInStore="0">
+                <label>Product</label>
+                <field id="recommendation_size" translate="label" type="text" sortOrder="0" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Recommendation For You Size</label>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

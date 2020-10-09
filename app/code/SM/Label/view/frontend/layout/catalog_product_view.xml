@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category  SM
+ * @package   SM_Label
+ * @license   http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ *
+ * @author    Logan Ta <phuongtt2@smartosc.com>
+ *
+ * @copyright 2020 Copyright (c) SmartOSC. All rights reserved.
+ * @url http://www.smartosc.com/
+ */
+ -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+            <referenceBlock name="page.main.title">
+            <!--template product label custom in product detail page-->
+                <block class="SM\Label\Block\Product\View\CustomLabel" name="custom.product.label.pdp" after="-"/>
+            </referenceBlock>
+    </body>
+</page>

@@ -1,0 +1,93 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var $block \Magento\Checkout\Block\Onepage\Link */
+?>
+<?php if ($block->isPossibleOnepageCheckout()) :?>
+    <button type="button"
+            data-role="proceed-to-checkout"
+            data-gtm-event="checkout-step-1"
+            title="<?= $block->escapeHtmlAttr(__('Checkout')) ?>"
+            class="action primary checkout<?= ($block->isDisabled()) ? ' disabled' : '' ?>"
+        <?php if ($block->isDisabled()) :?>
+            disabled="disabled"
+        <?php endif; ?>>
+        <span><?= $block->escapeHtml(__('Check Out')) ?></span>
+    </button>
+    <script type="text/javascript">
+        require(['jquery', 'gtmCheckout', 'mage/url', 'domReady!'], function ($, gtmCheckout, urlBuilder) {
+            $(window).load(function () {
+                $('[data-role="proceed-to-checkout"]').on('click',function () {
+                    if (typeof dataLayerSourceObjects !== 'undefined') {
+                        let productIds = [];
+                        $('input.item-checked:checked').each(function () {
+                            //Todo Remove Debug
+                            console.log($(this).attr('data-gtm-product-id'));
+                            console.log($(this).parents().eq(2).find('input[data-role="cart-item-qty"]').val());
+                            let data = {
+                                'productId' : $(this).attr('data-gtm-product-id'),
+                                'productQty' :$(this).parents().eq(2).find('input[data-role="cart-item-qty"]').val(),
+                                'delivery_option' : 'Not available'
+                            };
+                            productIds.push(data);
+                        });
+                        console.log(productIds);
+                        let data = {
+                            'productsInfo' : productIds
+                        };
+                        console.log(data);
+                        $.ajax({
+                            type: 'POST',
+                            url: urlBuilder.build('sm_gtm/gtm/product'),
+                            data: data,
+                            dataType: "json",
+                            async: true,
+                            success: function (result) {
+                                //Todo Remove Debug
+                                console.log(typeof result);
+                                console.log(result);
+                                if (result) {
+                                    var dataProducts = [];
+                                    var quantity = 0;
+                                    var total = 0;
+                                    $.each(result, function(key, value){
+                                        console.log(value);
+                                        try {
+                                            let product = JSON.parse(value);
+                                            dataProducts.push(product);
+                                            quantity += (product.quantity * 1);
+                                            console.log(quantity);
+                                            total += (product.quantity * product.price);
+                                            console.log(total);
+                                        } catch (e) {
+                                            window.location.href='<?= $block->getUrl('transcheckout')?>';
+                                        }
+                                    });
+                                    //Todo Remove Debug
+                                    console.log(dataProducts);
+                                    dataProducts['step'] = 1;
+                                    dataProducts['option'] = 'Review Product';
+                                    dataProducts['basket_value'] = total;
+                                    dataProducts['basket_quantity'] = quantity;
+                                    dataProducts['eventCallback'] = function () {
+                                        document.location = '<?= $block->getUrl('transcheckout')?>';
+                                    };
+                                    dataProducts['eventTimeout'] = 2000;
+                                    gtmCheckout.push('checkout',dataProducts);
+                                }
+                            },
+                            error: function () {
+                                window.location.href='<?= $block->getUrl('transcheckout')?>';
+                            }
+                        });
+                    } else {
+                        window.location.href='<?= $block->getUrl('transcheckout')?>';
+                    }
+                })
+            });
+        });
+    </script>
+<?php endif?>

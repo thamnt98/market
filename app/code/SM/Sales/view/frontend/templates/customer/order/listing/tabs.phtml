@@ -1,0 +1,16 @@
+<?php
+/** @var \SM\Sales\Block\Customer\Order\Tabs $block */
+
+?>
+
+<div class="item title <?= ($block->checkTabActive(\SM\Sales\Model\ParentOrderRepository::IN_PROGRESS) ? "active" : "") ?>">
+    <a class="switch" href="<?= $block->getUrl("sales/order/history", ['tab' => \SM\Sales\Model\ParentOrderRepository::IN_PROGRESS]) ?>">
+        <?= $block->escapeHtml(__('In Progress')) ?>
+    </a>
+</div>
+
+<div class="item title <?= ($block->checkTabActive(\SM\Sales\Model\ParentOrderRepository::COMPLETED) ? "active" : "") ?>">
+    <a class="switch" href="<?= $block->getUrl("sales/order/history", ['tab' => \SM\Sales\Model\ParentOrderRepository::COMPLETED]) ?>">
+        <?= $block->escapeHtml(__('Completed')) ?>
+    </a>
+</div>

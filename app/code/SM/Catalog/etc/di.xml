@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Sales\Model\ResourceModel\Report\Bestsellers">
+        <plugin name="trans_sales_report_bestsellers"
+                type="SM\Catalog\Plugin\Model\ResourceModel\Report\Bestsellers" sortOrder="30"/>
+    </type>
+
+    <preference for="Magento\Catalog\Block\Product\View\AddTo\Compare" type="SM\Catalog\Block\Product\View\AddTo\Compare"/>
+    <preference for="Magento\Catalog\Block\Product\Compare\ListCompare" type="SM\Catalog\Block\Product\Compare\ListCompare"/>
+    <preference for="Magento\CatalogWidget\Block\Product\ProductsList" type="SM\Catalog\Block\Product\Widget\ProductsList"/>
+    <preference for="Magento\Catalog\Ui\DataProvider\Product\Listing\Collector\Price" type="SM\Catalog\Ui\DataProvider\Product\Listing\Collector\Price"/>
+    <preference for="Magento\Catalog\Block\Product\ProductList\Toolbar"
+                type="SM\Catalog\Block\MagentoCatalog\Product\ProductList\Toolbar"/>
+    <preference for="Magento\Catalog\Block\Product\View\Attributes"
+                type="SM\Catalog\Block\Product\View\Attributes"/>
+    <preference for="Magento\Catalog\Model\Product"
+                type="SM\Catalog\Override\MagentoCatalog\Model\Product"/>
+</config>

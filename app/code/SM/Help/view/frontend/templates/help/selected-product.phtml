@@ -1,0 +1,96 @@
+<?php
+/**
+ * @category SM
+ * @package SM_Help
+ * @license     http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @author      Chinhvd <chinhvd@smartosc.com>
+ * @copyright   Copyright (c) SmartOSC. All rights reserved.
+ * @url http://www.smartosc.com/
+ */
+?>
+<?php /** @var SM\Help\Block\ContactUs\OrderProduct $block */ ?>
+<?php
+    $data = $block->getData();
+    $listProduct = $block->getProduct($data);
+    /** @var SM\Sales\Model\Data\SubOrderData $order */
+    $order = $block->getOrder($data);
+    $productIds = implode(",",$data['data']['productIDs']['productIDs']);
+    $parentIncrementId = $block->getParentOrder($order->getId())->getIncrementId();
+    $parentOrderId = $block->getParentOrder($order->getId())->getId();
+?>
+
+<?php if ($listProduct): ?>
+    <div id="reference-number" class="reference-number">
+        <label id="label-reference" class="title__contactus"><?= $block->escapeHtml(__('Reference Number '))?></label>
+        <div class="content-reference-number">
+            <span id='refer-number' class='refer-number-id'><?= $block->escapeHtml(__($parentIncrementId)) ?></span>
+            <a id="order-detail" target="_blank" href="<?= $block->getUrl("sales/invoice/view/id/" . $parentOrderId)?>">
+                <?= $block->escapeHtml(__('See Details')) ?>
+            </a>
+        </div>
+    </div>
+    <label id="label-track-product" class="label-track-order title__contactus"><?= $block->escapeHtml(__('Product with problems'))?></label>
+    <div id="product-track-box" class="product-track-box">
+        <div id="product-track-content">
+            <div id="product-track-head" class="order-track-box order-track-products">
+                <div class="order-track-head">
+                    <div id="product-total" class="gr-date-total">
+                <span id='product-track-box-selected' class='or-track-total'>
+                    <span><?= $block->escapeHtml(__('You have selected '))?>
+                        <span><?= count($listProduct) , count($listProduct) > 1 ? __(' products') : __(' product') ?></span>
+                    </span>
+                </span>
+                    </div>
+                    <div class="gr-status"><span class="or-track-status"><?= $block->escapeHtml(__('Status:')) ?><span
+                                class="color-blue"><?= $block->escapeHtml(__($order->getStatus())) ?></span>
+                                        </span>
+                    </div>
+                </div>
+                <div class="order-track-content">
+                    <div class="order-track-content__items">
+                        <?php foreach ($listProduct as $product): ?>
+                            <?php /** @var $product \Magento\Catalog\Model\Product */?>
+                            <img src="<?php echo $block->getImage($product, 70, 70)?>"/>
+                        <?php endforeach; ?>
+                        <input name="order_increment_id" hidden value="<?=  $order->getIncrementId() ?>" />
+                        <input name="order_id" hidden value="<?= $order->getId() ?>" />
+                        <input name="product_ids" hidden value="<?= $productIds ?>" />
+                    </div>
+
+                    <div class="order-track-content__edit">
+                        <a id="product-list-edit" class="edit-product" href="#"><span class="apl-pencil"></span><?= $block->escapeHtml(__('Edit'))?></a>
+                    </div>
+                </div>
+                <div class="order-track-content__bottom">
+                    <div class="gr-date-total">
+                        <div class="bt-chage-delete">
+                            <a href="#" id="return-refund-change-order" class="change-order"><?= $block->escapeHtml(__('Change Order ')) ?></a>
+                            <a href="#" id="return-refund-remove-order" class="remove-order"><?= $block->escapeHtml(__('Remove Order ')) ?></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
+<script>
+    require([
+        'jquery',
+    ], function ($) {
+        let helpOrderList = $('.help-order-list'),
+            returnRefundOrder = $('#return-refund-order');
+        $("#return-refund-change-order").on('click',function () {
+            helpOrderList.modal('openModal');
+        });
+
+        $("#return-refund-remove-order").on('click',function () {
+            $('#selected-product').hide();
+            $("#button-select-product").show();
+        });
+
+        $("#product-list-edit").on('click',function () {
+            returnRefundOrder.modal("openModal");
+        });
+    });
+</script>

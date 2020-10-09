@@ -1,0 +1,141 @@
+<?php 
+/**
+ * @category Trans
+ * @package  Trans_Customer
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ * @author   Original Imam Kusuma <imam.kusuma@ctcorpdigital.com>
+ * @author   Another  Dwi Septha Kurniawan <septha.kurniawan@transdigital.co.id>
+ *
+ * Copyright © 2019 CT Corp Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+?>
+
+<div id="divOuter" class="field-otp" <?php echo $block->isHide() ? 'style="display: none;"' : ''; ?>>
+	<div id="divInner">
+		<input id="otp-field" type="text" name="otp" maxlength="6" data-validate="{required:true}"/>
+	</div>
+
+	<div class="actions-resend">
+        <button class="action resend-verification" title="<?= $block->escapeHtmlAttr(__('Resend')) ?>"><span><?= $block->escapeHtml(__('Resend')) ?></span></button>
+    </div>
+</div>
+
+<div class="wrapper-msg" style="display: none;">
+	<span class="message"></span>
+</div>
+
+<script>
+	// <![CDATA[
+	require(
+    [
+    	'jquery',
+        'mage/storage',
+        'mage/url',
+        'mage/translate'
+    ],
+    function ($, storage, urlBuilder) {
+        'use strict';
+
+     	var obj = $('#otp-field'), resendObj = $('.resend-verification'),
+     	redirectOnSuccess = "<?php echo $block->getRedirectIfSuccess() ?>", 
+     	redirectOnFailed = "<?php echo $block->getRedirectIfFail() ?>",
+     	formParams = <?php echo $block->getFormParams(); ?>,
+     	tokenBearer = "<?php echo $block->getTokenBearer(); ?>",
+     	verificationId = "<?php echo $block->getVerificationId() ?>";
+		
+		obj.on('keyup', stopCarret);
+		resendObj.on('click', sendVerification);
+
+		function stopCarret() {
+			if (obj.val().length > 5){
+				verify(obj);
+			}
+		}
+
+		function sendVerification() {
+			event.preventDefault();
+			$('.wrapper-msg').hide();
+			$('.wrapper-msg .message').html('');
+
+			var url = "<?php echo $block->getSendSmsVerificationUrl() ?>", telephone = formParams.telephone, postData, verification, isNeedCheck = formParams.isNeedCheck;
+			
+			if(!telephone) {
+				telephone = $('input[name="username"]').val(); //get username value
+			}
+
+			if(!telephone) {
+				telephone = $('input[name="login[username]"]').val(); //get username value
+			}
+
+			postData = '{"telephone":"' + telephone + '", "isNeedCheck": ' + isNeedCheck + '}';
+			
+			verification = $.parseJSON(
+                $.ajax({
+					type: 'post',
+                    showLoader: true,
+                    url: url,
+                    data: postData,
+                    contentType: 'application/json',
+					cache: false,
+                    async: false,
+                    beforeSend: function (xhr) {
+					    xhr.setRequestHeader('Authorization', 'Bearer ' + tokenBearer);
+					}
+                }).responseText
+            );
+
+            verification = $.parseJSON(verification);
+			
+			if(!verification.error) {
+				verificationId = verification.verification_id;
+			} else {
+				$('.wrapper-msg .message').html($.mage.__('Send verification code failed. Please make sure your phone number is valid and active.'));
+				$('.wrapper-msg').show();
+			}
+		}
+
+		function verify() {
+			var msg, url = "<?php echo $block->getVerifyUrl(); ?>", postData;
+
+			if(!verificationId) {
+				verificationId = $('input[name="verification_id"]').val();
+			}
+			
+			postData = '{"code":"' + obj.val() + '", "verificationId":"' + verificationId + '"}';
+			
+			$.ajax({
+				type: 'post',
+				data: postData,
+				showLoader: true,
+				url: url,
+				contentType: 'application/json',
+				cache: false,
+				success: function(result) {
+					if(result == true) {
+						if(redirectOnSuccess) {
+							window.location.href = redirectOnSuccess;
+						}
+
+						<?php if($block->isSubmitForm()) { ?>
+							$(".<?php echo $block->getFormClass() ?>").submit();
+							$('.submit').attr("disabled", true);
+                        	$('body').trigger('processStart');
+						<?php } ?>
+						// msg = $.mage.__('Verification success.');
+					} else {
+						if(redirectOnFailed) {
+							window.location.href = redirectOnFailed;
+						}
+						msg = $.mage.__('Verification code wrong!');
+					}
+					$('.wrapper-msg').show();
+					$('.wrapper-msg .message').html(msg);
+			    }
+			});
+		}		   
+		
+    });
+	// ]]>
+</script>

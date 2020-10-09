@@ -1,0 +1,12 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Framework\Console\CommandListInterface">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="sm_setup_upgrade_cms" xsi:type="object">SM\Setup\Console\Command\UpgradeCms</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\Data\Form\Element\Select">
+        <plugin name="SM_Setup::FormSelectPlugin" type="SM\Setup\Plugin\Magento\Framework\Data\Form\Element\Select" />
+    </type>
+</config>

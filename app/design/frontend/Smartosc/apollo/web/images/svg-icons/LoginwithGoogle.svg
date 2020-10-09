@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 59.1 (86144) - https://sketch.com -->
+    <title>Group 2</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <circle id="path-1" cx="21" cy="21" r="21"></circle>
+        <filter x="-13.1%" y="-8.3%" width="126.2%" height="126.2%" filterUnits="objectBoundingBox" id="filter-2">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="1.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0.688887002   0 0 0 0 0.688887002   0 0 0 0 0.688887002  0 0 0 0.5 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+        <path d="M0.245,0.0718095238 L0.245,5.28214286 L7.595,5.28214286 C7.2786,6.96552381 6.3168,8.39342857 4.8706,9.34904762 L4.8706,9.34904762 L4.8706,12.7282381 L9.2834,12.7282381 C11.8664,10.382 13.356,6.9282381 13.356,2.82542857 L13.356,2.82542857 C13.356,1.87119048 13.2678,0.952857143 13.1068,0.0718095238 L13.1068,0.0718095238 L0.245,0.0718095238 Z" id="path-3"></path>
+        <path d="M0.6412,0.936285714 L0.6412,4.42733333 C2.8882,8.82980952 7.5068,11.8485714 12.845,11.8485714 L12.845,11.8485714 C16.5326,11.8485714 19.6238,10.643 21.8834,8.58538095 L21.8834,8.58538095 L17.4706,5.20619048 C16.247,6.01404762 14.6818,6.49047619 12.845,6.49047619 L12.845,6.49047619 C9.2876,6.49047619 6.2762,4.1207619 5.2024,0.936285714 L5.2024,0.936285714 L0.6412,0.936285714 Z" id="path-5"></path>
+        <path d="M2.0412,0.613142857 C1.1144,2.4332381 0.588,4.48947619 0.588,6.66309524 L0.588,6.66309524 C0.588,8.83671429 1.1144,10.8957143 2.0412,12.7130476 L2.0412,12.7130476 L6.6024,9.222 C6.3308,8.41552381 6.174,7.55104762 6.174,6.66309524 L6.174,6.66309524 C6.174,5.77514286 6.3308,4.91066667 6.6024,4.10419048 L6.6024,4.10419048 L6.6024,0.613142857 L2.0412,0.613142857 Z" id="path-7"></path>
+        <path d="M0.6412,7.51790476 L5.2024,11.0089524 C6.2762,7.82447619 9.2876,5.4547619 12.845,5.4547619 L12.845,5.4547619 C14.8512,5.4547619 16.6502,6.13419048 18.0656,7.46957143 L18.0656,7.46957143 L21.9842,3.60566667 C19.6182,1.43204762 16.5256,0.0966666667 12.845,0.0966666667 L12.845,0.0966666667 C7.5068,0.0966666667 2.8882,3.11542857 0.6412,7.51790476 L0.6412,7.51790476 Z" id="path-9"></path>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard-Copy" transform="translate(-1364.000000, -163.000000)">
+            <g id="Group-2" transform="translate(1367.000000, 164.000000)">
+                <g id="Oval-Copy">
+                    <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
+                    <use fill="#F7F7F7" fill-rule="evenodd" xlink:href="#path-1"></use>
+                </g>
+                <g id="Group-13" transform="translate(8.000000, 8.000000)">
+                    <g id="Group-3" transform="translate(14.000000, 11.530538)">
+                        <mask id="mask-4" fill="white">
+                            <use xlink:href="#path-3"></use>
+                        </mask>
+                        <g id="Clip-2"></g>
+                        <polygon id="Fill-1" fill="#3E82F1" mask="url(#mask-4)" points="-7.343 20.213 20.9426 20.213 20.9426 -7.41295238 -7.343 -7.41295238"></polygon>
+                    </g>
+                    <g id="Group-6" transform="translate(1.400000, 15.673395)">
+                        <mask id="mask-6" fill="white">
+                            <use xlink:href="#path-5"></use>
+                        </mask>
+                        <g id="Clip-5"></g>
+                        <polygon id="Fill-4" fill="#32A753" mask="url(#mask-6)" points="-6.9482 19.3333333 29.4714 19.3333333 29.4714 -6.54709524 -6.9482 -6.54709524"></polygon>
+                    </g>
+                    <g id="Group-9" transform="translate(0.000000, 7.387681)">
+                        <mask id="mask-8" fill="white">
+                            <use xlink:href="#path-7"></use>
+                        </mask>
+                        <g id="Clip-8"></g>
+                        <polygon id="Fill-7" fill="#F9BB00" mask="url(#mask-8)" points="-7 20.1978095 14.1904 20.1978095 14.1904 -6.87161905 -7 -6.87161905"></polygon>
+                    </g>
+                    <g id="Group-12" transform="translate(1.400000, 0.482919)">
+                        <mask id="mask-10" fill="white">
+                            <use xlink:href="#path-9"></use>
+                        </mask>
+                        <g id="Clip-11"></g>
+                        <polygon id="Fill-10" fill="#E74133" mask="url(#mask-10)" points="-6.9482 18.4923333 29.5694 18.4923333 29.5694 -7.38809524 -6.9482 -7.38809524"></polygon>
+                    </g>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

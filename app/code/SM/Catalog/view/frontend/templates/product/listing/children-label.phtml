@@ -1,0 +1,22 @@
+<?php
+/**
+ * SMCommerce
+ *
+ * Date: June, 01 2020
+ * Time: 2:03 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ */ ?>
+<?php /** @var $block \SM\Catalog\Block\Product\ProductList\Item\Details\ChildrenLabel */ ?>
+<?php $count = $block->countChildren(); ?>
+<?php if ($count): ?>
+    <div class="swatch-options">
+        <span class="oval-swatch oval-black"></span>
+        <span class="oval-swatch oval-pink"></span>
+        <span class="oval-swatch oval-dark-blue"></span>
+        <span class="oval-swatch oval-dark-blue2"></span>
+        <span class="oval-number"><?= $count ?></span>
+    </div>
+<?php endif; ?>

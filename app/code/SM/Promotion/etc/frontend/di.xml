@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_Promotion
+ *
+ * Date: September, 21 2020
+ * Time: 5:57 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Quote\Model\Quote\TotalsCollector">
+        <plugin name="AmastyPromo::AutoAdd" disabled="true" />
+        <plugin name="SM_Promotion::OverrideAmastyAutoAdd"
+                type="SM\Promotion\Plugin\MagentoQuote\Model\Quote\TotalsCollector" />
+    </type>
+    <preference for="Amasty\Promo\Block\Items" type="SM\Promotion\Override\AmastyPromo\Block\Items" />
+</config>

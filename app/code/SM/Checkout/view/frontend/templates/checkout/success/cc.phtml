@@ -1,0 +1,437 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var SM\Checkout\Block\Checkout\Success $block */
+
+$orderItems = $block->getOrderItems();
+$imageBlock = $block->getLayout()->createBlock('Magento\Catalog\Block\Product\ListProduct');
+$freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
+?>
+<div class="wrapper-payment " data-block="success">
+    <div class="logo-bank">
+        <img src='<?= $block->getViewFileUrl('images/payment-success-credit-card.png'); ?>' alt=""
+             width="306"/>
+    </div>
+    <div class="success-payment">
+        <p class="status-payment"><?= $block->escapeHtml(__('Payment Successful!')) ?></p>
+        <p class="text-label-body"><?= $block->getCreatedAt() ?></p>
+    </div>
+    <div class="total-payment">
+        <label class="text-label-body"><?= $block->escapeHtml(__('Total Payment')) ?></label>
+        <p class="text-body"><?= $block->getGrandTotal() ?></p>
+        <span class="text-label-body">
+        <?= $block->escapeHtml(__('We have authorized your card temporarily. You will be charged once your order is completed.')) ?>
+        </span>
+    </div>
+
+    <div class="total-payment payment-method">
+        <label class="text-label-body"><?= $block->escapeHtml(__('Payment Method')) ?></label>
+        <div class="virtual-account">
+            <?php
+            if (!empty($block->getLogoPayment())) :
+                ?>
+                <img src='<?= $block->getLogoPayment() ?>' alt=""  height="40"/>
+            <?php
+            else:
+                ?>
+                <span class="text-label-body"><?= $block->getTitlePaymentMethod() ?></span>
+
+            <?php
+            endif;
+            ?>
+        </div>
+    </div>
+
+    <div class="invoice-number">
+        <label class="text-label-body"><?= $block->escapeHtml(__('Reference Number')) ?></label>
+        <p class="text-body"><?= $block->getReferenceNumber() ?></p>
+    </div>
+
+
+</div>
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<div class="wrapper-payment hidden" data-block="confirm">
+    <div class="logo-bank">
+        <img src='<?= $block->getViewFileUrl('images/order-confirmed.png'); ?>' alt=""  width="306"/>
+    </div>
+
+    <div class="success-payment">
+        <p class="status-payment"><?= $block->escapeHtml(__('Order Confirmed')) ?></p>
+        <p class="text-label-body"><?= $block->getCreatedAt() ?></p>
+    </div>
+    <div class="order-info no-bground">
+        <div class="invoice-number">
+            <label class="text-label-body"><?= $block->escapeHtml(__('Reference Number')) ?></label>
+            <p class="text-body"><?= $block->getReferenceNumber() ?></p>
+        </div>
+        <div class="total-payment">
+            <label class="text-label-body"><?= $block->escapeHtml(__('Total Payment')) ?></label>
+            <p class="text-body price-red"><?= $block->getGrandTotal() ?></p>
+        </div>
+        <div class="total-payment payment-method">
+            <label class="text-label-body"><?= $block->escapeHtml(__('Payment Method')) ?></label>
+            <div class="virtual-account">
+                <?php
+                if (!empty($block->getLogoPayment())) :
+                    ?>
+                    <img src='<?= $block->getLogoPayment() ?>' alt=""  height="40" />
+                <?php endif;?>
+                <?php if ($block->isVirtualAccount()): ?>
+                    <span><?= $block->escapeHtml(__("Virtual Account")) ?></span>
+                <?php else:?>
+                    <span><?= $block->escapeHtml(__("Credit Card")) ?></span>
+                <?php endif; ?>
+            </div>
+        </div>
+        <!-- <div class="invoice-number">
+            <label class="text-label-body"><?/*= $block->escapeHtml(__('Reference Number')) */?></label>
+            <p class="text-body"><?/*= $block->getReferenceNumber() */?></p>
+        </div>-->
+    </div>
+
+    <!-- please style Pickup at store information -->
+    <?php if ($block->isPickupAtStore()):?>
+        <div class="block-payment product-purchased">
+            <div class="block-header product-header">
+                <div>
+                    <h4 class="tl-order-id"><?= $block->escapeHtml(__('Pick-Up Store Information')) ?></h4>
+                </div>
+                <div class="arrown-scroll">
+                    <a class="arrow pickup" href="javascript:void(0)" onclick="togglePickup()"></a>
+                </div>
+            </div>
+            <div class="pick-at-store-info ">
+                <div class="pick-store-name">
+                    <h4><?= $block->getPickupStoreName() ?></h4>
+                    <p><?= $block->getFullAddress() ?>
+                    </p>
+                </div>
+                <div class="pick-store-date">
+                    <h4><?= $block->escapeHtml(__('Pick Up Date')) ?></h4>
+                    <p><?= $block->getStorePickupTime() ?></p>
+                </div>
+                <div class="map-store">
+                    <div id="map" style="width: 100%;height: 300px"></div>
+                </div>
+                <div class="direction">
+                    <span class="apl-ArrowIcon"></span>
+                    <span>Direction</span>
+                </div>
+            </div>
+        </div>
+    <?php
+    endif;
+    ?>
+    <?php $childOrders = $block->getChildOrders($block->getOrderId()); ?>
+    <?php if (empty($childOrders)): ?>
+        <div class="block-payment product-purchased">
+            <div class="block-header product-header">
+                <div class="">
+                    <h4 class="tl-order-id"><?= $block->escapeHtml(__('Order ID')).' '.$block->getReferenceNumber() ?></h4>
+                    <p><?= $block->isPickupAtStore()?$block->getPickupStoreName():$block->getDeliveryAddress() ?></p>
+                </div>
+                <div class="arrown-scroll arrown-scroll-<?= $block->getOrderId() ?>">
+                    <a class="arrow" href="javascript:void(0)" onclick="toggleContent(<?= $block->getOrderId(); ?>)"></a>
+                </div>
+            </div>
+            <div class="order-content order-content-<?= $block->getOrderId() ?>">
+                <div class="block-content product-content">
+                    <ul>
+
+                        <?php
+                        /** @var \Magento\Sales\Model\Order\Item $orderItem */
+                        $totalItem = 0;
+                        foreach ($orderItems as $index => $orderItem):
+                            if (empty($orderItem->getParentItemId())):
+                                $totalItem++;
+                                ?>
+
+                                <li data-href="order-item" class="<?= $totalItem>3 ? 'hidden' :'' ?>" data-index="<?= $index ?>">
+                                    <div class="wrap-info-detail">
+                                        <img src='<?= $block->getProductImageUrl( $orderItem->getProduct()) ?>' alt=""
+                                             height="74"/>
+                                        <div class="info-product">
+                                            <p><?= $orderItem->getProduct()->getName() ?></p>
+
+                                            <?php if ($freshHelper->isFreshProduct($orderItem->getProduct())) : ?>
+                                                <?php /** @var \SM\FreshProduct\Block\Order\Item $freshBlock */
+                                                $freshBlock = $block->getLayout()->getBlock("fresh.item");
+                                                ?>
+                                                <?php if ($freshBlock) : ?>
+                                                    <?= $freshBlock->setProduct($orderItem->getProduct())->setQty((int)$orderItem->getQtyOrdered())->toHtml(); ?>
+                                                <?php endif; ?>
+                                            <?php else: ?>
+                                                <span><?= (int)$orderItem->getQtyOrdered() ?> pc<?= (int)$orderItem->getQtyOrdered()>1?'s':'' ?> (<?= number_format($orderItem->getProduct()->getWeight()) ?> <?= $block->getWeightUnit() ?>)</span>
+                                            <?php endif; ?>
+
+                                            <?php
+                                            if ($orderItem->getChildrenItems()) {
+                                                $options=$orderItem->getProductOptions();
+                                                if ($orderItem->getProduct()->getTypeId()==\Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
+                                                    if (!empty($options['attributes_info'])) {
+                                                        foreach ($options['attributes_info'] as $attribute) {
+                                                            echo '<br>';
+                                                            echo '<span>'.$attribute['label'].': '.$attribute['value'].'</span>';
+                                                        }
+                                                    }
+                                                }
+                                                elseif ($orderItem->getProduct()->getTypeId()==\Magento\Bundle\Model\Product\Type::TYPE_CODE) {
+                                                    /** @var \Magento\Sales\Model\Order\Item $childrenItem */
+                                                    foreach ($orderItem->getChildrenItems() as $childrenItem){
+                                                        $option = $childrenItem->getProductOptions();
+                                                        echo '<br>';
+                                                        echo '<strong>'.json_decode($option['bundle_selection_attributes'])->option_label.': </strong>';
+                                                        if ($childrenItem->getProduct()->getTypeId()==\Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
+                                                            if (!empty($option['attributes_info'])) {
+                                                                foreach ($option['attributes_info'] as $attribute) {
+                                                                    echo '<br>';
+                                                                    echo '<span>'.$attribute['label'].': '.$attribute['value'].'</span>';
+                                                                }
+                                                            }
+                                                        } else {
+                                                            echo '<span>'. $childrenItem->getProduct()->getName().'</span>';
+                                                        }
+                                                    }
+                                                }else{
+                                                    foreach ($orderItem->getChildrenItems() as $childrenItem){
+
+                                                        ?>
+                                                        <br>
+                                                        <span><?= $childrenItem->getName() ?></span>
+                                                        <?php
+                                                    }
+                                                }
+                                            }
+                                            ?>
+                                        </div>
+                                    </div>
+                                    <div class="wrap-info-subtotal">
+                                        <h4 class="subtotal"><?= $block->renderPrice($orderItem->getRowTotal()) ?></h4>
+                                    </div>
+                                </li>
+
+                            <?php endif; endforeach;
+                        ?>
+
+                    </ul>
+                </div>
+                <?php
+                $more = $totalItem - 3;
+                if ($more > 0):
+                    ?>
+                    <div class="block-footer product-footer" data-id="show-more">
+                        <a class="" href="javascript:void(0)" onclick="showMore()">+ <?= $more ?> more product<?=$more>1?'s':''?></a>
+                    </div>
+                <?php
+                endif;
+                ?>
+            </div>
+        </div>
+    <?php else: ?>
+        <?php foreach ($childOrders as $child): ?>
+            <div class="block-payment product-purchased">
+                <div class="block-header product-header">
+                    <div class="">
+                        <h4 class="tl-order-id"><?= $block->escapeHtml(__('Order ID')).' '.$child->getReferenceOrderId() ?></h4>
+                        <p><?= ($child->getShippingMethod() == 'store_pickup_store_pickup') ? $block->getChildOrderPickupAtStore($child)->getName() : $block->getChildOrderDeliveryAddress($child) ?></p>
+                    </div>
+                    <div class="arrown-scroll arrown-scroll-<?= $child->getId() ?>">
+                        <a class="arrow" href="javascript:void(0)" onclick="toggleContent(<?= $child->getId() ?>)"></a>
+                    </div>
+                </div>
+                <div class="order-content order-content-<?= $child->getId() ?>">
+                    <div class="block-content product-content">
+                        <ul>
+
+                            <?php
+                            /** @var \Magento\Sales\Model\Order\Item $orderItem */
+                            $totalItem = 0;
+                            foreach ($child->getAllItems() as $index => $orderItem):
+                                if (empty($orderItem->getParentItemId())):
+                                    $totalItem++;
+                                    ?>
+
+                                    <li data-href="order-item" class="<?= $totalItem>3 ? 'hidden' :'' ?>" data-index="<?= $index ?>">
+                                        <div class="wrap-info-detail">
+                                            <img src='<?= $block->getProductImageUrl( $orderItem->getProduct()) ?>' alt=""
+                                                 width="74"/>
+                                            <div class="info-product">
+                                                <p><?= $orderItem->getProduct()->getName() ?></p>
+
+                                                <?php if ($freshHelper->isFreshProduct($orderItem->getProduct())) : ?>
+                                                    <?php /** @var \SM\FreshProduct\Block\Order\Item $freshBlock */
+                                                    $freshBlock = $block->getLayout()->getBlock("fresh.item");
+                                                    ?>
+                                                    <?php if ($freshBlock) : ?>
+                                                        <?= $freshBlock->setProduct($orderItem->getProduct())->setQty((int)$orderItem->getQtyOrdered())->toHtml(); ?>
+                                                    <?php endif; ?>
+                                                <?php else: ?>
+                                                    <span><?= (int)$orderItem->getQtyOrdered() ?> pc<?= (int)$orderItem->getQtyOrdered()>1?'s':'' ?> (<?= number_format($orderItem->getProduct()->getWeight()) ?> <?= $block->getWeightUnit() ?>)</span>
+                                                <?php endif; ?>
+
+                                                <?php
+                                                if ($orderItem->getChildrenItems()) {
+                                                    $options=$orderItem->getProductOptions();
+                                                    if ($orderItem->getProduct()->getTypeId()==\Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
+                                                        if (!empty($options['attributes_info'])) {
+                                                            foreach ($options['attributes_info'] as $attribute) {
+                                                                echo '<br>';
+                                                                echo '<span>'.$attribute['label'].': '.$attribute['value'].'</span>';
+                                                            }
+                                                        }
+                                                    }
+                                                    elseif ($orderItem->getProduct()->getTypeId()==\Magento\Bundle\Model\Product\Type::TYPE_CODE) {
+                                                        /** @var \Magento\Sales\Model\Order\Item $childrenItem */
+                                                        foreach ($orderItem->getChildrenItems() as $childrenItem){
+                                                            $option = $childrenItem->getProductOptions();
+                                                            echo '<br>';
+                                                            echo '<strong>'.json_decode($option['bundle_selection_attributes'])->option_label.': </strong>';
+                                                            if ($childrenItem->getProduct()->getTypeId()==\Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
+                                                                if (!empty($option['attributes_info'])) {
+                                                                    foreach ($option['attributes_info'] as $attribute) {
+                                                                        echo '<br>';
+                                                                        echo '<span>'.$attribute['label'].': '.$attribute['value'].'</span>';
+                                                                    }
+                                                                }
+                                                            } else {
+                                                                echo '<span>'. $childrenItem->getProduct()->getName().'</span>';
+                                                            }
+                                                        }
+                                                    }else{
+                                                        foreach ($orderItem->getChildrenItems() as $childrenItem){
+
+                                                            ?>
+                                                            <br>
+                                                            <span><?= $childrenItem->getName() ?></span>
+                                                            <?php
+                                                        }
+                                                    }
+                                                }
+                                                ?>
+                                            </div>
+                                        </div>
+                                        <div class="wrap-info-subtotal">
+                                            <h4 class="subtotal"><?= $block->renderPrice($orderItem->getRowTotal()) ?></h4>
+                                        </div>
+                                    </li>
+
+                                <?php endif; endforeach;
+                            ?>
+
+                        </ul>
+                    </div>
+                    <?php
+                    $more = $totalItem - 3;
+                    if ($more > 0):
+                        ?>
+                        <div class="block-footer product-footer" data-id="show-more">
+                            <a class="" href="javascript:void(0)" onclick="showMore()">+ <?= $more ?> more product<?=$more>1?'s':''?></a>
+                        </div>
+                    <?php
+                    endif;
+                    ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    <?php endif; ?>
+
+    <div class="block-payment bill-paid-details">
+        <div class="block-header">
+            <h4><?= $block->escapeHtml(__('Payment Details')) ?></h4>
+        </div>
+        <div class="block-content bill-paid-content">
+            <div class="item">
+                <span class="title-item"><?= $block->escapeHtml(__("Subtotal"))?> (<?= $totalItem ?> item<?= $totalItem>1?'s':'' ?>)</span>
+                <span class="info-item"><?= $block->getSubTotal() ?></span>
+            </div>
+            <div class="item">
+                <span class="title-item"><?= $block->escapeHtml(__("Delivery Fee"))?></span>
+                <span class="info-item"><?= $block->getShippingFee() ?></span>
+            </div>
+            <div class="item">
+                <span class="title-item"><?= $block->escapeHtml(__("Voucher"))?></span>
+                <span class="info-item"><?= $block->getDiscountAmount() ?></span>
+            </div>
+            <div class="item hidden">
+                <span class="title-item">Bank Mega 10% Discount</span>
+                <span class="info-item">- Rp 50.000</span>
+            </div>
+        </div>
+        <div class="block-footer bill-paid-footer">
+            <div class="total">
+                <span class="title-total">Total</span>
+                <span class="info-total"><?= $block->getGrandTotal() ?></span>
+            </div>
+            <div class="note">
+                <p><?= $block->getTitlePaymentMethod() ?></p>
+            </div>
+        </div>
+    </div>
+    <div class="check-payment-row">
+        <?php if ($block->getOrderIsVirtual()):?>
+            <a class="btn-outline-secondary" href="/sales/order/digital/id/<?= $block->getOrderId() ?>"><?= $block->escapeHtml(__("Check My Order"))?></a>
+        <?php else:?>
+            <a class="btn-outline-secondary" href="/sales/order/physical/id/<?= $block->getOrderId() ?>"><?= $block->escapeHtml(__("Check My Order"))?></a>
+        <?php endif;?>
+        <a class="action primary" href="/"><?= $block->escapeHtml(__("Back to Home"))?></a>
+    </div>
+</div>
+<?php if ($block->getOrderIsVirtual()):?>
+    <script>
+        jQuery(window).load(function () {
+            window.setTimeout(function(){
+                window.location.href = "<?= $block->getUrl("transcheckout/digitalproduct/confirmed", ["id" => $block->getOrderId()])?>";
+            }, <?= $block->getTimeRedirect() ?>);
+        })
+    </script>
+<?php else:?>
+    <script>
+        setTimeout(function () {
+            jQuery('[data-block=success]').addClass('hidden');
+            jQuery('[data-block=confirm]').removeClass('hidden');
+            jQuery('html, body').animate({ scrollTop: 0 }, 500, function () {
+            });
+        }, <?= $block->getTimeDisplayConfirmPage() ?>);
+
+        function showMore() {
+            jQuery('[data-href="order-item"]').removeClass('hidden');
+            jQuery('[data-id="show-more"]').addClass('hidden');
+        }
+        function toggleContent(id){
+            jQuery('.arrown-scroll-' + id + ' .arrow').toggleClass('active');
+            jQuery('.order-content-' + id).toggleClass('hidden');
+        }
+        function togglePickup(){
+            jQuery('.arrown-scroll .arrow.pickup').toggleClass('active');
+            jQuery('.pick-at-store-info').toggleClass('hidden');
+        }
+    </script>
+<?php endif;?>
+
+<?php
+if ($block->isPickupAtStore()):
+    ?>
+    <script>
+        function initMap() {
+            // The location of Uluru
+            var uluru = {lat: <?= $block->getPickupStoreInfo('latitude') ?>, lng: <?= $block->getPickupStoreInfo('longitude') ?>};
+            // The map, centered at Uluru
+            var map = new google.maps.Map(
+                document.getElementById('map'), {zoom: 10, center: uluru});
+            // The marker, positioned at Uluru
+            var marker = new google.maps.Marker({position: uluru, map: map});
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=<?= $block->getSecret() ?>&callback=initMap">
+    </script>
+<?php
+endif;
+?>

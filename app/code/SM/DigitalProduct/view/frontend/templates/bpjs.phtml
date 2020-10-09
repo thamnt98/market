@@ -1,0 +1,175 @@
+<?php
+/** @var \SM\DigitalProduct\Block\Bpjs\Index $block */
+
+?>
+
+
+<div class="digital-product-billing">
+    <?php
+    /** @var \SM\DigitalProduct\Block\Banner $bannerBlock */
+    $bannerBlock = $block->getChildBlock("digitalproduct.banner");
+    ?>
+    <?= $bannerBlock->toHtml()?>
+    <div class="product data items">
+        <?php
+        /** @var \SM\DigitalProduct\Block\Tab $tabBlock */
+        $tabBlock = $block->getChildBlock("digitalproduct.tab");
+        $tabBlock->setTab(\SM\DigitalProduct\Model\CategoryRepository::BPJS);
+        ?>
+        <?= $tabBlock->toHtml()?>
+        <div id="bpjs" class="item content bpjs" data-role="content">
+            <!-- start content-->
+            <h3 class="title-head-ct">Pay BPJS Premium</h3>
+
+            <div class="wrap-radio">
+                <div class="radio-custom-checkmark">Kesehatan
+                    <input type="radio"  name="radio" checked="checked" />
+                    <lable class="checkmark"></lable>
+                </div>
+                <div class="radio-custom-checkmark">Ketenagakerjaan
+                    <input type="radio" name="radio"  />
+                    <lable class="checkmark"></lable>
+                </div>
+            </div>
+
+            <!--start box kesehatan-->
+            <div class="bpjs-kese">
+
+                <label class="label-input">Family Virtual Account Number<span class="dpl-tooltip"><a href="#" aria-describedby="tooltip-6" >
+                                <img src='<?= $block->getViewFileUrl('images/info.svg'); ?>' alt=""  width="13" height="16" /></a>
+                            <span class="tooltip-content" id="tooltip-6" role="tooltip">Reference number for payment sent
+        by SMS after your BPJS registration.</span></span></label>
+                <div class="wrap-input">
+                    <input class="input-text" type="text" placeholder="" />
+                    <img src="https://via.placeholder.com/51x51.png" alt="" />
+                </div>
+
+                <div class="dpl-select sl-month">
+                    <label class="label-input">Pay for</label>
+                    <div class="sortby-dropdown shoplist-sortby">
+                            <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+                                <span><?= $block->escapeHtml('Select Month') ?></span>
+                            </span>
+                        <ul class="dropdown">
+                            <li class="item">Select Month</li>
+                            <li class="item">Select Month</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="dpb-block-mobile info-pln">
+                    <h3>Information</h3>
+                    <p>Starting 1 January 2020, BPJS Kesehatan fee has been adjusted as follows.</p>
+                    <p>1st class: from Rp 80.000 to Rp 160.000</p>
+                    <p>2nd class: from Rp 51.000 to Rp 110.000</p>
+                    <p>3rd class: from Rp 25.500 to Rp 42.000</p>
+                    <p class="mar-top-50">- Make sure you enter the right number according to your BPJS card.</p>
+                    <p>- Payment verification will be proceeded in maximum of 2 x 24 hours of working days.</p>
+                    <p>- Transaction with "Waiting for Operator" status on Friday, Saturday and Sunday will be proceeded on the next working days.</p>
+                </div>
+
+                <div class="dpb-bottom-price dpb-price-noprice">
+                    <a href="#" class="action primary">Check My Bill</a>
+                </div>
+
+                <div class="dpb-policy">
+                    <div class="dpb-title-head"><h3><?= $block->escapeHtml(__('How to Pay Your BPJS Premium')) ?></h3></div>
+                    <div class="dpd-policy-content">
+                        <p>Transmart now serves you with an option to pay yout BPJS premium. Only with your internet connection and an access to Transmart website or application, you can do your BPJS Kesehatan or BPJS Ketenagakerjaan payment in seconds. No more queuing to do this transaction, you just need to follow these steps.</p>
+                        <p class="mar-pad-0">Pay BPJS Kesehatan Online</p>
+                        <ol>
+                            <li>Go to Transmart website.</li>
+                            <li>Choose Top Up & Bills category on the homepage.</li>
+                            <li>Go to BPJS menu.</li>
+                            <li>Choose Kesehatan.</li>
+                            <li>Enter your Family Virtual Account Number.</li>
+                            <li>Select the period that you want to pay.</li>
+                            <li>Click "Check My Bill" button.</li>
+                            <li>Select your payment method and please make the payment.</li>
+                        </ol>
+                        <p class="mar-pad-0">Pay BPJS Ketenagakerjaan Online</p>
+                        <ol>
+                            <li>Go to Transmart website.</li>
+                            <li>Choose Top Up & Bills category on the homepage.</li>
+                            <li>Go to BPJS menu.</li>
+                            <li>Choose Ketenagakerjaan.</li>
+                            <li>Enter your KTP number.</li>
+                            <li>Select the period that you want to pay.</li>
+                            <li>Click "Check My Bill" button.</li>
+                            <li>Select your payment method and please make the payment.</li>
+                        </ol>
+                        <p>Don't miss the chance to do other bill transactions through Transmart. Here you can pay your PLN electricity bill, PDAM water bill, mobile postpaid bill, Telkom bill and top up your mobile number, mobile package and electricity token. Make your life convenient by doing your transactions through Transmart website and application. Secure payment options available for you to choose.</p>
+                    </div>
+                </div>
+
+            </div>
+            <!--End box kesehatan-->
+
+            <!--start box Ketenagakerjaan-->
+            <div class="bpjs-ketenaga">
+
+                <label class="label-input">KTP Number<span class="dpl-tooltip"><a href="#" aria-describedby="tooltip-7" >
+                                <img src='<?= $block->getViewFileUrl('images/info.svg'); ?>' alt=""  width="13" height="16" /></a>
+                            <span class="tooltip-content" id="tooltip-7" role="tooltip">Insert your KTP Number for your
+        BPJS Ketenagakerjaan.</span></span></label>
+                <div class="wrap-input">
+                    <input class="input-text" type="text" placeholder="" />
+                    <img src="https://via.placeholder.com/51x51.png" alt="" />
+                </div>
+
+                <div class="dpl-select sl-period">
+                    <label class="label-input">Pay for</label>
+                    <div class="sortby-dropdown shoplist-sortby">
+                            <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+                                <span><?= $block->escapeHtml('Select Period') ?></span>
+                            </span>
+                        <ul class="dropdown">
+                            <li class="item">Select Period</li>
+                            <li class="item">Select Period</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="dpb-block-mobile info-pln">
+                    <h3>Information</h3>
+                    <p>You can do BPJS billing code payment from SiskoTKLN in Transmart.</p>
+                </div>
+
+                <div class="dpb-bottom-price dpb-price-noprice">
+                    <a href="#" class="action primary">Check My Bill</a>
+                </div>
+
+                <div class="dpb-policy">
+                    <div class="dpb-title-head"><h3><?= $block->escapeHtml(__('How to Pay Your BPJS Premium')) ?></h3></div>
+                    <div class="dpd-policy-content">
+                        <p>Transmart now serves you with an option to pay yout BPJS premium. Only with your internet connection and an access to Transmart website or application, you can do your BPJS Kesehatan or BPJS Ketenagakerjaan payment in seconds. No more queuing to do this transaction, you just need to follow these steps.</p>
+                        <p class="mar-pad-0">Pay BPJS Kesehatan Online</p>
+                        <ol>
+                            <li>Go to Transmart website.</li>
+                            <li>Choose Top Up & Bills category on the homepage.</li>
+                            <li>Go to BPJS menu.</li>
+                            <li>Choose Kesehatan.</li>
+                            <li>Enter your Family Virtual Account Number.</li>
+                            <li>Select the period that you want to pay.</li>
+                            <li>Click "Check My Bill" button.</li>
+                            <li>Select your payment method and please make the payment.</li>
+                        </ol>
+                        <p class="mar-pad-0">Pay BPJS Ketenagakerjaan Online</p>
+                        <ol>
+                            <li>Go to Transmart website.</li>
+                            <li>Choose Top Up & Bills category on the homepage.</li>
+                            <li>Go to BPJS menu.</li>
+                            <li>Choose Ketenagakerjaan.</li>
+                            <li>Enter your KTP number.</li>
+                            <li>Select the period that you want to pay.</li>
+                            <li>Click "Check My Bill" button.</li>
+                            <li>Select your payment method and please make the payment.</li>
+                        </ol>
+                        <p>Don't miss the chance to do other bill transactions through Transmart. Here you can pay your PLN electricity bill, PDAM water bill, mobile postpaid bill, Telkom bill and top up your mobile number, mobile package and electricity token. Make your life convenient by doing your transactions through Transmart website and application. Secure payment options available for you to choose.</p>
+                    </div>
+                </div>
+
+            </div>
+            <!--End box Ketenagakerjaan-->
+
+        </div>
+    </div>
+</div>

@@ -1,0 +1,162 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+
+    <!-- Home API-->
+    <route url="/V1/homepage/getSlider" method="GET">
+        <service class="SM\MobileApi\Api\HomeInterface" method="getHomeSlider"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/homepage/getMostPopular" method="GET">
+        <service class="SM\MobileApi\Api\HomeInterface" method="getMostPopular"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <route url="/V1/homepage/getListingPromo" method="GET">
+        <service class="SM\MobileApi\Api\PromoInterface" method="getPromoListing"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/homepage/getSurpriseDeal" method="GET">
+        <service class="SM\MobileApi\Api\HomeInterface" method="getSurpriseDeal"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <!-- Product -->
+    <route url="/V1/product/getProductById" method="GET">
+        <service class="SM\MobileApi\Api\ProductInterface" method="getDetails"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <route url="/V1/product/getProductBySku" method="GET">
+        <service class="SM\MobileApi\Api\ProductInterface" method="getDetailsBySKU"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/product/getRelatedProduct" method="GET">
+        <service class="SM\MobileApi\Api\ProductInterface" method="getRelatedProducts"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <!--    search product -->
+    <route url="/V1/search/products" method="GET">
+        <service class="SM\MobileApi\Api\SearchProductInterface" method="search"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V2/search/products" method="GET">
+        <service class="SM\MobileApi\Api\SearchProductInterface" method="searchV2"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/search/products/recommendation" method="GET">
+        <service class="SM\MobileApi\Api\SearchProductInterface" method="getRecommendationProducts"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/search/products/suggestion" method="GET">
+        <service class="SM\MobileApi\Api\SearchProductInterface" method="getSearchSuggestion"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/search/products/scan" method="GET">
+        <service class="SM\MobileApi\Api\SearchProductInterface" method="searchProductByBarcode"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <!-- Cms Page -->
+    <route url="/V1/cms/getCmsPage" method="GET">
+        <service class="SM\MobileApi\Api\CmsManagementInterface" method="getCmsPages"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <!-- Store Config -->
+    <route url="/V1/store/storeViewsData" method="GET">
+        <service class="SM\MobileApi\Api\StoreInterface" method="getList"/>
+        <resources>
+            <resource ref="Magento_Backend::store"/>
+        </resources>
+    </route>
+
+    <!-- Cart -->
+    <route url="/V1/cart/addtocart" method="POST">
+        <service class="SM\MobileApi\Api\CartInterface" method="addToCart"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <route url="/V1/cart/getcartcount" method="GET">
+        <service class="SM\MobileApi\Api\CartInterface" method="getCartCount"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/cart/removecart/:id" method="DELETE">
+        <service class="SM\MobileApi\Api\CartInterface" method="removeCart"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/cart/getcartitems" method="GET">
+        <service class="SM\MobileApi\Api\CartInterface" method="getItems"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+</routes>

@@ -1,0 +1,77 @@
+<?php /** @var \SM\Notification\Block\Customer\Toolbar $block */?>
+<div class="headtab-toolbar">
+    <div class="wrap-date-sortby">
+        <div class="notification-filter-date">
+            <div class="control">
+                <input name="date" id="date-filter" title="<?= __('Date') ?>"
+                       placeholder="<?= __('Select Date') ?>"
+                       value="<?= $block->getDateFilterTxt() ?>"
+                       type="text" />
+            </div>
+        </div>
+    </div>
+    <?php if ($unread = $block->countUnread()) : ?>
+        <div class="mark-read">
+            <a id="mark-read-all-btn" href="#"><?= __("Mark All as Read (%1)", $unread) ?></a>
+        </div>
+    <?php endif; ?>
+</div>
+
+<script type="text/javascript">
+    require([
+        "jquery",
+        "mage/calendar"
+    ], function ($) {
+        let $date = $('#date-filter'),
+            baseUrl = '<?= $block->getCurrentUrl() ?>';
+
+        $($date).datepicker({
+                showMonthAfterYear: false,
+                dateFormat: 'dd M yy'
+            }
+        );
+
+        $($date).change(function () {
+            let url = baseUrl,
+                regex = /date=\d+-\d+-\d+/,
+                filter = '<?= \SM\Notification\Block\Customer\Toolbar::FILTER_DATE ?>=' +
+                    $.datepicker.formatDate('yy-mm-dd', $.datepicker.parseDate("dd M yy", $(this).val()));
+
+            if (regex.test(url)) {
+                window.location.href = url.replace(regex, filter);
+
+                return;
+            }
+
+            if (url.indexOf('?') < 1) {
+                url += '?';
+            } else {
+                url += '&';
+            }
+
+            url += filter;
+
+            window.location.href = url;
+        });
+
+        $('#mark-read-all-btn').click(function (e) {
+            e.preventDefault();
+            $('body').loader('show');
+            $.ajax({
+                url: '<?= $block->getReadAllUrl() ?>',
+                type: 'GET',
+                dataType: 'json',
+                success: function (response) {
+                    location.reload()
+                }
+            })
+        });
+    });
+</script>
+<script type="text/x-magento-init">
+{
+    "*": {
+        "SM_Notification/js/toolbar":{}
+    }
+}
+</script>

@@ -1,0 +1,332 @@
+<?php
+/** @var \SM\Sales\Block\Order\Physical\Detail $block */
+/** @var \SM\Sales\Api\Data\ParentOrderDataInterface $parentOrder */
+$parentOrder = $block->getParentOrder();
+$statuses = $block->getStatuses();
+$freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
+if ($parentOrder) {
+    ?>
+    <div class="my-order order-detail order-detail2" data-gtm-event="order-id"
+         data-gtm="<?= $parentOrder->getParentOrderId() ?>">
+        <div class="dis-flex title-order-detail">
+            <a href="<?= $block->getUrl("*/*/history") ?>"
+               class="back-orderlist"><?= $block->escapeHtml(__('Back to order list')) ?></a>
+        </div>
+
+        <div class="weighing-message" style="display: none">
+            <i class="notification-icon"></i>
+            <span><?= $block->escapeHtml(__('There is an adjustment after weighing your fresh products.')) ?></span>
+            <span><?= $block->escapeHtml(__("Don't worry, this adjustment amount won't be charged to your card.")) ?></span>
+            <span><?= $block->escapeHtml(__("Total adjustment: Rp 10000")) ?></span>
+        </div>
+
+        <?php if ($parentOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::STATUS_ORDER_CANCELED): ?>
+            <div class="error-message">
+                <span class="icon icon-error"></span>
+                <span class="error"><?= $parentOrder->getCancelMessage() ?></span>
+            </div>
+        <?php endif; ?>
+        <div class="table-product">
+            <div class="tpr-top">
+                <div class="tpr-top-left">
+                    <span class="tl-invoice-number"><?= $block->escapeHtml(__('Reference Number')) ?></span>
+                    <h4 data-gtm="<?= $block->escapeHtml(($parentOrder->getReferenceNumber())) ?>">
+                        <?= $block->escapeHtml(__($parentOrder->getReferenceNumber())) ?>
+                        <?php if (!is_null($parentOrder->getInvoiceNumber())): ?>
+                            <a href="<?= $block->getUrl("*/invoice/view",
+                                ["id" => $parentOrder->getParentOrderId()]) ?>" target="_blank">
+                                <?= $block->escapeHtml(__('See Invoice')) ?>
+                            </a>
+                        <?php endif; ?>
+                    </h4>
+                    <span
+                        class="date"><?= $block->escapeHtml(__($block->timeFormat($parentOrder->getOrderDate()))) ?></span>
+                </div>
+                <div class="bx-total-payment total-payment-detail">
+                    <span class="tl-invoice-number"><?= $block->escapeHtml(__('Total Payment')) ?></span>
+                    <h4 data-gtm="<?= $block->escapeHtml($parentOrder->getTotalPayment()) ?>"><?= $block->escapeHtml(__($block->currencyFormat($parentOrder->getTotalPayment()))) ?></h4>
+                    <span class="date"><?= $block->escapeHtml(__('Payment Method: %1',
+                            $parentOrder->getPaymentMethod())) ?></span>
+                </div>
+                <div class="tpr-top-right">
+                    <?php if ($parentOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::STATUS_COMPLETE): ?>
+                        <button data-gtm-event="reorder-all"
+                                data-gtm="<?= $block->escapeHtml($parentOrder->getParentOrderId()) ?>"
+                                id="btn-reorder-all" type="submit"
+                                class="action primary"><?= $block->escapeHtml(__('Reorder All')) ?></button>
+                        <button type="submit" class="action secondary"
+                                onclick="document.location.href = '<?= $block->getUrl("review/customer/list") ?>'"><?= $block->escapeHtml(__('Give Review')) ?></button>
+                    <?php endif; ?>
+                </div>
+            </div>
+            <!-- order-detail content -->
+            <?php
+            /** @var \SM\Sales\Api\Data\SubOrderDataInterface $subOrder */
+            foreach ($parentOrder->getSubOrders() as $subOrder) :?>
+                <?php $isPickUp = $subOrder->getShippingMethodCode() == "store_pickup_store_pickup" ?>
+                <div class="order-detail-content">
+                    <div class="dis-flex order-detail-ct-top">
+                        <div class="order-id">
+                            <span class="order-id-info"><?= $block->escapeHtml(__('Order ID')) ?></span>
+                            <h4><?= $block->escapeHtml(__($subOrder->getSubOrderId())) ?></h4>
+                        </div>
+                        <div class="order-delivery-method">
+                            <span class="order-id-info"><?= $block->escapeHtml(__('Delivery Method')) ?></span>
+                            <h4><?= $block->escapeHtml(__($subOrder->getShippingMethod())) ?></h4>
+                        </div>
+                        <?php
+                        /** @var \SM\Sales\Block\Order\Digital\Part\Content $paymentInfoBlock */
+                        $paymentInfoBlock = $block->getChildBlock("sm.sales.order.detail.payment");
+                        $paymentInfoBlock->setParentOrder($parentOrder); ?>
+                        <?= $paymentInfoBlock->toHtml() ?>
+                    </div>
+                    <!--prodgress-bar status-->
+                    <?php
+                    /** @var \SM\Sales\Block\Customer\Order\ProgressBar $progressBlock */
+                    $progressBlock = $block->getChildBlock("sm.sales.order.detail.progress.bar");
+                    $progressBlock->setStatuses($statuses);
+                    $progressBlock->setStatus($subOrder->getStatus())->setStatusHistories($subOrder->getStatusHistory());
+                    $progressBlock->setDeliveryMethodCode($subOrder->getShippingMethodCode());
+                    $progressBlock->setIsDetail(true); ?>
+                    <?= $progressBlock->toHtml() ?>
+                    <!--End prodgress-bar status-->
+
+
+                    <div class="dis-flex delivey-tracking">
+                        <div class="od-delivery-address">
+                            <?php if ($isPickUp): ?>
+                                <?php if ($subOrder->getStoreInfo()): ?>
+                                    <?php
+                                    /** @var \SM\MobileApi\Api\Data\Catalog\Product\StoreInfoInterface $storeInfo */
+                                    $storeInfo = $subOrder->getStoreInfo();
+                                    $preparedStreet = $block->prepareStreet($storeInfo->getStreet()); ?>
+                                    <span
+                                        class="delivery-address"><?= $block->escapeHtml(__('Store Information')) ?></span>
+                                    <h4><?= $block->escapeHtml($storeInfo->getName()) ?></h4>
+                                    <p><?= $block->escapeHtml($preparedStreet["street"]) ?></p>
+                                    <p><?= $block->escapeHtml($preparedStreet["last"]) ?></p>
+                                    <p><?= $block->escapeHtml($block->pickUpTimeDateFormat($storeInfo->getPickUpDate()) . ", " . $storeInfo->getPickUpTime()) ?></p>
+                                <?php endif; ?>
+                            <?php else: ?>
+                                <?php if ($subOrder->getDeliveryAddress()): ?>
+                                    <?php
+                                    /** @var \SM\Sales\Api\Data\DeliveryAddressDataInterface $deliveryAddress */
+                                    $deliveryAddress = $subOrder->getDeliveryAddress(); ?>
+                                    <span
+                                        class="delivery-address"><?= $block->escapeHtml(__('Delivery Address')) ?></span>
+                                    <h4><?= $block->escapeHtml($deliveryAddress->getFullName()) ?></h4>
+                                    <p><?= $block->escapeHtml($deliveryAddress->getStreet()) ?></p>
+                                    <p><?= $block->escapeHtml($deliveryAddress->getCity() . ", " . $deliveryAddress->getCountry()) ?></p>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                        </div>
+                        <div class="tracking-order">
+                            <?php if (!$isPickUp): ?>
+                                <span class="delivery-address"><?= $block->escapeHtml(__('Tracking Number')) ?></span>
+                                <h4><?= $block->escapeHtml(__('SK383092814')) ?></h4>
+                                <a href="#" class="track-order" data-trigger="track-order"
+                                   data-gtm-event="track_order_click"
+                                   data-gtm="<?= $block->escapeHtml($parentOrder->getParentOrderId()) ?>"><?= $block->escapeHtml(__('Order Updates')) ?></a>
+                                <div data-bind="mageInit: {
+                            'Magento_Ui/js/modal/modal':{
+                            'type': 'popup',
+                            'title': 'Track Order',
+                            'trigger': '[data-trigger=track-order]',
+                            'modalClass': 'pp-track-order',
+                            'responsive': true
+                            }}">
+                                    <div class="ct-track-order">
+                                        <div class="tracking-number">
+                                            <span><?= $block->escapeHtml(__('Tracking Number')) ?></span>
+                                            <h3><?= $block->escapeHtml(__('SK383092821')) ?></h3>
+                                        </div>
+                                        <div class="deliver-from">
+                                            <span><?= $block->escapeHtml(__('Deliver From')) ?></span>
+                                            <h3><?= $block->escapeHtml(__('JNE Tomang')) ?></h3>
+                                        </div>
+                                        <div class="status-history">
+                                            <h5 class="tl-status-history"><?= $block->escapeHtml(__('Status History')) ?></h5>
+                                            <?php foreach ($subOrder->getStatusHistoryDetails() as $history): ?>
+                                                <div class="status-history-info status-delivery active">
+                                                    <span class="ic-status-bar"></span>
+                                                    <h4><?= $block->escapeHtml(__($history->getComment())) ?></h4>
+                                                    <span class="date"><?= $history->getCreatedAt() ?></span>
+                                                </div>
+                                            <?php endforeach; ?>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <ul class="list-items-review">
+                        <?php
+                        /** @var \SM\Sales\Api\Data\DetailItemDataInterface $item */
+                        foreach ($subOrder->getItems() as $item) :?>
+                            <?php $isBundle = false; ?>
+                            <li class="item-review" data-gtm-event="complete-order-item"
+                                data-gtm="<?= $item->getSku() ?>">
+                                <div class="item-info">
+                                    <a href="<?= $block->escapeHtml($item->getUrl()) ?>"
+                                       title="<?= $block->escapeHtml($item->getProductName()) ?>"
+                                       class="product-item-photo">
+                                        <?php if ($subOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::STATUS_ORDER_CANCELED): ?>
+                                            <div class="image-canceled">
+                                                <span><?= $block->escapeHtml(__("Not Available")) ?></span></div>
+                                        <?php endif; ?>
+                                        <img src="<?= $block->escapeHtml($item->getImageUrl()) ?>" width="110"
+                                             height="110" alt="<?= $block->escapeHtml($item->getProductName()) ?>"/>
+                                    </a>
+                                    <div class="product-item-details">
+                                        <a href="<?= $block->escapeHtml($item->getUrl()) ?>"
+                                           class="product-item-name"><?= $block->escapeHtml($item->getProductName()) ?></a>
+                                        <dl class="item-options">
+                                            <?php if ($freshHelper->isFreshProduct($item->getFreshProduct())):?>
+                                                <?php /** @var \SM\FreshProduct\Block\Order\Item $freshBlock */
+                                                $freshBlock = $block->getChildBlock('fresh.item');
+                                                $freshBlock->setProduct($item->getFreshProduct());
+                                                $freshBlock->setQty((int)$item->getQuantity())?>
+                                                <?= $freshBlock->toHtml() ?>
+                                            <?php else: ?>
+                                                <?php if ($item->getProductType() == \SM\Sales\Model\ParentOrderRepository::OPTION_TYPE_CONFIGURABLE): ?>
+                                                    <?php foreach ($item->getOptions() as $key => $option): ?>
+                                                        <?php $char = $key != 0 ? ', ' : ''; ?>
+                                                        <p><?= $char . $block->escapeHtml($option->getOptionValue()) ?></p>
+                                                    <?php endforeach; ?>
+                                                <?php endif; ?>
+                                                <?php $qty = (int)$item->getQuantity(); ?>
+                                                <?php if ($item->getProductType() == \SM\Sales\Model\ParentOrderRepository::OPTION_TYPE_BUNDLE): ?>
+                                                    <?php $isBundle = true ?>
+                                                    <dd><span
+                                                            class="price"><?= $block->escapeHtml(__($qty . " Complete Package")) ?></span>
+                                                    </dd>
+                                                <?php else: ?>
+                                                    <dd><span
+                                                            class="price"><?= $block->escapeHtml(__($qty . (($qty > 1)? " pcs" : " pc"))) ?></span>
+                                                    </dd>
+                                                <?php endif; ?>
+                                            <?php endif; ?>
+                                        </dl>
+                                        <?= $block->getInstallationHtml($item) ?>
+                                    </div>
+                                </div>
+                                <div class="total-product-price">
+                                    <div class="gr-sub-price">
+                                        <span class="product-price"><?= $block->escapeHtml(__('Price')) ?></span>
+                                        <h4 class="price"><?= $block->escapeHtml($block->currencyFormat($item->getTotal())) ?></h4>
+                                    </div>
+                                    <?php if ($subOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::STATUS_COMPLETE): ?>
+                                        <?php
+                                        /** @var \SM\Sales\Block\Order\Button\ReorderItem $reorderBlock */
+                                        $reorderBlock = $block
+                                            ->getChildBlock("sm.sales.order.detail.reorder")
+                                            ->setItem($item); ?>
+                                        <?= $reorderBlock->toHtml() ?>
+                                    <?php endif; ?>
+                                </div>
+                                <?php if ($isBundle): ?>
+                                    <div class="bundle-items">
+                                        <dl class="item-options">
+                                            <?php foreach ($item->getOptions() as $option): ?>
+                                                <?php $values = json_decode($option->getOptionValue(), true); ?>
+                                                <dd>
+                                                    <dl>
+                                                        <?php foreach ($values as $value): ?>
+                                                            <strong><?= isset($value["title"]) ? $value["title"] : "" ?></strong>
+                                                            <dd><span><?= $option->getOptionSelection() ?></span></dd>
+                                                        <?php endforeach; ?>
+                                                    </dl>
+                                                </dd>
+                                            <?php endforeach; ?>
+                                        </dl>
+                                    </div>
+                                <?php endif; ?>
+                            </li>
+                        <?php endforeach; ?>
+                        <li class="item-review">
+                            <div class="delivery-fee">
+                                <h4><?= $block->escapeHtml(__('Delivery Fee')) ?></h4>
+                            </div>
+                            <div class="sub-total">
+                                <h4 class="price" data-gtm="<?= $block->escapeHtml($subOrder->getDeliveryFee()) ?>"
+                                    data-gtm-event="fee"><?= $block->escapeHtml($block->currencyFormat($subOrder->getDeliveryFee())) ?></h4>
+                                <?php if ($subOrder->getStatus() == \SM\Sales\Api\ParentOrderRepositoryInterface::STATUS_DELIVERED): ?>
+                                    <a
+                                        data-receive-url="<?= $block->getUrl("sales/order/receiveorder",
+                                            ["id" => $subOrder->getId()]) ?>"
+                                        style="cursor: pointer"
+                                        class="action primary received btn-received"
+                                        data-gtm-event="complete-order" data-gtm="<?= $subOrder->getStatusLabel() ?>">
+                                        <?= $block->escapeHtml(__('I have received this order')) ?>
+                                    </a>
+                                <?php endif; ?>
+                            </div>
+                        </li>
+
+                    </ul>
+                </div>
+            <?php endforeach; ?>
+            <!--End order-detail content-->
+
+            <!-- shopping summary-->
+            <div class="shopping-summary">
+                <h5 class="tl-summary"><?= $block->escapeHtml(__('Shopping Summary')) ?></h5>
+                <div class="dis-flex subtotal">
+                    <h4><?= $block->escapeHtml(__('Subtotal')) ?></h4>
+                    <h4 class="price"><?= $block->escapeHtml($block->currencyFormat($parentOrder->getSubTotal())) ?></h4>
+                </div>
+                <div class="dis-flex delivery-fee-sub">
+                    <h4><?= $block->escapeHtml(__('Delivery Fee Subtotal')) ?></h4>
+                    <h4 class="price"><?= $block->escapeHtml($block->currencyFormat($parentOrder->getTotalShippingAmount())) ?></h4>
+                </div>
+                <?php
+                /** @var \SM\Sales\Block\Order\VoucherDetail $voucherDetailBlock */
+                $voucherDetailBlock = $block->getLayout()->createBlock(\SM\Sales\Block\Order\VoucherDetail::class);
+                $voucherDetailBlock->setParentOrder($parentOrder); ?>
+                <?= $voucherDetailBlock->toHtml() ?>
+                <div class="dis-flex total">
+                    <h4><?= $block->escapeHtml(__('Total')) ?></h4>
+                    <h4 class="price"><?= $block->escapeHtml($block->currencyFormat($parentOrder->getTotalPayment())) ?></h4>
+                </div>
+            </div>
+            <!--end shopping summary-->
+            <div class="order-detail-bottom">
+                <div class="inner">
+                    <?php if ($parentOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::STATUS_IN_DELIVERY ||
+                        $parentOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::PICK_UP_BY_CUSTOMER): ?>
+                        <button class="action secondary help-order-form"
+                                onclick="window.location.href='<?= $block->getUrl("help/contactus") ?>'"><?= $block->escapeHtml(__('I have a problem with this order')) ?></button>
+                    <?php endif; ?>
+                    <p><?= $block->escapeHtml(__("Need help? Go to our")) ?> <a
+                            href="<?= $block->getUrl("help") . "my-orders.html" ?>"><?= $block->escapeHtml(__("Help Center")) ?></a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <form id="form-reorder-all" action="<?= $block->getReorderAllUrl() ?>" method="post" style="display: none">
+        <input type="hidden" name="parent_order_id" value="<?= $parentOrder->getParentOrderId() ?>"/>
+    </form>
+    <div id="confirm-reorder-all" class="content" style="display:none;">
+    <span class="remove-wishlist-verify">
+        <span><?= $block->escapeHtml(__('Are you sure you want to reorder all items in this order? ')) ?></span><br>
+        <span><?= $block->escapeHtml(__('By confirming, all products will be added to your cart. ')) ?></span>
+    </span>
+    </div>
+
+    <script type="text/x-magento-init">
+{
+    "*": {
+        "DetailReorderAll": {},
+        "SM_Sales/js/detail/receive-order": {
+
+        }
+    }
+}
+
+    </script>
+    <?php
+} else { ?>
+    <h1><?= $block->escapeHtml(__('Your Order Can\'t View. Please Try Again Later!')) ?> </h1>
+<?php } ?>

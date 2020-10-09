@@ -1,0 +1,31 @@
+{
+    "sm_digitalproduct_category": {
+        "column": {
+            "category_id": true,
+            "type": true,
+            "thumbnail": true,
+            "position": true,
+            "is_active": true,
+            "magento_category_ids": true
+        }
+    },
+    "sm_digitalproduct_category_store": {
+        "column": {
+            "category_store_id": true,
+            "store_id": true,
+            "category_name": true,
+            "information": true,
+            "how_to_buy": true,
+            "tooltip": true,
+            "category_id": true,
+            "info": true
+        }
+    },
+    "sm_digitalproduct_operator_icon": {
+        "column": {
+            "operator_icon_id": true,
+            "operator_service": true,
+            "icon": true
+        }
+    }
+}

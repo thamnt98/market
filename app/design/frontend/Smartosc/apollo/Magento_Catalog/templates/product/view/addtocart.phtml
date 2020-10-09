@@ -1,0 +1,77 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var $block \Magento\Catalog\Block\Product\View */
+?>
+<?php $_product = $block->getProduct(); ?>
+<?php $buttonTitle = __('Add to Cart'); ?>
+<?php if ($_product->isSaleable()) :?>
+    <div class="fieldset">
+        <?php if ($block->shouldRenderQuantity()) :?>
+            <div class="title-qty" for="qty"><?= $block->escapeHtml(__('Quantity')) ?></div>
+            <div class="qty-block" id="qty-action-pdp">
+            <span id="subtract-cart-item" class="subtract-cart-item decrease-qty" style="display: inline-block">
+                <span data-bind="i18n: '-'">-</span>
+            </span>
+
+                <div class="field qty">
+                    <div class="control">
+                        <input type="number"
+                               name="qty"
+                               id="qty"
+                               min="0"
+                               readonly
+                               value="<?= $block->getProductDefaultQty() * 1 ?>"
+                               title="<?= $block->escapeHtmlAttr(__('Qty')) ?>"
+                               class="input-text qty"
+                               data-validate="<?= $block->escapeHtmlAttr(json_encode($block->getQuantityValidators())) ?>"
+                        />
+                    </div>
+                </div>
+
+                <span id="add-cart-item" class="add-cart-item increase-qty" style="display: inline-block">
+                <span data-bind="i18n: '+'">+</span>
+            </span>
+                <div class="tooltip-qty" style="display: none;">
+                    <span class="tooltip-content"><?php echo __('Sorry, you have reached the maximum number of items for this product'); ?></span>
+                </div>
+            </div>
+        <?php endif; ?>
+        <div class="actions">
+            <button type="submit"
+                    title="<?= $block->escapeHtmlAttr($buttonTitle) ?>"
+                    class="action primary tocart"
+                    id="product-addtocart-button" disabled>
+                <span><?= $block->escapeHtml($buttonTitle) ?></span>
+            </button>
+            <?= $block->getChildHtml('', true) ?>
+        </div>
+    </div>
+<?php endif; ?>
+<script type="text/x-magento-init">
+    {
+        "#product_addtocart_form": {
+            "Magento_Catalog/js/validate-product": {}
+        }
+    }
+</script>
+<script type="text/x-magento-init">
+                    {
+                    "*": {
+                        "Magento_Ui/js/core/app": {
+                            "components": {
+                                "pdp-qty-action": {
+                                    "component": "Magento_Catalog/js/pdp/qty-product",
+                                        "config": {
+                                            "productType" : "<?php echo $_product->getTypeId(); ?>",
+                                            "productId" : "<?php echo $_product->getId(); ?>"
+                                                 }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+</script>

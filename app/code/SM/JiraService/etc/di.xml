@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Declare interface -->
+    <preference for="SM\JiraService\Api\Data\CreateTicketResponseInterface" type="SM\JiraService\Model\Data\CreateTicketResponse"/>
+
+    <preference for="SM\JiraService\Api\JiraRepositoryInterface" type="SM\JiraService\Model\JiraRepository"/>
+
+    <preference for="SM\JiraService\Api\Data\ResponseInterface" type="SM\JiraService\Model\Data\Response"/>
+
+</config>

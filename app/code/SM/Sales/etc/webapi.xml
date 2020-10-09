@@ -1,0 +1,105 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+
+    <route url="/V1/order/parent-orders" method="GET">
+        <service class="SM\Sales\Api\ParentOrderRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/order/reorder-quickly" method="GET">
+        <service class="SM\Sales\Api\ParentOrderRepositoryInterface" method="getListReorderQuickly"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/order/parent-orders/:orderId" method="GET">
+        <service class="SM\Sales\Api\ParentOrderRepositoryInterface" method="getById"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/order/items/reorder" method="POST">
+        <service class="SM\Sales\Api\OrderItemRepositoryInterface" method="reorder"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/order/items/reorder-all" method="POST">
+        <service class="SM\Sales\Api\OrderItemRepositoryInterface" method="reorderAll"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+
+    <route method="GET" url="/V1/invoice/view/:orderId">
+        <service class="SM\Sales\Api\InvoiceRepositoryInterface" method="getById"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+
+    <route method="GET" url="/V1/sub-orders/:subOrderId">
+        <service class="SM\Sales\Api\SubOrderRepositoryInterface" method="getById"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <route url="/V1/sub-orders" method="GET">
+        <service class="SM\Sales\Api\SubOrderRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route method="PUT" url="/V1/sub-orders/received/:subOrderId">
+        <service class="SM\Sales\Api\SubOrderRepositoryInterface" method="setReceivedById"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <route url="/V1/order/digital/:orderId" method="GET">
+        <service class="SM\Sales\Api\DigitalOrderRepositoryInterface" method="getById"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/order/statuses" method="GET">
+        <service class="SM\Sales\Api\SubOrderRepositoryInterface" method="getStatusLabel"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <!--  API for testing  -->
+    <route url="/V1/sub-orders/reset-status/:orderId" method="PUT">
+        <service class="SM\Sales\Api\SubOrderRepositoryInterface" method="resetStatus"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+</routes>

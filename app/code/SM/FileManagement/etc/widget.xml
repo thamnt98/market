@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<widgets xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Widget:etc/widget.xsd">
+    <widget id="transmart_file" class="SM\FileManagement\Block\Widget\File"
+            is_email_compatible="true"
+            placeholder_image="Magento_Catalog::images/product_widget_new.png" ttl="86400">
+        <label translate="true">Transmart File</label>
+        <description translate="true"/>
+        <parameters>
+            <parameter name="file_id" xsi:type="text" visible="true" required="true">
+                <label translate="true">File ID</label>
+            </parameter>
+            <parameter name="template" xsi:type="select" required="true" visible="false">
+                <label translate="true">Template</label>
+                <options>
+                    <option name="default" value="SM_FileManagement::widget/file/default.phtml"
+                            selected="true">
+                        <label translate="true">Default Template</label>
+                    </option>
+                </options>
+            </parameter>
+        </parameters>
+    </widget>
+</widgets>
+

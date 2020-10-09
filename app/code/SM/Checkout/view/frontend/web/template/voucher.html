@@ -1,0 +1,116 @@
+<!-- ko if:showVoucherBlock -->
+    <!-- ko if:canShow -->
+        <div class="bx-apply-voucher" data-trigger="apply-voucher" data-bind="click: function(){ openVoucherList() }">
+            <img data-bind="attr:{src: require.toUrl('images/svg-icons/Voucher.svg'), height: 18, width:30}"/>
+            <span data-bind="i18n: 'Apply your voucher'"></span>
+            <a href="#" data-bind="
+                text: getAddButtonTitle(),
+                attr: {
+                    class: 'bt-add ' + (applyList().length > 0 ? 'has-applied' : '')
+                }"
+            ></a>
+        </div>
+        <!-- ko foreach:{data: applyList, as: 'voucher'} -->
+            <div class="bx-remove-voucher applied">
+                <div class="til-code">
+                    <span class="tile-voucher" data-bind="html: voucher.code"></span>
+                    <!-- ko if : voucher.amount && voucher.amount != 0 -->
+                    <span class="code-voucher" data-bind="text: $parent.getFormattedPrice(voucher.amount)"></span>
+                    <!-- /ko -->
+                </div>
+                <div class="apply-remove">
+                    <span class="applied-vouver" data-bind="i18n: 'Applied'"><span class="voucher-icon"></span></span>
+                    <a href="#" class="bt-remove" data-bind="click: function(){ $parent.removeVoucher(voucher.code);}"><span
+                        class="apl-Remove"></span></a>
+                </div>
+            </div>
+        <!-- /ko -->
+        <!-- ko foreach:{data: notApplyList, as: 'voucher'} -->
+            <div class="bx-remove-voucher appliable">
+                <div class="til-code">
+                    <span class="tile-voucher" data-bind="html: voucher.code"></span>
+                </div>
+                <div class="apply-remove">
+                    <span class="applied-vouver" data-bind="i18n: 'Not Appliable'"><span class="voucher-icon"></span></span>
+                    <a href="#" class="bt-remove" data-bind="click: function(){ $parent.removeVoucher(voucher.code);}"><span
+                        class="apl-Remove"></span></a>
+                </div>
+            </div>
+        <!-- /ko -->
+        <div class="ct-apply-voucher" data-bind="attr:{id: 'ct-apply-voucher-popup'}, afterRender: onRenderComplete()">
+    <h2 class="voucher-list-title" data-bind="i18n: 'Apply Voucher'"></h2>
+    <div class="gr-search-ck">
+        <input type="text"
+               data-bind="attr:{id: 'voucher-search'}, valueUpdate: 'keypress', event: {keypress: searchEnter}"
+               class="input-text" placeholder="Find promos and discounts"/>
+        <button type="submit" class="action secondary"
+                data-bind="i18n: 'Search', click: function(){ findVoucher(); }"></button>
+    </div>
+    <div class="list-voucher">
+        <h5 class="list-voucher-tilte" data-bind="text: 'You have '+ voucherList().length +' voucher(s)'"></h5>
+        <ul class="list-items scrollbar">
+            <!-- ko foreach:{data: voucherList() , as: 'item'} -->
+            <li class="item-voucher" data-bind="attr:{description: item.name, name: item.discount_text}">
+                <div class="inner">
+                    <!-- ko if: item.time_left_txt -->
+                    <span class="time-use-voucher" data-bind="text: item.time_left_txt"></span>
+                    <!-- /ko -->
+                    <div class="img-voucher" data-bind="click: function (){ $parent.showDetails(item.id)}">
+                        <img data-bind="attr:{src: require.toUrl(item.image), height: 200, width:337}"/>
+                        <div class="img-voucher-ct">
+                            <span class="title-voucher" data-bind="text:'voucher'"></span>
+                            <h2 class="voucher-value" data-bind="text: item.discount_text"></h2>
+                            <span class="voucher-category" data-bind="text: item.discount_note"></span>
+                        </div>
+                    </div>
+                    <div class="item-voucher-detail">
+                        <p class="description" data-trigger="apply-voucher-detail" data-bind="text: item.name"></p>
+                        <!-- ko if: item.expired_txt -->
+                        <span class="valid-until" data-bind="text: item.expired_txt"></span>
+                        <!-- /ko -->
+                        <button class="action primary small"
+                                data-bind="i18n: 'Use', click: function(){ $parent.applyVoucher(item.code, false); }"></button>
+                    </div>
+                </div>
+                <div class="ct-apply-voucher"
+                     data-bind="attr:{id: 'ct-apply-voucher-popup-'+ item.id}, afterRender: $parent.onRenderCompleteDetails(item.id) ">
+                    <h2 class="tl-voucher-detail" data-bind="i18n: 'Apply Voucher'"></h2>
+                    <div class="banner-voucher-detail">
+                        <!-- ko if: item.time_left_txt -->
+                        <span class="time-use-voucher" data-bind="text: item.time_left_txt"></span>
+                        <!-- /ko -->
+                        <img data-bind="attr:{src: require.toUrl(item.image)}" alt=""/>
+                        <div class="img-voucher-ct">
+                            <span class="title-voucher" data-bind="text:'voucher'"></span>
+                            <h2 class="voucher-value" data-bind="text: item.discount_text"></h2>
+                            <span class="voucher-category" data-bind="text: item.discount_note"></span>
+                        </div>
+                    </div>
+                    <div class="voucher-ct-detail">
+                        <div class="wrap">
+                            <p class="description" data-bind="text: item.name"></p>
+                            <!-- ko if: item.expired_txt -->
+                            <span class="valid-until" data-bind="text: item.expired_txt"></span>
+                            <!-- /ko -->
+                        </div>
+                        <button class="action primary"
+                                data-bind="i18n: 'Use', click: function(){ $parent.applyVoucher(item.code, true); }"></button>
+                    </div>
+                    <div class="term-how-use scrollbar">
+                        <div class="box-term">
+                            <h4 class="title" data-bind="i18n: 'Terms & Conditions:'"></h4>
+                            <p class="content" data-bind="html: item.term_condition"></p>
+                        </div>
+                        <div class="box-how-use">
+                            <h4 class="title" data-bind="i18n: 'How to Use:'"></h4>
+                            <p class="content" data-bind="html: item.how_to_use"></p>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <!-- /ko -->
+        </ul>
+    </div>
+</div>
+    <!-- /ko -->
+<!-- /ko -->

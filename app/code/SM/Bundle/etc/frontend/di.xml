@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magento\Catalog\Block\Product\View" type="SM\Bundle\Block\Product\View" />
+    <preference for="Magento\Bundle\Block\Catalog\Product\View\Type\Bundle" type="SM\Bundle\Block\Catalog\Product\View\Type\Bundle" />
+    <preference for="Wizkunde\ConfigurableBundle\Model\Product\Type\Grouped"
+                type="SM\Bundle\Model\Product\Type\Grouped" />
+    <type name="Wizkunde\ConfigurableBundle\Model\Product\Type">
+        <plugin name="SM.Bundle.Wizkunde.Type.Grouped"
+                type="SM\Bundle\Plugin\Model\Product\Type" sortOrder="299" disabled="true"/>
+    </type>
+</config>

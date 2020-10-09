@@ -1,0 +1,29 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+?>
+<div class="new-checkout">
+    <div class="ck-payment">
+        <h3><?= $block->escapeHtml(__('Select Payment Method'))?></h3>
+        <div class="slect-payment-gr">
+            <a href="#" class="action pagebuilder-button-secondary bt-virtual active"><?= $block->escapeHtml(__('Virtual Account'))?></a>
+            <a href="#" class="action pagebuilder-button-secondary bt-debit-credit"><?= $block->escapeHtml(__('Debit & Credit Card'))?></a>
+            <a href="#" class="action pagebuilder-button-secondary bt-more"><?= $block->escapeHtml(__('+ More'))?></a>
+        </div>
+        <h3><?= $block->escapeHtml(__('Select Virtual Account'))?></h3>
+        <div class="sl-payment-infor">
+            <div class="bx-payment">
+                <img class="icon-card" src='<?= $block->getViewFileUrl('images/svg-icons/Voucher.svg'); ?>' alt=""  width="150" height="55" />
+            </div>
+            <div class="bx-payment">
+                <img class="icon-card" src='<?= $block->getViewFileUrl('images/svg-icons/Voucher.svg'); ?>' alt=""  width="150" height="55" />
+            </div>
+            <div class="bx-payment">
+                <img class="icon-card" src='<?= $block->getViewFileUrl('images/svg-icons/Voucher.svg'); ?>' alt=""  width="150" height="55" />
+            </div>
+        </div>
+    </div>
+</div>

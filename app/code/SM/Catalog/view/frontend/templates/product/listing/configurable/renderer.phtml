@@ -1,0 +1,21 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<?php
+/** @var $block \Magento\ConfigurableProduct\Block\Product\View\Type\configurable */
+$block->unsetData('allow_products');
+$count = count($block->getAllowProducts());
+?>
+<?php if ($count): ?>
+    <div class="swatch-options">
+        <span class="oval-swatch oval-black"></span>
+        <span class="oval-swatch oval-pink"></span>
+        <span class="oval-swatch oval-dark-blue"></span>
+        <span class="oval-swatch oval-dark-blue2"></span>
+        <span class="oval-number"><?= $count ?></span>
+    </div>
+<?php endif; ?>
+

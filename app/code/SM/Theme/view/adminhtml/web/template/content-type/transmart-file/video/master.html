@@ -1,0 +1,18 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<div attr="data.main.attributes" css="data.main.css" ko-style="data.main.style">
+    <div html="data.main.html" data-element="main"></div>
+    <div class="block-content">
+        <div if="data.contents.html" html="data.contents.html" attr="data.contents.attributes" data-appearance="grid"
+             data-element="contents"
+             class="bypass-html-filter"></div>
+        <a if="data.link.attributes().href" attr="data.link.attributes" ko-style="data.link.style" css="data.link.css">
+            <span data-bind="i18n: 'View More'"/>
+        </a>
+    </div>
+</div>

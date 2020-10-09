@@ -1,0 +1,43 @@
+<?php
+/** @var \SM\Review\Block\Customer\Toolbar $block */
+
+?>
+<div class="headtab-toolbar">
+    <div class="sortby-dropdown review-sortby">
+        <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+            <span><?= $block->escapeHtml(__('Sort by')) ?></span>
+        </span>
+
+            <ul class="dropdown">
+                <li class="item radio-custom">
+                    <input id="sort_desc" type="radio" value="desc" name="sort" <?= ($block->getRequest()->getParam("sort") == "desc" || !$block->getRequest()->getParam("sort")) ? "checked" : ""?>/>
+                    <label for="sort_desc"><?= $block->escapeHtml(__('Recent')) ?></label>
+                </li>
+                <li class="item radio-custom">
+                    <input id="sort_asc" type="radio" value="asc" name="sort" <?= ($block->getRequest()->getParam("sort") == "asc") ? "checked" : ""?>/>
+                    <label for="sort_asc"><?= $block->escapeHtml(__('Previous')) ?></label>
+                </li>
+            </ul>
+
+    </div>
+    <div class="shoplist-search review-search">
+        <div class="control">
+            <a id="btn-search-item" href="#"><span class="apl-ic_search"></span></a>
+
+                <input id="input-search" type="text" name="key" value="<?= ($block->getRequest()->getParam("key")) ? $block->getRequest()->getParam("key") : ""?>"
+                       placeholder="<?= $block->escapeHtml(__('Search by reference number, product name or product code'))?>"
+                       class="input-text" maxlength="128" role="combobox" aria-haspopup="false"
+                       aria-autocomplete="both" autocomplete="off" aria-expanded="true"
+                />
+
+        </div>
+    </div>
+</div>
+
+<script type="text/x-magento-init">
+{
+    "*": {
+        "SM_Review/js/toolbar":{}
+    }
+}
+</script>

@@ -1,0 +1,93 @@
+<?php
+
+/** @var \SM\Checkout\Block\DigitalProduct\Confirmed $block */
+
+/** @var \SM\Sales\Api\Data\DigitalOrderDataInterface $digitalOrder */
+$digitalOrder = $block->getDigitalOrder();
+$serviceType = $digitalOrder->getProductOption()->getExtensionAttributes()->getDigitalData()->getServiceType();
+?>
+
+<div class="wrapper-payment confirmed">
+    <div class="logo-bank">
+        <img src='<?= $block->getViewFileUrl('images/order-confirmed.png'); ?>' alt=""  width="461" height="406" />
+    </div>
+
+    <div class="success-payment">
+        <p class="status-payment"><?= $block->escapeHtml(__('Order Confirmed')) ?></p>
+        <p class="text-label-body"><?= $block->dateFormat($digitalOrder->getUpdatedAt())?></p>
+    </div>
+    <div class="order-info confirmed">
+        <div class="invoice-number">
+            <label class="text-label-body trans-id-label"><?= $block->escapeHtml(__('Transaction ID')) ?></label>
+            <p class="text-body trans-id"><?= $digitalOrder->getPaymentInfo()->getTransactionId() ?></p>
+        </div>
+        <div class="total confirmed">
+            <label class="text-label-body"><?= $block->escapeHtml(__('Total Payment')) ?></label>
+            <p class="text-body red"><?= $block->currencyFormat($digitalOrder->getGrandTotal())?></p>
+        </div>
+        <div class="total-payment payment-method">
+            <label class="text-label-body"><?= $block->escapeHtml(__('Payment Method')) ?></label>
+            <div class="virtual-account">
+                <h3><?= $digitalOrder->getPaymentMethod() ?></h3>
+            </div>
+        </div>
+    </div>
+    <div class="block-payment product-purchased">
+        <div id="accordion" data-mage-init='{
+        "accordion":{
+            "active": [0],
+            "collapsible": true,
+            "openedState": "active",
+            "multipleCollapsible": true
+        }}'>
+            <div data-role="collapsible">
+                <div data-role="trigger" class="block-header product-header accordion" style="cursor: pointer">
+                    <p><?= $block->escapeHtml((__('Order ID ')) . $digitalOrder->getReferenceOrderId()) ?></p>
+                </div>
+            </div>
+            <div data-role="content" class="block-content product-content">
+                <?php
+                /** @var \SM\Sales\Block\Order\Digital\Part\Content $contentBlock */
+                $contentBlock = $block->getLayout()->createBlock(\SM\Sales\Block\Order\Digital\Part\Content::class);
+                $contentBlock->setParentOrder($digitalOrder);
+                ?>
+                <?php if ($serviceType == \SM\DigitalProduct\Helper\Category\Data::ELECTRICITY_TOKEN_VALUE):?>
+                    <?php
+                    $contentBlock->setTemplate(\SM\Sales\Block\Order\Digital\Part\Content::TEMPLATE_CONTENT_PLN_TOKEN)
+                    ?>
+                <?php elseif ($serviceType == \SM\DigitalProduct\Helper\Category\Data::ELECTRICITY_BILL_VALUE):?>
+                    <?php
+                    $contentBlock->setTemplate(\SM\Sales\Block\Order\Digital\Part\Content::TEMPLATE_CONTENT_PLN_BILL)
+                    ?>
+                <?php else:?>
+                    <?php
+                    $contentBlock->setTemplate(\SM\Sales\Block\Order\Digital\Part\Content::TEMPLATE_CONTENT_MOBILE)
+                    ?>
+                <?php endif;?>
+                <?= $contentBlock->toHtml()?>
+            </div>
+        </div>
+    </div>
+    <div class="summary-confirmed">
+        <!-- shopping summary-->
+        <?php if ($serviceType == \SM\DigitalProduct\Helper\Category\Data::ELECTRICITY_TOKEN_VALUE):?>
+            <?php
+            $contentBlock->setTemplate(\SM\Sales\Block\Order\Digital\Part\Content::TEMPLATE_SUMMARY_PLN_TOKEN)
+            ?>
+        <?php elseif ($serviceType == \SM\DigitalProduct\Helper\Category\Data::ELECTRICITY_BILL_VALUE):?>
+            <?php
+            $contentBlock->setTemplate(\SM\Sales\Block\Order\Digital\Part\Content::TEMPLATE_SUMMARY_PLN_BILL)
+            ?>
+        <?php else:?>
+            <?php
+            $contentBlock->setTemplate(\SM\Sales\Block\Order\Digital\Part\Content::TEMPLATE_SUMMARY_MOBILE)
+            ?>
+        <?php endif;?>
+        <?= $contentBlock->toHtml()?>
+    </div>
+    <div class="check-payment-row">
+        <a href="/sales/order/digital/id/<?= $digitalOrder->getParentOrderId() ?>" class="btn-outline-secondary" type="button"><?= $block->escapeHtml(__("Check My Order"))?></a>
+        <a href="/" class="action primary" type="button"><?= $block->escapeHtml(__("Back to Home"))?></a>
+    </div>
+</div>
+

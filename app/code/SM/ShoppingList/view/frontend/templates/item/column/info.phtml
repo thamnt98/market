@@ -1,0 +1,67 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \SM\ShoppingList\Block\Item\Column\Image $block */
+
+/** @var \SM\ShoppingList\Api\Data\ShoppingListItemDataInterface $item */
+$item = $block->getItem();
+$productName = $item->getCustomAttribute("product_name")->getValue();
+$productUrl = $item->getCustomAttribute("product_url")->getValue();
+$productImage = $item->getCustomAttribute("product_image")->getValue();
+$productPrice = $item->getCustomAttribute("product_price")->getValue();
+$ratingSummary = $item->getCustomAttribute("product_rating")->getValue();
+$reviewCount = $item->getCustomAttribute("review_count")->getValue();
+$product = $block->getProductLabel();
+$label = $block->getLabel($product);
+$productModel = $block->getProduct();
+/** @var \SM\Catalog\Helper\Data $helper */
+$helper = $this->helper('SM\Catalog\Helper\Data');
+?>
+
+<a class="product-item-photo" tabindex="-1" href="<?= $block->escapeUrl($productUrl) ?>" title="<?= $block->escapeHtml($productName) ?>">
+    <span class="product-image-container" style="width:240px;">
+        <span class="product-image-wrapper" style="padding-bottom: 125%;">
+            <img class="product-image-photo" src="<?= $block->escapeHtml($productImage)?>" max-width="240" max-height="300" alt="<?= $block->escapeHtml($productName) ?>">
+        </span>
+    </span>
+    <span class="product-stock popular-sale-count-<?php echo $product->getId() ?>" style="display: none"></span>
+
+    <?php $count = $helper->countChildren($productModel); ?>
+    <?php if ($count): ?>
+        <div class="swatch-options">
+            <span class="oval-swatch oval-black"></span>
+            <span class="oval-swatch oval-pink"></span>
+            <span class="oval-swatch oval-dark-blue"></span>
+            <span class="oval-swatch oval-dark-blue2"></span>
+            <span class="oval-number"><?= $count ?></span>
+        </div>
+    <?php endif; ?>
+</a>
+<div class="shoppinglist-item-label"><?= $label ?></div>
+<strong class="product-item-name">
+    <a href="<?= $block->escapeUrl($productUrl) ?>" title="<?= $block->escapeHtml($productName) ?>" class="product-item-link">
+        <?= $block->escapeHtml($productName) ?>
+    </a>
+</strong>
+<?php
+$label = $ratingSummary;
+if (!$ratingSummary) {
+    $label = 0;
+    $ratingSummary = 1;
+}?>
+<div class="product-reviews-summary short">
+    <div class="rating-summary">
+        <div class="rating-result" title="<?= $label ?>%">
+            <span style="width:<?= $ratingSummary ?>%; cursor: pointer;" onclick="location.href = '<?= $productUrl?>'">
+                <span><?= $ratingSummary ?>%</span>
+            </span>
+        </div>
+    </div>
+    <span class="rating-count reviews-actions">(<?= $reviewCount ?>)</span>
+</div>
+<div class="product-price">
+<?= $block->getProductPrice() ?>
+</div>

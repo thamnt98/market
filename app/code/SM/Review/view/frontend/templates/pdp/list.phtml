@@ -1,0 +1,119 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var SM\Review\Block\Product\View\ListView $block */
+
+/** @var \SM\Review\Api\Data\ReviewDataInterface[] $reviews */
+$reviews = $block->getReviews();
+$reviewCollection = $block->getReviewCollection();
+
+$format = \IntlDateFormatter::MEDIUM;
+$templateType = \SM\Review\Block\ReviewRenderer::BOTTOM_VIEW;
+
+$productId = $block->getProductId();
+?>
+<div class="review-container">
+    <div class="title-review-head">
+        <?= $block->escapeHtml(__('Reviews')) ?>
+    </div>
+    <div id="review-pdp" class="review-summary review-pdp">
+        <div class="summary-review-info">
+            <?php
+            /** @var \SM\Review\Block\ReviewRenderer $summaryBlock */
+            $summaryBlock = $block->getChildBlock('product.review.summary.short'); ?>
+            <?= $summaryBlock->getSummaryShort($block->getProduct(), $templateType, false); ?>
+        </div>
+    </div>
+    <?php if (count($reviews)) : ?>
+        <div class="block review-list" id="customer-reviews">
+            <div class="block-content">
+                <div class="toolbar review-toolbar">
+                    <?= $block->getChildHtml('toolbar') ?>
+                </div>
+                <ol class="items review-items">
+                    <?php
+                    /** @var \SM\Review\Api\Data\ReviewDataInterface $review */
+                    foreach ($reviews as $review) : ?>
+                        <li class="item review-item" itemscope itemprop="review">
+                            <div class="review-item__img">
+                                <img src="<?= $review->getProfileImage();?>"/>
+                            </div>
+                            <div class="review-item__content">
+                                <div class="review-item__head">
+                                    <div class="review-item__author">
+                                        <?= $block->escapeHtml($review->getNickname()) ?>
+                                    </div>
+                                    <div class="review-item__date-time">
+                                        <time class="review-details-value" itemprop="datePublished" datetime="<?= $block->escapeHtmlAttr($block->formatDate($review->getCreatedAt(), $format)) ?>"><?= $block->escapeHtml($block->formatDate($review->getCreatedAt(), $format)) ?></time>
+                                    </div>
+                                </div>
+
+                                <?php if ($review->getRating() != 0) : ?>
+                                    <?php
+                                    $percent = floatval($review->getRating()) * 20;
+                                    ?>
+                                    <div class="review-item__ratings">
+                                        <div class="rating-summary item" itemprop="reviewRating" itemscope>
+                                            <div class="rating-result" title="<?= $block->escapeHtmlAttr($percent) ?>%">
+                                                <meta itemprop="worstRating" content = "1"/>
+                                                <meta itemprop="bestRating" content = "100"/>
+                                                <span style="width:<?= $block->escapeHtmlAttr($percent) ?>%">
+                                                        <span itemprop="ratingValue"><?= $block->escapeHtml($percent) ?>%</span>
+                                                    </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+                                <div class="review-item__title" itemprop="name"><?= $block->escapeHtml($review->getTitle()) ?></div>
+
+                                <div class="review-item__description" itemprop="description">
+                                    <?= /* @noEscape */ nl2br($block->escapeHtml($review->getDetail())) ?>
+                                </div>
+                                <div class="review-item__image">
+                                    <?php
+                                    $images = $review->getImages();
+                                    ?>
+                                    <?php foreach ($images as $image):?>
+                                        <a href="<?= $image ?>" target="_blank">
+                                            <img src="<?= $image ?>" />
+                                        </a>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        </li>
+                    <?php endforeach; ?>
+                </ol>
+                <div class="toolbar review-toolbar">
+                    <?php
+                    /** @var \Magento\Theme\Block\Html\Pager $pagerBlock */
+                    $pagerBlock = $block->getLayout()->createBlock(\Magento\Theme\Block\Html\Pager::class);
+                    $pagerBlock->setShowPerPage(false);
+                    $pagerBlock->setData("show_amounts", false);
+                    $pagerBlock->setCollection($reviewCollection) ?>
+                    <?= $pagerBlock->toHtml()?>
+                </div>
+            </div>
+        </div>
+    <?php else:?>
+        <div id="notice-empty" class="no-route" style="display: none">
+            <div class="no-route-info">
+                <img src="<?=$block->getViewFileUrl('images/myreview-tobe-reviewed.png')?>" alt="Your list is still empty" width="401"/>
+                <h4><?= $block->escapeHtml(__('Be the first to review this product! Share your thoughts with us.')) ?></h4>
+            </div>
+        </div>
+    <?php endif;?>
+</div>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "ReviewButton" :{
+                "product_id" : "<?= $productId;?>",
+                "process_url" : "<?= $block->getUrl("review/customer/allow")?>"
+
+            }
+        }
+    }
+</script>

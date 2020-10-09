@@ -1,0 +1,106 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<div class="my-review">
+    <h2><?= $block->escapeHtml(__('My Reviews')) ?></h2>
+    <div class="product data items"
+         data-mage-init='{"mage/tabs": {"openedState": "active", "animate": {"duration": 100}, "active": 1}}'>
+        <div class="item title" data-role="collapsible">
+            <a class="switch" data-toggle="trigger" href="#tab-tobe-review">
+                <?= $block->escapeHtml(__('To be Reviewed')) ?>
+            </a>
+        </div>
+        <div id="tab-tobe-review" class="item content tobe-review" data-role="content">
+            <!--header-dropdow and search-->
+            <div class="headtab-toolbar">
+                <div class="sortby-dropdown">
+                    <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+                        <span><?= $block->escapeHtml('Sort by') ?></span>
+                    </span>
+                    <ul class="dropdown">
+                        <li class="item radio-custom">
+                            <input type="radio" name="recent" checked/>
+                            <label for="recent"><?= $block->escapeHtml('Recent') ?></label>
+                        </li>
+                        <li class="item radio-custom">
+                            <input type="radio" name="previous"/>
+                            <label for="previous"><?= $block->escapeHtml('Previous') ?></label>
+                        </li>
+                    </ul>
+                </div>
+                <!-- search box---->
+                <div class="shoplist-search">
+                    <div class="control">
+                        <a href="#"><span class="apl-ic_search"></span></a>
+                        <input id="search" type="text" name="q" value=""
+                               placeholder="<?= $block->escapeHtml(__('Search by invoice number, product name or product code'))?>"
+                               class="input-text" maxlength="128" role="combobox" aria-haspopup="false"
+                               aria-autocomplete="both" autocomplete="off" aria-expanded="true"/>
+                    </div>
+                </div>
+                <!-- search box---->
+            </div>
+            <!--header-dropdow and search-->
+            <!--search noresult-->
+            <div class="search-noresult">
+                <img width="150" src="<?= $block->getViewFileUrl('images/search-not-found.png') ?>"
+                     alt="<?= $block->escapeHtml(__('search result empty')) ?>" width="401"/>
+                <div class="search-noresult--content">
+                    <h2><?= $block->escapeHtml(__('Oops. We can\'t find it.')) ?></h2>
+                    <p><?= $block->escapeHtml(__('But no worries. Try again with other keyword.')) ?></p>
+                </div>
+            </div>
+            <!--search noresult-->
+        </div>
+        <div class="item title" data-role="collapsible">
+            <a class="switch" data-toggle="trigger" href="#tab-reviewed">
+                <?= $block->escapeHtml(__('Reviewed')) ?>
+            </a>
+        </div>
+        <div id="tab-reviewed" class="item content reviewed" data-role="content">
+            <!--header-dropdow and search-->
+            <div class="headtab-toolbar">
+                <div class="sortby-dropdown">
+                    <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+                        <span><?= $block->escapeHtml('Sort by') ?></span>
+                    </span>
+                    <ul class="dropdown">
+                        <li class="item radio-custom">
+                            <input type="radio" name="recent" checked/>
+                            <label for="recent"><?= $block->escapeHtml('Recent') ?></label>
+                        </li>
+                        <li class="item radio-custom">
+                            <input type="radio" name="previous"/>
+                            <label for="previous"><?= $block->escapeHtml('Previous') ?></label>
+                        </li>
+                    </ul>
+                </div>
+                <!-- search box---->
+                <div class="shoplist-search">
+                    <div class="control">
+                        <a href="#"><span class="apl-ic_search"></span></a>
+                        <input id="search" type="text" name="q" value=""
+                               placeholder="<?= $block->escapeHtml(__('Search by invoice number, product name or product code'))?>"
+                               class="input-text" maxlength="128" role="combobox" aria-haspopup="false"
+                               aria-autocomplete="both" autocomplete="off" aria-expanded="true"/>
+                    </div>
+                </div>
+                <!-- search box---->
+            </div>
+            <!--header-dropdow and search-->
+            <!--search noresult-->
+            <div class="search-noresult">
+                <img width="150" src="<?= $block->getViewFileUrl('images/search-not-found.png') ?>"
+                     alt="<?= $block->escapeHtml(__('search result empty')) ?>" width="401"/>
+                <div class="search-noresult--content">
+                    <h2><?= $block->escapeHtml(__('Oops. We can\'t find it.')) ?></h2>
+                    <p><?= $block->escapeHtml(__('But no worries. Try again with other keyword.')) ?></p>
+                </div>
+            </div>
+            <!--search noresult-->
+        </div>
+    </div>
+</div>

@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_Notification
+ *
+ * Date: June, 04 2020
+ * Time: 10:24 AM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <group id="sm_notification">
+        <!-- Sync message to queue -->
+        <job name="sm_notification_sync_push" instance="SM\Notification\Cron\Sync\PushDevice" method="execute">
+            <config_path>sm_notification/sync/push_device</config_path>
+        </job>
+        <job name="sm_notification_sync_sms" instance="SM\Notification\Cron\Sync\Sms" method="execute">
+            <config_path>sm_notification/sync/sms</config_path>
+        </job>
+        <job name="sm_notification_sync_email" instance="SM\Notification\Cron\Sync\Email" method="execute">
+            <config_path>sm_notification/sync/email</config_path>
+        </job>
+
+        <!-- Generate message product limit sock in cart -->
+        <job name="sm_notification_limit_stock" instance="SM\Notification\Cron\LimitStock" method="execute">
+            <config_path>sm_notification/generate/limit_stock</config_path>
+        </job>
+
+        <!-- Generate message Abandoned Cart -->
+        <job name="sm_notification_abandoned_cart" instance="SM\Notification\Cron\AbandonedCart" method="execute">
+            <config_path>sm_notification/generate/abandoned_cart</config_path>
+        </job>
+        <job name="sm_notification_abandoned_cart_repeat" instance="SM\Notification\Cron\AbandonedCartRepeat" method="execute">
+            <config_path>sm_notification/generate/abandoned_cart_repeat</config_path>
+        </job>
+
+        <!-- Generate message V.A payment expiring soon -->
+        <job name="sm_notification_payment_va_expiring_soon"
+             instance="SM\Notification\Cron\VaPaymentExpiringSoon" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
+
+        <job name="sm_notification_delivered" instance="SM\Notification\Cron\DeliveredIntoDestination" method="execute">
+            <config_path>sm_notification/sync/delivered</config_path>
+        </job>
+
+        <!-- Generate message remind pickup -->
+        <job name="sm_notification_remind_pickup" instance="SM\Notification\Cron\Order\RemindPickup" method="execute">
+            <config_path>sm_notification/sync/remind_pickup</config_path>
+        </job>
+    </group>
+</config>

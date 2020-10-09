@@ -1,0 +1,475 @@
+// /**
+//  * Copyright © Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+//
+//  Variables
+//  _____________________________________________
+
+@checkout-payment-method-title__border: @checkout-shipping-method__border;
+@checkout-payment-method-title__padding: @checkout-shipping-method__padding;
+@checkout-payment-method-title-mobile__padding: 15px;
+
+@checkout-payment-method-content__padding__xl: 22px;
+
+@checkout-billing-address-details__line-height: 27px;
+@checkout-billing-address-details__padding: 0 0 0 23px;
+@checkout-billing-address-form__max-width: @checkout-shipping-address__max-width;
+
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+
+    /* ck-payment */
+    .checkout-payment-method {
+        margin-left: @indent__s;
+        >h2 {
+            display: none;
+        }
+    }
+    .sl-payment-infor-card {
+        max-width: 536px;
+    }
+    .sl-card-multi {
+        display: flex;
+        justify-content: space-between;
+        padding-bottom: @indent__base;
+        label {
+           color: @c-tsm-grey20;
+            .lib-font-size(16);
+        }
+        .multi-payment {
+            .lib-font-size(12);
+        }
+    }
+    .sl-card {
+        position: relative;
+        margin-bottom: @indent__l;
+        .code-card {
+            position: absolute;
+            top: @indent__l;
+            left: @indent__l;
+        }
+    }
+
+    .ck-payment {
+        .slect-payment-gr {
+            display: flex;
+            padding-bottom: @indent__l;
+            border-bottom: 1px solid @color-gray90;
+            margin-bottom: @indent__xl;
+            .action.pagebuilder-button-secondary {
+                min-width: 160px;
+                box-sizing: border-box;
+                &:extend(.abs-shadow-box all);
+                color: rgba(47,47,47,0.5);
+                margin-right: @indent__s;
+                .lib-font-size(14);
+                line-height: @indent__xl;
+                font-family: @font-family-SF-UI-Display-Medium;
+                padding:0;
+                &.active {
+                    background: @color-white;
+                    border-width: 1px;
+                    color: @c-tsm-grey6;
+                    border-color: @c-tsm-bright-orange;
+                }
+            }
+        }
+        .sl-payment-infor {
+            display: flex;
+            .bx-payment {
+                margin-right: @indent__s + @indent__xs;
+            }
+        }
+        h3 {
+            .lib-list-reset-styles();
+            color: @color-black;
+            padding-bottom: @indent__base;
+            font-family: @font-family-SF-UI-Display-Semibold;
+        }
+        .payment-valid{
+                color: @c-tsm-red;
+                .lib-font-size(12);
+        }
+        .bx-payment {
+            &:extend(.abs-shadow-box all);
+            padding: @indent__base;
+            .lib-clearfix();
+            margin-bottom: @indent__base;
+            border:2px solid @color-white;
+            display: flex;
+            max-width: 629px;
+            box-sizing: border-box;
+            &.active {
+                border-color: @c-tsm-bright-orange;
+            }
+            .radio-custom, .icon-card, .info-card {
+                display: inline-block;
+                vertical-align: middle;
+            }
+            .icon-card {
+                margin: 0 @indent__base 0 0;
+            }
+            .radio-custom {
+                position: relative;
+                input[type="radio"]:not(:checked) {
+                    top:8px;
+                    left: 2px;
+                }
+                label {
+                    .lib-font-size(0);
+                }
+            }
+            .pagebuilder-button-secondary.small {
+                height: 22px;
+                line-height: 19px;
+                font-size: 12px;
+                padding: 0;
+                min-width: 93px;
+                box-sizing: border-box;
+                margin-left: @indent__s;
+            }
+
+            .info-card {
+                width: ~'calc(100% - 35px)';
+                font-family: @font-family-SF-UI-Display-Semibold;
+                h4 {
+                    color:@color-black;
+                    .lib-font-size(16);
+                    .lib-list-reset-styles();
+                }
+                p {
+                    .lib-font-size(12);
+                    color:@c-tsm-grey9;
+                    .apl-tick-info{
+                        padding-right: 5px;
+                        .lib-font-size(14);
+                        vertical-align: text-top;
+                        &:before{
+                            color:@c-tsm-grey9;
+                        }
+                    }
+                    &.options-active {
+                        color:@c-tsm-grey6;
+                        span {
+                            color:@c-tsm-grey9;
+                        }
+                    }
+                    &.payment-valid {
+                        color: @c-tsm-red;
+                        .lib-font-size(12);
+                    }
+                }
+            }
+            .bx-payment-content {
+                display: flex;
+                width: ~'calc(100% - 30px)';
+            }
+            .full-install-payment {
+                display: flex;
+                a {
+                    display: inline-block;
+                    background: @color-gray90;
+                    .lib-font-size(10);
+                    text-transform: uppercase;
+                    color: @c-tsm-grey6;
+                    padding: @indent__xs @indent__base;
+                    border-radius: 3px;
+
+                    &.installment, &.fullpayment {
+                        &.active {
+                            background: @c-tsm-green;
+                            color: @color-white;
+                        }
+                    }
+                    &.fullpayment {
+                        &.active {
+                            margin-right: -3px;
+                            z-index: 0;
+                        }
+                    }
+                    &.installment {
+                        &.active {
+                            margin-left: -3px;
+                            z-index: 0;
+                        }
+                    }
+
+                }
+            }
+            .select-bank {
+                margin-top: @indent__s;
+
+                .icon-card {
+                   margin:0 @indent__xs 0 0;
+                }
+                .sortby-dropdown ul.dropdown {
+                    border-bottom-right-radius: @border-radius-5;
+                    border-bottom-left-radius: @border-radius-5;
+                    padding:0;
+                    li {
+                        margin:0;
+                        padding: @indent__xs @indent__s;
+                        display: flex;
+                        align-items: center;
+                        &:hover {
+                            background: @c-tsm-grey36;
+                        }
+                        span {
+                            font-family: @font-family-SF-UI-Display-Semibold;
+                        }
+                        &:last-child {
+                            border-bottom-right-radius: 3px;
+                            border-bottom-left-radius: 3px;
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+    .payment-options-list {
+        display: flex;
+        padding: @indent__s 0;
+        .payment-options-info {
+            padding-right: 5%;
+            width: 50%;
+        }
+        .payment-options-price {
+            h4 {
+                .lib-font-size(18);
+            }
+        }
+    }
+    .choose-payment-options {
+        margin-top: @indent__base;
+    }
+    .active-sucessfull {
+        .apl-tick-success {
+            &:before {
+                color: @c-tsm-green;
+                .lib-font-size(20);
+            }
+        }
+        .code-card {
+            color: @c-tsm-grey4;
+            .lib-font-size(14);
+            display: inline-block;
+            margin-left: @indent__xs;
+        }
+    }
+
+
+    .checkout-payment-method {
+        .step-title {
+            border-bottom: 0;
+            margin-bottom: 0;
+        }
+
+        .payment-method {
+            &:first-child {
+                .payment-method-title {
+                    border-top: 0;
+                }
+            }
+
+            &._active {
+                .payment-method-content {
+                    display: block;
+                }
+            }
+
+            & + .payment-method {
+                .payment-method-title {
+                    .lib-css(border-top, @checkout-payment-method-title__border);
+                }
+            }
+            form {
+                &.form-purchase-order {
+                    margin-bottom: 15px;
+                }
+            }
+        }
+
+        .payment-method-content {
+            > .actions-toolbar {
+                > .primary {
+                    .action {
+                        &.primary {
+                            &:extend(.abs-button-l all);
+                        }
+                    }
+                }
+            }
+            /**
+             * @codingStandardsIgnoreStart
+             */
+            #po_number {
+                margin-bottom: 20px;
+            }
+            //  @codingStandardsIgnoreEnd
+        }
+
+        .payment-method-title {
+            .lib-css(padding, @checkout-payment-method-title__padding 0);
+            margin: 0;
+
+            .payment-icon {
+                display: inline-block;
+                margin-right: @indent__xs;
+                vertical-align: middle;
+            }
+
+            .action-help {
+                display: inline-block;
+                margin-left: @indent__xs;
+            }
+        }
+
+        .payment-method-content {
+            display: none;
+            .lib-css(padding, 0 0 @indent__base @checkout-payment-method-content__padding__xl);
+            .fieldset {
+                &:not(:last-child) {
+                    margin: 0 0 @indent__base;
+                }
+            }
+        }
+
+        .payment-group {
+            & + .payment-group {
+                .step-title {
+                    margin: @indent__base 0 0;
+                }
+            }
+        }
+
+        .field-select-billing,
+        .billing-address-form {
+            .lib-css(max-width, @checkout-billing-address-form__max-width);
+        }
+
+        .billing-address-same-as-shipping-block {
+            margin: 0 0 @indent__s;
+        }
+
+        .checkout-billing-address {
+            margin: 0 0 @indent__base;
+
+            .primary {
+                .action-update {
+                    margin-bottom: 20px;
+                    margin-right: 0;
+                }
+            }
+
+            .action-cancel {
+                &:extend(.abs-action-button-as-link all);
+            }
+
+            .billing-address-details {
+                .lib-css(line-height, @checkout-billing-address-details__line-height);
+                .lib-css(padding, @checkout-billing-address-details__padding);
+            }
+        }
+
+        .payment-method-note {
+            & + .checkout-billing-address {
+                margin-top: @indent__base;
+            }
+        }
+
+        .field-select-billing {
+            > .label {
+                &:extend(.abs-visually-hidden all);
+            }
+        }
+
+        .payment-method-iframe {
+            background-color: transparent;
+            display: none;
+            width: 100%;
+        }
+
+        .no-payments-block {
+            margin: @indent__base 0;
+        }
+
+        .payments {
+            .legend {
+                &:extend(.abs-visually-hidden all);
+            }
+        }
+    }
+}
+
+//
+//  Mobile
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .checkout-payment-method {
+        .payment-methods {
+            .lib-css(margin, 0 -(@checkout-payment-method-title-mobile__padding));
+        }
+
+        .step-title {
+            .lib-css(padding-left, @checkout-payment-method-title-mobile__padding);
+            .lib-css(padding-right, @checkout-payment-method-title-mobile__padding)
+        }
+
+        .payment-method-title {
+            .lib-css(padding, @checkout-payment-method-title-mobile__padding)
+        }
+
+        .payment-method-content {
+            .lib-css(padding, 0 @checkout-payment-method-title-mobile__padding @indent__base);
+        }
+
+        .checkout-billing-address {
+            .action-cancel {
+                margin-top: @indent__s;
+            }
+        }
+    }
+}
+
+//
+//  Desktop
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .checkout-payment-method {
+        .actions-toolbar {
+            .primary {
+                float: right;
+                margin: 0;
+            }
+        }
+
+        .fieldset {
+            > .field-select-billing {
+                > .control {
+                    float: none;
+                    width: 100%;
+                }
+            }
+        }
+    }
+
+    .checkout-billing-address {
+        .action-update {
+            float: right;
+        }
+
+        .actions-toolbar {
+            .action-cancel {
+                margin: 6px @indent__base 0 0;
+            }
+        }
+    }
+}

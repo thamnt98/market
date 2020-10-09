@@ -1,0 +1,93 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+?>
+<div class="help-pages">
+    <!------site content------>
+    <div class="help-content help-contactus-wrap">
+        <div class="help-content-list-top">
+            <h2>What Can We Do For you?</h2>
+        </div>
+
+        <div class="help-contactus">
+
+            <p class="tl-contact-please">Please Share the Details!</p>
+            <div class="cat-select-contact">
+                <label><?= $block->escapeHtml(__('Category'))?></label>
+                <div class="sortby-dropdown">
+                        <span aria-haspopup="true" class="action toggle"  data-toggle="dropdown">
+                            <span>All</span>
+                        </span>
+                        <ul class="dropdown">
+                            <li class="item"><a href="#">All</a></li>
+                            <li class="item"><a href="#">My Order</a></li>
+                            <li class="item"><a href="#">Return & Refund</a></li>
+                            <li class="item"><a href="#">My Account</a></li>
+                            <li class="item"><a href="#">Payment</a></li>
+                            <li class="item"><a href="#">Vouchers & Promos</a></li>
+                            <li class="item"><a href="#">Delivery & Pick Up in Store</a></li>
+                            <li class="item"><a href="#">Buying Guide</a></li>
+                            <li class="item"><a href="#">About Us</a></li>
+                        </ul>
+                </div>
+            </div>
+            <div class="help-order-to-track">
+                <label><?= $block->escapeHtml(__('Order to Track'))?></label>
+                <a href="#" id="button-order-track" class="button-order-track"><?= $block->escapeHtml(__('Choose Order…'))?></a>
+            </div>
+            <div class="help-contact-textarea">
+                <label><?= $block->escapeHtml(__('Tell us your concerns'))?></label>
+                <textarea rows="4" cols="50" placeholder="Please tell us your concerns here"></textarea>
+                <p class="typ-word">140/500</p>
+                <div class="input-attach-button">
+                    <img src='<?= $block->getViewFileUrl('images/icon-attach.png'); ?>' alt="" />
+                    <input type="file" class="file-upload" id="file-upload" />
+                    <span id="change-text-file"><?= $block->escapeHtml(__('Attach your file here'))?></span>
+                </div>
+                <div class="checkbox-custom">
+                    <input type="checkbox" name="messages" checked/>
+                    <label for="messages"><?= $block->escapeHtml('Send me the copy of my message') ?></label>
+                </div>
+                <div class="align-right"><button class="action primary"><?= $block->escapeHtml(__('Submit'))?></button></div>
+            </div>
+        </div>
+    </div>
+    <!------site content------>
+
+    <!------site bar left------>
+    <div class="sidebar sidebar-main">
+        <div class="block block-collapsible-nav">
+            <div class="title block-collapsible-nav-title">
+                <strong><?= $block->escapeHtml(__('Help Center'))?></strong>
+            </div>
+            <div class="content block-collapsible-nav-content" id="block-collapsible-nav">
+                <ul class="nav items">
+                    <li class="nav item">
+                        <a href="http://transmart.local/customer/account/"><?= $block->escapeHtml(__('My Orders'))?></a></li>
+                    <li class="nav item"><a href="#"><?= $block->escapeHtml(__('Return & Refund'))?></a></li>
+                    <li class="nav item"><a href="#"><?= $block->escapeHtml(__('My Account'))?></a></li>
+                    <li class="nav item"><a href="#"><?= $block->escapeHtml(__('Payment'))?></a></li>
+                    <li class="nav item"><a href="#"><?= $block->escapeHtml(__('Promos & Vouchers'))?></a></li>
+                    <li class="nav item"><a href="#"><?= $block->escapeHtml(__('Buying Guide'))?></a></li>
+                    <li class="nav item"><a href="#"><?= $block->escapeHtml(__('About Us'))?></a></li>
+                    <li class="nav item"><a href="#"><?= $block->escapeHtml(__('Delivery & Pick Up in Sto..'))?></a></li>
+                    <li class="nav item"><a href="#"><?= $block->escapeHtml(__('Contact Us'))?></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!------site bar left------>
+
+</div>
+<script type="text/javascript">
+    document.getElementById("file-upload").addEventListener("change", function() {
+        var fullPath = document.getElementById("file-upload").value;
+        var filename = fullPath.replace(/^.*[\\\/]/, '');
+          document.getElementById("change-text-file").innerHTML = filename;
+        });
+</script>
+
+

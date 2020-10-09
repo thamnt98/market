@@ -1,0 +1,12 @@
+<?php
+/**
+ * Shopping cart template
+ *
+ * @var $block \Magento\Checkout\Block\Cart
+ */
+?>
+<?php if (count($block->getItems())> 0) : ?>
+    <?= $block->getChildHtml('with-items');?>
+<?php else: ?>
+    <?= $block->getChildHtml('no-items'); ?>
+<?php endif; ?>

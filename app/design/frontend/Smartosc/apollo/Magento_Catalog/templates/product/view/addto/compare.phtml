@@ -1,0 +1,24 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var $block \Magento\Catalog\Block\Product\View\Addto\Compare */
+
+if ($block->isAllowAddToComepare()):
+?>
+
+    <?php $viewModel = $block->getData('addToCompareViewModel'); ?>
+    <?php $product = $block->getProduct();?>
+    <?php if ($viewModel->isAvailableForCompare($block->getProduct())):?>
+    <?php if($product->getTypeId() == 'simple' ||  $product->getTypeId() == 'configurable'):?>
+        <div class="split button">
+            <a id="add-compare" href="#" data-post='<?= /* @noEscape */ $block->getPostDataParams() ?>'
+               data-role="add-to-links"
+               class="action tocompare"><span><?= $block->escapeHtml(__('Add to Compare')) ?></span></a>
+        </div>
+    <?php endif; ?>
+<?php endif; ?>
+
+<?php endif; ?>

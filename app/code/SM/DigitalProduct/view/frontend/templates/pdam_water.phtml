@@ -1,0 +1,68 @@
+<?php
+/** @var \SM\DigitalProduct\Block\PdamWater\Index $block */
+
+?>
+
+<div class="digital-product-billing">
+    <?php
+    /** @var \SM\DigitalProduct\Block\Banner $bannerBlock */
+    $bannerBlock = $block->getChildBlock("digitalproduct.banner");
+    ?>
+    <?= $bannerBlock->toHtml()?>
+    <div class="product data items">
+        <?php
+        /** @var \SM\DigitalProduct\Block\Tab $tabBlock */
+        $tabBlock = $block->getChildBlock("digitalproduct.tab");
+        $tabBlock->setTab(\SM\DigitalProduct\Model\CategoryRepository::PDAM_WATER);
+        ?>
+        <?= $tabBlock->toHtml()?>
+        <div id="pdam-water" class="item content pdam-water" data-role="content">
+            <!-- content-start------->
+            <h3 class="title-head-ct">Pay PDAM Water Bill</h3>
+
+            <div class="dpl-select sl-region">
+                <label class="label-input">Region</label>
+                <div class="sortby-dropdown shoplist-sortby">
+                            <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+                                <span><?= $block->escapeHtml('Select Region') ?></span>
+                            </span>
+                    <ul class="dropdown">
+                        <li class="item">Select Region</li>
+                        <li class="item">Select Region</li>
+                    </ul>
+                </div>
+            </div>
+
+            <label class="label-input">Customer ID<span class="dpl-tooltip"><a href="#" aria-describedby="tooltip-5" >
+                                <img src='<?= $block->getViewFileUrl('images/info.svg'); ?>' alt=""  width="13" height="16" /></a>
+                            <span class="tooltip-content" id="tooltip-5" role="tooltip">Your customer or connection number.</span></span></label>
+
+            <div class="wrap-input">
+                <input class="input-text" type="text" placeholder="2124343552452" />
+                <img src="https://via.placeholder.com/51x51.png" alt="" />
+            </div>
+
+
+            <div class="dpb-bottom-price dpb-price-noprice">
+                <a href="#" class="action primary">Check My Bill</a>
+            </div>
+
+            <div class="dpb-policy">
+                <div class="dpb-title-head"><h3><?= $block->escapeHtml(__('How to Pay PDAM Water Bill')) ?></h3></div>
+                <div class="dpd-policy-content">
+                    <p>You can entrust yout PDAM water bill payment to Transmart. There is so much benefit you can get by paying your water bill online: easy water bill checking, paying without queuing in line and you can do it anywhere anytime. No more hassle in getting your bill payment done, just do these steps:</p>
+                    <ol>
+                        <li>Go to Transmart website.</li>
+                        <li>Choose Top Up & Bills category on the homepage.</li>
+                        <li>Go to PDAM Water menu.</li>
+                        <li>Select your region and enter your Customer ID. You can find your Customer ID in the water bill.</li>
+                        <li>Click "Check My Bill" button.</li>
+                        <li>Select your payment method and please make the payment.</li>
+                    </ol>
+                    <p>You can also enjoy this easy payment while paying your PLN bill, BPJS bill, mobile postpaid bill and Telkom bill. Your transaction is made convenient with secure payment options from Transmart: virtual account, credit card, debit card and instant payment. Make sure you also top up your mobile number, mobile package and PLN electricity token through Transmart to make your life easier.</p>
+                </div>
+            </div>
+            <!-- content-end------->
+        </div>
+    </div>
+</div>

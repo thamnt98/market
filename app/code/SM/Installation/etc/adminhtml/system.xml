@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_Installation
+ *
+ * Date: April, 21 2020
+ * Time: 3:43 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="installation" translate="label" type="text" sortOrder="90"
+                 showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Installation</label>
+            <tab>transmart</tab>
+            <resource>SM_Installation::configuration</resource>
+            <group id="general" translate="label" type="text" sortOrder="0"
+                   showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General</label>
+                <field id="enable" type="select" translate="label comment" sortOrder="1" canRestore="1"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="tooltip" type="textarea" translate="label comment" sortOrder="1" canRestore="1"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Tooltip</label>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

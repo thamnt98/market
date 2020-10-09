@@ -1,0 +1,25 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Save report_viewed_product_summary -->
+    <type name="Magento\Reports\Model\ResourceModel\Product\Index\Viewed">
+        <plugin name="sm_reports_magento_reports_model_resourceModel_product_index_viewed"
+                type="SM\Reports\Plugin\Magento\Reports\Model\ResourceModel\Product\Index\Viewed" />
+    </type>
+
+    <!-- Increase count for api -->
+    <type name="SM\Product\Api\Repository\ProductRepositoryInterface">
+        <plugin name="sm_reports_sm_product_repository_productRepositoryInterface"
+                type="SM\Reports\Plugin\SM\Product\Api\Repository\ProductRepositoryInterface" />
+    </type>
+
+    <!-- Entity -->
+    <preference for="SM\Reports\Api\Entity\ReportViewedProductSummaryInterface"
+                type="SM\Reports\Model\Entity\ReportViewedProductSummary"/>
+
+    <!-- SearchResult -->
+    <preference for="SM\Reports\Api\Data\Response\ReportViewedProductSummarySearchResultsInterface"
+                type="SM\Reports\Model\Data\Response\ReportViewedProductSummarySearchResults"/>
+
+    <!-- Repository -->
+    <preference for="SM\Reports\Api\Repository\ReportViewedProductSummaryRepositoryInterface"
+                type="SM\Reports\Model\Repository\ReportViewedProductSummaryRepository"/>
+</config>

@@ -1,0 +1,27 @@
+{
+    "salesrule": {
+        "column": {
+            "day_of_week": true,
+            "skip_special": true,
+            "voucher_reward": true,
+            "reward_rule": true,
+            "voucher_rewarded": true,
+            "is_suggestion": true
+        }
+    },
+    "quote_address": {
+        "column": {
+            "shipping_rule_ids": true
+        }
+    },
+    "quote": {
+        "column": {
+            "shipping_rule_ids": true
+        }
+    },
+    "sales_order": {
+        "column": {
+            "shipping_rule_ids": true
+        }
+    }
+}

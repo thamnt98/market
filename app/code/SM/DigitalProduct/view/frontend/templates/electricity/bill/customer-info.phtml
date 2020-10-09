@@ -1,0 +1,55 @@
+<?php
+/** @var \SM\DigitalProduct\Block\Electricity\Bill\CustomerInformation $block */
+
+$information = $block->getInformation();
+?>
+
+<?php if ($information->getResponseCode() == \SM\DigitalProduct\Api\ReorderRepositoryInterface::SUCCESS): ?>
+    <?php
+
+    $block->calculateMultipleBills($information->getBills());
+
+    ?>
+    <h3 class="title"><?= $block->escapeHtml(__("Bill Information")) ?></h3>
+    <table class="info-table">
+        <tr class="header-row">
+            <th class="header"><?= $block->escapeHtml(__("Customer ID")) ?></th>
+            <th class="header"><?= $block->escapeHtml(__("Name")) ?></th>
+            <th class="header"><?= $block->escapeHtml(__("Power")) ?></th>
+            <th class="header" colspan="2"><?= $block->escapeHtml(__("Period")) ?></th>
+        </tr>
+        <tr class="data-row">
+            <td class="data"><?= $block->escapeHtml($information->getSubscriberId()) ?></td>
+            <td class="data"><?= $block->escapeHtml($information->getSubscriberName()) ?></td>
+            <td class="data"><?= $block->escapeHtml(__("%1 VA", $information->getPower())) ?></td>
+            <td class="data" colspan="2"><?= $block->escapeHtml($block->getPeriod()) ?></td>
+        </tr>
+        <tr class="header-row">
+            <th class="header"><?= $block->escapeHtml(__("Bill")) ?></th>
+            <th class="header"><?= $block->escapeHtml(__("Penalty")) ?></th>
+            <th class="header"><?= $block->escapeHtml(__("Incentive & Tax Fee")) ?></th>
+            <th class="header"><?= $block->escapeHtml(__("Admin Fee")) ?></th>
+            <th class="header"><?= $block->escapeHtml(__("Total Bill")) ?></th>
+        </tr>
+        <tr class="data-row">
+            <td class="data"><?= $block->escapeHtml($block->priceFormat($block->getTotalBill())) ?></td>
+            <td class="data"><?= $block->priceFormat($block->getPenaltyFee()) ?></td>
+            <td class="data"><?= $block->priceFormat($block->getIncentive()) ?></td>
+            <td id="admin-fee-data" class="data"></td>
+            <td id="total-data" class="data">
+
+            </td>
+        </tr>
+    </table>
+    <div id="response-holder"
+         style="display: none"
+        data-total-value="<?= $block->getTotalBill() ?>"
+        data-penalty="<?= $block->getPenaltyFee()?>"
+        data-incentive="<?= $block->getIncentive()?>"></div>
+    <input type="hidden" value="<?= $information->getSubscriberName() ?>" name="digital[name]"/>
+    <input type="hidden" value="<?= $information->getPower() . " VA" ?>" name="digital[power]"/>
+    <input type="hidden" value="<?= $block->getPeriod() ?>" name="digital[period]"/>
+    <input type="hidden" value="<?= $block->getTotalBill() ?>" name="digital[bill]"/>
+    <input type="hidden" value="<?= $block->getPenaltyFee() ?>" name="digital[penalty]"/>
+    <input type="hidden" value="<?= $block->getIncentive() ?>" name="digital[incentive_and_tax_fee]"/>
+<?php endif; ?>

@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!--DATA-->
+    <preference for="Mirasvit\Blog\Api\Data\PostInterface" type="Mirasvit\Blog\Model\Post"/>
+    <preference for="Mirasvit\Blog\Api\Data\CategoryInterface" type="Mirasvit\Blog\Model\Category"/>
+    <preference for="Mirasvit\Blog\Api\Data\TagInterface" type="Mirasvit\Blog\Model\Tag"/>
+
+    <!--REPOSITORY-->
+    <preference for="Mirasvit\Blog\Api\Repository\PostRepositoryInterface" type="Mirasvit\Blog\Repository\PostRepository"/>
+    <preference for="Mirasvit\Blog\Api\Repository\CategoryRepositoryInterface" type="Mirasvit\Blog\Repository\CategoryRepository"/>
+    <preference for="Mirasvit\Blog\Api\Repository\TagRepositoryInterface" type="Mirasvit\Blog\Repository\TagRepository"/>
+    <preference for="Mirasvit\Blog\Api\Repository\AuthorRepositoryInterface" type="Mirasvit\Blog\Repository\AuthorRepository"/>
+
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="blog_post_listing_data_source" xsi:type="string">Mirasvit\Blog\Model\ResourceModel\Post\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Mirasvit\Blog\Model\ResourceModel\Post\Grid\Collection">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">mst_blog_post_entity</argument>
+            <argument name="eventPrefix" xsi:type="string">blog_post_grid_collection</argument>
+            <argument name="eventObject" xsi:type="string">post_grid_collection</argument>
+            <argument name="resourceModel" xsi:type="string">Mirasvit\Blog\Model\ResourceModel\Post</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Eav\Model\Entity\AttributeCache">
+        <arguments>
+            <argument name="unsupportedTypes" xsi:type="array">
+                <item name="blog_post" xsi:type="string">blog_post</item>
+                <item name="blog_category" xsi:type="string">blog_category</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

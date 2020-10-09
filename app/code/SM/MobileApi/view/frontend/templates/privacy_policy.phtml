@@ -1,0 +1,9 @@
+<?php
+//@codingStandardsIgnoreFile
+
+/** @var \SM\MobileApi\Block\CMSPageMobile $block */
+
+$pageId = $this->helper(\SM\MobileApi\Helper\CMSPage::class)->getPolicyPageId();
+?>
+
+<?= $block->getContentWYSIWYG($block->getContentById($pageId))?>

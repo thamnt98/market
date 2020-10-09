@@ -1,0 +1,216 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Unknown </title></head><body>
+<h1 id="ejs">EJS</h1>
+<p>Embedded JavaScript templates</p>
+<p><a href="https://travis-ci.org/mde/ejs"><img alt="Build Status" src="https://img.shields.io/travis/mde/ejs/master.svg?style=flat" /></a>
+<a href="https://david-dm.org/mde/ejs?type=dev"><img alt="Developing Dependencies" src="https://img.shields.io/david/dev/mde/ejs.svg?style=flat" /></a>
+<a href="https://snyk.io/test/npm/ejs"><img alt="Known Vulnerabilities" src="https://snyk.io/test/npm/ejs/badge.svg?style=flat" /></a></p>
+<h2 id="installation">Installation</h2>
+<p><code>bash
+$ npm install ejs</code></p>
+<h2 id="features">Features</h2>
+<ul>
+<li>Control flow with <code>&lt;% %&gt;</code></li>
+<li>Escaped output with <code>&lt;%= %&gt;</code> (escape function configurable)</li>
+<li>Unescaped raw output with <code>&lt;%- %&gt;</code></li>
+<li>Newline-trim mode ('newline slurping') with <code>-%&gt;</code> ending tag</li>
+<li>Whitespace-trim mode (slurp all whitespace) for control flow with <code>&lt;%_ _%&gt;</code></li>
+<li>Custom delimiters (e.g., use <code>&lt;? ?&gt;</code> instead of <code>&lt;% %&gt;</code>)</li>
+<li>Includes</li>
+<li>Client-side support</li>
+<li>Static caching of intermediate JavaScript</li>
+<li>Static caching of templates</li>
+<li>Complies with the <a href="http://expressjs.com">Express</a> view system</li>
+</ul>
+<h2 id="example">Example</h2>
+<p><code>ejs
+&lt;% if (user) { %&gt;
+  &lt;h2&gt;&lt;%= user.name %&gt;&lt;/h2&gt;
+&lt;% } %&gt;</code></p>
+<p>Try EJS online at: https://ionicabizau.github.io/ejs-playground/.</p>
+<h2 id="usage">Usage</h2>
+<p>```javascript
+let template = ejs.compile(str, options);
+template(data);
+// =&gt; Rendered HTML string</p>
+<p>ejs.render(str, data, options);
+// =&gt; Rendered HTML string</p>
+<p>ejs.renderFile(filename, data, options, function(err, str){
+    // str =&gt; Rendered HTML string
+});
+```</p>
+<p>It is also possible to use <code>ejs.render(dataAndOptions);</code> where you pass
+everything in a single object. In that case, you'll end up with local variables
+for all the passed options. However, be aware that your code could break if we
+add an option with the same name as one of your data object's properties.
+Therefore, we do not recommend using this shortcut.</p>
+<h2 id="options">Options</h2>
+<ul>
+<li><code>cache</code>                 Compiled functions are cached, requires <code>filename</code></li>
+<li><code>filename</code>              The name of the file being rendered. Not required if you
+    are using <code>renderFile()</code>. Used by <code>cache</code> to key caches, and for includes.</li>
+<li><code>root</code>                  Set project root for includes with an absolute path (/file.ejs).</li>
+<li><code>context</code>               Function execution context</li>
+<li><code>compileDebug</code>          When <code>false</code> no debug instrumentation is compiled</li>
+<li><code>client</code>                When <code>true</code>, compiles a function that can be rendered
+    in the browser without needing to load the EJS Runtime
+    (<a href="https://github.com/mde/ejs/releases/latest">ejs.min.js</a>).</li>
+<li><code>delimiter</code>             Character to use with angle brackets for open/close</li>
+<li><code>debug</code>                 Output generated function body</li>
+<li><code>strict</code>                When set to <code>true</code>, generated function is in strict mode</li>
+<li><code>_with</code>                 Whether or not to use <code>with() {}</code> constructs. If <code>false</code>
+    then the locals will be stored in the <code>locals</code> object. Set to <code>false</code> in strict mode.</li>
+<li><code>destructuredLocals</code>    An array of local variables that are always destructured from
+    the locals object, available even in strict mode.</li>
+<li><code>localsName</code>            Name to use for the object storing local variables when not using
+    <code>with</code> Defaults to <code>locals</code></li>
+<li><code>rmWhitespace</code>          Remove all safe-to-remove whitespace, including leading
+    and trailing whitespace. It also enables a safer version of <code>-%&gt;</code> line
+    slurping for all scriptlet tags (it does not strip new lines of tags in
+    the middle of a line).</li>
+<li><code>escape</code>                The escaping function used with <code>&lt;%=</code> construct. It is
+    used in rendering and is <code>.toString()</code>ed in the generation of client functions.
+    (By default escapes XML).</li>
+<li><code>outputFunctionName</code>    Set to a string (e.g., 'echo' or 'print') for a function to print
+    output inside scriptlet tags.</li>
+<li><code>async</code>                 When <code>true</code>, EJS will use an async function for rendering. (Depends
+    on async/await support in the JS runtime.</li>
+</ul>
+<p>This project uses <a href="http://usejsdoc.org/">JSDoc</a>. For the full public API
+documentation, clone the repository and run <code>npm run doc</code>. This will run JSDoc
+with the proper options and output the documentation to <code>out/</code>. If you want
+the both the public &amp; private API docs, run <code>npm run devdoc</code> instead.</p>
+<h2 id="tags">Tags</h2>
+<ul>
+<li><code>&lt;%</code>              'Scriptlet' tag, for control-flow, no output</li>
+<li><code>&lt;%_</code>             'Whitespace Slurping' Scriptlet tag, strips all whitespace before it</li>
+<li><code>&lt;%=</code>             Outputs the value into the template (escaped)</li>
+<li><code>&lt;%-</code>             Outputs the unescaped value into the template</li>
+<li><code>&lt;%#</code>             Comment tag, no execution, no output</li>
+<li><code>&lt;%%</code>             Outputs a literal '&lt;%'</li>
+<li><code>%%&gt;</code>             Outputs a literal '%&gt;'</li>
+<li><code>%&gt;</code>              Plain ending tag</li>
+<li><code>-%&gt;</code>             Trim-mode ('newline slurp') tag, trims following newline</li>
+<li><code>_%&gt;</code>             'Whitespace Slurping' ending tag, removes all whitespace after it</li>
+</ul>
+<p>For the full syntax documentation, please see <a href="https://github.com/mde/ejs/blob/master/docs/syntax.md">docs/syntax.md</a>.</p>
+<h2 id="includes">Includes</h2>
+<p>Includes either have to be an absolute path, or, if not, are assumed as
+relative to the template with the <code>include</code> call. For example if you are
+including <code>./views/user/show.ejs</code> from <code>./views/users.ejs</code> you would
+use <code>&lt;%- include('user/show') %&gt;</code>.</p>
+<p>You must specify the <code>filename</code> option for the template with the <code>include</code>
+call unless you are using <code>renderFile()</code>.</p>
+<p>You'll likely want to use the raw output tag (<code>&lt;%-</code>) with your include to avoid
+double-escaping the HTML output.</p>
+<p><code>ejs
+&lt;ul&gt;
+  &lt;% users.forEach(function(user){ %&gt;
+    &lt;%- include('user/show', {user: user}) %&gt;
+  &lt;% }); %&gt;
+&lt;/ul&gt;</code></p>
+<p>Includes are inserted at runtime, so you can use variables for the path in the
+<code>include</code> call (for example <code>&lt;%- include(somePath) %&gt;</code>). Variables in your
+top-level data object are available to all your includes, but local variables
+need to be passed down.</p>
+<p>NOTE: Include preprocessor directives (<code>&lt;% include user/show %&gt;</code>) are
+still supported.</p>
+<h2 id="custom-delimiters">Custom delimiters</h2>
+<p>Custom delimiters can be applied on a per-template basis, or globally:</p>
+<p>```javascript
+let ejs = require('ejs'),
+    users = ['geddy', 'neil', 'alex'];</p>
+<p>// Just one template
+ejs.render('&lt;?= users.join(" | "); ?&gt;', {users: users}, {delimiter: '?'});
+// =&gt; 'geddy | neil | alex'</p>
+<p>// Or globally
+ejs.delimiter = '$';
+ejs.render('&lt;$= users.join(" | "); $&gt;', {users: users});
+// =&gt; 'geddy | neil | alex'
+```</p>
+<h2 id="caching">Caching</h2>
+<p>EJS ships with a basic in-process cache for caching the intermediate JavaScript
+functions used to render templates. It's easy to plug in LRU caching using
+Node's <code>lru-cache</code> library:</p>
+<p><code>javascript
+let ejs = require('ejs'),
+    LRU = require('lru-cache');
+ejs.cache = LRU(100); // LRU cache with 100-item limit</code></p>
+<p>If you want to clear the EJS cache, call <code>ejs.clearCache</code>. If you're using the
+LRU cache and need a different limit, simple reset <code>ejs.cache</code> to a new instance
+of the LRU.</p>
+<h2 id="custom-file-loader">Custom file loader</h2>
+<p>The default file loader is <code>fs.readFileSync</code>, if you want to customize it, you can set ejs.fileLoader.</p>
+<p>```javascript
+let ejs = require('ejs');
+let myFileLoad = function (filePath) {
+  return 'myFileLoad: ' + fs.readFileSync(filePath);
+};</p>
+<p>ejs.fileLoader = myFileLoad;
+```</p>
+<p>With this feature, you can preprocess the template before reading it.</p>
+<h2 id="layouts">Layouts</h2>
+<p>EJS does not specifically support blocks, but layouts can be implemented by
+including headers and footers, like so:</p>
+<p><code>ejs
+&lt;%- include('header') -%&gt;
+&lt;h1&gt;
+  Title
+&lt;/h1&gt;
+&lt;p&gt;
+  My page
+&lt;/p&gt;
+&lt;%- include('footer') -%&gt;</code></p>
+<h2 id="client-side-support">Client-side support</h2>
+<p>Go to the <a href="https://github.com/mde/ejs/releases/latest">Latest Release</a>, download
+<code>./ejs.js</code> or <code>./ejs.min.js</code>. Alternately, you can compile it yourself by cloning
+the repository and running <code>jake build</code> (or <code>$(npm bin)/jake build</code> if jake is
+not installed globally).</p>
+<p>Include one of these files on your page, and <code>ejs</code> should be available globally.</p>
+<h3 id="example_1">Example</h3>
+<p><code>html
+&lt;div id="output"&gt;&lt;/div&gt;
+&lt;script src="ejs.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  let people = ['geddy', 'neil', 'alex'],
+      html = ejs.render('&lt;%= people.join(", "); %&gt;', {people: people});
+  // With jQuery:
+  $('#output').html(html);
+  // Vanilla JS:
+  document.getElementById('output').innerHTML = html;
+&lt;/script&gt;</code></p>
+<h3 id="caveats">Caveats</h3>
+<p>Most of EJS will work as expected; however, there are a few things to note:</p>
+<ol>
+<li>Obviously, since you do not have access to the filesystem, <code>ejs.renderFile()</code> won't work.</li>
+<li>For the same reason, <code>include</code>s do not work unless you use an <code>include callback</code>. Here is an example:
+  ```javascript
+  let str = "Hello &lt;%= include('file', {person: 'John'}); %&gt;",
+      fn = ejs.compile(str, {client: true});</li>
+</ol>
+<p>fn(data, null, function(path, d){ // include callback
+    // path -&gt; 'file'
+    // d -&gt; {person: 'John'}
+    // Put your code here
+    // Return the contents of file as a string
+  }); // returns rendered string
+  ```</p>
+<p>See the <a href="https://github.com/mde/ejs/tree/master/examples">examples folder</a> for more details.</p>
+<h3 id="ide-integration-with-syntax-highlighting">IDE Integration with Syntax Highlighting</h3>
+<p>VSCode:Javascript EJS by <em>DigitalBrainstem</em></p>
+<h2 id="related-projects">Related projects</h2>
+<p>There are a number of implementations of EJS:</p>
+<ul>
+<li>TJ's implementation, the v1 of this library: https://github.com/tj/ejs</li>
+<li>Jupiter Consulting's EJS: http://www.embeddedjs.com/</li>
+<li>EJS Embedded JavaScript Framework on Google Code: https://code.google.com/p/embeddedjavascript/</li>
+<li>Sam Stephenson's Ruby implementation: https://rubygems.org/gems/ejs</li>
+<li>Erubis, an ERB implementation which also runs JavaScript: http://www.kuwata-lab.com/erubis/users-guide.04.html#lang-javascript</li>
+<li>DigitalBrainstem EJS Language support: https://github.com/Digitalbrainstem/ejs-grammar</li>
+</ul>
+<h2 id="license">License</h2>
+<p>Licensed under the Apache License, Version 2.0
+(<a href="http://www.apache.org/licenses/LICENSE-2.0">http://www.apache.org/licenses/LICENSE-2.0</a>)</p>
+<hr />
+<p>EJS Embedded JavaScript templates copyright 2112
+mde@fleegix.org.</p>
+</body></html>

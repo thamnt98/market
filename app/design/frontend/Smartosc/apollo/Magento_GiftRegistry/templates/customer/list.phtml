@@ -1,0 +1,221 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+?>
+
+<?php $entityCollection = $block->getEntityCollection(); ?>
+
+<?php if ($entityCollection && count($entityCollection)) :?>
+    <div class="table-wrapper giftregistry">
+        <table id="giftregistry-table" class="data table table-giftregistry">
+            <caption class="table-caption"><?= $block->escapeHtml(__('Gift Registry')) ?></caption>
+            <thead>
+            <tr>
+                <th scope="col" class="col event"><?= $block->escapeHtml(__('Event')) ?></th>
+                <th scope="col" class="col create"><?= $block->escapeHtml(__('Created On')) ?></th>
+                <th scope="col" class="col message"><?= $block->escapeHtml(__('Message')) ?></th>
+                <th scope="col" class="col actions">&nbsp;</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($entityCollection as $item) :?>
+                <tr>
+                    <td data-th="<?= $block->escapeHtmlAttr(__('Event')) ?>" class="col event" title="<?= /* @noEscape */ $block->getEscapedTitle($item) ?>"><?= /* @noEscape */ $block->truncateString($block->getEscapedTitle($item), 70) ?></td>
+                    <td data-th="<?= $block->escapeHtmlAttr(__('Created On')) ?>" class="col create"><?= $block->escapeHtml($block->getFormattedDate($item)) ?></td>
+                    <td data-th="<?= $block->escapeHtmlAttr(__('Message')) ?>" class="col message"><?= /* @noEscape */ $block->getEscapedMessage($item) ?></td>
+                    <td data-th="<?= $block->escapeHtmlAttr(__('Action')) ?>" class="col actions">
+                        <a href="<?= $block->escapeUrl($block->getItemsUrl($item)) ?>" class="action manage" title="<?= $block->escapeHtmlAttr(__('Manage Items')) ?>"><?= $block->escapeHtml(__('Manage Items')) ?></a>
+                        <a href="<?= $block->escapeUrl($block->getShareUrl($item)) ?>" class="action share" title="<?= $block->escapeHtmlAttr(__('Share')) ?>"><?= $block->escapeHtml(__('Share')) ?></a>
+                        <a href="<?= $block->escapeUrl($block->getEditUrl($item)) ?>" class="action edit" title="<?= $block->escapeHtmlAttr(__('Edit')) ?>"><?= $block->escapeHtml(__('Edit')) ?></a>
+                        <a href="#"
+                           data-post='<?= /* @noEscape */ $block->getDeleteParams($item) ?>'
+                           class="action delete"
+                           title="<?= $block->escapeHtmlAttr(__('Delete')) ?>"
+                           data-role="remove-gift-registry"
+                            ><?= $block->escapeHtml(__('Delete')) ?></a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php if ($block->getChildHtml('pager')) :?>
+        <div class="toolbar giftregistry-toolbar bottom">
+            <?= $block->getChildHtml('pager') ?>
+        </div>
+    <?php endif;?>
+<?php else :?>
+
+    <div class="my-giftRegistry">
+        <div class="giftRegistry-content">
+            <div class="row">
+                <div class="col-sm-12 col-lg-6">
+                    <a class="giftRegistry-post" href="#">
+
+                        <div class="giftRegistry-post--image">
+
+                            <img src='<?= $block->escapeUrl($block->getViewFileUrl('images/gift/gift-registry-1.jpg')); ?>' alt="Demo">
+                        </div>
+                        <div class="giftRegistry-card--info">
+                            <div class="banner-figure">
+                                <i class="icon-gift ic-mygift-1"></i>
+                            </div>
+                            <div class="banner-figcaption">
+                                <h3 class="banner-figcaption__title"> <?= $block->escapeHtml(__('My Gift Registry')) ?></h3>
+                                <p class="banner-figcaption__text"><?= $block->escapeHtml(__('A list of gift registries created by you')) ?></p>
+                            </div>
+
+                        </div>
+
+                    </a>
+                </div>
+                <div class="col-sm-12 col-lg-6">
+                    <a class="giftRegistry-post">
+                        <div class="giftRegistry-post--image">
+                            <img src='<?= $block->escapeUrl($block->getViewFileUrl('images/gift/gift-registry-2.jpg')); ?>' alt="Demo">
+                        </div>
+                        <div class="giftRegistry-card--info">
+                            <div class="banner-figure">
+                                <i class="icon-gift ic-mygift-2"></i>
+                            </div>
+                            <div class="banner-figcaption">
+                                <h3 class="banner-figcaption__title"> <?= $block->escapeHtml(__('Shared with Me')) ?></h3>
+                                <p class="banner-figcaption__text"><?= $block->escapeHtml(__('Gift registries that people share with you')) ?></p>
+
+                            </div>
+
+                        </div>
+
+                    </a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="create-registry-modal" style="display:none;">
+        <p><?php echo __("What’s the occasion?") ?></p>
+        <form action="#"  class="form-createRegistry">
+            <ul class="list-createRegistry" data-role="sorter">
+                <li class="list-createRegistry__item active">
+                    <div class="createRegistry--button pagebuilder-button-secondary">
+                        <input type="radio" name="topic" checked="" value="">
+                        <label for="topic-all"><?php echo __("Wedding") ?></label>
+                    </div>
+
+                </li>
+
+                <li class="list-createRegistry__item">
+                    <div class="createRegistry--button pagebuilder-button-secondary">
+                        <input type="radio"  name="topic" value="blog">
+                        <label for="topic-2"><?php echo __("Baby Shower") ?></label>
+                    </div>
+                </li>
+                <li class="list-createRegistry__item">
+                    <div class="createRegistry--button pagebuilder-button-secondary">
+                        <input type="radio"  name="topic" value="cooking">
+                        <label for="topic-4"><?php echo __("Birthday") ?></label>
+                    </div>
+                </li>
+                <li class="list-createRegistry__item">
+                    <div class="createRegistry--button pagebuilder-button-secondary">
+                        <input type="radio"  name="topic" value="do-it-yourself">
+                        <label for="topic-6"><?php echo __("Others") ?></label>
+                    </div>
+                </li>
+
+            </ul>
+
+        </form>
+
+    </div>
+<?php endif;?>
+
+
+<script>
+    require([
+        'mage/dataPost',
+        'Magento_Ui/js/modal/confirm',
+        'prototype'
+    ], function(dataPost, confirm){
+//<![CDATA[
+        $$("[data-role='remove-gift-registry']").each(function(item){
+            Event.observe(item, "click", function (event) {
+                var params = JSON.parse(jQuery(event.currentTarget).attr('data-post'));
+
+                event.stopPropagation();
+                confirm({
+                    content: '<?= $block->escapeJs($block->escapeHtml(__('Are you sure you want to delete this gift registry?'))) ?>',
+                    actions: {
+                        confirm: function () {
+                            dataPost().postData(params);
+                        }
+                    }
+                });
+            });
+        });
+
+
+//]]>
+    });
+
+    require(
+        [
+            'jquery',
+            'Magento_Ui/js/modal/modal'
+        ],
+        function(
+            $,
+            modal
+        ) {
+            var options = {
+                type: 'popup',
+                responsive: true,
+                title: 'Create a Registry',
+                modalClass: 'modal-popup-small',
+                buttons: [{
+                    text: $.mage.__('Cancel'),
+                    class: 'action secondary',
+                    click: function () {
+                        this.closeModal();
+
+                    }
+                },
+                    {
+                        text: $.mage.__('Create'),
+                        class: 'action primary',
+                        click: function () {
+                            //this.closeModal();
+                            document.location.href = "<?= $block->escapeUrl($block->getAddUrl()) ?>";
+                        }
+                    }]
+            };
+
+            const createRegister = $('.create-registry-modal');
+            const popup = modal(options, createRegister);
+            const createRegistrybutton = $('.createRegistry--button');
+
+            $(".giftRegistry-post").click(function() {
+                createRegister.modal('openModal');
+            });
+
+            $(createRegistrybutton).click(function() {
+                const $parent = $(this).parent();
+                if ($parent.hasClass('active')) return;
+                else{
+                    $(this).children('input[type="radio"]').prop("checked", true);
+                    $parent.addClass('active').siblings().removeClass('active');
+                }
+
+            });
+
+
+        }
+    );
+</script>
+

@@ -1,0 +1,137 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<div class="my-order order-detail">
+    <div class="dis-flex title-order-detail">
+        <h2><?= $block->escapeHtml(__('Order Detail')) ?></h2>
+        <a href="#" class="back-orderlist"><?= $block->escapeHtml(__('Back to order list')) ?></a>
+    </div>
+    <div class="table-product">
+        <div class="tpr-top">
+            <div class="tpr-top-left">
+                <span class="tl-invoice-number"><?= $block->escapeHtml(__('Reference Number')) ?></span>
+                <h4><?= $block->escapeHtml(__('984759371923')) ?><a href=""><?= $block->escapeHtml(__('See invoice')) ?></a></h4>
+                <span class="date">28 Oct 2019 | 20:00 PM</span>
+            </div>
+            <div class="bx-total-payment total-payment-detail">
+                <span class="tl-invoice-number"><?= $block->escapeHtml(__('Total Payment')) ?></span>
+                <h4><?= $block->escapeHtml(__('Rp 1.738.500')) ?></h4>
+                <span class="date">Payment Method: Bank Mega Virtual Account</span>
+            </div>
+        </div>
+       <!-- order-detail content-->
+        <div class="order-detail-content">
+            <div class="dis-flex order-detail-ct-top">
+                <div class="order-id">
+                    <span class="order-id-info"><?= $block->escapeHtml(__('Order ID')) ?></span>
+                    <h4><?= $block->escapeHtml(__('ID/29038330')) ?></h4>
+                </div>
+                <div class="order-delivery-method">
+                    <span class="order-id-info"><?= $block->escapeHtml(__('Order ID')) ?></span>
+                    <h4><?= $block->escapeHtml(__('Same Day')) ?></h4>
+                </div>
+            </div>
+            <!--prodgress-bar status-->
+            <div class="bx-order-status">
+                <h5 class="tl-status"><?= $block->escapeHtml(__('Status')) ?></h5>
+                <div class="progress-bar-status">
+                   <div class="wrap-status status-waiting-payment active">
+                       <span class="svg-icon svg-icon-WaitingForPaymentGrey"></span>
+                       <span class="status-text"><?= $block->escapeHtml(__('Waiting for Payment')) ?></span>
+                       <span class="status-date"><?= $block->escapeHtml(__('28 Oct 2019 | 20:00 PM')) ?></span>
+                   </div>
+                    <div class="wrap-status status-process active">
+                        <span class="svg-icon svg-icon-InProcessGrey"></span>
+                        <span class="status-text"><?= $block->escapeHtml(__('In Process')) ?></span>
+                        <span class="status-date"><?= $block->escapeHtml(__('28 Oct 2019 | 20:00 PM')) ?></span>
+                    </div>
+                    <div class="wrap-status status-delivery">
+                        <span class="svg-icon svg-icon-InDeliveryGrey"></span>
+                        <span class="status-text"><?= $block->escapeHtml(__('In Delivery')) ?></span>
+                    </div>
+                    <div class="wrap-status status-received">
+                        <span class="svg-icon svg-icon-OrderReceivedGrey"></span>
+                        <span class="status-text"><?= $block->escapeHtml(__('Order Received')) ?></span>
+                    </div>
+                </div>
+            </div>
+            <!--End prodgress-bar status-->
+            <div class="od-delivery-address">
+                <span class="delivery-address"><?= $block->escapeHtml(__('Delivery Address')) ?></span>
+                <h4><?= $block->escapeHtml(__('Rosita (Home)')) ?></h4>
+                <p>Jl. Cempaka Raya Gang Haji Munasir III No. 6, Cempaka Putih Barat, Jakarta Pusat</p>
+            </div>
+            <ul class="list-items-review">
+                <li class="item-review">
+                    <div class="item-info">
+                        <a href="#" title="thaole1233" class="product-item-photo">
+                            <img src="https://apollo11-dev.ctdigital.id/media/catalog/product/cache/6410bdb417f1097c90b11783ebe3d82c/2/_/2_1_1.jpg" width="110" height="110" alt="thaole1233" />
+                        </a>
+                        <div class="product-item-details">
+                            <a href="https://apollo11-dev.ctdigital.id/thaole1233.html" class="product-item-name">Onitsuka Tiger Mexico 66 (Kill Bill)</a>
+                            <dl class="item-options">
+                                <dt>Ram</dt>
+                                <dd>
+                                    1 x RAM 8GB <span class="price">Rp 100</span> </dd>
+                            </dl>
+                            <div class="free-install">
+                                <label class="label-text">Free installation included<span class="dpl-tooltip"><a href="#" aria-describedby="tooltip-1" ><img src='<?= $block->getViewFileUrl('images/info.svg'); ?>' alt=""  width="13" height="16" /></a><span class="tooltip-content" id="tooltip-1" role="tooltip">Your mobile number or
+the number used for your modem.</span></span></label>
+                            </div>
+                            <div class="bx-note">
+                                <strong><?= $block->escapeHtml(__('Note:')) ?></strong>
+                                <p><?= $block->escapeHtml(__('Tolong pasangkan di kamar utama saya dan
+kabari jika mau datang ke rumah.')) ?></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="total-product-price">
+                        <span class="product-price"><?= $block->escapeHtml(__('Product Price')) ?></span>
+                        <h4 class="price"><?= $block->escapeHtml(__('Rp 1.499.000')) ?></h4>
+                    </div>
+                </li>
+                <li class="item-review">
+                    <div class="delivery-fee">
+                        <h4><?= $block->escapeHtml(__('Delivery Fee')) ?></h4>
+                    </div>
+                    <div class="sub-total">
+                        <h4 class="price"><?= $block->escapeHtml(__('Rp 1.499.000')) ?></h4>
+                        <button type="submit" class="action primary"><?= $block->escapeHtml(__('I have received this order')) ?></button>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <!--End order-detail content-->
+
+       <!-- shopping summary-->
+        <div class="shopping-summary">
+            <h5 class="tl-summary"><?= $block->escapeHtml(__('Shopping Summary')) ?></h5>
+            <div class="dis-flex subtotal">
+                <h4><?= $block->escapeHtml(__('Subtotal')) ?></h4>
+                <h4 class="price"><?= $block->escapeHtml(__('Rp 4.399.000')) ?></h4>
+            </div>
+            <div class="dis-flex delivery-fee-sub">
+                <h4><?= $block->escapeHtml(__('Delivery Fee Subtotal')) ?></h4>
+                <h4 class="price"><?= $block->escapeHtml(__('Rp 56.000')) ?></h4>
+            </div>
+            <div class="dis-flex voucher-promo-discount">
+                <h4><?= $block->escapeHtml(__('Voucher/Promo/Discount')) ?></h4>
+                <h4 class="price"><?= $block->escapeHtml(__('-Rp 10.000')) ?></h4>
+            </div>
+            <div class="dis-flex total">
+                <h4><?= $block->escapeHtml(__('Total')) ?></h4>
+                <h4 class="price"><?= $block->escapeHtml(__('Rp 4.455.000')) ?></h4>
+            </div>
+        </div>
+        <!--end shopping summary-->
+        <div class="order-detail-bottom">
+            <div class="inner">
+                <button type="submit" class="action secondary"><?= $block->escapeHtml(__('I have a problem with this order')) ?></button>
+                <p>Need help? Go to our <a href="#">Help Center</a></p>
+            </div>
+        </div>
+    </div>
+</div>

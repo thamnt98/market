@@ -1,0 +1,106 @@
+<?php
+
+/** @var \SM\ShoppingList\Block\Item\Column\Actions $block */
+
+/** @var \SM\ShoppingList\Api\Data\ShoppingListItemDataInterface $item */
+$item = $block->getItem();
+
+$itemId = $item->getWishlistItemId();
+
+$productName = $item->getCustomAttribute("product_name")->getValue();
+$productUrl = $item->getCustomAttribute("product_url")->getValue();
+$productImage = $item->getCustomAttribute("product_image")->getValue();
+$productPrice = $item->getCustomAttribute("product_price")->getValue();
+$ratingSummary = $item->getCustomAttribute("product_rating")->getValue();
+
+$product = $block->getProduct();
+?>
+<div class="product-item-actions">
+    <a href="#" id="button-open-move-<?= $itemId ?>" class="action move moveotherlist"><?= $block->escapeHtml(__('Move to')) ?></a>
+    <div id = "move-shoppinglist-modal-<?= $itemId ?>" class="content" style="display: none">
+        <div class="product-info">
+            <img src="<?= $productImage ?>" width="124px" alt="product's img"/>
+            <span class="product-name"><?= $block->escapeHtml($productName) ?></span>
+        </div>
+        <form>
+            <ul class="list-choice" id="list-choice-<?= $itemId ?>">
+                <?php if (count($block->getShoppingLists())): ?>
+                    <?php
+                    /** @var \SM\ShoppingList\Api\Data\ShoppingListDataInterface $list */
+                    foreach ($block->getShoppingLists() as $list) :?>
+                        <?php if ($list->getWishlistId() != $block->getItem()->getWishlistId()): ?>
+                            <li class="checkbox-custom">
+                                <input type="checkbox" name="selected-<?= $itemId ?>[]" value="<?= $block->escapeHtml($list->getWishlistId()) ?>">
+                                <label><?= $block->escapeHtml($list->getName()) ?></label>
+                            </li>
+                        <?php endif;?>
+                    <?php endforeach;?>
+                <?php endif;?>
+            </ul>
+            <input type="hidden" name="item_id" value="<?= $itemId ?>"/>
+            <div class="add-new-wishlist">
+                <a id="open-create-to-move-<?= $itemId ?>" class="remove-list" href="#">
+                    <span><?= $block->escapeHtml(__('Create a List')) ?></span>
+                </a>
+
+                <div id="create-to-move-<?= $itemId?>" class="bx-addition-wishlist-name" style="display: none">
+                    <label class="label" for="shoppinglist-name-<?= $itemId?>"><?= $block->escapeHtml(__('List Name')) ?></label>
+                    <div class="wrap">
+                        <input type="text" class="addition-wishlist-name" id="shoppinglist-name-<?= $itemId?>" name="addition_wishlist_name"
+                               placeholder="<?= $block->escapeHtml(__('Type the list name here')) ?>"/>
+                        <button type="button" class="add-wishlist-name" id="submit-create-<?= $itemId ?>"><span class="apl-ic_plus"><?= $block->escapeHtml('Plus') ?></span></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <?php $percent = $block->getDiscountPercent($block->getProduct()); ?>
+    <?php if ($percent != null && $percent > 0) : ?>
+        <span class="product-sale">
+            <?= $block->escapeHtml(__('%1% OFF', $percent)); ?>
+        </span>
+    <?php endif; ?>
+
+    <a href="#" data-role="remove"
+       title="<?= $block->escapeHtmlAttr(__('Remove Item')) ?>"
+       class="btn-remove action delete"
+       id="button-remove-item-<?= $itemId ?>">
+        <span><?= $block->escapeHtml(__('Remove item')) ?></span>
+    </a>
+    <div id="confirm-delete-item-modal-<?= $itemId ?>" class="content" style="display:none;">
+    <span class="remove-wishlist-verify">
+        <span><?= $block->escapeHtml(__('Are you sure you want to delete'))?></span>
+        <b><?= $productName?></b>
+        <span><?= $block->escapeHtml(__('from shopping list?'))?></span>
+    </span>
+    </div>
+</div>
+
+<div style="display: none">
+    <script type="text/x-magento-init">
+    {
+        "*": {
+            "ItemActions": {
+                "item_id":"<?= $itemId ?>",
+                "product_id":"<?= $product->getId() ?>",
+                "item_ids":"<?= implode(",", $block->getItemIds()) ?>",
+                "create_list_url":"<?= $block->getCreatListUrl() ?>",
+                "move_item_url":"<?= $block->getMoveItemUrl() ?>",
+                "remove_item_url":"<?= $block->getRemoveUrl($itemId) ?>",
+                "store_id":"<?= $block->getStoreId() ?>"
+            }
+        }
+    }
+    </script>
+</div>
+<div id="success-alert-modal-<?= $itemId?>" class="content add-success-modal" style="display:none;">
+    <div class="product-info">
+        <img src="<?= $productImage ?>" width="124px"  alt="<?= $productName?>"/>
+        <div class="success-content">
+            <span class="product-name"><?= $productName ?></span>
+            <h3><?= $block->escapeHtml(__("This item has been moved to"))?></h3>
+            <ul id="destination-list-<?= $itemId?>" style="list-style-type: none;">
+            </ul>
+        </div>
+    </div>
+</div>

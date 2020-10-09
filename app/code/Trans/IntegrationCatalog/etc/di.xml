@@ -1,0 +1,83 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_IntegrationCatalog
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   JP <jaka.pondan@ctcorpdigital.com>
+ * @author   Anan Fauzi <anan.fauzi@transdigital.co.id>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- DB Model-->
+    <preference for="Trans\IntegrationCatalog\Api\IntegrationJobRepositoryInterface"
+                type="Trans\IntegrationCatalog\Model\IntegrationJobRepository" />
+    <preference for="Trans\IntegrationCatalog\Api\Data\IntegrationJobInterface"
+                type="Trans\IntegrationCatalog\Model\IntegrationJob" />
+    <preference for="Trans\IntegrationCatalog\Api\Data\IntegrationJobSearchResultInterface"
+                type="Trans\IntegrationCatalog\Model\IntegrationJobSearchResult" />
+
+    <preference for="Trans\IntegrationCatalog\Api\IntegrationDataValueRepositoryInterface"
+                type="Trans\IntegrationCatalog\Model\IntegrationDataValueRepository" />
+    <preference for="Trans\IntegrationCatalog\Api\Data\IntegrationDataValueInterface"
+                type="Trans\IntegrationCatalog\Model\IntegrationDataValue" />
+    <preference for="Trans\IntegrationCatalog\Api\Data\IntegrationDataValueSearchResultInterface"
+                type="Trans\IntegrationCatalog\Model\IntegrationDataValueSearchResult" />
+
+    <!-- Logic Model-->
+    <preference for="Trans\IntegrationCatalog\Api\IntegrationCheckUpdatesInterface"
+                type="Trans\IntegrationCatalog\Model\IntegrationCheckUpdates" />
+
+    <preference for="Trans\IntegrationCatalog\Api\IntegrationGetUpdatesInterface"
+                type="Trans\IntegrationCatalog\Model\IntegrationGetUpdates" />
+    <!-- Product -->
+    <preference for="Trans\IntegrationCatalog\Api\IntegrationProductRepositoryInterface"
+                type="Trans\IntegrationCatalog\Model\IntegrationProductRepository" />
+    <preference for="Trans\IntegrationCatalog\Api\Data\IntegrationProductInterface"
+                type="Trans\IntegrationCatalog\Model\IntegrationProduct" />
+    <preference for="Trans\IntegrationCatalog\Api\IntegrationProductLogicInterface"
+                type="Trans\IntegrationCatalog\Model\IntegrationProductLogic" />
+
+    <!-- Product Image -->
+    <preference for="Trans\IntegrationCatalog\Api\IntegrationProductImageInterface"
+                type="Trans\IntegrationCatalog\Model\IntegrationProductImage" />
+
+
+    <preference for="Trans\IntegrationCatalog\Api\ProductAssociationLogicInterface"
+                type="Trans\IntegrationCatalog\Model\ProductAssociationLogic" />
+    <preference for="Trans\IntegrationCatalog\Api\Data\ProductAssociationInterface"
+                type="Trans\IntegrationCatalog\Model\ProductAssociation" />
+    <preference for="Trans\IntegrationCatalog\Api\ProductAssociationRepositoryInterface"
+                type="Trans\IntegrationCatalog\Model\ProductAssociationRepository" />
+
+    <!-- @anan.fauzi: add console for checking pim integration functionalities-->
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <!-- pim check product image console-->
+            <argument name="commands" xsi:type="array">
+                 <item name="Trans_IntegrationCatalog_Console_Pim_Check_ProductImage" xsi:type="object">Trans\IntegrationCatalog\Console\Pim\Check\ProductImage</item>
+            </argument>
+            <!-- pim get product image console-->
+            <argument name="commands" xsi:type="array">
+               <item name="Trans_IntegrationCatalog_Console_Pim_Get_ProductImage" xsi:type="object">Trans\IntegrationCatalog\Console\Pim\Get\ProductImage</item>
+            </argument>
+            <!-- pim save product image console-->
+            <argument name="commands" xsi:type="array">
+                 <item name="Trans_IntegrationCatalog_Console_Pim_Save_ProductImage" xsi:type="object">Trans\IntegrationCatalog\Console\Pim\Save\ProductImage</item>
+            </argument>
+            <!-- synch configurable product image -->
+            <argument name="commands" xsi:type="array">
+                 <item name="Trans_IntegrationCatalog_Console_Pim_Save_ConfigurableProductImage" xsi:type="object">Trans\IntegrationCatalog\Console\Pim\Save\ConfigurableProductImage</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- @anan.fauzi <add configurable product synch cron service contract -->
+    <preference for="Trans\IntegrationCatalog\Api\Data\ConfigurableProductCronSynchInterface" type="Trans\IntegrationCatalog\Model\ConfigurableProductCronSynch" />
+    <preference for="Trans\IntegrationCatalog\Api\ConfigurableProductCronSynchRepositoryInterface" type="Trans\IntegrationCatalog\Model\ConfigurableProductCronSynchRepository" />
+</config>

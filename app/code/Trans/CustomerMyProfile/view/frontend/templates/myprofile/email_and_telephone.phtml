@@ -1,0 +1,79 @@
+<?php
+/**
+ * @category Trans
+ * @package  Trans_CustomerMyProfile
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Dwi Septha Kurniawan <septha.kurniawan@transdigital.co.id>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+
+// @codingStandardsIgnoreFile
+?>
+<?php /** @var $block \Trans\CustomerMyProfile\Block\MyProfile\EmailAndTelephone */ ?>
+<div class="block block-dashboard-info">
+    <div class="block-title">
+            <strong><?= $block->escapeHtml(__('Email & Mobile Number')) ?></strong>
+    </div>
+    <div class="block-content box-content-email-mobileNumber">
+        <table class="table-content-email-mobileNumber">
+            <tr>
+                <td class="td-fist-child w-15">
+                    <div class="box-title">
+                        <span><?= $block->escapeHtml(__('Email address')) ?></span>
+                    </div>
+                    <div class="box-content">
+                        <p><?= $block->escapeHtml($block->getEmail()) ?></p>
+                    </div>
+                </td>
+                <td class="td-fist-child w-25">
+                    <label id="verified_email"
+                           class="label-status <?= $block->escapeHtml($block->getVerifyClass($block->isVerifiedEmail())) ?>">
+                        <?= $block->escapeHtml($block->getVerifiedEmail()) ?>
+                    </label>
+                </td>
+                <td class="td-fist-child w-15">
+                    <a class="action edit" href="<?= $block->escapeUrl($block->getUrl('customermyprofile/myprofile/editemail')) ?>">
+                        <span><?= $block->escapeHtml(__('Edit')) ?></span>
+                    </a>
+                </td>
+                <td class="td-fist-child w-60">
+                    <?php if ($block->getVerifiedEmail() == 'Unverified') : ?>
+                    <label class="notification verify-email">
+                        <i class="icon-notify"></i>
+                        <?= $block->escapeHtml(__('Check your inbox to verify this email address.')) ?>
+                    </label>
+                    <?php endif; ?>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <div class="box-title">
+                        <span><?= $block->escapeHtml(__('Mobile Number')) ?></span>
+                    </div>
+                    <div class="box-content">
+                        <p><?= $block->escapeHtml($block->getTelephone()) ?></p>
+                    </div>
+                </td>
+                <td>
+                    <label id="verified_mobile_number"
+                           class="label-status verified">
+                        <?= $block->escapeHtml(__('Verified')) ?>
+                    </label>
+                </td>
+                <td>
+                    <a class="action edit" href="<?= $block->escapeUrl($block->getUrl('customermyprofile/myprofile/editmobilenumber')) ?>">
+                        <span><?= $block->escapeHtml(__('Edit')) ?></span>
+                    </a>
+                </td>
+                <td class="td-fist-child w-15">
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>

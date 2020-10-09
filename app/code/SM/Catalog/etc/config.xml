@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <catalog>
+            <frontend>
+                <grid_per_page_values>50,100,150,200</grid_per_page_values>
+                <list_per_page_values>40,80,120,160,200</list_per_page_values>
+                <grid_per_page>100</grid_per_page>
+                <list_per_page>40</list_per_page>
+                <default_sort_by>best_sellers</default_sort_by>
+                <show_swatches_in_product_list>0</show_swatches_in_product_list>
+            </frontend>
+        </catalog>
+        <cataloginventory>
+            <item_options>
+                <max_sale_qty>99</max_sale_qty>
+            </item_options>
+        </cataloginventory>
+        <trans_catalog>
+            <product>
+                <group_name_prefix>Group -</group_name_prefix>
+                <bundle_name_prefix>Bundle -</bundle_name_prefix>
+                <update_cta_cron>1</update_cta_cron>
+                <update_cta_cron_time>0 16 * * *</update_cta_cron_time>
+            </product>
+            <available_store_pickup>
+                <open_time>10AM</open_time>
+                <close_time>9PM</close_time>
+            </available_store_pickup>
+        </trans_catalog>
+    </default>
+</config>

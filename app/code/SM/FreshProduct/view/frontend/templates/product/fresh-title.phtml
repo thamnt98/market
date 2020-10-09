@@ -1,0 +1,20 @@
+<?php /** @var $block \SM\FreshProduct\Block\Product\View */ ?>
+<?php
+$product = $block->getProduct();
+?>
+
+<?php if ($block->isFreshProduct($product)) : ?>
+    <?php if ($block->isPriceInKg($product)) : ?>
+        <div class="fresh-product-title">
+            <div class="weight">
+                <?= $block->escapeHtml($block->getProductWeight($product)) ?>
+            </div>
+        </div>
+    <?php else: ?>
+        <div class="fresh-product-title">
+            <div class="weight">
+                <?= $block->escapeHtml($block->getSoldIn($product)) ?>
+            </div>
+        </div>
+    <?php endif; ?>
+<?php endif; ?>

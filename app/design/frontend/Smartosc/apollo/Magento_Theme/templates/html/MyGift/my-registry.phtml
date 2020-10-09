@@ -1,0 +1,148 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+
+
+<div class="my-giftRegistry">
+    <div class="giftRegistry-content">
+        <div class="row">
+            <div class="col-sm-12 col-md-6">
+                <a class="giftRegistry-post" href="#">
+
+                    <div class="giftRegistry-post--image">
+
+                        <img src='<?= $block->escapeUrl($block->getViewFileUrl('images/gift/gift-registry-1.jpg')); ?>' alt="Gift Registry" loading="lazy">
+                    </div>
+                    <div class="giftRegistry-card--info">
+                        <div class="banner-figure">
+                            <i class="icon ic-mygift"></i>
+                        </div>
+                        <div class="banner-figcaption">
+                            <h3 class="banner-figcaption__title"> <?= $block->escapeHtml(__('My Gift Registry')) ?></h3>
+                            <p class="banner-figcaption__text"><?= $block->escapeHtml(__('A list of gift registries created by you')) ?></p>
+                        </div>
+
+                    </div>
+
+                </a>
+            </div>
+            <div class="col-sm-12 col-md-6">
+                <a class="giftRegistry-post">
+                    <div class="giftRegistry-post--image">
+                        <img src='<?= $block->escapeUrl($block->getViewFileUrl('images/gift/gift-registry-2.jpg')); ?>' alt="Gift Registry 2" loading="lazy">
+                    </div>
+                    <div class="giftRegistry-card--info">
+                        <div class="banner-figure">
+                            <i class="icon ic-mygift"></i>
+                        </div>
+                        <div class="banner-figcaption">
+                            <h3 class="banner-figcaption__title"> <?= $block->escapeHtml(__('Shared with Me')) ?></h3>
+                            <p class="banner-figcaption__text"><?= $block->escapeHtml(__('Gift registries that people share with you')) ?></p>
+
+                        </div>
+
+                    </div>
+
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+<div class="create-registry-modal" style="display:none;">
+    <p>What’s the occasion?</p>
+
+    <form action="#"  class="form-createRegistry">
+        <ul class="list-createRegistry" data-role="sorter">
+            <li class="list-createRegistry__item active">
+                <div class="createRegistry--button pagebuilder-button-secondary">
+                    <input type="radio" name="topic" checked="" value="">
+                    <label for="topic-all">Wedding</label>
+                </div>
+
+            </li>
+
+            <li class="list-createRegistry__item">
+                <div class="createRegistry--button pagebuilder-button-secondary">
+                    <input type="radio"  name="topic" value="blog">
+                    <label for="topic-2">Baby Shower</label>
+                </div>
+            </li>
+            <li class="list-createRegistry__item">
+                <div class="createRegistry--button pagebuilder-button-secondary">
+                    <input type="radio"  name="topic" value="cooking">
+                    <label for="topic-4">Birthday</label>
+                </div>
+            </li>
+            <li class="list-createRegistry__item">
+                <div class="createRegistry--button pagebuilder-button-secondary">
+                    <input type="radio"  name="topic" value="do-it-yourself">
+                    <label for="topic-6">Others</label>
+                </div>
+            </li>
+
+        </ul>
+
+    </form>
+
+</div>
+
+<script>
+    require(
+        [
+            'jquery',
+            'Magento_Ui/js/modal/modal'
+        ],
+        function(
+            $,
+            modal
+        ) {
+            var options = {
+                type: 'popup',
+                responsive: true,
+                innerScroll: true,
+                title: 'Create a Registry',
+                modalClass: 'modal-popup-small',
+                buttons: [{
+                    text: $.mage.__('Cancel'),
+                    class: 'action secondary',
+                    click: function () {
+                        this.closeModal();
+
+                    }
+                },
+                {
+                    text: $.mage.__('Create'),
+                    class: 'action primary',
+                    click: function () {
+                        //this.closeModal();
+                    }
+                }]
+            };
+
+            const createRegister = $('.create-registry-modal');
+            const popup = modal(options, createRegister);
+            const createRegistrybutton = $('.createRegistry--button');
+
+            $(".giftRegistry-post").click(function() {
+                createRegister.modal('openModal');
+            });
+
+            $(createRegistrybutton).click(function() {
+                const $parent = $(this).parent();
+                if ($parent.hasClass('active')) return;
+                else{
+                    $(this).children('input[type="radio"]').prop("checked", true);
+                    $parent.addClass('active').siblings().removeClass('active');
+                }
+
+            });
+
+
+        }
+    );
+</script>

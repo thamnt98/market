@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="product.info.price">
+            <block class="SM\FlashSale\Block\Catalog\Product\Event" name="event-detail-count"
+                   template="SM_FlashSale::product/detailcount.phtml" after="pdp-badge-discount"/>
+        </referenceContainer>
+    </body>
+</page>

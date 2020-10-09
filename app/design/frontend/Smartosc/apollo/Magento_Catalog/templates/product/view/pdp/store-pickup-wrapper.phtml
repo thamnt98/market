@@ -1,0 +1,15 @@
+<?php
+
+/**
+ * @var \Magento\Framework\View\Element\Template $block
+ */
+?>
+
+<div id="store-pickup-wrapper" data-product-id="<?= $block->getRequest()->getParam("id")?>"></div>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_Catalog/js/pdp/store-pickup-wrapper": {}
+        }
+    }
+</script>

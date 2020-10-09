@@ -1,0 +1,383 @@
+// /**
+//  * Copyright © Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+@apl-ic_search:"\e925";
+
+& when (@media-common = true) {
+    .list-group-title {
+        h5 {
+            .lib-list-reset-styles();
+            .lib-font-size(16);
+            font-family: @font-family-SF-UI-Display-Bold;
+        }
+    }
+    .find-a-store {
+        .modal-footer {
+            display: none;
+        }
+        .modal-content,
+        .modal-header {
+            padding: 0;
+        }
+        .modal-inner-wrap {
+            width: 678px;
+            border-radius: 15px;
+            background-color: @background-find-store;
+            box-shadow: 0 1px 4px 0 rgba(48, 48, 48, 0.5);
+            .find-store{
+                .modal-content-stores{
+                    .modal-header {
+                        margin-bottom: 35px;
+                        .modal-header-location {
+                            margin-bottom: 20px;
+                            display: flex;
+                            align-items: center;
+                            .modal-title {
+                                margin-left: 15px;
+                                font-weight: @font-weight__bold;
+                                letter-spacing: 0;
+                                line-height: 31px;
+                                border-bottom: none;
+                            }
+                        }
+                        .input-group {
+                            display: flex;
+                            margin-bottom: 10px;
+                            form {
+                                width: 100%;
+                            }
+                            .input-group-find-stores {
+                                position: relative;
+                                width: 100%;
+                                input {
+                                    box-sizing: border-box;
+                                    border: 0.5px solid     @c-tsm-grey2;
+                                    border-radius: 5px;
+                                    background-color: @input-find-store__background-color;
+                                    box-shadow: 0 1px 4px 0 rgba(152, 152, 152, 0.5);
+                                    padding: 0  50px 0 15px;
+                                    font-weight: @font-weight__heavier;
+                                    letter-spacing: 0;
+                                    color: @c-tsm-grey6;
+                                }
+                                .icon-search {
+                                    position: absolute;
+                                    top: 9px;
+                                    right: 15px;
+                                    .lib-icon-font(
+                                        @_icon-font-content: @apl-ic_search,
+                                        @_icon-font-size: 18px,
+                                        @_icon-font: @font-family-apl-icons,
+                                        @_icon-font-color: @c-tsm-grey4,
+                                        @_icon-font-line-height: 18px
+                                    );
+                                }
+                            }
+                        }
+                        .or-use-current-locat {
+                            color: @c-tsm-grey22;
+                            font-size: 14px;
+                            font-weight: @font-weight__heavier;
+                            letter-spacing: 0;
+                            line-height: 16px;
+                            a {
+                                color: @c-tsm-grey22;
+                                position: relative;
+
+                                &:after {
+                                    box-sizing: border-box;
+                                    height: 1px;
+                                    width: 100px;
+                                    background: @c-tsm-grey12;
+                                    content: "";
+                                    left: 5px;
+                                    bottom: -2px;
+                                    position: absolute;
+                                }
+                            }
+                        }
+                    }
+                    .modal-body {
+                        .no-store-locator{
+                            text-align: center;
+                            img{
+                                margin-bottom: 25px;
+                            }
+                            h4{
+                                text-align: center;
+                                font-size: 16px;
+                                line-height: 28px;
+                                padding: 0;
+                                margin: 0;
+                                font-weight: normal;
+                                font-family: @font-family-SF-UI-Display-Bold;
+                                margin-bottom: 50px;
+                            }
+                        }
+                        h5.title {
+                            font-size: 16px;
+                            margin-bottom: 15px;
+                        }
+                        .list-group {
+                            overflow-y: auto;
+                        }
+
+                        .force-overflow {
+                            max-height: 530px;
+                            padding-left: 0px;
+                        }
+
+                        .scrollbar::-webkit-scrollbar-track {
+                            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+                            border-radius: 10px;
+                            background-color: @color-white;
+                        }
+
+                        .scrollbar::-webkit-scrollbar {
+                            width: 8px;
+                            background-color: @color-white;
+                        }
+
+                        .scrollbar::-webkit-scrollbar-thumb {
+                            border-radius: 10px;
+                            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+                            background-color: @scroll-bar__background-color;
+                        }
+
+                        .list-group-item {
+                            display: block;
+                            border-top: 1px solid @c-tsm-grey24;
+                            position: relative;
+                            padding: @indent__base 80px @indent__base 0px;
+                            margin-bottom: 0px;
+                            min-height: 67px;
+                            &:last-child {
+                                border-bottom: 1px solid @c-tsm-grey24;
+                            }
+                            .list-group-title {
+                                h5 {
+
+                                    margin-top: 0px;
+                                    margin-bottom: 10px;
+                                    .lib-font-size(16);
+                                    font-family: @font-family-SF-UI-Display-Bold;
+                                }
+                            }
+
+                            p {
+                                color: @c-tsm-grey22;
+                                font-weight: @font-weight__heavier;
+                                margin-bottom: 1px;
+                            }
+                            .direction {
+                                position: absolute;
+                                right: 30px;
+                                top: 20px;
+                                text-align: center;
+                                .apl-ArrowIcon {
+                                    display: block;
+                                    margin-bottom: 5px;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+//
+//  Mobile (style-m.css)
+//  _____________________________________________
+//@screen__s = 639
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__s){
+    .find-a-store{
+        .modal-inner-wrap{
+            padding: 15px;
+            .find-store{
+                .modal-content-stores{
+                    .modal-header{
+                        .modal-header-location{
+                            > .apl-Location{
+                                font-size: 30px;
+                            }
+                            .modal-title{
+                                font-size: 22px;
+                            }
+                        }
+                        .input-group {
+                            .input-group-find-stores{
+                                margin-right: 10px;
+                                input{
+                                    font-size: 12px;
+                                }
+                            }
+                            .input-group-append{
+                                > button{
+                                    padding-left: 15px;
+                                    padding-right: 15px;
+                                    font-size: 12px;
+                                }
+                            }
+                        }
+                    }
+                    .modal-body{
+                        .list-group{
+                            padding-right: 0px;
+                        }
+                        .list-group-item{
+                            .list-group-title{
+                                h6{
+                                    font-size: 14px;
+                                }
+                            }
+                            p{
+                                font-size: 12px;
+                            }
+                            .direction{
+                                .apl-ArrowIcon{
+                                    font-size: 35px;
+                                }
+                                span{
+                                    font-size: 12px;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+// @screen__m = 767
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m){
+    .find-a-store {
+        .modal-inner-wrap {
+            padding: 20px 15px 15px 40px;
+            .find-store {
+                .modal-content-stores {
+                    .modal-header {
+                        .modal-header-location {
+                            > .apl-Location {
+                                font-size: 40px;
+                            }
+
+                            .modal-title {
+                                font-size: 26px;
+                            }
+                        }
+
+                        .input-group {
+
+                            .input-group-find-stores {
+                                margin-right: 15px;
+
+                                input {
+                                    font-size: 14px;
+                                }
+                            }
+
+                            .input-group-append {
+                                > button {
+                                    padding-left: 35px;
+                                    padding-right: 35px;
+                                }
+                            }
+                        }
+                    }
+                    .modal-body {
+                        .list-group {
+                            padding-right: 20px;
+                        }
+                        .list-group-item {
+                            .list-group-title {
+                                h6 {
+                                    font-size: 16px;
+                                }
+                            }
+                            p {
+                                font-size: 14px;
+                            }
+                            .direction {
+                                .apl-ArrowIcon {
+                                    font-size: 45px;
+                                }
+                                span {
+                                    font-size: 16px;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+//
+//  Desktop (style-l.css)
+//  _____________________________________________
+// @screen__m = 768
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .find-a-store {
+        .modal-inner-wrap {
+            padding: 20px 15px 15px 40px;
+            .find-store {
+                .modal-content-stores {
+                    .modal-header {
+                        .modal-header-location {
+                            > .apl-Location {
+                                font-size: 40px;
+                            }
+                            .modal-title {
+                                font-size: 26px;
+                            }
+                        }
+                        .input-group {
+                            .input-group-find-stores {
+                                margin-right: 15px;
+                                input {
+                                    font-size: 14px;
+                                }
+                            }
+                            .input-group-append {
+                                > button {
+                                    padding-left: 55px;
+                                    padding-right: 55px;
+                                }
+                            }
+                        }
+                    }
+
+                    .modal-body {
+                        .list-group {
+                            padding-right: 20px;
+                        }
+                        .list-group-item {
+                            .list-group-title {
+                                h6 {
+                                    font-size: 16px;
+                                }
+                            }
+                            p {
+                                font-size: 14px;
+                            }
+                            .direction {
+                                .apl-ArrowIcon {
+                                    font-size: 45px;
+                                }
+                                span {
+                                    font-size: 16px;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

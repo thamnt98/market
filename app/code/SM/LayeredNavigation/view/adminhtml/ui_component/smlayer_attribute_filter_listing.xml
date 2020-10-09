@@ -1,0 +1,65 @@
+<?xml version="1.0"?><!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_LayeredNavigation
+ *
+ * Date: April, 27 2020
+ * Time: 4:09 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">
+                smlayer_attribute_filter_listing.smlayer_attribute_filter_listing_data_source
+            </item>
+        </item>
+    </argument>
+    <settings>
+        <buttons/>
+        <spinner>smlayer_attribute_filter_listing_columns</spinner>
+        <deps>
+            <dep>smlayer_attribute_filter_listing.smlayer_attribute_filter_listing_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="smlayer_attribute_filter_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>Magento_Catalog::products</aclResource>
+        <dataProvider class="SM\LayeredNavigation\Model\Category\FilterList\DataProvider"
+                      name="smlayer_attribute_filter_listing_data_source">
+            <settings>
+                <requestFieldName>attribute_code</requestFieldName>
+                <primaryFieldName>attribute_code</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <columns name="smlayer_attribute_filter_listing_columns">
+        <selectionsColumn name="ids" component="SM_LayeredNavigation/js/grid/columns/onoff">
+            <settings>
+                <controlVisibility>false</controlVisibility>
+                <indexField>attribute_code</indexField>
+            </settings>
+        </selectionsColumn>
+        <column name="frontend_label">
+            <settings>
+                <filter>text</filter>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+                <label translate="true">Name</label>
+            </settings>
+        </column>
+        <column name="attribute_code">
+            <settings>
+                <filter>text</filter>
+                <bodyTmpl>ui/grid/cells/html</bodyTmpl>
+                <label translate="true">Code</label>
+            </settings>
+        </column>
+    </columns>
+</listing>

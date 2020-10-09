@@ -1,0 +1,284 @@
+@font-face {
+  font-family: 'apl';
+  src:  url('fonts/apl.eot?6tc7qa');
+  src:  url('fonts/apl.eot?6tc7qa#iefix') format('embedded-opentype'),
+    url('fonts/apl.ttf?6tc7qa') format('truetype'),
+    url('fonts/apl.woff?6tc7qa') format('woff'),
+    url('fonts/apl.svg?6tc7qa#apl') format('svg');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block;
+}
+
+[class^="apl-"], [class*=" apl-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'apl' !important;
+  speak: never;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.apl-pencil:before {
+  content: "\e942";
+}
+.apl-exchange-alt:before {
+  content: "\e940";
+  color: #626262;
+}
+.apl-setting:before {
+  content: "\e941";
+  color: #626262;
+}
+.apl-tick-info:before {
+  content: "\e93d";
+  color: #fb9e0d;
+}
+.apl-tick-success:before {
+  content: "\e93e";
+  color: #f7b500;
+}
+.apl-tick-warning:before {
+  content: "\e93f";
+  color: #e52020;
+}
+.apl-delivery:before {
+  content: "\e93c";
+}
+.apl-facebook_messenger:before {
+  content: "\e935";
+  color: #007fff;
+}
+.apl-facebook:before {
+  content: "\e937";
+  color: #45619d;
+}
+.apl-google-plus:before {
+  content: "\e939";
+  color: #dc4e41;
+}
+.apl-pinterest:before {
+  content: "\e93a";
+  color: #ca2028;
+}
+.apl-twitter:before {
+  content: "\e93b";
+  color: #1cb7eb;
+}
+.apl-star-fill:before {
+  content: "\e933";
+  color: #fbb317;
+}
+.apl-star-empty:before {
+  content: "\e931";
+  color: #fcb415;
+}
+.apl-ArrowIcon:before {
+  content: "\e92c";
+  color: #2b86df;
+}
+.apl-Location:before {
+  content: "\e92d";
+  color: #2b86df;
+}
+.apl-QuestionHelp:before {
+  content: "\e924";
+  color: #fff;
+}
+.apl-grid:before {
+  content: "\e928";
+}
+.apl-Shopping-List:before {
+  content: "\e91b";
+}
+.apl-MovetoList:before {
+  content: "\e927";
+  color: #bababa;
+}
+.apl-List:before {
+  content: "\e91d";
+  color: #989898;
+}
+.apl-Share:before {
+  content: "\e91c";
+  color: #989898;
+}
+.apl-cancel:before {
+  content: "\e919";
+}
+.apl-Back:before {
+  content: "\e901";
+  color: #000;
+}
+.apl-Cart:before {
+  content: "\e90b";
+  color: #000;
+}
+.apl-Close-Button:before {
+  content: "\e918";
+  color: #000;
+}
+.apl-delivery-large:before {
+  content: "\e91a";
+}
+.apl-account:before {
+  content: "\e92e";
+  color: #000;
+}
+.apl-Notification:before {
+  content: "\e92f";
+  color: #000;
+}
+.apl-Pick-Up-in-Store-Grey:before {
+  content: "\e930";
+  color: #000;
+}
+.apl-Remove:before {
+  content: "\e932";
+  color: #000;
+}
+.apl-Sort:before {
+  content: "\e934";
+  color: #000;
+}
+.apl-Star-Full:before {
+  content: "\e936";
+  color: #000;
+}
+.apl-Voucher:before {
+  content: "\e938";
+}
+.apl-ic_adress:before {
+  content: "\e900";
+  color: #000;
+}
+.apl-ic_arr-left:before {
+  content: "\e902";
+  color: #000;
+}
+.apl-ic_arr-left-thin:before {
+  content: "\e903";
+  color: #000;
+}
+.apl-ic_arr-right:before {
+  content: "\e904";
+  color: #000;
+}
+.apl-ic_bank-card:before {
+  content: "\e905";
+  color: #000;
+}
+.apl-ic_bell:before {
+  content: "\e906";
+}
+.apl-ic_calender:before {
+  content: "\e907";
+  color: #000;
+}
+.apl-ic_cart:before {
+  content: "\e908";
+}
+.apl-ic_cart2:before {
+  content: "\e909";
+  color: #000;
+}
+.apl-ic_category:before {
+  content: "\e90a";
+  color: #000;
+}
+.apl-ic_clock:before {
+  content: "\e90c";
+  color: #000;
+}
+.apl-ic_credit-card:before {
+  content: "\e90d";
+}
+.apl-ic_credit-card2:before {
+  content: "\e90e";
+}
+.apl-ic_delivery-large:before {
+  content: "\e90f";
+}
+.apl-ic_delivery-long:before {
+  content: "\e910";
+  color: #000;
+}
+.apl-ic_delivey2:before {
+  content: "\e911";
+}
+.apl-ic_gift:before {
+  content: "\e912";
+  color: #000;
+}
+.apl-ic_gift2:before {
+  content: "\e913";
+}
+.apl-ic_heart-empty:before {
+  content: "\e914";
+}
+.apl-ic_heart-full:before {
+  content: "\e915";
+  color: #000;
+}
+.apl-ic_info:before {
+  content: "\e916";
+  color: #000;
+}
+.apl-ic_information:before {
+  content: "\e917";
+}
+.apl-ic_minus:before {
+  content: "\e91e";
+  color: #000;
+}
+.apl-ic_myprofile:before {
+  content: "\e91f";
+  color: #000;
+}
+.apl-ic_myreview:before {
+  content: "\e920";
+  color: #000;
+}
+.apl-ic_notification:before {
+  content: "\e921";
+  color: #000;
+}
+.apl-ic_plus:before {
+  content: "\e922";
+  color: #000;
+}
+.apl-ic_process:before {
+  content: "\e923";
+  color: #000;
+}
+.apl-ic_search:before {
+  content: "\e925";
+  color: #000;
+}
+.apl-ic_shop:before {
+  content: "\e926";
+}
+.apl-ic-delivery-short:before {
+  content: "\e929";
+  color: #000;
+}
+.apl-ic-help:before {
+  content: "\e92a";
+  color: #000;
+}
+.apl-ic-pickup:before {
+  content: "\e92b";
+  color: #000;
+}
+.apl-camera:before {
+  content: "\e943";
+}
+.apl-share2:before {
+  content: "\ea82";
+}

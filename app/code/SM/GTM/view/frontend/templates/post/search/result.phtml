@@ -1,0 +1,15 @@
+<?php $query = $block->getRequest()->getParam('q'); ?>
+<?php if (!$block->getLayout()->getBlock('blog.search.result')->getPostCollection()->getSize()) : ?>
+    <script>
+        require(['jquery', 'gtmInspireMe', 'domReady!'],function ($, gtm) {
+            $(window).load(function () {
+                if (typeof dataLayerSourceObjects !== 'undefined') {
+                    console.log(dataLayerSourceObjects);
+                    let data = [];
+                    data['query'] = "<?= $block->escapeHtml($query); ?>";
+                    gtm.push('search_inspire_me_failed', data);
+                }
+            });
+        })
+    </script>
+<?php endif; ?>

@@ -1,0 +1,13 @@
+<?php
+/** @var $block \SM\Catalog\Block\Product\ProductList\Item\AddTo\Iteminfo */
+$percent = $block->getDiscountPercent($block->getProduct());
+?>
+
+<?php if (!empty($percent)): ?>
+    <div class="disc-percent-list">
+        <span class="product-sale">
+            <?= $block->escapeHtml(__('%1% OFF', $percent));?>
+        </span>
+    </div>
+<?php endif; ?>
+

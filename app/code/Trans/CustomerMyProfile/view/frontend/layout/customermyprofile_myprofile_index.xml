@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_CustomerMyProfile
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Dwi Septha Kurniawan <septha.kurniawan@transdigital.co.id>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="customer_account"/>
+    <head>
+        <!--<css src="Trans_CustomerMyProfile::css/profile-picture.css"/>-->
+        <title>
+            My Profile
+        </title>
+    </head>
+    <body>
+        <!--<referenceContainer name="content">
+            <block class="Trans\CustomerMyProfile\Block\MyProfile\Edit\EditPersonalInformation" name="customermyprofile.myprofile.editinfo" template="Trans_CustomerMyProfile::myprofile/edit/edit_personal_information.phtml" cacheable="false" />
+            <block class="Trans\CustomerMyProfile\Block\MyProfile\Edit\EditMobileNumber" name="customermyprofile.myprofile.editmobilenumber" template="Trans_CustomerMyProfile::myprofile/edit/edit_mobile_number.phtml" cacheable="false" />
+            <block class="Trans\CustomerMyProfile\Block\MyProfile\Edit\EditEmail" name="customermyprofile.myprofile.editemail" template="Trans_CustomerMyProfile::myprofile/edit/edit_email.phtml" cacheable="false" />
+            <block class="Trans\CustomerMyProfile\Block\MyProfile\Edit\ChangePassword" name="customermyprofile.myprofile.changepassword" template="Trans_CustomerMyProfile::myprofile/edit/change_password.phtml" cacheable="false" />
+            <block class="Trans\CustomerMyProfile\Block\MyProfile\PersonalInformation" name="customermyprofile.myprofile.info" template="Trans_CustomerMyProfile::myprofile/personal_information.phtml" cacheable="false" />
+            <block class="Trans\CustomerMyProfile\Block\MyProfile\EmailAndTelephone" name="customermyprofile.myprofile.emailandtelephone" template="Trans_CustomerMyProfile::myprofile/email_and_telephone.phtml" cacheable="false" />
+            <block class="Trans\CustomerMyProfile\Block\MyProfile\Password" name="customermyprofile.myprofile.password" template="Trans_CustomerMyProfile::myprofile/password.phtml" cacheable="false" />
+        </referenceContainer>-->
+    </body>
+</page>

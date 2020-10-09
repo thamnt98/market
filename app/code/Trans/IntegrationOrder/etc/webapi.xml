@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_IntegrationOrder
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Muhammad Randy <muhammad.randy@transdigital.co.id>
+ *
+ * Copyright © 2020 PT CT Corp Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route url="/V1/integration/order/status" method="POST">
+        <service class="Trans\IntegrationOrder\Api\OrderStatusInterface" method="statusNonSubAction"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/integration/order/status/subaction" method="POST">
+        <service class="Trans\IntegrationOrder\Api\OrderStatusInterface" method="statusWithSubAction"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/integration/order/status/orderitems" method="POST">
+        <service class="Trans\IntegrationOrder\Api\OrderStatusInterface" method="statusOrderItems"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+ 	<route url="/V1/integration/order/status/updateawb" method="POST">
+        <service class="Trans\IntegrationOrder\Api\OrderStatusInterface" method="updateAWB"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/integration/order/paymentstatus" method="POST">
+        <service class="Trans\IntegrationOrder\Api\OrderStatusInterface" method="checkPaymentStatus"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/integration/order/allocationrule" method="POST">
+        <service class="Trans\IntegrationOrder\Api\OrderAllocationRuleInterface" method="getOrderAllocationRule"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/integration/order/createorder" method="POST">
+        <service class="Trans\IntegrationOrder\Api\OmsIntegrationInterface" method="createOrderOms"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/integration/order/updatepayment" method="POST">
+        <service class="Trans\IntegrationOrder\Api\PaymentStatusInterface" method="sendStatusPayment"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/integration/order/return/create" method="POST">
+        <service class="Trans\IntegrationOrder\Api\ReturnStatusInterface" method="sendReturn"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/integration/order/return/initiate" method="POST">
+        <service class="Trans\IntegrationOrder\Api\ReturnStatusInterface" method="returnInitiate"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/integration/order/return/progress" method="POST">
+        <service class="Trans\IntegrationOrder\Api\ReturnStatusInterface" method="returnProgress"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/integration/order/return/cancel" method="POST">
+        <service class="Trans\IntegrationOrder\Api\ReturnStatusInterface" method="returnCancel"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+</routes>

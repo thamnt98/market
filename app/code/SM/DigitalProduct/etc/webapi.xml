@@ -1,0 +1,217 @@
+<?xml version="1.0" ?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <!-- Get Data -->
+    <route method="GET" url="/V1/digitalproduct/slider">
+        <service class="SM\DigitalProduct\Api\SliderRepositoryInterface" method="getSlider"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route method="GET" url="/V1/digitalproduct/category/search">
+        <service class="SM\DigitalProduct\Api\CategoryRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route method="GET" url="/V1/digitalproduct/categories">
+        <service class="SM\DigitalProduct\Api\CategoryRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route method="GET" url="/V1/digitalproduct/category/:categoryCode">
+        <service class="\SM\DigitalProduct\Api\CategoryContentRepositoryInterface" method="getCategoryContent"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <!-- Quick Transaction API -->
+    <route method="GET" url="/V1/digitalproduct/quickTransaction">
+        <service class="\SM\DigitalProduct\Api\OrderRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route method="POST" url="/V1/digitalproduct/reOrder">
+        <service class="\SM\DigitalProduct\Api\ReorderRepositoryInterface" method="reOrder"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+    <!-- End Quick Transaction API -->
+
+    <route method="GET" url="/V1/digitalproduct/operator">
+        <service class="SM\DigitalProduct\Api\DigitalProductRepositoryInterface" method="getOperator"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route method="POST" url="/V1/digitalproduct/checkprefix">
+        <service class="SM\DigitalProduct\Api\DigitalProductRepositoryInterface" method="checkPrefix"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <!--  Start: Get Inquire  -->
+    <route method="POST" url="/V1/digitalproduct/electricity_prepaid/inquire">
+        <service class="\SM\DigitalProduct\Api\Inquire\ElectricityTokenInterface" method="inquire"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route method="POST" url="/V1/digitalproduct/electricity_postpaid/inquire">
+        <service class="\SM\DigitalProduct\Api\Inquire\ElectricityBillInterface" method="inquire"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route method="POST" url="/V1/digitalproduct/pdam/inquire">
+        <service class="SM\DigitalProduct\Api\InquireRepositoryInterface" method="inquirePdam"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route method="POST" url="/V1/digitalproduct/bpjs/inquire">
+        <service class="SM\DigitalProduct\Api\InquireRepositoryInterface" method="inquireBpjs"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route method="POST" url="/V1/digitalproduct/mobilepostpaid/inquire">
+        <service class="SM\DigitalProduct\Api\InquireRepositoryInterface" method="inquireMobilePostpaid"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route method="POST" url="/V1/digitalproduct/telkom/inquire">
+        <service class="SM\DigitalProduct\Api\InquireRepositoryInterface" method="inquireTelkom"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <!--  End: Get Inquire  -->
+
+    <route method="GET" url="/V1/digitalproduct/products/:digitalCatCode">
+        <service class="SM\DigitalProduct\Api\DigitalProductRepositoryInterface" method="getProductsByCategory"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <!-- Cart API -->
+    <route method="POST" url="/V1/digitalproduct/addToCart">
+        <service class="\SM\DigitalProduct\Api\CartRepositoryInterface" method="addToCart"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+    <!-- Start: Get Transaction API  -->
+    <route method="POST" url="/V1/digitalproduct/mobile/transaction">
+        <service class="SM\DigitalProduct\Api\TransactionRepositoryInterface" method="transactionMobile"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route method="POST" url="/V1/digitalproduct/electricity_postpaid/transaction">
+        <service class="SM\DigitalProduct\Api\TransactionRepositoryInterface" method="transactionElectricityPostPaid"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route method="POST" url="/V1/digitalproduct/electricity_prepaid/transaction">
+        <service class="SM\DigitalProduct\Api\TransactionRepositoryInterface" method="transactionElectricityPrePaid"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route method="POST" url="/V1/digitalproduct/pdam/transaction">
+        <service class="SM\DigitalProduct\Api\TransactionRepositoryInterface" method="transactionPdam"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route method="POST" url="/V1/digitalproduct/bpjs/transaction">
+        <service class="SM\DigitalProduct\Api\TransactionRepositoryInterface" method="transactionBpjs"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route method="POST" url="/V1/digitalproduct/mobilepostpaid/transaction">
+        <service class="SM\DigitalProduct\Api\TransactionRepositoryInterface" method="transactionMobilePostpaid"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route method="POST" url="/V1/digitalproduct/telkom/transaction">
+        <service class="SM\DigitalProduct\Api\TransactionRepositoryInterface" method="transactionTelkom"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <!--  End: Transaction API  -->
+</routes>

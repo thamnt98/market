@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="abstract_detail"/>
+    <body>
+        <referenceContainer name="content">
+            <block class="SM\Sales\Block\Order\Digital\Detail" name="sm.sales.order.detail" template="SM_Sales::order/detail/digital/wrapper.phtml">
+                <block class="SM\Sales\Block\Order\Digital\Part\Content" name="sm.sales.order.detail.payment" template="SM_Sales::order/payment-info.phtml"/>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

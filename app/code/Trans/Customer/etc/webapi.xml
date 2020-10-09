@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!-- 
+/**
+ * @category Trans
+ * @package  Trans_Customer
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ * @author   Imam Kusuma <imam.kusuma@ctcorpdigital.com>
+ * @edited   J.P <jaka.pondan@ctcorpdigital.com>
+ *
+ * Copyright © 2019 CT Corp Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route url="/V1/customer/isTelephoneAvailable" method="POST">
+        <service class="Trans\Customer\Api\AccountManagementInterface" method="isTelephoneAvailable"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <route url="/V1/customer/auth-verification" method="POST">
+        <service class="Trans\Customer\Api\AccountManagementInterface" method="authVerification"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/customer/send-sms-verification" method="POST">
+        <service class="Trans\Customer\Api\AccountManagementInterface" method="sendSmsVerification"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <!--    Integration Customer-->
+    <route url="/V1/customer/integration" method="POST">
+        <service class="Trans\Customer\Api\CustomerIntegrationInterface" method="CreateNewCustomer"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <route url="/V1/customer/checkCustomerIntegration" method="POST">
+        <service class="Trans\Customer\Api\AccountManagementInterface" method="checkCustomerRegister"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <route url="/V1/customer/getCustomerIntegration" method="POST">
+        <service class="Trans\Customer\Api\AccountManagementInterface" method="getCentralCustomerData"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+</routes>

@@ -1,0 +1,22 @@
+<?php
+/** @var \SM\Review\Block\Customer\EditReviewed $block */
+
+/** @var \SM\Review\ViewModel\ReviewViewModel $reviewViewModel */
+$reviewViewModel = $block->getData("reviewViewModel");
+
+/** @var \SM\Review\Api\Data\Product\ReviewDetailInterface $review */
+$review = $block->getReview();
+
+$product = $block->getProduct();
+?>
+<div class="review-product">
+    <a href="<?= $block->getUrl('review/customer/list', ["tab" => "reviewed"]) ?>" class="back-myreview"><?= $block->escapeHtml(__('Back to My Reviews')) ?></a>
+    <div class="form-review">
+        <?php
+        /** @var \SM\Review\Block\Customer\Form\Detail $formBlock */
+        $formBlock = $block->getChildBlock("product.review.form.detail");
+        $formBlock->setProduct($product);
+        $formBlock->setReview($review); ?>
+        <?= $block->getChildHtml("product.review.form.detail");?>
+    </div>
+</div>

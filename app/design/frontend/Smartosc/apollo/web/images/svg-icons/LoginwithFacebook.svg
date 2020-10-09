@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg  viewBox="0 0 48 48" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 59.1 (86144) - https://sketch.com -->
+    <title>Group</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <circle id="path-1" cx="21" cy="21" r="21"></circle>
+        <filter x="-13.1%" y="-8.3%" width="126.2%" height="126.2%" filterUnits="objectBoundingBox" id="filter-2">
+            <feOffset dx="0" dy="2" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
+            <feGaussianBlur stdDeviation="1.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
+            <feColorMatrix values="0 0 0 0 0.690196078   0 0 0 0 0.690196078   0 0 0 0 0.690196078  0 0 0 1 0" type="matrix" in="shadowBlurOuter1"></feColorMatrix>
+        </filter>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard-Copy" transform="translate(-1364.000000, -94.000000)">
+            <g id="Group" transform="translate(1367.000000, 95.000000)">
+                <g id="Oval">
+                    <use fill="black" fill-opacity="1" filter="url(#filter-2)" xlink:href="#path-1"></use>
+                    <use fill="#3B5998" fill-rule="evenodd" xlink:href="#path-1"></use>
+                </g>
+                <path d="M26,10.1730769 L26,13.9807692 L23.8194444,13.9807692 C22.1111111,13.9807692 21.7916667,14.8317308 21.7916667,16.0576923 L21.7916667,18.7836538 L25.8611111,18.7836538 L25.3194444,23.0528846 L21.7916667,23.0528846 L21.7916667,34 L17.5416667,34 L17.5416667,23.0528846 L14,23.0528846 L14,18.7836538 L17.5416667,18.7836538 L17.5416667,15.6394231 C17.5416667,11.9903846 19.6944444,10 22.8333333,10 C24.3333333,10 25.625,10.1153846 26,10.1730769 Z" id="facebook" fill="#FFFFFF"></path>
+            </g>
+        </g>
+    </g>
+</svg>

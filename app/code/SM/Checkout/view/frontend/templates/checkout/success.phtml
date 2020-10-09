@@ -1,0 +1,18 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var SM\Checkout\Block\Checkout\Success $block */
+
+$orderItems = $block->getOrderItems();
+?>
+<?php if ($block->isSucceed()):
+    echo $block->getChildBlock('checkout_success.cc')->toHtml();
+    ?>
+
+<?php elseif ($block->isVirtualAccount()):
+    echo $block->getChildBlock('checkout_success.va')->toHtml();
+    ?>
+<?php endif; ?>

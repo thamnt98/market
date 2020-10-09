@@ -1,0 +1,26 @@
+<?php /** @var SM\TodayDeal\Block\PostList $block */ ?>
+
+
+<div class="row section-today-deal">
+<?php foreach($block->getPosts() as $post): ?>
+    <div class="col-sm-12 col-md-4">
+        <?php /** @var SM\TodayDeal\Model\Post $post */ ?>
+
+            <div class="todaydeal-post">
+                <?php if ($post->getThumbnailName()): ?>
+                <a href="<?php echo $post->getPostUrl(); ?>" class="todaydeal-post-image">
+                    <img class="lazy-loaded" loading="lazy" width="432"
+                         src="<?= $block->escapeUrl($block->getImageResize($post->getThumbnailName(), $post->getThumbnailPath(), 432)) ?>"
+                         alt="<?= $block->escapeHtml($post->getTitle()) ?>"/>
+                </a>
+                <?php endif; ?>
+                <h2 class="todaydeal-post-title"><a href="<?php echo $post->getPostUrl();?>"><?php echo __($post->getTitle()); ?></a></h2>
+            </div>
+
+
+    </div>
+<?php endforeach; ?>
+</div>
+<div class="toolbar">
+    <?php echo $block->getChildHtml("posts.pager"); ?>
+</div>

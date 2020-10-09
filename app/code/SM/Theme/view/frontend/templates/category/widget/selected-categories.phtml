@@ -1,0 +1,70 @@
+<?php
+/**
+ * Selected categories list template
+ *
+ * @var $block \SM\Theme\Block\Category\Widget\SelectedCategories
+ */
+?>
+<?php if ($selectedIdsDefault = $block->getSelectedCategoryIds()): ?>
+<?php //$customerSelectedControl = $block->getSelectedCategoriesCustomer($block->getCustomerId(), $selectedIdsDefault)
+    ; ?>
+    <div class="selected-categories category-list">
+        <div class="block-title">
+            <?php if ($title = $block->getData('title')) : ?>
+                <strong><?= $block->escapeHtml(__($title)) ?></strong>
+            <?php endif ?>
+        </div>
+        <ol class="category list items category-items row no-gutters">
+            <?php $count = 0; ?>
+            <?php /** @var $_category \Magento\Catalog\Model\Category */ ?>
+            <?php foreach ($selectedIdsDefault as $categoryId) : ?>
+                <?php if ($category = $block->getCategoryById($categoryId)): ?>
+                    <?php if ($count++ == 3): ?>
+                        <?php break ?>
+                    <?php endif; ?>
+                    <li class="item category category-item col-xs-4 col-sm-4">
+                        <div class="category-item-info" data-container="category-list">
+                            <a href="<?= $block->escapeUrl($category->getUrl()); ?>"
+                               class="<?= 'category photo category-item-photo ' . $category->getId(); ?>">
+                                <?php if ($imgUrl = $category->getImageUrl('thumbnail')) : ?>
+                                    <div class="category-image">
+                                        <img src="<?= $block->escapeUrl($block->getImageResize($imgUrl, 240, 240))?>"
+                                             alt="<?= $block->escapeHtmlAttr($category->getName()) ?>"
+                                             title="<?= $block->escapeHtmlAttr($category->getName()) ?>"
+                                             class="image" loading="lazy" width="240" />
+                                    </div>
+                                <?php endif ?>
+                                <div class="category name">
+                                    <?= $block->escapeHtml($category->getName()); ?>
+                                </div>
+                            </a>
+                        </div>
+                    </li>
+                    <?php if ($category->getId()): ?>
+                        <script>
+                            require(['jquery', 'moment'], function ($, moment) {
+                                $('.category.photo.category-item-photo.<?= $category->getId(); ?>').click(function (e) {
+                                    window.dataLayer = window.dataLayer || [];
+                                    window.dataLayer.push({
+                                        event: "select_category_homepage",
+                                        uniqueUserID: dataLayerSourceObjects.customer.uniqueUserID,
+                                        userID: dataLayerSourceObjects.customer.userID,
+                                        customerID: dataLayerSourceObjects.customer.customerID,
+                                        customerType: dataLayerSourceObjects.customer.customerType,
+                                        loyalty: dataLayerSourceObjects.customer.loyalty,
+                                        customerStatus: dataLayerSourceObjects.customer.customerStatus,
+                                        loginType: dataLayerSourceObjects.customer.loginType,
+                                        timestamp: moment().format('DD\/MM\/YYYY HH:mm:ss'),
+                                        menu_name: "<?= $category->getName(); ?>",
+                                        store_name: dataLayerSourceObjects.customer.storeName,
+                                        store_ID: dataLayerSourceObjects.customer.storeID
+                                    });
+                                });
+                            });
+                        </script>
+                    <?php endif ?>
+                <?php endif ?>
+            <?php endforeach; ?>
+        </ol>
+    </div>
+<?php endif; ?>

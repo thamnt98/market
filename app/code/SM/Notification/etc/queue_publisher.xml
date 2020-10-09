@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_Notification
+ *
+ * Date: June, 03 2020
+ * Time: 3:56 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/publisher.xsd">
+    <publisher topic="sm.notification.sms">
+        <connection name="amqp" exchange="magento" />
+    </publisher>
+    <publisher topic="sm.notification.push">
+        <connection name="amqp" exchange="magento" />
+    </publisher>
+    <publisher topic="sm.notification.email">
+        <connection name="amqp" exchange="magento" />
+    </publisher>
+</config>

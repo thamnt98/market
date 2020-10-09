@@ -1,0 +1,55 @@
+<?php /** @var $block \SM\Notification\Block\Header\Sidebar */ ?>
+<div data-block="notification" class="navbar-notification jsNavbarNotification">
+    <button class="action show-notification btn-icon jsNavbarNotification"
+       data-bind="scope: 'notification_content'">
+        <span class="icon ic-notification">
+            <!-- ko if: getTotalNotification() > 0 -->
+            <span class="counter qty empty"
+                  data-bind="css: { empty: getTotalNotification() == 0 && !isLoading() }, blockLoader: isLoading">
+                <span class="counter-number"><!-- ko text: getTotalNotification()--><!-- /ko --></span>
+            </span>
+            <!-- /ko -->
+        </span>
+    </button>
+    <?php if (true) :?>
+        <div class="block block-notification"
+             data-role="dropdownDialog"
+             data-mage-init='{"dropdownDialog":{
+                "appendTo":"[data-block=notification]",
+                "triggerTarget":".show-notification",
+                "timeout": "200",
+                "triggerEvent":"hover",
+                "closeOnMouseLeave": true,
+                "closeOnEscape": true,
+                "triggerClass":"active",
+                "parentClass":"active",
+                "buttons":[]}}'>
+            <div id="notification-content-wrapper" data-bind="scope: 'notification_content'">
+                <!-- ko template: getTemplate() --><!-- /ko -->
+            </div>
+        </div>
+    <?php else :?>
+        <script>
+            require(['jquery'], function ($) {
+                $('button.action.show-notification').click(function() {
+                    $(document.body).trigger('processStart');
+                });
+            });
+        </script>
+    <?php endif ?>
+</div>
+<script>
+    window.isLoggedIn = <?= $block->isLogin() ? 'true' : 'false' ?>;
+</script>
+<script type="text/x-magento-init">
+    {
+        "[data-block='notification']": {
+            "Magento_Ui/js/core/app": <?= /* @noEscape */ $block->getJsLayout() ?>
+        },
+        "*": {
+            "Magento_Ui/js/block-loader": "<?= $block->escapeJs(
+                $block->escapeUrl($block->getViewFileUrl('images/loader-1.gif'))
+            ) ?>"
+        }
+    }
+</script>

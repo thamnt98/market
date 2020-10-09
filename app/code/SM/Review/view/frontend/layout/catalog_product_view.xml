@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+
+<page layout="1column" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="review_product_form_component"/>
+    <head>
+        <css src="SM_Review::css/style.css"/>
+    </head>
+    <body>
+        <referenceContainer name="content">
+            <block class="Magento\Cookie\Block\RequireCookie" name="require-cookie" template="Magento_Cookie::require_cookie.phtml" ifconfig="catalog/review/active">
+                <arguments>
+                    <argument name="triggers" xsi:type="array">
+                        <item name="submitReviewButton" xsi:type="string">.review .action.submit</item>
+                    </argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+        <referenceBlock name="reviews.tab" remove="true" />
+
+        <referenceBlock name="product.info.review">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">SM_Review::pdp/review.phtml</argument>
+            </action>
+            <block class="SM\Review\Block\ReviewRenderer" name="product.review.summary" template="SM_Review::helper/summary_short.phtml" after="-" />
+        </referenceBlock>
+
+        <referenceContainer name="content">
+            <block class="Magento\Review\Block\Product\Review" name="reviews.custom" as="reviews.custom" template="Magento_Review::review.phtml" ifconfig="catalog/review/active" after="-">
+                <block class="Magento\Review\Block\Form" name="product.review.form" as="review_form" template="SM_Review::pdp/post.phtml" ifconfig="catalog/review/active">
+                    <block class="SM\Review\Block\Customer\Form\Detail" name="product.review.form.detail" template="SM_Review::form.phtml">
+                        <arguments>
+                            <argument name="reviewViewModel" xsi:type="object">SM\Review\ViewModel\ReviewViewModel</argument>
+                        </arguments>
+                    </block>
+                </block>
+                <block class="SM\Review\Block\Product\View\ListView" name="product.info.product_additional_data" as="product_additional_data" template="SM_Review::pdp/list.phtml" ifconfig="catalog/review/active">
+                    <block class="SM\Review\Block\ReviewRenderer" name="product.review.summary.short" template="SM_Review::helper/summary_short.phtml" after="-" />
+                    <block class="SM\Review\Block\Product\Button" name="product.review.write.button" template="SM_Review::pdp/write-button.phtml" />
+                    <block class="Magento\Theme\Block\Html\Pager" name="product_review_list.toolbar" as="pagination">
+                        <arguments>
+                            <argument name="show_per_page" xsi:type="boolean">false</argument>
+                            <argument name="show_amounts" xsi:type="boolean">false</argument>
+                        </arguments>
+                    </block>
+                </block>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_CatalogStock
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   JP <jaka.pondan@ctcorpdigital.com>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
+    <!-- <group id="ims_product_stock">
+        <job name="integration_ims_get_product_stock" instance="Trans\IntegrationCatalogStock\Cron\Ims\Get\Stock" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
+    </group> -->
+    <group id="ims_product_stock_update">
+        <job name="integration_ims_check_product_stock_update" instance="Trans\IntegrationCatalogStock\Cron\Ims\Check\StockUpdate" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
+        <job name="integration_ims_get_product_stock_update" instance="Trans\IntegrationCatalogStock\Cron\Ims\Get\StockUpdate" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
+        <job name="integration_ims_save_product_stock" instance="Trans\IntegrationCatalogStock\Cron\Ims\Save\Stock" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>
+    </group>
+
+</config>

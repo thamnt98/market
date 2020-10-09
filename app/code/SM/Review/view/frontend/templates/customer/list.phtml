@@ -1,0 +1,155 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \SM\Review\Block\Customer\ListReviewed $block */
+?>
+<div class="my-review">
+    <div class="product data items"
+         data-mage-init='{"mage/tabs": {"openedState": "active", "animate": {"duration": 100}, "active": 1}}'>
+<?php echo $this->getLayout()->createBlock("SM\Review\Block\Customer\Tabs")->setTemplate("SM_Review::customer/tabs.phtml")->toHtml() ?>
+
+<?php if ($block->getRequest()->getParam('tab') == 'reviewed') : ?>
+    <div id="tab-reviewed" class="item content reviewed" data-role="content">
+        <?php echo $block->getChildBlock('customer.wishlist.item.toolbar')->toHtml() ?>
+        <?php if ($block->getListReviewed() && !empty($block->getListReviewed())) : ?>
+            <?php foreach ($block->getListReviewed() as $item) : ?>
+        <?php /** @var \SM\Review\Api\Data\ReviewedInterface $item */ ?>
+            <div class="table-product">
+                <div class="tpr-top">
+                    <div class="tpr-top-left">
+                        <span class="tl-invoice-number"><?= $block->escapeHtml(__('Reference Number')) ?></span>
+                        <h4><?= $block->escapeHtml(__($item->getReferenceNumber())) ?></h4>
+                        <span class="date"><?= $item->getTimeCreated() ?></span>
+                    </div>
+                </div>
+                <ul class="list-items-review">
+                    <?php foreach ($item->getProducts() as $prd) : ?>
+                        <?php /** @var \SM\Review\Api\Data\Product\ProductReviewedInterface $prd */ ?>
+                    <li class="item-review">
+                        <div class="item-info">
+                            <a href="<?= $prd->getProductUrl() ?>" title="<?= $prd->getProductImage() ?>" class="product-item-photo">
+                                <img src="<?= $prd->getProductImage() ?>" width="110" height="110" alt="<?= $prd->getProductName() ?>" />
+                            </a>
+                            <div class="product-item-details">
+                                <a href="<?= $prd->getProductUrl() ?>" class="product-item-name"><?= $prd->getProductName() ?></a>
+                                <div class="product-reviews-summary short">
+                                    <div class="rating-summary">
+                                        <div class="rating-result" title="<?= $prd->getPercentVote() ?>%">
+                                            <span style="width:<?= $prd->getPercentVote() ?>%"><span><?= $prd->getPercentVote() ?>%</span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rw-comments">
+                            <p>“<?= $prd->getTitleVote() ?>”</p>
+                        </div>
+                        <div class="bt-review">
+                            <a href="<?= $block->getUrl('*/*/edit', ['id' => $prd->getReviewId()]) ?>" ><button type="button" class="action secondary"><?= $block->escapeHtml(__('Edit Review')) ?></button></a>
+                        </div>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+            <?php endforeach; ?>
+        <?php else : ?>
+            <?php if ($block->issetParamRequestKey()) : ?>
+                <!--search noresult-->
+                <div class="search-noresult">
+                    <img width="150" src="<?= $block->getViewFileUrl('images/search-not-found.png') ?>"
+                         alt="<?= $block->escapeHtml(__('search result empty')) ?>" width="401"/>
+                    <div class="search-noresult--content">
+                        <h2><?= $block->escapeHtml(__('Sorry, we can\'t find it here.')) ?></h2>
+                        <p><?= $block->escapeHtml(__('But no worries. You can try again with other keywords.')) ?></p>
+                    </div>
+                </div>
+                <!--search noresult-->
+            <?php else: ?>
+                <div class="no-route reviewed_empty_page">
+                    <div class="no-route-info">
+                        <img src="<?=$block->getViewFileUrl('images/myreview-review-success.png')?>" alt="Your list is still empty" width="401"/>
+                        <h4><?= $block->escapeHtml(__('You haven\'t said anything about a product.')) ?><br/>
+                            <?= $block->escapeHtml(__('Find something to review in "To be Reviewed" tab.')) ?></h4>
+                    </div>
+                </div>
+            <?php endif; ?>
+        <?php endif; ?>
+        <?php if ($block->getPagerHtml()): ?>
+            <div class="order-products-toolbar toolbar bottom"><?php echo $block->getPagerHtml(); ?></div>
+        <?php endif ?>
+    </div>
+<?php else: ?>
+        <div id="tab-tobe-review" class="item content tobe-review" data-role="content">
+            <?php echo $block->getChildBlock('customer.wishlist.item.toolbar')->toHtml() ?>
+            <?php if ($block->getListToBeReviewed() && !empty($block->getListToBeReviewed())) : ?>
+                <?php foreach ($block->getListToBeReviewed() as $item) : ?>
+                <?php /** @var \SM\Review\Api\Data\ToBeReviewedInterface $item */ ?>
+                    <div class="table-product">
+                        <div class="tpr-top">
+                            <div class="tpr-top-left">
+                                <span class="tl-invoice-number"><?= $block->escapeHtml(__('Reference Number')) ?></span>
+                                <h4><?= $block->escapeHtml(__($item->getReferenceNumber())) ?></h4>
+                                <span class="date"><?= $item->getTimeCreated() ?></span>
+                            </div>
+                            <div class="tpr-top-right">
+                                <span class="number-item"><?= sizeof($item->getProducts()) . ' ' . (sizeof($item->getProducts()) < 2 ? __('item') : __('items')) ?></span>
+                            </div>
+                        </div>
+                        <ul class="list-items-review">
+                            <?php foreach ($item->getProducts() as $prd) : ?>
+                                <?php /** @var \SM\Review\Api\Data\Product\ProductToBeReviewedInterface $prd */ ?>
+                                <li class="item-review">
+                                    <div class="item-info">
+                                        <a href="<?= $prd->getProductUrl() ?>" title="<?= $prd->getProductName() ?>" class="product-item-photo">
+                                            <img src="<?= $prd->getProductImage() ?>" width="110" height="110" alt="<?= $prd->getProductName() ?>" />
+                                        </a>
+                                        <div class="product-item-details">
+                                            <a href="<?= $prd->getProductUrl() ?>" class="product-item-name"><?= $prd->getProductName() ?></a>
+                                        </div>
+                                    </div>
+                                    <div class="bt-review">
+                                        <a href="<?= $block->getUrl('*/*/add', ['id' => $prd->getProductId(), "orderId" => $item->getOrderId()]) ?>"><button type="button" class="action primary"><?= $block->escapeHtml(__('Review Product')) ?></button></a>
+                                    </div>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endforeach; ?>
+            <?php else: ?>
+                <?php if ($block->issetParamRequestKey()) : ?>
+                    <!--search noresult-->
+                    <div class="search-noresult">
+                        <img width="150" src="<?= $block->getViewFileUrl('images/search-not-found.png') ?>"
+                             alt="<?= $block->escapeHtml(__('search result empty')) ?>" width="401"/>
+                        <div class="search-noresult--content">
+                            <h2><?= $block->escapeHtml(__('Sorry, we can\'t find it here.')) ?></h2>
+                            <p><?= $block->escapeHtml(__('But no worries. Try again with other keyword.')) ?></p>
+                        </div>
+                    </div>
+                    <!--search noresult-->
+                <?php else: ?>
+                    <div class="no-route to_be_reviewed_empty_page">
+                        <div class="no-route-info">
+                            <img src="<?=$block->getViewFileUrl('images/myreview-tobe-reviewed.png')?>" alt="Your list is still empty" width="401"/>
+                            <h4><?= $block->escapeHtml(__('Your voice matters!')) ?><br/>
+                                <?= $block->escapeHtml(__('Share your opinion by reviewing purchased products here.')) ?></h4>
+                            <button type="button" name="do"
+                                    title="<?= $block->escapeHtml(__('Shop Now')) ?>"
+                                    class="action primary browse-products"
+                                    onclick="location.href = '<?= $block->getUrl()?>'">
+                                <span><?= $block->escapeHtml(__('Shop Now')) ?></span>
+                            </button>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            <?php endif; ?>
+            <?php if ($block->getPagerHtml()): ?>
+                <div class="order-products-toolbar toolbar bottom"><?php echo $block->getPagerHtml(); ?></div>
+            <?php endif ?>
+        </div>
+<?php endif; ?>
+    </div>
+</div>

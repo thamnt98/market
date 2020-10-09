@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="customer_account"/>
+    <head>
+        <title>Voucher Details</title>
+    </head>
+    <body>
+        <referenceBlock name="head.components">
+            <block class="Magento\Framework\View\Element\Js\Components" name="customer_account_edit_head_components" template="Magento_Customer::js/components.phtml"/>
+        </referenceBlock>
+        <referenceBlock name="page.main.title" remove="true" />
+        <referenceBlock name="customer-account-navigation-reward-link">
+            <arguments>
+                <argument name="is_highlighted" xsi:type="boolean">true</argument>
+            </arguments>
+        </referenceBlock>
+        <referenceBlock name="content">
+            <block class="SM\MyVoucher\Block\Customer\MyVoucherDetail" name="customer.voucher.datail" template="SM_MyVoucher::customer/voucher/detail.phtml"/>
+        </referenceBlock>
+        <referenceBlock name="breadcrumbs">
+            <action method="addCrumb">
+                <argument name="crumbName" xsi:type="string">My Vouchers</argument>
+                <argument name="crumbInfo" xsi:type="array">
+                    <item name="title" xsi:type="string">My Vouchers</item>
+                    <item name="label" xsi:type="string" translate="true">My Vouchers</item>
+                    <item name="link" xsi:type="string">{{baseUrl}}myvoucher/voucher</item>
+                </argument>
+            </action>
+            <action method="addCrumb">
+                <argument name="crumbName" xsi:type="string">Voucher Details</argument>
+                <argument name="crumbInfo" xsi:type="array">
+                    <item name="title" xsi:type="string">Voucher Details</item>
+                    <item name="label" xsi:type="string" translate="true">Voucher Details</item>
+                </argument>
+            </action>
+        </referenceBlock>
+    </body>
+</page>

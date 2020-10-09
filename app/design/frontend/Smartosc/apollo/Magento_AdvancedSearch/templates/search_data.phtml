@@ -1,0 +1,27 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * @var \Magento\AdvancedSearch\Block\SearchData $block
+ */
+?>
+<?php
+/** @var \Magento\Search\Model\QueryResult[] $data */
+$data = $block->getItems();
+if (count($data)) : ?>
+    <span class="search-suggest-words">
+        <?= $block->escapeHtml(__($block->getTitle())) ?>
+        <?php foreach ($data as $additionalInfo) : ?>
+            <span class="suggest-word">
+                <a href="<?= $block->escapeUrl($block->getLink($additionalInfo->getQueryText())) ?>"
+                ><?= $block->escapeHtml($additionalInfo->getQueryText()) .'?' ?></a>
+                <?php if ($block->isShowResultsCount()) : ?>
+                    <span class="count"><?= /* @noEscape */ (int)$additionalInfo->getResultsCount() ?></span>
+                <?php endif; ?>
+            </span>
+        <?php endforeach; ?>
+    </span>
+<?php endif; ?>

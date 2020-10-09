@@ -1,0 +1,164 @@
+<?php
+/** @var \SM\DigitalProduct\Block\Electricity\Index $block */
+
+?>
+<div class="digital-product-billing">
+    <div class="product data items">
+        <div id="pln-electricity" class="item pln-electricity" data-role="content">
+            <!-- content-start------->
+            <h3 class="title-head-ct"><?= $block->escapeHtml(__('Buy Token or Pay Electricity Bill')) ?></h3>
+            <div class="wrap-radio">
+                <label class="radio-custom-checkmark">
+                    <?= $block->getContentToken()->getCategoryName()?>
+                    <input id="radio-token" type="radio"  name="type" data-type="token" checked/>
+                    <label class="checkmark"></label>
+                </label>
+                <label class="radio-custom-checkmark">
+                    <?= $block->getContentBill()->getCategoryName()?>
+                    <input id="radio-bill" type="radio" name="type" data-type="bill"/>
+                    <label class="checkmark"></label>
+                </label>
+            </div>
+            <div class="electricity-token">
+                <label class="label-input">
+                    <span id="label-input" ><?= $block->escapeHtml(__("Meter Number/Customer ID"))?></span>
+                    <span class="dpl-tooltip">
+                        <a href="#" aria-describedby="tooltip-3" >
+                            <img src='<?= $block->getViewFileUrl('images/info.svg'); ?>' alt=""  width="13" height="16" />
+                        </a>
+                        <span class="tooltip-content" id="tooltip-3" role="tooltip">
+                            <span id="tooltip-token" >
+                                <?= $block->getContentToken()->getTooltip()?>
+                            </span>
+                            <span id="tooltip-bill" style="display:none;">
+                                <?= $block->getContentBill()->getTooltip()?>
+                            </span>
+                        </span>
+                    </span>
+                </label>
+                <form action="<?= $block->getFormActionUrl()?>" method="post">
+                    <?= $block->getBlockHtml('formkey')?>
+                    <input id="service-type-bill" type="radio" value="<?= $block->escapeHtml(
+                        \SM\DigitalProduct\Api\DigitalProductRepositoryInterface::SERVICE_TYPE[
+                        \SM\DigitalProduct\Helper\Category\Data::ELECTRICITY_BILL_VALUE
+                        ]
+                    )?>" name="digital[service_type]" style="display:none;"/>
+                    <input id="service-type-token" type="radio" value="<?= $block->escapeHtml(
+                        \SM\DigitalProduct\Api\DigitalProductRepositoryInterface::SERVICE_TYPE[
+                        \SM\DigitalProduct\Helper\Category\Data::ELECTRICITY_TOKEN_VALUE
+                        ]
+                    )?>" name="digital[service_type]" checked style="display:none;"/>
+                    <input id="form-current-type" type="hidden"
+                           value="<?= \SM\DigitalProduct\Helper\Category\Data::ELECTRICITY_TOKEN_VALUE ?>"
+                            name="service_type">
+                    <div class="wrap-input">
+                        <input
+                            id="input-number"
+                            class="input-text"
+                            type="text"
+                            name="digital[customer_id]"
+                            placeholder="<?= $block->escapeHtml(__("Example: 511812345XXX"))?>"/>
+                        <div class="mage-error" id="error-message"></div>
+                        <img id="operator-icon" src="<?= $block->getContentBill()->getOperatorImage() ?>" width="51px"
+                             height="51px" alt="" />
+                    </div>
+                    <div id="customer-information-token" class="info-wrapper dpb-block-mobile" style="display: none">
+                        <h3 class="title"><?= $block->escapeHtml(__("Customer Information"))?></h3>
+                        <div class="table-responsive">
+                            <table class="info-table">
+                                <tr class="header-row">
+                                    <th class="header"><?= $block->escapeHtml(__("Customer ID"))?></th>
+                                    <th class="header"><?= $block->escapeHtml(__("Material Number"))?></th>
+                                    <th class="header"><?= $block->escapeHtml(__("Name"))?></th>
+                                    <th class="header"><?= $block->escapeHtml(__("Power"))?></th>
+                                    <th id="price-header" class="header" style="display:none;"><?= $block->escapeHtml(__("Price"))?></th>
+                                </tr>
+                                <tr class="data-row" id="data-row-token">
+                                    <td id="price-data" class="data" style="display:none;"></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="customer-information" class="info-wrapper dpb-block-mobile" style="display: none">
+                    </div>
+                    <div id="inquire-error" class="info-wrapper dpb-block-mobile" style="display: none">
+                    </div>
+                    <div id="product-list">
+                        <input id="selected-product-price-value" type="hidden" value="" name="price"/>
+                        <?php
+                        /** @var \SM\DigitalProduct\Block\Index\ProductList $productListBlock */
+                        $productListBlock = $block->getChildBlock("electricity.product.list");
+
+                        $productListBlock->setCategory(\SM\DigitalProduct\Model\CategoryRepository::ELECTRICITY);
+                        $productListBlock->setC1Categories($block->getC1Categories());
+                        ?>
+
+                        <?= $productListBlock->toHtml(); ?>
+                    </div>
+                    <input id="selected-product-name" type="checkbox" value="" name="digital[product_name]" style="display: none" checked/>
+                    <input id="selected-product-price" type="checkbox" value="" name="digital[price]" style="display: none" checked/>
+                    <input id="selected-product-id-vendor" type="checkbox" value="" name="digital_transaction[product_id_vendor]" style="display: none" checked/>
+                    <input id="admin-fee-submit" type="hidden" value="" name="digital[admin_fee]"/>
+                    <input id="info-content-bill" type="radio" value="<?= $block->getContentBill()->getInfo() ?>"
+                           name="digital[info]" style="display:none;"/>
+                    <input id="info-content-token" type="radio" value="<?= $block->getContentToken()->getInfo() ?>"
+                           name="digital[info]" checked style="display:none;"/>
+                    <input id="operator-image-value" type="hidden" value="<?= $block->getContentBill()->getOperatorImage() ?>" name="digital_transaction[operator_image]"/>
+                    <div id="information-token">
+                        <?php if (!(is_null($block->getContentToken()->getInformation()) || $block->getContentToken()->getInformation() == "")):?>
+                            <div class="dpb-block-mobile">
+                                <h3 class="info-title"><?= $block->escapeHtml(__("Information"))?></h3>
+                                <div class="info-content">
+                                    <?= $block->getContentToken()->getInformation()?>
+                                </div>
+                            </div>
+                        <?php endif;?>
+                    </div>
+                    <div id="information-bill" style="display: none">
+                        <?php if (!(is_null($block->getContentBill()->getInformation()) || $block->getContentBill()->getInformation() == "")):?>
+                            <div class="dpb-block-mobile">
+                                <h3 class="info-title"><?= $block->escapeHtml(__("Information"))?></h3>
+                                <div class="info-content">
+                                    <?= $block->getContentBill()->getInformation()?>
+                                </div>
+                            </div>
+                        <?php endif;?>
+                    </div>
+                    <div id="product-detail-wrapper" class="dpb-block-mobile active" style="display: none">
+                    </div>
+
+                    <div id="product-price-wrapper" class="dpb-bottom-price dpb-price-noprice">
+                        <div id="product-price" class="dpb-price">
+                            <label><?= $block->escapeHtml(__("Price"))?></label>
+                            <span id="product-price-value"></span>
+                        </div>
+                        <button id="btn-buy-product" disabled type="submit" class="action primary disabled"><?= $block->escapeHtml(__("Buy"))?></button>
+                    </div>
+                </form>
+                <!------if not price please add class 'dpb-price-noprice'-->
+            </div>
+            <?php if ($howToBuy = $block->getContentToken()->getHowToBuy()):?>
+            <div class="dpb-policy">
+                <div class="dpb-title-head"><h3><?= $block->escapeHtml(__("How to Buy Electricity Token or Pay PLN Bill")) ?></h3></div>
+                <div class="dpd-policy-content">
+                    <?= $howToBuy ?>
+                </div>
+            </div>
+            <?php endif;?>
+        </div>
+    </div>
+</div>
+<script type="text/x-magento-init">
+{
+    "*": {
+        "SM_DigitalProduct/js/electricity/select-type":{},
+        "SM_DigitalProduct/js/electricity/validate-customer":{
+            "check_url":"<?= $block->getUrl("digitalproduct/electricity/checkcustomer")?>"
+        }
+    }
+}
+</script>
+<script>
+    window.orderPriceFormat = <?= $this->helper('Magento\Tax\Helper\Data')->getPriceFormat($block->getStore()); ?>;
+    window.orderPriceFormat.requiredPrecision = 0;
+</script>

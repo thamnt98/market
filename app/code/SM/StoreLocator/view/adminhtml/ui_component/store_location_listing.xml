@@ -1,0 +1,116 @@
+<listing xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">store_location_listing.store_location_listing_data_source</item>
+        </item>
+    </argument>
+    <settings>
+        <spinner>store_location_columns</spinner>
+        <deps>
+            <dep>store_location_listing.store_location_listing_data_source</dep>
+        </deps>
+        <buttons>
+            <button name="import">
+                <url path="*/*/importForm"/>
+                <class>primary</class>
+                <label translate="true">Import Store Location</label>
+            </button>
+        </buttons>
+    </settings>
+    <dataSource name="store_location_listing_data_source" component="Magento_Ui/js/grid/provider">
+        <settings>
+            <updateUrl path="mui/index/render"/>
+        </settings>
+        <aclResource>SM_StoreLocator::store_manager</aclResource>
+        <dataProvider class="SM\StoreLocator\Ui\Component\Location\DataProvider" name="store_location_listing_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>place_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <listingToolbar name="listing_top">
+        <settings>
+            <sticky>false</sticky>
+        </settings>
+        <bookmark name="bookmarks"/>
+        <columnsControls name="columns_controls"/>
+        <filters name="listing_filters"/>
+        <paging name="listing_paging"/>
+    </listingToolbar>
+    <columns name="store_location_columns">
+        <column name="place_id" sortOrder="1">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Place ID</label>
+            </settings>
+        </column>
+        <column name="store_code" sortOrder="2">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Store Code</label>
+            </settings>
+        </column>
+        <column name="name" sortOrder="3">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Store Name</label>
+            </settings>
+        </column>
+        <column name="address_line_1" sortOrder="4">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Address Line 1</label>
+            </settings>
+        </column>
+        <column name="address_line_2" sortOrder="5">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Address Line 2</label>
+            </settings>
+        </column>
+        <column name="district_id" sortOrder="6">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">District</label>
+            </settings>
+        </column>
+        <column name="city" sortOrder="7">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">City</label>
+            </settings>
+        </column>
+        <column name="lat" sortOrder="8">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Latitude</label>
+            </settings>
+        </column>
+        <column name="long" sortOrder="9">
+            <settings>
+                <filter>textRange</filter>
+                <label translate="true">Longitude</label>
+            </settings>
+        </column>
+        <actionsColumn name="opening_hours" class="SM\StoreLocator\Ui\Component\Listing\Columns\OpeningHours" sortOrder="10">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="component" xsi:type="string">SM_StoreLocator/js/grid/columns/view-opening-hours</item>
+                    <item name="indexField" xsi:type="string">place_id</item>
+                    <item name="sortable" xsi:type="boolean">false</item>
+                    <item name="label" xsi:type="string" translate="true">View opening hours</item>
+                </item>
+            </argument>
+        </actionsColumn>
+        <actionsColumn name="actions" class="SM\StoreLocator\Ui\Component\Listing\Columns\LocationActions" sortOrder="11">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="resizeEnabled" xsi:type="boolean">false</item>
+                    <item name="resizeDefaultWidth" xsi:type="string">107</item>
+                    <item name="indexField" xsi:type="string">place_id</item>
+                </item>
+            </argument>
+        </actionsColumn>
+    </columns>
+</listing>

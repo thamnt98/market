@@ -1,0 +1,15 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+ -->
+<div class="new-checkout">
+    <div class="ck-payment">
+        <h3 data-bind="i18n: 'Select Payment Method'"></h3>
+        <p class="payment-valid" data-href="payment-error"></p>
+        <input type="hidden" name="selected-method" data-bind="value: selectedMethod">
+            <!-- ko template: { name: templateVA } --><!-- /ko -->
+            <!-- ko template: { name: templateCC } --><!-- /ko -->
+    </div>
+</div>

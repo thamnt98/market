@@ -1,0 +1,160 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+/** @var \SM\InspireMe\Block\Adminhtml\Form\FrontendModel\MostPopular $block */
+use SM\InspireMe\Helper\Data;
+?>
+
+<?php
+//var_dump($block->getArrayRows()); die();
+$_htmlId = $block->getHtmlId() ? $block->getHtmlId() : '_' . uniqid();
+$basedOnOptions = $block->getBasedOnOptions();
+?>
+
+<div class="design_theme_ua_regexp" id="grid<?= $block->escapeHtmlAttr($_htmlId) ?>">
+    <div class="admin__control-table-wrapper">
+        <table class="admin__control-table" id="<?= $block->escapeHtmlAttr($block->getElement()->getId()) ?>">
+            <thead>
+            <tr>
+                <?php foreach ($block->getColumns() as $columnName => $column) : ?>
+                    <th><?= $block->escapeHtml($column['label']) ?></th>
+                <?php endforeach; ?>
+            </tr>
+            </thead>
+
+            <tbody id="addRow<?= $block->escapeHtmlAttr($_htmlId) ?>">
+            <?php $position = 1; ?>
+            <?php foreach ($block->getArrayRows() as $row) : ?>
+                <tr>
+                    <td>
+                        <input type="text" disabled
+                               name="<?= $block->getFieldName(Data::MP_POSITION, $position) ?>"
+                               id="position-<?= $block->escapeHtmlAttr($position) ?>"
+                               value="<?= $row->getData(Data::MP_POSITION) ?>" />
+                    </td>
+                    <?php if ($row->getData(Data::MP_BASED_ON) == 0) : ?>
+                        <td>
+                            <select id="select-position-<?= $block->escapeHtmlAttr($position) ?>"
+                                    name="<?= $block->getFieldName(Data::MP_BASED_ON, $position) ?>"
+                                    class="select-position"
+                            >
+                                <option value="<?= $block->escapeHtmlAttr($basedOnOptions[0]['value'])?>" selected>
+                                    <?= $block->escapeHtml($basedOnOptions[0]['label']) ?>
+                                </option>
+                                <option value="<?= $block->escapeHtmlAttr($basedOnOptions[1]['value'])?>">
+                                    <?= $block->escapeHtml($basedOnOptions[1]['label']) ?>
+                                </option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" disabled class="article"
+                                   name="<?= $block->getFieldName(Data::MP_SELECT_ARTICLE, $position) ?>"
+                                   id="article-<?= $block->escapeHtmlAttr($position) ?>"
+                                   placeholder="<?= $block->escapeHtml(__('Search article...')) ?>"
+                                   value="">
+                        </td>
+                        <td>
+                            <input type="text" disabled class="article-id"
+                                   name="<?= $block->getFieldName(Data::MP_SELECT_ARTICLE_ID, $position) ?>"
+                                   value="">
+                        </td>
+                    <?php else : ?>
+                        <td>
+                            <select id="select-position-<?= $block->escapeHtmlAttr($position) ?>"
+                                    name="<?= $block->getFieldName(Data::MP_BASED_ON, $position) ?>"
+                                    class="select-position"
+                            >
+                                <option value="<?= $block->escapeHtmlAttr($basedOnOptions[0]['value'])?>">
+                                    <?= $block->escapeHtml($basedOnOptions[0]['label']) ?>
+                                </option>
+                                <option value="<?= $block->escapeHtmlAttr($basedOnOptions[1]['value'])?>" selected>
+                                    <?= $block->escapeHtml($basedOnOptions[1]['label']) ?>
+                                </option>
+                            </select>
+                        </td>
+                        <td>
+                            <input type="text" class="article"
+                                   name="<?= $block->getFieldName(Data::MP_SELECT_ARTICLE, $position) ?>"
+                                   id="article-<?= $block->escapeHtmlAttr($position) ?>"
+                                   placeholder="<?= $block->escapeHtml(__('Search article...')) ?>"
+                                   value="<?= $row->getData(Data::MP_SELECT_ARTICLE) ?>">
+                        </td>
+                        <td>
+                            <input type="text" class="article-id"
+                                   name="<?= $block->getFieldName(Data::MP_SELECT_ARTICLE_ID, $position) ?>"
+                                   value="<?= $row->getData(Data::MP_SELECT_ARTICLE_ID) ?>">
+                        </td>
+                    <?php endif ?>
+                </tr>
+                <?php $position++ ?>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+        <div id="suggestion-box" style="display: none"></div>
+    </div>
+
+    <script type="text/javascript">
+        require(['jquery'], function ($) {
+            let basedOn    = $('.select-position'),
+                article    = $('.article'),
+                articleId  = $('.article-id'),
+                suggestion = $('#suggestion-box');
+
+            basedOn.on('change', function () {
+                let curArticleId   = $(this).closest('tr').find(articleId),
+                    curArticleName = $(this).closest('tr').find(article);
+
+                curArticleId.attr('disabled', !curArticleId.attr('disabled'));
+                curArticleName.attr('disabled', !curArticleName.attr('disabled'));
+            });
+
+            article.each(function () {
+                let self   = $(this),
+                    selfId = $(this).closest('tr').find(articleId);
+                self.keypress(function (event) {
+                    if (event.which === 13 && self.val()) {
+                        $.ajax({
+                            type : "POST",
+                            url  : "<?= $this->getUrl('blog/mostpopular/chooser') ?>" + "?isAjax=true",
+                            data : {
+                                name     : self.val(),
+                                form_key : window.FORM_KEY,
+                            },
+                            success : function(response) {
+                                if (response.error === false) {
+                                    console.log(response);
+                                    let articleSuggest = response.articles,
+                                        suggestHtml = "";
+
+                                    $.each(articleSuggest, function (key, obj) {
+                                        suggestHtml +=
+                                            "<a href='#' class='article-name' " +
+                                            "id='article-" + key + "' " +
+                                            "data-selected='" + obj['id'] + "'>" +
+                                            obj['name'] + "</a>";
+                                    });
+
+                                    suggestion.html(suggestHtml);
+                                    suggestion.show();
+
+                                    $('.article-name').on('click', function (event) {
+                                        event.preventDefault();
+                                        self.val($(this).text());
+                                        selfId.val($(this).data('selected'));
+                                        suggestion.hide();
+                                    });
+                                } else {
+                                    suggestion.hide();
+                                }
+                            }
+                        });
+                    } else {
+                        suggestion.hide();
+                    }
+                });
+            });
+        });
+    </script>
+</div>

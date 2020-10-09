@@ -1,0 +1,30 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var $block \SM\Checkout\Block\HomePage */
+
+?>
+
+<?php if ($block->isActive()) : ?>
+    <div id="home-fulfillment-limitation" style="display:none">
+        <div class="content popup-tobacco">
+            <h4 class="text">
+                <?= __('Transmart now delivers to %1.', '<span class="bold">Jabodetabek area</span>') ?><br>
+                <?= __('But we are coming to more cities soon. Stay tuned!') ?> <a href="<?= $block->getLink(); ?>"><?= __('Read more') ?></a>
+            </h4>
+        </div>
+
+    </div>
+    <script type="text/x-magento-init">
+        {
+            "#home-fulfillment-limitation": {
+                "SM_Checkout/js/home-fulfillment-limitation": {
+                }
+            }
+        }
+    </script>
+<?php endif; ?>
+

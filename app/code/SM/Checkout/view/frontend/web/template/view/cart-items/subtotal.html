@@ -1,0 +1,10 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!-- ko if:(isDiscount($parents[1]) && !isShowPromoPrice($parents[1].item_id)) -->
+<span class="base-subtotal old" data-bind="text: getBaseSubTotal($parents[1])"></span>
+<!-- /ko -->
+<span class="subtotal" data-bind="text: getValue($parents[1]), css: {final: isDiscount($parents[1])}"></span>

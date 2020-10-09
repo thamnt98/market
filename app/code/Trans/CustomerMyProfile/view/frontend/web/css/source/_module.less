@@ -1,0 +1,83 @@
+/**
+ * @category Trans
+ * @package  Trans_CustomerMyProfile
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Dwi Septha Kurniawan <septha.kurniawan@transdigital.co.id>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+
+& when (@media-common = true) {
+    .profile-picture {
+        position: relative;
+    }
+
+    .image-photo-profile{
+        float: left;
+        width: 170px;
+    }
+
+    .add-photo-profile{
+        width: 80%;
+
+        vertical-align: middle;
+        display: table-cell;
+    }
+
+    #add-photo-profile{
+        cursor: pointer;
+    }
+
+    .profile-picture-image {
+        display: block;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+    }
+
+    .field-name-profile-picture {
+        img {
+            cursor: pointer;
+        }
+    }
+
+    .profile-picture-overlay {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 150px;
+        width: 150px;
+        opacity: 0;
+        transition: .5s ease;
+        background-color: #000;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+
+    .profile-picture-overlay {
+        &:hover {
+            opacity: 0.5;
+        }
+    }
+
+    .profile-picture-text {
+        color: white;
+        font-size: 20px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        -webkit-transform: translate(-50%, -50%);
+        -ms-transform: translate(-50%, -50%);
+        transform: translate(-50%, -50%);
+        text-align: center;
+    }
+
+    .profile-picture-input {
+        opacity: 0;
+    }
+}

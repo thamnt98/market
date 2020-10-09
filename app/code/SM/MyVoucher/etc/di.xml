@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Api defined -->
+    <preference for="SM\MyVoucher\Api\Data\RuleInterface" type="SM\MyVoucher\Model\Rule" />
+    <preference for="SM\MyVoucher\Api\RuleRepositoryInterface" type="SM\MyVoucher\Model\RuleRepository" />
+    <preference for="SM\MyVoucher\Api\Data\RuleDataInterface" type="SM\MyVoucher\Model\Data\RuleData"/>
+
+
+    <!-- Amasty Override -->
+    <preference for="Amasty\Rules\Model\DiscountRegistry"
+                type="SM\MyVoucher\Model\AmastyRules\DiscountRegistry" />
+
+
+    <!-- Magento Override -->
+    <preference for="Magento\SalesRule\Controller\Adminhtml\Promo\Quote\Save"
+                type="SM\MyVoucher\Controller\Adminhtml\Promo\Quote\Save" />
+
+
+    <!-- SM Defined -->
+    <type name="SM\MyVoucher\Model\ImageUploader">
+        <arguments>
+            <argument name="baseTmpPath" xsi:type="string">sm/tmp/icon</argument>
+            <argument name="basePath" xsi:type="string">sm/icon</argument>
+            <argument name="allowedExtensions" xsi:type="array">
+                <item name="jpg" xsi:type="string">jpg</item>
+                <item name="jpeg" xsi:type="string">jpeg</item>
+                <item name="gif" xsi:type="string">gif</item>
+                <item name="png" xsi:type="string">png</item>
+            </argument>
+        </arguments>
+    </type>
+
+
+    <!-- Magento Plugin -->
+    <type name="Magento\Framework\EntityManager\Operation\Create\CreateMain">
+        <plugin name="SM_MyVoucher::EntityManagerCreateMainVersion"
+                type="SM\MyVoucher\Plugin\MagentoFramework\EntityManager\Operation\Create\CreateMain" />
+    </type>
+    <type name="Magento\SalesRule\Model\Rule\DataProvider">
+        <plugin name="SM_MyVoucher::SalesRuleDataProvider"
+                type="SM\MyVoucher\Plugin\MagentoSalesRule\Model\Rule\DataProvider"/>
+    </type>
+    <type name="Magento\Framework\EntityManager\Operation\Update\UpdateMain">
+        <plugin name="SM_MyVoucher::EntityManagerUpdateMainVersion"
+                type="SM\MyVoucher\Plugin\MagentoFramework\EntityManager\Operation\Create\CreateMain" />
+    </type>
+</config>

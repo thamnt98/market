@@ -1,0 +1,65 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_IntegrationCatalogPrice
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Muhammad Rifai <muhammad.rifai@ctcorpdigital.com>
+ * @modify	 J.P <jaka.pondan@ctcorpdigital.com>
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- DB Model-->
+
+    <preference for="Trans\IntegrationCatalogPrice\Api\Data\StorePriceInterface"
+                type="Trans\IntegrationCatalogPrice\Model\StorePrice" />
+    <preference for="Trans\IntegrationCatalogPrice\Api\StorePriceRepositoryInterface"
+                type="Trans\IntegrationCatalogPrice\Model\StorePriceRepository" />
+
+    <preference for="Trans\IntegrationCatalogPrice\Api\Data\PromotionPriceInterface"
+                type="Trans\IntegrationCatalogPrice\Model\PromotionPrice" />
+    <preference for="Trans\IntegrationCatalogPrice\Api\PromotionPriceRepositoryInterface"
+                type="Trans\IntegrationCatalogPrice\Model\PromotionPriceRepository" />
+
+    <preference for="Trans\IntegrationCatalogPrice\Api\Data\OnlinePriceInterface"
+                type="Trans\IntegrationCatalogPrice\Model\OnlinePrice" />
+    <preference for="Trans\IntegrationCatalogPrice\Api\OnlinePriceRepositoryInterface"
+                type="Trans\IntegrationCatalogPrice\Model\OnlinePriceRepository" />
+
+    <!-- Jobs-->
+    <preference for="Trans\IntegrationCatalogPrice\Api\IntegrationJobRepositoryInterface"
+                type="Trans\IntegrationCatalogPrice\Model\IntegrationJobRepository" />
+    <preference for="Trans\IntegrationCatalogPrice\Api\Data\IntegrationJobInterface"
+                type="Trans\IntegrationCatalogPrice\Model\IntegrationJob" />
+    <preference for="Trans\IntegrationCatalogPrice\Api\Data\IntegrationJobSearchResultInterface"
+                type="Trans\IntegrationCatalogPrice\Model\IntegrationJobSearchResult" />
+
+    <preference for="Trans\IntegrationCatalogPrice\Api\IntegrationDataValueRepositoryInterface"
+                type="Trans\IntegrationCatalogPrice\Model\IntegrationDataValueRepository" />
+    <preference for="Trans\IntegrationCatalogPrice\Api\Data\IntegrationDataValueInterface"
+                type="Trans\IntegrationCatalogPrice\Model\IntegrationDataValue" />
+    <preference for="Trans\IntegrationCatalogPrice\Api\Data\IntegrationDataValueSearchResultInterface"
+                type="Trans\IntegrationCatalogPrice\Model\IntegrationDataValueSearchResult" />
+
+    <!-- Logic Model-->
+    <preference for="Trans\IntegrationCatalogPrice\Api\IntegrationCheckUpdatesInterface"
+                type="Trans\IntegrationCatalogPrice\Model\IntegrationCheckUpdates" />
+
+    <preference for="Trans\IntegrationCatalogPrice\Api\IntegrationGetUpdatesInterface"
+                type="Trans\IntegrationCatalogPrice\Model\IntegrationGetUpdates" />
+
+
+    <preference for="Trans\IntegrationCatalogPrice\Api\StorePriceLogicInterface"
+                type="Trans\IntegrationCatalogPrice\Model\StorePriceLogic" />
+
+    <preference for="Trans\IntegrationCatalogPrice\Api\PromotionPriceLogicInterface"
+                type="Trans\IntegrationCatalogPrice\Model\PromotionPriceLogic" />
+
+    <preference for="Trans\IntegrationCatalogPrice\Api\OnlinePriceLogicInterface"
+                type="Trans\IntegrationCatalogPrice\Model\OnlinePriceLogic" />
+
+</config>

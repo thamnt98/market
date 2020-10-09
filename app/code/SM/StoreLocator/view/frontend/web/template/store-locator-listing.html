@@ -1,0 +1,51 @@
+<div class="find-store">
+    <div class="modal-content-stores">
+        <div class="modal-header">
+            <div class="modal-header-location">
+                <span class="apl-Location"></span>
+                <span class="modal-title" data-bind="i18n: 'Find a Store'"></span>
+            </div>
+            <div class="input-group">
+                <form data-bind="submit: getStoreList">
+                    <div class="input-group-find-stores">
+                        <input
+                            id="input-search-location"
+                            type="text"
+                            class="form-control input-location-stores"
+                            aria-label="Amount (to the nearest dollar)"
+                            data-bind="attr : {placeholder: $t('Type in a location to find the nearest stores')} "/>
+                        <span class="icon-search" data-bind=" click: getStoreList"></span>
+                    </div>
+                </form>
+            </div>
+            <span data-bind=" click: searchStoreByAutocomplete" id="btn-search-store"></span>
+            <p class="or-use-current-locat"><span data-bind="i18n:'or use '"></span><a id="btn-current-location" href="#" data-bind=" click: getStoreListByLocation, i18n: 'Current Location'"></a></p>
+        </div>
+        <div class="modal-body">
+            <h5 class="title store-list-title" style="display: none" data-bind="i18n: 'Store List'"></h5>
+            <div class="list-group scrollbar store-list-group">
+                <ul class="force-overflow store-listing"
+                    data-bind="foreach: storeList">
+                    <li class="list-group-item" data-bind=" click: function(){ $parent.selectStore($data) }">
+                        <div class="list-group-title">
+                            <h5 data-bind="text: name"></h5>
+                        </div>
+                        <p data-bind="text: address_line_1"></p>
+                        <p data-bind="text: address_line_2"></p>
+                        <p><span data-bind="i18n: 'Open until '"></span><span data-bind="text: close"></span></p>
+                        <div class="direction">
+                            <span class="apl-ArrowIcon" data-bind="click: $parent.getDirection" style="cursor: pointer"></span>
+                            <span data-bind="text: distance"></span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="no-store-locator">
+                <img data-bind="attr:{src: require.toUrl('images/store-not-found.png') }" alt="no store locator"  width="250" src="">
+                <h4><span data-bind="i18n: 'Sorry, We can\'t find any store here.'"></span><br>
+                    <span data-bind="i18n: 'Please update your location to see'"></span><br>
+                    <span data-bind="i18n: 'Transmart stores around you.'"></span></h4>
+            </div>
+        </div>
+    </div>
+</div>

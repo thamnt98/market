@@ -1,0 +1,101 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Handle search by ID-->
+    <type name="Magento\Elasticsearch6\Model\Client\Elasticsearch">
+        <plugin name="sm_search_magento_elasticsearch6_model_client_elasticsearch"
+                type="SM\Search\Plugin\Magento\Elasticsearch6\Model\Client\Elasticsearch" />
+    </type>
+
+    <!-- Handle search for short query text -->
+    <type name="Magento\Catalog\Model\Layer\Search\CollectionFilter">
+        <plugin name="sm_search_magento_catalog_model_layer_search_collectionFilter" type="SM\Search\Plugin\Magento\Catalog\Model\Layer\Search\CollectionFilter" />
+    </type>
+
+    <!-- Fix suggestion keyword link -->
+    <type name="Magento\AdvancedSearch\Block\Suggestions">
+        <plugin name="sm_search_magento_advancedSearch_block_suggestions" type="SM\Search\Plugin\Magento\AdvancedSearch\Block\Suggestions" />
+    </type>
+
+    <!-- Save query text personal & category -->
+    <type name="Magento\Search\Model\Query">
+        <plugin name="sm_search_magento_search_model_query"
+                type="SM\Search\Plugin\Magento\Search\Model\Query" />
+    </type>
+
+    <!-- Search -->
+    <preference for="SM\Search\Api\SearchInterface"
+                type="SM\Search\Model\Search"/>
+
+    <!-- Suggestion -->
+    <preference for="Magento\Search\Controller\Ajax\Suggest"
+                type="SM\Search\Override\Magento\Search\Controller\Ajax\Suggest"/>
+
+    <!-- Logger Handler -->
+    <type name="SM\Search\Plugin\Magento\Elasticsearch6\Model\Client\Elasticsearch">
+        <arguments>
+            <argument name="logger" xsi:type="object">SM\Search\Logger\Logger</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="SM\Search\Logger\Logger" type="Monolog\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">elasticsearchLogger</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">SM\Search\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="SM\Search\Logger\Handler" type="Magento\Framework\Logger\Handler\Base">
+        <arguments>
+            <argument name="fileName" xsi:type="string">var/log/elasticsearch.log</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Entity -->
+    <preference for="SM\Search\Api\Entity\SearchQueryPersonalInterface"
+                type="SM\Search\Model\Entity\SearchQueryPersonal"/>
+    <preference for="SM\Search\Api\Entity\SearchQueryCategoryInterface"
+                type="SM\Search\Model\Entity\SearchQueryCategory"/>
+
+    <!-- SearchResult -->
+    <preference for="SM\Search\Api\Data\Response\SearchQueryPersonalSearchResultsInterface"
+                type="SM\Search\Model\Data\Response\SearchQueryPersonalSearchResults"/>
+    <preference for="SM\Search\Api\Data\Response\SearchQueryCategorySearchResultsInterface"
+                type="SM\Search\Model\Data\Response\SearchQueryCategorySearchResults"/>
+    <preference for="SM\Search\Api\Data\Response\SearchQuerySearchResultsInterface"
+                type="SM\Search\Model\Data\Response\SearchQuerySearchResults"/>
+    <preference for="SM\Search\Api\Data\Response\SearchResultInterface"
+                type="SM\Search\Model\Data\Response\SearchResult"/>
+    <preference for="SM\Search\Api\Data\Response\SuggestionSearchResultInterface"
+                type="SM\Search\Model\Data\Response\SuggestionSearchResult"/>
+
+    <!-- Repository -->
+    <preference for="SM\Search\Api\Repository\SearchQueryPersonalRepositoryInterface"
+                type="SM\Search\Model\Repository\SearchQueryPersonalRepository"/>
+    <preference for="SM\Search\Api\Repository\SearchQueryCategoryRepositoryInterface"
+                type="SM\Search\Model\Repository\SearchQueryCategoryRepository"/>
+    <preference for="SM\Search\Api\Repository\SearchQueryRepositoryInterface"
+                type="SM\Search\Model\Repository\SearchQueryRepository"/>
+
+    <preference for="Magento\CatalogSearch\Block\Result"
+                type="SM\Search\Block\Result"/>
+
+    <!-- Search Result Temp -->
+    <preference for="Magento\Framework\Search\Adapter\Mysql\TemporaryStorage"
+                type="SM\Search\Model\Adapter\Mysql\TemporaryStorage"/>
+
+    <!-- Elasticsearch Plugin -->
+    <type name="Magento\Elasticsearch\Elasticsearch5\SearchAdapter\Mapper">
+        <plugin name="SM_Search::EsSearchAdapterMapper"
+                type="SM\Search\Plugin\MagentoElasticsearch\Elasticsearch5\SearchAdapter\Mapper"/>
+    </type>
+    <type name="Magento\Elasticsearch\SearchAdapter\DocumentFactory">
+        <plugin name="SM_Search::EsSearchAdapterDocument"
+                type="SM\Search\Plugin\MagentoElasticsearch\SearchAdapter\DocumentFactory"/>
+    </type>
+    <!-- End Elasticsearch Plugin -->
+
+    <preference for="Amasty\Shopby\Model\ResourceModel\Fulltext\Collection"
+                type="SM\Search\Override\Amasty\Shopby\Model\ResourceModel\Fulltext\Collection"/>
+
+</config>

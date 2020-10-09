@@ -1,0 +1,76 @@
+<?php
+/** @var \SM\DigitalProduct\Block\Telkom\Index $block */
+
+?>
+
+<div class="digital-product-billing">
+    <?php
+    /** @var \SM\DigitalProduct\Block\Banner $bannerBlock */
+    $bannerBlock = $block->getChildBlock("digitalproduct.banner");
+    ?>
+    <?= $bannerBlock->toHtml()?>
+    <div class="product data items">
+        <?php
+        /** @var \SM\DigitalProduct\Block\Tab $tabBlock */
+        $tabBlock = $block->getChildBlock("digitalproduct.tab");
+        $tabBlock->setTab(\SM\DigitalProduct\Model\CategoryRepository::TOPUP);
+        ?>
+        <?= $tabBlock->toHtml()?>
+        <div id="telkom" class="item content dpb-telkom" data-role="content">
+            <!-- content-end------->
+
+            <h3 class="title-head-ct">Pay Telkom Bill</h3>
+
+            <div class="dpl-select sl-location">
+                <label class="label-input">Location</label>
+                <div class="sortby-dropdown shoplist-sortby">
+                            <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+                                <span><?= $block->escapeHtml('Jakarta') ?></span>
+                            </span>
+                    <ul class="dropdown">
+                        <li class="item">Jakarta</li>
+                        <li class="item">Jakarta</li>
+                    </ul>
+                </div>
+            </div>
+
+            <label class="label-input">Phone Number <span class="dpl-tooltip"><a href="#" aria-describedby="tooltip-9" >
+                                <img src='<?= $block->getViewFileUrl('images/info.svg'); ?>' alt=""  width="13" height="16" /></a>
+                            <span class="tooltip-content" id="tooltip-9" role="tooltip">Your area code and telephone number.
+        Example: 02187654321</span></span>
+            </label>
+
+            <div class="wrap-input">
+                <input class="input-text" type="text" placeholder="Example: 0217368279" />
+                <img src="https://via.placeholder.com/51x51.png" alt="" />
+            </div>
+
+            <div class="dpb-block-mobile info-pln">
+                <h3>Information</h3>
+                <ol>
+                    <li>Telkom payments include Indihome products and landlines.</li>
+                    <li>The total bill listed includes a fine.</li>
+                    <li>The payment verification process takes a maximum of 2x24 hours.</li>
+                </ol>
+            </div>
+            <div class="dpb-bottom-price dpb-price-noprice">
+                <a href="#" class="action primary">Go to Payment</a>
+            </div>
+
+            <div class="dpb-policy">
+                <div class="dpb-title-head"><h3><?= $block->escapeHtml(__('How to Pay Telkom Bill')) ?></h3></div>
+                <div class="dpd-policy-content">
+                    <ol>
+                        <li>Go to Transmart website.</li>
+                        <li>Choose Top Up & Bills category on the homepage.</li>
+                        <li>Go to Telkom menu.</li>
+                        <li>Enter your phone number (including area code).</li>
+                        <li>Click "Check My Bill" button.</li>
+                        <li>Select your payment method and please make the payment.</li>
+                    </ol>
+                </div>
+            </div>
+            <!-- content-end------->
+        </div>
+    </div>
+</div>

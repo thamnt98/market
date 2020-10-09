@@ -1,0 +1,255 @@
+// /**
+//  * Copyright © Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+//
+//  Luma theme variables
+//  _____________________________________________
+
+// Font family
+
+
+//  Weights
+
+@font-weight__thin: 100;
+@font-weight__ultralight: 200;
+@font-weight__light: normal;
+@font-weight__regular: normal;
+@font-weight__heavier: normal;
+@font-weight__semibold: normal;
+@font-weight__bold: normal;
+@font-weight__heavybold: 800;
+@font-weight__black: 900;
+
+//  Fonts
+
+@font-family-apl-icons: 'apl';
+
+@font-family-SF-UI-Display-Black: 'SF UI Display Black';
+@font-family-SF-UI-Display-Bold: 'SF UI Display Bold';
+@font-family-SF-UI-Display-Heavy: 'SF UI Display Heavy';
+@font-family-SF-UI-Display-Light: 'SF UI Display Light';
+@font-family-SF-UI-Display-Medium: 'SF UI Display Medium';
+@font-family-SF-UI-Display-Semibold: 'SF UI Display Semibold';
+@font-family-SF-UI-Display-Thin: 'SF UI Display Thin';
+@font-family-SF-UI-Display-Ultralight: 'SF UI Display Ultralight';
+
+// Font base
+
+@font-family__base: @font-family-SF-UI-Display-Medium, @font-family__sans-serif;
+
+
+//
+//  Typography
+//  ---------------------------------------------
+
+
+//  Colors nesting
+@page__background-color: @color-white;
+
+// Colors theme
+
+// Primary colors
+
+@c-tsm-red: #E02020;
+@c-tsm-red2: #E50000;
+@c-tsm-red3: #700707;
+@c-tsm-red4: #BC2C0C;
+@c-tsm-red5: #DB3320;
+@c-tsm-bright-orange: #FB9E0D;
+
+// Secondary colors
+
+@c-tsm-orange: #ED4A12;
+@c-tsm-orange2: #FFA100;
+@c-tsm-orange3: #FBCC20;
+@c-tsm-light-orange: #FFEBCA;
+@c-tsm-light-orange2: #FEEBCE;
+@c-tsm-yellow: #F7B500;
+@c-tsm-green: #3EBE26;
+@c-tsm-blue: #2B86DF;
+@c-tsm-blue2: #0085E5;
+@c-tsm-blue3: #3E96C6;
+@c-tsm-blue4: #2E84D8;
+@c-tsm-dark-red: #A43017;
+@c-tsm-dark-red2: #cc2424;
+@c-tsm-light-blue: #EDF7FA;
+@c-tsm-light-blue2: #74C7AD;
+@c-tsm-orange-footer-link: #f69a0a;
+@c-tsm-pink: #D32852;
+@c-tsm-dark-blue: #E2EC86;
+@c-tsm-dark-blue2: #ECBB86;
+
+
+// Neutral colors
+
+@c-tsm-grey1: #F2F2F2;
+@c-tsm-grey2: #E5E5E5;
+@c-tsm-grey3: #D4D4D4;
+@c-tsm-grey4: #BABABA;
+@c-tsm-grey5: #777777;
+@c-tsm-grey6: #2F2F2F;
+@c-tsm-grey7: #8D8D8D;
+@c-tsm-grey8: #D5D2D2;
+@c-tsm-grey9: #6B6B6B;
+@c-tsm-grey10: #DBDADA;
+@c-tsm-grey11: #EAEAEA;
+@c-tsm-grey12: #979797;
+@c-tsm-grey13: #B2B2B2;
+@c-tsm-grey14: #727272;
+@c-tsm-grey15: #AAA9A9;
+@c-tsm-grey16: #DFDFDF;
+@c-tsm-grey17: #EDEDED;
+@c-tsm-grey18: #3F3F3F;
+@c-tsm-grey19: #545454;
+@c-tsm-grey20: #7b7b7b;
+@c-tsm-grey21: #606060;
+@c-tsm-grey22: #6B6A6A;
+@c-tsm-grey23: #D8D8D8;
+@c-tsm-grey24: @c-tsm-grey10;
+@c-tsm-grey25: #FDFDFD;
+@c-tsm-grey26: #7D7D7D;
+@c-tsm-grey27: #BDBDBD;
+@c-tsm-grey28: #676767;
+@c-tsm-grey29: #4B4B4B;
+@c-tsm-grey30: #E3DDDD;
+@c-tsm-grey31: #767676;
+@c-tsm-grey32: @c-tsm-grey9;
+@c-tsm-grey33: @c-tsm-grey23;
+@c-tsm-grey34: #515151;
+@c-tsm-grey35: #A1A1A1;
+@c-tsm-grey36: #F3F3F3;
+@c-tsm-grey37: #808080;
+@c-tsm-grey38: #989898;
+@c-tsm-grey39: #A09C9C;
+@c-tsm-grey40: #353535;
+@c-tsm-input-placeholder: #CFCFCF;
+@c-tsm-grey41: #A0A0A0;
+// Graphic Colors
+
+@c-tsm-divider: @c-tsm-grey2;
+@c-tsm-txt-link: @c-tsm-blue;
+@c-opt-box: @c-tsm-light-blue;
+@c-tsm-notification: @c-tsm-light-orange;
+@c-tsm-toast: #191919;
+@c-tsm-normal-price: @c-tsm-grey5;
+@c-tsm-hightlighted-price: @c-tsm-orange;
+@c-tsm-error-text: @c-tsm-red;
+@c-tsm-success: @c-tsm-green;
+@c-tsm-status-checkout: #afdd99;
+@c-tsm-status-checkout2: #8BB8E6;
+
+// Sub category bar Colors
+
+@c-tsm-groceries: #FA601B;
+@c-tsm-mother-kids-baby: #C0D2CE;
+@c-tsm-beauty-health-pharmacy: #F3AFB8;
+@c-tsm-household-kitchen: #90BE2E;
+@c-tsm-electrical-hardware-tools: #0260A5;
+@c-tsm-clothing-apparel: #FFB84B;
+@c-tsm-electronics-appliances: #79207A;
+@c-tsm-gadget-entertaiment: #E3CFBD;
+@c-tsm-furmiture-homedecor: #7E926F;
+@c-tsm-automotive: #292929;
+@c-tsm-sport-outdoor: #087EC5;
+@c-tsm-stationery: #85EA67;
+@c-tsm-pets: #F17C36;
+@c-tsm-gifts: #FFDC7A;
+@c-tsm-digital-payment: #6A9F37;
+
+@primary__color: @c-tsm-grey6;
+@background-color-hover: rgba(60, 64, 67, 0.08);
+@slider-tsm-groceries:#219E56;
+//
+//  Icons
+//  ---------------------------------------------
+
+@icon-success: '\e60e';
+@icon-error: '\e61f';
+@icon-edit: '\e601';
+@icon-print: '\e624';
+@icon-star-empty: '\e625';
+@icon-download: '\e626';
+@icon-private: '\e629';
+@icon-present: '\e62a';
+@icon-gift-registry: '\e62b';
+
+
+@icon-calendar__font-size: 23px;
+
+//
+//  Sidebar
+//  ---------------------------------------------
+
+@sidebar__background-color: @color-white; // Used in cart sidebar, Checkout sidebar, Tier Prices, My account navigation, Rating block background
+
+//
+//  Sidebar blocks
+//  ---------------------------------------------
+
+@block-items__counter__color: @color-gray43;
+
+//
+//  Button
+//  ---------------------------------------------
+@button__border-radius:8px;
+@color-blue1: @c-tsm-bright-orange;
+
+//
+//  Transmart App
+//  ---------------------------------------------
+@color-validation:#f11a1a;
+@background-dropdown-city:#EAEAEA;
+@color-textleading-1:#FFDB78;
+@color-textleading-2:#615F5F;
+@color-app-topbar:#E9E9E9;
+@color-app-services-border:#E2E2E2;
+@background-app-leading:#f14c4c ;
+
+@c-tsm-dropdown-city:#EAEAEA;
+@c-tsm-color-textleading-1:#FFDB78;
+@c-tsm-color-textleading-2:#615F5F;
+@c-tsm-color-app-topbar:#E9E9E9;
+@c-tsm-color-app-services-border:#E2E2E2;
+@c-tsm-background-app-leading:#f14c4c ;
+
+@indent__trsm-16: 16px;
+@indent__trsm-15: 15px;
+@indent__trsm-25: 25px;
+
+@form-element-input-placeholder__color: @c-tsm-grey5;
+@form-element-input-placeholder__font-style: @font-family-SF-UI-Display-Light;
+
+@color-validation:#f11a1a;
+@background-dropdown-city:#EAEAEA;
+@color-textleading-1:#FFDB78;
+@color-textleading-2:#615F5F;
+@color-app-topbar:#E9E9E9;
+@color-app-services-border:#E2E2E2;
+@background-app-leading:#f14c4c ;
+//
+//  find-store
+//  ---------------------------------------------
+@background-find-store: #FDFDFD;
+@input-find-store__background-color: @color-white;
+@input-find-store__color: #C9C9C9;
+//
+//  scrollbar
+//  ---------------------------------------------
+@scroll-bar__background-color: @c-tsm-grey23;
+// account
+@c-tsm-green1: #219540;
+
+@c-tsm-red1: #DC1D1D;
+// my address
+@c-tsm-green-1: #AFDD99;
+@c-tsm-orange-1: #E6B08B;
+@c-tsm-delete-disabled: #C8C8C8;
+@c-tsm-red1: #DC1D1D;
+@c-tsm-red-2:#FFE6E6;
+// my payment
+@c-tsm-red-3: #FD1212;
+
+@c-tsm-black1:#070707;
+

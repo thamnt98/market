@@ -1,0 +1,752 @@
+// /**
+//  * Copyright © Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+//
+//  Commona
+//  _____________________________________________
+//
+
+& when (@media-common = true) {
+    .lib-font-face(
+        @family-name: @font-family-apl-icons,
+        @font-path: '@{baseDir}fonts/apl-icons/fonts/apl',
+        @font-weight: normal,
+        @font-style: normal
+    );
+
+    .lib-font-face(
+        @family-name: @font-family-SF-UI-Display-Black,
+        @font-path: '@{baseDir}fonts/sfuidisplay/black/sf-ui-display-black',
+        @font-weight: normal,
+        @font-style: normal
+    );
+
+    .lib-font-face(
+        @family-name: @font-family-SF-UI-Display-Bold,
+        @font-path: '@{baseDir}fonts/sfuidisplay/bold/sf-ui-display-bold',
+        @font-weight: normal,
+        @font-style: normal
+    );
+
+    .lib-font-face(
+        @family-name: @font-family-SF-UI-Display-Heavy,
+        @font-path: '@{baseDir}fonts/sfuidisplay/heavy/sf-ui-display-heavy',
+        @font-weight: normal,
+        @font-style: normal
+    );
+
+    .lib-font-face(
+        @family-name: @font-family-SF-UI-Display-Light,
+        @font-path: '@{baseDir}fonts/sfuidisplay/light/sf-ui-display-light',
+        @font-weight: normal,
+        @font-style: normal
+    );
+
+    .lib-font-face(
+        @family-name: @font-family-SF-UI-Display-Medium,
+        @font-path: '@{baseDir}fonts/sfuidisplay/medium/sf-ui-display-medium',
+        @font-weight: normal,
+        @font-style: normal
+    );
+
+    .lib-font-face(
+        @family-name: @font-family-SF-UI-Display-Semibold,
+        @font-path: '@{baseDir}fonts/sfuidisplay/semibold/sf-ui-display-semibold',
+        @font-weight: normal,
+        @font-style: normal
+    );
+
+    .lib-font-face(
+        @family-name: @font-family-SF-UI-Display-Thin,
+        @font-path: '@{baseDir}fonts/sfuidisplay/thin/sf-ui-display-thin',
+        @font-weight: normal,
+        @font-style: normal
+    );
+
+    .lib-font-face(
+        @family-name: @font-family-SF-UI-Display-Ultralight,
+        @font-path: '@{baseDir}fonts/sfuidisplay/ultralight/sf-ui-display-ultralight',
+        @font-weight: normal,
+        @font-style: normal
+    );
+}
+
+[class^="apl-"], [class*=" apl-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'apl' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  vertical-align: middle;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@apl-font-family: 'apl';
+@apl-Notification: "\e92f";
+@apl-ic_cart: "\e908";
+@apl-ic_cart2: "\e909";
+@apl-ic_heart-empty: "\e914";
+@apl-ic_search:"\e925";
+@apl-ic_close:"\e919";
+@apl-shopping-list: "\e91b";
+@apl-List: "\e91d";
+@apl-grid: "\e928";
+@apl-arrow-black: "\e901";
+@apl-ic_arr-left: "\e902";
+@apl-MovetoList: "\e927";
+@apl-Shopping-List: "\e91b";
+@apl-ic_category: "\e90a";
+@apl-ic_minus: "\e91e";
+@apl-ic_plus: "\e922";
+@apl-star-empty: "\e931";
+@apl-star-fill: "\e933";
+@apl-Share: "\e91c";
+@apl-Location:"\e92d";
+@apl-ic_adress:"\e900";
+@apl-ic_calender: "\e907";
+@apl-tick-success: "\e93e";
+@apl-tick-info: "\e93d";
+@apl-tick-warning: "\e93f";
+@apl-delivery: "\e93c";
+@apl-close-Button: "\e918";
+@apl-Pick-Up-in-Store-Grey: "\e930";
+@apl-camera: "\e943";
+@apl-setting: "\e941";
+@apl-remove: "\e932";
+@apl-ic_bank-card:"\e905";
+
+.apl-pencil:before {
+    content: "\e942";
+}
+.apl-exchange-alt:before {
+    content: "\e940";
+    color: #626262;
+}
+.apl-setting:before {
+    content: "\e941";
+    color: #626262;
+}
+.apl-tick-info:before {
+    content: "\e93d";
+    color: #fb9e0d;
+}
+.apl-tick-success:before {
+    content: "\e93e";
+    color: #f7b500;
+}
+.apl-tick-warning:before {
+    content: "\e93f";
+    color: #e52020;
+}
+.apl-delivery:before {
+    content: "\e93c";
+}
+.apl-facebook_messenger:before {
+    content: "\e935";
+    color: #007fff;
+}
+.apl-facebook:before {
+    content: "\e937";
+    color: #45619d;
+}
+.apl-google-plus:before {
+    content: "\e939";
+    color: #dc4e41;
+}
+.apl-pinterest:before {
+    content: "\e93a";
+    color: #ca2028;
+}
+.apl-twitter:before {
+    content: "\e93b";
+    color: #1cb7eb;
+}
+.apl-star-fill:before {
+    content: "\e933";
+    color: #fbb317;
+}
+.apl-star-empty:before {
+    content: "\e931";
+    color: #fcb415;
+}
+.apl-ArrowIcon:before {
+    content: "\e92c";
+    color: #2b86df;
+}
+.apl-Location:before {
+    content: "\e92d";
+    color: #2b86df;
+}
+.apl-QuestionHelp:before {
+    content: "\e924";
+    color: #fff;
+}
+.apl-grid:before {
+    content: "\e928";
+}
+.apl-Shopping-List:before {
+    content: "\e91b";
+}
+.apl-MovetoList:before {
+    content: "\e927";
+    color: #bababa;
+}
+.apl-List:before {
+    content: "\e91d";
+    color: #989898;
+}
+.apl-Share:before {
+    content: "\e91c";
+    color: #989898;
+}
+.apl-cancel:before {
+    content: "\e919";
+}
+.apl-Back:before {
+    content: "\e901";
+    color: #000;
+}
+.apl-Cart:before {
+    content: "\e90b";
+    color: #000;
+}
+.apl-Close-Button:before {
+    content: "\e918";
+    color: #000;
+}
+.apl-delivery-large:before {
+    content: "\e91a";
+}
+.apl-account:before {
+    content: "\e92e";
+    color: #000;
+}
+.apl-Notification:before {
+    content: "\e92f";
+    color: #000;
+}
+.apl-Pick-Up-in-Store-Grey:before {
+    content: "\e930";
+    color: #000;
+}
+.apl-Remove:before {
+    content: "\e932";
+    color: #000;
+}
+.apl-Sort:before {
+    content: "\e934";
+    color: #000;
+}
+.apl-Star-Full:before {
+    content: "\e936";
+    color: #000;
+}
+.apl-Voucher:before {
+    content: "\e938";
+}
+.apl-ic_adress:before {
+    content: "\e900";
+    color: #000;
+}
+.apl-ic_arr-left:before {
+    content: "\e902";
+    color: #000;
+}
+.apl-ic_arr-left-thin:before {
+    content: "\e903";
+    color: #000;
+}
+.apl-ic_arr-right:before {
+    content: "\e904";
+    color: #000;
+}
+.apl-ic_bank-card:before {
+    content: "\e905";
+    color: #000;
+}
+.apl-ic_bell:before {
+    content: "\e906";
+}
+.apl-ic_calender:before {
+    content: "\e907";
+    color: #000;
+}
+.apl-ic_cart:before {
+    content: "\e908";
+}
+.apl-ic_cart2:before {
+    content: "\e909";
+    color: #000;
+}
+.apl-ic_category:before {
+    content: "\e90a";
+    color: #000;
+}
+.apl-ic_clock:before {
+    content: "\e90c";
+    color: #000;
+}
+.apl-ic_credit-card:before {
+    content: "\e90d";
+}
+.apl-ic_credit-card2:before {
+    content: "\e90e";
+}
+.apl-ic_delivery-large:before {
+    content: "\e90f";
+}
+.apl-ic_delivery-long:before {
+    content: "\e910";
+    color: #000;
+}
+.apl-ic_delivey2:before {
+    content: "\e911";
+}
+.apl-ic_gift:before {
+    content: "\e912";
+    color: #000;
+}
+.apl-ic_gift2:before {
+    content: "\e913";
+}
+.apl-ic_heart-empty:before {
+    content: "\e914";
+}
+.apl-ic_heart-full:before {
+    content: "\e915";
+    color: #000;
+}
+.apl-ic_info:before {
+    content: "\e916";
+    color: #000;
+}
+.apl-ic_information:before {
+    content: "\e917";
+}
+.apl-ic_minus:before {
+    content: "\e91e";
+    color: #000;
+}
+.apl-ic_myprofile:before {
+    content: "\e91f";
+    color: #000;
+}
+.apl-ic_myreview:before {
+    content: "\e920";
+    color: #000;
+}
+.apl-ic_notification:before {
+    content: "\e921";
+    color: #000;
+}
+.apl-ic_plus:before {
+    content: "\e922";
+    color: #000;
+}
+.apl-ic_process:before {
+    content: "\e923";
+    color: #000;
+}
+.apl-ic_search:before {
+    content: "\e925";
+    color: #000;
+}
+.apl-ic_shop:before {
+    content: "\e926";
+}
+.apl-ic-delivery-short:before {
+    content: "\e929";
+    color: #000;
+}
+.apl-ic-help:before {
+    content: "\e92a";
+    color: #000;
+}
+.apl-ic-pickup:before {
+    content: "\e92b";
+    color: #000;
+}
+.apl-camera:before {
+    content: "\e943";
+}
+.apl-share2:before {
+    content: "\ea82";
+}
+
+// End icons font
+
+
+@font-path: '@{baseDir}images/svg-icons';
+@font-path-base: '@{baseDir}images';
+@font-path-payment: '@{baseDir}images/svg-icons/icons-payment';
+@font-path-loading: '@{baseDir}images/svg_loading';
+
+
+
+[class^="svg-icon-"],
+[class*="svg-icon-"],
+[class^="svg-icon-"]:before,
+[class*="svg-icon-"]:before {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  display: inline-block;
+  vertical-align: middle;
+}
+
+
+.svg-select-product {
+  width: 16px;
+  height: 16px;
+  background: url(~'@{font-path}/select-product.svg') no-repeat;
+}
+
+.svg-icon-Warning {
+  width: 20px;
+  height: 20px;
+  background: url(~'@{font-path}/Warning.svg') no-repeat;
+}
+
+.svg-icon-WaitingForPayment {
+  width: 31px;
+  height: 31px;
+  background: url(~'@{font-path}/WaitingForPayment.svg') no-repeat;
+}
+
+.svg-icon-WaitingForPaymentGrey {
+  width: 31px;
+  height: 31px;
+  background: url(~'@{font-path-payment}/WaitingForPaymentGrey.svg') no-repeat;
+}
+
+.svg-icon-WaitingForPaymentGreen {
+  width: 31px;
+  height: 31px;
+  background: url(~'@{font-path-payment}/WaitingForPaymentGreen.svg') no-repeat;
+}
+
+.svg-icon-VoucherApplied {
+  width: 13px;
+  height: 13px;
+  background: url(~'@{font-path}/VoucherApplied.svg') no-repeat;
+}
+
+.svg-icon-Voucher {
+  width: 30px;
+  height: 30px;
+  background: url(~'@{font-path}/Voucher.svg') no-repeat;
+}
+
+.svg-icon-ToggleOn {
+  width: 34px;
+  height: 15px;
+  background: url(~'@{font-path}/ToggleOn.svg') no-repeat;
+}
+
+.svg-icon-ToggleOff {
+  width: 34px;
+  height: 15px;
+  background: url(~'@{font-path}/ToggleOff.svg') no-repeat;
+}
+
+.svg-icon-Subscription {
+  width: 25px;
+  height: 25px;
+  background: url(~'@{font-path}/Subscription.svg') no-repeat;
+}
+
+.svg-icon-StarBorder {
+  width: 14px;
+  height: 13px;
+  background: url(~'@{font-path}/StarBorder.svg') no-repeat;
+}
+
+.svg-icon-ShoppingList {
+  width: 20px;
+  height: 18px;
+  background: url(~'@{font-path}/ShoppingList.svg') no-repeat;
+}
+
+.svg-icon-PickUpinStoreOrange {
+  width: 17px;
+  height: 16px;
+  background: url(~'@{font-path}/PickUpinStoreOrange.svg') no-repeat;
+}
+
+.svg-icon-PickUpGrey {
+  width: 31px;
+  height: 31px;
+  background: url(~'@{font-path-payment}/PaymentHandGrey.svg') no-repeat;
+}
+
+.svg-icon-PickUpGreen {
+  width: 31px;
+  height: 31px;
+  background: url(~'@{font-path}/PickUpGreen.svg') no-repeat;
+}
+
+.svg-icon-ReadyPickUpGrey {
+    width: 31px;
+    height: 31px;
+    background: url(~'@{font-path}/PickUpGrey.svg') no-repeat;
+}
+
+.svg-icon-Oval {
+  width: 40px;
+  height: 40px;
+  background: url(~'@{font-path}/Oval.svg') no-repeat;
+}
+
+.svg-icon-OrderReceivedGrey {
+  width: 31px;
+  height: 31px;
+  background: url(~'@{font-path-payment}/OrderReceivedGrey.svg') no-repeat;
+}
+
+.svg-icon-OrderReceivedGreen {
+  width: 31px;
+  height: 31px;
+  background: url(~'@{font-path-payment}/OrderReceivedGreen.svg') no-repeat;
+}
+
+.svg-icon-Options {
+  width: 7px;
+  height: 25px;
+  background: url(~'@{font-path}/Options.svg') no-repeat;
+}
+
+.svg-icon-NotificationSettings {
+  width: 25px;
+  height: 25px;
+  background: url(~'@{font-path}/NotificationSettings.svg') no-repeat;
+}
+
+.svg-icon-MyReviews {
+  width: 25px;
+  height: 25px;
+  background: url(~'@{font-path}/MyReviews.svg') no-repeat;
+}
+
+.svg-icon-MyProfile {
+  width: 25px;
+  height: 25px;
+  background: url(~'@{font-path}/MyProfile.svg') no-repeat;
+}
+
+.svg-icon-MyAddress {
+  width: 25px;
+  height: 25px;
+  background: url(~'@{font-path}/MyAddress.svg') no-repeat;
+}
+
+.svg-icon-MyAddress {
+  width: 25px;
+  height: 25px;
+  background: url(~'@{font-path}/MyAddress.svg') no-repeat;
+}
+
+.svg-icon-LoginwithGoogle {
+  width: 48px;
+  height: 48px;
+  background: url(~'@{font-path}/LoginwithGoogle.svg') no-repeat;
+}
+
+.svg-icon-LoginwithFacebook {
+  width: 48px;
+  height: 48px;
+  background: url(~'@{font-path}/LoginwithFacebook.svg') no-repeat;
+}
+
+.svg-icon-List {
+  width: 31px;
+  height: 26px;
+  background: url(~'@{font-path}/List.svg') no-repeat;
+}
+
+.svg-icon-InProcessGrey {
+  width: 31px;
+  height: 31px;
+  background: url(~'@{font-path-payment}/InProcessGrey.svg') no-repeat;
+}
+
+.svg-icon-InProcessGreen {
+  width: 31px;
+  height: 31px;
+  background: url(~'@{font-path-payment}/InProcessGreen.svg') no-repeat;
+}
+
+.svg-icon-InfoOrange {
+  width: 14px;
+  height: 14px;
+  background: url(~'@{font-path}/InfoOrange.svg') no-repeat;
+}
+
+.svg-icon-InfoGrey {
+  width: 14px;
+  height: 14px;
+  background: url(~'@{font-path}/InfoGrey.svg') no-repeat;
+}
+
+.svg-icon-InDeliveryGrey {
+  width: 31px;
+  height: 31px;
+  background: url(~'@{font-path-payment}/InDeliveryGrey.svg') no-repeat;
+}
+
+.svg-icon-InDeliveryGreen {
+  width: 31px;
+  height: 31px;
+  background: url(~'@{font-path-payment}/InDeliveryGreen.svg') no-repeat;
+}
+
+.svg-icon-Help {
+  width: 25px;
+  height: 25px;
+  background: url(~'@{font-path}/Help.svg') no-repeat;
+}
+
+.svg-icon-Grid {
+  width: 29px;
+  height: 28px;
+  background: url(~'@{font-path}/Grid.svg') no-repeat;
+}
+
+.svg-icon-DeliveryOrange {
+  width: 29px;
+  height: 15px;
+  background: url(~'@{font-path}/DeliveryOrange.svg') no-repeat;
+}
+
+.svg-icon-BanksCards {
+  width: 25px;
+  height: 25px;
+  background: url(~'@{font-path}/BanksCards.svg') no-repeat;
+}
+.svg-icon-exchange {
+    width: 16px;
+    height: 16px;
+    margin-right: 10px;
+}
+
+
+//
+//  Desktop
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    h1 {
+        .lib-css(font-size, @h1__font-size-desktop);
+        .lib-css(margin-bottom, @h1__margin-bottom__desktop);
+    }
+}
+
+
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+    .items {
+        .lib-list-reset-styles();
+    }
+}
+
+//
+
+@h1__font-size: 18px;
+@h1__font-color: @heading__color__base;
+@h1__font-family: @heading__font-family__base;
+@h1__font-weight: @font-weight__bold;
+@h1__font-style: @heading__font-style__base;
+@h1__line-height: @heading__line-height__base;
+@h1__margin-top: 0;
+@h1__margin-bottom: @heading__margin-bottom__base;
+@h1__font-size-desktop: 40px;
+
+@h2__font-size: 16px;
+@h2__font-color: @heading__color__base;
+@h2__font-family: @heading__font-family__base;
+@h2__font-weight: @font-weight__semibold;
+@h2__font-style: @heading__font-style__base;
+@h2__line-height: @heading__line-height__base;
+@h2__margin-top: @indent__m;
+@h2__margin-bottom: @heading__margin-bottom__base;
+@h2__font-size-desktop: 26px;
+
+@h3__font-size: 14px;
+@h3__font-color: @heading__color__base;
+@h3__font-family: @heading__font-family__base;
+@h3__font-weight: @font-weight__semibold;
+@h3__font-style: @heading__font-style__base;
+@h3__line-height: @heading__line-height__base;
+@h3__margin-top: @indent__base * .75;
+@h3__margin-bottom: @indent__s;
+@h3__font-size-desktop: 20px;
+
+@h4__font-size: 12px;
+@h4__font-color: @heading__color__base;
+@h4__font-family: @heading__font-family__base;
+@h4__font-weight: @font-weight__bold;
+@h4__font-style: @heading__font-style__base;
+@h4__line-height: @heading__line-height__base;
+@h4__margin-top: @heading__margin-top__base;
+@h4__margin-bottom: @heading__margin-bottom__base;
+@h4__font-size-desktop: 18px;
+
+@h5__font-size: 10px;
+@h5__font-color: @heading__color__base;
+@h5__font-family: @heading__font-family__base;
+@h5__font-weight: @font-weight__semibold;
+@h5__font-style: @heading__font-style__base;
+@h5__line-height: @heading__line-height__base;
+@h5__margin-top: @heading__margin-top__base;
+@h5__margin-bottom: @heading__margin-bottom__base;
+@h5__font-size-desktop: 14px;
+
+@h6__font-size: 8px;
+@h6__font-color: @heading__color__base;
+@h6__font-family: @heading__font-family__base;
+@h6__font-weight: @font-weight__bold;
+@h6__font-style: @heading__font-style__base;
+@h6__line-height: @heading__line-height__base;
+@h6__margin-top: @heading__margin-top__base;
+@h6__margin-bottom: @heading__margin-bottom__base;
+@h6__font-size-desktop: 8px;
+
+//
+//  Desktop
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+  h1 {
+    .lib-css(font-size, @h1__font-size-desktop);
+    .lib-css(margin-bottom, @h1__margin-bottom__desktop);
+  }
+
+  h2 {
+    .lib-css(font-size, @h2__font-size-desktop);
+  }
+
+  h3 {
+    .lib-css(font-size, @h3__font-size-desktop);
+  }
+
+  h4 {
+    .lib-css(font-size, @h4__font-size-desktop);
+  }
+
+  h5 {
+    .lib-css(font-size, @h5__font-size-desktop);
+  }
+
+  h6 {
+    .lib-css(font-size, @h6__font-size-desktop);
+  }
+}
+

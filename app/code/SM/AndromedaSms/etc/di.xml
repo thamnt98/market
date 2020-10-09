@@ -1,0 +1,36 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- API Model -->
+    <preference for="SM\AndromedaSms\Api\SmsVerificationInterface" type="SM\AndromedaSms\Model\SmsVerification"/>
+    <preference for="SM\AndromedaSms\Api\SmsVerification\TestMode\ManagementInterface"
+                type="SM\AndromedaSms\Model\SmsVerification\TestMode\Management"/>
+
+    <!-- Entity -->
+    <preference for="SM\AndromedaSms\Api\Entity\SmsVerificationInterface"
+                type="SM\AndromedaSms\Model\Entity\SmsVerification"/>
+    <preference for="SM\AndromedaSms\Api\Entity\SmsVerification\TestMode\SmsVerificationInterface"
+        type="SM\AndromedaSms\Model\Entity\SmsVerification\TestMode\SmsVerification"/>
+
+    <!-- Repository -->
+    <preference for="SM\AndromedaSms\Api\Repository\SmsVerificationRepositoryInterface"
+                type="SM\AndromedaSms\Model\Repository\SmsVerificationRepository"/>
+    <preference for="SM\AndromedaSms\Api\Repository\SmsVerification\TestMode\SmsVerificationRepositoryInterface"
+                type="SM\AndromedaSms\Model\Repository\SmsVerification\TestMode\SmsVerificationRepository"/>
+
+    <!-- Send Sms Data -->
+    <preference for="SM\AndromedaSms\Api\Data\SmsVerification\SendSms\TestMode\ResponseInterface"
+                type="SM\AndromedaSms\Model\Data\SmsVerification\SendSms\TestMode\Response"/>
+
+    <!-- Verify Sms Data -->
+    <preference for="SM\AndromedaSms\Api\Data\SmsVerification\VerifySms\TestMode\ResponseInterface"
+                type="SM\AndromedaSms\Model\Data\SmsVerification\VerifySms\TestMode\Response"/>
+
+    <!-- Verify sms before customer registration -->
+    <type name="SM\Customer\Controller\Trans\CreateAccount">
+        <plugin name="sm_andromedaSms_sm_customer_controller_trans_createAccount"
+                type="SM\AndromedaSms\Plugin\SM\Customer\Controller\Trans\CreateAccount" />
+    </type>
+    <type name="SM\Customer\Api\TransCustomerRepositoryInterface">
+        <plugin name="sm_andromedaSms_sm_customer_api_transCustomerRepositoryInterface"
+                type="SM\AndromedaSms\Plugin\SM\Customer\Api\TransCustomerRepositoryInterface" />
+    </type>
+</config>

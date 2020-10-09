@@ -1,0 +1,29 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magento\Customer\Model\Customer" type="SM\CustomPrice\Model\Customer"/>
+    <preference for="Magento\Customer\Model\Session" type="SM\CustomPrice\Model\Session\Customer"/>
+    <preference for="Trans\LocationCoverage\Model\ResourceModel\District" type="SM\CustomPrice\Model\ResourceModel\District"/>
+    <preference for="Amasty\Shopby\Model\Layer\Filter\Price" type="SM\CustomPrice\Model\Layer\Filter\Price"/>
+    <preference for="Magento\Elasticsearch\SearchAdapter\Dynamic\DataProvider" type="SM\CustomPrice\SearchAdapter\Dynamic\DataProvider"/>
+    <type name="Magento\Catalog\Model\Product">
+        <plugin name="get_price_by_store" type="SM\CustomPrice\Plugin\Product" sortOrder="1" disabled="false"/>
+    </type>
+
+    <type name="Magento\ImportExport\Model\Import\SampleFileProvider">
+        <arguments>
+            <argument name="samples" xsi:type="array">
+                <item name="store_location" xsi:type="string">SM_CustomPrice</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Catalog\Model\ResourceModel\Product\Collection">
+        <plugin name="add_price_by_store_to_product" type="SM\CustomPrice\Plugin\AddCustomPriceProductCollection"/>
+    </type>
+    <type name="SM\CustomPrice\Model\Session\Customer">
+        <arguments>
+            <argument name="districtModel" xsi:type="object">SM\CustomPrice\Model\ResourceModel\District\Proxy</argument>
+            <argument name="appState" xsi:type="object">Magento\Framework\App\State\Proxy</argument>
+            <argument name="tokenUserContext" xsi:type="object">Magento\Webapi\Model\Authorization\TokenUserContext\Proxy</argument>
+        </arguments>
+    </type>
+</config>

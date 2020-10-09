@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="andromeda_api" translate="label" sortOrder="999" showInDefault="1" showInWebsite="0"
+                 showInStore="0">
+            <label>Andromeda API</label>
+            <tab>transmart</tab>
+            <resource>SM_AndromedaApi::configuration</resource>
+            <group id="authorization" translate="label" sortOrder="0" showInDefault="1" showInWebsite="0"
+                   showInStore="0">
+                <label>Authorization</label>
+                <field id="test_mode" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>Test Mode</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>When enabled, it will get "Test Base Url" as endpoint</comment>
+                </field>
+                <field id="test_base_url" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>Test Base Url</label>
+                    <comment>default http://integration-5ojmyuq-uervi76xv5cfc.ap-3.magentosite.cloud/ (end with /)</comment>
+                </field>
+                <field id="key" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>Key</label>
+                </field>
+                <field id="core_api_endpoint" translate="label" type="text" sortOrder="20" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Core API Endpoint</label>
+                </field>
+                <field id="cdp_sync_api_endpoint" translate="label" type="text" sortOrder="30" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>CDP Sync API Endpoint</label>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

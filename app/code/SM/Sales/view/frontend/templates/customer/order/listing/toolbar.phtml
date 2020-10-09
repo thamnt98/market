@@ -1,0 +1,59 @@
+<?php
+/** @var \SM\Sales\Block\Customer\Order\Toolbar $block */
+
+?>
+
+<div class="headtab-toolbar">
+    <form id="filter-form" action="<?= $block->getCurrentUrl()?>" method="GET">
+        <div class="gr-date-filter">
+            <div class="gr-date">
+                <input type="text" autocomplete="off" class="input-text" id="date_from" name="from" placeholder="<?= $block->escapeHtml(__("From"))?>" value="<?= $block->getRequest()->getParam("from", "")?>"/>
+                <span class="line-hozion"><?= $block->escapeHtml('-') ?></span>
+                <input type="text" autocomplete="off" class="input-text" id="date_to" name="to" placeholder="<?= $block->escapeHtml(__("To"))?>" value="<?= $block->getRequest()->getParam("to", "")?>"/>
+            </div>
+
+            <div class="gr-filter">
+                <div class="sortby-dropdown">
+                        <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+                            <span><?= $block->escapeHtml(__('Sort by')) ?></span>
+                        </span>
+                    <ul class="dropdown">
+                        <li class="item <?= (($block->getRequest()->getParam("sort", \SM\Sales\Model\ParentOrderRepository::SORT_LATEST) ==  \SM\Sales\Model\ParentOrderRepository::SORT_LATEST) ? "active" : "")?>">
+                            <label style="cursor: pointer" for="sort_latest"><?= $block->escapeHtml(__('Latest Order')) ?></label>
+                        </li>
+                        <li class="item <?= (($block->getRequest()->getParam("sort", \SM\Sales\Model\ParentOrderRepository::SORT_LATEST) ==  \SM\Sales\Model\ParentOrderRepository::SORT_STATUS) ? "active" : "")?>">
+                            <label style="cursor: pointer" for="sort_status"><?= $block->escapeHtml(__('Order Status')) ?></label>
+                        </li>
+                    </ul>
+                </div>
+                <a href="<?= $block->getUrlWithoutParams() ?>" class="reset-filter"><?= $block->escapeHtml(__('Reset filter')) ?></a>
+            </div>
+        </div>
+        <!-- search box---->
+        <div class="shoplist-search">
+            <div class="control">
+                <a href="#"><span class="apl-ic_search" id="btn-search-submit"></span></a>
+                <input id="search_order" type="text" name="key" value="<?= $block->getRequest()->getParam("key", "")?>"
+                       placeholder="<?= $block->escapeHtml(__('Search product, order ID or reference number'))?>"
+                       class="input-text" maxlength="128" role="combobox" aria-haspopup="false"
+                       aria-autocomplete="both" autocomplete="off" aria-expanded="true"/>
+            </div>
+        </div>
+        <input type="radio" name="sort" id="sort_latest" style="display:none;"
+               value="<?= \SM\Sales\Model\ParentOrderRepository::SORT_LATEST?>"
+            <?= (($block->getRequest()->getParam("sort", \SM\Sales\Model\ParentOrderRepository::SORT_LATEST) ==  \SM\Sales\Model\ParentOrderRepository::SORT_LATEST) ? "checked" : "")?>/>
+        <input type="radio" name="sort" id="sort_status" style="display:none;"
+               value="<?= \SM\Sales\Model\ParentOrderRepository::SORT_STATUS?>"
+            <?= (($block->getRequest()->getParam("sort", \SM\Sales\Model\ParentOrderRepository::SORT_LATEST) ==  \SM\Sales\Model\ParentOrderRepository::SORT_STATUS) ? "checked" : "")?>/>
+        <input type="submit" style="display: none;" />
+    </form>
+    <!-- search box---->
+</div>
+<script type="text/x-magento-init">
+{
+    "*": {
+        "OrderFilter":{},
+        "FilterDate":{}
+    }
+}
+</script>

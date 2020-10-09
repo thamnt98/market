@@ -1,0 +1,415 @@
+<?php
+/**
+ * Surprise deals product list template
+ *
+ * @var $block \SM\Theme\Block\Product\Widget\SurpriseDeals
+ */
+
+use Magento\Framework\App\Action\Action;
+?>
+<?php
+$shoppingListHelper = $this->helper('SM\ShoppingList\Helper\Data');
+$_productCollection = $block->getFlashSaleProductCollection();
+$_event = $block->getEvent();
+$templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
+$helperSMCatalog = $this->helper('SM\Catalog\Helper\Data');
+?>
+<?php if ($_productCollection && $_productCollection->getSize() > 0) : ?>
+    <?php
+    $image = 'product_small_image';
+    if($_event->getData("flash_sale_image") &&
+        $_event->getData("flash_sale_image") != null &&
+        $_event->getData("flash_sale_image") != "") {
+        $backgroundUrl = $_event->getData("flash_sale_image");
+    }
+    else $backgroundUrl = "";
+    ?>
+    <div class="section-surprise smart-products <?php echo ($backgroundUrl != null) ?  'show-img' : '' ?> " style="background-image: url(<?php echo $backgroundUrl ?>); background-size: contain;" >
+        <div class="block-title">
+            <div class="section-header-title">
+                <?php if ($title = $block->getData('title')) : ?>
+                    <strong><?= $block->escapeHtml(__($title)) ?></strong>
+                <?php endif ?>
+                <div class="ticker surprise-timer" id="event-ticker-<?= $block->escapeHtmlAttr($_event->getId()) ?>"
+                    data-mage-init='{"ticker":{"eventEndTimeUTC": <?= $block->escapeHtmlAttr($block->getEndTimeUTC($_event)) ?>}}'>
+                    <span class="hour">
+                        <span data-container="hour" class="value itemtimer">&nbsp;</span>
+                    </span>
+                    <span class="surprise-timer-dot">:</span>
+
+                    <span class="minute">
+                        <span data-container="minute" class="value itemtimer">&nbsp;</span>
+                    </span>
+                    <span class="surprise-timer-dot">:</span>
+
+                    <span class="second">
+                        <span data-container="second" class="value itemtimer">&nbsp;</span>
+                    </span>
+                </div>
+            </div>
+                <?php if($_productCollection->getSize() > 5): ?>
+                    <a href="<?php echo ($block->getEventCategory() != null) ? $block->getEventCategory()->getUrl() : '#'; ?>" class="section-link link see-all-surprise-deal"><?= $block->escapeHtml(__('See All')) ?></a>
+                <?php endif; ?>
+        </div>
+
+        <div class="block-content ">
+            <div class="products-grid grid">
+                <ol class="product-cards product-items row ">
+                    <?php
+                    /** @var $_product \Magento\Catalog\Model\product */
+                    $position = 1;
+                    ?>
+                    <?php foreach ($_productCollection as $_product) : ?>
+                        <?php if ($_product->isAvailable() && $_product->isSaleable()) :?>
+                        <?php
+                            $dataGTM = $block->escapeHtml($block->getGtm($_product));
+                            $showCart = !$_product->getData('hide_cta_button');
+                        ?>
+                    <?php if ($helperSMCatalog->isProductStockStatus($_product->getId())): ?>
+                        <li class="product-card col-xs-6 col-sm-4 col-md-15">
+                            <div class="product-item <?php if (!$showCart) : ?>product-item--hideCart <?php endif; ?>">
+                                <div class="product-item-info " data-container="product-list">
+                                    <div class="product-item-photo-wrapper">
+                                        <a href="<?= $block->escapeUrl($_product->getProductUrl()); ?>"
+                                           class="product photo product-item-photo"
+                                           <?php if ($dataGTM) : ?>
+                                           data-gtm-product='<?= $dataGTM ?>'
+                                           data-position="<?= $position ?>"
+                                           <?php endif; ?>
+                                           tabindex="-1">
+                                            <?= $block->getImage($_product, $image)->toHtml() ?>
+                                        </a>
+
+                                        <!--variant configurable product-->
+                                        <?php $count = count($_product->getTypeInstance()->getChildrenIds($_product->getId())); ?>
+                                        <?php if ($block->isConfigProduct($_product) && $count): ?>
+                                            <div class="swatch-options">
+                                                <span class="oval-swatch oval-black"></span>
+                                                <span class="oval-swatch oval-pink"></span>
+                                                <span class="oval-swatch oval-dark-blue"></span>
+                                                <span class="oval-swatch oval-dark-blue2"></span>
+                                                <span class="oval-number"><?= $count ?></span>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <div class="product details product-item-details">
+                                        <div class="product-item-name">
+                                            <a href="<?= $block->escapeUrl($_product->getProductUrl()); ?>"
+                                               class="product-item-link <?= $_product->getId() ?>sd"
+                                               <?php if ($dataGTM) : ?>
+                                               data-gtm-product='<?= $dataGTM ?>'
+                                               data-position="<?= $position ?>"
+                                               <?php endif; ?>
+                                               tabindex="-1">
+                                                <?= $block->escapeHtml($_product->getName()); ?>
+                                            </a>
+                                        </div>
+                                        <div class="product-price">
+                                            <?= $block->getProductPriceHtml($_product); ?>
+                                        </div>
+
+                                        <?php if ($templateType && ($block->getData("show_review")??true)) : ?>
+                                        <?php
+                                            $ratingSummary = $block->getRattingSummary($_product);
+                                            $reviewCount = $block->getRattingCount($_product);
+                                            ?>
+                                            <div class="product-reviews-summary short<?= !$ratingSummary ? ' no-rating' : '' ?>" onclick="location.href = '<?= $_product->getProductUrl()?>'">
+                                                <div class="rating-summary">
+                                                    <div class="rating-result" title="<?= $block->escapeHtmlAttr($ratingSummary) ?>%">
+                                                        <span style="width:<?= $ratingSummary ?>%"><span><?= $block->escapeHtml($ratingSummary) ?>%</span></span>
+                                                    </div>
+                                                </div>
+                                                <span class="rating-count reviews-actions">(<?= $block->escapeHtml($reviewCount) ?>)</span>
+                                            </div>
+                                        <?php endif; ?>
+
+                                        <div class="product-item-actions">
+                                        <?php if ($showCart ) : ?>
+                                            <div class="actions-primary">
+
+                                                <?php $childrenIds = $_product->getTypeInstance()->getChildrenIds($_product->getId()); ?>
+                                                <?php if ($childrenIds): ?>
+                                                    <a title="<?= $block->escapeHtmlAttr(__('View Details')) ?>"
+                                                       href="<?= $block->escapeUrl($_product->getProductUrl()) ?>"
+                                                       class="action view-details primary"
+                                                       <?php if ($dataGTM) : ?>
+                                                       data-gtm-product='<?= $dataGTM ?>'
+                                                       data-position="<?= $position ?>"
+                                                       <?php endif; ?>>
+                                                        <?= $block->escapeHtml(__('View Details')) ?>
+                                                    </a>
+                                                <?php else : ?>
+                                                    <?php if ($_product->isSaleable()) : ?>
+                                                        <?php $postParams = $block->getAddToCartPostParams($_product); ?>
+                                                        <form data-role="tocart-form"
+                                                              data-product-sku="<?= $block->escapeHtml($_product->getSku()) ?>"
+                                                              action="<?= $block->escapeUrl($postParams['action']) ?>"
+                                                              method="post">
+                                                            <input type="hidden" name="product"
+                                                                   value="<?= $block->escapeHtmlAttr($postParams['data']['product']) ?>">
+                                                            <div class="update-cart-qty">
+                                                                <input type="hidden" name="item_id" value="0"/>
+                                                                <input type="hidden" name="qty_type" value="1"/>
+                                                                <button type="submit"
+                                                                        title="<?= $block->escapeHtmlAttr(__('Decrease qty')) ?>"
+                                                                        class="action decrease-qty">
+                                                                    <span><?= __('-') ?></span>
+                                                                </button>
+                                                                <label for="item_qty" class="label-item-qty">
+                                                                    <input type="number" name="item_qty" value="0"/>
+                                                                </label>
+                                                                <button type="submit" title="<?= $block->escapeHtmlAttr(__('Increase qty')) ?>"
+                                                                        value="increase" class="action increase-qty">
+                                                                    <span><?= __('+') ?></span>
+                                                                </button>
+                                                            </div>
+                                                            <input type="hidden" name="<?= /* @noEscape */
+                                                            Action::PARAM_NAME_URL_ENCODED ?>" value="<?= /* @noEscape */
+                                                            $postParams['data'][Action::PARAM_NAME_URL_ENCODED] ?>">
+                                                            <?= $block->getBlockHtml('formkey') ?>
+                                                            <button type="submit"
+                                                                    title="<?= $block->escapeHtml(__('Add to Cart')) ?>"
+                                                                    class="action tocart primary">
+                                                                <span><?= $block->escapeHtml(__('Add to Cart')) ?></span>
+                                                            </button>
+                                                        </form>
+                                                    <?php else : ?>
+                                                        <?php if ($_product->getIsSalable()) : ?>
+                                                            <div class="stock available"><span><?= $block->escapeHtml(__('In stock')) ?></span></div>
+                                                        <?php else : ?>
+                                                            <div class="stock unavailable"><span><?= $block->escapeHtml(__('Out of stock')) ?></span></div>
+                                                        <?php endif; ?>
+                                                    <?php endif;?>
+                                                <?php endif;?>
+
+                                            </div>
+                                        <?php endif;?>
+                                            <?php if ($shoppingListHelper->isActiveShoppingList()):?>
+                                            <?php
+                                            $isAddedShoppingList = $shoppingListHelper->isAddedShoppingList($_product->getId())? 'true':'false';
+                                            $getMyFavoritesListDefaultId = $shoppingListHelper->getMyFavoritesListDefaultId();
+                                            ?>
+
+                                        <a style="cursor: pointer"
+                                           id="shoppinglist-add-<?= $_product->getId() ?>"
+                                           class="action towishlist"
+                                           <?php if ($dataGTM) : ?>
+                                           data-gtm-product='<?= $dataGTM ?>'
+                                           data-position="<?= $position ?>"
+                                           <?php endif; ?>
+                                           data-action="add-to-wishlist"
+                                           title="<?= $block->escapeHtmlAttr(__('Add to Shopping List')) ?>">
+                                            <span><?= $block->escapeHtml(__('Add to Shopping List')) ?></span>
+                                        </a>
+                                        <a style="cursor: pointer; display: none;"
+                                               id="shoppinglist-remove-<?= $_product->getId() ?>"
+                                               class="action remove towishlist"
+                                               title="<?= $block->escapeHtmlAttr(__('Remove to Shopping List')) ?>">
+                                                <span><?= $block->escapeHtml(__('Remove to Shopping List')) ?></span>
+                                        </a>
+
+                                        <div id="success-alert-modal-<?= $_product->getId() ?>" class="content add-success-modal" style="display:none;">
+                                            <div class="product-info">
+                                                <img src="<?= $block->getImage($_product, "product_base_image")->getData("image_url");
+                                                ?>" width="124px"  alt="<?= $_product->getName() ?>" loading="lazy"/>
+                                                <div class="success-content">
+                                                    <span class="product-name"><?= $block->escapeHtml($_product->getName()) ?></span>
+                                                    <h3><?= $block->escapeHtml(__("This item has been added to"))?></h3>
+                                                    <ul id="destination-list-<?= $_product->getId() ?>" style="list-style-type: none;">
+                                                    </ul>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <script type="text/x-magento-init">
+                                        {
+                                            "*": {
+                                                "AddFromList":{
+                                                    "product_id":"<?= $_product->getId() ?>",
+                                                    "store_id":"<?= $_product->getStoreId() ?>",
+                                                    "add_item_url":"<?= $block->getUrl("shoppinglist/ajax/additems")?>",
+                                                    "remove_item_url":"<?= $block->getUrl("shoppinglist/ajax/removeitem")?>",
+                                                    "is_added_shopping_list":"<?php echo $isAddedShoppingList ?>",
+                                                    "my_favorite_id": "<?= $getMyFavoritesListDefaultId ?>"
+                                                }
+                                            }
+                                        }
+                                        </script>
+                                            <?php endif;?>
+                                        <?php $percent = $block->getDiscountPercent($_product); ?>
+                                        <?php if ($percent != null && $percent > 0) : ?>
+                                            <span class="product-sale">
+                                                <?= $block->escapeHtml(__('%1% OFF', $percent)); ?>
+                                            </span>
+                                        <?php endif; ?>
+                                        </div>
+
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+                        </li>
+                        <script>
+                            require(['jquery', "gtmProduct", 'domReady!'], function ($, gtm) {
+                                if (typeof dataLayerSourceObjects !== 'undefined') {
+                                    $(window).load(function () {
+                                        let data = $('.product-item-link.<?= $_product->getId() ?>sd').attr("data-gtm-product");
+
+                                        if (data) {
+                                            try {
+                                                data = JSON.parse(data);
+                                                data['position'] = $('.product-item-link.<?= $_product->getId() ?>sd').attr("data-position");
+                                                gtm.push("product_view", data);
+                                            } catch (e) {
+
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                        </script>
+                        <?php $position++; ?>
+                        <?php endif;?>
+                    <?php endif; ?>
+                    <?php endforeach; ?>
+                </ol>
+            </div>
+
+        </div>
+
+    </div>
+    <script>
+        require(
+            [
+                'jquery',
+                'jqueryCountdown',
+                'domReady!'
+            ],
+            function ($) {
+                var time = "<?= $block->getData('day') ?> <?= $block->getData('time') ?>:00:00";
+                $('.jsSurpriseTime').countdown(time, function (event) {
+                    $(".jsSurpriseTimerHour").html(event.strftime("%-H"));
+                    $(".jsSurpriseTimerMinute").html(event.strftime("%-M"));
+                    $(".jsSurpriseTimerSecond").html(event.strftime("%-S"));
+                    $this.on('finish.countdown', function(event){
+                        if($(".row-surpriseDeals").length > 0) $(".row-surpriseDeals").hide();
+                    });
+                });
+            }
+        );
+    </script>
+    <script>
+        require(['jquery', "gtmProduct", 'Magento_Ui/js/lib/view/utils/async', 'domReady!'], function ($, gtm, async) {
+            if (typeof dataLayerSourceObjects !== 'undefined') {
+                window.eventCreate = window.eventCreate || {};
+
+                async.async('.product-item-link', function () {
+                    if (!eventCreate['.product-item-link']) {
+                        eventCreate['.product-item-link'] = 0;
+                    }
+
+                    let current = $($('.product-item-link')[eventCreate['.product-item-link']]);
+                    $(current).click(function (e) {
+                        e.preventDefault();
+                        let data = $(this).attr("data-gtm-product");
+                        let url = $(this).attr('href');
+
+                        if (data) {
+                            try {
+                                data = JSON.parse(data);
+                                data['eventCallback'] = function () {
+                                    document.location = url;
+                                };
+                                data['position'] = $(this).attr("data-position");
+                                gtm.push("productClick", data);
+                            } catch (e) {
+                                window.location = url;
+                            }
+                        } else {
+                            window.location = url;
+                        }
+                    });
+                    eventCreate['.product-item-link']++;
+                });
+
+                async.async('.product-item-photo', function () {
+                    if (!eventCreate['.product-item-photo']) {
+                        eventCreate['.product-item-photo'] = 0;
+                    }
+
+                    let current = $($('.product-item-photo')[eventCreate['.product-item-photo']]);
+                    $(current).click(function (e) {
+                        e.preventDefault();
+                        let data = $(this).attr("data-gtm-product");
+                        let url = $(this).attr('href');
+
+                        if (data) {
+                            try {
+                                data = JSON.parse(data);
+                                data['eventCallback'] = function () {
+                                    document.location = url;
+                                };
+                                data['position'] = $(this).attr("data-position");
+                                gtm.push("productClick", data);
+                            } catch (e) {
+
+                            }
+                        } else {
+                            window.location = url;
+                        }
+                    });
+                    eventCreate['.product-item-photo']++;
+                });
+
+                async.async('.action.towishlist', function () {
+                    if (!eventCreate['.action.towishlist']) {
+                        eventCreate['.action.towishlist'] = 0;
+                    }
+
+                    let current = $($('.action.towishlist')[eventCreate['.action.towishlist']]);
+                    $(current).click(function (e) {
+                        let data = $(this).attr("data-gtm-product");
+
+                        if (data) {
+                            try {
+                                data = JSON.parse(data);
+                                data['position'] = $(this).attr("data-position");
+                                gtm.push("add_to_favorite", data);
+                            } catch (e) {
+
+                            }
+                        }
+                    });
+                    eventCreate['.action.towishlist']++;
+                });
+            }
+        });
+    </script>
+    <?php if (!$block->isRedirectToCartEnabled()) :?>
+        <script type="text/x-magento-init">
+        {
+            "[data-role=tocart-form], .form.map.checkout": {
+                "catalogAddToCartAdvanced": {
+                    "product_sku": "<?= $block->escapeJs($_product->getSku()) ?>"
+                }
+            }
+        }
+        </script>
+    <?php endif; ?>
+<?php else: ?>
+    <script>
+        require(
+            [
+                'jquery',
+                'domReady!'
+            ],
+            function ($) {
+                if($(".row-surpriseDeals").length > 0) $(".row-surpriseDeals").hide();
+            }
+        );
+    </script>
+<?php endif; ?>
+

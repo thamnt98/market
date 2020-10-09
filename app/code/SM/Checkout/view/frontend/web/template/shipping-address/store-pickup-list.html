@@ -1,0 +1,48 @@
+<div data-bind="attr:{id: 'store-pickup-list-popup'}, afterRender: onRenderComplete()">
+    <h1 class="storepickup-title" data-bind="i18n:'Change Store'"></h1>
+    <div class="ct-delivery-adrress">
+        <div class="gr-search-ck">
+            <input type="text" class="input-text" data-bind="attr:{id: 'store-search'}, value: searchStoreAddress, event: {keypress: onEnter}, afterRender: renderSearchBox('store-search', '1')" />
+            <button data-bind="click: function(){ findStore()}, i18n: 'Find Stores'" class="action secondary"></button>
+        </div>
+        <p class="note-current">
+            <span class="text" data-bind="i18n: 'or use'"> </span>
+            <span class="current-location" data-bind="i18n: 'Current Location', click: function(){ getCurrentLocation()}"></span>
+        </p>
+        <!-- ko if:hasCurrentStore -->
+        <div class="current-data">
+            <div class="gr-data">
+                <h5 data-bind="html: currentStoreName"></h5>
+                <p data-bind="html: currentStoreAddress"></p>
+                <div class="note-your-pick">
+                    <span class="choose-address"></span>
+                    <span class="note-main-adrress" data-bind="i18n:'Your Pick Up Store'"></span></div>
+            </div>
+            <div class="direction">
+                <span class="apl-ArrowIcon"></span>
+                <span data-bind="text: getDistance(currentPickupId())"></span>
+            </div>
+        </div>
+        <!-- /ko -->
+
+        <h4 data-bind="i18n:'Store List'"></h4>
+        <ul class="list-address">
+            <!-- ko foreach: {data:sourceShortestDistanceList , as: 'item'} -->
+            <li data-bind="attr:{id: 'store-' + item.source_code}">
+                <div class="gr-data">
+                    <h5 data-bind="html: item.name"></h5>
+                    <p data-bind="html: item.street"></p>
+                    <button data-bind="click: function(){ $parent.selectedStore(item.source_code)}, i18n:'Pick Up from This Store'" class="action secondary"></button>
+                </div>
+                <div class="direction">
+                    <span class="apl-ArrowIcon"></span>
+                    <span data-bind="text: $parent.getDistance(item.source_code)"></span>
+                </div>
+            </li>
+            <!-- /ko -->
+            <!-- ko if:sourceShortestDistanceList().length == 0 -->
+                <li data-bind="i18n: 'Not Found Stores'"></li>
+            <!-- /ko -->
+        </ul>
+    </div>
+</div>

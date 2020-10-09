@@ -1,0 +1,52 @@
+<?php
+/**
+ * @category SM
+ * @package SM_Brand
+ * @license     http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @author      Chinhvd <chinhvd@smartosc.com>
+ * @copyright   Copyright (c) SmartOSC. All rights reserved.
+ * @url http://www.smartosc.com/
+ */
+?>
+<?php /** @var $block \SM\Brand\Block\Adminhtml\Category\BrandList */ ?>
+<div id="category-tab-brand-list" class="merchandiser-app" data-role="brand-list">
+    <p><?= __('The first 6 brands will be shown on C0 Category Landing Page') ?></p>
+    <p><?= __('The first 12 brands will be shown on C0 Mobile Category Page') ?></p>
+    <?= $block->getChildHtml('smart_category') ?>
+    <div id="brand-list-tab-regular" class="regular-category-settings">
+        <div class="actions">
+            <?= $block->getChildHtml('add_brand_btn') ?>
+        </div>
+    </div>
+    <div class="merchandiser-tabs" data-role="brand-list-tabs">
+        <div id="brand_list_grid" class="tabs-tab-grid merchandiser-tab" role="tabpanel">
+            <?= $block->getChildHtml('grid') ?>
+        </div>
+        <div class="no-display">
+            <input id="category_brand_list" type="hidden"
+                   data-form-part="category_form" name="<?= \SM\Brand\Block\Adminhtml\Category\BrandList::FIELD_NAME ?>"
+                   value="<?= $block->escapeHtmlAttr($block->getPositionDataJson()) ?>"/>
+            <input type="hidden"
+                   data-form-part="category_form" name="<?= \SM\Brand\Block\Adminhtml\Category\BrandList::OLD_DATA_FIELD_NAME ?>"
+                   value="<?= $block->escapeHtmlAttr($block->getPositionDataJson()) ?>"/>
+        </div>
+    </div>
+</div>
+
+<script type="text/x-magento-init">
+    {
+        "[data-role=brand-list]": {
+            "SM_Brand/js/category/brand-list": {
+                "addBrandsUrl"     : "<?= $block->escapeJs($block->escapeUrl($block->getDialogUrl())) ?>",
+                "currentCategoryId": "<?= $block->escapeJs($block->getCategoryId()) ?>",
+                "fieldName"        : "<?= $block->escapeJs($block->getFieldName()) ?>",
+                "formName"         : "category_form"
+            }
+        }
+    }
+
+
+</script>
+<script>
+    require('mage/apply/main').apply();
+</script>

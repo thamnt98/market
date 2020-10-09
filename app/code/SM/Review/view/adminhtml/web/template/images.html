@@ -1,0 +1,6 @@
+<div data-bind="foreach: value, visible: value().length > 0">
+    <a href="#" data-bind="attr : {href: $data}">
+        <img data-bind="attr : {src: $data, alt : 'Review Image'}" style="max-height:200px;max-width:200px;"/>
+    </a>
+</div>
+<em data-bind="visible: value().length == 0, i18n: 'No Image'"></em>

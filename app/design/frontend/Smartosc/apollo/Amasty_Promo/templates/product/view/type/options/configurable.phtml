@@ -1,0 +1,70 @@
+<?php
+/**
+ * SMCommerce
+ *
+ * Date: September, 18 2020
+ * Time: 4:22 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ */ ?>
+<?php /** @var $block \Magento\ConfigurableProduct\Block\Product\View\Type\Configurable */ ?>
+
+<?php
+$product    = $block->getProduct();
+$attributes = $block->decorateArray($block->getAllowAttributes());
+?>
+<?php if ($product->isSaleable() && count($attributes)):?>
+    <?php foreach ($attributes as $attribute): ?>
+        <div class="field configurable required">
+            <label class="label" for="attribute<?= (int)$attribute->getAttributeId() ?>">
+                <span><?= $block->escapeHtml($attribute->getProductAttribute()->getStoreLabel()) ?></span>
+            </label>
+            <div class="control">
+                <select name="super_attribute[<?= (int)$attribute->getAttributeId() ?>]"
+                        data-validate="{required:true}"
+                        id="attribute<?= $attribute->getAttributeId() . "-" . $product->getId() ?>"
+                        class="super-attribute-select">
+                    <option value=""><?= $block->escapeHtml(__('Choose an Option...')); ?></option>
+                </select>
+            </div>
+        </div>
+    <?php endforeach; ?>
+    <script>
+        require(
+            [
+                'jquery',
+                'Amasty_Promo/js/type/configurable',
+                'Amasty_Promo/js/price-updater'
+            ], function($) {
+                let popupOverlay = $('[data-role=ampromo-overlay]');
+
+                <?php if ($block->getRequest()->isXmlHttpRequest()) : ?>
+                initConfigurable();
+                <?php endif; ?>
+                popupOverlay.on('init.ampopup', function () {
+                    initConfigurable();
+                });
+
+                function initConfigurable() {
+                    let spConfig = <?= $block->unsetData('allow_products')->getJsonConfig() ?>;
+
+                    $('[data-ampromo-js="items-content"]').ampromoPriceUpdater({
+                        productId: <?= $block->escapeHtml($product->getId()) ?>,
+                        priceConfig: <?= /* @escapeNotVerified */ $block->getJsonConfig() ?>
+                    });
+
+                    spConfig.containerId = "#ampromo_items_form-<?= $product->getId() ?>";
+                    $(spConfig.containerId).ampromoConfigurable({
+                        priceHolderSelector: ".price-box-<?= $product->getId() ?>",
+                        spConfig: spConfig,
+                        gallerySwitchStrategy: "<?= /* @escapeNotVerified */ $block->getVar(
+                            'gallery_switch_strategy',
+                            'Magento_ConfigurableProduct'
+                        ) ?: 'replace'; ?>"
+                    });
+                }
+            });
+    </script>
+<?php endif;?>

@@ -1,0 +1,292 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="carriers" translate="label" type="text" sortOrder="320" showInDefault="1" showInWebsite="1"
+                 showInStore="1">
+            <group id="transshipping" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Trans Shipping Method</label>
+                <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1"
+                       showInStore="0">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="name" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Trans Shipping Method</label>
+                </field>
+                <field id="price" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1"
+                       showInStore="0">
+                    <label>Price</label>
+                    <validate>validate-number validate-zero-or-greater</validate>
+                </field>
+                <field id="handling_type" translate="label" type="select" sortOrder="7" showInDefault="1"
+                       showInWebsite="1" showInStore="0">
+                    <label>Calculate Handling Fee</label>
+                    <source_model>Magento\Shipping\Model\Source\HandlingType</source_model>
+                </field>
+                <field id="handling_fee" translate="label" type="text" sortOrder="8" showInDefault="1" showInWebsite="1"
+                       showInStore="0">
+                    <label>Handling Fee</label>
+                    <validate>validate-number validate-zero-or-greater</validate>
+                </field>
+                <field id="sort_order" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1"
+                       showInStore="0">
+                    <label>Sort Order</label>
+                </field>
+                <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Trans Shipping Method</label>
+                </field>
+                <field id="sallowspecific" translate="label" type="select" sortOrder="90" showInDefault="1"
+                       showInWebsite="1" showInStore="0">
+                    <label>Ship to Applicable Countries</label>
+                    <frontend_class>shipping-applicable-country</frontend_class>
+                    <source_model>Magento\Shipping\Model\Config\Source\Allspecificcountries</source_model>
+                </field>
+                <field id="specificcountry" translate="label" type="multiselect" sortOrder="91" showInDefault="1"
+                       showInWebsite="1" showInStore="0">
+                    <label>Ship to Specific Countries</label>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                    <can_be_empty>1</can_be_empty>
+                </field>
+                <field id="showmethod" translate="label" type="select" sortOrder="92" showInDefault="1"
+                       showInWebsite="1" showInStore="0">
+                    <label>Show Method if Not Applicable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <frontend_class>shipping-skip-hide</frontend_class>
+                </field>
+                <field id="specificerrmsg" translate="label" type="textarea" sortOrder="80" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Displayed Error Message</label>
+                </field>
+            </group>
+            <group id="store_pickup" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10"
+                   translate="label">
+                <label>Store Pick Up</label>
+                <field id="active" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label"
+                       type="select">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="name" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="2" translate="label"
+                       type="text">
+                    <label>Store Pick Up Method</label>
+                </field>
+                <field id="price" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="30" translate="label"
+                       type="text">
+                    <label>Price</label>
+                    <validate>validate-number validate-zero-or-greater</validate>
+                </field>
+                <field id="sort_order" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="40"
+                       translate="label" type="text">
+                    <label>Sort Order</label>
+                </field>
+                <field id="title" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="50" translate="label"
+                       type="text">
+                    <label>Store Pick Up Method</label>
+                </field>
+                <field id="sallowspecific" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="60"
+                       translate="label" type="select">
+                    <label>Ship to Applicable Countries</label>
+                    <frontend_class>shipping-applicable-country</frontend_class>
+                    <source_model>Magento\Shipping\Model\Config\Source\Allspecificcountries</source_model>
+                </field>
+                <field id="specificcountry" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="70"
+                       translate="label" type="multiselect">
+                    <label>Ship to Specific Countries</label>
+                    <can_be_empty>1</can_be_empty>
+                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+                </field>
+                <field id="specificerrmsg" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="80"
+                       translate="label" type="textarea">
+                    <label>Displayed Error Message</label>
+                </field>
+                <field id="date_limit" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="80"
+                       translate="label" type="text">
+                    <label>Pick Up Date Limit</label>
+                    <validate>required-entry validate-digits validate-zero-or-greater</validate>
+                    <comment>Pick Up Date Limit = x (day), Customer can select pickup date from current_date to
+                        (current_date + x)
+                    </comment>
+                </field>
+                <field id="today_time_start" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="80"
+                       translate="label" type="text">
+                    <label>Today Pick Up Time Start</label>
+                    <validate>required-entry validate-digits validate-zero-or-greater</validate>
+                    <comment>Today Pick Up Time Start = x (hours), if (current_time + x) > nextday_time_start, Customer
+                        can select time from (current_time + x), else Customer can select time from nextday_time_start
+                    </comment>
+                </field>
+                <field id="nextday_time_start" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="80"
+                       translate="label" type="text">
+                    <label>Next Day Pick Up Time Start</label>
+                    <validate>required-entry validate-digits validate-zero-or-greater</validate>
+                    <comment>Next Day Up Time Start = x. Example: x = 13, customer can pickup store from 1 PM.</comment>
+                </field>
+                <field id="time_end" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="80"
+                       translate="label" type="text">
+                    <label>Pick Up Time End</label>
+                    <validate>required-entry validate-digits validate-zero-or-greater</validate>
+                    <comment>Pick Up Time End = x, x from 0 to 24. Example: x = 19, customer can pickup store up to 7
+                        PM
+                    </comment>
+                </field>
+            </group>
+        </section>
+        <section id="sm_payment" translate="label" sortOrder="100" showInDefault="1" showInWebsite="0"
+                 showInStore="0">
+            <label>Payment</label>
+            <tab>transmart</tab>
+            <resource>SM_Payment::configuration</resource>
+            <group id="general" translate="label" sortOrder="70" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>General</label>
+                <field id="time_display_confirm_page" translate="label" type="text" sortOrder="0" showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1" canRestore="1">
+                    <label>Time display confirm page</label>
+                </field>
+            </group>
+            <group id="credit_card" translate="label" sortOrder="70" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Credit Card</label>
+                    <field id="minimum_amount" translate="label" type="text" sortOrder="0" showInDefault="1"
+                           showInWebsite="1"
+                           showInStore="1" canRestore="1">
+                        <label>Minimum amount</label>
+                    </field>
+                <field id="payment_success_page_time" translate="label" type="text" sortOrder="0" showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1" canRestore="1">
+                    <label>Payment Success Page Time</label>
+                </field>
+            </group>
+            <group id="virtual_account" translate="label" sortOrder="70" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Virtual account</label>
+                <field id="minimum_amount" translate="label" type="text" sortOrder="0" showInDefault="1"
+                       showInWebsite="1"
+                       showInStore="1" canRestore="1">
+                    <label>Minimum amount</label>
+                </field>
+                <group id="sprint_bca_va" translate="label" sortOrder="70" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>BCA</label>
+                    <field id="website" translate="label" type="text" sortOrder="0" showInDefault="1"
+                           showInWebsite="1"
+                           showInStore="1" canRestore="1">
+                        <label>Website</label>
+                    </field>
+
+                </group>
+            </group>
+        </section>
+        <section id="sm_checkout" translate="label" sortOrder="100" showInDefault="1" showInWebsite="0"
+                 showInStore="0">
+            <label>Checkout OAR</label>
+            <tab>transmart</tab>
+            <resource>SM_Payment::configuration</resource>
+            <group id="checkout_oar" translate="label" sortOrder="70" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>OAR Test Mode</label>
+                <field id="oar_active" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label"
+                       type="select">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="checkout_order_summary" translate="label" sortOrder="70" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Show Order Summary</label>
+                <field id="active" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label"
+                       type="select">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+        <section id="sm_checkout_fulfillment" translate="label" sortOrder="100" showInDefault="1" showInWebsite="1"
+                 showInStore="1">
+            <label>Checkout Limit Fulfillment Store</label>
+            <tab>transmart</tab>
+            <resource>SM_Payment::configuration</resource>
+            <group id="general" translate="label" sortOrder="70" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Limit Fulfillment Store</label>
+                <field id="active" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label"
+                       type="select">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="link" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label"
+                       type="text">
+                    <label>Delivery Area Link</label>
+                </field>
+            </group>
+        </section>
+        <section id="payment">
+            <group id="sprint">
+                <group id="sprint_channel">
+                    <field id="description" translate="label" type="textarea" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Description</label>
+                    </field>
+                    <group id="sprint_bca_va">
+                        <field id="description" translate="label" type="textarea" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Description</label>
+                        </field>
+                        <field id="tooltip_description" translate="label" type="textarea" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Tooltip Description</label>
+                        </field>
+                    </group>
+                    <group id="sprint_permata_va">
+                        <field id="description" translate="label" type="textarea" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Description</label>
+                        </field>
+                        <field id="tooltip_description" translate="label" type="textarea" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Tooltip Description</label>
+                        </field>
+                    </group>
+                </group>
+                <group id="sprint_cc_payment">
+                    <field id="description" translate="label" type="textarea" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Description</label>
+                    </field>
+                    <group id="sprint_allbankfull_cc">
+                        <field id="description" translate="label" type="textarea" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Description</label>
+                        </field>
+                        <field id="tooltip_description" translate="label" type="textarea" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Tooltip Description</label>
+                        </field>
+                    </group>
+                    <group id="sprint_allbank_debit">
+                        <field id="description" translate="label" type="textarea" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Description</label>
+                        </field>
+                        <field id="tooltip_description" translate="label" type="textarea" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Tooltip Description</label>
+                        </field>
+                    </group>
+                    <group id="sprint_bca_cc">
+                        <field id="description" translate="label" type="textarea" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Description</label>
+                        </field>
+                        <field id="tooltip_description" translate="label" type="textarea" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Tooltip Description</label>
+                        </field>
+                    </group>
+                    <group id="sprint_mega_cc">
+                        <field id="description" translate="label" type="textarea" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Description</label>
+                        </field>
+                        <field id="tooltip_description" translate="label" type="textarea" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Tooltip Description</label>
+                        </field>
+                    </group>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

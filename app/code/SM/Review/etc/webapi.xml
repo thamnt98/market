@@ -1,0 +1,139 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+
+    <route url="/V1/customer/review/to-be-reviewed" method="GET">
+        <service class="SM\Review\Api\ToBeReviewedRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/customer/review/to-be-reviewed/allow/:productId" method="GET">
+        <service class="SM\Review\Api\ToBeReviewedRepositoryInterface" method="isReviewAllowed"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/customer/review/reviewed" method="GET">
+        <service class="SM\Review\Api\ReviewedRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/customer/review/reviewed/:reviewId" method="GET">
+        <service class="SM\Review\Api\ReviewedRepositoryInterface" method="getById"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/review/review-edits" method="GET">
+        <service class="SM\Review\Api\ReviewEditRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/customer/review-edits/review/:reviewId" method="GET">
+        <service class="SM\Review\Api\ReviewEditRepositoryInterface" method="getByReviewId"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/review/review-edits/:entityId" method="GET">
+        <service class="SM\Review\Api\ReviewEditRepositoryInterface" method="getById"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/review/review-edits/apply" method="POST">
+        <service class="SM\Review\Api\ReviewEditRepositoryInterface" method="apply"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/review/review-edits/reject" method="POST">
+        <service class="SM\Review\Api\ReviewEditRepositoryInterface" method="reject"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/review/review-edits/delete" method="DELETE">
+        <service class="SM\Review\Api\ReviewEditRepositoryInterface" method="delete"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/review/review-edits/:entityId" method="DELETE">
+        <service class="SM\Review\Api\ReviewEditRepositoryInterface" method="deleteById"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/review/review-edits" method="POST">
+        <service class="SM\Review\Api\ReviewEditRepositoryInterface" method="create"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+
+    <route url="/V1/review/review-images" method="GET">
+        <service class="SM\Review\Api\ReviewImageRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/review/upload-image" method="POST">
+        <service class="SM\Review\Api\ReviewImageRepositoryInterface" method="uploadImage"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/review/create" method="POST">
+        <service class="SM\Review\Api\ReviewRepositoryInterface" method="create"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/reviews" method="GET">
+        <service class="SM\Review\Api\ReviewRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/review/summary" method="POST">
+        <service class="SM\Review\Api\ReviewRepositoryInterface" method="getRatingSummary"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+</routes>

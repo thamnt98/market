@@ -1,0 +1,96 @@
+<?php /** @var $block \SM\LayeredNavigation\Block\Navigation */ ?>
+<?php /** @var $filterSetting \Amasty\ShopbyBase\Model\FilterSetting*/ ?>
+
+<?php if ($block->canShowBlock()) : ?>
+    <div class="block filter" id="layered-filter-block" data-mage-init='
+    {
+        "collapsible":
+        {
+            "openedState": "active",
+            "collapsible": true,
+            "active": false,
+            "collateral":
+            {
+                "openedState": "filter-active",
+                "element": "body"
+            }
+        }
+    }'>
+        <?php $filtered = count($block->getLayer()->getState()->getFilters()) ?>
+        <div class="block-title filter-title" data-count="<?= /* @noEscape */ $filtered ?>">
+            <strong data-role="title"><?= $block->escapeHtml(__('Shop By')); ?></strong>
+        </div>
+        <div class="block-content filter-content">
+            <?= $block->getChildHtml('state') ?>
+
+
+            <?php $wrapOptions = false; ?>
+            <?php /** @var $filter \Magento\Catalog\Model\Layer\Filter\FilterInterface */ ?>
+            <?php foreach ($block->getFilters() as $filter) : ?>
+                <?php
+                $count = 0;
+                $layer = $filter->getLayer();
+                $category = $layer->getCurrentCategory();
+                $brandValue = $category->getData('applied_brand_customizer_value');
+                ?>
+                <?php if (!$wrapOptions) : ?>
+                    <strong role="heading" aria-level="2"
+                            class="block-subtitle filter-subtitle"><?= $block->escapeHtml(__('Shopping Options')) ?></strong>
+                    <div class="filter-options" id="narrow-by-list" data-role="content" data-mage-init='
+                                        {
+                                            "SM_Theme/js/accordion":
+                                            {
+                                                "openedState": "active",
+                                                "collapsible": true,
+                                                "active": false,
+                                                "multipleCollapsible": false
+                                            }
+                                        }'>
+                    <?php $wrapOptions = true; ?>
+                <?php endif; ?>
+
+                <div data-role="collapsible" class="filter-options-item">
+
+                    <?php if (isset($brandValue) && ++$count == 1): ?>
+                        <div data-role="title"
+                             class="filter-options-title"><?= $block->escapeHtml(__($category->getData('name'))) ?></div>
+                        <div data-role="content" class="filter-options-content"><?= /* @noEscape */
+                            $block->getChildBlock('renderer')->render($filter) ?></div
+                        <?php break; ?>
+                    <?php else: ?>
+                        <div data-role="title"
+                             class="filter-options-title"><?= $block->escapeHtml(__($filter->getName())) ?></div>
+                        <div data-role="content" class="filter-options-content">
+                            <?php if ($filter->getRequestVar() == 'cat'): ?><div class="am-ranges filter-options-category"><?php endif; ?>
+                                    <?= /* @noEscape */ $block->getChildBlock('renderer')->render($filter) ?>
+                             <?php if ($filter->getRequestVar() == 'cat'): ?>
+                              </div>
+                              <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+
+                </div>
+            <?php endforeach; ?>
+            <?php if ($wrapOptions) : ?>
+            </div>
+            <?php else : ?>
+            <script>
+                require([
+                    'jquery'
+                ], function ($) {
+                    $('#layered-filter-block').addClass('filter-no-options');
+                });
+            </script>
+            <?php endif; ?>
+            <?php if ($block instanceof \SM\LayeredNavigation\Block\Navigation && $block->isShowLandingPage()): ?>
+            <div class="filter-options-item">
+                <a class="back-to-landing"
+                   href="<?= $block->escapeHtmlAttr($block->getLandingPageUrl()) ?>"
+                   title="<?= $block->escapeHtmlAttr(__('Back to Category Page')) ?>">
+                    <?= __('Back to Category Page') ?>
+                </a>
+            </div>
+            <?php endif ?>
+        </div>
+    </div>
+<?php endif; ?>

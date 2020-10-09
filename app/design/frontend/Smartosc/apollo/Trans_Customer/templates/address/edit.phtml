@@ -1,0 +1,444 @@
+<?php
+
+/**
+ * SMCommerce
+ *
+ * @category  Trans
+ * @package   Trans_Customer
+ *
+ * Date: April, 25 2020
+ * Time: 8:26 AM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ */
+?>
+<?php /** @var $block \SM\Customer\Block\Address\Edit */ ?>
+<?php $formData = $block->prepareFormData() ?>
+<?php $location = $block->getLocation() ?>
+<?php $province = $block->getRegion()?>
+<form class="form-address-edit" data-gtm="hello"
+      action="<?= $block->escapeUrl($block->getSaveUrl()) ?>"
+      method="post"
+      id="form-validate"
+      enctype="multipart/form-data"
+      data-mage-init='{"validation": {}}'
+      data-hasrequired="<?= $block->escapeHtmlAttr(__('* Required Fields')) ?>">
+    <legend class="legend"><span><?= $block->escapeHtml($block->getPageTitle()) ?></span></legend>
+    <div class="form-address-edit-content">
+        <?= $block->getBlockHtml('formkey') ?>
+        <input type="hidden" name="success_url" value="<?= $block->escapeUrl($block->getSuccessUrl()) ?>">
+        <input type="hidden" name="error_url" value="<?= $block->escapeUrl($block->getErrorUrl()) ?>">
+
+        <!-- Address name field -->
+        <div class="field address-name">
+            <label for="address-name" class="label">
+                <span><?= __('Address Name') ?></span>
+            </label>
+            <div class="control">
+                <?php $defaultAddrName = count($block->getCustomer()->getAddresses()) ? '' : __('Home') ?>
+                <input type="text" name="address_tag" id="address-name"
+                       value="<?= $block->escapeHtmlAttr($formData->getData('address_tag') == '' ? $defaultAddrName : $formData->getData('address_tag'))  ?>"
+                       title="<?= $block->escapeHtmlAttr(__('Address Name')) ?>"
+                       class="required-entry input-text">
+                <p class="tag-suggest">
+                    <span><?= /* @noEscape */ $block->escapeHtml(__('Home')); ?></span>
+                    <span><?= /* @noEscape */ $block->escapeHtml(__('Office')); ?></span>
+                    <span><?= /* @noEscape */ $block->escapeHtml(__('Apartment')); ?></span>
+                    <span><?= /* @noEscape */ $block->escapeHtml(__('Others')); ?></span>
+                </p>
+            </div>
+        </div>
+        <!-- End Address name -->
+
+        <!-- Fullname field -->
+        <div class="field fullname">
+            <label for="fullname" class="label">
+                <span><?= __("Recipient's Name") ?></span>
+            </label>
+            <div class="control">
+                <input type="text" name="fullname" id="fullname"
+                       value="<?= $block->escapeHtmlAttr($formData->getData('fullname')) ?>"
+                       title="<?= $block->escapeHtmlAttr(__("Recipient's Name")) ?>"
+                       class="input-text required-entry">
+            </div>
+        </div>
+        <!-- End Fullname -->
+
+        <!-- Phone number field -->
+        <?php if ($block->isEnableTelephone()) : ?>
+            <div class="field telephone required">
+                <label for="telephone" class="label">
+                    <span><?= __("Phone number") ?></span>
+                </label>
+                <div class="control">
+                    <input type="number" name="telephone" id="telephone"
+                           value="<?= $block->escapeHtmlAttr($formData->getData('telephone')) ?>"
+                           title="<?= __('Phone number') ?>" class="input-text validate-phone required-entry"
+                           data-validate="{'validate-phone-require':true, 'validate-number':true, 'minlength':10, 'maxlength':16}"
+                           data-msg-minlength="<?= $block->escapeHtmlAttr(__('Make sure you follow the format')) ?>"
+                           data-msg-maxlength="<?= $block->escapeHtmlAttr(__('Make sure you follow the format')) ?>"
+                           aria-required="true"/>
+                </div>
+            </div>
+        <?php endif ?>
+        <!-- End phone number -->
+
+        <!-- Fax field -->
+        <?= $block->getFaxHtml() ?>
+        <!-- End fax -->
+
+        <!-- VAT field -->
+        <?php if ($block->getAddressHelper()->isVatAttributeVisible()) : ?>
+            <div class="field taxvat">
+                <label class="label" for="vat_id">
+                    <span><?= /* @noEscape */ $block->getAttributeData()->getFrontendLabel('vat_id') ?></span>
+                </label>
+                <div class="control">
+                    <input type="text"
+                           name="vat_id"
+                           value="<?= $block->escapeHtmlAttr($block->getAddress()->getVatId()) ?>"
+                           title="<?= /* @noEscape */ $block->getAttributeData()->getFrontendLabel('vat_id') ?>"
+                           class="input-text <?= $block->escapeHtmlAttr($this->helper(\Magento\Customer\Helper\Address::class)->getAttributeValidationClass('vat_id')) ?>"
+                           id="vat_id">
+                </div>
+            </div>
+        <?php endif; ?>
+        <!-- End VAT -->
+
+        <!-- Country field -->
+        <div class="field country required hidden">
+            <label class="label" for="country"><span><?= /* @noEscape */ $block->getAttributeData()->getFrontendLabel('country_id') ?></span></label>
+            <div class="control">
+                <?= $block->getCountryHtmlSelect() ?>
+            </div>
+        </div>
+        <!-- End country -->
+
+        <!-- Province field -->
+        <div class="field region required">
+            <label class="label" for="region_id">
+                <span><?= __('Province') ?></span>
+            </label>
+            <div class="control control-region" selector="city-block">
+                <select style="visibility: hidden;height: 0" id="region_id" name="region_id"
+                        title="<?= /* @noEscape */ $block->getAttributeData()->getFrontendLabel('region') ?>"
+                        class="region_id"
+                    <?= /* @noEscape */ !$block->getConfig('general/region/display_all') ? ' disabled="disabled"' : '' ?>
+                >
+                    <option value=""><?= __('Please select your province') ?></option>
+                </select>
+
+                <input type="text"
+                       id="region"
+                       name="region"
+                       value="<?= $block->escapeHtmlAttr($block->getRegion()) ?>"
+                       title="<?= /* @noEscape */ $block->getAttributeData()->getFrontendLabel('region') ?>"
+                       class="input-text validate-not-number-first <?= $block->escapeHtmlAttr($block->getAttributeValidationClass('region')) ?>"
+                    <?= !$block->getConfig('general/region/display_all') ? ' disabled="disabled"' : '' ?> />
+
+                <input class="action toggle region_fake input-city"
+                       type="text"
+                       id="region-fake"
+                       value="<?= $block->escapeHtmlAttr($block->getRegion()); ?>"
+                       title="<?= $block->escapeHtmlAttr(__('Province')) ?>"
+                       autocomplete="off"
+                       placeholder="<?= $block->getRegion() != '' ? $block->escapeHtmlAttr($block->getRegion()) : __('Please select your province'); ?>"
+                       data-toggle="dropdown"/>
+
+                <ul id="region_id_fake" name="region_id_fake" class="dropdown" >
+
+                </ul>
+            </div>
+        </div>
+        <!-- End province -->
+
+        <!-- City field -->
+        <div class="field city required">
+            <label class="label" for="city"><span><?= /* @noEscape */ $block->getAttributeData()->getFrontendLabel('city') ?></span></label>
+            <div class="control" selector="city-block">
+                <input type="text"
+                       selector="city"
+                       value="<?= $block->escapeHtmlAttr($formData->getData('city_name')); ?>"
+                       title="<?= $block->escapeHtmlAttr(__('City')) ?>"
+                       autocomplete="off"
+                       placeholder="<?= $formData->getData('city_name') != '' ? $block->escapeHtmlAttr($formData->getData('city_name')) : __('Please select your city'); ?>"
+                       class="input-text input-city <?= $block->escapeHtmlAttr($this->helper(\Magento\Customer\Helper\Address::class)->getAttributeValidationClass('city')) ?>">
+                <ul class="notranslate" id="city-list" selector="city-list" style="display: none"></ul>
+            </div>
+        </div>
+        <!-- End city -->
+
+        <!-- District field -->
+        <div class="field district required">
+            <label class="label" for="district">
+                <span><?= /* @noEscape */ $block->getAttributeData()->getFrontendLabel('district') ?></span>
+            </label>
+            <div class="control">
+                <select id="district"
+                        name="district"
+                        data-validate='{"required":true}'
+                        required>
+                    <option value=""><?= __('Please select your district') ?></option>
+                </select>
+                <input id="cityId" name="city" type="hidden"/>
+            </div>
+        </div>
+        <!-- End district -->
+
+        <?php $streetValidationClass = $block->getAttributeValidationClass('street'); ?>
+        <!-- Address field -->
+        <div class="field street required">
+            <label for="street_1" class="label">
+                <span><?= __("Address") ?></span>
+            </label>
+            <div class="control">
+                <textarea rows="2" cols="3" type="text"
+                          name="street[]"
+                          title="<?= /* @noEscape */ $block->getAttributeData()->getFrontendLabel('street') ?>"
+                          id="street_1"
+                          selector="street"
+                          class="input-text <?= $block->escapeHtmlAttr($streetValidationClass) ?>"><?= ($block->isEditAddress() == 0) ? '' : $block->escapeHtmlAttr($block->getStreetLine(1)) ?></textarea>
+            </div>
+        </div>
+        <!-- End address -->
+
+        <!-- Postcode field -->
+        <div class="field zip required">
+            <label class="label" for="zip">
+                <span><?= __('Zip Code') ?></span>
+            </label>
+            <div class="control">
+                <input type="text"
+                       name="postcode"
+                       value="<?= ($block->isEditAddress() == 0) ? '' : $block->escapeHtmlAttr($block->getAddress()->getPostcode()) ?>"
+                       title="<?= /* @noEscape */ $block->getAttributeData()->getFrontendLabel('postcode') ?>"
+                       id="zip"
+                       class="input-text validate-zip-international <?= $block->escapeHtmlAttr($this->helper(\Magento\Customer\Helper\Address::class)->getAttributeValidationClass('postcode')) ?>">
+                <div role="alert" class="message warning" style="display:none">
+                    <span></span>
+                </div>
+            </div>
+        </div>
+        <!-- End postcode -->
+
+        <!-- Address Detail field -->
+        <div class="field street required">
+            <label for="street_2" class="label">
+                <span><?= $block->escapeHtml(__("Address Detail")) ?></span>
+            </label>
+            <div class="control">
+                <input type="text"
+                       name="street[]"
+                       value="<?= $block->escapeHtmlAttr($block->getStreetLine(2)) ?>"
+                       title="<?= /* @noEscape */ $block->getAttributeData()->getFrontendLabel('street') ?>"
+                       id="street_2"
+                       selector="street"
+                       placeholder="example: floor, tower, etc"
+                       class="input-text"/>
+            </div>
+        </div>
+        <!-- End Address Detail -->
+
+        <div class="pin" id="pin">
+            <input type="hidden" id="address" name="pinpoint_location" value="<?= $block->escapeHtmlAttr($location['pinpoint']);?>" readonly />
+            <input type="text" name="latitude" id="latitude" value="<?= $location['lat']?>" style="display:none;" readonly/>
+            <input type="text" name="longitude" id="longitude" value="<?= $block->escapeHtmlAttr($location['long']);?>" style="display:none;" readonly/>
+            <div id="map"></div>
+            <div class="mark-location">
+                <div class="name-icon-location-map">
+                    <img src='<?= $block->getViewFileUrl('images/svg-icons/MyAddress.svg'); ?>' alt=""  width="20" height="20" />
+                    <p class="name-location-map">
+                        <span id="mark-location-detail"><?= empty($location['pinpoint']) ? $block->escapeHtml(__("Mark location in the map")) : $block->escapeHtml($location['pinpoint']) ?></span>
+                    </p>
+                </div>
+                <p class="pinpoint-detected-button" selector="pinpoint-detected-button" data-action="<?= empty($location['pinpoint']) ? 'add' : 'remove' ?>">
+                    <?= $block->escapeHtml(__( empty($location['pinpoint']) ? 'Add pinpoint' : 'Remove pinpoint')) ?>
+                </p>
+            </div>
+            <div id="map-detected" style="display:none">
+                <input id="pinpoint-search" selector="pinpoint-search" class="controls" type="text" placeholder="<?= $block->escapeHtmlAttr(__('Type in your address')) ?>">
+                <div id="pinpoint-map" style="width: 100%; height:300px"></div>
+                <div class="pinpoint-address">
+                    <p class="pinpoint-address__title"><?= $block->escapeHtml(__("Pinned Location")) ?></p>
+                    <p class="pinpoint-address__description" selector="pinpoint-address"></p>
+                </div>
+            </div>
+        </div>
+        <?php
+        $checkout = 'false';
+        if ($block->getRequest()->getParam('checkout') && $block->getRequest()->getParam('checkout') == 'true') {
+            $checkout = 'true';
+        }
+        ?>
+        <?php if ($checkout == 'true'): ?>
+            <input type="hidden" name="redirect_checkout" value="<?= $checkout ?>" />
+        <?php endif; ?>
+        <?php
+        $currentAddressId = $action = false;
+        if ($checkout == 'true') {
+            if ($block->getRequest()->getParam('current')) {
+                $currentAddressId = $block->getRequest()->getParam('current');
+            }
+            if ($block->getRequest()->getParam('action')) {
+                $action = $block->getRequest()->getParam('action');
+            }
+        }
+        ?>
+        <?php if ($currentAddressId && $action): ?>
+            <input type="hidden" name="current_address_id" value="<?= $currentAddressId ?>" />
+            <input type="hidden" name="action" value="<?= $action ?>" />
+        <?php endif; ?>
+    </div>
+    <div class="actions-toolbar">
+        <a href="<?= $block->getUrl('customer/address') ?>" class="profile-cancel action"><?= $block->escapeHtml(__('Cancel')) ?></a>
+        <button type="button" id="address-submit" class="profile-save primary action" data-action="save-address"><?= $block->escapeHtml(__('Save')) ?></button>
+    </div>
+</form>
+<script type="text/x-magento-init">
+    {
+        "#form-validate": {
+            "addressValidation": {
+                "postCodes": <?= /* @noEscape */ $block->getPostCodeConfig()->getSerializedPostCodes(); ?>
+            }
+        },
+        "#country": {
+            "regionUpdater": {
+                "optionalRegionAllowed": <?= /* @noEscape */ $block->getConfig('general/region/display_all') ? 'true' : 'false' ?>,
+                "regionListId": "#region_id",
+                "regionInputId": "#region",
+                "postcodeId": "#zip",
+                "form": "#form-validate",
+                "regionJson": <?= /* @noEscape */ $this->helper(\Magento\Directory\Helper\Data::class)->getRegionJson() ?>,
+                "defaultRegion": "<?= (int) $block->getRegionId() ?>",
+                "countriesWithOptionalZip": <?= /* @noEscape */ $this->helper(\Magento\Directory\Helper\Data::class)->getCountriesWithOptionalZip(true) ?>
+            }
+        },
+        "#region_id": {
+            "Trans_Customer/js/fillout-city-district": {
+                "formSelector": "#form-validate",
+                "cityBlockSelector": "#form-validate [selector=city-block]",
+                "cityTextSelector": "#form-validate [selector=city]",
+                "citySelector": "#form-validate input[name=city]",
+                "cityListSelector": "#form-validate [selector=city-list]",
+                "districtSelector": "#form-validate select[name=district]",
+                "currentCityValue": "<?= $formData->getData('city_id') ?>",
+                "currentDistrictValue": "<?= $formData->getData('district_id') ?>",
+                "streetSelector": "#form-validate input[selector=street]",
+                "data": <?= \Zend_Json_Encoder::encode($formData->getData()) ?>
+            }
+        },
+        "*": {
+            "Trans_Customer/js/location": {
+                "formSelector": "#form-validate",
+                "phoneSelector": "#form-validate input[name=telephone]",
+                "addressTagSelector": "#form-validate input[name=address_tag]",
+                "tagSuggestSelector": ".tag-suggest span",
+                "streetSelector": "#street_1",
+                "zipcode": "#zip",
+                "apiKey": "<?= $block->escapeHtml($block->getSecret()) ?>",
+                "lat": "<?= $block->escapeHtml($location['lat']) ?>",
+                "long": "<?= $block->escapeHtml($location['long']) ?>",
+                "statusLocation": <?= $block->escapeHtml($location['status']) ?>,
+                "latSelector": "#form-validate input[name=latitude]",
+                "longSelector": "#form-validate input[name=longitude]",
+                "pinpointSelector": "#form-validate input[name=pinpoint_location]",
+                "locationTxtSelector": "#mark-location-detail",
+                "pinpointDetectedButton": "#form-validate [selector=pinpoint-detected-button]",
+                "mapDetectedSelector": "#map-detected",
+                "mapSearchId": "pinpoint-search",
+                "pinpointMapId": "pinpoint-map",
+                "pinpointAlert": "#pin-alert",
+                "pinpointAddressSelector": "[selector=pinpoint-address]",
+                "data": <?= $block->getLocationJsonData() ?>
+            }
+        }
+    }
+</script>
+<script>
+    require([
+        'jquery',
+        'jquery/jquery-storageapi',
+        'mage/validation',
+        'domReady!'
+    ], function ($) {
+        let form = $('#form-validate'),
+            pinAddress = $('#address'),
+            buttonSubmit = $('#address-submit');
+
+        $(window).load(function() {
+            $('#region_id').find('option').each(function () {
+                let self = $(this);
+                    $('#region_id_fake').append('<li value="'+self.val()+'">'+'<label>'+self.text()+'</label>'+'</li>');
+            });
+
+            $('#region_id_fake').find('li:not(:first-child)').each(function (index) {
+
+                $(this).on('click',function () {
+                    $('#region-fake').val($(this).find('label').text());
+                    $('select#region_id').val($(this).val()).change();
+                });
+            });
+        });
+
+        buttonSubmit.click(function (event) {
+            event.preventDefault();
+            form.validation('isValid');
+            if (!pinAddress.val()) {
+                $('#pin-alert').remove();
+                $('#pin').append(`<div class="pin-required" id="pin-alert">` + $.mage.__("Pin point is required") + `</div>`);
+            } else {
+                form.trigger('submit');
+                if (typeof dataLayerSourceObjects !== 'undefined') {
+                    let data = {
+                        'address_title': form.find('input[name="address_tag"]').val(),
+                        'recepient_name': form.find('input[name="fullname"]').val(),
+                        'phoneNumber': form.find('input[name="telephone"]').val(),
+                        'province': form.find('select[name="region_id"] option:selected').text(),
+                        'district': form.find('select[name="district"] option:selected').text(),
+                        'city': form.find('input[selector="city"]').val(),
+                        'address': form.find('textarea[name="street[]"]').val(),
+                        'pinpoint': form.find('input[name="longitude"]').val() + ', ' + form.find('input[name="latitude"]').val()
+                    };
+                    //Todo Remove Debug
+                    console.log(data);
+                    try {
+                        $.localStorage.set('address-gtm', data);
+                    } catch (e) {
+                        //Todo Remove Debug
+                        console.log("Err");
+                    }
+                }
+            }
+
+            let regionIdError = document.getElementById("region_id-error");
+            //console.log(regionIdError);
+            if(regionIdError === undefined || regionIdError === null){
+                //console.log("khong co id");
+                $(".region_fake").removeClass("mage-error");
+            }else {
+                //console.log("co id");
+                $(".region_fake").addClass("mage-error");
+            }
+        });
+
+        $("#region-fake").keyup(function () {
+            var input = this.value,
+                filter = input.toUpperCase(),
+                ul = document.getElementById("region_id_fake"),
+                li = ul.getElementsByTagName('li');
+
+            for (var i = 0; i < li.length; i++) {
+                var a = li[i].getElementsByTagName('label')[0],
+                    txtValue = a.textContent || a.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    li[i].style.display = "";
+                } else {
+                    li[i].style.display = "none";
+                }
+            }
+        });
+
+    })
+</script>

@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+	<route method="POST" url="/V1/sm-filemanagement/file">
+		<service class="SM\FileManagement\Api\FileRepositoryInterface" method="save"/>
+		<resources>
+			<resource ref="SM_FileManagement::File_save"/>
+		</resources>
+	</route>
+	<route method="GET" url="/V1/sm-filemanagement/file/search">
+		<service class="SM\FileManagement\Api\FileRepositoryInterface" method="getList"/>
+		<resources>
+			<resource ref="SM_FileManagement::File_view"/>
+		</resources>
+	</route>
+	<route method="GET" url="/V1/sm-filemanagement/file/:fileId">
+		<service class="SM\FileManagement\Api\FileRepositoryInterface" method="get"/>
+		<resources>
+			<resource ref="SM_FileManagement::File_view"/>
+		</resources>
+	</route>
+	<route method="PUT" url="/V1/sm-filemanagement/file/:fileId">
+		<service class="SM\FileManagement\Api\FileRepositoryInterface" method="save"/>
+		<resources>
+			<resource ref="SM_FileManagement::File_update"/>
+		</resources>
+	</route>
+	<route method="DELETE" url="/V1/sm-filemanagement/file/:fileId">
+		<service class="SM\FileManagement\Api\FileRepositoryInterface" method="deleteById"/>
+		<resources>
+			<resource ref="SM_FileManagement::File_delete"/>
+		</resources>
+	</route>
+    <route method="POST" url="/V1/sm-filemanagement/image/upload">
+        <service class="SM\FileManagement\Api\UploadImageInterface" method="uploadImage"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+</routes>

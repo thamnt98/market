@@ -1,0 +1,49 @@
+<!-- ko if: isStepShipping-->
+
+    <!-- ko foreach: getRegion('delivery-type') -->
+    <!-- ko template: getTemplate() --><!-- /ko -->
+    <!--/ko-->
+
+    <!-- ko foreach: getRegion('address-list') -->
+    <!-- ko template: getTemplate() --><!-- /ko -->
+    <!--/ko-->
+
+    <!-- ko foreach: getRegion('pickup-address') -->
+    <!-- ko template: getTemplate() --><!-- /ko -->
+    <!--/ko-->
+
+    <!-- ko foreach: getRegion('delivery-address-list') -->
+    <!-- ko template: getTemplate() --><!-- /ko -->
+    <!--/ko-->
+
+    <!-- ko foreach: getRegion('store-pickup-list') -->
+    <!-- ko template: getTemplate() --><!-- /ko -->
+    <!--/ko-->
+
+    <div id="map-detected" style="display:none">
+        <input id="pinpoint-search" selector="pinpoint-search" class="controls" type="text" data-bind="attr:{placeholder: placeHolder()}">
+        <div id="pinpoint-map" style="width: 100%; height:300px"></div>
+        <div class="pinpoint-address">
+            <p data-bind="i18n: 'Pinned Location'"></p>
+            <p selector="pinpoint-address"></p>
+        </div>
+    </div>
+
+    <!-- ko if: hasFreshItem-->
+        <div class="message">
+            <div class="block-remark">
+                <span data-bind="i18n: 'Weight & final price will be adjusted after weighing.'" class="remark"></span>
+                <span class="dpl-tooltip">
+                   <span class="apl-tick-info"></span>
+                   <span class="tooltip-content" role="tooltip" data-bind="i18n: getTooltip" />
+                </span>
+            </div>
+            <div class="block-remark delivery-remark">
+                <span class="apl-delivery-large"></span>
+                <span data-bind="i18n: 'To keep the quality, we only use instant delivery for our fresh products.'" class="delivery-remark-label"></span>
+            </div>
+        </div>
+    <!--/ko-->
+
+<!--/ko-->
+

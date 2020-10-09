@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+	<preference for="SM\FileManagement\Api\FileRepositoryInterface" type="SM\FileManagement\Model\FileRepository"/>
+	<preference for="SM\FileManagement\Api\Data\FileInterface" type="SM\FileManagement\Model\Data\File"/>
+	<preference for="SM\FileManagement\Api\Data\FileSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+    <preference for="SM\FileManagement\Api\UploadImageInterface" type="SM\FileManagement\Model\UploadImage"/>
+
+	<virtualType name="SM\FileManagement\Model\ResourceModel\File\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+		<arguments>
+			<argument name="mainTable" xsi:type="string">sm_filemanagement_file</argument>
+			<argument name="resourceModel" xsi:type="string">SM\FileManagement\Model\ResourceModel\File\Collection</argument>
+		</arguments>
+	</virtualType>
+	<type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+		<arguments>
+			<argument name="collections" xsi:type="array">
+				<item name="sm_filemanagement_file_listing_data_source" xsi:type="string">SM\FileManagement\Model\ResourceModel\File\Grid\Collection</item>
+			</argument>
+		</arguments>
+	</type>
+</config>

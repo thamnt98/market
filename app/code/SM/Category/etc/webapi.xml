@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+
+    <!-- Category API-->
+    <route url="/V1/category/getCategoryTree" method="GET">
+        <service class="SM\Category\Api\CategoryInterface" method="getCategoryTree"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <route url="/V1/category/getSubCategory" method="GET">
+        <service class="SM\Category\Api\CategoryInterface" method="getSubCategory"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <route url="/V1/category/getProducts" method="GET">
+        <service class="SM\MobileApi\Api\ProductInterface" method="getList"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <route url="/V1/category/getMostPopular" method="GET">
+        <service class="SM\Category\Api\CategoryInterface" method="getMostPopularProduct"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <route url="/V1/category/getFavoriteBrands" method="GET">
+        <service class="SM\Category\Api\CategoryInterface" method="getFavoriteBrands"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+
+    <route url="/V1/category/getCategoryMetaData" method="GET">
+        <service class="SM\Category\Api\CategoryInterface" method="getCategoryMetaData"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+</routes>

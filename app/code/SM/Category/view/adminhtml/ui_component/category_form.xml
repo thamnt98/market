@@ -1,0 +1,198 @@
+<?xml version="1.0"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <fieldset name="transmart">
+        <field name="include_in_search_form">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">boolean</item>
+                    <item name="formElement" xsi:type="string">checkbox</item>
+                    <item name="label" xsi:type="string" translate="true">Include In Search Form</item>
+                    <item name="prefer" xsi:type="string">toggle</item>
+                    <item name="valueMap" xsi:type="array">
+                        <item name="true" xsi:type="string">1</item>
+                        <item name="false" xsi:type="string">0</item>
+                    </item>
+                    <item name="default" xsi:type="number">1</item>
+                </item>
+            </argument>
+        </field>
+        <field name="allow_compare">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">boolean</item>
+                    <item name="formElement" xsi:type="string">checkbox</item>
+                    <item name="label" xsi:type="string" translate="true">Allow Comparison</item>
+                    <item name="prefer" xsi:type="string">toggle</item>
+                    <item name="valueMap" xsi:type="array">
+                        <item name="true" xsi:type="string">1</item>
+                        <item name="false" xsi:type="string">0</item>
+                    </item>
+                    <item name="default" xsi:type="number">1</item>
+                </item>
+            </argument>
+        </field>
+        <field name="most_popular">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">boolean</item>
+                    <item name="formElement" xsi:type="string">checkbox</item>
+                    <item name="label" xsi:type="string" translate="true">Most Popular</item>
+                    <item name="prefer" xsi:type="string">toggle</item>
+                    <item name="valueMap" xsi:type="array">
+                        <item name="true" xsi:type="string">1</item>
+                        <item name="false" xsi:type="string">0</item>
+                    </item>
+                    <item name="default" xsi:type="number">0</item>
+                    <item name="notice" xsi:type="string" translate="true">
+                        This attribute is define which category is Most Popular Category (using for Mobile version)
+                    </item>
+                </item>
+            </argument>
+        </field>
+
+        <field name="main_category_color" sortOrder="30" formElement="colorPicker">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="disabledValues" xsi:type="array">
+                        <item name="none" xsi:type="string">none</item>
+                    </item>
+                    <item name="default" xsi:type="string">#ffffff</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Main Category Color</label>
+                <componentType>colorPicker</componentType>
+                <placeholder translate="true">No Color</placeholder>
+                <validation>
+                    <rule name="validate-color" xsi:type="boolean">true</rule>
+                    <rule name="required" xsi:type="boolean">false</rule>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+                <dataScope>main_category_color</dataScope>
+                <additionalClasses>
+                    <class name="admin__field-medium">true</class>
+                </additionalClasses>
+                <imports>
+                    <link name="setDisabled">ns = ${ $.ns }, index = border:value</link>
+                </imports>
+            </settings>
+            <formElements>
+                <colorPicker>
+                    <settings>
+                        <colorPickerMode>full</colorPickerMode>
+                        <colorFormat>hex</colorFormat>
+                    </settings>
+                </colorPicker>
+            </formElements>
+        </field>
+
+        <field name="sub_category_color" sortOrder="35" formElement="colorPicker">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="disabledValues" xsi:type="array">
+                        <item name="none" xsi:type="string">none</item>
+                    </item>
+                    <item name="default" xsi:type="string">#ffffff</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Most Popular Color</label>
+                <componentType>colorPicker</componentType>
+                <placeholder translate="true">No Color</placeholder>
+                <validation>
+                    <rule name="validate-color" xsi:type="boolean">true</rule>
+                    <rule name="required" xsi:type="boolean">false</rule>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+                <dataScope>sub_category_color</dataScope>
+                <additionalClasses>
+                    <class name="admin__field-medium">true</class>
+                </additionalClasses>
+                <imports>
+                    <link name="setDisabled">ns = ${ $.ns }, index = border:value</link>
+                </imports>
+            </settings>
+            <formElements>
+                <colorPicker>
+                    <settings>
+                        <colorPickerMode>full</colorPickerMode>
+                        <colorFormat>hex</colorFormat>
+                    </settings>
+                </colorPicker>
+            </formElements>
+        </field>
+
+        <field name="favorite_brand_color" sortOrder="40" formElement="colorPicker">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="disabledValues" xsi:type="array">
+                        <item name="none" xsi:type="string">none</item>
+                    </item>
+                    <item name="default" xsi:type="string">#ffffff</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Favorite Brand Color</label>
+                <componentType>colorPicker</componentType>
+                <placeholder translate="true">No Color</placeholder>
+                <validation>
+                    <rule name="validate-color" xsi:type="boolean">true</rule>
+                    <rule name="required" xsi:type="boolean">false</rule>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+                <dataScope>favorite_brand_color</dataScope>
+                <additionalClasses>
+                    <class name="admin__field-medium">true</class>
+                </additionalClasses>
+                <imports>
+                    <link name="setDisabled">ns = ${ $.ns }, index = border:value</link>
+                </imports>
+            </settings>
+            <formElements>
+                <colorPicker>
+                    <settings>
+                        <colorPickerMode>full</colorPickerMode>
+                        <colorFormat>hex</colorFormat>
+                    </settings>
+                </colorPicker>
+            </formElements>
+        </field>
+
+        <field name="product_color" sortOrder="45" formElement="colorPicker">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="disabledValues" xsi:type="array">
+                        <item name="none" xsi:type="string">none</item>
+                    </item>
+                    <item name="default" xsi:type="string">#ffffff</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Product Color</label>
+                <componentType>colorPicker</componentType>
+                <placeholder translate="true">No Color</placeholder>
+                <validation>
+                    <rule name="validate-color" xsi:type="boolean">true</rule>
+                    <rule name="required" xsi:type="boolean">false</rule>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+                <dataScope>product_color</dataScope>
+                <additionalClasses>
+                    <class name="admin__field-medium">true</class>
+                </additionalClasses>
+                <imports>
+                    <link name="setDisabled">ns = ${ $.ns }, index = border:value</link>
+                </imports>
+            </settings>
+            <formElements>
+                <colorPicker>
+                    <settings>
+                        <colorPickerMode>full</colorPickerMode>
+                        <colorFormat>hex</colorFormat>
+                    </settings>
+                </colorPicker>
+            </formElements>
+        </field>
+    </fieldset>
+</form>

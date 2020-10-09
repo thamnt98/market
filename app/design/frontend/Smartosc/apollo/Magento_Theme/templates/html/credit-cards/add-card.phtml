@@ -1,0 +1,133 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<div class="block block-credit-card">
+    <div class="block-content">
+        <div class="block-item">
+            <div class="block-item-title">
+                <p>Add Credit or Debit Card</p>
+            </div>
+            <div class="block-item-content">
+                <div class="card">
+                    <div class="card-type">
+                        <img src='<?= $block->getViewFileUrl('images/card-visa.png'); ?>' alt=""  width="61" height="35" />
+                    </div>
+                    <div class="card-info">
+                        <p class="card-number">XXXX XXXX XXX 5635</p>
+                        <div class="card-info-valid">
+                            <p class="">Valid Thru</p>
+                            <p class="expiration-date">05/20</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="add-credit-card ">
+                    <!--First name-->
+                    <div class="field">
+                        <label class="label">
+                            <span>First Name</span>
+                        </label>
+                        <div class="control">
+                            <fieldset class="fieldset">
+                                <div class="fields">
+                                    <div class="control">
+                                        <input type="text" name="firstname" value="Rosita Dewi"/>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <!--Last name-->
+                    <div class="field">
+                        <label class="label">
+                            <span>Last Name</span>
+                        </label>
+                        <div class="control">
+                            <fieldset class="fieldset">
+                                <div class="fields">
+                                    <div class="field">
+                                        <div class="control">
+                                            <input type="text" name="lastname" value="Amalia"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </fieldset>
+                        </div>
+                    </div>
+                    <!--Card Number and CVV-->
+                    <div class="field field card-number-cvv">
+                       <div class="field-card-number">
+                           <label class="label">
+                               <span>Card number</span>
+                           </label>
+                           <div class="control">
+                               <fieldset class="fieldset">
+                                   <div class="fields">
+                                       <div class="control">
+                                           <input type="text" name="card-number" value="XXXXXXXXXX5635"/>
+                                       </div>
+                                   </div>
+                               </fieldset>
+                           </div>
+                       </div>
+                        <div class="field-cvv-number">
+                            <label class="label">
+                                <span>CVV</span>
+                            </label>
+                            <div class="control">
+                                <fieldset class="fieldset">
+                                    <div class="fields">
+                                        <div class="control">
+                                            <input type="text" name="cvv" value="***"/>
+                                        </div>
+                                    </div>
+                                </fieldset>
+                            </div>
+                        </div>
+                    </div>
+                    <!--Expiration Date-->
+                    <div class="field expiration-date">
+                        <label class="label">
+                            <span>Expiration Date</span>
+                        </label>
+                        <div class="control">
+                            <div class="dob-date-dropdown">
+                                <select class="month" name="month">
+                                    <option value="">Month</option>
+                                    <option value="01">January</option>
+                                    <option value="02">February</option>
+                                    <option value="03">March</option>
+                                    <option value="04">April</option>
+                                    <option value="05">May</option>
+                                    <option value="06">June</option>
+                                    <option value="07">July</option>
+                                    <option value="08">August</option>
+                                    <option value="09">September</option>
+                                    <option value="10">October</option>
+                                    <option value="11">November</option>
+                                    <option value="12">December</option>
+                                </select>
+                                <select class="year" name="year">
+                                    <option value="">Year</option>
+                                    <option value="2020">2020</option>
+                                    <option value="2019">2019</option>
+                                    <option value="2018">2018</option>
+                                    <option value="2017">2017</option>
+                                    <option value="2016">2016</option>
+                                    <option value="2015">2015</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="actions-toolbar">
+                <button type="button" class="profile-cancel">Cancel</button>
+                <button type="submit" class="profile-save primary action">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+

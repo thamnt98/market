@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_Notification
+ *
+ * Date: September, 29 2020
+ * Time: 2:34 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Override -->
+    <!-- *** Amasty *** -->
+    <preference for="Amasty\Rgrid\Controller\Adminhtml\Promo\Quote\Duplicate"
+                type="SM\Promotion\Override\AmastyRgrid\Controller\Adminhtml\Promo\Quote\Duplicate" />
+</config>

@@ -1,0 +1,81 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// phpcs:disable Magento2.Templates.ThisInTemplate
+
+/**  @var $block \Magento\Checkout\Block\Cart\Grid */
+?>
+<?php
+    $mergedCells = 1;
+    $viewModel = $block->getData('viewModel');
+?>
+<?= $block->getChildHtml('form_before') ?>
+<form action="<?= $block->escapeUrl($block->getUrl('checkout/cart/updatePost')) ?>"
+          method="post"
+          id="form-validate"
+          data-mage-init='{"Magento_Checkout/js/action/update-shopping-cart":
+              {"validationURL" : "<?= $block->escapeUrl($block->getUrl('checkout/cart/updateItemQty')) ?>",
+              "updateCartActionContainer": "#update_cart_action_container"}
+          }'
+          class="form form-cart">
+    <?= $block->getBlockHtml('formkey') ?>
+    <div class="cart table-wrapper<?= $mergedCells == 2 ? ' detailed' : '' ?>">
+        <?php if ($block->getPagerHtml()) :?>
+            <div class="cart-products-toolbar cart-products-toolbar-top toolbar"
+                 data-attribute="cart-products-toolbar-top"><?= $block->getPagerHtml() ?>
+            </div>
+        <?php endif ?>
+        <table id="shopping-cart-table"
+               class="cart items data table"
+               data-mage-init='{"shoppingCart":{"emptyCartButton": ".action.clear",
+               "updateCartActionContainer": "#update_cart_action_container"}}'>
+            <caption class="table-caption"><?= $block->escapeHtml(__('Shopping Cart Items')) ?></caption>
+            <thead>
+                <tr>
+                    <th class="col head-cart" colspan="4">
+                        <div class="checkbox-custom">
+                            <input id="selected-all" type="checkbox"
+                                   <?php if ($viewModel->isSelectedAll()) {
+                                        echo 'checked=true';
+                                    }?>
+                                   name="selected-all"
+                            />
+                            <label for="selected-all"><?= __('Select all products') ?></label>
+                        </div>
+                        <a id="remove-selected-items" href="#" class="remove-select-items" data-gtm-event="remove-selected-items"><?= __('Remove selected items') ?></a>
+                    </th>
+                </tr>
+            </thead>
+            <?php foreach ($block->getItems() as $_item) :?>
+                <?= $block->getItemHtml($_item) ?>
+            <?php endforeach ?>
+        </table>
+        <?php if ($block->getPagerHtml()) :?>
+            <div class="cart-products-toolbar cart-products-toolbar-bottom toolbar"
+                 data-attribute="cart-products-toolbar-bottom"><?= $block->getPagerHtml() ?>
+            </div>
+        <?php endif ?>
+    </div>
+</form>
+<form name="remove_selected_item" class="no-display" action="<?= $block->getUrl('transcheckout/cart/update') ?>" method="post">
+    <?= $block->getBlockHtml('formkey') ?>
+    <input name="remove_ids" value="" data-validate="{required:true}" class="input-text"/>
+    <button type="submit"></button>
+</form>
+<div class="loading-mask no-display" data-role="loader">
+    <div class="loader">
+        <img src=" <?= $block->escapeUrl($block->getViewFileUrl('images/loader-2.gif')) ?>">
+    </div>
+</div>
+<?= $block->getChildHtml('checkout.cart.order.actions') ?>
+<?= $block->getChildHtml('shopping.cart.table.after') ?>
+<script type="text/x-magento-init">
+{
+    "*": {
+        "updateCartForm": ""
+    }
+}
+</script>

@@ -1,0 +1,18 @@
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="shoppinglist_mylist_detail"/>
+    <body>
+        <referenceContainer name="page.top">
+            <block class="Magento\Theme\Block\Html\Breadcrumbs" name="custom_breadcrumbs" as="custom_breadcrumbs"/>
+        </referenceContainer>
+        <referenceBlock name="breadcrumbs">
+            <action method="addCrumb">
+                <argument name="crumbName" xsi:type="string">Shopping List</argument>
+                <argument name="crumbInfo" xsi:type="array">
+                    <item name="title" xsi:type="string" translate="true">Shopping List</item>
+                    <item name="label" xsi:type="string" translate="true">Shopping List</item>
+                </argument>
+            </action>
+        </referenceBlock>
+    </body>
+</page>

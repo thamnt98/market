@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="sm_store_flag" translate="label" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+            <class>separator-top</class>
+            <label>Storeview Flags</label>
+            <tab>transmart</tab>
+            <resource>SM_StoreviewFlags::storeviewFlags</resource>
+            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Store Info</label>
+                <field id="upload_flag" translate="label" type="image" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Flag</label>
+                    <backend_model>\Magento\Config\Model\Config\Backend\Image</backend_model>
+                    <upload_dir config="system/filesystem/media" scope_info="1">smstoresflags</upload_dir>
+                    <base_url type="media" scope_info="1">smstoresflags</base_url>
+                    <comment><![CDATA[Allowed file types: jpg, jpeg, gif, png]]></comment>
+                </field>
+                <field id="abbreviation_name" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Abbreviation Store Name </label>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

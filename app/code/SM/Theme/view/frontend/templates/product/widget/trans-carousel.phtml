@@ -1,0 +1,209 @@
+<?php
+/**
+ * Trans product carousel list template
+ *
+ * @var $block \SM\Theme\Block\Product\Widget\TransCarousel
+ */
+
+use Magento\Framework\App\Action\Action;
+
+?>
+<?php
+$_productCollection = $block->getProductCollection();
+$shoppingListHelper = $this->helper('SM\ShoppingList\Helper\Data');
+?>
+<?php if ($_productCollection && $_productCollection->getSize() > 0) :?>
+    <?php
+    $image = 'new_products_content_widget_grid';
+    ?>
+    <div class="section-carousel">
+
+        <div class="block-title">
+            <div class="section-header-title">
+                <?php if ($title = $block->getData('title')) : ?>
+                    <strong><?= $block->escapeHtml(__($title)) ?></strong>
+                <?php endif ?>
+            </div>
+
+            <?php if ($_productCollection->getSize() > $block::DEFAULT_PRODUCTS_COUNT) : ?>
+                <a href="#" class="section-link link"><?= $block->escapeHtml(__('See All')) ?></a>
+            <?php endif;?>
+        </div>
+
+        <div class="block-content ">
+            <div class="products-grid grid">
+                <ol class="product-carousel product-items row">
+                    <?php /** @var $_product \Magento\Catalog\Model\product */ ?>
+                    <?php foreach ($_productCollection as $_product) :?>
+                        <li class="product-card product-item col-xs-4 col-sm-4 col-md-15">
+                            <div class="product-item-info product-item--hideCart" data-container="product-list">
+                                <div class="product-item-photo-wrapper">
+                                    <a href="<?= $block->escapeUrl($_product->getProductUrl()); ?>"
+                                       class="product photo product-item-photo"
+                                       tabindex="-1">
+                                        <?= $block->getImage($_product, $image)->toHtml() ?>
+                                    </a>
+
+
+                                    <div class="product-stock">
+                                        <?= $block->escapeHtml($block->getStockItem($_product->getId())); ?><?= $block->escapeHtml(__(' Left')); ?>
+                                    </div>
+
+                                    <!--variant configurable product-->
+                                    <?php $count = count($_product->getTypeInstance()->getChildrenIds($_product->getId())); ?>
+                                    <?php if ($block->isConfigProduct($_product) && $count): ?>
+                                        <div class="swatch-options">
+                                            <span class="oval-swatch oval-black"></span>
+                                            <span class="oval-swatch oval-pink"></span>
+                                            <span class="oval-swatch oval-dark-blue"></span>
+                                            <span class="oval-swatch oval-dark-blue2"></span>
+                                            <span class="oval-number"><?= $count ?></span>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="product-item-details">
+
+                                    <div class="product-item-name">
+                                        <a href="<?= $block->escapeUrl($_product->getProductUrl()); ?>"
+                                           class="product-item-link"
+                                           tabindex="-1">
+                                            <?= $block->escapeHtml($_product->getName()); ?>
+                                        </a>
+                                    </div>
+                                    <div class="product-price">
+                                        <?= $block->getProductPriceHtml($_product); ?>
+                                    </div>
+
+                                    <?php if (!$_product->getData('hide_cta_button')) : ?>
+                                        <div class="product-add-to-cart">
+                                            <?php $childrenIds = $_product->getTypeInstance()->getChildrenIds($_product->getId()); ?>
+                                            <?php if ($childrenIds): ?>
+                                                <a title="<?= $block->escapeHtmlAttr(__('View Details')) ?>"
+                                                   href="<?= $block->escapeUrl($_product->getProductUrl()) ?>"
+                                                   class="action view-details primary">
+                                                    <?= $block->escapeHtml(__('View Details')) ?>
+                                                </a>
+                                            <?php else : ?>
+                                                <?php if ($_product->isSaleable()) : ?>
+                                                    <?php $postParams = $block->getAddToCartPostParams($_product); ?>
+                                                    <form data-role="tocart-form"
+                                                          data-product-sku="<?= $block->escapeHtml($_product->getSku()) ?>"
+                                                          action="<?= $block->escapeUrl($postParams['action']) ?>"
+                                                          method="post">
+                                                        <input type="hidden" name="product"
+                                                               value="<?= $block->escapeHtmlAttr($postParams['data']['product']) ?>">
+                                                        <div class="update-cart-qty">
+                                                            <input type="hidden" name="item_id" value="0"/>
+                                                            <input type="hidden" name="qty_type" value="1"/>
+                                                            <button type="submit"
+                                                                    title="<?= $block->escapeHtmlAttr(__('Decrease qty')) ?>"
+                                                                    class="action decrease-qty">
+                                                                <span><?= __('-') ?></span>
+                                                            </button>
+                                                            <label for="item_qty" class="label-item-qty">
+                                                                <input type="number" name="item_qty" value="0"/>
+                                                            </label>
+                                                            <button type="submit" title="<?= $block->escapeHtmlAttr(__('Increase qty')) ?>"
+                                                                    value="increase" class="action increase-qty">
+                                                                <span><?= __('+') ?></span>
+                                                            </button>
+                                                        </div>
+                                                        <input type="hidden" name="<?= /* @noEscape */
+                                                        Action::PARAM_NAME_URL_ENCODED ?>" value="<?= /* @noEscape */
+                                                        $postParams['data'][Action::PARAM_NAME_URL_ENCODED] ?>">
+                                                        <?= $block->getBlockHtml('formkey') ?>
+                                                        <button type="submit"
+                                                                title="<?= $block->escapeHtml(__('Add to Cart')) ?>"
+                                                                class="action tocart primary">
+                                                            <span><?= $block->escapeHtml(__('Add to Cart')) ?></span>
+                                                        </button>
+                                                    </form>
+                                                <?php else : ?>
+                                                    <?php if ($_product->getIsSalable()) : ?>
+                                                        <div class="stock available"><span><?= $block->escapeHtml(__('In stock')) ?></span></div>
+                                                    <?php else : ?>
+                                                        <div class="stock unavailable"><span><?= $block->escapeHtml(__('Out of stock')) ?></span></div>
+                                                    <?php endif; ?>
+                                                <?php endif;?>
+                                            <?php endif;?>
+                                        </div>
+                                    <?php endif;?>
+                                    <?php if ($shoppingListHelper->isActiveShoppingList()):?>
+                                    <?php
+                                    $isAddedShoppingList = $shoppingListHelper->isAddedShoppingList($_product->getId())? 'true':'false';
+                                    $getMyFavoritesListDefaultId = $shoppingListHelper->getMyFavoritesListDefaultId();
+                                    ?>
+
+                                    <a style="cursor: pointer"
+                                       id="shoppinglist-add-<?= $_product->getId() ?>"
+                                       class="action towishlist"
+                                       title="<?= $block->escapeHtmlAttr(__('Add to Shopping List')) ?>">
+                                        <span><?= $block->escapeHtml(__('Add to Shopping List')) ?></span>
+                                    </a>
+                                    <a style="cursor: pointer; display: none;"
+                                       id="shoppinglist-remove-<?= $_product->getId() ?>"
+                                       class="action remove towishlist"
+                                       title="<?= $block->escapeHtmlAttr(__('Remove to Shopping List')) ?>">
+                                        <span><?= $block->escapeHtml(__('Remove to Shopping List')) ?></span>
+                                    </a>
+
+                                    <div id="success-alert-modal-<?= $_product->getId() ?>" class="content add-success-modal" style="display:none;">
+                                        <div class="product-info">
+                                            <img src="<?= $block->getImage($_product, "product_base_image")->getData("image_url");
+                                            ?>" width="124px"  alt="<?= $_product->getName() ?>"/>
+                                            <div class="success-content">
+                                                <span class="product-name"><?= $block->escapeHtml($_product->getName()) ?></span>
+                                                <h3><?= $block->escapeHtml(__("This item has been added to"))?></h3>
+                                                <ul id="destination-list-<?= $_product->getId() ?>" style="list-style-type: none;">
+                                                </ul>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <script type="text/x-magento-init">
+                                    {
+                                        "*": {
+                                            "AddFromList":{
+                                                "product_id":"<?= $_product->getId() ?>",
+                                                "store_id":"<?= $_product->getStoreId() ?>",
+                                                "add_item_url":"<?= $block->getUrl("shoppinglist/ajax/additems")?>",
+                                                "remove_item_url":"<?= $block->getUrl("shoppinglist/ajax/removeitem")?>",
+                                                "is_added_shopping_list":"<?php echo $isAddedShoppingList ?>",
+                                                "my_favorite_id": "<?= $getMyFavoritesListDefaultId ?>"
+                                            }
+                                        }
+                                    }
+                                    </script>
+                                    <?php endif;?>
+                                    <?php $percent = $block->getDiscountPercent($_product); ?>
+                                    <?php if ($percent != null && $percent > 0) : ?>
+                                        <span class="product-sale">
+                                                <?= $block->escapeHtml(__('%1% OFF', $percent)); ?>
+                                            </span>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </li>
+                    <?php endforeach; ?>
+                </ol>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        require([
+            'jquery',
+            'slick'
+        ], function ($) {
+                $(".product-carousel").slick({
+                    dots: true,
+                    infinite: true,
+                    speed: 300,
+                    slidesToShow: 4,
+                    slidesToScroll: 4,
+                });
+        });
+    </script>
+<?php endif; ?>

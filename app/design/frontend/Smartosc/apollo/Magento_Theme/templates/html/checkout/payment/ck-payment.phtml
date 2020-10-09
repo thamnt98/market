@@ -1,0 +1,158 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+?>
+<div class="new-checkout">
+    <div class="ck-payment">
+        <h3><?= $block->escapeHtml(__('Select Payment Method'))?></h3>
+        <!--start box payment-->
+        <div class="bx-payment active">
+            <div class="radio-custom">
+                <input type="radio" name="payment" />
+                <label for="virtual"><?= $block->escapeHtml(__('Virtual Account'))?></label>
+            </div>
+            <div class="bx-payment-content">
+                <img class="icon-card" src='<?= $block->getViewFileUrl('images/svg-icons/Voucher.svg'); ?>' alt=""  width="35" height="23" />
+                <div class="info-card">
+                    <h4><?= $block->escapeHtml(__('Virtual Account'))?></h4>
+                    <p><?= $block->escapeHtml(__('BCA, Bank Mega, & Permata Bank'))?></p>
+                    <div class="select-bank">
+                        <div class="sortby-dropdown">
+                            <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+                                <span><?= $block->escapeHtml('Select Bank') ?></span>
+                            </span>
+                            <ul class="dropdown">
+                                <li class="item"><img class="icon-card" src='<?= $block->getViewFileUrl('images/svg-icons/Voucher.svg'); ?>' alt=""  width="24" height="14" /><span><?= $block->escapeHtml('Bank Mega') ?></span></li>
+                                <li class="item"><img class="icon-card" src='<?= $block->getViewFileUrl('images/svg-icons/Voucher.svg'); ?>' alt=""  width="24" height="14" /><span><?= $block->escapeHtml('BCA') ?></span></li>
+                                <li class="item"><img class="icon-card" src='<?= $block->getViewFileUrl('images/svg-icons/Voucher.svg'); ?>' alt=""  width="24" height="14" /><span><?= $block->escapeHtml('Bank Permata') ?></span></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--ENd box payment-->
+        <!--start box payment-->
+        <div class="bx-payment">
+            <div class="radio-custom">
+                <input type="radio" name="payment" />
+                <label for="Credit"><?= $block->escapeHtml(__('Credit Card'))?></label>
+            </div>
+            <div class="bx-payment-content">
+                <img class="icon-card" src='<?= $block->getViewFileUrl('images/svg-icons/Voucher.svg'); ?>' alt=""  width="35" height="23" />
+                <div class="info-card">
+                    <h4><?= $block->escapeHtml(__('Credit Card'))?></h4>
+                    <p><?= $block->escapeHtml(__('Full payment & installment available'))?></p>
+                    <div class="full-install-payment">
+                        <a href="#" class="fullpayment active"><?= $block->escapeHtml(__('FULL PAYMENT'))?></a>
+                        <a href="#" class="installment"><?= $block->escapeHtml(__('INSTALLMENT'))?></a>
+                    </div>
+                    <div class="select-bank">
+                        <div class="sortby-dropdown">
+                            <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+                                <span><?= $block->escapeHtml('Select Bank') ?></span>
+                            </span>
+                            <ul class="dropdown">
+                                <li class="item"><img class="icon-card" src='<?= $block->getViewFileUrl('images/svg-icons/Voucher.svg'); ?>' alt=""  width="24" height="14" /><span><?= $block->escapeHtml('Bank Mega') ?></span></li>
+                                <li class="item"><img class="icon-card" src='<?= $block->getViewFileUrl('images/svg-icons/Voucher.svg'); ?>' alt=""  width="24" height="14" /><span><?= $block->escapeHtml('BCA') ?></span></li>
+                                <li class="item"><img class="icon-card" src='<?= $block->getViewFileUrl('images/svg-icons/Voucher.svg'); ?>' alt=""  width="24" height="14" /><span><?= $block->escapeHtml('Bank Permata') ?></span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="choose-payment-options">
+                        <p><?= $block->escapeHtml(__('Please choose one of the payment options'))?></p>
+                        <!--start options payment-->
+                        <div class="payment-options-list">
+                            <div class="radio-custom">
+                                <input type="radio" name="payment" />
+                                <label for="Credit"><?= $block->escapeHtml(__('0% Installment - 3 Months'))?></label>
+                            </div>
+                            <div class="payment-options-info">
+                                <h4><?= $block->escapeHtml(__('0% Installment - 3 Months'))?></h4>
+                                <p><?= $block->escapeHtml(__('+ Service fee Rp 0'))?></p>
+                            </div>
+                            <div class="payment-options-price">
+                                <h4><?= $block->escapeHtml(__('Rp 499.870'))?></h4>
+                            </div>
+                        </div>
+                        <!--start options payment-->
+                        <!--start options payment-->
+                        <div class="payment-options-list">
+                            <div class="radio-custom">
+                                <input type="radio" name="payment" />
+                                <label for="Credit"><?= $block->escapeHtml(__('0% Installment - 3 Months'))?></label>
+                            </div>
+                            <div class="payment-options-info">
+                                <h4><?= $block->escapeHtml(__('0% Installment - 6 Months'))?></h4>
+                                <p><?= $block->escapeHtml(__('+ Service fee Rp 0'))?></p>
+                            </div>
+                            <div class="payment-options-price">
+                                <h4><?= $block->escapeHtml(__('Rp 249.870'))?></h4>
+                            </div>
+                        </div>
+                        <!--start options payment-->
+                        <!--start options payment-->
+                        <div class="payment-options-list">
+                            <div class="radio-custom">
+                                <input type="radio" name="payment" />
+                                <label for="Credit"><?= $block->escapeHtml(__('0% Installment - 3 Months'))?></label>
+                            </div>
+                            <div class="payment-options-info">
+                                <h4><?= $block->escapeHtml(__('0% Installment - 12 Months'))?></h4>
+                                <p><?= $block->escapeHtml(__('+ Service fee Rp 0'))?></p>
+                            </div>
+                            <div class="payment-options-price">
+                                <h4><?= $block->escapeHtml(__('Rp 99.840'))?></h4>
+                            </div>
+                        </div>
+                        <!--start options payment-->
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--ENd box payment-->
+        <!--start box payment-->
+        <div class="bx-payment">
+            <div class="radio-custom">
+                <input type="radio" name="payment" />
+                <label for="Debit"><?= $block->escapeHtml(__('Debit Card'))?></label>
+            </div>
+            <div class="bx-payment-content">
+                <img class="icon-card" src='<?= $block->getViewFileUrl('images/svg-icons/Voucher.svg'); ?>' alt=""  width="35" height="23" />
+                <div class="info-card">
+                        <h4><?= $block->escapeHtml(__('Debit Card'))?></h4>
+                        <p><?= $block->escapeHtml(__('Full payment with debit card'))?></p>
+                </div>
+            </div>
+        </div>
+        <!--ENd box payment-->
+        <!--start box payment-->
+        <div class="bx-payment">
+            <div class="radio-custom">
+                <input type="radio" name="payment" />
+                <label for="OVO"><?= $block->escapeHtml(__('Pay with OVO'))?></label>
+            </div>
+            <div class="bx-payment-content">
+                <img class="icon-card" src='<?= $block->getViewFileUrl('images/svg-icons/Voucher.svg'); ?>' alt=""  width="35" height="23" />
+                <div class="info-card">
+                    <h4>Pay with OVO
+                        <a href="#" class="action pagebuilder-button-secondary small"><?= $block->escapeHtml(__('Activate'))?></a>
+                        <!--show when active -->
+                        <span class="active-sucessfull">
+                            <span class="apl-tick-success"></span>
+                            <span class="code-card"><?= $block->escapeHtml(__('0818•••••271'))?></span>
+                        </span>
+                    </h4>
+                    <p><?= $block->escapeHtml(__('Easy Payment with OVO Cash and OVO Points'))?></p>
+                    <!--show when active -->
+                    <p class="options-active">OVO Cash <span>Rp 1.500.000</span> <span class="line">|</span> OVO Points <span>2.000.000</span></p>
+                </div>
+            </div>
+
+        </div>
+        <!--ENd box payment-->
+    </div>
+</div>

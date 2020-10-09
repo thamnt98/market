@@ -1,0 +1,76 @@
+<?php
+/**
+ * @project    ct-corp-transmart
+ * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @author     Duc Nguyen Hoang <ducnh2@smartosc.com>
+ * @copyright  Copyright © 2020 SmartOSC. All rights reserved.
+ * @url        http://www.smartosc.com
+ */
+
+/** @var \Mirasvit\Blog\Block\Post\View $block */
+$post = $block->getPost();
+$helper = $this->helper(\SM\InspireMe\Helper\Data::class);
+?>
+
+<div class="inspire-post-view" data-gtm='<?= $helper->prepareGtmData($post) ?>' >
+
+    <div class="inspire-post-wapper">
+        <?php if (!$post->getData('show_hot_spot')): ?>
+            <?php if ($post->getFeaturedImageUrl()) : ?>
+                <div class="post-image-large">
+                    <img
+                        src="<?= $block->escapeUrl($helper->getImageResize($post->getFeaturedImage(), 1055, 680)) ?>"
+                        alt="<?= $block->escapeHtml($post->getName()) ?>">
+                </div>
+            <?php endif; ?>
+        <?php else: ?>
+            <?= $block->getChildBlock('lookbook.inspire')->setData('lookbook_id', $post->getData('look_book_id'))->toHtml() ?>
+        <?php endif ?>
+        <div class="inspire-post--heading">
+            <h2 class="post-title"><?= $block->escapeHtml($post->getName()) ?></h2>
+            <span class="post-created-date"><?= $block->escapeHtml($block->getFormatDate($post->getCreatedAt())) ?></span>
+        </div>
+        <div class="inspire-post-content"
+             data-gtm-event="<?= \SM\InspireMe\Helper\Data::GTM_POST_EVENT_ARTICLE_ENGAGEMENT ?>"
+             data-gtm='<?= $helper->prepareGtmDataInspireMe($post) ?>'>
+            <?= /* @noEscape */ $block->getPostContent() ?>
+
+        </div>
+
+        <div class="inspire-post-footer gridRow-100">
+            <?= $this->getChildHtml('social.sharing') ?>
+
+            <?php $tags = $post->getTags() ?>
+
+            <?php if (count($tags)) : ?>
+                <div class="inspire-tags">
+                    <h3><?= $block->escapeHtml(__('Tags')) ?></h3>
+                    <?php /** @var \Mirasvit\Blog\Model\Tag $tag */ ?>
+                    <?php foreach ($tags as $tag) : ?>
+                        <a href="<?= $block->escapeUrl($tag->getUrl())?>" class="tag-item">
+                            <?= $block->escapeHtml($tag->getName()) ?>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
+        </div>
+    </div>
+
+    <?= $this->getChildHtml('blog.post.related.products') ?>
+    <?= $this->getChildHtml('blog.post.most.popular') ?>
+</div>
+<script>
+    require(['jquery', 'Magento_Ui/js/lib/view/utils/async'],function ($, async) {
+        if(typeof dataLayerSourceObjects != "undefined"){
+            async.async('.inspire-post-view',function () {
+                if(typeof $('.inspire-post-view').attr('data-gtm') != "undefined"){
+                    let data = $('.inspire-post-view').attr("data-gtm");
+                    data = JSON.parse(data);
+                    data['articlePresent'] = 'Yes';
+                    dataLayerSourceObjects['promo']=data;
+                }
+            });
+        }
+    })
+</script>

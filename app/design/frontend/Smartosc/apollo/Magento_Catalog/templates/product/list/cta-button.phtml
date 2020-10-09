@@ -1,0 +1,73 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+use Magento\Framework\App\Action\Action;
+
+?>
+<?php
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundThis
+
+/**
+ * CTA button template
+ *
+ * @var $block \Magento\Catalog\Block\Product\ListProduct
+ */
+?>
+<?php if (!$_product->getData('hide_cta_button')) : ?>
+    <span class="action-primary-loader"></span>
+    <div class="actions-primary"<?= strpos($pos, $viewMode . '-primary') ? $block->escapeHtmlAttr($position) : '' ?>>
+        <?php $childrenIds = $_product->getTypeInstance()->getChildrenIds($_product->getId()); ?>
+        <?php if ($childrenIds): ?>
+            <a title="<?= $block->escapeHtmlAttr(__('View Details')) ?>"
+               href="<?= $block->escapeUrl($_product->getProductUrl()) ?>"
+               class="action view-details primary">
+                <?= $block->escapeHtml(__('View Details')) ?>
+            </a>
+        <?php else : ?>
+            <?php if ($_product->isSaleable()) : ?>
+                <?php $postParams = $block->getAddToCartPostParams($_product); ?>
+                <form data-role="tocart-form"
+                      data-product-sku="<?= $block->escapeHtmlAttr($_product->getSku()) ?>"
+                      action="<?= $block->escapeUrl($postParams['action']) ?>"
+                      method="post">
+                    <input type="hidden" name="product" value="<?= /* @noEscape */ $postParams['data']['product'] ?>">
+                    <div class="update-cart-qty">
+                        <input type="hidden" name="item_id" value="0"/>
+                        <input type="hidden" name="qty_type" value="1"/>
+                        <button type="submit"
+                                title="<?= $block->escapeHtmlAttr(__('Decrease qty')) ?>"
+                                class="action decrease-qty">
+                            <span><?= __('-') ?></span>
+                        </button>
+                        <label for="item_qty" class="label-item-qty">
+                            <input type="number" name="item_qty" value="0"/>
+                        </label>
+                        <button type="submit" title="<?= $block->escapeHtmlAttr(__('Increase qty')) ?>"
+                                value="increase" class="action increase-qty">
+                            <span><?= __('+') ?></span>
+                        </button>
+                    </div>
+                    <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED ?>"
+                           value="<?= /* @noEscape */ $postParams['data'][Action::PARAM_NAME_URL_ENCODED] ?>">
+                    <?= $block->getBlockHtml('formkey') ?>
+                    <input type="hidden" name="product-cat-label-<?= /* @noEscape */ $postParams['data']['product'] ?>" value="" />
+                    <button type="submit"
+                            title="<?= $block->escapeHtmlAttr(__('Add to Cart')) ?>"
+                            class="action tocart primary">
+                        <span><?= $block->escapeHtml(__('Add to Cart')) ?></span>
+                    </button>
+                </form>
+            <?php else : ?>
+                <?php if ($_product->isAvailable()) : ?>
+                    <div class="stock available"><span><?= $block->escapeHtml(__('In stock')) ?></span></div>
+                <?php else : ?>
+                    <div class="stock unavailable"><span><?= $block->escapeHtml(__('Out of stock')) ?></span></div>
+                <?php endif; ?>
+            <?php endif; ?>
+        <?php endif; ?>
+    </div>
+<?php endif; ?>
+

@@ -1,0 +1,22 @@
+<script>
+    require(['jquery', 'gtmCheckout', 'jquery/jquery-storageapi', 'domReady!'], function ($, gtmCheckout) {
+        $(window).load(function () {
+            let data = $.localStorage.get('product-checkout-gtm');
+            if (data) {
+                data['step'] = 3;
+                data['option'] = 'Payment Method';
+                data['payment_method'] = "<?= $block->getTitlePaymentMethod() ?>";
+                <?php if ($block->isSucceed()||$block->checkPaymentChannel() === 'credit_card'||($block->checkPaymentChannel() === 'virtual_account'&& $block->isPaid())) : ?>
+                    data['coupon'] = "<?= $block->getCouponCodeGTM() ?>";
+                    data['shipping'] = "<?= $block->getShippingGTM() ?>";
+                    data['id'] = "<?= $block->getReferenceNumber() ?>";
+                gtmCheckout.push('purchase',data);
+                <?php endif; ?>
+                gtmCheckout.push('checkout_success',data);
+                <?php if ($block->isSucceed()) : ?>
+                    $.localStorage.remove('product-checkout-gtm');
+                <?php endif; ?>
+            }
+        });
+    });
+</script>

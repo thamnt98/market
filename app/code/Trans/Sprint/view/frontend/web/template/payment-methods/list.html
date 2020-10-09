@@ -1,0 +1,36 @@
+<!-- 
+/**
+ * @category Trans
+ * @package  Trans_Sprint
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ * @author   Imam Kusuma <imam.kusuma@transdigital.co.id>
+ *
+ * Copyright © 2019 CT Corp Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+
+<span class="choose-method-payment-custom" data-bind="i18n: 'Silahkan pilih metode pembayaran yang anda inginkan:'"></span>
+<div if="isPaymentMethodsAvailable()"
+     class="items payment-methods">
+    <div repeat="foreach: paymentGroupsList, item: '$group'"
+         class="payment-group">
+        <!-- <div if="getRegion($group().displayArea)().length"
+             translate="getGroupTitle($group)"
+             class="step-title"
+             data-role="title">
+        </div> -->
+        <input type="radio" name="payment_group" if="getRegion($group().displayArea)().length" data-bind="event: {click: openPaymentMethodGroup($group().alias)}, attr: {'value': $group().alias, 'id' : 'payment_group_radio_' + $group().alias}"/>
+        <label class="label payment-group-label" data-bind="attr: {'for': 'payment_group_radio_' + $group().alias}">
+            <span translate="getGroupTitle($group)" data-role="title"></span>
+        </label>
+        <div style="display: none;" class="payment-method-group" data-bind="attr: {'id': 'payment-method-group-' + $group().alias}">
+            <each args="data: getRegion($group().displayArea), as: 'method'" render=""/>
+        </div>
+    </div>
+</div>
+<div ifnot="isPaymentMethodsAvailable()"
+     class="no-payments-block"
+     translate="'No Payment Methods'">
+</div>

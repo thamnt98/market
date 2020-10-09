@@ -1,0 +1,92 @@
+<?xml version="1.0" ?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+	<argument name="data" xsi:type="array">
+		<item name="js_config" xsi:type="array">
+			<item name="provider" xsi:type="string">sm_digitalproduct_operator_icon_form.operator_icon_form_data_source</item>
+		</item>
+		<item name="label" translate="true" xsi:type="string">General Information</item>
+		<item name="template" xsi:type="string">templates/form/collapsible</item>
+	</argument>
+	<settings>
+		<buttons>
+			<button class="SM\DigitalProduct\Block\Adminhtml\Operator\Icon\Edit\BackButton" name="back"/>
+			<button class="SM\DigitalProduct\Block\Adminhtml\Operator\Icon\Edit\DeleteButton" name="delete"/>
+			<button class="SM\DigitalProduct\Block\Adminhtml\Operator\Icon\Edit\SaveButton" name="save"/>
+		</buttons>
+		<namespace>sm_digitalproduct_operator_icon_form</namespace>
+		<dataScope>data</dataScope>
+		<deps>
+			<dep>sm_digitalproduct_operator_icon_form.operator_icon_form_data_source</dep>
+		</deps>
+	</settings>
+	<dataSource name="operator_icon_form_data_source">
+		<argument name="data" xsi:type="array">
+			<item name="js_config" xsi:type="array">
+				<item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+			</item>
+		</argument>
+		<settings>
+			<submitUrl path="*/*/save"/>
+		</settings>
+		<dataProvider class="SM\DigitalProduct\Model\OperatorIcon\DataProvider" name="operator_icon_form_data_source">
+			<settings>
+				<requestFieldName>operator_icon_id</requestFieldName>
+				<primaryFieldName>operator_icon_id</primaryFieldName>
+			</settings>
+		</dataProvider>
+	</dataSource>
+	<fieldset name="general">
+		<settings>
+			<label>General</label>
+		</settings>
+        <field name="operator_service" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">operator_icon</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Operator Service</label>
+                <dataScope>operator_service</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="SM\DigitalProduct\Ui\Component\Form\OperatorService\Options"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="icon" formElement="imageUploader">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">operator_icon</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Icon</label>
+                <componentType>imageUploader</componentType>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <imageUploader>
+                    <settings>
+                        <allowedExtensions>jpg jpeg gif png</allowedExtensions>
+                        <maxFileSize>2097152</maxFileSize>
+                        <uploaderConfig>
+                            <param xsi:type="string" name="url">sm_digitalproduct/operatoricon/uploadimage</param>
+                        </uploaderConfig>
+                        <previewTmpl>Magento_Catalog/image-preview</previewTmpl>
+                        <initialMediaGalleryOpenSubpath>sm/dp/icon</initialMediaGalleryOpenSubpath>
+                    </settings>
+                </imageUploader>
+            </formElements>
+        </field>
+	</fieldset>
+</form>

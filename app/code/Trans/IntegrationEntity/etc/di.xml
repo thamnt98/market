@@ -1,0 +1,71 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_IntegrationEntity
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   JP <jaka.pondan@ctcorpdigital.com>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- DB Model-->
+
+
+    <preference for="Trans\IntegrationEntity\Api\IntegrationJobRepositoryInterface"
+                type="Trans\IntegrationEntity\Model\IntegrationJobRepository" />
+    <preference for="Trans\IntegrationEntity\Api\Data\IntegrationJobInterface"
+                type="Trans\IntegrationEntity\Model\IntegrationJob" />
+    <preference for="Trans\IntegrationEntity\Api\Data\IntegrationJobSearchResultInterface"
+                type="Trans\IntegrationEntity\Model\IntegrationJobSearchResult" />
+
+    <preference for="Trans\IntegrationEntity\Api\IntegrationDataValueRepositoryInterface"
+                type="Trans\IntegrationEntity\Model\IntegrationDataValueRepository" />
+    <preference for="Trans\IntegrationEntity\Api\Data\IntegrationDataValueInterface"
+                type="Trans\IntegrationEntity\Model\IntegrationDataValue" />
+    <preference for="Trans\IntegrationEntity\Api\Data\IntegrationDataValueSearchResultInterface"
+                type="Trans\IntegrationEntity\Model\IntegrationDataValueSearchResult" />
+
+    <!-- Logic Model-->
+    <preference for="Trans\IntegrationEntity\Api\IntegrationCheckUpdatesInterface"
+                type="Trans\IntegrationEntity\Model\IntegrationCheckUpdates" />
+
+    <preference for="Trans\IntegrationEntity\Api\IntegrationGetUpdatesInterface"
+                type="Trans\IntegrationEntity\Model\IntegrationGetUpdates" />
+    <!-- Store Logic Model-->
+    <preference for="Trans\IntegrationEntity\Api\IntegrationStoreInterface"
+                type="Trans\IntegrationEntity\Model\IntegrationStore" />
+
+    <preference for="Trans\IntegrationEntity\Api\IntegrationAssignSourcesInterface"
+                type="Trans\IntegrationEntity\Model\IntegrationAssignSources" />                   
+
+    <preference for="Trans\IntegrationEntity\Api\IntegrationStoreRepositoryInterface"
+                type="Trans\IntegrationEntity\Model\IntegrationStoreRepository" />
+
+    <preference for="Trans\IntegrationEntity\Api\IntegrationInventoryRepositoryInterface"
+                type="Trans\IntegrationEntity\Model\IntegrationInventoryRepository" />
+
+    <preference for="Trans\IntegrationEntity\Api\IntegrationInitialStoreInterface" type="Trans\IntegrationEntity\Model\IntegrationInitialStore"/>
+    <preference for="Trans\IntegrationEntity\Api\Data\IntegrationInitialStoreResponseInterface" type="Trans\IntegrationEntity\Model\IntegrationInitialStoreResponse"/>
+
+     <!-- Product Attribute -->
+    <preference for="Trans\IntegrationEntity\Api\IntegrationProductAttributeInterface"
+                type="Trans\IntegrationEntity\Model\IntegrationProductAttribute" />
+
+    <preference for="Trans\IntegrationEntity\Api\IntegrationProductAttributeRepositoryInterface"
+                type="Trans\IntegrationEntity\Model\IntegrationProductAttributeRepository" />
+
+    <preference for="Trans\IntegrationEntity\Api\Data\IntegrationProductAttributeTypeInterface"
+                type="Trans\IntegrationEntity\Model\IntegrationProductAttributeType" />
+
+    <preference for="Trans\IntegrationEntity\Api\Data\IntegrationProductAttributeSetInterface"
+                type="Trans\IntegrationEntity\Model\IntegrationProductAttributeSet" />
+
+    <preference for="Trans\IntegrationEntity\Api\Data\IntegrationProductAttributeSetChildInterface"
+                type="Trans\IntegrationEntity\Model\IntegrationProductAttributeSetChild" />
+
+</config>

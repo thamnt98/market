@@ -1,0 +1,303 @@
+h1{
+    color: rosybrown;
+}
+.logo {
+    display: block;
+    float: none;
+    text-align: left;
+}
+@font-face{
+    font-family:'SF UI Display Medium';
+    src:url('/pub/static/frontend/Magento/blank/en_US/fonts/sfuidisplay/medium/sf-ui-display-medium.woff2') format('woff2'),
+    url('/pub/static/frontend/Magento/blank/en_US/fonts/sfuidisplay/medium/sf-ui-display-medium.woff') format('woff');
+    font-weight:normal;
+    font-style:normal;
+    font-display:auto
+}
+@media print {
+    * {
+        -webkit-filter: none !important;
+        background: transparent !important;
+        color: black !important;
+        filter: none !important;
+        text-shadow: none !important;
+        font-family: Verdana, Helvetica, sans-serif!important;
+    }
+    a,
+    a:visited {
+        text-decoration: underline !important;
+    }
+    pre,
+    blockquote {
+        border: 1px solid #999;
+        page-break-inside: avoid;
+    }
+    thead {
+        display: table-header-group;
+    }
+    .table-wrapper table {
+        width: 100%;
+        table-layout: fixed;
+    }
+    .table-wrapper td {
+        width: auto;
+    }
+    .table-wrapper > tfoot > tr:first-child {
+        border-top: 1px solid #999;
+    }
+
+    .table-order table {
+        width: 100%;
+        table-layout: fixed;
+        font-family: Verdana, Helvetica, sans-serif!important;
+    }
+
+    .table-order table td {
+        width: auto;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+
+    .box,
+    tr,
+    img {
+        page-break-inside: avoid;
+    }
+    img {
+        max-width: 100% !important;
+    }
+
+    @page {
+        margin: 1cm;
+    }
+
+    .block-content,
+    p,
+    h2,
+    h3 {
+        orphans: 3;
+        widows: 3;
+        margin: 0 0 20px 0;
+    }
+    .block-content {
+        page-break-before: avoid;
+    }
+
+    .block-title,
+    h2,
+    h3 {
+        page-break-after: avoid;
+    }
+
+    .nav-toggle {
+        display: none !important;
+    }
+
+    .logo,
+    .footer .copyright {
+        display: block !important;
+        margin: 10px 0;
+    }
+    .order-details-items .order-items .order-gift-message:not(.expanded-content) {
+        height: auto;
+        visibility: visible;
+    }
+    .column.main {
+        float: none !important;
+        width: 100% !important;
+    }
+
+    .breadcrumbs {
+        margin: 0 auto;
+        text-align: right;
+    }
+
+    .footer.content {
+        padding: 0;
+    }
+
+    .hidden-print {
+        display: none !important;
+    }
+    .myorder-invoice {
+        max-width: 1027px;
+        margin: auto;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+    .myorder-invoice:before {
+        height: 27px;
+        background: #E5E5E5;
+        width: 100%;
+        margin-top:-1cm;
+    }
+    .myorder-invoice .wr-logo {
+        display: block;
+        padding-top: 10px;
+        padding-bottom: 20px;
+        float:left;
+        width: 100%;
+    }
+
+    .wrap-inv-number-date {
+        display: block;
+        padding-bottom: 10px;
+        float:left;
+        width:100%;
+        clear:both;
+
+    }
+    .myorder-invoice .wrap-invoice-number {
+        float: left;
+        width: 50%;
+    }
+    .myorder-invoice .wrap-invoice-date {
+        float: right;
+        width: 45%;
+    }
+
+    .myorder-invoice .wrap-pay-method {
+        padding-bottom: 10px;
+    }
+    .myorder-invoice .wrap-pay-method {
+        padding:15px 0;
+    }
+    .wrap-invoice-total,
+    .order-list-title{
+        font-family: Verdana, Helvetica, sans-serif;
+    }
+    .myorder-invoice span {
+        font-size:11pt;
+        color:#7b7b7b;
+        padding: 10px 0;
+        font-family: Verdana, Helvetica, sans-serif;
+    }
+    .wrap-pay-method p {
+        font-family: Verdana, Helvetica, sans-serif;
+        margin:0;
+        padding:0;
+        font-size:12pt;
+        color:#7b7b7b;
+    }
+    .myorder-invoice h3 {
+        color:black;
+        font-weight: 500;
+        padding:0px 0 10px;
+        margin:0px;
+        font-family: Verdana, Helvetica, sans-serif;
+        font-size:13pt;
+    }
+    .myorder-invoice .table-order {
+        padding-bottom: 45px;
+        border-bottom: 2px solid #e5e5e5;
+        margin-bottom: 10px;
+    }
+    .myorder-invoice .table-order table td {
+        font-size:12pt;
+        padding-top:15px;
+        padding-bottom:15px;
+    }
+    item {
+        text-align: center;
+        padding-left:0px;
+    }
+    .myorder-invoice .table-order table td th.col, td.col subtotal {
+        text-align: right;
+        padding-right: 20px;
+    }
+    .myorder-invoice .table-order table thead th.col {
+        background: #e5e5e5;
+        font-size:11pt;
+        color:black;
+        padding-top:12px;
+        padding-bottom:12px;
+    }
+
+    .myorder-invoice .table-order table tbody td {
+        color:#7b7b7b;
+        border-bottom: 2px solid #e5e5e5;
+    }
+    .myorder-invoice .tale-order2 table tfoot td.subtotal-text{
+        text-align: left;
+    }
+    .myorder-invoice .tale-order2 table tfoot td.subtotal-text,
+    .myorder-invoice .tale-order2 table tfoot td.subtotal{
+        border-bottom: 2px solid #e5e5e5;
+
+    }
+    .myorder-invoice .table-order table tfoot {
+        color: black;
+    }
+
+    .myorder-invoice .table-order table tfoot td.subtotal-text {
+        font-size:13.5pt;
+        text-align: right;
+        font-weight: 500;
+        line-height: 30px;
+    }
+    .myorder-invoice .table-order table tfoot td.subtotal-text span {
+        display: block;
+        font-size:12pt;
+        color:#7b7b7b;
+        width: 100%;
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+    .myorder-invoice .table-order table tfoot td .subtotal {
+        color: black;
+        font-weight: 500;
+        border-bottom: 2px solid #e5e5e5;
+    }
+
+    .myorder-invoice .table-order table tfoot .total td.subtotal-text,
+    .myorder-invoice .table-order table tfoot .total td.subtotal {
+        color: #ED4A12;
+        font-weight: 500;
+    }
+    .myorder-invoice .table-order table tfoot .total td.subtotal-text {
+        font-size:13.5pt;
+    }
+    .myorder-invoice .table-order table tfoot .total td.subtotal {
+        font-size:15pt;
+    }
+    .myorder-invoice .table-order table tfoot .total td.subtotal-text,
+    .myorder-invoice .table-order table tfoot .total td.subtotal {
+        border: 2px solid  #e5e5e5;
+        padding-top: 15px;
+        padding-bottom: 15px;
+
+    }
+    .myorder-invoice .table-order table tfoot .total td.subtotal-text {
+        text-align: left;
+        border-right: 0;
+        padding-left:30px;
+    }
+    .myorder-invoice .table-order table tfoot .total td.subtotal {
+        border-left: 0;
+    }
+    .myorder-invoice .table-order table tfoot .discount.subtotal-text,
+    .discount.subtotal {
+        border-top: 2px solid #e5e5e5;
+        padding-top: 10px;
+        padding-bottom: 10px;
+    }
+    .myorder-invoice .table-order .tale-order2 {
+        border-bottom: 0;
+        padding-bottom:0;
+        margin-bottom:0;
+    }
+    .myorder-invoice .table-order .tale-order2 table tfoot td {
+        border-bottom:2px solid #e5e5e5;
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+    .myorder-invoice .table-order .tale-order2 table tfoot .total-order-id td {
+        border-bottom: 0;
+    }
+    .table-order table tr .id {width: 40%;padding-left:20px;text-align: left;}
+    .table-order table tr .item {width: 30%;text-align: center;}
+    .table-order table tr .subtotal {width: 30%;text-align:right;padding-right: 20px;}
+    .service-fee .subtotal-text, .service-fee .subtotal {border-bottom:2px solid #e5e5e5;}
+
+}
+

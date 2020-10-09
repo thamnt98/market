@@ -1,0 +1,19 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="SM_DigitalProduct::top_level" module="SM_DigitalProduct" sortOrder="9999" title="Digital Products"
+             resource="Magento_Catalog::catalog"
+             parent="Magento_Catalog::catalog"/>
+        <add action="sm_digitalproduct/category/index" id="SM_DigitalProduct::sm_digitalproduct_category"
+             module="SM_DigitalProduct" parent="SM_DigitalProduct::top_level" resource="SM_DigitalProduct::category"
+             sortOrder="99" title="Categories"/>
+        <add action="sm_digitalproduct/operatoricon/index" id="SM_DigitalProduct::sm_digitalproduct_operator_icon"
+             module="SM_DigitalProduct" parent="SM_DigitalProduct::top_level"
+             resource="SM_DigitalProduct::operator_icon" sortOrder="99" title="Operator Icon"/>
+        <add action="adminhtml/system_config/edit/section/digital_product/"
+             id="SM_DigitalProduct::sm_digitalproduct_configuration"
+             module="SM_DigitalProduct" parent="SM_DigitalProduct::top_level"
+             resource="SM_DigitalProduct::config_sm_digitalproduct" sortOrder="99" title="Configuration"/>
+    </menu>
+</config>

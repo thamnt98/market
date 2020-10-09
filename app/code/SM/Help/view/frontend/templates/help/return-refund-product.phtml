@@ -1,0 +1,99 @@
+<?php
+/**
+ * @category SM
+ * @package SM_Help
+ * @license     http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @author      Chinhvd <chinhvd@smartosc.com>
+ * @copyright   Copyright (c) SmartOSC. All rights reserved.
+ * @url http://www.smartosc.com/
+ */
+?>
+<?php /** @var SM\Help\Block\ContactUs\OrderProduct $block */ ?>
+<?php /** @var Magento\Sales\Model\Order $order */?>
+<?php
+    $data = $block->getData();
+    $order = $block->getOrder($data);
+?>
+
+<?php if ($order): ?>
+    <?php foreach ($order->getItems() as $item): ?>
+        <?php /** @var $item \Magento\Catalog\Model\Product */?>
+        <tr class="return-refund-product-info">
+            <td class="col-checkbox">
+                <div class="checkbox-custom">
+                    <input id="selected-product-<?=$item->getProductId()?>" class="order-product-selected-product" type="checkbox" name="selected-product" value="<?=$item->getProductId()?>"" />
+                    <label for="recent"></label>
+                </div>
+            </td>
+            <td class="col-image">
+                <img src="<?php echo $block->getImage($item, 70, 70)?>"/>
+            </td>
+            <td class="col-description">
+                <div class="product-description">
+                    <label for="selected-product-<?=$item->getProductId()?>" class="product-name"><?= $block->escapeHtml(__($item->getName()))?></label>
+                    <span><?= $block->escapeHtml(__($item->getAttributes()))?></span>
+                </div>
+            </td>
+            <td class="col-price-quanity">
+                <div class="product-price-quantity">
+                    <div class="price-product"><?= $block->escapeHtml($block->getPrice($item->getPrice())) ?></div>
+                    <div class="qty-block" id="qty-action-<?= $block->escapeHtmlAttr($item->getId())?>" style="display: block">
+                        <button class="action decrease-qty " type="button" value="<?= $item->getId() ?>"
+                                id="help-decrease-qty<?= $block->escapeHtmlAttr($item->getId())?>"
+                                style="display: inline-block">-</button>
+
+                        <span class="field qty">
+                            <input id="qty" class="qty" type="number" name="qty_value" readonly value="<?= $block->escapeHtml(__((int)$item->getQtyOrdered()))?>"/>
+                            <input  name="qty_hidden" hidden value="<?= $block->escapeHtml(__((int)$item->getQtyOrdered()))?>"/>
+                        </span>
+                        <button class="action increase-qty disable-qty" type="button" value="<?= $item->getId() ?>"
+                                id="help-increase-qty<?= $block->escapeHtmlAttr($item->getId())?>"
+                                style="display: inline-block">+</button>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    <?php endforeach; ?>
+<?php endif; ?>
+
+<script>
+    require([
+        'jquery',
+    ], function ($) {
+        $(".action").on("click", function () {
+
+            let $button = $(this),
+                buttonValue = $(this).val(),
+                oldValue = $button.parent().find('input[name="qty_value"]').val(),
+                sum = 0,
+                valueHidden = $button.parent().find('input[name="qty_hidden"]').val();
+
+            $('input[name="qty_value"]').each(function () {
+                sum += Number($(this).val());
+            });
+
+            if ($button.text() == "+" && oldValue < valueHidden) {
+                var newVal = parseFloat(oldValue) + 1;
+                if (newVal == valueHidden) {
+                    $button.addClass('disable-qty');
+                }
+            } else if ($button.text() == "-") {
+                if (oldValue > 1) {
+                    $("#help-increase-qty"+buttonValue).removeClass('disable-qty');
+                    var newVal = parseFloat(oldValue) - 1;
+                } else {
+                    if (valueHidden == 1)
+                    {
+                        $("#help-increase-qty"+buttonValue).addClass('disable-qty');
+                        newVal = 1;
+                    } else {
+                        newVal = 1;
+                    }
+                }
+            } else {
+                return false;
+            }
+            $button.parent().find('input[name="qty_value"]').val(newVal);
+        });
+    });
+</script>

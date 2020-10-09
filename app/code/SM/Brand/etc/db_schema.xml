@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category SM
+ * @package SM_Brand
+ * @license     http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @author      Chinhvd <chinhvd@smartosc.com>
+ * @copyright   Copyright (c) SmartOSC. All rights reserved.
+ * @url http://www.smartosc.com/
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="amasty_amshopby_option_setting">
+        <column xsi:type="varchar" name="brand_page_layout" nullable="true" length="255" comment="Brand Page Layout"/>
+        <column xsi:type="int" name="most_popular_category_id" padding="10" unsigned="true"
+                nullable="false" identity="false" comment="Most Popular Category ID"/>
+        <column xsi:type="int" name="campaign_id" padding="10" unsigned="true"
+                nullable="false" identity="false" comment="Campaign ID"/>
+    </table>
+
+    <table name="category_brand_list" resource="default" engine="innodb"
+           comment="Select Brand For Category Table">
+        <!-- Columns -->
+        <column xsi:type="smallint" name="id" padding="6" unsigned="true"
+                nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="category_id" padding="10" unsigned="true"
+                nullable="false" identity="false" comment="Category ID"/>
+        <column xsi:type="int" name="option_setting_id" padding="11" unsigned="true"
+                nullable="false" identity="false" comment="Brand ID"/>
+        <column xsi:type="varchar" name="title" nullable="true" length="255" comment="Brand Title"/>
+        <column xsi:type="smallint" name="position" padding="3" unsigned="true"
+                nullable="false" identity="false" comment="Brand Position"/>
+
+        <!-- Primary key -->
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+
+        <!-- Foreign Key -->
+        <constraint xsi:type="foreign" referenceId="CATEGORY_BRAND_LIST_CATEGORY_ID_CATEGORY_ENTITY_ROW_ID"
+                    table="category_brand_list" column="category_id" referenceTable="catalog_category_entity"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+
+        <!-- Index -->
+        <constraint xsi:type="unique" referenceId="CATEGORY_BRAND_LIST_CATEGORY_ID_ATTRIBUTE_ID_STORE_ID">
+            <column name="category_id"/>
+            <column name="option_setting_id"/>
+        </constraint>
+    </table>
+</schema>

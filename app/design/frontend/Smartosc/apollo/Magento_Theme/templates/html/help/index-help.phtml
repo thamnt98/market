@@ -1,0 +1,113 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+?>
+
+<div class="help-pages">
+    <div class="help-top">
+        <h1><?= $block->escapeHtml(__('Hello! Need help?'))?></h1>
+        <p><?= $block->escapeHtml(__('Find the answers and solutions you need here.'))?></p>
+        <div class="help-search">
+            <div class="control">
+                <a href="#"><span class="apl-ic_search"></span></a>
+                <input id="search" type="text" name="q" value=""
+                       placeholder="<?= $block->escapeHtml(__('Type your topic here (example: refund)'))?>"
+                       class="input-text" maxlength="128" role="combobox" aria-haspopup="false"
+                       aria-autocomplete="both" autocomplete="off" aria-expanded="true"/>
+            </div>
+        </div>
+    </div>
+    <div class="row content-top">
+        <div class="col-sm-12 col-md-6 ct-top-left">
+            <h2>Top 5 FAQs</h2>
+            <ol class="help-list-question">
+                <li><a href="#"><?= $block->escapeHtml(__('How do I check my order status?'))?></a></li>
+                <li><a href="#"><?= $block->escapeHtml(__('How is my delivery fee calculated?'))?></a></li>
+                <li><a href="#"><?= $block->escapeHtml(__('Can I cancel my order?'))?></a></li>
+                <li><a href="#"><?= $block->escapeHtml(__('When can I return a product? What are the conditions?'))?></a></li>
+                <li><a href="#"><?= $block->escapeHtml(__('How if my order has been cancelled but I didn\'t get refund?'))?></a></li>
+            </ol>
+        </div>
+        <div class="col-sm-12 col-md-6 ct-top-right">
+            <div class="inner">
+                <h2><?= $block->escapeHtml(__('We will Happily Assist you.'))?></h2>
+                <p><?= $block->escapeHtml(__('Transmart.com will 24/7 help you'))?></p>
+                <button type="submit" class="action primary"><?= $block->escapeHtml(__('Contact Us'))?></button>
+            </div>
+        </div>
+    </div>
+    <div class="content-bottom">
+        <h2>Hello, what can we help you with?</h2>
+        <div class="row">
+            <div class="col-sm-6 col-lg-4">
+                <a href="#" class="inner">
+                    <img src='<?= $block->getViewFileUrl('images/svg-icons/ic-myorder.svg'); ?>' alt=""  width="50" height="50" />
+
+                    <div class="gr-text"><h4><?= $block->escapeHtml(__('My Orders'))?></h4>
+                        <p><?= $block->escapeHtml(__('Get to know more about your orders.'))?></p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <a href="#" class="inner">
+                    <img src='<?= $block->getViewFileUrl('images/svg-icons/ic-myorder.svg'); ?>' alt=""  width="50" height="50" />
+                    <div class="gr-text"><h4><?= $block->escapeHtml(__('Return & Refund'))?></h4>
+                        <p><?= $block->escapeHtml(__('Learn how we process your return & refund'))?></p></div>
+                </a>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <a href="#" class="inner">
+                    <img src='<?= $block->getViewFileUrl('images/svg-icons/MyProfile.svg'); ?>' alt=""  width="50" height="50" />
+                    <div class="gr-text"> <h4><?= $block->escapeHtml(__('My Account'))?></h4>
+                        <p><?= $block->escapeHtml(__('Find all about your account customization'))?></p></div>
+                </a>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <a href="#" class="inner">
+                    <img src='<?= $block->getViewFileUrl('images/svg-icons/BanksCards.svg'); ?>' alt=""  width="50" height="50" />
+                    <div class="gr-text"><h4><?= $block->escapeHtml(__('Payment'))?></h4>
+                        <p><?= $block->escapeHtml(__('Check out the available methods & how to'))?></p></div>
+                </a>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <a href="#" class="inner">
+                    <img src='<?= $block->getViewFileUrl('images/svg-icons/ic_voucher.svg'); ?>' alt=""  width="50" height="50" />
+                    <div class="gr-text"><h4><?= $block->escapeHtml(__('Promos & Vouchers'))?></h4>
+                        <p><?= $block->escapeHtml(__('Learn more about our vouchers & promos'))?></p>
+                    </div>
+                </a>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <a href="#" class="inner">
+                    <img src='<?= $block->getViewFileUrl('images/svg-icons/ic-myorder.svg'); ?>' alt=""  width="50" height="50" />
+                    <div class="gr-text"> <h4><?= $block->escapeHtml(__('Buying Guide'))?></h4>
+                        <p><?= $block->escapeHtml(__('Let us help you shop in Transmart'))?></p></div>
+                </a>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <a href="#" class="inner">
+                    <img src='<?= $block->getViewFileUrl('images/svg-icons/ic-myorder.svg'); ?>' alt=""  width="50" height="50" />
+                    <div class="gr-text"> <h4><?= $block->escapeHtml(__('About Us'))?></h4>
+                        <p><?= $block->escapeHtml(__('Learn more about Transmart'))?></p></div>
+                </a>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <a href="#" class="inner">
+                    <img src='<?= $block->getViewFileUrl('images/svg-icons/ic-myorder.svg'); ?>' alt=""  width="50" height="50" />
+                    <div class="gr-text"><h4><?= $block->escapeHtml(__('My Orders'))?></h4>
+                        <p><?= $block->escapeHtml(__('Know our delivery options in Transmart'))?></p></div>
+                </a>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <a href="#" class="inner">
+                    <img src='<?= $block->getViewFileUrl('images/svg-icons/ic-myorder.svg'); ?>' alt=""  width="50" height="50" />
+                    <div class="gr-text"><h4><?= $block->escapeHtml(__('Contact Us'))?></h4>
+                        <p><?= $block->escapeHtml(__('Reach us for any questions or issues.'))?></p></div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

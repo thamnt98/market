@@ -1,0 +1,38 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \Magento\Review\Block\Product\ReviewRenderer $block */
+
+$url = $block->getReviewsUrl() . '#reviews';
+$urlForm = $block->getReviewsUrl() . '#review-form';
+$helper = $this->helper(SM\Catalog\Helper\CompareHelper::class);
+$isComparePage = $helper->checkComparePage();
+
+?>
+<?php if ($block->isReviewEnabled()) : ?>
+    <?php
+    $rating = $block->getRatingSummary();
+    $label = $rating;
+    $reviewCount = $block->getReviewsCount();
+    if (is_null($rating)) {
+        $rating = 1;
+        $label = 0;
+        $reviewCount = 0;
+    }
+
+    ?>
+    <div class="product-reviews-summary short<?= !$rating ? ' no-rating' : '' ?>" onclick="location.href = '<?= $block->getProduct()->getProductUrl()?>'">
+            <div class="rating-summary">
+                <div class="rating-result" title="<?= $block->escapeHtmlAttr($label) ?>%">
+                    <span style="width:<?= $rating ?>%"><span><?= $block->escapeHtml($label) ?>%</span></span>
+                </div>
+            </div>
+
+            <?php if ($isComparePage == false):?>
+                <span class="rating-count reviews-actions">(<?= $block->escapeHtml($reviewCount) ?>)</span>
+            <?php endif; ?>
+    </div>
+<?php endif; ?>

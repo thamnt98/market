@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_LayeredNavigation
+ *
+ * Date: April, 27 2020
+ * Time: 10:29 AM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <fieldset name="product_attribute_filter" sortOrder="45">
+        <settings>
+            <collapsible>true</collapsible>
+            <label translate="true">Product Attributes Filter in Category</label>
+        </settings>
+        <container name="product_attribute_filter_container" sortOrder="100">
+            <htmlContent name="html_content">
+                <block name="gallery" class="SM\LayeredNavigation\Block\Adminhtml\Category\AssignProductAttribute"/>
+            </htmlContent>
+        </container>
+    </fieldset>
+</form>

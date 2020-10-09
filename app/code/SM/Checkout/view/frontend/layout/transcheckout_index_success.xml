@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="SM_Checkout::css/style.css"/>
+    </head>
+    <body>  <referenceContainer name="header.panel" remove="true" />
+        <referenceBlock name="header-wrapper" remove="true" />
+        <referenceBlock name="page.main.title" remove="true" />
+        <referenceBlock name="navigation.sections" remove="true" />
+        <referenceContainer name="page.wrapper">
+            <container name="checkout.header.container" as="checkout_header_container" label="Checkout Page Header Container" htmlTag="header" htmlClass="page-header" before="main.content">
+                <container name="checkout.header.wrapper" label="Checkout Page Header" as="checkout_header_wrapper" htmlTag="div" htmlClass="header content"/>
+            </container>
+        </referenceContainer>
+        <move element="logo" destination="checkout.header.wrapper"/>
+        <referenceContainer name="content">
+            <block class="SM\Checkout\Block\Checkout\Success" name="checkout_success" template="SM_Checkout::checkout/success.phtml" cacheable="false">
+                <block class="SM\Checkout\Block\Checkout\Success" name="checkout_success.cc" template="SM_Checkout::checkout/success/cc.phtml"/>
+                <block class="SM\Checkout\Block\Checkout\Success" name="checkout_success.va" template="SM_Checkout::checkout/success/va.phtml"/>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

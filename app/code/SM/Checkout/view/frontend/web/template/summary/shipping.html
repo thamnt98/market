@@ -1,0 +1,50 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!-- ko if: quoteIsVirtual == 0 -->
+<!-- ko if: show -->
+<!--ko foreach: previewOrderData()-->
+<tr class="totals shipping excl">
+    <th class="mark" scope="row">
+        <span class="label" data-bind="text: $parent.getTitle($index() + 1)"></span>
+    </th>
+    <td class="amount">
+        <!-- ko if: free_shipping -->
+        <span class="price totals-price old-price"
+              data-bind="text: $parent.getDeliveryFee(shipping_fee_not_discount), attr: {'data-th': $parent.getTitle($index() + 1)}"></span>
+        <span class="price totals-price"
+              data-bind="text: $parent.getDeliveryFee(shipping_fee, true), attr: {'data-th': $parent.getTitle($index() + 1)}"></span>
+        <!-- /ko -->
+        <!-- ko ifnot: free_shipping -->
+            <span class="price totals-price"
+              data-bind="text: $parent.getDeliveryFee(shipping_fee), attr: {'data-th': $parent.getTitle($index() + 1)}"></span>
+        <!-- /ko -->
+    </td>
+</tr>
+<!-- /ko -->
+<!-- /ko -->
+<!-- ko if: showSubtotalDeliveryFee() -->
+<tr class="totals shipping excl">
+    <th class="mark" scope="row">
+        <span class="label" data-bind="text: getDeliverySubTotalTitle()"></span>
+        <!-- remove temporary rates label-->
+        <!--<span class="value" data-bind="text: getShippingMethodTitle()"></span>-->
+    </th>
+    <td class="amount">
+        <!-- ko if: isCalculated() -->
+        <span class="price totals-price old-price"
+              data-bind="text: getOldValue(), attr: {'data-th': getDeliverySubTotalTitle()}"></span>
+        <span class="price totals-price"
+              data-bind="text: getValue(), attr: {'data-th': getDeliverySubTotalTitle()}"></span>
+        <!-- /ko -->
+        <!-- ko ifnot: isCalculated() -->
+        <span class="not-calculated totals-price"
+              data-bind="text: getValue(), attr: {'data-th': 'Not yet calculated}"></span>
+        <!-- /ko -->
+    </td>
+</tr>
+<!-- /ko -->
+<!-- /ko -->

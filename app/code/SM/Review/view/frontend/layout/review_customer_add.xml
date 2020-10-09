@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="customer_account"/>
+    <body>
+        <referenceBlock name="breadcrumbs">
+            <action method="addCrumb">
+                <argument name="crumbName" xsi:type="string">My Reviews</argument>
+                <argument name="crumbInfo" xsi:type="array">
+                    <item name="title" xsi:type="string" translate="true">My Reviews</item>
+                    <item name="label" xsi:type="string" translate="true">My Reviews</item>
+                    <item name="link" xsi:type="string">/review/customer/list</item>
+                </argument>
+            </action>
+            <action method="addCrumb">
+                <argument name="crumbName" xsi:type="string">Review Product</argument>
+                <argument name="crumbInfo" xsi:type="array">
+                    <item name="title" xsi:type="string" translate="true">Review Product</item>
+                    <item name="label" xsi:type="string" translate="true">Review Product</item>
+                </argument>
+            </action>
+        </referenceBlock>
+        <referenceContainer name="content">
+            <block class="Magento\Review\Block\Form" name="sm_review_customer_add" template="SM_Review::customer/add.phtml" cacheable="false">
+                <block class="SM\Review\Block\Customer\Form\Detail" name="product.review.form.detail" template="SM_Review::form.phtml">
+                    <arguments>
+                        <argument name="reviewViewModel" xsi:type="object">SM\Review\ViewModel\ReviewViewModel</argument>
+                    </arguments>
+                </block>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

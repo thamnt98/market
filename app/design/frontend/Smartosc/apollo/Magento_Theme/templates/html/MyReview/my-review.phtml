@@ -1,0 +1,209 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<div class="my-review">
+    <h2><?= $block->escapeHtml(__('My Reviews')) ?></h2>
+    <div class="product data items"
+         data-mage-init='{"mage/tabs": {"openedState": "active", "animate": {"duration": 100}, "active": 1}}'>
+        <div class="item title" data-role="collapsible">
+            <a class="switch" data-toggle="trigger" href="#tab-tobe-review">
+                <?= $block->escapeHtml(__('To be Reviewed')) ?>
+            </a>
+        </div>
+        <div id="tab-tobe-review" class="item content tobe-review" data-role="content">
+            <!--header-dropdow and search-->
+            <div class="headtab-toolbar">
+                <div class="sortby-dropdown">
+                    <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+                        <span><?= $block->escapeHtml('Sort by') ?></span>
+                    </span>
+                    <ul class="dropdown">
+                        <li class="item radio-custom">
+                            <input type="radio" name="recent" checked/>
+                            <label for="recent"><?= $block->escapeHtml('Recent') ?></label>
+                        </li>
+                        <li class="item radio-custom">
+                            <input type="radio" name="previous"/>
+                            <label for="previous"><?= $block->escapeHtml('Previous') ?></label>
+                        </li>
+                    </ul>
+                </div>
+               <!-- search box---->
+                <div class="shoplist-search">
+                    <div class="control">
+                        <a href="#"><span class="apl-ic_search"></span></a>
+                        <input id="search" type="text" name="q" value=""
+                               placeholder="<?= $block->escapeHtml(__('Search by invoice number, product name or product code'))?>"
+                               class="input-text" maxlength="128" role="combobox" aria-haspopup="false"
+                               aria-autocomplete="both" autocomplete="off" aria-expanded="true"/>
+                    </div>
+                </div>
+                <!-- search box---->
+            </div>
+            <!--header-dropdow and search-->
+            <div class="table-product">
+                <div class="tpr-top">
+                    <div class="tpr-top-left">
+                        <span class="tl-invoice-number"><?= $block->escapeHtml(__('Invoice Number')) ?></span>
+                        <h4><?= $block->escapeHtml(__('(INV/20190401/XVII/IV/76373236)')) ?></h4>
+                        <span class="date">28 Oct 2019 |20:00 PM</span>
+                    </div>
+                    <div class="tpr-top-right">
+                        <span class="number-item">3 items</span>
+                    </div>
+                </div>
+                <ul class="list-items-review">
+                    <li class="item-review">
+                        <div class="item-info">
+                            <a href="#" title="thaole1233" class="product-item-photo">
+                                <img src="https://apollo11-dev.ctdigital.id/media/catalog/product/cache/6410bdb417f1097c90b11783ebe3d82c/2/_/2_1_1.jpg" width="110" height="110" alt="thaole1233" />
+                            </a>
+                            <div class="product-item-details">
+                                <a href="https://apollo11-dev.ctdigital.id/thaole1233.html" class="product-item-name">Onitsuka Tiger Mexico 66 (Kill Bill)</a>
+                            </div>
+                        </div>
+                        <div class="bt-review">
+                            <button type="submit" class="action primary"><?= $block->escapeHtml(__('Review Product')) ?></button>
+                        </div>
+                    </li>
+                    <li class="item-review">
+                        <div class="item-info">
+                            <a href="#" title="thaole1233" class="product-item-photo">
+                                <img src="https://apollo11-dev.ctdigital.id/media/catalog/product/cache/6410bdb417f1097c90b11783ebe3d82c/2/_/2_1_1.jpg" width="110" height="110" alt="thaole1233" />
+                            </a>
+                            <div class="product-item-details">
+                                <a href="https://apollo11-dev.ctdigital.id/thaole1233.html" class="product-item-name">Onitsuka Tiger Mexico 66 (Kill Bill)</a>
+                            </div>
+                        </div>
+                        <div class="bt-review">
+                            <button type="submit" class="action primary"><?= $block->escapeHtml(__('Review Product')) ?></button>
+                        </div>
+                    </li>
+                    <li class="item-review">
+                        <div class="item-info">
+                            <a href="#" title="thaole1233" class="product-item-photo">
+                                <img src="https://apollo11-dev.ctdigital.id/media/catalog/product/cache/6410bdb417f1097c90b11783ebe3d82c/2/_/2_1_1.jpg" width="110" height="110" alt="thaole1233" />
+                            </a>
+                            <div class="product-item-details">
+                                <a href="https://apollo11-dev.ctdigital.id/thaole1233.html" class="product-item-name">Onitsuka Tiger Mexico 66 (Kill Bill)</a>
+                            </div>
+                        </div>
+                        <div class="bt-review">
+                            <button type="submit" class="action primary"><?= $block->escapeHtml(__('Review Product')) ?></button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="item title" data-role="collapsible">
+            <a class="switch" data-toggle="trigger" href="#tab-reviewed">
+                <?= $block->escapeHtml(__('Reviewed')) ?>
+            </a>
+        </div>
+        <div id="tab-reviewed" class="item content reviewed" data-role="content">
+            <!--header-dropdow and search-->
+            <div class="headtab-toolbar">
+                <div class="sortby-dropdown">
+                    <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+                        <span><?= $block->escapeHtml('Sort by') ?></span>
+                    </span>
+                    <ul class="dropdown">
+                        <li class="item radio-custom">
+                            <input type="radio" name="recent" checked/>
+                            <label for="recent"><?= $block->escapeHtml('Recent') ?></label>
+                        </li>
+                        <li class="item radio-custom">
+                            <input type="radio" name="previous"/>
+                            <label for="previous"><?= $block->escapeHtml('Previous') ?></label>
+                        </li>
+                    </ul>
+                </div>
+                <!-- search box---->
+                <div class="shoplist-search">
+                    <div class="control">
+                        <a href="#"><span class="apl-ic_search"></span></a>
+                        <input id="search" type="text" name="q" value=""
+                               placeholder="<?= $block->escapeHtml(__('Search by invoice number, product name or product code'))?>"
+                               class="input-text" maxlength="128" role="combobox" aria-haspopup="false"
+                               aria-autocomplete="both" autocomplete="off" aria-expanded="true"/>
+                    </div>
+                </div>
+                <!-- search box---->
+            </div>
+            <!--header-dropdow and search-->
+            <div class="table-product">
+                <div class="tpr-top">
+                    <div class="tpr-top-left">
+                        <span class="tl-invoice-number"><?= $block->escapeHtml(__('Invoice Number')) ?></span>
+                        <h4><?= $block->escapeHtml(__('(INV/20190401/XVII/IV/76373236)')) ?></h4>
+                        <span class="date">28 Oct 2019 |20:00 PM</span>
+                    </div>
+                </div>
+                <ul class="list-items-review">
+                    <li class="item-review">
+                        <div class="item-info">
+                            <a href="#" title="thaole1233" class="product-item-photo">
+                                <img src="https://apollo11-dev.ctdigital.id/media/catalog/product/cache/6410bdb417f1097c90b11783ebe3d82c/2/_/2_1_1.jpg" width="110" height="110" alt="thaole1233" />
+                            </a>
+                            <div class="product-item-details">
+                                <a href="https://apollo11-dev.ctdigital.id/thaole1233.html" class="product-item-name">Onitsuka Tiger Mexico 66 (Kill Bill)</a>
+                                <div class="product-reviews-summary short">
+                                    <div class="rating-summary">
+                                        <div class="rating-result" title="20%">
+                                            <span style="width:20%"><span>20%</span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rw-comments">
+                            <p>“I like this product, the scent is so nice it smells so good !..”</p>
+                        </div>
+                        <div class="bt-review">
+                            <button type="submit" class="action secondary"><?= $block->escapeHtml(__('Edit Review')) ?></button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <!--End tbale product review-->
+            <div class="table-product">
+                <div class="tpr-top">
+                    <div class="tpr-top-left">
+                        <span class="tl-invoice-number"><?= $block->escapeHtml(__('Invoice Number')) ?></span>
+                        <h4><?= $block->escapeHtml(__('(INV/20190401/XVII/IV/76373236)')) ?></h4>
+                        <span class="date">28 Oct 2019 |20:00 PM</span>
+                    </div>
+                </div>
+                <ul class="list-items-review">
+                    <li class="item-review">
+                        <div class="item-info">
+                            <a href="#" title="thaole1233" class="product-item-photo">
+                                <img src="https://apollo11-dev.ctdigital.id/media/catalog/product/cache/6410bdb417f1097c90b11783ebe3d82c/2/_/2_1_1.jpg" width="110" height="110" alt="thaole1233" />
+                            </a>
+                            <div class="product-item-details">
+                                <a href="https://apollo11-dev.ctdigital.id/thaole1233.html" class="product-item-name">Onitsuka Tiger Mexico 66 (Kill Bill)</a>
+                                <div class="product-reviews-summary short">
+                                    <div class="rating-summary">
+                                        <div class="rating-result" title="20%">
+                                            <span style="width:20%"><span>20%</span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="rw-comments">
+                            <p>“I like this product, the scent is so nice it smells so good !..”</p>
+                        </div>
+                        <div class="bt-review">
+                            <button type="submit" class="action secondary"><?= $block->escapeHtml(__('Edit Review')) ?></button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <!--End tbale product review-->
+        </div>
+    </div>
+</div>

@@ -1,0 +1,182 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Checkout\Model\Cart\ImageProvider">
+        <plugin name="sm_checkout_image_data" type="SM\Checkout\Plugin\Checkout\Model\Cart\ImageProvider"
+                sortOrder="10"/>
+    </type>
+    <preference for="Magento\Multishipping\Model\Cart\CartTotalRepositoryPlugin"
+                type="SM\Checkout\Plugin\Multishipping\Model\Cart\CartTotalRepositoryPlugin"/>
+    <preference for="SM\Checkout\Api\AccountManagementInterface" type="SM\Checkout\Model\AccountManagement"/>
+    <preference for="SM\Checkout\Api\Data\AccountManagementResponseInterface"
+                type="SM\Checkout\Model\AccountManagementResponse"/>
+    <preference for="SM\Checkout\Api\VoucherInterface" type="SM\Checkout\Model\VoucherManagement"/>
+    <preference for="SM\Checkout\Api\CartUpdateRepositoryInterface" type="SM\Checkout\Model\CartUpdateRepository"/>
+    <preference for="Magento\CatalogInventory\Model\StockStateProvider" type="SM\Checkout\Model\StockStateProvider"/>
+    <preference for="Magento\CatalogInventory\Model\Quote\Item\QuantityValidator"
+                type="SM\Checkout\Model\Quote\Item\QuantityValidator"/>
+
+    <!--Multi Shipping Checkout-->
+    <preference for="SM\Checkout\Api\MultiShippingInterface" type="SM\Checkout\Model\MultiShipping"/>
+    <preference for="SM\Checkout\Api\MultiShippingMobileInterface" type="SM\Checkout\Model\MultiShippingMobile"/>
+    <preference for="SM\Checkout\Api\Data\Checkout\CustomerAddressDataInterface"
+                type="SM\Checkout\Model\Api\CustomerAddressData"/>
+    <preference for="SM\Checkout\Api\Data\Checkout\CheckoutDataInterface" type="SM\Checkout\Model\Api\CheckoutData"/>
+    <preference for="SM\Checkout\Api\Data\Checkout\QuoteItems\ItemInterface" type="SM\Checkout\Model\Api\Item"/>
+    <preference for="SM\Checkout\Api\Data\Checkout\ShippingMethodInterface"
+                type="SM\Checkout\Model\Api\ShippingMethod"/>
+    <preference for="SM\Checkout\Api\Data\Checkout\Estimate\ItemInterface" type="SM\Checkout\Model\Api\Estimate\Item"/>
+    <preference for="SM\Checkout\Api\Data\Checkout\Estimate\AdditionalInfoInterface"
+                type="SM\Checkout\Model\Api\Estimate\AdditionalInfo"/>
+    <preference for="SM\Checkout\Api\Data\Checkout\Estimate\AdditionalInfo\StorePickUpInterface"
+                type="SM\Checkout\Model\Api\Estimate\AdditionalInfo\StorePickUp"/>
+    <preference for="SM\Checkout\Api\Data\Checkout\Estimate\ItemAdditionalInfo\AdditionalInfoInterface"
+                type="SM\Checkout\Model\Api\Estimate\ItemAdditionalInfo\AdditionalInfo"/>
+    <preference for="SM\Checkout\Api\Data\Checkout\Estimate\ItemAdditionalInfo\Delivery\DeliveryInterface"
+                type="SM\Checkout\Model\Api\Estimate\ItemAdditionalInfo\Delivery\Delivery"/>
+    <preference for="SM\Checkout\Api\Data\Checkout\Estimate\PreviewOrderInterface"
+                type="SM\Checkout\Model\Api\Estimate\PreviewOrder"/>
+    <preference for="SM\Checkout\Api\Data\Checkout\ConfigInterface"
+                type="SM\Checkout\Model\Api\Config"/>
+    <preference for="SM\Checkout\Api\Data\Checkout\Config\StorePickUpInterface"
+                type="SM\Checkout\Model\Api\Config\StorePickUp"/>
+    <preference for="SM\Checkout\Api\Data\Checkout\Config\DeliveryInterface"
+                type="SM\Checkout\Model\Api\Config\Delivery"/>
+    <preference for="SM\Checkout\Api\Data\Checkout\SearchStoreResponseInterface"
+                type="SM\Checkout\Model\Api\SearchStoreResponse"/>
+    <preference for="SM\Checkout\Api\Data\Checkout\SearchStoreInterface"
+                type="SM\Checkout\Model\Api\SearchStore"/>
+    <preference for="SM\Checkout\Api\Data\Checkout\QuoteItems\ProductOptions\ProductOptionsInterface"
+                type="SM\Checkout\Model\Api\ProductOptions"/>
+    <preference for="SM\Checkout\Api\Data\Checkout\Voucher\VoucherInterface"
+                type="SM\Checkout\Model\Api\CheckoutData\Voucher\Voucher"/>
+    <preference for="SM\Checkout\Api\Data\Checkout\SupportShippingInterface"
+                type="SM\Checkout\Model\Api\CheckoutData\SupportShipping"/>
+
+    <!--api for web-->
+    <preference for="SM\Checkout\Api\Data\CheckoutWeb\EstimateItemInterface"
+                type="SM\Checkout\Model\Api\CheckoutWeb\EstimateItem"/>
+    <preference for="SM\Checkout\Api\Data\CheckoutWeb\AdditionalInfoInterface"
+                type="SM\Checkout\Model\Api\CheckoutWeb\AdditionalInfo"/>
+    <preference for="SM\Checkout\Api\Data\CheckoutWeb\AdditionalInfo\StorePickUpInterface"
+                type="SM\Checkout\Model\Api\CheckoutWeb\AdditionalInfo\StorePickUp"/>
+
+    <preference for="SM\Checkout\Api\Data\CheckoutWeb\EstimateShippingInterface"
+                type="SM\Checkout\Model\Api\CheckoutWeb\EstimateShipping"/>
+    <preference for="SM\Checkout\Api\Data\CheckoutWeb\ItemsValidMethod\ItemInterface"
+                type="SM\Checkout\Model\Api\CheckoutWeb\ItemsValidMethod\Item"/>
+    <preference for="SM\Checkout\Api\Data\CheckoutWeb\ItemsValidMethod\MethodInterface"
+                type="SM\Checkout\Model\Api\CheckoutWeb\ItemsValidMethod\Method"/>
+
+    <preference for="SM\Checkout\Api\Data\CheckoutWeb\PreviewOrderInterface"
+                type="SM\Checkout\Model\Api\CheckoutWeb\PreviewOrder"/>
+    <preference for="SM\Checkout\Api\Data\CheckoutWeb\PreviewOrder\Request\StoreDateTimeInterface"
+                type="SM\Checkout\Model\Api\CheckoutWeb\PreviewOrder\Request\StoreDateTime"/>
+    <preference for="SM\Checkout\Api\Data\CheckoutWeb\PreviewOrder\Request\DeliveryDateTimeInterface"
+                type="SM\Checkout\Model\Api\CheckoutWeb\PreviewOrder\Request\DeliveryDateTime"/>
+    <preference for="SM\Checkout\Api\Data\CheckoutWeb\DigitalInterface"
+                type="SM\Checkout\Model\Api\CheckoutWeb\Digital"/>
+    <preference for="SM\Checkout\Api\Data\CheckoutWeb\SourceStoreInterface"
+                type="SM\Checkout\Model\Api\CheckoutWeb\SourceStore"/>
+    <preference for="SM\Checkout\Api\Data\CheckoutWeb\SearchStoreInterface"
+                type="SM\Checkout\Model\Api\CheckoutWeb\SearchStore"/>
+    <preference for="SM\Checkout\Api\Data\CheckoutWeb\VoucherInterface"
+                type="SM\Checkout\Model\Api\CheckoutWeb\Voucher"/>
+
+    <virtualType name="Magento\Sales\Model\ResourceModel\Order\Grid" type="Magento\Sales\Model\ResourceModel\Grid">
+        <arguments>
+            <argument name="columns" xsi:type="array">
+                <item name="is_parent" xsi:type="string">sales_order.is_parent</item>
+                <item name="parent_order" xsi:type="string">sales_order.parent_order</item>
+                <item name="store_pick_up" xsi:type="string">sales_order.store_pick_up</item>
+                <item name="split_store_code" xsi:type="string">sales_order.split_store_code</item>
+                <item name="date" xsi:type="string">sales_order.date</item>
+                <item name="time" xsi:type="string">sales_order.time</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <!-- logic multiple coupon code-->
+    <!--<preference for="Magento\SalesRule\Observer\CouponCodeValidation" type="SM\Checkout\Observer\CouponCodeValidation" />-->
+    <preference for="Magento\Quote\Model\Quote\Address"
+                type="SM\Checkout\Preference\Quote\Model\Quote\Address"/>
+    <preference for="Magento\Quote\Model\Quote\TotalsCollector"
+                type="SM\Checkout\Preference\Quote\Model\Quote\TotalsCollector"/>
+    <type name="Magento\Quote\Model\Quote\Address">
+        <plugin name="sm_transcheckout_collect_shipping_rate" type="SM\Checkout\Plugin\Quote\Model\Quote\Address" sortOrder="50"/>
+    </type>
+    <!-- payment -->
+    <preference for="SM\Checkout\Api\PaymentInterface" type="SM\Checkout\Model\Payment" />
+    <preference for="SM\Checkout\Api\OrderInterface" type="SM\Checkout\Model\Order" />
+    <preference for="SM\Checkout\Api\Data\Checkout\PaymentMethodsInterface"
+                type="SM\Checkout\Model\Api\CheckoutData\PaymentMethods"/>
+    <preference for="SM\Checkout\Api\Data\Checkout\PaymentMethods\InstallmentTermInterface"
+                type="SM\Checkout\Model\Api\CheckoutData\PaymentMethods\InstallmentTerm"/>
+    <preference for="\SM\Checkout\Api\Data\Checkout\PaymentMethods\PaymentMethodInterface"
+                type="SM\Checkout\Model\Api\CheckoutData\PaymentMethods\PaymentMethod"/>
+    <preference for="Amasty\Rules\Block\Cart\LayoutProcessor" type="SM\Checkout\Block\Cart\LayoutProcessor" />
+    <preference for="\SM\Checkout\Api\Data\Checkout\PaymentMethods\CreditMethodInterface"
+                type="\SM\Checkout\Model\Api\CheckoutData\PaymentMethods\CreditMethod"/>
+    <preference for="\SM\Checkout\Api\Data\Checkout\PaymentMethods\VirtualMethodInterface"
+                type="\SM\Checkout\Model\Api\CheckoutData\PaymentMethods\VirtualMethod"/>
+    <preference for="\SM\Checkout\Api\Data\Checkout\PaymentMethods\InstallmentMethodInterface"
+                type="\SM\Checkout\Model\Api\CheckoutData\PaymentMethods\InstallmentMethod"/>
+    <preference for="\SM\Checkout\Api\Data\Checkout\PlaceOrderInterface"
+                type="\SM\Checkout\Model\Api\CheckoutData\PlaceOrder"/>
+    <preference for="\SM\Checkout\Api\Data\Checkout\PlaceOrder\PaymentInterface"
+                type="\SM\Checkout\Model\Api\CheckoutData\PlaceOrder\Payment"/>
+    <preference for="\SM\Checkout\Api\Data\CartItem\UpdateItemInterface"
+                type="\SM\Checkout\Model\Api\Cart\UpdateItem"/>
+
+    <preference for="\SM\Checkout\Api\Data\Checkout\PaymentMethods\BankInterface"
+                type="\SM\Checkout\Model\Api\CheckoutData\PaymentMethods\Bank"/>
+    <preference for="\SM\Checkout\Api\Data\Checkout\PaymentMethods\MethodInterface"
+                type="\SM\Checkout\Model\Api\CheckoutData\PaymentMethods\Method"/>
+    <preference for="\SM\Checkout\Api\Data\Checkout\PaymentMethods\HowToPayInterface"
+                type="\SM\Checkout\Model\Api\CheckoutData\PaymentMethods\HowToPay"/>
+
+    <type name="Magento\Checkout\Model\PaymentInformationManagement">
+        <plugin name="sm_transcheckout_validate_before_place_order" type="SM\Checkout\Plugin\Checkout\Model\PaymentInformationManagement" sortOrder="50"/>
+    </type>
+
+    <type name="Magento\Quote\Model\Cart\CartTotalRepository">
+        <plugin name="sm_transcheckout_not_apply_voucher" type="SM\Checkout\Plugin\Quote\Model\Cart\CartTotalRepository" sortOrder="50"/>
+    </type>
+
+    <preference for="Magento\Weee\Block\Item\Price\Renderer"
+                type="SM\Checkout\Block\Cart\Item\Price\Renderer"/>
+
+    <preference for="\Magento\Quote\Model\Webapi\ParamOverriderCartId"
+                type="\SM\Checkout\Preference\Quote\Model\Webapi\ParamOverriderCartId"/>
+
+
+    <type name="Magento\Tax\Model\Sales\Total\Quote\Tax">
+        <plugin name="SM_Checkout::TotalShippingDiscount"
+                type="SM\Checkout\Plugin\MagentoTax\Model\Quote\Address\Total\Tax"/>
+    </type>
+
+    <type name="Magento\Tax\Model\Sales\Total\Quote\Shipping">
+        <plugin name="SM_Checkout::TotalShippingDiscount"
+                type="SM\Checkout\Plugin\MagentoTax\Model\Sales\Total\Quote\Shipping"/>
+    </type>
+
+    <type name="SM\Checkout\Preference\Quote\Model\Quote\Address">
+        <plugin name="sm_trancheckout_quote_address_item"
+                type="SM\Checkout\Plugin\Address"/>
+    </type>
+
+    <preference for="\Magento\Quote\Model\Quote"
+                type="SM\Checkout\Preference\Quote\Model\Quote"/>
+
+    <type name="Magento\Quote\Model\Quote\Item">
+        <plugin name="sm_transcheckout_quote_item_plugin"
+                type="SM\Checkout\Plugin\Quote\Model\Quote\Item" />
+    </type>
+
+    <!-- *************************** Plugins ********************************** -->
+    <!-- Trans -->
+    <type name="Trans\Sprint\Model\Total\ServiceFee">
+        <plugin name="SM_Checkout::CollectTotalServiceFee"
+                type="SM\Checkout\Plugin\TransSprint\Model\Total\ServiceFee" />
+    </type>
+</config>

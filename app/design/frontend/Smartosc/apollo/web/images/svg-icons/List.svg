@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 31 26" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 59.1 (86144) - https://sketch.com -->
+    <title>List</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard-Copy" transform="translate(-226.000000, -560.000000)">
+            <g id="List" transform="translate(226.000000, 560.000000)">
+                <circle id="Oval" fill="#989898" cx="2.5" cy="2.5" r="2.5"></circle>
+                <circle id="Oval-Copy" fill="#989898" cx="2.5" cy="12.5" r="2.5"></circle>
+                <circle id="Oval-Copy-2" fill="#989898" cx="2.5" cy="23.5" r="2.5"></circle>
+                <line x1="11.2992979" y1="24" x2="29.0601227" y2="24" id="Path-4-Copy-2" stroke="#989898" stroke-width="2" fill="#D8D8D8" stroke-linecap="round"></line>
+                <line x1="11.2992979" y1="13" x2="29.0601227" y2="13" id="Path-4-Copy" stroke="#989898" stroke-width="2" fill="#D8D8D8" stroke-linecap="round"></line>
+                <line x1="11.2992979" y1="2.5" x2="29.0601227" y2="2.5" id="Path-4" stroke="#989898" stroke-width="2" fill="#D8D8D8" stroke-linecap="round"></line>
+            </g>
+        </g>
+    </g>
+</svg>

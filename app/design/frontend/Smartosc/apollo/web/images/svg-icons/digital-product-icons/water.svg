@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="29px" height="43px" viewBox="0 0 29 43" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 59.1 (86144) - https://sketch.com -->
+    <title>noun_Water_1817304</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <linearGradient x1="50%" y1="0%" x2="50%" y2="100%" id="linearGradient-1">
+            <stop stop-color="#F9B215" offset="0%"></stop>
+            <stop stop-color="#F79B0B" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Top-Up-&amp;-Billing" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Top-Up-&amp;-Billing---Top-Up-Info" transform="translate(-713.000000, -564.000000)" fill="url(#linearGradient-1)">
+            <g id="noun_Water_1817304" transform="translate(713.000000, 564.000000)">
+                <path d="M29,28.1267804 C29,36.3405614 22.5085922,43 14.5,43 C6.49140784,43 0,36.3405614 0,28.1267804 C0,21.6017611 5.42088849,16.1322179 8.71550407,10.2774023 C10.6442846,6.85160154 12.5721423,3.42580077 14.5,0 C16.4278577,3.42580077 18.3557154,6.85160154 20.2844959,10.2774023 C23.5791115,16.1322179 29,21.6017611 29,28.1267804 Z M5.00652368,27.9724821 C5.104347,33.4921959 9.01543406,37.8513594 14.4760056,37.8683985 C15.5954366,37.7282994 15.8307663,40.2273638 14.3846423,40.2065382 C8.12671843,40.5094551 2.54063773,34.3271106 2.72336431,27.9582829 C2.75381874,26.4967089 5.02867235,26.5724381 5.00652368,27.9724821 L5.00652368,27.9724821 Z" id="Shape"></path>
+            </g>
+        </g>
+    </g>
+</svg>

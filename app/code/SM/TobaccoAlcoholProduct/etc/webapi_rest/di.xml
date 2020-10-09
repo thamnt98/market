@@ -1,0 +1,28 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="SM\MobileApi\Helper\Product">
+        <plugin name="set_tobacco_alcohol_product_attribute"
+                type="SM\TobaccoAlcoholProduct\Plugin\MobileApi\Helper\Product" />
+    </type>
+
+    <type name="SM\MobileApi\Model\Product">
+        <plugin name="set_tobacco_alcohol_category_attribute"
+                type="SM\TobaccoAlcoholProduct\Plugin\MobileApi\Model\Product" />
+    </type>
+
+    <type name="Magento\Catalog\Model\ResourceModel\Product\Collection">
+        <plugin name="add_tobacco_product_attributes"
+                type="SM\TobaccoAlcoholProduct\Plugin\Catalog\Model\ResourceModel\Product\Collection"/>
+    </type>
+
+    <type name="SM\GTM\Helper\Data">
+        <plugin name="set_is_alcohol_informed_data_if_null"
+                type="SM\TobaccoAlcoholProduct\Plugin\GTM\Helper\Data" />
+    </type>
+
+    <type name="Magento\Catalog\Model\ResourceModel\Category\Collection">
+        <plugin name="filter_tobacco_categories"
+                type="SM\TobaccoAlcoholProduct\Plugin\Catalog\Model\ResourceModel\Category\Collection" />
+    </type>
+</config>

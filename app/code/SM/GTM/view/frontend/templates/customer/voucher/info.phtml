@@ -1,0 +1,45 @@
+<script>
+    require(['jquery', 'Magento_Ui/js/lib/view/utils/async', 'gtmCheckout', 'moment', 'gtmSha256', 'jquery/jquery-storageapi', 'domReady!'],function ($, async, gtmCheckout, moment, sha256) {
+        $(window).load(function () {
+            if (typeof dataLayerSourceObjects !== "undefined") {
+                window.eventCreate = window.eventCreate || {};
+                var currentTime = moment().format('YYYY-MM-DD');
+                async.async('[data-gtm-event="voucher"]', function () {
+                    if (!eventCreate['[data-gtm-event="voucher"]']) {
+                        eventCreate['[data-gtm-event="voucher"]'] = 0;
+                    }
+                    let current = $($('[data-gtm-event="voucher"]')[eventCreate['[data-gtm-event="voucher"]']]);
+                    let current_data = [];
+                    current_data['voucher_id'] = sha256($(current).attr('data-gtm-voucher-id'));
+                    current_data['voucher_name'] = $(current).attr('data-gtm-voucher-name');
+                    current_data['voucher_description'] = $(current).attr('data-gtm-voucher-description');
+                    let validationVoucher = $(current).attr('data-gtm-validation');
+                    if (validationVoucher) {
+                        current_data['voucher_validation'] = 'Valid until ' + validationVoucher;
+                        current_data['voucher_status'] = gtmCheckout.minusDay(currentTime, validationVoucher);
+                    } else {
+                        current_data['voucher_validation'] = "Not available";
+                        current_data['voucher_status'] = "Expired";
+                    }
+                    gtmCheckout.push('view_voucher', current_data);
+                    $(current).on('click', function () {
+                        gtmCheckout.push('click_voucher', current_data);
+                        try {
+                            let useVoucher = {
+                                'voucher_id' : current_data['voucher_id'],
+                                'voucher_name' : current_data['voucher_name'],
+                                'voucher_description': current_data['voucher_description'],
+                                'voucher_validation' : current_data['voucher_validation'],
+                                'voucher_status': current_data['voucher_status']
+                            };
+                            $.localStorage.set('use_voucher_gtm', useVoucher);
+                        } catch (e) {
+
+                        }
+                    });
+                    eventCreate['[data-gtm-event="voucher"]']++;
+                });
+            }
+        });
+    });
+</script>

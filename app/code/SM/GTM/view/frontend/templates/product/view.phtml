@@ -1,0 +1,225 @@
+<?php
+$GTMViewModel = $block->getData('gtm_view_model');
+$product = $block->getProduct();
+$data= null;
+if ($GTMViewModel) {
+    $data = $GTMViewModel->getGtmData($product);
+}
+?>
+<?php if ($data): ?>
+    <script type="text/javascript" defer>
+        require(['jquery', "gtmProduct", 'Magento_Ui/js/lib/view/utils/async', 'jquery/jquery-storageapi', 'mage/translate', 'domReady!'], function ($, gtm, async) {
+            $(window).load(function () {
+                window.eventCreate = window.eventCreate || {};
+                let data = <?= $data ?>;
+
+                $('.cloud-zoom-gallery').on('click', function () {
+                    data['picture_position'] = $(this).attr('data-gtm-position');
+                    gtm.push('click_picture_PDP', data);
+                });
+
+                async.async('[data-gtm-pdp-social-share="messenger"]', function () {
+                    if (!eventCreate['[data-gtm-pdp-social-share="messenger"]']) {
+                        eventCreate['[data-gtm-pdp-social-share="messenger"]'] = 0;
+                    }
+
+                    let current = $($('[data-gtm-pdp-social-share="messenger"]')[eventCreate['[data-gtm-pdp-social-share="messenger"]']]);
+                    $(current).find('a').on('click', function () {
+                        data['social_media'] = "Messenger";
+                        gtm.push('share_product', data);
+                    });
+                    eventCreate['[data-gtm-pdp-social-share="messenger"]']++;
+                });
+
+                async.async('[data-gtm-pdp-social-share="facebook"]', function () {
+                    if (!eventCreate['[data-gtm-pdp-social-share="facebook"]']) {
+                        eventCreate['[data-gtm-pdp-social-share="facebook"]'] = 0;
+                    }
+
+                    let current = $($('[data-gtm-pdp-social-share="facebook"]')[eventCreate['[data-gtm-pdp-social-share="facebook"]']]);
+                    $(current).find('a').on('click', function () {
+                        data['social_media'] = "Facebook";
+                        gtm.push('share_product', data);
+                    });
+                    eventCreate['[data-gtm-pdp-social-share="facebook"]']++;
+                });
+
+                async.async('[data-gtm-pdp-social-share="googleplus"]', function () {
+                    if (!eventCreate['[data-gtm-pdp-social-share="googleplus"]']) {
+                        eventCreate['[data-gtm-pdp-social-share="googleplus"]'] = 0;
+                    }
+
+                    let current = $($('[data-gtm-pdp-social-share="googleplus"]')[eventCreate['[data-gtm-pdp-social-share="googleplus"]']]);
+                    $(current).find('a').on('click', function () {
+                        data['social_media'] = "Google+";
+                        gtm.push('share_product', data);
+                    });
+                    eventCreate['[data-gtm-pdp-social-share="googleplus"]']++;
+                });
+
+                async.async('[data-gtm-pdp-social-share="pinterest"]', function () {
+                    if (!eventCreate['[data-gtm-pdp-social-share="pinterest"]']) {
+                        eventCreate['[data-gtm-pdp-social-share="pinterest"]'] = 0;
+                    }
+
+                    let current = $($('[data-gtm-pdp-social-share="pinterest"]')[eventCreate['[data-gtm-pdp-social-share="pinterest"]']]);
+                    $(current).find('a').on('click', function () {
+                        data['social_media'] = "Pinterest";
+                        gtm.push('share_product', data);
+                    });
+                    eventCreate['[data-gtm-pdp-social-share="pinterest"]']++;
+                });
+
+                async.async('[data-gtm-pdp-social-share="twitter"]', function () {
+                    if (!eventCreate['[data-gtm-pdp-social-share="twitter"]']) {
+                        eventCreate['[data-gtm-pdp-social-share="twitter"]'] = 0;
+                    }
+
+                    let current = $($('[data-gtm-pdp-social-share="twitter"]')[eventCreate['[data-gtm-pdp-social-share="twitter"]']]);
+                    $(current).find('a').on('click', function () {
+                        data['social_media'] = "Twitter";
+                        gtm.push('share_product', data);
+                    });
+                    eventCreate['[data-gtm-pdp-social-share="twitter"]']++;
+                });
+
+                $('[data-gtm-pdp="view-review"]').on('click', function () {
+                    gtm.push('view_review', data);
+                });
+
+                $('[data-gtm-pdp="delivery-info"]').on('click', function () {
+                    gtm.push('delivery_info', data);
+                });
+
+                $('[data-gtm-pdp="store-info"]').on('click', function () {
+                    gtm.push('store_info', data);
+                });
+
+                $('[data-gtm-pdp="buy-now-pdp"]').on('click', function () {
+                    data['quantity'] = $('input[name="qty"]').val();
+                    //Todo Remove Debug
+                    console.log(data);
+                    gtm.push('buy_now_pdp', data);
+                });
+
+                async.async('[data-gtm-message="success"]', function () {
+                    //Todo Remove Debug
+                    console.log($('[data-gtm-message="success"]').text());
+                    if ($('[data-gtm-message="success"]').text().includes($.mage.__('shopping cart'))) {
+                        data['quantity'] = $('input[name="qty"]').val();
+                        gtm.push('addToCartPDP', data);
+                    }
+                });
+
+                async.async('[data-gtm-pdp="add-to-wishlist"]', function () {
+                    $('[data-gtm-pdp="add-to-wishlist"]').on('change', function () {
+                        data['shopping_listName'] = $('[data-gtm-pdp="add-to-wishlist"]').attr('data-gtm-wishlist');
+                        //Todo Remove Debug
+                        console.log(data['shopping_listName']);
+                        gtm.push('add_to_shopping_list', data);
+                        $('[data-gtm-pdp="add-to-wishlist"]').val('false');
+                    });
+                });
+
+                $('form#review-form').on('submit', function () {
+                    let rating = $(this).find('input[name="rating"]:checked').val();
+                    rating = rating > 1 ? rating + ' Stars' : rating + ' Star';
+                    let quantity = $('input[name="qty"]').val();
+                    let dataReview = {
+                        'quantity' : quantity,
+                        'review_title' : $(this).find('input[name="title"]').val(),
+                        'review_message' : $(this).find('textarea[name="detail"]').val(),
+                        'review_photo' : $(this).find('.file-uploader-preview').length ? "Yes" : "No",
+                        'review_rating' : rating
+                    };
+                    $.localStorage.set('review_data',dataReview);
+                });
+
+                async.async('[data-gtm-message="success"]', function () {
+                    //Todo Remove Debug
+                    console.log($('[data-gtm-message="success"]').text());
+                    if ($('[data-gtm-message="success"]').text().includes($.mage.__('Thank you for reviewing'))) {
+                        let dataReview = $.localStorage.get('review_data');
+                        data['quantity'] = dataReview['quantity'];
+                        data['review_title'] = dataReview['review_title'];
+                        data['review_message'] = dataReview['review_message'];
+                        data['review_photo'] = dataReview['review_photo'];
+                        data['review_rating'] = dataReview['review_rating'];
+                        //Todo Remove Debug
+                        console.log(data);
+                        gtm.push('review_submitted', data);
+                        $.localStorage.remove('review_data');
+                    }
+                });
+
+                setTimeout(function () {
+                    gtm.push("product_detail_view", data);
+                }, 3000);
+
+                $('.product.info.detailed').find('a').on('click', function () {
+                    data['menu_name'] = $(this).text();
+                    if (typeof data['menu_name'] !== 'undefined') {
+                        data['menu_name'] = $(this).text().trim();
+                    }
+                    data['quantity'] = $('input[name="qty"]').val();
+                    gtm.push('pdp_info_tab', data);
+                });
+
+                async.async('[data-gtm-event="product_click"]', function () {
+                    if (!eventCreate['[data-gtm-event="product_click"]']) {
+                        eventCreate['[data-gtm-event="product_click"]'] = 0;
+                    }
+                    let current = $($('[data-gtm-event="product_click"]')[eventCreate['[data-gtm-event="product_click"]']]);
+                    $(current).on('click', function (e) {
+                        e.preventDefault();
+                        let data_product_pdp = $(this).attr('data-gtm-product');
+                        let url = $(this).attr('href');
+                        if (data_product_pdp) {
+                            try {
+                                data_product_pdp = JSON.parse(data_product_pdp);
+                                data_product_pdp['list'] = $(this).attr('data-gtm-list');
+                                data_product_pdp['position'] = $(this).attr('data-gtm-position');
+                                data_product_pdp['eventCallback'] = function () {
+                                    document.location = url;
+                                };
+                                gtm.push('productClick', data_product_pdp);
+                            } catch (e) {
+                                window.location = url;
+                            }
+                        } else {
+                            window.location = url;
+                        }
+                    });
+                    eventCreate['[data-gtm-event="product_click"]']++;
+                });
+
+                async.async('[data-gtm-event="product_view"]', function () {
+                    if (!eventCreate['[data-gtm-event="product_view"]']) {
+                        eventCreate['[data-gtm-event="product_view"]'] = 0;
+                    }
+                    let current = $($('[data-gtm-event="product_view"]')[eventCreate['[data-gtm-event="product_view"]']]);
+                    let data_product_pdp = $(current).attr('data-gtm-product');
+                    if (data_product_pdp) {
+                        try {
+                            data_product_pdp = JSON.parse(data_product_pdp);
+                            data_product_pdp['list'] = $(current).attr('data-gtm-list');
+                            data_product_pdp['position'] = $(current).attr('data-gtm-position');
+                            gtm.push('product_view', data_product_pdp);
+                        } catch (e) {
+
+                        }
+                    }
+                    eventCreate['[data-gtm-event="product_view"]']++;
+                });
+
+                async.async('[data-gtm-message="success"]', function () {
+                    //Todo Remove Debug
+                    console.log($('[data-gtm-message="success"]').text());
+                    if ($('[data-gtm-message="success"]').text().includes($.mage.__('Item has been added to Compare Products.'))) {
+                        gtm.push('compare_product', data);
+                    }
+                });
+            });
+        });
+    </script>
+<?php endif; ?>

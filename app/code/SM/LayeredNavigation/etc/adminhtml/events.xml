@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_LayeredNavigation
+ *
+ * Date: April, 27 2020
+ * Time: 6:09 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="adminhtml_catalog_category_after_save">
+        <observer name="category_save_filter_list"
+                  instance="SM\LayeredNavigation\Observer\SaveFilterList"/>
+    </event>
+</config>

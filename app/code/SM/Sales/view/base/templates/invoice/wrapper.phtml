@@ -1,0 +1,13 @@
+<?php
+/**
+ * @var \SM\Sales\Block\Invoice\Wrapper $block;
+ */
+
+/** @var \SM\Sales\Block\Invoice\Content $contentBlock */
+$contentBlock = $block->getChildBlock("sm.sales.order.view.content");
+$contentBlock->setInvoice($block->getInvoice());
+
+echo $block->getPDF($contentBlock->toHtml());
+
+die; /** TODO: Fix unable to load PDF error */
+

@@ -1,0 +1,335 @@
+<?php
+// @codingStandardsIgnoreFile
+/** @var \SM\Customer\Block\Form\Register $block */
+if (!$block->isLoggedIn()) :?>
+    <div class="block-container-signin block-container--register" id="register" style="display: none">
+        <div class="row no-gutters">
+            <div class="container-signin--left col-xs-12 col-xl-6">
+                <img src='<?= $block->escapeUrl($block->getViewFileUrl('images/reliable.jpg')); ?>' alt="Welcome" loading="lazy" width="585" height="859">
+            </div>
+            <div class="container-signin--right col-xs-12 col-xl-6">
+                <div class="container-signin--content">
+                    <div class="block-title block-title-register">
+                        <strong id="block-customer-login-heading" role="heading"
+                                aria-level="2"><?= __('CREATE ACCOUNT') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?></strong>
+                    </div>
+                    <form class="form create account form-create-account"
+                          action="<?= $block->escapeUrl($block->getPostActionUrl()) ?>" method="post"
+                          data-mage-init='{"validation":{}}' autocomplete="off">
+                        <?= $block->getBlockHtml('formkey'); ?>
+
+                        <p class="block-subtitle">
+                            <?= __("Join now to enjoy Transmart's delightful shopping experience, promotions, loyalty program, rewards and so much more!") //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?>
+                        </p>
+                        <fieldset class="fieldset create info" data-hasrequired="<?= __('* Required Fields') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?>">
+                            <div class="field name">
+                                <label class="label"
+                                       for="name"><span><?= __('Full Name') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?></span></label>
+                                <div class="control">
+                                    <input name="name" id="name" type="text" class="input-text required-entry"
+                                           title="<?= __('Full Name') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?>"
+                                           data-validate="{required:true, 'minlength':1, 'maxlength':50 }"
+                                           autocomplete="off">
+                                </div>
+                            </div>
+
+                            <div class="field email ">
+                                <label class="label"
+                                       for="email"><span><?= __('Email') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?></span></label>
+                                <div class="control">
+                                    <input name="email" id="email" type="email" class="input-text"
+                                           title="<?= __('Email') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?>"
+                                           data-validate="{required:true, 'validate-customer-email':true}">
+                                </div>
+                            </div>
+
+                            <div class="field telephone ">
+                                <label class="label" for="telephone"><span><?= $block->escapeHtml(__('Mobile Number')) ?></span></label>
+                                <div class="control">
+                                    <input name="telephone" id="telephone" value="08"  type="number" class="input-text"
+                                           title="<?= __('Mobile Number') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?>"
+                                           data-validate="{required:true, 'validate-phone-require':true, 'validate-phone':true, 'validate-number':true, 'minlength':10, 'maxlength':16}">
+                                </div>
+                            </div>
+
+                            <div class="field password ">
+                                <label for="password" class="label"><span><?= __('Password') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?></span></label>
+                                <div class="control input-group">
+                                    <input type="password" name="password" id="password"
+                                           title="<?= __('Password') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?>"
+                                           class="input-text"
+                                           data-password-min-length="<?= $block->escapeHtmlAttr($block->getMinimumPasswordLength()) ?>"
+                                           data-password-min-character-sets="<?= $block->escapeHtmlAttr($block->getRequiredCharacterClassesNumber()) ?>"
+                                           data-validate="{required:true, 'validate-trans-password':true}"
+                                           autocomplete="off">
+                                    <div class="input-group-prepend input-group-password" id="show_password" >
+                                            <span class="input-group-text" id="inputGroupPrepend">
+                                                <a class="input-icon-eye eye-back" href="javascript:void(0)" aria-hidden="true"><svg aria-hidden="true" class="stUf5b" fill="currentColor" focusable="false" width="19px" height="19px" viewBox="0 0 24 24" xmlns="https://www.w3.org/2000/svg"><path d="M10.58,7.25l1.56,1.56c1.38,0.07,2.47,1.17,2.54,2.54l1.56,1.56C16.4,12.47,16.5,12,16.5,11.5C16.5,9.02,14.48,7,12,7 C11.5,7,11.03,7.1,10.58,7.25z"></path><path d="M12,6c3.79,0,7.17,2.13,8.82,5.5c-0.64,1.32-1.56,2.44-2.66,3.33l1.42,1.42c1.51-1.26,2.7-2.89,3.43-4.74 C21.27,7.11,17,4,12,4c-1.4,0-2.73,0.25-3.98,0.7L9.63,6.3C10.4,6.12,11.19,6,12,6z"></path><path d="M16.43,15.93l-1.25-1.25l-1.27-1.27l-3.82-3.82L8.82,8.32L7.57,7.07L6.09,5.59L3.31,2.81L1.89,4.22l2.53,2.53 C2.92,8.02,1.73,9.64,1,11.5C2.73,15.89,7,19,12,19c1.4,0,2.73-0.25,3.98-0.7l4.3,4.3l1.41-1.41l-3.78-3.78L16.43,15.93z M11.86,14.19c-1.38-0.07-2.47-1.17-2.54-2.54L11.86,14.19z M12,17c-3.79,0-7.17-2.13-8.82-5.5c0.64-1.32,1.56-2.44,2.66-3.33 l1.91,1.91C7.6,10.53,7.5,11,7.5,11.5c0,2.48,2.02,4.5,4.5,4.5c0.5,0,0.97-0.1,1.42-0.25l0.95,0.95C13.6,16.88,12.81,17,12,17z"></path></svg></a>
+                                                <a class="input-icon-eye eye-front " href="javascript:void(0)" aria-hidden="true"><svg aria-hidden="true" class="stUf5b" fill="currentColor" focusable="false" width="19px" height="19px" viewBox="0 0 24 24" xmlns="https://www.w3.org/2000/svg"><path d="M12,7c-2.48,0-4.5,2.02-4.5,4.5S9.52,16,12,16s4.5-2.02,4.5-4.5S14.48,7,12,7z M12,14.2c-1.49,0-2.7-1.21-2.7-2.7 c0-1.49,1.21-2.7,2.7-2.7s2.7,1.21,2.7,2.7C14.7,12.99,13.49,14.2,12,14.2z"></path><path d="M12,4C7,4,2.73,7.11,1,11.5C2.73,15.89,7,19,12,19s9.27-3.11,11-7.5C21.27,7.11,17,4,12,4z M12,17 c-3.79,0-7.17-2.13-8.82-5.5C4.83,8.13,8.21,6,12,6s7.17,2.13,8.82,5.5C19.17,14.87,15.79,17,12,17z"></path></svg></a>
+
+                                            </span>
+                                    </div>
+
+                                    <div id="password-strength-meter-container" data-role="password-strength-meter" aria-live="polite" style="display:none">
+                                        <div id="password-strength-meter" class="password-strength-meter">
+                                            <?= __('Password Strength') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?>:
+                                            <span id="password-strength-meter-label" data-role="password-strength-meter-label">
+                                                <?= __('No Password') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div id="suggestion-password" style="display: none">
+                                        <span id="sg-title"></span>
+                                        <span id="sg-password"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="field confirmation ">
+                                <label for="password-confirmation" class="label"><span><?= __('Confirm Password') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?></span></label>
+                                <div class="control input-group">
+                                    <input type="password" name="password_confirmation"
+                                           title="<?= __('Confirm Password') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?>"
+                                           id="password-confirmation"
+                                           class="input-text"
+                                           data-password-min-length="<?= $block->escapeHtmlAttr($block->getMinimumPasswordLength()) ?>"
+                                           data-password-min-character-sets="<?= $block->escapeHtmlAttr($block->getRequiredCharacterClassesNumber()) ?>"
+                                           data-validate="{required:true, equalTo:'#password','validate-trans-password':true}"
+                                           autocomplete="off">
+                                    <div class="input-group-prepend input-group-password" id="show_confirmation" >
+                                            <span class="input-group-text" id="inputGroupPrepend">
+                                                <a class="input-icon-eye eye-back"  href="javascript:void(0)" aria-hidden="true"><svg aria-hidden="true" class="stUf5b" fill="currentColor" focusable="false" width="19px" height="19px" viewBox="0 0 24 24" xmlns="https://www.w3.org/2000/svg"><path d="M10.58,7.25l1.56,1.56c1.38,0.07,2.47,1.17,2.54,2.54l1.56,1.56C16.4,12.47,16.5,12,16.5,11.5C16.5,9.02,14.48,7,12,7 C11.5,7,11.03,7.1,10.58,7.25z"></path><path d="M12,6c3.79,0,7.17,2.13,8.82,5.5c-0.64,1.32-1.56,2.44-2.66,3.33l1.42,1.42c1.51-1.26,2.7-2.89,3.43-4.74 C21.27,7.11,17,4,12,4c-1.4,0-2.73,0.25-3.98,0.7L9.63,6.3C10.4,6.12,11.19,6,12,6z"></path><path d="M16.43,15.93l-1.25-1.25l-1.27-1.27l-3.82-3.82L8.82,8.32L7.57,7.07L6.09,5.59L3.31,2.81L1.89,4.22l2.53,2.53 C2.92,8.02,1.73,9.64,1,11.5C2.73,15.89,7,19,12,19c1.4,0,2.73-0.25,3.98-0.7l4.3,4.3l1.41-1.41l-3.78-3.78L16.43,15.93z M11.86,14.19c-1.38-0.07-2.47-1.17-2.54-2.54L11.86,14.19z M12,17c-3.79,0-7.17-2.13-8.82-5.5c0.64-1.32,1.56-2.44,2.66-3.33 l1.91,1.91C7.6,10.53,7.5,11,7.5,11.5c0,2.48,2.02,4.5,4.5,4.5c0.5,0,0.97-0.1,1.42-0.25l0.95,0.95C13.6,16.88,12.81,17,12,17z"></path></svg></a>
+                                                <a class="input-icon-eye eye-front " href="javascript:void(0)"  aria-hidden="true"><svg aria-hidden="true" class="stUf5b" fill="currentColor" focusable="false" width="19px" height="19px" viewBox="0 0 24 24" xmlns="https://www.w3.org/2000/svg"><path d="M12,7c-2.48,0-4.5,2.02-4.5,4.5S9.52,16,12,16s4.5-2.02,4.5-4.5S14.48,7,12,7z M12,14.2c-1.49,0-2.7-1.21-2.7-2.7 c0-1.49,1.21-2.7,2.7-2.7s2.7,1.21,2.7,2.7C14.7,12.99,13.49,14.2,12,14.2z"></path><path d="M12,4C7,4,2.73,7.11,1,11.5C2.73,15.89,7,19,12,19s9.27-3.11,11-7.5C21.27,7.11,17,4,12,4z M12,17 c-3.79,0-7.17-2.13-8.82-5.5C4.83,8.13,8.21,6,12,6s7.17,2.13,8.82,5.5C19.17,14.87,15.79,17,12,17z"></path></svg></a>
+
+                                            </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="field delivery-area actions-toolbar">
+
+
+                                    <div class="row">
+                                        <div class="col-xs-6 col-md-6">
+                                            <label class="label" for="delivery-area"><span><?= __('Delivery Area') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?></span></label>
+                                            <div class="autocomplete dropdown-city">
+                                                <div class="dropdown-toggle">
+                                                    <label for="city"/>
+                                                    <input autocomplete="<?= substr(md5(mt_rand()), 0, 7); ?>" id="city" selector="city" type="text" placeholder="<?= $block->escapeHtml(__('Select City')) ?>" data-validate='{"required":true}' />
+                                                </div>
+
+                                                <ul id="city-list" class="dropdown" selector="city-list" style="display: none"></ul>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6 col-md-6">
+                                            <div class="autocomplete  dropdown-city">
+
+                                                <label class="label" for="delivery-area"><span><?= __('District') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?></span></label>
+                                                <div class="dropdown-toggle">
+                                                <span class="action toggle district-fake-current" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+                                                    <span><?= $block->escapeHtml(__('Select District')) ?></span>
+                                                </span>
+                                                </div>
+                                                <ul class="dropdown district-fake" data-role="sorter">
+                                                </ul>
+                                                <div class="select-district">
+                                                    <select class="" id="district" name="district" placeholder="<?= __('District') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?>" data-validate='{"required":true}'>
+                                                        <optgroup>
+                                                            <option value="" ><?= __('Select District') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?></option>
+                                                        </optgroup>
+                                                    </select>
+                                                    <input id="cityId" name="city" type="hidden"/>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+
+                            </div>
+
+                        </fieldset>
+
+                        <div class="terms-policy actions-toolbar">
+                            <label class="label">
+                                <span>
+                                    <?= __('By signing up, I agree to the ') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?>
+                                    <a href="#" id="register-terms-conditions"><?= __('Terms of Use') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?></a>
+                                    <?= __('and') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?>
+                                    <a href="#" id="register-privacy-policy"><?= __('Privacy Policy') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?></a>
+                                </span>
+                            </label>
+                        </div>
+                        <?= $block->getChildHtml('terms.conditions') ?>
+                        <?= $block->getChildHtml('privacy.policy') ?>
+
+                        <div class="actions-toolbar">
+                            <button type="submit" id="button-register" class="action register primary" title="<?= __('Register') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?>">
+                                <span><?= __('Register') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?></span></button>
+                            <div id="otp-error"></div>
+
+                        </div>
+                    </form>
+
+                    <div class="form-social">
+                        <?= $block->getChildBlock('register.popup.authentication.social')->toHtml(); ?>
+
+                        <div class="create-account">
+                            <p><?= __('Already have an account?') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?></p>
+                            <button type="button" class="action create secondary" id="login">
+                                <span><?= __('Sign In') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?></span></button>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        require(
+            [
+                'jquery',
+                'Magento_Ui/js/modal/modal',
+                'ForgotPassword',
+                'OtpVerification',
+                'ValidateEmail',
+                'ValidatePhone',
+                'FilloutCityDistrict',
+                'SuggestPassword',
+                'CustomerSocialProvider',
+                'mage/validation',
+                'domReady!'
+            ],
+            function($, modal, ForgotPassword, OtpVerification, validateEmail, validatePhone, fillOutCityDistrict, suggestPassword) {
+                let registerContainer = $('#register'),
+                    options = {
+                    type: 'popup',
+                    responsive: true,
+                    innerScroll: false,
+                    title: '',
+                    buttons: [],
+                    clickableOverlay: false,
+                    opened: function($Event) {
+                        $('.modal-header button.action-close', $Event.srcElement).hide();
+                    },
+                    keyEventHandlers: {
+                        escapeKey: function () { return; }
+                    }
+                };
+                modal(options, registerContainer);
+
+                $('body').on('click', '#create-account', function() {
+                    $('#tab-login').modal('closeModal');
+                    var registerModal = registerContainer.modal('openModal').show().closest('.modal-popup').addClass('modal-popup-signin');
+                    validateEmail.create(registerModal);
+                    validatePhone.create(registerModal);
+                    fillOutCityDistrict.create(registerModal);
+                    suggestPassword.create(registerModal);
+                });
+
+                registerContainer.find('input').change(function () {
+                    $.validator.validateSingleElement($(this));
+                    let errorEmail = registerContainer.find('.mage-error[id="email-error"]');
+                    let errorPass = registerContainer.find('.mage-error[id="password-error"]');
+                    let errorPassConfirm = registerContainer.find('.mage-error[id="password-confirmation-error"]');
+                    let errorPhone = registerContainer.find('.mage-error[id="telephone-error"]');
+                    let emailRegistered = registerContainer.find('.mage-error[id="advice-required-entry-email_address"]');
+                    let phoneRegistered = registerContainer.find('.mage-error[id="advice-required-entry-telephone"]');
+
+                    if (errorEmail.css('display') == "block") {
+                        if (errorPhone.css('display') == "block") {
+                            if (errorPass.css('display') == "block" || errorPassConfirm.css('display') == "block") {
+                                $(document).trigger('customer:register-fail');
+                            } else {
+                                $(document).trigger('customer:register-fail-email-phone');
+                            }
+                        } else if (errorPass.css('display') == "block" || errorPassConfirm.css('display') == "block") {
+                            $(document).trigger('customer:register-fail-email-pass');
+                        } else {
+                            $(document).trigger('customer:register-fail-email');
+                        }
+                    } else if (errorPhone.css('display') == "block") {
+                        if(errorPass.css('display') == "block" || errorPassConfirm.css('display') == "block") {
+                            $(document).trigger('customer:register-fail-phone-pass');
+                        } else {
+                            $(document).trigger('customer:register-fail-phone');
+                        }
+                    } else if(errorPass.css('display') == "block" || errorPassConfirm.css('display') == "block") {
+                        $(document).trigger('customer:register-fail-pass');
+                    }
+
+                    if (emailRegistered.css('display') == "block") {
+                        if (phoneRegistered.css('display') == "block") {
+                            $(document).trigger('customer:already-registered');
+                        } else {
+                            $(document).trigger('customer:already-registered-email');
+                        }
+                    } else if (phoneRegistered.css('display') == "block") {
+                        $(document).trigger('customer:already-registered-phone');
+                    }
+                });
+
+                registerContainer.on('click', '#show_password,#show_confirmation', function() {
+                    //let passwordField = registerContainer.find('#password');
+                    let passwordField = $(this).parents('.input-group').find('.input-text');
+                    if (passwordField.attr('type') === 'password') {
+                        passwordField.attr('type', 'text');
+                    } else {
+                        passwordField.attr('type', 'password');
+                    }
+                    $(this).toggleClass('show-password');
+                });
+
+                registerContainer.find('#show_password').mouseover(function(){
+                    registerContainer.find('.confirmation span').addClass('disable-forcus');
+                    registerContainer.find('#password-strength-meter').addClass('disable-forcus');
+                });
+
+                registerContainer.find('#show_password').mouseleave(function(){
+                    registerContainer.find('.confirmation span').removeClass('disable-forcus');
+                    registerContainer.find('#password-strength-meter').removeClass('disable-forcus');
+                });
+
+
+                registerContainer.find('#telephone').keyup(function(e) {
+                    if (this.value.length < 2) {
+                        this.value = '08';
+                    } else if (this.value.indexOf('08') !== 0) {
+                        this.value = '08' + String.fromCharCode(e.which);
+                    }
+                });
+
+                registerContainer.find('#button-register').click(function(event) {
+                    event.preventDefault();
+                    var dataForm = registerContainer.find('.form-create-account');
+                    var ignore = null;
+
+                    dataForm.mage('validation', {
+                        ignore: ignore ? ':hidden:not(' + ignore + ')' : ':hidden'
+                    }).find('input:text').attr('autocomplete', 'off');
+                    dataForm.validation('isValid');
+                    if (dataForm.validation('isValid') === true) {
+                        $('#phone-otp').text(registerContainer.find("input[name='telephone']").val());
+                        OtpVerification.sendOtp('register', registerContainer.find('#telephone').val(), false, $('#otp-error'), registerContainer, function () {
+                            registerContainer.find(".form-create-account").submit();
+                        });
+                    }
+
+                });
+            }
+        );
+    </script>
+    <script type="text/x-magento-init">
+    {
+        ".field.password": {
+            "passwordStrengthIndicator": {
+                "formSelector": "form.form-create-account"
+            }
+        }
+    }
+</script>
+<?php endif; ?>
+

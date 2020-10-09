@@ -1,0 +1,13 @@
+<?php
+/** @var $block Toolbar */
+
+use Mirasvit\Blog\Block\Post\PostList\Toolbar;
+
+?>
+<?php if ($block->getCollection()->getSize()): ?>
+    <div class="toolbar blog-post-list__toolbar">
+        <?php include($block->getTemplateFile('post/list/toolbar/amount.phtml')) ?>
+
+        <?= $block->getPagerHtml() ?>
+    </div>
+<?php endif ?>

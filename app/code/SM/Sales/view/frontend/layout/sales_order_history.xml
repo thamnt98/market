@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="customer_account"/>
+    <body>
+        <referenceBlock name="breadcrumbs" remove="true"/>
+        <referenceContainer name="page.top">
+            <block class="Magento\Theme\Block\Html\Breadcrumbs" name="custom_breadcrumbs">
+                <action method="addCrumb">
+                    <argument name="crumbName" xsi:type="string">Home</argument>
+                    <argument name="crumbInfo" xsi:type="array">
+                        <item name="title" xsi:type="string">Home</item>
+                        <item name="label" xsi:type="string">Home</item>
+                        <item name="link" xsi:type="string">{{baseUrl}}</item>
+                    </argument>
+                </action>
+                <action method="addCrumb">
+                    <argument name="crumbName" xsi:type="string">My Orders</argument>
+                    <argument name="crumbInfo" xsi:type="array">
+                        <item name="title" xsi:type="string">My Orders</item>
+                        <item name="label" xsi:type="string" translate="true">My Orders</item>
+                    </argument>
+                </action>
+            </block>
+        </referenceContainer>
+        <referenceBlock name="page.main.title">
+            <action method="setPageTitle">
+                <argument translate="true" name="title" xsi:type="string">Order List</argument>
+            </action>
+        </referenceBlock>
+        <referenceContainer name="content">
+            <referenceBlock name="sales.order.history" remove="true"/>
+            <referenceBlock name="customer.account.link.back" remove="true"/>
+            <block class="SM\Sales\Block\Customer\Order\Listing" name="sm.sales.order.listing" template="SM_Sales::customer/order/listing/list.phtml">
+                <block class="SM\Sales\Block\Customer\Order\Toolbar" name="sm.sales.order.toolbar" template="SM_Sales::customer/order/listing/toolbar.phtml"/>
+                <block class="SM\Sales\Block\Customer\Order\Tabs" name="sm.sales.order.tabs" template="SM_Sales::customer/order/listing/tabs.phtml"/>
+                <block class="SM\Sales\Block\Order\Listing\ParentOrderItem" name="sm.sales.order.parent.order">
+                    <block class="SM\Sales\Block\Order\Button\ReorderAll" name="sm.sales.order.button.reorder.all" template="SM_Sales::order/reorder-all.phtml"/>
+                    <block class="SM\Sales\Block\Customer\Order\ProgressBar" name="sm.sales.order.listing.item.progress.bar" as="progress.bar" template="SM_Sales::customer/order/listing/progress-bar.phtml"/>
+                    <block class="SM\Sales\Block\Order\Digital\Part\Content" name="sm.sales.order.listing.item.payment" template="SM_Sales::order/payment-info.phtml"/>
+                </block>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

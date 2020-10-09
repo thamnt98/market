@@ -1,0 +1,9 @@
+<?php /** @var $block \SM\Catalog\Block\Product\View */ ?>
+<?php $percent = $block->getDiscountPercent($block->getProduct()); ?>
+<?php if($percent > 0 ): ?>
+<div class="disc-percent" style="display: <?=$percent > 0 ? 'block':'none'?> ;">
+    <span class="badge-discount-pdp"><?= $block->escapeHtml(__('Disc  %1 %', $percent)); ?></span>
+    <span class="original-price"><?= $block->getOriginalPrice($block->getProduct()) ?></span>
+</div>
+
+<?php endif ?>

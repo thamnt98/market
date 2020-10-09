@@ -1,0 +1,23 @@
+<div id="tobacco-product-popup-content"
+     class="content popup-tobacco"
+     data-is-show="<?= $block->isShow()?>"
+     style="display: none">
+    <img src='<?= $block->getViewFileUrl('images/tobacco-verification.png'); ?>' alt="tobacco"/>
+    <h4 class="text"><?= $block->escapeHtml(__("You have to be "))?>
+        <span class="bold"><?= $block->escapeHtml(__("at least 18 years old "))?></span>
+        <?= $block->escapeHtml(__("to purchase tobacco products"))?><br/>
+        <span class="bold"><?= $block->escapeHtml(__("& at least 21 years old "))?></span>
+        <?= $block->escapeHtml(__("to purchase alcohol products."))?>
+    </h4>
+    <h4 class="text">
+        <?= $block->escapeHtml(__("We will also do ID verification upon delivery & pick-up."))?>
+    </h4>
+</div>
+
+<script type="text/x-magento-init">
+{
+    "*": {
+        "SM_TobaccoAlcoholProduct/js/trigger-popup" : {}
+    }
+}
+</script>

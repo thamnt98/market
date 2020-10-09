@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <andromeda_api>
+            <sms_verification>
+                <verification_code_expired_in>30</verification_code_expired_in>
+                <lock_after_number_of_failed>5</lock_after_number_of_failed>
+                <unlock_after_number_of_hours>24</unlock_after_number_of_hours>
+            </sms_verification>
+        </andromeda_api>
+    </default>
+</config>

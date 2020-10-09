@@ -1,0 +1,33 @@
+<?php
+
+/** @var $block \SM\FreshProduct\Block\Order\Item */
+
+$product = $block->getProduct();
+$qty = $block->getQty();
+$weight = number_format($product->getWeight());
+$freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
+?>
+
+<?php if ($freshHelper->isPriceInKg($product)) : ?>
+    <?php if ($freshHelper->isShowPromoPrice($product)) : ?>
+        <span class="old-price">
+            <?= $block->escapeHtml($freshHelper->formatPrice($freshHelper->getBasePrice($product)) . '/kg') ?>
+        </span>
+        <span class="special-price">
+            <?= $block->escapeHtml($freshHelper->formatPrice($freshHelper->getPromoPrice($product)) . '/kg') ?>
+        </span>
+
+
+    <?php else : ?>
+        <span class="price-box"><?= $block->escapeHtml($freshHelper->getPricePerKg($product) . '/kg') ?></span>
+    <?php endif; ?>
+    <br>
+    <span class="value"><?php echo ($qty) ?></span>
+    <span class="label">x</span>
+    <span class="product-weight"><?php echo($weight . ' gram') ?></span>
+    <span class="total-weight"><?= $block->escapeHtml('(' . $block->getTotalWeight($qty, $weight) . ' gram)') ?></span>
+<?php else : ?>
+    <span class="value"><?php echo ($qty) ?></span>
+    <span class="label"><?= $block->escapeHtml($freshHelper->getSoldIn($product)) ?></span>
+    <span class="total-weight"><?= $block->escapeHtml('(' . $block->getTotalWeight($qty, $weight) . ' gram)') ?></span>
+<?php endif; ?>

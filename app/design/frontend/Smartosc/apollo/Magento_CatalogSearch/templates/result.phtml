@@ -1,0 +1,127 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** This changes need to valid applying filters and configuration before search process is started. */
+/** @var \SM\Search\Block\Result $block */
+
+/** @var \Magento\CatalogSearch\Helper\Data $helper */
+$helper = $this->helper(\Magento\CatalogSearch\Helper\Data::class);
+$resultCount = $block->getResultCount();
+?>
+<?php if ($resultCount) : ?>
+    <?= /* @noEscape */ $block->getChildHtml('tagged_product_list_rss_link') ?>
+<div class="search results">
+    <?php if ($messages = $block->getNoteMessages()) : ?>
+    <div class="message notice">
+        <div>
+            <?php foreach ($messages as $message) : ?>
+                <?= /* @noEscape */ $message ?><br />
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <?php endif; ?>
+    <h3 class="search-summary">
+        <?php
+        if ($resultCount > 1) {
+            echo __('%1 results found for "%2"', $resultCount, $helper->getEscapedQueryText());
+        }
+        else {
+            echo __('1 result found for "%1"', $helper->getEscapedQueryText());
+        }
+        ?>
+    </h3>
+    <?php $block->removeChildAdditional() ?>
+    <?= /* @noEscape */ $block->getProductListHtml() ?>
+</div>
+<?php else : ?>
+<style type="text/css">
+    .catalogsearch-result-index .column.main {
+        width: 100%;
+        float: none;
+    }
+    .catalogsearch-result-index .sidebar {
+        display: none;
+    }
+    .catalogsearch-result-index .no-result .toolbar {
+        display: none;
+    }
+</style>
+<?php
+    $suggestions = $block->getAdditionalHtml();
+    if ($suggestions) {
+?>
+    <div class="search suggest">
+        <div class="suggest__miss--head">
+            <?php
+                echo $block->escapeHtml($block->getNoResultText() ? $block->getNoResultText() : __('Sorry, we cannot find "%1".', $helper->getEscapedQueryText()));
+                echo $suggestions;
+            ?>
+        </div>
+
+            <?php if ($messages = $block->getNoteMessages()) : ?>
+                <div class="message notice">
+                    <div>
+                        <?php foreach ($messages as $message) : ?>
+                            <?= /* @noEscape */ $message ?><br />
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
+        <h3 class="search-summary">
+            <?php
+            $block->prepareSuggestionList();
+            $resultCount = $block->getResultCount();
+            if ($resultCount > 1) {
+                echo __('%1 results found for "%2"', $resultCount, $block->getSuggestionKeyword());
+            }
+            else {
+                echo __('1 result found for "%1"', $block->getSuggestionKeyword());
+            }
+            ?>
+        </h3>
+        <?php $block->removeChildAdditional() ?>
+        <?= /* @noEscape */ $block->getProductListHtml() ?>
+    </div>
+<?php } else { ?>
+    <div class="search no-result">
+        <div class="block-no-result">
+            <img src='<?php echo $this->getViewFileUrl('images/search-not-found.png'); ?>' alt="Demo">
+            <div class="content-no-result">
+                <h3><?php echo __('Sorry, it\'s currently unavailable.')?></h3>
+                <div class="txt-description"><?php echo __('But no worries, we have something that you might like!')?></div>
+            </div>
+        </div>
+        <?php if ($messages = $block->getNoteMessages()) : ?>
+            <div class="message notice">
+                <div>
+                    <?php foreach ($messages as $message) : ?>
+                        <?= /* @noEscape */ $message ?><br />
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endif; ?>
+        <?php
+        $recommendCount = $block->prepareRecommendationListOnNoResult();
+        if ($recommendCount !== null && $recommendCount > 0) { ?>
+            <h3 class="search-summary search-summary__noresult">
+                <?php
+                    echo __('What we have for you');
+                ?>
+            </h3>
+            <?php $block->removeChildAdditional() ?>
+            <?= /* @noEscape */ $block->getProductListHtml() ?>
+        <?php } ?>
+    </div>
+<?php } ?>
+<?php endif; ?>
+
+<script>
+    require([
+        'jquery',
+    ], function ($) {
+        $('#toolbar-amount').hide();
+    });
+</script>

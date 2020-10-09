@@ -1,0 +1,131 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+?>
+<div class="notifications">
+    <h2><?= $block->escapeHtml(__('Notifications')) ?></h2>
+    <div class="headtab-toolbar">
+        <div class="sortby-dropdown shoplist-sortby">
+        <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+            <span><?= $block->escapeHtml('Sort by') ?></span>
+        </span>
+            <ul class="dropdown">
+                <li class="item checkbox-custom">
+                    <input type="checkbox" name="recent" checked/>
+                    <label for="recent"><?= $block->escapeHtml('Recent') ?></label>
+                </li>
+                <li class="item checkbox-custom">
+                    <input type="checkbox" name="previous"/>
+                    <label for="previous"><?= $block->escapeHtml('Previous') ?></label>
+                </li>
+            </ul>
+        </div>
+
+        <div class="shoplist-search">
+            <div class="control">
+                <a href="#"><span class="apl-ic_search"></span></a>
+                <input id="search" type="text" name="q" value=""
+                       placeholder="<?= $block->escapeHtml(__('Search product in this list'))?>"
+                       class="input-text" maxlength="128" role="combobox" aria-haspopup="false"
+                       aria-autocomplete="both" autocomplete="off" aria-expanded="true"/>
+            </div>
+        </div>
+    </div>
+    <div class="product data items"
+         data-mage-init='{"mage/tabs": {"openedState": "active", "animate": {"duration": 100}, "active": 1, "disabled": [2], "disabledState": "disabled"}}'>
+
+            <div class="item title active" data-role="collapsible">
+                <a class="switch" data-toggle="trigger" href="#tab-alls">Alls</a>
+            </div>
+            <div id="tab-alls" class="item content" data-role="content">
+                <ul class="noti-list-content">
+                    <li class="noti-item">
+                        <span class="note-img"><img src='<?= $block->getViewFileUrl('images/icon-ship.png'); ?>' alt="" /></span>
+                        <div class="noti-item-content">
+                            <span class="noti-status"><span>Order Status</span><span class="noti-date">1 Nov 2019</span></span>
+                            <h4>Order <a href="#">ID/29038321 </a> is on its way!</h4>
+                            <p class="noti-descrip">Order <a href="#">ID/29038329</a> is now being processed. Check out the progress in My Order.</p>
+                        </div>
+                    </li>
+                    <li class="noti-item">
+                        <span class="note-img"><img src='<?= $block->getViewFileUrl('images/icon-ship.png'); ?>' alt="" /></span>
+                        <div class="noti-item-content">
+                            <span class="noti-status"><span>Order Status</span><span class="noti-date">1 Nov 2019</span></span>
+                            <h4>Order <a href="#">ID/29038321 </a> is on its way!</h4>
+                            <p class="noti-descrip">Order <a href="#">ID/29038329</a> is now being processed. Check out the progress in My Order.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="item title" data-role="collapsible">
+                <a class="switch" data-toggle="trigger" href="#tab-order-status">Order Status</a>
+            </div>
+               <div id="tab-order-status" class="item content" data-role="content"><ul class="noti-list-content">
+                       <li class="noti-item">
+                           <span class="note-img"><img src='<?= $block->getViewFileUrl('images/icon-ship.png'); ?>' alt="" /></span>
+                           <div class="noti-item-content">
+                               <span class="noti-status"><span>Order Status</span><span class="noti-date">1 Nov 2019</span></span>
+                               <h4>Order <a href="#">ID/29038321 </a> is on its way!</h4>
+                               <p class="noti-descrip">Order <a href="#">ID/29038329</a> is now being processed. Check out the progress in My Order.</p>
+                           </div>
+                       </li>
+                       <li class="noti-item">
+                           <span class="note-img"><img src='<?= $block->getViewFileUrl('images/icon-ship.png'); ?>' alt="" /></span>
+                           <div class="noti-item-content">
+                               <span class="noti-status"><span>Order Status</span><span class="noti-date">1 Nov 2019</span></span>
+                               <h4>Order <a href="#">ID/29038321 </a> is on its way!</h4>
+                               <p class="noti-descrip">Order <a href="#">ID/29038329</a> is now being processed. Check out the progress in My Order.</p>
+                           </div>
+                       </li>
+                   </ul></div>
+
+            <div class="item title" data-role="collapsible">
+                <a class="switch" data-toggle="trigger" href="#tab-events">Events</a>
+            </div>
+            <div id="tab-events" class="item content" data-role="content"><ul class="noti-list-content">
+                    <li class="noti-item">
+                        <span class="note-img"><img src='<?= $block->getViewFileUrl('images/icon-ship.png'); ?>' alt="" /></span>
+                        <div class="noti-item-content">
+                            <span class="noti-status"><span>Order Status</span><span class="noti-date">1 Nov 2019</span></span>
+                            <h4>Order <a href="#">ID/29038321 </a> is on its way!</h4>
+                            <p class="noti-descrip">Order <a href="#">ID/29038329</a> is now being processed. Check out the progress in My Order.</p>
+                        </div>
+                    </li>
+                    <li class="noti-item">
+                        <span class="note-img"><img src='<?= $block->getViewFileUrl('images/icon-ship.png'); ?>' alt="" /></span>
+                        <div class="noti-item-content">
+                            <span class="noti-status"><span>Order Status</span><span class="noti-date">1 Nov 2019</span></span>
+                            <h4>Order <a href="#">ID/29038321 </a> is on its way!</h4>
+                            <p class="noti-descrip">Order <a href="#">ID/29038329</a> is now being processed. Check out the progress in My Order.</p>
+                        </div>
+                    </li>
+                </ul></div>
+            <div class="item title" data-role="collapsible">
+                <a class="switch" data-toggle="trigger" href="#tab-promotions">Promotions</a>
+            </div>
+            <div id="tab-promotions" class="item content" data-role="content"><ul class="noti-list-content">
+                    <li class="noti-item">
+                        <span class="note-img"><img src='<?= $block->getViewFileUrl('images/icon-ship.png'); ?>' alt="" /></span>
+                        <div class="noti-item-content">
+                            <span class="noti-status"><span>Order Status</span><span class="noti-date">1 Nov 2019</span></span>
+                            <h4>Order <a href="#">ID/29038321 </a> is on its way!</h4>
+                            <p class="noti-descrip">Order <a href="#">ID/29038329</a> is now being processed. Check out the progress in My Order.</p>
+                        </div>
+                    </li>
+                    <li class="noti-item">
+                        <span class="note-img"><img src='<?= $block->getViewFileUrl('images/icon-ship.png'); ?>' alt="" /></span>
+                        <div class="noti-item-content">
+                            <span class="noti-status"><span>Order Status</span><span class="noti-date">1 Nov 2019</span></span>
+                            <h4>Order <a href="#">ID/29038321 </a> is on its way!</h4>
+                            <p class="noti-descrip">Order <a href="#">ID/29038329</a> is now being processed. Check out the progress in My Order.</p>
+                        </div>
+                    </li>
+                </ul></div>
+    </div>
+
+</div>
+
+

@@ -1,0 +1,35 @@
+<?php
+/**
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_Installation
+ *
+ * Date: May, 15 2020
+ * Time: 3:33 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ */ ?>
+<?php /** @var $block \SM\Installation\Block\View */ ?>
+<div class="installation-view" data-bind="scope:'installation-<?= $block->getData('item_id') ?>'">
+    <!-- ko template: getTemplate() --><!-- /ko -->
+    <script type="text/x-magento-init">
+        {
+            "*": {
+                "Magento_Ui/js/core/app": {
+                    "components": {
+                        "installation-<?= $block->getData('item_id') ?>": {
+                            "component"     : "SM_Installation/js/view",
+                            "data"          : <?= $block->getJsonData() ?? '{}' ?>,
+                            "showNote"      : <?= $block->getData('show_note') ?>,
+                            "tooltip"       : "<?= $block->escapeHtml($block->getTooltip()) ?>",
+                            "tooltipUrl"    : "<?= /* @noEscape */ $block->getViewFileUrl('images/info.svg') ?>"
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</div>

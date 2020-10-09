@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_Promotion
+ *
+ * Date: August, 17 2020
+ * Time: 10:41 AM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="sales_order_place_after">
+        <observer name="Amasty_RulesPro::after_place_order" disabled="true" />
+    </event>
+    <event name="sales_quote_collect_totals_before">
+        <observer name="SM_Promotion::BeforeCollectTotals"
+                  instance="SM\Promotion\Observer\Quote\BeforeCollectTotals" />
+    </event>
+</config>

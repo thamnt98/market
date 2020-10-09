@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_Customer
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Muhammad Randy <muhammad.randy@ctcorpdigital.com>
+ *
+ * Copyright © 2019 PT CTCORP Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="address_grid">
+            <action method="setTemplate">
+                <argument name="template" xsi:type="string">Trans_Customer::address/grid.phtml</argument>
+            </action>
+            <arguments>
+                <argument name="view_model" xsi:type="object">Trans\Customer\ViewModel\CustomerAddress</argument>
+            </arguments>
+        </referenceBlock>
+        <referenceBlock name="page.main.title" remove="true"/>
+        <referenceBlock name="address_book" remove="true"/>
+    </body>
+</page>

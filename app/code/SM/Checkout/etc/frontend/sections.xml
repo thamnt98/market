@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Customer:etc/sections.xsd">
+    <action name="transcheckout/cart/ajaxupdate">
+        <section name="cart"/>
+    </action>
+    <action name="transcheckout/cart/update">
+        <section name="cart"/>
+    </action>
+    <action name="digitalproduct/index/addtocart">
+        <section name="cart"/>
+    </action>
+</config>

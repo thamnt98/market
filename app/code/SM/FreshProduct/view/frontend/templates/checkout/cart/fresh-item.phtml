@@ -1,0 +1,28 @@
+<?php
+
+/** @var $block \SM\FreshProduct\Block\Product\View */
+
+$_product = $block->getProduct();
+$freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
+?>
+
+<?php if ($freshHelper->isFreshProduct($_product)) : ?>
+    <?php if ($freshHelper->isPriceInKg($_product)) : ?>
+        <?php if ($freshHelper->isShowPromoPrice($_product)) : ?>
+         <div class="fresh-price">
+              <span class="old-price">
+                                <?= $block->escapeHtml($freshHelper->formatPrice($freshHelper->getBasePrice($_product)) . ' / kg') ?>
+             </span>
+             <span class="special-price">
+                                <?= $block->escapeHtml($freshHelper->formatPrice($freshHelper->getPromoPrice($_product)) . ' / kg') ?>
+             </span>
+
+
+         </div>
+        <?php else : ?>
+            <span class="fresh-price"><?= $block->escapeHtml($freshHelper->getPricePerKg($_product) . ' / kg') ?></span>
+        <?php endif; ?>
+    <?php else : ?>
+        <div class="fresh-price"><?= $block->escapeHtml($block->getSoldIn($_product)) ?></div>
+    <?php endif; ?>
+<?php endif; ?>

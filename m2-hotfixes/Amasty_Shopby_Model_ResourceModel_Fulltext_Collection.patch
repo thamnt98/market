@@ -1,0 +1,32 @@
+diff --git a/vendor/amasty/shopby/Model/ResourceModel/Fulltext/Collection.php b/vendor/amasty/shopby/Model/ResourceModel/Fulltext/Collection.php
+index 8a1e523e5..fecd036cc 100755
+--- a/vendor/amasty/shopby/Model/ResourceModel/Fulltext/Collection.php
++++ b/vendor/amasty/shopby/Model/ResourceModel/Fulltext/Collection.php
+@@ -160,6 +160,27 @@ class Collection extends \Magento\Catalog\Model\ResourceModel\Product\Collection
+         return $this;
+     }
+ 
++    public function setQueryText($query)
++    {
++        $this->queryText = trim($query);
++        $this->requestBuilder->bind('search_term', $this->queryText);
++        return $this;
++    }
++
++    public function resetSearchEngineResult()
++    {
++        $this->queryResponse = null;
++        $this->_isFiltersRendered = false;
++
++        $tables = $this->getSelect()->getPart(\Zend_Db_Select::FROM);
++        if (isset($tables['search_result'])) {
++            unset($tables['search_result']);
++        }
++        $this->getSelect()->setPart(\Zend_Db_Select::FROM, $tables);
++
++        return $this;
++    }
++
+     /**
+      * @inheritdoc
+      */

@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="SM_Review::edit_review" title="Pending Edit Reviews" translate="title" module="SM_Review" parent="Magento_Backend::marketing_user_content" sortOrder="80" action="review/edit/pending" resource="Magento_Review::pending"/>
+    </menu>
+</config>

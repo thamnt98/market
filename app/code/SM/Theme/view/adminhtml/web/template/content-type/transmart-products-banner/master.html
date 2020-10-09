@@ -1,0 +1,63 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<div attr="data.main.attributes" ko-style="data.main.style" css="data.main.css">
+    <div if="data.title.html()" class="block-title">
+        <strong css="data.title.css"
+                attr="data.title.attributes"
+                ko-style="data.title.style" html="data.title.html"/>
+        <a if="data.link.attributes().href" attr="data.link.attributes" ko-style="data.link.style" css="data.link.css">
+            See All
+        </a>
+
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12 col-xl-6 pagebuilder-trans-image">
+            <figure
+                    ko-style="Object.assign({}, data.main.style(), !data.desktop_image.attributes().src ? {} : {borderStyle: 'none'})">
+                <a if="data.link.attributes().href" attr="data.link.attributes" ko-style="data.link.style" css="data.link.css">
+                    <img if="data.desktop_image.attributes().src"
+                         attr="data.desktop_image.attributes"
+                         class="pagebuilder-mobile-hidden"
+
+                         ko-style="data.desktop_image.style"/>
+                    <img if="data.mobile_image.attributes().src"
+                         attr="data.mobile_image.attributes"
+                         class="pagebuilder-mobile-only"
+
+                         ko-style="data.mobile_image.style"/>
+                </a>
+
+                <ifnot args="data.link.attributes().href">
+                    <img if="data.desktop_image.attributes().src"
+                         attr="data.desktop_image.attributes"
+                         class="pagebuilder-mobile-hidden"
+                         css="data.desktop_image.css"
+                         ko-style="data.desktop_image.style"/>
+                    <img if="data.mobile_image.attributes().src"
+                         attr="data.mobile_image.attributes"
+                         class="pagebuilder-mobile-only"
+                         css="data.mobile_image.css"
+                         ko-style="data.mobile_image.style"/>
+                </ifnot>
+
+                <figcaption if="data.caption.html()"
+                            attr="data.caption.attributes"
+                            css="data.caption.css"
+                            html="data.caption.html"
+                            ko-style="data.caption.style">
+                </figcaption>
+            </figure>
+        </div>
+        <div class="col-sm-12 col-xl-6">
+            <div data-bind="html: data.main.html" data-element="main"></div>
+
+        </div>
+    </div>
+
+</div>

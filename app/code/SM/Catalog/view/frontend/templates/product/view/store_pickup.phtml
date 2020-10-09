@@ -1,0 +1,108 @@
+<?php
+/**
+ * SMCommerce
+ *
+ * Date: May, 14 2020
+ * Time: 2:06 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ */ ?>
+<?php /** @var $block \SM\Catalog\Block\Product\StorePickup */ ?>
+<?php $product = $block->getProduct() ?>
+<?php if ($product): ?>
+    <?php $list = $block->getList($product) ?>
+    <div class="block-container-object-php block-container-pickup"
+         id="store-pickup-popup-<?= $block->escapeHtmlAttr($product->getId()) ?>"
+         style="display: none;"
+    >
+        <div class="block-content" aria-labelledby="block-product-pickup-heading">
+            <fieldset class="fieldset pickup">
+                <div class="pdp-pickup pdp-delivery">
+                    <h2 class="title">
+                        <i class="apl-Location"></i><?= $block->escapeHtml(__('Product Available at')) ?>
+                    </h2>
+                    <?php if(empty($list)): ?>
+                        <ul class="pdp-pickup-container" data-option-id="0">
+                            <li class="pdp-pickup location-content">
+                                <h3 class="txt-title">
+                                    <?= $block->escapeHtml(__('Product has not available on any source!')) ?>
+                                </h3>
+                            </li>
+                        </ul>
+                    <?php else: ?>
+                        <ul class="pdp-pickup-container" data-option-id="0">
+                            <?php foreach ($list as $key => $value) : ?>
+                                <li class="pdp-pickup location-content">
+                                    <h3 class="txt-title"><span><?= $block->escapeHtml(__($value['name'])) ?></span><span><?= $block->escapeHtml(__(' ('.$key.' km)')) ?></span></h3>
+                                    <p><?= $block->escapeHtml(__($value['region'])) ?></p>
+                                    <p><?= $block->escapeHtml(__($value['city'])) ?></p>
+                                    <p><?= $block->escapeHtml(__($value['street'])) ?></p>
+                                    <p><?= $block->escapeHtml(__('Open until: %1',$block->getStoreTimeAvailable())) ?></p>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+                    <?php if ($product->getTypeId() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE): ?>
+                        <?php foreach ($product->getTypeInstance()->getUsedProducts($product) as $child) : ?>
+                            <?php $childPickups = $block->getList($child) ?>
+                            <?php if(empty($childPickups)): ?>
+                                <ul class="pdp-pickup-container"
+                                    style="display: none"
+                                    data-option-id="<?= $block->escapeHtmlAttr($child->getId()) ?>"
+                                >
+                                    <li class="pdp-pickup location-content">
+                                        <h3 class="txt-title">
+                                            <?= $block->escapeHtml(__('Product has not available on any source!')) ?>
+                                        </h3>
+                                    </li>
+                                </ul>
+                            <?php else: ?>
+                                <ul class="pdp-pickup-container"
+                                    style="display: none"
+                                    data-option-id="<?= $block->escapeHtmlAttr($child->getId()) ?>"
+                                >
+                                    <?php foreach ($childPickups as $key => $value): ?>
+                                        <li class="pdp-pickup location-content">
+                                            <h3 class="txt-title"><span><?= $block->escapeHtml(__($value['name'])) ?></span><span><?= $block->escapeHtml(__(' ('.$key.' km)')) ?></span></h3>
+                                            <p><?= $block->escapeHtml(__($value['region'])) ?></p>
+                                            <p><?= $block->escapeHtml(__($value['city'])) ?></p>
+                                            <p><?= $block->escapeHtml(__($value['street'])) ?></p>
+                                            <p><?= $block->escapeHtml(__('Open until: %1',$block->getStoreTimeAvailable())) ?></p>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            <?php endif; ?>
+                        <?php endforeach; ?>
+                    <?php endif ?>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+    <script>
+        require(
+            [
+                'jquery',
+                'Magento_Ui/js/modal/modal'
+            ],
+            function ($, modal) {
+                "use strict";
+
+                let $block  = $('#store-pickup-popup-<?= $block->escapeHtmlAttr($product->getId()) ?>'),
+                    options = {
+                        type            : 'popup',
+                        responsive      : true,
+                        innerScroll     : false,
+                        buttons         : [],
+                        modalClass      : 'block-container-delivery',
+                        clickableOverlay: false
+                    };
+
+                modal(options, $block);
+                $('#store-pickup-btn-<?= $product->getId() ?>').click(function () {
+                    $block.modal('openModal');
+                });
+            });
+    </script>
+<?php endif ?>

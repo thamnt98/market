@@ -1,0 +1,54 @@
+<?php
+/**
+ * @category Trans
+ * @package  Trans_CustomerMyProfile
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Dwi Septha Kurniawan <septha.kurniawan@transdigital.co.id>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+/** @var \Trans\CustomerMyProfile\Block\MyProfile\Edit\EditEmail $block */
+?>
+<form class="form form-edit-account" action="<?= $block->escapeUrl($block->getUrl('customermyprofile/email/save')) ?>" method="post" id="form-edit-email" enctype="multipart/form-data" data-mage-init='{"validation": {}}' autocomplete="off">
+    <legend class="legend"><span><?= $block->escapeHtml(__('Edit Email')) ?></span></legend><br>
+    <fieldset class="fieldset change-email password" data-container="change-email-password" style="display: block;">
+        <div class="field email required" data-container="change-email">
+            <label class="label" for="email"><span><?= $block->escapeHtml(__('Email')) ?></span></label>
+            <div class="control">
+                <input type="email" name="email" id="email" autocomplete="email" data-input="change-email"
+                       value="<?= $block->escapeHtmlAttr($block->getCustomer()->getEmail()) ?>"
+                       title="<?= $block->escapeHtmlAttr(__('Email')) ?>"
+                       class="input-text validateee-customer-email" data-validate="{'required':true}" />
+                <div class="trans-message-error email-msg"></div>
+                <div class="tooltip">
+                    <img src='<?= $block->getViewFileUrl('images/info.svg'); ?>' alt=""  width="13" height="16" />
+                    <span class="tooltiptext">
+                        <?= $block->escapeHtml(__('You will receive a verification link by saving the change.')) ?>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+
+    <div class="actions-toolbar">
+        <button type="button" class="profile-cancel"><?= $block->escapeHtml(__('Cancel')) ?></button>
+        <button type="submit" class="profile-save primary action"><?= $block->escapeHtml(__('Save')) ?></button>
+    </div>
+</form>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Trans_CustomerMyProfile/js/email": {
+                "formSelector": "#form-edit-email",
+                "emailSelector": "#form-edit-email input[name=email]",
+                "resetButtonSelector": "#form-edit-email button.profile-cancel",
+                "email": "<?= $block->getCustomer()->getEmail(); ?>",
+                "emailMsg": "#form-edit-email .email-msg"
+            },
+            "validateCustomerEmail" : {}
+        }
+    }
+</script>

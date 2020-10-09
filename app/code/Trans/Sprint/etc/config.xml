@@ -1,0 +1,84 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_Sprint
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Imam Kusuma <imam.kusuma@transdigital.co.id>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../Store/etc/config.xsd">
+    <default>
+        <payment>
+            <sprint>
+                <active>1</active>
+                <is_production>0</is_production>
+                <expiry>30</expiry>
+                <model>Trans\Sprint\Model\Payment\Sprint</model>
+                <order_status>pending_payment</order_status><!-- set default order status-->
+            </sprint>
+
+            <sprint_bca_va>
+                <active>1</active>
+                <payment_action>authorize</payment_action><!-- You can use another methor like capture  -->
+                <model>Trans\Sprint\Model\Payment\BcaVa</model>
+                <active>1</active>
+                <title>BCA Virtual Account</title>
+                <order_status>pending_payment</order_status><!-- set default order status-->
+                <payment_channel>virtual_account</payment_channel>
+            </sprint_bca_va>
+            <sprint_permata_va>
+                <active>1</active>
+                <payment_action>authorize</payment_action><!-- You can use another methor like capture  -->
+                <model>Trans\Sprint\Model\Payment\PermataVa</model>
+                <active>1</active>
+                <title>Permata Virtual Account</title>
+                <order_status>pending_payment</order_status><!-- set default order status-->
+                <payment_channel>virtual_account</payment_channel>
+            </sprint_permata_va>
+            <sprint_bca_cc>
+                <active>1</active>
+                <payment_action>authorize</payment_action><!-- You can use another methor like capture  -->
+                <model>Trans\Sprint\Model\Payment\BcaCc</model>
+                <active>1</active>
+                <title>BCA Credit Card 0% Installment</title>
+                <order_status>pending_payment</order_status><!-- set default order status-->
+                <payment_channel>credit_card</payment_channel>
+                <ipg>sprint</ipg>
+            </sprint_bca_cc>
+            <sprint_mega_cc>
+                <active>1</active>
+                <payment_action>authorize</payment_action><!-- You can use another methor like capture  -->
+                <model>Trans\Sprint\Model\Payment\MegaCc</model>
+                <active>1</active>
+                <title>Bank Mega Credit Card Full Payment</title>
+                <order_status>pending_payment</order_status><!-- set default order status-->
+                <payment_channel>credit_card</payment_channel>
+                <promo_code></promo_code>
+                <ipg>sprint</ipg>
+            </sprint_mega_cc>
+            <sprint_allbankfull_cc>
+                <active>1</active>
+                <payment_action>authorize</payment_action><!-- You can use another methor like capture  -->
+                <model>Trans\Sprint\Model\Payment\AllBankFullCc</model>
+                <active>1</active>
+                <title>All Bank Credit Card Full Payment</title>
+                <order_status>pending_payment</order_status><!-- set default order status-->
+            </sprint_allbankfull_cc>
+            <sprint_allbank_debit>
+                <active>1</active>
+                <payment_action>authorize</payment_action><!-- You can use another methor like capture  -->
+                <model>Trans\Sprint\Model\Payment\AllBankDebit</model>
+                <active>1</active>
+                <title>All Bank Debit Card</title>
+                <order_status>pending_payment</order_status><!-- set default order status-->
+                <payment_channel>credit_card</payment_channel>
+            </sprint_allbank_debit>
+        </payment>
+    </default>
+</config>

@@ -1,0 +1,36 @@
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_Notification
+ *
+ * Date: June, 17 2020
+ * Time: 11:36 AM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<!--@subject {{trans "Your order is cancelled (Reference number: %order_id)" order_id=$order.getIncrementId()}} @-->
+
+{{template config_path="design/email/header_template"}}
+<table class="greeting" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "Hello"}} {{var customer_name}},
+            </p>
+            <p>
+                {{trans "We are sorry to inform you that order with reference number %order_id is cancelled."  order_id=$order.getIncrementId()}}
+                {{trans "Reason: declined by bank."}}
+                {{trans "Don't worry, you are not charged for this order."}}
+                {{trans "You can always try ordering again with your Transmart app or transmart.co.id."}}
+            </p>
+            <p>
+                {{trans "Sincerely"}},
+                Transmart
+            </p>
+        </td>
+    </tr>
+</table>
+{{template config_path="design/email/footer_template"}}

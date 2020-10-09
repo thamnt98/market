@@ -1,0 +1,33 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+?>
+<div class="new-checkout">
+    <div class="ck-payment">
+        <h3><?= $block->escapeHtml(__('Select Payment Method'))?></h3>
+        <div class="slect-payment-gr">
+            <a href="#" class="action pagebuilder-button-secondary bt-virtual"><?= $block->escapeHtml(__('Virtual Account'))?></a>
+            <a href="#" class="action pagebuilder-button-secondary bt-debit-credit active"><?= $block->escapeHtml(__('Debit & Credit Card'))?></a>
+            <a href="#" class="action pagebuilder-button-secondary bt-more"><?= $block->escapeHtml(__('+ More'))?></a>
+        </div>
+        <h3><?= $block->escapeHtml(__('Credit/Debit Card'))?></h3>
+        <div class="sl-payment-infor-card">
+            <div class="sl-card-multi">
+                <label><?= $block->escapeHtml(__('Select Card to Pay'))?></label>
+                <a href="#" class="multi-payment"><?= $block->escapeHtml(__('Multiple Payments'))?></a>
+            </div>
+            <div class="sl-card">
+                <img class="icon-card" src='<?= $block->getViewFileUrl('images/svg-icons/Voucher.svg'); ?>' alt=""  width="535" height="150" />
+                <label class="code-card"><?= $block->escapeHtml(__('**** **** **** 1918'))?></label>
+            </div>
+            <div class="sl-card">
+                <img class="icon-card" src='<?= $block->getViewFileUrl('images/svg-icons/Voucher.svg'); ?>' alt=""  width="535" height="150" />
+                <label class="code-card"><?= $block->escapeHtml(__('**** **** **** 1233'))?></label>
+            </div>
+            <button type="submit" class="action secondary addcard"><?= $block->escapeHtml(__('Add Card'))?></button>
+        </div>
+    </div>
+</div>

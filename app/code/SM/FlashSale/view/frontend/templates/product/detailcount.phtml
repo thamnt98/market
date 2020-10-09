@@ -1,0 +1,28 @@
+<?php $_event = $block->getEvent();
+
+if($_event && $block->checkProductFlashSale() == true && $_event->getStatus() == "open"){
+?>
+<div class="row-surpriseDeals">
+    <div class="section-header-title">
+        <div class="surprise-text"><?= $block->escapeHtml(__("Surprise Deal")) ?></div>
+        <div class="ticker surprise-timer" id="event-ticker-<?= $block->escapeHtmlAttr($_event->getId()) ?>"
+             data-mage-init='{"ticker":{"eventEndTimeUTC": <?= $block->escapeHtmlAttr($block->getEndTimeUTC($_event)) ?>}}'>
+            <span class="surprise-text__ends"><?= $block->escapeHtml(__('Promo ends in')) ?></span>
+                    <span class="hour">
+                        <span data-container="hour" class="value itemtimer">&nbsp;</span>
+                    </span>
+            <span class="surprise-timer-dot">:</span>
+
+            <span class="minute">
+                <span data-container="minute" class="value itemtimer">&nbsp;</span>
+            </span>
+            <span class="surprise-timer-dot">:</span>
+
+            <span class="second">
+                <span data-container="second" class="value itemtimer">&nbsp;</span>
+            </span>
+        </div>
+    </div>
+</div>
+
+<?php } ?>

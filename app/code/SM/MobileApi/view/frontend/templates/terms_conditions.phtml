@@ -1,0 +1,15 @@
+<?php
+//@codingStandardsIgnoreFile
+
+/** @var \SM\MobileApi\Block\CMSPageMobile $block */
+
+$pageId = $this->helper(\SM\MobileApi\Helper\CMSPage::class)->getTermsPageId();
+?>
+
+<?= $block->getContentWYSIWYG($block->getContentById($pageId))?>
+
+<script>
+    require(['jquery'],function ($) {
+        $("[data-content-type='block']").hide();
+    });
+</script>

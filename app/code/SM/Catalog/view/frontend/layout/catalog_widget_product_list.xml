@@ -1,0 +1,24 @@
+<!--
+  ~ Copyright © Magento, Inc. All rights reserved.
+  ~ See COPYING.txt for license details.
+  -->
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="category.product.type.details.renderers">
+            <block class="SM\Catalog\Block\Product\ProductList\Item\Details\ChildrenLabel"
+                   name="category.product.type.details.renderers.children.label" as="configurable"
+                   template="SM_Catalog::product/listing/children-label.phtml">
+            </block>
+            <block class="SM\Catalog\Block\Product\ProductList\Item\Details\ChildrenLabel"
+                   name="category.product.type.details.renderers.children.label" as="bundle"
+                   template="SM_Catalog::product/listing/children-label.phtml">
+            </block>
+            <block class="SM\Catalog\Block\Product\ProductList\Item\Details\ChildrenLabel"
+                   name="category.product.type.details.renderers.children.label" as="grouped"
+                   template="SM_Catalog::product/listing/children-label.phtml">
+            </block>
+        </referenceBlock>
+    </body>
+</page>

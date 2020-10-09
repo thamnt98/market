@@ -1,0 +1,308 @@
+<?php
+/**
+ * @project    ct-corp-transmart
+ * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @author     Duc Nguyen Hoang <ducnh2@smartosc.com>
+ * @copyright  Copyright © 2020 SmartOSC. All rights reserved.
+ * @url        http://www.smartosc.com
+ */
+
+use Magento\Framework\App\Action\Action;
+use SM\InspireMe\Helper\Data;
+/** @var \SM\ShoppingList\Helper\Data $shoppingListHelper */
+$shoppingListHelper = $this->helper('SM\ShoppingList\Helper\Data');
+/** @var \Mirasvit\Blog\Block\Post\View\RelatedProducts $block */
+$listProducts = $block->getRelatedProducts();
+$templateType = \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW;
+if (!count($listProducts)) {
+    return;
+}
+/** @var \Mirasvit\Blog\Model\Post $currentPost */
+$currentArticle = $block->getCurrentPost();
+$ingredient = $block->isIngredientBlockType();
+$availableToCart = 0;
+$GTMViewModel = $block->getLayout()->getBlock('blog.post.related.products') ?
+    $block->getLayout()->getBlock('blog.post.related.products')->getData('gtm_view_model') : null;
+$position = 1;
+/** @var \SM\Catalog\Helper\Data $helper */
+$helper = $this->helper('SM\Catalog\Helper\Data');
+/** @var \SM\Catalog\Helper\Data $helperSMCatalog */
+$helperSMCatalog = $this->helper('SM\Catalog\Helper\Data');
+?>
+
+<div class="blog__post-view blog__post-view-related-products smart-products">
+    <div class="block-title">
+        <strong><?= $currentArticle->getRelatedProductsTitle() ?></strong>
+    </div>
+    <div class="products-grid grid">
+        <div class="product-cards product-items row">
+            <?php /** @var \Magento\Catalog\Model\Product $product */ ?>
+            <?php foreach ($listProducts as $product): ?>
+            <?php if (is_int($product)) {
+                continue;
+            }?>
+            <?php $GTMViewModel ? $data = $GTMViewModel->getGtmData($product) : $data = null; ?>
+                <div class="product-card col-xs-6 col-sm-4 col-md-15"
+                    <?php if ($data) : ?>
+                        data-gtm-event="<?= \SM\InspireMe\Helper\Data::GTM_POST_EVENT_PRODUCT_VIEW ?>"
+                        data-gtm-product="<?= $block->escapeHtml($data) ?>"
+                        data-gtm-position="<?= $position ?>"
+                        data-gtm-list="<?= $currentArticle->getRelatedProductsTitle() ?>"
+                    <?php endif; ?>>
+                    <div class="product-item <?php if ($ingredient) : ?>product-item--hideCart<?php endif; ?>">
+                        <div class="product-item-info " data-container="product-list">
+                            <div class="product-item-photo-wrapper">
+                                <a href="<?= $block->getProductUrl($product) ?>" class="product photo product-item-photo"
+                                <?php if ($data) : ?>
+                                data-gtm-event="<?= \SM\InspireMe\Helper\Data::GTM_POST_EVENT_PRODUCT_CLICK ?>"
+                                data-gtm-product="<?= $block->escapeHtml($data) ?>"
+                                data-gtm-position="<?= $position ?>"
+                                data-gtm-list="<?= $currentArticle->getRelatedProductsTitle() ?>"
+                                <?php endif; ?>
+                                >
+                                    <?= $block->getImage($product, 'related_products_list')->toHtml() ?>
+                                </a>
+                                <?php $count = $helper->countChildren($product); ?>
+                                <?php if ($count): ?>
+                                    <div class="swatch-options">
+                                        <span class="oval-swatch oval-black"></span>
+                                        <span class="oval-swatch oval-pink"></span>
+                                        <span class="oval-swatch oval-dark-blue"></span>
+                                        <span class="oval-swatch oval-dark-blue2"></span>
+                                        <span class="oval-number"><?= $count ?></span>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                            <div class="product details product-item-details">
+                                <strong class="product name product-item-name">
+                                    <a class="product-item-link" title="<?= $block->escapeHtml($product->getName()) ?>"
+                                       href="<?= $block->getProductUrl($product) ?>"
+                                        <?php if ($data) : ?>
+                                            data-gtm-event="<?= \SM\InspireMe\Helper\Data::GTM_POST_EVENT_PRODUCT_CLICK ?>"
+                                            data-gtm-product="<?= $block->escapeHtml($data) ?>"
+                                            data-gtm-position="<?= $position ?>"
+                                            data-gtm-list="<?= $currentArticle->getRelatedProductsTitle() ?>"
+                                        <?php endif; ?>
+                                    >
+                                        <?= $block->escapeHtml($product->getName()) ?>
+                                    </a>
+                                </strong>
+                                <?= $block->getProductPrice($product) ?>
+                                <?php if ($templateType) :?>
+                                    <?php
+                                    $ratingSummary = $helperSMCatalog->getRattingSummary($product->getSku());
+                                    $reviewCount = $helperSMCatalog->getRattingCount($product->getSku());
+                                    ?>
+                                    <div class="product-reviews-summary short<?= !$ratingSummary ? ' no-rating' : '' ?>" onclick="location.href = '<?php echo $product->getProductUrl()?>'">
+                                        <div class="rating-summary">
+                                            <div class="rating-result" title="<?= $block->escapeHtmlAttr($ratingSummary) ?>%">
+                                                <span style="width:<?= $ratingSummary ?>%"><span><?= $block->escapeHtml($ratingSummary) ?>%</span></span>
+                                            </div>
+                                        </div>
+                                        <span class="rating-count reviews-actions">(<?= $block->escapeHtml($reviewCount) ?>)</span>
+                                    </div>
+                                <?php endif; ?>
+
+                                <?php $percent = $helperSMCatalog->getDiscountPercent($product); ?>
+                                <?php if ($percent != null && $percent > 0) : ?>
+                                    <span class="product-sale">
+                                                <?= $block->escapeHtml(__('%1% OFF', $percent)); ?>
+                                            </span>
+                                <?php endif; ?>
+
+                                <?php if (!$ingredient) : ?>
+                                    <div class="product-item-actions">
+                                        <div class="product-item-actions">
+                                            <div class="actions-primary">
+                                            <?php $childrenIds = $product->getTypeInstance()->getChildrenIds($product->getId()); ?>
+                                            <?php if ($childrenIds) : ?>
+                                                <a title="<?= $block->escapeHtmlAttr(__('View Details')) ?>"
+                                                   href="<?= $block->escapeUrl($product->getProductUrl()) ?>"
+                                                   class="action view-details primary"
+                                                    <?php if ($data) : ?>
+                                                        data-gtm-event="<?= \SM\InspireMe\Helper\Data::GTM_POST_EVENT_PRODUCT_CLICK ?>"
+                                                        data-gtm-product="<?= $block->escapeHtml($data) ?>"
+                                                        data-gtm-position="<?= $position ?>"
+                                                        data-gtm-list="<?= $currentArticle->getRelatedProductsTitle() ?>"
+                                                    <?php endif; ?>
+                                                >
+                                                    <?= $block->escapeHtml(__('View Details')) ?>
+                                                </a>
+                                            <?php else : ?>
+                                                <?php if ($product->isSaleable()) : ?>
+                                                    <?php $postParams = $block->getAddToCartPostParams($product); ?>
+                                                    <form data-role="tocart-form"
+                                                          data-product-sku="<?= $block->escapeHtml($product->getSku()) ?>"
+                                                          action="<?= $block->escapeUrl($postParams['action']) ?>"
+                                                          method="post">
+                                                        <input type="hidden" name="product"
+                                                               value="<?= $block->escapeHtmlAttr($postParams['data']['product']) ?>">
+                                                        <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED ?>"
+                                                               value="<?= /* @noEscape */ $postParams['data'][Action::PARAM_NAME_URL_ENCODED] ?>">
+                                                        <?= $block->getBlockHtml('formkey') ?>
+                                                        <button type="submit"
+                                                                title="<?= $block->escapeHtml(__('Add to Cart')) ?>"
+                                                                class="action tocart primary"
+                                                            <?php if ($data) : ?>
+                                                                data-gtm-event="<?= \SM\InspireMe\Helper\Data::PRODUCT_EVENT_ADD_TO_CART ?>"
+                                                                data-gtm-product="<?= $block->escapeHtml($data) ?>"
+                                                            <?php endif; ?>
+                                                        >
+                                                            <span><?= $block->escapeHtml(__('Add to Cart')) ?></span>
+                                                        </button>
+                                                    </form>
+                                                <?php else : ?>
+                                                    <?php if ($product->getIsSalable()) : ?>
+                                                        <div class="stock available"><span><?= $block->escapeHtml(__('In stock')) ?></span></div>
+                                                    <?php else : ?>
+                                                        <div class="stock unavailable"><span><?= $block->escapeHtml(__('Out of stock')) ?></span></div>
+                                                    <?php endif; ?>
+                                                <?php endif;?>
+                                            <?php endif;?>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php else : ?>
+                                <?php $childrenIds = $product->getTypeInstance()->getChildrenIds($product->getId()); ?>
+                                    <?php if ($childrenIds) : ?>
+                                        <a title="<?= $block->escapeHtmlAttr(__('View Details')) ?>"
+                                           href="<?= $block->escapeUrl($product->getProductUrl()) ?>"
+                                           class="action view-details primary"
+                                            <?php if ($data) : ?>
+                                                data-gtm-event="<?= \SM\InspireMe\Helper\Data::GTM_POST_EVENT_PRODUCT_CLICK ?>"
+                                                data-gtm-product="<?= $block->escapeHtml($data) ?>"
+                                                data-gtm-position="<?= $position ?>"
+                                                data-gtm-list="<?= $currentArticle->getRelatedProductsTitle() ?>"
+                                            <?php endif; ?>
+                                        >
+                                            <?= $block->escapeHtml(__('View Details')) ?>
+                                        </a>
+                                    <?php else : ?>
+                                        <?php if ($product->isSaleable()) : ?>
+                                            <?php $availableToCart += $product->getData(Data::RELATED_PRODUCT_VALUE) ?>
+                                            <?php $postParams = $block->getAddToCartPostParams($product); ?>
+                                        <div class="product-add-to-cart">
+                                            <form data-role="tocart-form"
+                                                  class="product-add-form"
+                                                  data-product-sku="<?= $block->escapeHtml($product->getSku()) ?>"
+                                                  action="<?= $block->escapeUrl($postParams['action']) ?>"
+                                                  method="post" data-mage-init='{"validation":{}}'>
+                                                <input type="hidden" name="product"
+                                                       value="<?= $block->escapeHtmlAttr($postParams['data']['product']) ?>">
+                                                <input type="hidden" name="<?= /* @noEscape */ Action::PARAM_NAME_URL_ENCODED ?>"
+                                                       value="<?= /* @noEscape */ $postParams['data'][Action::PARAM_NAME_URL_ENCODED] ?>">
+                                                <?= $block->getBlockHtml('formkey') ?>
+                                                <div class="qty-block" id="qty-action-<?= $block->escapeHtmlAttr($product->getId())?>">
+                                                    <button id="decrease-cart-item<?= $block->escapeHtmlAttr($product->getId())?>"
+                                                            class="action  decrease-cart-item increase-qty"
+                                                            style="display: inline-block">-</button>
+                                                    <span class="field qty">
+                                                        <span class="control">
+                                                            <input type="number" name="qty" class="input-text qty"
+                                                                   id="qty-<?= $block->escapeHtmlAttr($product->getId())?>"
+                                                                   title="<?= $block->escapeHtmlAttr(__('Quantity')) ?>"
+                                                                   value="<?= $block->escapeHtmlAttr($product->getData(Data::RELATED_PRODUCT_VALUE)) ?>"
+                                                                   data-validate="{'required-number':true, 'validate-item-quantity':{'minAllowed':1, 'maxAllowed':99}}"
+                                                            />
+                                                        </span>
+                                                    </span>
+                                                    <button id="increase-cart-item-<?= $block->escapeHtmlAttr($product->getId())?>"
+                                                            class="action increase-qty increase-cart-item"
+                                                            style="display: inline-block">+</button>
+                                                </div>
+                                                <div class="ingredient-button" style="display: none">
+                                                    <button type="button"
+                                                            title="<?= $block->escapeHtml(__('Add to Cart')) ?>"
+                                                            class="action tocart primary"
+                                                        <?php if ($data) : ?>
+                                                            data-gtm-event="<?= \SM\InspireMe\Helper\Data::PRODUCT_EVENT_ADD_TO_CART ?>"
+                                                            data-gtm-product="<?= $block->escapeHtml($data) ?>"
+                                                        <?php endif; ?>
+                                                    >
+                                                        <span><?= $block->escapeHtml(__('Add to Cart')) ?></span>
+                                                    </button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <?php else : ?>
+                                            <?php if ($product->getIsSalable()) : ?>
+                                                <div class="stock available">
+                                                    <span><?= $block->escapeHtml(__('In stock')) ?></span>
+                                                </div>
+                                            <?php else : ?>
+                                                <div class="stock unavailable">
+                                                    <span><?= $block->escapeHtml(__('Out of stock')) ?></span>
+                                                </div>
+                                            <?php endif; ?>
+                                        <?php endif;?>
+                                    <?php endif;?>
+                                <?php endif; ?>
+
+                                <?php if ($shoppingListHelper->isActiveShoppingList()):?>
+                                <a style="cursor: pointer"
+                                   id="shoppinglist-add-<?= $product->getId() ?>"
+                                   class="action towishlist <?= $product->getId() ?>"
+                                   data-action="add-to-wishlist"
+                                   title="<?= $block->escapeHtmlAttr(__('Add to Shopping List')) ?>">
+                                    <span><?= $block->escapeHtml(__('Add to Shopping List')) ?></span>
+                                </a>
+
+                                <div id="success-alert-modal-<?= $product->getId() ?>" class="content add-success-modal" style="display:none;">
+                                    <div class="product-info">
+                                        <img src="<?= $block->getImage($product, "product_base_image")->getData("image_url");
+                                        ?>" width="124px"  alt="<?= $product->getName() ?>"/>
+                                        <div class="success-content">
+                                            <span class="product-name"><?= $block->escapeHtml($product->getName()) ?></span>
+                                            <h3><?= $block->escapeHtml(__("This item has been added to"))?></h3>
+                                            <ul id="destination-list-<?= $product->getId() ?>" style="list-style-type: none;">
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <script type="text/x-magento-init">
+                                {
+                                    "*": {
+                                        "AddFromList":{
+                                            "product_id":"<?= $product->getId() ?>",
+                                            "store_id":"<?= $product->getStoreId() ?>",
+                                            "add_item_url":"<?= $block->getUrl("shoppinglist/ajax/additems")?>"
+                                        }
+                                    }
+                                }
+                                </script>
+                                <?php endif;?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php $position++; ?>
+            <?php endforeach ?>
+        </div>
+    </div>
+    <?php if ($ingredient) : ?>
+        <div class="products-selected-to-cart">
+            <button type="submit" id="add-selected-tocart"
+                    class="action primary add-selected-tocart"
+                    title="<?= $block->escapeHtml(__('Add to Cart')) ?>">
+                <?= $availableToCart > 1 ?
+                    $block->escapeHtml(__('Add %1 items to cart', $availableToCart))
+                    :$block->escapeHtml(__('Add %1 item to cart', $availableToCart))
+                ?>
+            </button>
+        </div>
+    <?php endif; ?>
+</div>
+<script type="text/x-magento-init">
+    {
+        "[data-role=tocart-form]": {
+            "catalogAddToCart": {}
+        },
+        "*": {
+            "updateQtyProduct": {},
+            "validation": {}
+        }
+    }
+</script>
+

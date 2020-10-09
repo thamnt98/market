@@ -1,0 +1,54 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<div class="review-product">
+    <h2><?= $block->escapeHtml(__('Review Product')) ?></h2>
+    <a href="#" class="back-myreview"><?= $block->escapeHtml(__('Back to My Reviews')) ?></a>
+    <div class="form-review">
+        <ul class="list-items-review">
+            <li class="item-review">
+                <div class="item-info">
+                    <a href="#" title="thaole1233" class="product-item-photo">
+                        <img src="https://apollo11-dev.ctdigital.id/media/catalog/product/cache/6410bdb417f1097c90b11783ebe3d82c/2/_/2_1_1.jpg" width="110" height="110" alt="thaole1233" />
+                    </a>
+                    <div class="product-item-details">
+                        <a href="https://apollo11-dev.ctdigital.id/thaole1233.html" class="product-item-name">Onitsuka Tiger Mexico 66 (Kill Bill)</a>
+                        <div class="product-reviews-summary short">
+                            <div class="rating-summary">
+                                <div class="rating-result" title="20%">
+                                    <span style="width:20%"><span>20%</span></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </li>
+            <li class="rw-tile">
+                <label><?= $block->escapeHtml(__('Title')) ?></label>
+                <input type="text" class="input-text" placeholder="Write the title of your review" />
+            </li>
+            <li class="rw-tile-review">
+                <label><?= $block->escapeHtml(__('Review')) ?></label>
+                <textarea class="text-area" placeholder="How do you like the product? Let everyone know about it!
+Please be polite and clear so others can be well informed about this product."></textarea>
+                <p class="note"><?= $block->escapeHtml(__('At least 20 characters')) ?></p>
+            </li>
+            <li class="rw-upload-photo">
+                <label><?= $block->escapeHtml(__('Upload Photo')) ?></label>
+                <!--phan nay code lam -->
+                <div class="upload-photo">photo</div>
+                <!--phan nay code lam -->
+                <p class="note"><?= $block->escapeHtml(__('Maximum size 10 MB. You can upload up to 5 photos.')) ?></p>
+            </li>
+            <li class="rw-group-button">
+                <button class="action secondary" type="submit"><?= $block->escapeHtml(__('Cancel')) ?></button>
+                <button class="action primary" type="submit"><?= $block->escapeHtml(__('Submit')) ?></button>
+            </li>
+        </ul>
+
+    </div>
+</div>
+

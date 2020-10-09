@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_LocationCoverage
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Muhammad Randy <muhammad.randy@transdigital.co.id>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="Trans_LocationCoverage::city" title="City" module="Trans_LocationCoverage" sortOrder="100"
+             resource="Trans_LocationCoverage::city" parent="Magento_Customer::customer"/>
+
+        <add id="Trans_LocationCoverage::city_list" title="Manage City List" module="Trans_LocationCoverage" sortOrder="110"
+             parent="Trans_LocationCoverage::city" action="manage_city/index"
+             resource="Trans_LocationCoverage::city"/>
+
+        <add id="Trans_LocationCoverage::region_list" title="Manage Region List" module="Trans_LocationCoverage" sortOrder="120"
+             parent="Trans_LocationCoverage::city" action="manage_city/index/region"
+             resource="Trans_LocationCoverage::city"/>
+
+        <add id="Trans_LocationCoverage::district_list" title="Manage District List" module="Trans_LocationCoverage" sortOrder="130"
+             parent="Trans_LocationCoverage::city" action="manage_city/index/district"
+             resource="Trans_LocationCoverage::city"/>
+
+    </menu>
+</config>

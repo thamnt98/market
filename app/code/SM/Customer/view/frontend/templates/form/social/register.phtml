@@ -1,0 +1,97 @@
+<?php
+/** @var \SM\Customer\Block\Form\Register $block */
+if (!$block->isLoggedIn()) :
+    ?>
+
+    <div class="block-container-signin block-container--register" id="social-register" style="display: none">
+        <div class="row no-gutters">
+            <div class="container-signin--left col-xs-12 col-xl-6">
+                <img src='<?php echo $this->getViewFileUrl('images/reliable-register.jpg'); ?>' alt="Welcome" loading="lazy" width="585" height="859">
+            </div>
+            <div class="container-signin--right col-xs-12 col-xl-6">
+                <div class="container-signin--content container-signin--social container-signin--facebook">
+
+                    <div class="block-title block-title-social">
+                        <button type="button" class="action-back" id="login">
+                            <i class="icon ic-black"> </i>
+                        </button>
+                        <img class="sociallogin-facebook-icon-image active" src="<?php echo $this->getViewFileUrl('SM_Customer::images/facebook.png'); ?>" alt="facebook-icon" loading="lazy"/>
+                        <img class="sociallogin-google-icon-image active" src="<?php echo $this->getViewFileUrl('SM_Customer::images/google.png'); ?>" alt="google icon" loading="lazy"/>
+                        <div class="block-subtitle--welcome">
+                            <?= $block->escapeHtml(__('Welcome, ')) ?>
+                            <span class="block-subtitle--name"></span>
+                        </div>
+
+                    </div>
+
+                    <form class="form create account form-create-account" action="<?= $block->escapeUrl($block->getPostActionUrl()) ?>" method="post" data-mage-init='{"validation":{}}'>
+                        <?= /* @noEscape */ $block->getBlockHtml('formkey'); ?>
+                        <p class=" block-subtitle-social"><?= $block->escapeHtml(__('Please confirm your account')) ?></p>
+                        <fieldset class="fieldset create info" data-hasrequired="<?php /* @escapeNotVerified */echo __('* Required Fields') ?>">
+                            <div class="field name hide-onsocial">
+                                <label class="label" for="name"><span><?= $block->escapeHtml(__('Full Name')) ?></span></label>
+                                <div class="control">
+                                    <input name="name" id="social-name" type="text" class="social-register-form-name input-text required-entry" title="<?php /* @escapeNotVerified */
+                                    echo __('Full Name') ?>" data-validate="{required:true, 'minlength':1, 'maxlength':50 }" autocomplete="off">
+                                </div>
+                            </div>
+
+                            <div class="field email email-lock">
+                                <label class="label" for="email"><span><?= $block->escapeHtml(__('Email')) ?></span></label>
+                                <div class="control">
+                                    <input name="email" id="social-email" type="email" class="social-register-form-email input-text" title="<?php /* @escapeNotVerified */
+                                    echo __('Email') ?>" data-validate="{required:true, 'validate-customer-email':true}">
+                                </div>
+                            </div>
+
+                            <div class="field telephone ">
+                                <label class="label" for="telephone"><span><?= $block->escapeHtml(__('Mobile Number')) ?></span></label>
+                                <div class="control">
+                                    <input name="telephone" id="social-phone" value="08"  type="number" class="input-text" title="<?php /* @escapeNotVerified */
+                                    echo __('Mobile Number') ?>" data-validate="{required:true, 'validate-phone-require':true, 'validate-phone':true, 'validate-number':true, 'minlength':10, 'maxlength':16}">
+                                </div>
+                            </div>
+                            <div class="field delivery-area actions-toolbar">
+                                <div class="control">
+                                    <div class="row">
+                                        <div class="col-xs-6 col-md-6">
+                                            <label class="label" for="delivery-area"><span><?= $block->escapeHtml(__('Delivery Area')) ?></span></label>
+                                            <div autocomplete="off">
+                                                <div class="autocomplete dropdown-city">
+                                                    <div class="dropdown-toggle">
+                                                    <input autocomplete="<?= substr(md5(mt_rand()), 0, 7); ?>" id="social-city" selector="city" type="text" placeholder="<?= $block->escapeHtml(__('Select City')) ?>" data-validate='{"required":true}'>
+                                                    </div>
+                                                    <ul id="city-list" selector="city-list" style="display: none" class="dropdown"></ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-xs-6 col-md-6 dropdown-city select-district">
+                                            <label class="label" for="delivery-area"><span><?= $block->escapeHtml(__('District')) ?></span></label>
+                                            <div class="dropdown-toggle">
+                                                <span class="action toggle district-fake-current" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+                                                    <span><?= $block->escapeHtml(__('Select District')) ?></span>
+                                                </span>
+                                            </div>
+                                            <ul class="dropdown district-fake" data-role="sorter">
+                                            </ul>
+                                            <select id="social-district" name="district" placeholder="<?= $block->escapeHtml(__('District')) ?>" data-validate='{"required":true}' >
+                                                <option value=""><?= $block->escapeHtml(__('District')) ?></option>
+                                            </select>
+                                            <input id="social-cityId" name="city" type="hidden"/>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <div class="actions-toolbar">
+                            <button type="submit" id="button-social-register" class="action register primary" title="<?= $block->escapeHtmlAttr(__('Register')) ?>"><span><?= $block->escapeHtml(__('Sign In')) ?></span></button>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>

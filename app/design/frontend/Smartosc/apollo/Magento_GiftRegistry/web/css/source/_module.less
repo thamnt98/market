@@ -1,0 +1,486 @@
+// /**
+//  * Copyright © Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
+
+//
+//  Variables
+//  _____________________________________________
+
+@review-ratings-left: 280px;
+@svg-icon-large: 75px;
+@svg-icon-medium: 45px;
+@svg-icon-small: 31px;
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+    .my-giftRegistry{
+
+        .actions-toolbar{
+            margin-bottom: 30px;
+            .primary{
+                float: none;
+            }
+        }
+    }
+    .giftRegistry-post{
+        border: 2px solid @c-tsm-grey2;
+        border-radius: 10px;
+
+        overflow: hidden;
+        box-shadow: 0 2px 4px  rgba(215,215,215,0.5);
+        margin-bottom: 30px;
+        display: block;
+        .giftRegistry-post--image{
+            font-size: 0;
+
+        }
+        //Hover Item Post
+        &:hover{
+            .giftRegistry-post--image{
+                opacity: 0.9;
+            }
+        }
+        .giftRegistry-card--info{
+            padding: 20px ;
+            .banner-figure{
+                width: 60px;
+                float:left;
+                margin-right:25px;
+                .icon-gift{
+                    width: 60px;
+                    height: 60px;
+                    display: block;
+                    border-radius: 50%;
+                }
+                .ic-mygift-1{
+                    background: url(~'../images/gift/gift-icon-1.png') no-repeat center center ;
+                }
+                .ic-mygift-2{
+                    background: url(~'../images/gift/gift-icon-2.png') no-repeat center center ;
+                }
+            }
+            .banner-figcaption{
+                overflow: hidden;
+            }
+            .banner-figcaption__title{
+                font-size: 24px;
+                margin: 3px 0 1rem;
+                color: @c-tsm-grey6;
+                font-family: @font-family-SF-UI-Display-Bold;
+            }
+            .banner-figcaption__text{
+                font-size: 16px;
+                color: @c-tsm-grey5;
+            }
+        }
+    }
+
+    //Popup Create Registry
+    .modal-popup.modal-slide .modal-footer{
+        border-bottom: 1px solid @c-tsm-grey10;
+    }
+    .create-registry-modal{
+        p{
+            font-size: 16px;
+            margin-bottom: 1rem;
+        }
+        .list-createRegistry{
+            list-style: none;
+            padding: 0;
+            margin-top: 30px;
+            li{
+                display: inline-block;
+                margin-right: 15px;
+                .createRegistry--button{
+                    position: relative;
+                    border: 1px solid @c-tsm-grey16;
+                    line-height: 20px;
+                    min-width: 118px;
+                    color: @c-tsm-grey5;
+                    label{
+                        cursor: pointer;
+                    }
+                }
+                input[type="radio"]{
+                    visibility: hidden;
+                    display: none;
+                }
+
+                &:hover{
+                    .createRegistry--button{
+                        border: 1px solid @c-tsm-orange2;
+                    }
+
+                }
+                &.active{
+                    .createRegistry--button{
+                        border: 1px solid @c-tsm-orange2;
+                        box-shadow: 0 0 1px 1px @c-tsm-orange2;
+                    }
+                }
+            }
+        }
+    }
+    .share-registry-modal{
+        font-size: 16px;
+        .form-createRegistry{
+            margin: 20px 0 30px;
+        }
+        .form-inline{
+            display: flex;
+            .control{
+                width: 90%;
+                padding-right: 20px;
+            }
+            .input-text{
+                border: 1px solid @c-tsm-grey2;
+                border-radius: 5px;
+                padding: 0 15px;
+                box-shadow: 0 1px 4px 0 rgba(152,152,152,0.5);
+                &.-webkit-input-placeholder,
+                &.-ms-input-placeholder,
+                &.placeholder{
+                    font-weight: 400;
+                }
+            }
+        }
+    }
+
+    .block-giftRegistry-user{
+        .lib-css(border-radius, 0 0 4px 4px);
+        border-top: solid 19px @c-tsm-grey2;
+        box-shadow: 0 2px 4px rgba(173, 173, 173, 0.5);
+        padding: 20px;
+        margin-bottom: 45px;
+
+        .giftRegistry-info--heading{
+            margin-bottom: 15px;
+            padding: 10px 0;
+            h3{
+                font-size: 26px;
+                margin-bottom:10px;
+                font-family: @font-family-SF-UI-Display-Bold;
+            }
+        }
+
+        .giftRegistry-info--heading__share{
+            ul.listgift-share{
+                list-style: none;
+                margin:0;
+                padding:0;
+                li{
+                    display: inline-block;
+                    border-left: 1px solid @c-tsm-blue2;
+                    padding: 0 10px;
+                    margin: 0;
+                    line-height: 100%;
+                    &:first-child{
+                        border: none;
+                    }
+                    a{
+                         display: block;
+                    }
+                }
+            }
+        }
+        .giftRegistry-info--content{
+            .row{margin: 0 -6px;}
+            [class^="col-md"], [class*=" col-md"], [class^="col-md-offset"], [class*=" col-md-offset"]{
+                padding: 0 6px;
+            }
+        }
+        .box-content-gift{
+            p{
+                font-size: 16px;
+                color: @c-tsm-grey20;
+                margin-bottom: 10px;
+            }
+            h3{
+                font-size: 36px;
+                margin:0;
+                font-weight: 600;
+                color: @color-black;
+            }
+        }
+        .box-content-gift--nobackground{
+            padding: 20px 0px;
+            h3{
+                font-size: 20px;
+            }
+        }
+        .box-content-gift--background{
+            text-align: center;
+            border-radius: 8px;
+            padding: 20px 10px;
+            height: calc(100% - 40px);
+            background: @c-tsm-light-orange2;
+        }
+    }
+
+    .block-giftRegistry-additem{
+        margin-bottom: 40px;
+        font-size: 16px;
+        color: @c-tsm-grey20;
+        line-height: 26px;
+
+        .giftRegistry-additem-heading{
+           h3{
+               font-size: 20px;
+               font-family: @font-family-SF-UI-Display-Bold;
+               color: @color-black;
+           }
+            p{
+                margin-bottom: 10px;
+            }
+
+        }
+    }
+    .box-gift-steps{
+
+        .box-gift-icons{
+            width: 115px;
+            height: 115px;
+            border-radius: 50%;
+            background: linear-gradient(180deg, #FFDC48 0%, #FF9310 100%);
+            margin: 30px auto;
+        }
+        a{
+            color: @color-black;
+            font-family: @font-family-SF-UI-Display-Semibold;
+            &:hover{
+                color: @c-tsm-grey20;
+            }
+        }
+
+    }
+
+
+    div.block-gift-services{
+
+        .block-title{
+            font-size: 32px;
+            font-family: @font-family-SF-UI-Display-Bold;
+            justify-content: inherit;
+
+            .icon-gift{
+                width: 55px;
+                height: 55px;
+                flex: 0 0 55px;
+                display: block;
+                margin-right: 30px;
+
+            }
+            .icon-gift-up{
+                background:  url("../images/gift/gift-icon-4.png")  no-repeat center center ;
+            }
+            .icon-gift-ship{
+                flex: 0 0 65px;
+                background:  url("../images/gift/gift-icon-5.png")  no-repeat center center ;
+            }
+            .icon-gift-easy{
+                background:  url("../images/gift/gift-icon-3.png")  no-repeat center center ;
+            }
+        }
+        .block-content{
+            font-size: 21px;
+            font-family: @font-family-SF-UI-Display-Semibold;
+            color: @color-textleading-2;
+        }
+    }
+    .block-giftRegistry-browse{
+        margin-bottom: 30px;
+        .giftRegistry-browse-heading{
+            padding-bottom: 20px;
+
+            border-bottom: 1px solid @c-tsm-grey11;
+            h3{
+                margin:0 0 10px;
+                font-size: 24px;
+                color: @color-black;
+                font-family: @font-family-SF-UI-Display-Bold;
+
+            }
+        }
+    }
+    .listgift-share{
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        li{
+            display: inline-block;
+            margin-right: 10px;
+            &:last-child{
+                margin:0;
+            }
+        }
+    }
+    @keyframes fill {
+        0% {
+            transform: rotate(0deg)
+        }
+        100% {
+            transform: rotate(45deg)
+        }
+    }
+
+
+    .block-giftRegistry-list{
+        margin-bottom: 20px;
+        .giftRegistry-list-heading{
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid @c-tsm-grey11;
+            h3{
+                margin:0 ;
+                font-size: 21px;
+                color: @color-black;
+                font-family: @font-family-SF-UI-Display-Bold;
+            }
+        }
+        .box-gift-listLeft{
+            font-size: 16px;
+            color: @c-tsm-grey14;
+            line-height: 28px;
+            display: flex;
+            justify-content: center;
+        }
+        .block-dashboard-info{
+            margin-bottom: 30px;
+        }
+    }
+    .block-giftRegistry-terms{
+        margin-bottom: 40px;
+        .block-content{
+            font-size: 16px;
+            line-height: 28px;
+        }
+    }
+
+    div.circle-wrap{
+        width: 120px;
+        height: 120px;
+        position: relative;
+        .is-open{
+            h3{
+                color:#FB971F;
+            }
+        }
+        .tox-progress-content{
+            justify-content: center;
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+            width: 120px;
+            height: 120px;
+            position: absolute;
+            top:0;
+            z-index: 1;
+            h3{
+                font-size: 24px;
+                margin: 0;
+                color: @c-tsm-grey34;
+                font-family: @font-family-SF-UI-Display-Bold;
+            }
+            p{
+                color: @c-tsm-grey14;
+            }
+        }
+    }
+
+}
+
+//
+//  Mobile
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    div.block-gift-services{
+        margin-bottom: 30px;
+        .block-title{
+            font-size: 26px;
+        }
+    }
+}
+
+//  Tablets  (style-l.css)
+//  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+div.block-giftRegistry-user{
+    .box-content-gift p{
+        min-height: 40px;
+    }
+}
+
+}
+//
+//  Desktop
+//  _____________________________________________
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__xl) {
+    .box-gift-list--service{
+        .row{
+            > .col-xs-12{
+                border-right: 3px solid @color-gray-darken1;
+                margin-bottom: 30px;
+                clear: both;
+                width: 100%;
+                display: inline-block;
+
+                &:last-child{
+                    border-right: none;
+                }
+            }
+
+        }
+    }
+
+    div.block-gift-services{
+        padding: 0 20px;
+        .block-title{
+            min-height: 90px;
+        }
+    }
+div.block-giftRegistry-user{
+    .giftRegistry-info--heading{
+        display: flex;
+        justify-content: space-between;
+        h3{
+            margin:0;
+        }
+    }
+    .box-content-gift p{
+        min-height: inherit;
+    }
+}
+.box-gift-steps {
+    padding: 0 120px;
+    .row {
+        margin: 0 -22px;
+    }
+
+    [class^="col-md"], [class*=" col-md"], [class^="col-md-offset"], [class*=" col-md-offset"] {
+        padding: 0 22px;
+    }
+}
+
+
+.giftRegistry-post div.giftRegistry-card--info{
+    padding: 30px 40px;
+}
+.block-giftRegistry-browse{
+    margin-bottom: 30px;
+    .giftRegistry-browse-heading{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        h3{
+            margin:0;
+
+        }
+    }
+}
+}

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_Installation
+ *
+ * Date: April, 21 2020
+ * Time: 2:47 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock  name="product.info">
+            <container name="product.info.form.addition" as="form_additional">
+                <block class="SM\Installation\Block\Form"
+                       name="product.info.form.installation"
+                       template="SM_Installation::form.phtml"
+                       ifconfig="installation/general/enable" />
+            </container>
+        </referenceBlock>
+    </body>
+</page>

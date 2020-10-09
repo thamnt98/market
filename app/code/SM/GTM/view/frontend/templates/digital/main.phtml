@@ -1,0 +1,19 @@
+<script>
+    require(['jquery', 'gtmCustomer', 'domReady!'], function ($, gtmCustomer) {
+        $(window).load(function () {
+            $('#btn-buy-product').on('click', function () {
+                let data = $('.item.active[data-gtm-event="digital_product_buy"]').attr('data-gtm');
+                if (data) {
+                    try {
+                        let parseData = JSON.parse(data);
+                        parseData['product_category'] = $.trim($('.active [data-gtm-event="digital_product_menu"]').text());
+                        console.log(parseData);
+                        gtmCustomer.push('digital_product_buy_button', parseData);
+                    } catch (e) {
+
+                    }
+                }
+            });
+        });
+    });
+</script>

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_MyVoucher
+ *
+ * Date: July, 03 2020
+ * Time: 2:30 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="sm_sales_rule" translate="label" type="text" sortOrder="200"
+                 showInDefault="1" showInWebsite="1" showInStore="1">
+            <resource>SM_MyVoucher::configuration</resource>
+            <label>Vouchers &amp; Promotions</label>
+            <tab>transmart</tab>
+            <group id="display" translate="label" showInStore="1" showInWebsite="1" showInDefault="1" sortOrder="10">
+                <label>Display</label>
+                <field id="expired_day_number" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1"
+                       translate="label comment" type="text">
+                    <label>Period to Display Expired Voucher (day)</label>
+                    <validate>validate-zero-or-greater</validate>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

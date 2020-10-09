@@ -1,0 +1,55 @@
+<div data-bind="foreach: {data: attributes(), as: 'item'}">
+    <div class="field" data-bind=" attr: {'name': item.code}">
+
+        <label class="label" data-bind="attr: { for: 'shipping-block.address-form.'+ item.code}">
+            <span data-bind="i18n: item.label"></span>
+        </label>
+        <!-- ko if: item.dataType !='select' && item.dataType != 'multiline' -->
+        <div class="control">
+            <input class="input-text" data-bind="
+                value: item.default,
+                valueUpdate: 'keyup',
+                attr: {
+                    type: item.dataType,
+                    name: 'shipping-block.address-form.'+ item.code,
+                    placeholder: item.label,
+                    'aria-required': item.required,
+                    id: 'shipping-block.address-form.'+ item.code
+                },
+                validationOptions: item.validation"
+            >
+        </div>
+        <!-- /ko -->
+        <!-- ko if: item.dataType =='multiline' -->
+
+        <!-- ko foreach: { data: $parent.getNumberStreets(item.size), as: 'street'} -->
+        <div class="control">
+            <input class="input-text" data-bind="
+                    value: item.default,
+                    valueUpdate: 'keyup',
+                    attr: {
+                        type: 'text',
+                        name: 'shipping-block.address-form.'+ item.code + '[' + street+ ']',
+                        placeholder: item.label,
+                        'aria-required': item.required,
+                        id: 'shipping-block.address-form.'+ item.code
+                    },
+                    validationOptions: item.validation"
+            >
+        </div>
+        <!-- /ko -->
+        <!-- /ko -->
+        <!-- ko if: item.dataType =='select' -->
+        <div class="control">
+            <select data-bind="
+                options: item.options,
+                optionsText: 'label',
+                optionsValue: 'value'
+            ">
+
+            </select>
+        </div>
+        <!-- /ko -->
+
+    </div>
+</div>

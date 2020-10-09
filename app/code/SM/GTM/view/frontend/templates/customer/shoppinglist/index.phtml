@@ -1,0 +1,27 @@
+<script>
+    require(['jquery', 'Magento_Ui/js/lib/view/utils/async', 'gtmCustomer', 'mage/url', 'jquery/jquery-storageapi', 'mage/translate', 'domReady!'],function ($, async, gtmCustomer, urlBuilder) {
+        $(window).load(function () {
+            if (typeof dataLayerSourceObjects !== 'undefined') {
+                $('.mylists-action.remove').each(function () {
+                    $(this).on('click',function () {
+                        let shoppinglist = $(this).parent().find('.mylists-title').text();
+                        console.log(shoppinglist);
+                        $.localStorage.set('shoppinglist-remove', shoppinglist);
+                    });
+                });
+                async.async('[data-gtm-message="success"]', function () {
+                    if ($('[data-gtm-message="success"]').text().includes($.mage.__('has been successfully deleted'))) {
+                        try {
+                            let shoppinglist =  $.localStorage.get('shoppinglist-remove');
+                            let data = [];
+                            data['shoppingList_name'] = shoppinglist;
+                            gtmCustomer.push('remove_shoppingList', data);
+                        } catch (e) {
+
+                        }
+                    }
+                });
+            }
+        });
+    });
+</script>

@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+
+<!--
+    /**
+    * @category SM
+    * @package  SM_MyVoucher
+    * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+    *
+    *
+    * @author   Hung Pham <hungpv@smartosc.com>
+    *
+    * Copyright © 2020 SmartOSC. All rights reserved.
+    * http://www.smartosc.com
+    */
+-->
+
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="salesrule_coupon" resource="default" engine="innodb" comment="Salesrule Coupon">
+        <column xsi:type="int" name="customer_id" nullable="true"
+                comment="Customer ID"/>
+    </table>
+    <table name="salesrule" resource="default" engine="innodb" comment="Salesrule">
+        <column xsi:type="varchar" name="discount_text" nullable="true"
+                comment="Discount value"/>
+        <column xsi:type="varchar" name="discount_note" nullable="true"
+                comment="Discount note"/>
+        <column xsi:type="varchar" name="area" nullable="true"
+                comment="Area"/>
+        <column xsi:type="datetime" name="from_date" comment="From" />
+        <column xsi:type="datetime" name="to_date" comment="To" />
+        <column xsi:type="varchar" name="front_redirect_url" nullable="true" comment="Frontend Redirect Url"/>
+        <column xsi:type="varchar" name="mobile_redirect" nullable="true" comment="Provide the code for mobile redirect."/>
+        <column xsi:type="smallint" name="mobile_redirect_area" nullable="true" comment="Mobile Redirect Area"/>
+    </table>
+</schema>

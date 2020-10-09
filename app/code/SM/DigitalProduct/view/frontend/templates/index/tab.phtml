@@ -1,0 +1,20 @@
+<?php
+/** @var \SM\DigitalProduct\Block\Tab $block */
+?>
+
+<?php if (count($block->getCategories()) > 0): ?>
+    <?php /** @var \SM\DigitalProduct\Api\Data\CategoryInterface $digitalCategory */ ?>
+    <?php foreach ($block->getCategories() as $digitalCategory):?>
+        <div
+            class="item title <?= (($block->getCategoryCode() == $digitalCategory->getType()) ? \SM\DigitalProduct\Block\Tab::ACTIVE : "") ?>">
+            <a class="switch" data-gtm-event="digital_product_menu" data-gtm-name="category" data-gtm="<?= $block->escapeHtml("{\"menu_name\": \"".$digitalCategory->getCategoryName()."\"}") ?>"
+               href="<?= $block->getUrl("*/" . $digitalCategory->getType()) ?>">
+                <img src='<?= $digitalCategory->getThumbnail() ?>'
+                     alt="<?= $digitalCategory->getCategoryName() ?>" />
+                <span><?= $digitalCategory->getCategoryName() ?></span>
+            </a>
+        </div>
+    <?php endforeach; ?>
+<?php else: ?>
+    <h3><?= $block->escapeHtml(__("Service is unavailable now!")) ?></h3>
+<?php endif; ?>

@@ -1,0 +1,268 @@
+<?xml version="1.0"?>
+<!--  
+/**
+ * @category Trans
+ * @package  Trans_Integration
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Imam Kusuma <imam.kusuma@ctcorpdigital.com>
+ *
+ * Copyright © 2019 CT Corp Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <integration>
+            <centralize>
+	        	<check_phone_number_central>1</check_phone_number_central>
+	        	<centralize_env>0</centralize_env>
+	        </centralize>
+        </integration>
+        <integration_channel>
+            <environment>0</environment> <!--default dev-->
+            <default_limit>100</default_limit>
+            <default_status>1</default_status>
+            <default_author>0</default_author>
+            <pim>
+                <name>PIM (Mocking)</name>
+                <code>pim</code>
+                <base_url>
+                    <develop>https://private-e11af-backendplatformpim.apiary-mock.com</develop>
+                    <production>#</production>
+                </base_url>
+                <channel_method_1>
+                    <tag>category</tag>
+                    <description>PIM API - Category 2.0</description>
+                    <method>GET</method>
+                    <headers>{}</headers>
+                    <query_params>{"company_code":"TRTLMRT001"}</query_params>
+                    <body>{}</body>
+                    <path>/api/ext/category</path>
+                </channel_method_1>
+                <channel_method_2>
+                    <channel_id>1</channel_id>
+                    <tag>product</tag>
+                    <description>PIM API - Product 2.0</description>
+                    <method>GET</method>
+                    <headers>{}</headers>
+                    <query_params>{"company_code":"TRTLMRT001","product_type":"simple"}</query_params>
+                    <body>{}</body>
+                    <path>/api/ext/product</path>
+                </channel_method_2>
+                <channel_method_3>
+                    <channel_id>1</channel_id>
+                    <tag>brand</tag>
+                    <description>PIM API - Brand</description>
+                    <method>GET</method>
+                    <headers>{"dest":"tm.regulus"}</headers>
+                    <query_params>{}</query_params>
+                    <body>{}</body>
+                    <path>/v1/brand</path>
+                </channel_method_3>
+                <channel_method_4>
+                    <tag>product-attribute</tag>
+                    <description>PIM API - Product Attribute 2.0</description>
+                    <method>GET</method>
+                    <headers>{}</headers>
+                    <query_params>{"company_code":"TRTLMRT001"}</query_params>
+                    <body>{}</body>
+                    <path>/api/ext/attribute</path>
+                </channel_method_4>
+                 <channel_method_5>
+                    <tag>product-store-price</tag>
+                    <description>PIM API - Product Price 2.0</description>
+                    <method>GET</method>
+                    <headers>{}</headers>
+                    <query_params>{"company_code":"TRTLMRT001"}</query_params>
+                    <body>{}</body>
+                    <path>/api/ext/price</path>
+                </channel_method_5>
+                <channel_method_6>
+                    <tag>product-association</tag>
+                    <description>PIM API - Product Association 1.0</description>
+                    <method>GET</method>
+                    <headers>{}</headers>
+                    <query_params>{"company_code":"TRTLMRT001"}</query_params>
+                    <body>{}</body>
+                    <path>/api/ext/association</path>
+                </channel_method_6>
+                 <channel_method_7>
+                    <tag>product-promotion</tag>
+                    <description>PIM API - Product Promotion 1.0</description>
+                    <method>GET</method>
+                    <headers>{}</headers>
+                    <query_params>{"company_code":"TRTLMRT001"}</query_params>
+                    <body>{}</body>
+                    <path>/api/ext/promo</path>
+                </channel_method_7>
+                <channel_method_8>
+                    <tag>product-image</tag>
+                    <description>PIM API - Product Image 2.0</description>
+                    <method>GET</method>
+                    <headers>{}</headers>
+                    <query_params>{"company_code":"TRTLMRT001"}</query_params>
+                    <body>{}</body>
+                    <path>/api/ext/image/product</path>
+                </channel_method_8>
+                <channel_method_9>
+                    <tag>brand</tag>
+                    <description>PIM API - Product Brand 2.0</description>
+                    <method>GET</method>
+                    <headers>{}</headers>
+                    <query_params>{"company_code":"TRTLMRT001"}</query_params>
+                    <body>{}</body>
+                    <path>/api/ext/brand</path>
+                </channel_method_9>
+                <channel_method_10>
+                    <channel_id>1</channel_id>
+                    <tag>product-digital</tag>
+                    <description>PIM API - Product Digital 1.0</description>
+                    <method>GET</method>
+                    <headers>{}</headers>
+                    <query_params>{"company_code":"TRTLMRT001","product_type":"digital"}</query_params>
+                    <body>{}</body>
+                    <path>/api/ext/product</path>
+                </channel_method_10>
+                <channel_method_11>
+                    <channel_id>1</channel_id>
+                    <tag>product-attribute-set</tag>
+                    <description>PIM API - Product Attribute Set 1.0</description>
+                    <method>GET</method>
+                    <headers>{}</headers>
+                    <query_params>{"company_code":"TRTLMRT001"}</query_params>
+                    <body>{}</body>
+                    <path>/api/ext/attribute/in/category</path>
+                </channel_method_11>
+            </pim>
+            <ims>
+                <name>Inventory Management</name>
+                <code>ims</code>
+                <description>Inventory Management System</description>
+                <base_url>
+                    <develop>http://34.68.240.28/ims</develop>
+                    <production>#</production>
+                </base_url>
+                <channel_method_1>
+                    <channel_id>2</channel_id>
+                    <tag>store</tag>
+                    <description>IMS API - Store Initial</description>
+                    <method>GET</method>
+                    <headers>{"dest":"stargazer"}</headers>
+                    <query_params>{"_channel":1}</query_params>
+                    <body>{}</body>
+                    <path>/v1/locations/all</path>
+                </channel_method_1>
+                <channel_method_2>
+                    <channel_id>2</channel_id>
+                    <tag>store-updates</tag>
+                    <description>IMS API - Store Updates</description>
+                    <method>GET</method>
+                    <headers>{"dest":"stargazer"}</headers>
+                    <query_params>{"_channel":1}</query_params>
+                    <body>{}</body>
+                    <path>/v1/locations/recent</path>
+                </channel_method_2>
+                <channel_method_3>
+                    <channel_id>2</channel_id>
+                    <tag>product-stock</tag>
+                    <description>IMS API - Product Stock Initial</description>
+                    <method>GET</method>
+                    <headers>{"dest":"stargazer"}</headers>
+                    <query_params>{"_channel":1}</query_params>
+                    <body>{}</body>
+                    <path>/v1/inventory/stock_allocation</path>
+                </channel_method_3>
+                <channel_method_4>
+                    <channel_id>2</channel_id>
+                    <tag>product-stock-update</tag>
+                    <description>IMS API - Product Stock Update Min</description>
+                    <method>GET</method>
+                    <headers>{"dest":"stargazer"}</headers>
+                    <query_params>{"_channel":1}</query_params>
+                    <body>{}</body>
+                    <path>/v1/inventory/recent</path>
+                </channel_method_4>
+                <channel_method_5>
+                    <channel_id>2</channel_id>
+                    <tag>product-stock-direct-check</tag>
+                    <description>IMS API - Direct Check stock</description>
+                    <method>POST</method>
+                    <headers>{"dest":"stargazer"}</headers>
+                    <query_params>{"_channel":1}</query_params>
+                    <body>{}</body>
+                    <path>/v1/inventory/check_stock</path>
+                </channel_method_5>
+            </ims>
+            <centralize>
+                <name>Centralize</name>
+                 <code>cdb</code>
+                <description>Database Centralize System</description>
+                <base_url>
+                    <develop>http://35.241.12.179/api/coreapi</develop>
+                    <production>#</production>
+                </base_url>
+                <general>
+                    <apiurl_dev>http://35.241.12.179/api/coreapi/</apiurl_dev>
+                    <enabled_sms_verification>1/</enabled_sms_verification>
+                </general>
+                <verification>
+                    <enabled_static_code>0</enabled_static_code>
+                    <static_otp_code>123456,654321</static_otp_code>
+                    <send_sms_verifcation>ma/send/sms/verification/v1.0</send_sms_verifcation>
+                    <verify_sms_verifcation>ma/verify/sms/verification/v1.0</verify_sms_verifcation>
+                </verification>
+                <channel_method_1>
+                    <channel_id>3</channel_id>
+                    <tag>register-customers</tag>
+                    <description>Centralize API - Register Customer</description>
+                    <description>Signup customer to API DB Centralize</description>
+                    <method>POST</method>
+                    <headers>{}</headers>
+                    <query_params>{}</query_params>
+                    <body>{}</body>
+                    <path>/ma/signup/customers/v1.0</path>
+                </channel_method_1>
+                <channel_method_2>
+                    <channel_id>3</channel_id>
+                    <tag>update-customers</tag>
+                    <description>Centralize API - Update Customer</description>
+                    <description>Update customer to API DB Centralize</description>
+                    <method>POST</method>
+                    <headers>{}</headers>
+                    <query_params>{}</query_params>
+                    <body>{}</body>
+                    <path>/ma/update/customer/details/v1.0</path>
+                </channel_method_2>
+            </centralize>
+            <oms>
+                <name>Order Management</name>
+                <code>oms</code>
+                <base_url>
+                    <develop>http://34.68.240.28</develop>
+                    <production>#</production>
+                </base_url>
+                <channel_method_1>
+                    <channel_id>4</channel_id>
+                    <tag>create-order-header</tag>
+                    <description>OMS - Create Order Header</description>
+                    <method>POST</method>
+                    <headers>{"dest":"omega"}</headers>
+                    <query_params>{}</query_params>
+                    <body>{}</body>
+                    <path>/v1/orders</path>
+                </channel_method_1>
+            </oms>
+            <notification>
+                <name>Notification</name>
+                <code>notify</code>
+                <base_url>
+                    <develop>https://notification-api-stg.ctdigital.id</develop>
+                    <production>https://notification-api.ctdigital.id</production>
+                </base_url>
+            </notification>
+        </integration_channel>
+    </default>
+</config>

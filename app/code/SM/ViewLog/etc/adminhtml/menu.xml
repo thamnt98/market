@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="SM_ViewLog::viewlog" title="View Log" module="SM_ViewLog" sortOrder="500"
+             resource="SM_ViewLog::viewlog"/>
+        <add id="SM_ViewLog::view" title="View file log" module="SM_ViewLog" sortOrder="10"
+             action="devlog/index/index"
+             resource="SM_ViewLog::viewlog"
+             parent="SM_ViewLog::viewlog"/>
+    </menu>
+</config>

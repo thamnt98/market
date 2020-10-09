@@ -1,0 +1,22 @@
+<script>
+    require(['jquery','moment'], function ($, moment) {
+        LC_API.on_chat_window_opened = function () {
+            if (typeof dataLayerSourceObjects !== 'undefined' && dataLayerSourceObjects.customer.loginType !== "null") {
+                window.dataLayer = window.dataLayer || [];
+                window.dataLayer.push({
+                    'event': "need_help_button",
+                    'uniqueUserID': dataLayerSourceObjects.customer.uniqueUserID,
+                    'userID': dataLayerSourceObjects.customer.userID,
+                    'customerID': dataLayerSourceObjects.customer.customerID,
+                    'customerType': dataLayerSourceObjects.customer.customerType,
+                    'loyalty': dataLayerSourceObjects.customer.loyalty,
+                    'customerStatus': dataLayerSourceObjects.customer.customerStatus,
+                    'loginType': dataLayerSourceObjects.customer.loginType,
+                    'store_name': dataLayerSourceObjects.store.store_name,
+                    'store_ID': dataLayerSourceObjects.store.store_ID,
+                    'timestamp': moment().format('DD\/MM\/YYYY HH:mm:ss')
+                });
+            }
+        }
+    });
+</script>

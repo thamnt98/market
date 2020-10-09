@@ -1,0 +1,34 @@
+<?php
+/** @var \SM\ShoppingList\Block\MyList\Listing $block */
+?>
+<div class="wishlist-header">
+    <div class="wishlist-title">
+        <span><?= $block->escapeHtml(__('Shopping List')) ?></span>
+    </div>
+
+    <div class="actions-toolbar">
+        <div class="primary">
+            <button type="button" class="action create-list" name="do" id="button-open-create-modal"
+                    title="<?= $block->escapeHtml(__('Create a List')) ?> "
+
+            >
+                <span><?= $block->escapeHtml(__('Create a List')) ?></span>
+            </button>
+            <div id="create-wishlist-modal" class="content" style="display: none">
+                <form id="form-create-list" action="<?= $block->getUrl("*/action/createlist")?>" method="post">
+                    <input type="text" class="create-list-name" id="create-list-name" name="shoppinglist_name"
+                           placeholder="<?= $block->escapeHtml(__('Type the list name here')) ?>"/>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/x-magento-init">
+{
+    "*": {
+        "ShoppingListCreate":{
+            "create_list_url":"<?= $block->getCreateListUrl()?>"
+        }
+    }
+}
+</script>

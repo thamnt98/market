@@ -1,0 +1,82 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+?>
+<a href="#" data-trigger="size-guide"><?= $block->escapeHtml(__('size-guide')) ?></a>
+<div data-bind="mageInit: {
+    'Magento_Ui/js/modal/modal':{
+    'type': 'popup',
+    'title': 'Size Guide',
+    'trigger': '[data-trigger=size-guide]',
+    'modalClass': 'pp-size-guide',
+    'responsive': true
+    }}">
+    <div class="size-guide-ct">
+        <table cellpadding="0" cellspacing="0" border="0" class="table-size-guide">
+            <tr>
+                <th><strong>Size</strong></th>
+                <th><strong>small</strong></th>
+                <th><strong>Medium</strong></th>
+                <th ><strong>Large</strong></th>
+            </tr>
+            <tr>
+                <td rowspan="2"><strong>Shoulder Length</strong></td>
+                <td>32 cm</td>
+                <td>38 cm</td>
+                <td>42 cm</td>
+            </tr>
+            <tr>
+                <td>12 inches</td>
+                <td>13 inches/td>
+                <td>14 inches/td>
+            </tr>
+            <tr>
+                <td rowspan="2"><strong>Bust</strong></td>
+                <td>28 cm</td>
+                <td>32 cm</td>
+                <td>36-38 cm</td>
+            </tr>
+            <tr>
+                <td>11 inches</td>
+                <td>13 inches/td>
+                <td>14 inches/td>
+            </tr>
+            <tr>
+                <td rowspan="2"><strong>Waist</strong></td>
+                <td>30 cm</td>
+                <td>34 cm</td>
+                <td>35 cm</td>
+            </tr>
+            <tr>
+                <td>12 inches</td>
+                <td>13 inches/td>
+                <td>13 inches/td>
+            </tr>
+            <tr>
+                <td rowspan="2"><strong>Hips</strong></td>
+                <td>30 cm</td>
+                <td>33 cm</td>
+                <td>35 cm</td>
+            </tr>
+            <tr>
+                <td>12 inches</td>
+                <td>13 inches/td>
+                <td>14 inches/td>
+            </tr>
+            <tr>
+                <td rowspan="2"><strong>Neck Length</strong></td>
+                <td>30 cm</td>
+                <td>33 cm</td>
+                <td>35 cm</td>
+            </tr>
+            <tr>
+                <td>12 inches</td>
+                <td>13 inches/td>
+                <td>14 inches/td>
+            </tr>
+        </table>
+    </div>
+</div>

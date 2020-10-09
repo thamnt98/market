@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="SM\StoreLocator\Api\Data\StoreInterface"
+                type="SM\StoreLocator\Model\Store" />
+    <preference for="SM\StoreLocator\Api\StoreLocationRepositoryInterface"
+                type="SM\StoreLocator\Model\Repository\StoreLocationRepository" />
+    <preference for="SM\StoreLocator\Api\Entity\StoreOpeningHoursInterface"
+                type="SM\StoreLocator\Model\Entity\StoreOpeningHours" />
+    <preference for="SM\StoreLocator\Api\Entity\StoreAddressInterface"
+                type="SM\StoreLocator\Model\Entity\StoreAddress" />
+    <preference for="SM\StoreLocator\Api\Data\Request\StoreSearchCriteriaInterface"
+                type="SM\StoreLocator\Model\Data\Request\StoreSearchCriteria"/>
+    <preference for="SM\StoreLocator\Api\Data\Request\SortOrderInterface"
+                type="SM\StoreLocator\Model\Data\Request\StoreSearchCriteria\SortOrder"/>
+    <preference for="SM\StoreLocator\Api\Data\Response\StoreSearchResultsInterface"
+                type="SM\StoreLocator\Model\Data\Response\StoreSearchResults" />
+</config>

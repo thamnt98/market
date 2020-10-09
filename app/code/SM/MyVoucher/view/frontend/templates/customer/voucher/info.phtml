@@ -1,0 +1,58 @@
+<?php
+/** @var \SM\MyVoucher\Block\Customer\MyVoucher $block */
+$vouchers = $block->getAllVoucher();
+
+if (!empty($vouchers)): ?>
+    <div class="list-voucher my-list-vouchers">
+        <h5 class="list-voucher-title"><?= $block->escapeHtml(__('You have %1 voucher(s)', count($vouchers))) ?></h5>
+        <ul class="list-items">
+            <?php foreach ($vouchers as $voucher): ?>
+                <li class="item-voucher <?= $voucher->getAvailable() ? '' : 'disabled' ?>"
+                    data-gtm-event="voucher"
+                    data-gtm-voucher-id="<?= $block->escapeHtml($voucher->getData('coupon_id')) ?>"
+                    data-gtm-voucher-name="<?= $block->escapeHtml($voucher->getData('name')) ?>"
+                    data-gtm-voucher-description="<?= $block->escapeHtml($voucher->getData('description')) ?>"
+                    data-gtm-validation="<?= $block->escapeHtml($voucher->getData('to_date')) ?>">
+                    <div class="inner">
+                        <?php if ($voucher->isExpired() || $voucher->getToDate()) : ?>
+                            <span class="time-use-voucher <?= $voucher->isExpired() ? 'voucher-expired' : ''?>">
+                                <?= $block->getTimeLeft($voucher) ?>
+                            </span>
+                        <?php endif; ?>
+                        <?php if ($voucher->getUseLeft() > -1) : ?>
+                            <span class="use-left-voucher"><?= 'x' . $voucher->getUseLeft() ?></span>
+                        <?php endif; ?>
+                        <div class="img-voucher">
+                            <a href="<?= $block->escapeHtmlAttr($block->getCouponUrl($voucher)) ?>">
+                                <img src='<?= $block->getVoucherImage($voucher); ?>' alt="<?= $voucher->getName() ?>" />
+                                <div class="img-voucher-ct">
+                                    <span class="title-voucher"><?= __('Voucher') ?></span>
+                                    <span class="voucher-discount-amount"><?= $voucher->getDiscountText() ?></span>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="item-voucher-detail">
+                            <p class="description" data-trigger="apply-voucher-detail"><?= $voucher->getName() ?></p>
+                            <?php if ($voucher->getToDate()) : ?>
+                                <span class="valid-until"><?= $block->getToDate($voucher) ?></span>
+                            <?php endif; ?>
+                            <a href="<?= $block->getCouponUrl($voucher) ?>" class="action primary small">
+                                <?= __('View') ?>
+                            </a>
+                        </div>
+                    </div>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    </div>
+<?php else: ?>
+    <p class="empty-voucher-text"><?= $block->escapeHtml(__("You have 0 vouchers")) ?></p>
+    <div class="no-route my-vouchers-empty">
+        <div class="no-route-info">
+            <img src="<?=$block->getViewFileUrl('images/voucher-empty.svg')?>" alt="<?= __('You do not have any vouchers at the moment') ?>" width="280"/>
+            <h4><?= $block->escapeHtml(__("You don't have any vouchers at the moment.")) ?></h4>
+        </div>
+    </div>
+<?php endif; ?>
+
+<!--<a href="--><?php //echo $block->getUrl("reward/customer/info/"); ?><!--">--><?php //echo $block->escapeHtml(__('Back To Reward')) ?><!--</a>-->

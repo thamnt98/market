@@ -1,0 +1,29 @@
+<?php
+/**
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_LayeredNavigation
+ *
+ * Date: April, 27 2020
+ * Time: 3:23 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ */
+?>
+<?php /** @var $block \Magento\Framework\View\Element\Template */ ?>
+<div data-role="catalog_category_add_attribute_filter_content" class="admin__old" style="display:none">
+    <div class="admin__data-grid-outer-wrap"
+         data-bind="scope: 'smlayer_attribute_filter_listing.smlayer_attribute_filter_listing'">
+        <div data-role="spinner"
+             data-component="smlayer_attribute_filter_listing.smlayer_attribute_filter_listing.smlayer_attribute_filter_listing_columns"
+             class="admin__data-grid-loading-mask">
+            <div class="spinner">
+                <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+            </div>
+        </div>
+        <!-- ko template: getTemplate() --><!-- /ko -->
+    </div>
+</div>

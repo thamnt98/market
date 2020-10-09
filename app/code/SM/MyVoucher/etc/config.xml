@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_MyVoucher
+ *
+ * Date: July, 03 2020
+ * Time: 2:51 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <sm_sales_rule>
+            <display>
+                <expired_day_number>5</expired_day_number>
+            </display>
+        </sm_sales_rule>
+    </default>
+</config>

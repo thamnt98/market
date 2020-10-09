@@ -1,0 +1,30 @@
+<?php
+/** @var \SM\Sales\Block\Order\Button\ReorderItem $block */
+
+$itemId = $block->getItem()->getItemId();
+$itemName = $block->getItem()->getProductName();
+$itemSku = $block->getItem()->getSku();
+?>
+<form id="form-reorder-item-<?= $itemId ?>" action="<?= $block->getReorderUrl() ?>" method="POST">
+    <input type="hidden" name="item_id" value="<?= $itemId ?>"/>
+</form>
+<button data-gtm-event="reorder-item" data-gtm="<?= $block->escapeHtml($itemSku) ?>" id="btn-reorder-item-<?= $itemId?>" class="action secondary">
+    <?= $block->escapeHtml(__('Reorder')) ?>
+</button>
+
+<div id="confirm-reorder-item-<?= $itemId ?>" class="content" style="display:none;">
+    <span class="remove-wishlist-verify">
+        <span><?= $block->escapeHtml(__('Are you sure you want to reorder ' . $itemName . "?"))?></span>
+        <span><?= $block->escapeHtml(__('(This item will be added to cart) '))?></span>
+    </span>
+</div>
+
+<script type="text/x-magento-init">
+{
+    "*": {
+        "ReorderItem": {
+            "item_id" : "<?= $itemId ?>"
+        }
+    }
+}
+</script>

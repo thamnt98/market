@@ -1,0 +1,21 @@
+<?php
+/** @var \SM\Review\Block\Product\Button $block */
+
+?>
+
+<div class="actions-toolbar review-form-actions">
+    <div class="actions-primary">
+        <button type="button" id="open-review-form" class="action secondary"><span><?= $block->escapeHtml(__('Write A Review')) ?></span></button>
+    </div>
+</div>
+
+<script type="text/x-magento-init">
+{
+    "*": {
+        "OpenReview" : {},
+        "ProcessInvoice": {
+            "order_id" : "<?= $block->getOrderId()?>"
+        }
+    }
+}
+</script>

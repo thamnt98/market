@@ -1,0 +1,36 @@
+<?php
+/** @var \SM\DigitalProduct\Block\Index\HowToBuy $block */
+?>
+
+<?php if (is_null($block->getHowToBuyIdentifier())):?>
+    <p><?= $block->escapeHtml(__("When it comes to paying your electricity bills or buying electricity token, no one wants to do it with too much hassle.
+                        Transmart gives you the solution! We offer a simplicity to provide your daily need."))?></p>
+    <p style="padding-bottom:0px;"><?= $block->escapeHtml(__("Buying PLN Electricity Token"))?><br/>
+        <?= $block->escapeHtml(__("You can find various nominal options for your electricity token.
+                        This prepaid electricity purchase can be done anywhere and anytime from Transmart's website and app.
+                        Follow these steps to buy electricity token."))?></p>
+    <ol>
+        <li><?= $block->escapeHtml(__("Go to Transmart website."))?></li>
+        <li><?= $block->escapeHtml(__("Choose Top Up & Bills category on the homepage."))?></li>
+        <li><?= $block->escapeHtml(__("Go to PLN Electricity menu."))?></li>
+        <li><?= $block->escapeHtml(__("Enter your meter number. You can find meter number in your customer card."))?></li>
+        <li><?= $block->escapeHtml(__("Select the nominal that you want to buy."))?></li>
+        <li><?= $block->escapeHtml(__('Tap or click "Buy" button.'))?></li>
+        <li><?= $block->escapeHtml(__("Select your payment method and please make the payment."))?></li>
+        <li><?= $block->escapeHtml(__("You will receive your token code in maximum of 2 x 24 hours."))?></li>
+    </ol>
+    <p style="padding-bottom:0;"><?= $block->escapeHtml(__("Paying Your PLN Electricity Bill"))?></p>
+    <ol>
+        <li><?= $block->escapeHtml(__("Go to Transmart website."))?></li>
+        <li><?= $block->escapeHtml(__("Choose Top Up & Bills category on the homepage."))?></li>
+        <li><?= $block->escapeHtml(__("Go to PLN Electricity menu."))?></li>
+        <li><?= $block->escapeHtml(__("Enter your meter number. You can find meter number in your customer card."))?></li>
+        <li><?= $block->escapeHtml(__("Select the nominal that you want to buy."))?></li>
+        <li><?= $block->escapeHtml(__('Tap or click "Check My Bill" button.'))?></li>
+        <li><?= $block->escapeHtml(__("Select your payment method and please make the payment."))?></li>
+    </ol>
+    <p><?= $block->escapeHtml(__("Paying other bills is just as easy! Transmart allows you to pay your PDAM water bill, BPJS bill, mobile postpaid and Telkom bill.
+                        You can also enjoy the easy way to top up your mobile number and to buy mobile package."))?></p>
+<?php else:?>
+    <?= $block->getLayout()->createBlock(\Magento\Cms\Block\Block::class)->setBlockId($block->getHowToBuyIdentifier())->toHtml();?>
+<?php endif;?>

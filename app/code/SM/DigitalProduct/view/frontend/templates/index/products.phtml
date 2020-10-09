@@ -1,0 +1,117 @@
+<?php
+/** @var \SM\DigitalProduct\Block\MobilePackage\ProductList $block*/
+$isElectric = ($block->getCategory() == \SM\DigitalProduct\Model\CategoryRepository::ELECTRICITY);
+$operator = $block->getOperator();
+
+?>
+
+<?php if (!is_null($operator)):?>
+    <input type="hidden" value="<?= $operator->getOperatorName()?>" name="digital[operator]"/>
+<?php endif;?>
+<?php if (count($block->getC1Categories())):?>
+<h3 class="title-nom"><?= $block->escapeHtml(__("Amount"))?></h3>
+<?php endif;?>
+<?php $position = 1; ?>
+<?php foreach ($block->getC1Categories() as $key => $c1Category):?>
+    <?php if ($key == 0):?>
+    <ul id="list<?= $c1Category->getMagentoCategoryId()?>" class="list-nomial">
+        <?php
+        $min = $minPosition = 0;
+        /** @var \Magento\Catalog\Api\Data\ProductInterface $product */
+        foreach ($c1Category->getProducts() as $product):?>
+            <?php
+            $denom = $product->getCustomAttribute("denom");
+            $denom = is_null($denom) ? "0" : $denom->getValue();
+
+            $min = $position == 1 ? $denom : $min;
+
+            $productIdVendorToken = $product->getCustomAttribute("product_id_vendor");
+            $productIdVendorToken = is_null($productIdVendorToken) ? "0" : $productIdVendorToken->getValue();
+
+            if ($product->getSpecialPrice()) {
+                $price = $product->getPriceInfo()->getPrice('final_price')->getValue();
+            } else {
+                $price = $product->getPrice();
+            }
+
+            $priceGtm = $isElectric ? $denom : $price;
+            $variantGtm = $isElectric ? $block->priceFormat($denom) : $block->priceFormat($price);
+            $brandGtm = $operator ? $operator->getOperatorName() : "Not Available";
+
+            $gtmDigital = Zend_Json_Encoder::encode([
+                'product_id' => $product->getSku(),
+                'product_name' => $product->getName(),
+                'product_price' => $priceGtm,
+                'product_brand' => $brandGtm,
+                'product_variant' => $variantGtm,
+                'product_position' => $position
+            ]);
+            ?>
+            <li class="item" <?php if ($gtmDigital) : ?>
+                data-gtm="<?= $block->escapeHtml($gtmDigital) ?>"
+                data-gtm-event="digital_product_buy"
+            <?php endif; ?>>
+                <label style="cursor: pointer">
+                    <div class="dpb-inner-content">
+                        <h4 class="denom"><?= number_format((int) $denom, 0, ',', '.') ?></h4>
+                        <div class="price-box">
+                        <?php if ($isElectric):?>
+                            <?php
+                                if ($min > (int) $denom) {
+                                    $minPosition = $position - 1;
+                                }
+                            ?>
+                            <span class="price-label"><?= $block->escapeHtml(__("Price: "))?></span>
+                            <span class="price"><?= $block->priceFormat($price)?></span>
+                        <?php else:?>
+                            <?php if ($product->getSpecialPrice()) : ?>
+                                <p class="old-price">
+                                    <span class="price-label"><?= $block->escapeHtml(__("Price: "))?></span>
+                                    <span class="price"><?= $block->priceFormat($product->getPrice())?></span>
+                                </p>
+                                <p class="special-price ">
+                                    <span class="price-label"><?= $block->escapeHtml(__("Price: "))?></span>
+                                    <span class="price"><?= $block->priceFormat($price)?></span>
+                                </p>
+                            <?php else: ?>
+                                <p class="regular-price">
+                                    <span class="price-label"><?= $block->escapeHtml(__("Price: "))?></span>
+                                    <span class="price"><?= $block->priceFormat($price)?></span>
+                                </p>
+                            <?php endif;?>
+                        <?php endif;?>
+                        </div>
+                        <input class="product-item" type="radio" value="<?= $product->getSku()?>" name="sku"
+
+                                data-product-price="<?= $block->priceFormat($price)?>"
+                               data-product-price-value="<?= $price ?>"
+                               data-product-id-vendor="<?= $productIdVendorToken ?>"
+                               data-product-desc="<?= $product->getDescription() ?>"
+                               data-product-name="<?= $product->getName() ?>"
+                               data-product-denom="<?= $denom ?>"
+                               style="display: none"/>
+                    </div>
+                </label>
+            </li>
+            <?php $position++; ?>
+        <?php endforeach;?>
+        <input type="hidden" name="min_position" value="<?= $minPosition ?>">
+    </ul>
+    <?php else:?>
+        <?php if (isset(array_values($c1Category->getProducts())[0])):?>
+            <?php
+            $product = array_values($c1Category->getProducts())[0];
+            $price = $product->getPriceInfo()->getPrice('final_price')->getValue();
+
+            $productIdVendorBill = $product->getCustomAttribute("product_id_vendor");
+            $productIdVendorBill = is_null($productIdVendorBill) ? "0" : $productIdVendorBill->getValue();
+            ?>
+            <input id="pln-bill-product" type="checkbox" value="<?= $product->getSku()?>"
+                   data-admin-fee="<?= $block->priceFormat($price) ?>"
+                   data-product-price-value="<?= $price ?>"
+                   name="sku"
+                   style="display: none"/>
+            <input id="bill-product-id-vendor" type="checkbox" value="<?= $productIdVendorBill ?>" name="digital_transaction[product_id_vendor]" style="display: none"/>
+        <?php endif;?>
+    <?php endif;?>
+<?php endforeach;?>

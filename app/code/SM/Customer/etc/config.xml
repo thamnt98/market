@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <sm_customer>
+            <verify_email>
+                <template>sm_customer_verify_email_template</template>
+                <sender>general</sender>
+            </verify_email>
+            <registration_success_email>
+                <template>sm_customer_registration_success_email_template</template>
+                <sender>general</sender>
+            </registration_success_email>
+            <change_telephone_notification>
+                <template>sm_customer_change_telephone_notification_template</template>
+                <sender>general</sender>
+            </change_telephone_notification>
+            <change_email_notification>
+                <template>sm_customer_change_email_notification_template</template>
+                <sender>general</sender>
+            </change_email_notification>
+            <change_password_notification>
+                <template>sm_customer_change_password_notification_template</template>
+                <sender>general</sender>
+            </change_password_notification>
+            <change_personal_information_notification>
+                <template>sm_customer_change_personal_information_notification_template</template>
+                <sender>general</sender>
+            </change_personal_information_notification>
+            <recovery>
+                <lockout_failures>5</lockout_failures>
+                <lockout_threshold>1000000</lockout_threshold>
+                <template>sm_customer_recovery_template</template>
+                <lock>sm_customer_recovery_lock</lock>
+                <sender>general</sender>
+            </recovery>
+            <customer_address_limit>
+                <limit>6</limit>
+            </customer_address_limit>
+        </sm_customer>
+    </default>
+</config>

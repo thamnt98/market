@@ -1,0 +1,21 @@
+<!-- ko if: isShow()-->
+    <div class="box-delivery-address">
+        <!-- ko if: hasSupportShippingText()-->
+        <div class="block-remark delivery-remark shipping-support-notify">
+            <span class="apl-delivery-large"></span>
+            <span class="shipping-support-label" data-bind="text: window.checkoutConfig.shipping_support"></span>
+        </div>
+        <!-- /ko -->
+        <h3 data-bind="i18n: 'Delivery Address'"></h3>
+        <!-- ko if: isAddressNotComplete()-->
+            <p class="address-not-complete-message" data-bind="html: getAddressNotCompleteMessage()"></p>
+        <!-- /ko -->
+        <ul>
+        <!-- ko if: (visible)-->
+            <!-- ko foreach: { data: elems, as: 'element' } -->
+            <!-- ko template: element.getTemplate() --><!-- /ko -->
+            <!-- /ko -->
+        <!-- /ko -->
+        </ul>
+    </div>
+<!-- /ko -->

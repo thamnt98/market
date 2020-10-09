@@ -1,0 +1,21 @@
+<div class="field city required">
+    <label class="label"><span>City</span></label>
+    <div class="control" selector="city-block">
+        <input type="text"
+               selector="city"
+               value=""
+               title="City"
+               autocomplete="off"
+               class="input-text">
+        <ul class="notranslate" id="city-list" selector="city-list" style="display: none"></ul>
+    </div>
+</div>
+
+<div class="field district required">
+    <label class="label" for="district"><span>District</span></label>
+    <div class="control">
+        <select id="district" name="district" data-validate='{"required":true}'>
+        </select>
+        <input id="cityId" name="city" type="hidden"/>
+    </div>
+</div>

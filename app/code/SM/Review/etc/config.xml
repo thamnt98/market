@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <sm_review>
+            <upload_image>
+                <active>1</active>
+            </upload_image>
+            <email_post>
+                <email_identity>general</email_identity>
+                <email_template>sm_review_email_post_email_template</email_template>
+            </email_post>
+            <email_edit>
+                <email_identity>general</email_identity>
+                <email_template>sm_review_email_edit_email_template</email_template>
+            </email_edit>
+        </sm_review>
+    </default>
+</config>

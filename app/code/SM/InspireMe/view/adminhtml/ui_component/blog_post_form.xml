@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ @project    ct-corp-transmart
+  ~ @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+  ~ @author     Duc Nguyen Hoang <ducnh2@smartosc.com>
+  ~ @copyright  Copyright © 2020 SmartOSC. All rights reserved.
+  ~ @url        http://www.smartosc.com
+  -->
+
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="buttons" xsi:type="array">
+            <item name="preview" xsi:type="array">
+                <item name="disabled" xsi:type="boolean">true</item>
+            </item>
+        </item>
+    </argument>
+
+    <container name="sidebar">
+        <fieldset name="Image">
+            <field name="featured_image">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="label" xsi:type="string" translate="true">Thumbnail</item>
+                        <item name="notice" xsi:type="string" translate="true">
+                            <![CDATA[
+                                Allowed file types: jpeg, gif, png.<br>
+                                Thumbnail size is 1410 x 780.
+                            ]]>
+                        </item>
+                    </item>
+                </argument>
+            </field>
+            <field name="show_hot_spot" sortOrder="10" formElement="checkbox">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="source" xsi:type="string">show_hot_spot</item>
+                        <item name="default" xsi:type="number">0</item>
+                        <item name="notice" xsi:type="string" translate="true">
+                            Only on details page
+                        </item>
+                    </item>
+                </argument>
+                <settings>
+                    <dataType>boolean</dataType>
+                    <label translate="true">Show "Hot Spot" and hide "thumbnail image"</label>
+                    <dataScope>show_hot_spot</dataScope>
+                </settings>
+                <formElements>
+                    <checkbox>
+                        <settings>
+                            <valueMap>
+                                <map name="false" xsi:type="number">0</map>
+                                <map name="true" xsi:type="number">1</map>
+                            </valueMap>
+                            <prefer>toggle</prefer>
+                        </settings>
+                    </checkbox>
+                </formElements>
+            </field>
+            <field name="look_book_id">
+                <argument name="data" xsi:type="array">
+                    <item name="options" xsi:type="object">MGS\Lookbook\Model\Entity\Attribute\Backend\Lookbook</item>
+                    <item name="config" xsi:type="array">
+                        <item name="label" xsi:type="string" translate="true">Choose Hot Spot</item>
+                        <item name="componentType" xsi:type="string">field</item>
+                        <item name="formElement" xsi:type="string">select</item>
+                        <item name="elementTmpl" xsi:type="string">ui/grid/filters/elements/ui-select</item>
+                        <item name="component" xsi:type="string">Magento_Ui/js/form/element/ui-select</item>
+                        <item name="filterOptions" xsi:type="boolean">true</item>
+                        <item name="showCheckbox" xsi:type="boolean">false</item>
+                        <item name="disableLabel" xsi:type="boolean">true</item>
+                        <item name="multiple" xsi:type="boolean">false</item>
+                        <item name="validation" xsi:type="array">
+                            <item name="required-entry" xsi:type="boolean">false</item>
+                        </item>
+                        <item name="notice" xsi:type="string" translate="true">
+                            To add hot spots from admin "Content -> Manager Hot Spots"
+                        </item>
+                    </item>
+                </argument>
+            </field>
+        </fieldset>
+        <fieldset name="categories">
+            <field name="category_ids">
+                <argument name="data" xsi:type="array">
+                    <item name="options" xsi:type="object">SM\InspireMe\Ui\Post\Source\Topic</item>
+                    <item name="config" xsi:type="array">
+                        <item name="label" xsi:type="string" translate="true">Topics</item>
+                        <item name="formElement" xsi:type="string">multiselect</item>
+                        <item name="elementTmpl" xsi:type="string">ui/form/element/multiselect</item>
+                        <item name="component" xsi:type="string">Magento_Ui/js/form/element/multiselect</item>
+                        <item name="template" xsi:type="string">ui/form/field</item>
+                        <item name="validation" xsi:type="array">
+                            <item name="required-entry" xsi:type="boolean">true</item>
+                        </item>
+                    </item>
+                </argument>
+            </field>
+        </fieldset>
+        <fieldset name="tags">
+            <field name="tag_ids">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="notice" xsi:type="string" translate="true">
+                            Only 5 first tags will be saved.
+                        </item>
+                    </item>
+                </argument>
+            </field>
+        </fieldset>
+        <fieldset name="homepage">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="collapsible" xsi:type="boolean">false</item>
+                    <item name="label" xsi:type="string" translate="true">Block On Homepage</item>
+                </item>
+            </argument>
+            <field name="position_homepage">
+                <argument name="data" xsi:type="array">
+                    <item name="options" xsi:type="object">SM\InspireMe\Ui\Post\Source\Position</item>
+                    <item name="config" xsi:type="array">
+                        <item name="label" xsi:type="string" translate="true">Position On Homepage</item>
+                        <item name="componentType" xsi:type="string">field</item>
+                        <item name="formElement" xsi:type="string">select</item>
+                        <item name="elementTmpl" xsi:type="string">ui/grid/filters/elements/ui-select</item>
+                        <item name="component" xsi:type="string">Magento_Ui/js/form/element/ui-select</item>
+                        <item name="filterOptions" xsi:type="boolean">true</item>
+                        <item name="disableLabel" xsi:type="boolean">true</item>
+                        <item name="multiple" xsi:type="boolean">false</item>
+                        <item name="visible" xsi:type="boolean">true</item>
+                    </item>
+                </argument>
+            </field>
+            <field name="home_image">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="dataType" xsi:type="string">string</item>
+                        <item name="source" xsi:type="string">template</item>
+                        <item name="label" xsi:type="string" translate="true">Image On Homepage</item>
+                        <item name="formElement" xsi:type="string">fileUploader</item>
+                        <item name="elementTmpl" xsi:type="string">ui/form/element/uploader/uploader</item>
+                        <item name="notice" xsi:type="string" translate="true">
+                            <![CDATA[
+                                For Web Only (not for Mobile).<br/>
+                                Allowed file types: jpeg, gif, png.<br/>
+                                Main Image's size is 580 x 550. The other's size is 360 x 225.
+                            ]]>
+                        </item>
+                        <item name="uploaderConfig" xsi:type="array">
+                            <item name="url" xsi:type="string">blog/post/fileUpload</item>
+                        </item>
+                        <item name="required" xsi:type="boolean">false</item>
+                    </item>
+                </argument>
+            </field>
+        </fieldset>
+        <fieldset name="publish">
+            <field name="is_pinned">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="visible" xsi:type="boolean">false</item>
+                    </item>
+                </argument>
+            </field>
+            <field name="created_at">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="visible" xsi:type="boolean">false</item>
+                    </item>
+                </argument>
+            </field>
+        </fieldset>
+    </container>
+    <container name="main">
+        <fieldset name="general" sortOrder="5">
+            <field name="name">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="notice" xsi:type="string" translate="true">Please remember to setup the title short
+                            enough so that it fits 1 line
+                        </item>
+                    </item>
+                </argument>
+            </field>
+            <field name="content">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="label" xsi:type="string" translate="true">Content</item>
+                        <item name="dataType" xsi:type="string">text</item>
+                        <item name="formElement" xsi:type="string">wysiwyg</item>
+                        <item name="wysiwyg" xsi:type="boolean">true</item>
+                        <item name="wysiwygConfigData" xsi:type="array">
+                            <item name="is_pagebuilder_enabled" xsi:type="boolean">true</item>
+                        </item>
+                    </item>
+                </argument>
+            </field>
+            <field name="is_short_content">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="description" xsi:type="string" translate="true">Short Description</item>
+                    </item>
+                </argument>
+            </field>
+            <field name="short_content">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="label" xsi:type="string" translate="true">Short Description</item>
+                        <item name="dataType" xsi:type="string">text</item>
+                        <item name="formElement" xsi:type="string">textarea</item>
+                        <item name="rows" xsi:type="number">6</item>
+                    </item>
+                </argument>
+            </field>
+        </fieldset>
+        <fieldset name="mobile_content" sortOrder="10">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="label" xsi:type="string" translate="true">Mobile Content</item>
+                    <item name="collapsible" xsi:type="boolean">true</item>
+                    <item name="opened" xsi:type="boolean">false</item>
+                    <item name="area" xsi:type="string">main</item>
+                </item>
+            </argument>
+            <field name="mobile_main_content" sortOrder="10">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="label" xsi:type="string" translate="true">Main Content</item>
+                        <item name="dataType" xsi:type="string">text</item>
+                        <item name="formElement" xsi:type="string">textarea</item>
+                        <item name="rows" xsi:type="number">10</item>
+                    </item>
+                </argument>
+            </field>
+            <field name="is_sub_content">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="label" xsi:type="string" translate="true">Would you like to add additional content?</item>
+                        <item name="dataType" xsi:type="string">boolean</item>
+                        <item name="formElement" xsi:type="string">checkbox</item>
+                        <item name="default" xsi:type="number">0</item>
+                        <item name="prefer" xsi:type="string">toggle</item>
+                        <item name="exports" xsi:type="array">
+                            <item name="checked" xsi:type="string">blog_post_form.blog_post_form:is_sub_content</item>
+                        </item>
+                        <item name="notice" xsi:type="string" translate="true">
+                            <![CDATA[
+                                Use for "Shop The Ingredients" Topics only <br/>
+                                To Get "Shop The Ingredients" Topics, go to Content -> Inspire Me -> Settings -> Related Products Block -> Shop The Ingredients <br/>
+                                If yes, You can add additional content, and Mobile will display the content as two tabs.
+                            ]]>
+                        </item>
+                    </item>
+                </argument>
+            </field>
+            <field name="mobile_sub_content">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="label" xsi:type="string" translate="true">Additional Content</item>
+                        <item name="dataType" xsi:type="string">text</item>
+                        <item name="formElement" xsi:type="string">textarea</item>
+                        <item name="rows" xsi:type="number">10</item>
+                        <item name="imports" xsi:type="array">
+                            <item name="visible" xsi:type="string">blog_post_form.blog_post_form:is_sub_content</item>
+                        </item>
+                    </item>
+                </argument>
+            </field>
+        </fieldset>
+        <fieldset name="products">
+            <field name="related_products_title" sortOrder="100">
+                <argument name="data" xsi:type="array">
+                    <item name="config" xsi:type="array">
+                        <item name="label" xsi:type="string" translate="true">Related Products Block Title</item>
+                        <item name="dataType" xsi:type="string">text</item>
+                        <item name="formElement" xsi:type="string">input</item>
+                    </item>
+                </argument>
+            </field>
+        </fieldset>
+    </container>
+</form>

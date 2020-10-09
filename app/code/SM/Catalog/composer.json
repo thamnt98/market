@@ -1,0 +1,25 @@
+{
+    "name": "smartosc/module-sm-catalog",
+    "description": "Magento 2 SM Catalog Module",
+    "homepage": "http://www.smartosc.com/",
+    "type": "magento2-module",
+    "version": "1.3.0",
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+          "name": "Logan Ta",
+          "email": "phuongtt2@smartosc.com"
+        }
+    ],
+    "support": {
+        "issues": "phuongtt2@smartosc.com"
+    },
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "SM\\Catalog\\": ""
+        }
+    }
+}

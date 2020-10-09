@@ -1,0 +1,50 @@
+<!--@subject {{trans "Thank you for writing your review in Transmart!"}}  @-->
+<!--@vars {
+"var name":"Customer Name",
+"var email":"Customer Email"
+} @-->
+{{template config_path="design/email/header_template"}}
+<table class="greeting" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "Hello"}}
+                <b>{{var name}},</b>
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End greeting-->
+<table class="message-email" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "Thank you for reviewing our product. Your review will help people to shop the right products."}}
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Message Email-->
+<table class="message-email" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "Did you know? Your review will be evaluated by our team to make sure it gives the best and complete information. We are looking forward to your next purchase and review!"}}
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Link To Verify-->
+<table class="sincerely" width="100%">
+    <tr>
+        <td>
+            <p>{{trans "Sincerely"}},</p>
+            <p class="signature">
+                <b>{{var store.frontend_name}}</b>
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Sincerely-->
+
+{{template config_path="design/email/footer_template"}}

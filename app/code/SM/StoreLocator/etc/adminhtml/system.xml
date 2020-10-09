@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="store_locator" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="0" showInStore="0">
+            <label>Store Locator</label>
+            <tab>transmart</tab>
+            <resource>SM_StoreLocator::config_store_locator</resource>
+            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>General Configuration</label>
+                <field id="max_distance" translate="label comment" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
+                    <label>Maximum Distance</label>
+                    <comment><![CDATA[Setting for maximum distance for searching store location. Unit is kilometer]]></comment>
+                </field>
+                <field id="number_location_displayed" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
+                    <label>Number Of Location Are Displayed</label>
+                    <comment><![CDATA[Setting for number of location are displayed on front-end]]></comment>
+                </field>
+                <field id="delete_uploaded_file" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
+                    <label>Delete Uploaded File</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment><![CDATA[Setting for delete uploaded file after import location success]]></comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

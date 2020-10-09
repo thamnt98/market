@@ -1,0 +1,21 @@
+<!--@subject Notification Can't Save Store @-->
+<!--@vars {
+"var message":""
+} @-->
+{{template config_path="design/email/header_template"}}
+
+<p class="greeting">{{trans "Hello,"}}</p>
+<br>
+
+<p>
+    We have received a request to add store {{var storename}}, but we can't save store because {{var message}}.
+</p>
+<br>
+<p>
+    {{var data}}
+</p>
+<br>
+
+<p>{{trans "Thanks,<br>%store_name" store_name=$store.getFrontendName() |raw}}</p>
+
+{{template config_path="design/email/footer_template"}}

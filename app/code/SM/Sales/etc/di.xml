@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <!-- Sub Order -->
+    <preference for="SM\Sales\Api\SubOrderRepositoryInterface" type="SM\Sales\Model\SubOrderRepository"/>
+    <preference for="SM\Sales\Api\Data\SubOrderDataInterface" type="SM\Sales\Model\Data\SubOrderData"/>
+    <preference for="SM\Sales\Api\Data\SubOrderSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+
+    <!-- InProgress -->
+    <preference for="SM\Sales\Api\Data\ParentOrderDataInterface" type="SM\Sales\Model\Data\ParentOrderData"/>
+    <preference for="SM\Sales\Api\Data\ParentOrderSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+    <preference for="SM\Sales\Api\ParentOrderRepositoryInterface" type="SM\Sales\Model\ParentOrderRepository"/>
+
+    <!-- Detail -->
+    <preference for="SM\Sales\Api\Data\DetailItemDataInterface" type="SM\Sales\Model\Data\DetailItemData"/>
+
+    <!--  Delivery Address  -->
+    <preference for="SM\Sales\Api\Data\DeliveryAddressDataInterface" type="SM\Sales\Model\Data\DeliveryAddressData"/>
+
+    <!--  Result Data  -->
+    <preference for="SM\Sales\Api\Data\ResultDataInterface" type="SM\Sales\Model\Data\ResultData"/>
+
+    <!--  Item Repository  -->
+    <preference for="SM\Sales\Api\OrderItemRepositoryInterface" type="SM\Sales\Model\OrderItemRepository"/>
+
+    <!--  Item Option Data  -->
+    <preference for="SM\Sales\Api\Data\ItemOptionDataInterface" type="SM\Sales\Model\Data\ItemOptionData"/>
+    <!--  Item Option Data  -->
+    <preference for="SM\Sales\Api\Data\ItemOptionDataInterface" type="SM\Sales\Model\Data\ItemOptionData"/>
+
+    <!-- Invoice -->
+    <preference for="SM\Sales\Api\InvoiceRepositoryInterface" type="SM\Sales\Model\InvoiceRepository"/>
+    <preference for="SM\Sales\Api\Data\InvoiceDataInterface" type="SM\Sales\Model\Data\InvoiceData"/>
+    <preference for="Magento\Sales\Model\Order\Pdf\Invoice" type="SM\Sales\Model\Order\Pdf\Invoice"/>
+
+    <preference for="SM\Sales\Api\Data\StatusHistoryDataInterface" type="SM\Sales\Model\Data\StatusHistoryData"/>
+    <preference for="SM\Sales\Api\Data\PaymentInfoDataInterface" type="SM\Sales\Model\Data\PaymentInfoData"/>
+
+    <preference for="SM\Sales\Api\DigitalOrderRepositoryInterface" type="SM\Sales\Model\DigitalOrderRepository"/>
+
+    <preference for="SM\Sales\Api\Data\DigitalOrderDataInterface" type="SM\Sales\Model\Data\DigitalOrderData"/>
+
+    <type name="SM\MyVoucher\Model\AmastyRules\DiscountRegistry">
+        <plugin name="sm_quote_save_voucher_detail" type="SM\Sales\Plugin\Quote\PrepareVoucherDetail"/>
+    </type>
+
+    <type name="SM\Checkout\Model\VoucherManagement">
+        <plugin name="sm_quote_remove_voucher_detail" type="SM\Sales\Plugin\Quote\RemoveVoucher"/>
+    </type>
+
+    <preference for="SM\Sales\Api\Data\ReorderQuickly\OrderDataInterface" type="SM\Sales\Model\Data\ReorderQuickly\OrderData"/>
+
+    <preference for="SM\Sales\Api\Data\Invoice\InvoiceInterface" type="SM\Sales\Model\Data\Invoice\Invoice"/>
+    <preference for="SM\Sales\Api\Data\Invoice\SubInvoiceInterface" type="SM\Sales\Model\Data\Invoice\SubInvoice"/>
+    <preference for="SM\Sales\Api\Data\Invoice\SubInvoiceItemInterface" type="SM\Sales\Model\Data\Invoice\SubInvoiceItem"/>
+</config>

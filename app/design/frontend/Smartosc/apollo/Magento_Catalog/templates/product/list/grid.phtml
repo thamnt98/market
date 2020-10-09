@@ -1,0 +1,271 @@
+<?php
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundThis
+
+/**
+ * Product grid template
+ *
+ * @var $block \SM\GTM\Block\Product\ListProduct
+ */
+$position = 1;
+$helper = $this->helper('SM\Catalog\Helper\Data');
+$isPopupShowed = false;
+$freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
+$category = $block->getLayer()->getCurrentCategory();
+?>
+<?php foreach ($_productCollection as $_product) : ?>
+    <?php $dataGTM = $block->escapeHtml($block->getGtm($_product)); ?>
+<?php if ($helper->isProductStockStatus($_product->getId())): ?>
+    <li class="item product product-item">
+        <div class="product-item-info"
+             data-container="product-<?= /* @noEscape */
+             $viewMode ?>">
+            <?php
+            $productImage = $block->getImage($_product, $imageDisplayArea);
+            if ($pos != null) {
+                $position = ' style="left:' . $productImage->getWidth() . 'px;'
+                    . 'top:' . $productImage->getHeight() . 'px;"';
+            }
+            ?>
+            <?php // Product Image?>
+            <a href="<?= $block->escapeUrl($_product->getProductUrl()) ?>"
+               class="product photo product-item-photo"
+               <?php if ($dataGTM) : ?>
+               data-gtm-product="<?= $dataGTM ?>"
+               data-position="<?= $position ?>"
+               <?php endif; ?>
+               tabindex="-1">
+                <?= $productImage->toHtml() ?>
+                <?php if ($_product->isAvailable()) :?>
+                    <?= $block->getProductDetailsHtml($_product) ?>
+                <?php endif; ?>
+            </a>
+            <?php $percent = $helper->getDiscountPercent($_product); ?>
+            <?php if ($percent != null && $percent > 0) : ?>
+                <span class="product-sale"><?= $block->escapeHtml(__('%1% OFF', $percent)); ?></span>
+            <?php endif; ?>
+
+            <?php
+            $_productNameStripped = $block->stripTags($_product->getName(), null, true);
+            ?>
+            <div class="product details product-item-details demo3">
+                <strong class="product name product-item-name">
+                    <a class="product-item-link <?= $_product->getId() ?>plp"
+                       <?php if ($dataGTM) : ?>
+                       data-gtm-product="<?= $dataGTM ?>"
+                       data-position="<?= $position ?>"
+                       <?php endif; ?>
+                       href="<?= $block->escapeUrl($_product->getProductUrl()) ?>">
+                        <?= /* @noEscape */
+                        $_helper->productAttribute($_product, $_product->getName(), 'name') ?>
+                    </a>
+                </strong>
+
+                <?= /* @noEscape */
+                $block->getProductPrice($_product) ?>
+
+                <?php if ($freshHelper->isFreshCategory($category)) : ?>
+                    <?php /** @var $freshBlock \SM\FreshProduct\Block\Product\View */ ?>
+                    <?php $freshBlock = $block->getLayout()->getBlock('product.fresh') ?>
+
+                    <?php if ($freshBlock) : ?>
+                        <?= $freshBlock->setProduct($_product)->toHtml() ?>
+                    <?php endif; ?>
+                <?php endif; ?>
+
+                    <?= $block->getReviewsSummaryHtml($_product, $templateType) ?>
+
+                <div class="product-item-inner">
+                    <div class="product actions product-item-actions"
+                         <?= strpos($pos, $viewMode . '-actions') ? $block->escapeHtmlAttr($position) : '' ?>
+                         data-gtm-product='<?= $dataGTM ?>'
+                         data-position="<?= $position ?>">
+                        <?php include($block->getTemplateFile('Magento_Catalog::product/list/cta-button.phtml')) ?>
+                        <div <?php if ($dataGTM) : ?>
+                             data-gtm-product='<?= $dataGTM ?>'
+                             data-position="<?= $position ?>"
+                             <?php endif; ?>
+                             data-role="add-to-links" class="actions-secondary"
+                             <?= strpos($pos, $viewMode . '-secondary') ? $block->escapeHtmlAttr($position) : '' ?>>
+                            <?php if ($addToBlock = $block->getChildBlock('addto')) : ?>
+                                <?= $addToBlock->setProduct($_product)->getChildHtml() ?>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <?php if ($showDescription) : ?>
+                        <div class="product description product-item-description">
+                            <?= /* @noEscape */
+                            $_helper->productAttribute($_product, $_product->getShortDescription(), 'short_description') ?>
+                            <a href="<?= $block->escapeUrl($_product->getProductUrl()) ?>"
+                               title="<?= /* @noEscape */
+                               $_productNameStripped ?>"
+                               class="action more"
+                               <?php if ($dataGTM) : ?>
+                               data-gtm-product='<?= $dataGTM ?>'
+                               data-position="<?= $position ?>"
+                               <?php endif; ?>
+                            ><?= $block->escapeHtml(__('Learn More')) ?></a>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+        <?php if (!$isPopupShowed && ($block->getNameInLayout() == "search_result_list")): ?>
+            <?php /** @var \SM\TobaccoAlcoholProduct\Helper\PopupAlcohol $popupHelper */
+            $popupHelper = $this->helper(\SM\TobaccoAlcoholProduct\Helper\PopupAlcohol::class);?>
+            <?php if ($popupHelper->isProductAlcohol($_product)):?>
+                <?php
+                    /** @var \SM\TobaccoAlcoholProduct\Block\Popup $tobaccoPopupBlock */
+                    $tobaccoPopupBlock = $block->getLayout()->createBlock(\SM\TobaccoAlcoholProduct\Block\Popup::class);
+                    $tobaccoPopupBlock->setIsSearch(true); ?>
+                    <?= $tobaccoPopupBlock->toHtml();?>
+                <?php $isPopupShowed = true; ?>
+            <?php endif;?>
+        <?php endif;?>
+    </li>
+    <?php endif; ?>
+    <script>
+        require(['jquery', "gtmProduct", 'domReady!'], function ($, gtm) {
+            if (typeof dataLayerSourceObjects !== 'undefined') {
+                $(window).load(function () {
+                    let data = $('.product-item-link.<?= $_product->getId() ?>plp').attr("data-gtm-product");
+                    if (data) {
+                        try {
+                            data = JSON.parse(data);
+                            data['position'] = $('.product-item-link.<?= $_product->getId() ?>plp').attr("data-position");
+                            gtm.push("product_view", data);
+                        } catch (e) {
+
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+    <?php $position++; ?>
+<?php endforeach; ?>
+<script>
+    require(['jquery', "gtmProduct", 'Magento_Ui/js/lib/view/utils/async', 'domReady!'], function ($, gtm, async) {
+        if (typeof dataLayerSourceObjects !== 'undefined') {
+            window.eventCreate = window.eventCreate || {};
+            $('.product-item-link').click(function (e) {
+                e.preventDefault();
+                let data = $(this).attr("data-gtm-product");
+                let url = $(this).attr('href');
+
+                if (data) {
+                    try {
+                        data = JSON.parse(data);
+                        data['eventCallback'] = function () {
+                            document.location = url;
+                        };
+                        data['position'] = $(this).attr("data-position");
+                        gtm.push("productClick", data);
+                    } catch (e) {
+                        window.location = url;
+                    }
+
+                } else {
+                    window.location = url;
+                }
+            });
+            $('.action.more').click(function (e) {
+                e.preventDefault();
+                let data = $(this).attr("data-gtm-product");
+                let url = $(this).attr('href');
+                if (data) {
+                    try {
+                        data = JSON.parse(data);
+                        data['eventCallback'] = function () {
+                            document.location = url;
+                        };
+                        data['position'] = $(this).attr("data-position");
+                        gtm.push("productClick", data);
+                    } catch (e) {
+                        window.location = url;
+                    }
+                } else {
+                    window.location = url;
+                }
+            });
+
+            $('.product-item-photo').click(function (e) {
+                let data = $(this).attr("data-gtm-product");
+                let url = $(this).attr('href');
+                if(data){
+                    try {
+                        data = JSON.parse(data);
+                        data['eventCallback'] = function () {
+                            document.location = url;
+                        };
+                        data['position'] = $(this).attr("data-position");
+                        gtm.push("productClick", data);
+                    } catch (e) {
+                        window.location = url;
+                    }
+
+                } else {
+                    window.location = url;
+                }
+
+
+            });
+
+            $('.action.towishlist').click(function (e) {
+                let data = $(this).parent().attr("data-gtm-product");
+                if (data) {
+                    try {
+                        data = JSON.parse(data);
+                        data['position'] = $(this).parent().attr("data-position");
+                        gtm.push("add_to_favorite", data);
+                    } catch (e) {
+
+                    }
+                }
+            });
+
+            $('.product-item-actions .action.tocart.primary').click(function (e) {
+                let data = $(this).parents().eq(2).attr("data-gtm-product");
+
+                if (data) {
+                    try {
+                        data = JSON.parse(data);
+                        data['position'] = $(this).parents().eq(2).attr("data-position");
+                        gtm.push("addToCart", data);
+                    } catch (e) {
+
+                    }
+                }
+            });
+
+            async.async('.action.view-details.primary', function () {
+                if (!eventCreate['.action.view-details.primary']) {
+                    eventCreate['.action.view-details.primary'] = 0;
+                }
+
+                let current = $($('.action.view-details.primary')[eventCreate['.action.view-details.primary']]);
+                $(current).click(function (e) {
+                    e.preventDefault();
+                    let data = $(this).parents().eq(1).attr("data-gtm-product");
+                    let url = $(this).attr('href');
+
+                    if (data) {
+                        try {
+                            data = JSON.parse(data);
+                            data['eventCallback'] = function () {
+                                document.location = url;
+                            };
+                            data['position'] = $(this).parents().eq(1).attr("data-position");
+                            gtm.push("productClick", data);
+                        } catch (e) {
+                            window.location = url;
+                        }
+
+                    } else {
+                        window.location = url;
+                    }
+                });
+                eventCreate['.action.view-details.primary']++;
+            });
+        }
+    });
+</script>

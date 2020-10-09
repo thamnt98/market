@@ -1,0 +1,22 @@
+{
+    "transmart_store_location": {
+        "column": {
+            "place_id": true,
+            "store_code": true,
+            "name": true,
+            "address_line_1": true,
+            "address_line_2": true,
+            "district_id": true,
+            "city": true,
+            "lat": true,
+            "long": true,
+            "opening_hours": true,
+            "status": true,
+            "position": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "TRANSMART_STORE_LOCATION_STORE_CODE": true
+        }
+    }
+}

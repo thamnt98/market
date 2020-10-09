@@ -1,0 +1,83 @@
+<script>
+    require(['jquery', 'gtmCustomer', 'Magento_Ui/js/lib/view/utils/async', 'mage/translate', 'jquery/jquery-storageapi', 'domReady!'], function ($, gtmCustomer, async) {
+        $('.sortby-dropdown [data-toggle="dropdown"]').on('click', function () {
+            $.localStorage.set('filter_category_sort','Sort By');
+        });
+        $('.gr-date').on('click', function () {
+            $.localStorage.set('filter_category_date','Date');
+        });
+        let data = [];
+        data['from'] = "<?= $block->getRequest()->getParam('from') ?>";
+        data['to'] = "<?= $block->getRequest()->getParam('to') ?>";
+        data['key'] = "<?= $block->getRequest()->getParam('key') ?>";
+        data['sort'] = "<?= $block->getRequest()->getParam('sort') ?>";
+        data['filter_category'] = "";
+        data['filter_name'] = "";
+        if ((data['from'] || data['to']) && $.localStorage.get('filter_category_date') == 'Date') {
+            if (data['from'] && data['to']) {
+                data['filter_name'] += data['from'] + ' to ' + data['to'] + ' ';
+            } else {
+                if (data['to']) {
+                    data['filter_name'] += 'Before ' + data['to'] + ' ';
+                } else if (data['from']) {
+                    data['filter_name'] += 'After ' + data['from'] + ' ';
+                }
+            }
+            data['filter_category'] = 'Date';
+            gtmCustomer.push('filter_order_list', data);
+        } else {
+            $.localStorage.remove('filter_category_date');
+        }
+        if (data['sort'] && $.localStorage.get('filter_category_sort') == 'Sort By') {
+            data['sort'] === 'sort_status' ? data['sort'] = 'Order Status' : data['sort'] = 'Latest Order';
+            data['filter_name'] = data['sort'];
+            data['filter_category'] = 'Sort By';
+            gtmCustomer.push('filter_order_list', data);
+        } else {
+            $.localStorage.remove('filter_category_sort');
+        }
+        if (data['key']) {
+            gtmCustomer.push('search_order_list', data);
+        }
+        async.async('.search-noresult', function () {
+            gtmCustomer.push("fail_search_order_list", data);
+        });
+        $(window).load(function () {
+            $('.tpr-top-right').each(function () {
+                $(this).find('a').first().on('click',function () {
+                    let data = [];
+                    data['referenceNumber'] = $(this).parents().eq(1).find('.tpr-top-left h4').text();
+                    data['basket_value'] = Math.round($(this).parents().eq(1).find('.bx-total-payment h4').attr('data-gtm'));
+                    gtmCustomer.push('see_order_details', data);
+                })
+            });
+            $('[data-gtm-event="reorder-all"]').each(function () {
+                $(this).on('click', function () {
+                    let data = {
+                        'referenceNumber':  $(this).parents().eq(2).find('.tpr-top-left h4').attr('data-gtm'),
+                        'basket_value': Math.round($(this).parents().eq(2).find('.bx-total-payment h4').attr('data-gtm')),
+                        'orderID': $(this).attr('data-gtm'),
+                        'order_date': $(this).parents().eq(2).find('.tpr-top-left .date').text()
+                    }
+                    console.log(data);
+                    $.localStorage.set('reoder-all-button-gtm', data);
+                });
+            });
+            async.async('[data-gtm-message="success"]', function () {
+                if ($('[data-gtm-message="success"]').text().includes($.mage.__('You added all completed order items to your shopping cart'))) {
+                    try {
+                        let data = $.localStorage.get('reoder-all-button-gtm');
+                        //Todo Remove Debug
+                        console.log(data);
+                        if (data) {
+                            gtmCustomer.push('reorder_all_button', data);
+                            $.localStorage.remove('reoder-all-button-gtm');
+                        }
+                    } catch (e) {
+
+                    }
+                }
+            });
+        });
+    });
+</script>

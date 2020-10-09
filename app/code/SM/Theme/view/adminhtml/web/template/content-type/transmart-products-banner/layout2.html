@@ -1,0 +1,106 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<div attr="data.main.attributes" ko-style="data.main.style" css="data.main.css">
+    <div if="data.title.html()" class="block-title">
+        <strong css="data.title.css"
+                attr="data.title.attributes"
+                ko-style="data.title.style" html="data.title.html"/>
+    </div>
+
+    <figure
+        ko-style="Object.assign({}, data.main.style(), !data.desktop_image.attributes().src ? {} : {borderStyle: 'none'})">
+        <a if="data.link.attributes().href" attr="data.link.attributes" ko-style="data.link.style" css="data.link.css">
+            <img if="data.desktop_image.attributes().src"
+                 attr="data.desktop_image.attributes"
+                 class="pagebuilder-mobile-hidden"
+                 css="data.desktop_image.css"
+                 ko-style="data.desktop_image.style"/>
+            <img if="data.mobile_image.attributes().src"
+                 attr="data.mobile_image.attributes"
+                 class="pagebuilder-mobile-only"
+                 css="data.mobile_image.css"
+                 ko-style="data.mobile_image.style"/>
+        </a>
+
+        <ifnot args="data.link.attributes().href">
+            <img if="data.desktop_image.attributes().src"
+                 attr="data.desktop_image.attributes"
+                 class="pagebuilder-mobile-hidden"
+                 css="data.desktop_image.css"
+                 ko-style="data.desktop_image.style"/>
+            <img if="data.mobile_image.attributes().src"
+                 attr="data.mobile_image.attributes"
+                 class="pagebuilder-mobile-only"
+                 css="data.mobile_image.css"
+                 ko-style="data.mobile_image.style"/>
+        </ifnot>
+
+        <figcaption if="data.caption.html()"
+                    attr="data.caption.attributes"
+                    css="data.caption.css"
+                    html="data.caption.html"
+                    ko-style="data.caption.style">
+        </figcaption>
+    </figure>
+    <div class="leading-todaydeal--product">
+        <div if="data.main.attributes().status === 'show-content'">
+            <div class="row no-gutters ">
+                <div class="col-xs-12 col-xl-4 leading-todaydeal--content">
+                    <div if="data.contents.html" html="data.contents.html" attr="data.contents.attributes" data-appearance="grid"
+                         data-element="contents"
+                         class="bypass-html-filter"></div>
+                    <a if="data.link.attributes().href" attr="data.link.attributes" ko-style="data.link.style" css="data.link.css">
+                        <span data-bind="i18n: 'View More'"/>
+                    </a>
+                </div>
+                <div class="col-xs-12 col-xl-8 smart-products">
+                    <div data-bind="html: data.main.html"
+                         data-element="main"
+                         data-content-type="products"
+                         data-appearance="carousel"
+                         data-autoplay="false"
+                         data-autoplay-speed="4000"
+                         data-carousel-products-display="2"
+                         data-infinite-loop="false"
+                         data-show-arrows="true"
+                         data-show-dots="true"
+                         data-carousel-mode="default"
+                         data-center-padding="90px"></div>
+                </div>
+            </div>
+        </div>
+        <div if="data.main.attributes().status === 'hide-content'">
+            <div class="row no-gutters ">
+                <div>
+                    <div style="display: none"
+                         html="data.contents.html"
+                         attr="data.contents.attributes"
+                         data-appearance="grid"
+                         data-element="contents"
+                         class="bypass-html-filter"></div>
+                </div>
+                <div class="col-xs-12 col-xm-12 smart-products">
+                    <div data-bind="html: data.main.html"
+                         data-element="main"
+                         data-content-type="products"
+                         data-appearance="carousel"
+                         data-autoplay="false"
+                         data-autoplay-speed="4000"
+                         data-carousel-products-display="2"
+                         data-infinite-loop="false"
+                         data-show-arrows="true"
+                         data-show-dots="true"
+                         data-carousel-mode="default"
+                         data-center-padding="90px"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>

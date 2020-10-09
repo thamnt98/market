@@ -1,0 +1,108 @@
+<?php
+/** @var \SM\Sales\Block\Customer\Order\Listing $block */
+
+$currentTab = $block->getRequest()->getParam("tab", \SM\Sales\Block\Customer\Order\Listing::TAB_IN_PROGRESS);
+$parentOrders = $block->getOrders();
+?>
+<div class="my-order my-order-list">
+    <!--start tab-->
+    <div class="product data items"
+         data-mage-init='{"mage/tabs": {"openedState": "active", "animate": {"duration": 100}, "active": 1}}'>
+
+        <?= $block->getChildHtml("sm.sales.order.tabs");?>
+        <!--start in-progress-->
+        <div id="tab-completed" class="item content completed" data-role="content">
+            <?php if ((count($parentOrders) > 0) || (count($parentOrders) == 0 && ($block->getRequest()->getParam("key") ||
+                        $block->getRequest()->getParam("from") || $block->getRequest()->getParam("to")))):?>
+                <?php
+                /** @var \SM\Sales\Block\Customer\Order\Toolbar $toolBarBlock */
+                $toolBarBlock = $block->getChildBlock("sm.sales.order.toolbar");
+                $toolBarBlock->setTab($currentTab); ?>
+                <?= $toolBarBlock->toHtml();?>
+            <?php endif;?>
+            <?php if (count($parentOrders) > 0):?>
+                <?php
+                /** @var \SM\Sales\Api\Data\ParentOrderDataInterface $parentOrder */
+                foreach ($parentOrders as $parentOrder):?>
+                    <?php
+                    $statuses = $block->getStatuses();
+
+                    /** @var \SM\Sales\Block\Order\Listing\ParentOrderItem $orderBlock */
+                    $orderBlock = $block->getChildBlock("sm.sales.order.parent.order");
+                    $orderBlock->setParentOrder($parentOrder);
+                    $orderBlock->setStatuses($statuses);
+                    ?>
+                    <?php if ($parentOrder->getIsDigital()):?>
+                        <?php
+                        $orderBlock->setTemplate(\SM\Sales\Block\Customer\Order\Listing::DIGITAL_ORDER_TEMPLATE);
+                        ?>
+                    <?php else:?>
+                        <?php
+                        $orderBlock->setTemplate(\SM\Sales\Block\Customer\Order\Listing::PHYSICAL_ORDER_TEMPLATE);
+                        ?>
+                    <?php endif;?>
+                    <?= $orderBlock->toHtml()?>
+                <?php endforeach;?>
+            <?php else:?>
+                <?php if ($block->getRequest()->getParam("key")): ?>
+                    <div class="search-noresult">
+                        <img src="<?= $block->getViewFileUrl('images/search-not-found.png') ?>"
+                             alt="<?= $block->escapeHtml(__('search result empty')) ?>" width="401"/>
+                        <div class="search-noresult--content">
+                            <h2><?= $block->escapeHtml(__('Oops! We can\'t find it.')) ?></h2>
+                            <p><?= $block->escapeHtml(__('But no worries. You can try again with other keywords.')) ?></p>
+                        </div>
+                    </div>
+                <?php else: ?>
+                    <?php if ($currentTab == \SM\Sales\Block\Customer\Order\Listing::TAB_IN_PROGRESS) : ?>
+                        <div class="no-route order-in-process">
+                            <div class="no-route-info">
+                                <img src="<?=$block->getViewFileUrl('images/shopping-list-empty.png')?>" alt="<?= __('No order is currently in progress.') ?>" width="401"/>
+                                <h4><?= $block->escapeHtml(__('No order is currently in progress.')) ?><br/>
+                                    <?= $block->escapeHtml(__('Start shopping and check your order status here.')) ?></h4>
+                                <button type="button" name="do"
+                                        title="<?= $block->escapeHtml(__('Shop Now')) ?>"
+                                        class="action primary browse-products"
+                                        onclick="location.href = '<?= $block->getUrl()?>'">
+                                    <span><?= $block->escapeHtml(__('Shop Now')) ?></span>
+                                </button>
+                            </div>
+                        </div>
+                    <?php else :?>
+                        <div class="no-route order-in-complete">
+                            <div class="no-route-info">
+                                <img src="<?=$block->getViewFileUrl('images/shopping-list-empty.png')?>" alt="<?= __('You haven\'t completed any order.') ?>" width="401"/>
+                                <h4><?= $block->escapeHtml(__("You haven't completed any order.")) ?><br/>
+                                    <?= $block->escapeHtml(__("What are you waiting for? Get all you need in Transmart.")) ?></h4>
+                                <button type="button" name="do"
+                                        title="<?= $block->escapeHtml(__('Shop Now')) ?>"
+                                        class="action primary browse-products"
+                                        onclick="location.href = '<?= $block->getUrl()?>'">
+                                    <span><?= $block->escapeHtml(__('Shop Now')) ?></span>
+                                </button>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                <?php endif;?>
+            <?php endif;?>
+        </div>
+        <!-- End table-->
+    </div>
+</div>
+<?php if ($block->getPagerHtml()): ?>
+    <div class="order-products-toolbar toolbar bottom"><?php echo $block->getPagerHtml(); ?></div>
+<?php endif ?>
+<!--ENnd start tab-->
+<div id="confirm-reorder-all" class="content" style="display:none;">
+    <span class="remove-wishlist-verify">
+        <span><?= $block->escapeHtml(__('Are you sure you want to reorder all items in this order? '))?></span><br>
+        <span><?= $block->escapeHtml(__('By confirming, all products will be added to your cart. '))?></span>
+    </span>
+</div>
+<script type="text/x-magento-init">
+{
+    "*": {
+        "SM_DigitalProduct/js/reorder":{}
+    }
+}
+</script>

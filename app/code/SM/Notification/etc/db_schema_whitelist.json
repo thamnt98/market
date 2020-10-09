@@ -1,0 +1,180 @@
+{
+    "sm_notification": {
+        "column": {
+            "entity_id": true,
+            "owner_id": true,
+            "event_type": true,
+            "customer_type": true,
+            "customer": true,
+            "title": true,
+            "redirect_type": true,
+            "redirect_id": true,
+            "start_date": true,
+            "end_date": true,
+            "created_at": true,
+            "updated_at": true,
+            "store_id": true,
+            "image": true,
+            "id": true,
+            "is_system": true,
+            "event": true
+        },
+        "index": {
+            "SM_NOTIFICATION_TITLE": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "sm_notification_message": {
+        "column": {
+            "entity_id": true,
+            "notification_id": true,
+            "message_type": true,
+            "content": true,
+            "status": true,
+            "email_template": true,
+            "status_message": true,
+            "params": true,
+            "created_at": true,
+            "updated_at": true,
+            "store_id": true
+        },
+        "index": {
+            "SM_NOTIFICATION_MESSAGE_CONTENT": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "SM_NTFC_MESSAGE_NTFC_ID_SM_NTFC_ENTT_ID": true
+        }
+    },
+    "sm_notification_customer_setting": {
+        "column": {
+            "entity_id": true,
+            "parent_code": true,
+            "code": true,
+            "name": true,
+            "default_value": true,
+            "message_type": true,
+            "event_type": true,
+            "area": true,
+            "tab": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "sm_notification_customer_action": {
+        "column": {
+            "entity_id": true,
+            "notification_id": true,
+            "customer_ids": true,
+            "created_at": true,
+            "updated_at": true,
+            "store_id": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "sm_notification_trigger_event": {
+        "column": {
+            "id": true,
+            "event_type": true,
+            "event_id": true,
+            "event_name": true,
+            "created_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "sm_notification_customer": {
+        "column": {
+            "id": true,
+            "message_id": true,
+            "customer_id": true,
+            "is_read": true,
+            "updated_at": true,
+            "push_status": true,
+            "email_status": true,
+            "sms_status": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "SM_NOTIFICATION_CUSTOMER_MESSAGE_ID_SM_NOTIFICATION_ID": true,
+            "SM_NOTIFICATION_CUSTOMER_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID": true,
+            "SM_NOTIFICATION_CUSTOMER_MESSAGE_ID_CUSTOMER_ID": true,
+            "SM_NOTIFICATION_CUSTOMER_MESSAGE_ID_SM_NOTIFICATION_MSG_ID": true
+        }
+    },
+    "sm_notification_push": {
+        "column": {
+            "message_id": true,
+            "content": true,
+            "status": true,
+            "title": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "SM_NOTIFICATION_PUSH_MESSAGE_ID_SM_NOTIFICATION_ID": true,
+            "SM_NOTIFICATION_PUSH_MESSAGE_ID_SM_NOTIFICATION_MSG_ID": true
+        }
+    },
+    "sm_notification_email": {
+        "column": {
+            "message_id": true,
+            "subject": true,
+            "template_id": true,
+            "status": true,
+            "params": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "SM_NOTIFICATION_EMAIL_MESSAGE_ID_SM_NOTIFICATION_ID": true,
+            "SM_NOTIFICATION_EMAIL_MESSAGE_ID_SM_NOTIFICATION_MSG_ID": true
+        }
+    },
+    "sm_notification_msg": {
+        "column": {
+            "id": true,
+            "is_system": true,
+            "event": true,
+            "redirect_type": true,
+            "redirect_id": true,
+            "start_date": true,
+            "end_date": true,
+            "created_at": true,
+            "title": true,
+            "content": true,
+            "image": true,
+            "params": true,
+            "admin_type": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        },
+        "index": {
+            "SM_NOTIFICATION_MSG_TITLE": true,
+            "SM_NOTIFICATION_MSG_CONTENT": true
+        }
+    },
+    "sm_notification_sms": {
+        "column": {
+            "message_id": true,
+            "content": true,
+            "status": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "SM_NOTIFICATION_SMS_MESSAGE_ID_SM_NOTIFICATION_MSG_ID": true
+        }
+    },
+    "quote_item": {
+        "column": {
+            "qty_updated_at": true
+        }
+    }
+}

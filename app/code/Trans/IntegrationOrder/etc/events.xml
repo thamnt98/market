@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--  
+/**
+ * @category Trans
+ * @package  Trans_IntegrationOrder
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Muhammad Randy <muhammad.randy@ctcorpdigital.com>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+
+    <event name="update_payment_oms">
+        <observer name="update_payment_oms" instance="Trans\IntegrationOrder\Observer\StatusPaymentOms" />
+    </event>
+    
+    <!-- <event name="checkout_onepage_controller_success_action">
+        <observer name="sales_order_place_after_update" instance="Trans\IntegrationOrder\Observer\SubmitOms" />
+    </event>
+
+    <event name="multishipping_checkout_controller_success_action">
+        <observer name="custom_multiple_order" instance="Trans\IntegrationOrder\Observer\MultipleSubmitOms" />
+    </event> -->
+
+    <!-- <event name="controller_action_predispatch_checkout_index_index">
+        <observer name="checkout_page_oar" instance="Trans\IntegrationOrder\Observer\AllocationRuleOms" />
+    </event>
+
+    <event name="controller_action_predispatch_multishipping_checkout_shipping">
+        <observer name="checkout_multi_page_oar" instance="Trans\IntegrationOrder\Observer\AllocationRuleMultiOrder" />
+    </event> -->
+
+    <event name="success_update_qty_allocated">
+        <observer name="set_session_after_create_order" instance="Trans\IntegrationOrder\Observer\AfterCreateOrderOms" />
+    </event>
+</config>

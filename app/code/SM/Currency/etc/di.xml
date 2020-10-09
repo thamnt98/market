@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Framework\Locale\Format">
+        <plugin name="trans_locale_format" type="SM\Currency\Plugin\Locale\Format" sortOrder="30"/>
+    </type>
+    <type name="Magento\Directory\Model\Currency">
+        <plugin name="trans_directory_currency" type="SM\Currency\Plugin\Directory\Currency" sortOrder="30"/>
+    </type>
+
+    <preference for="Magento\Directory\Model\PriceCurrency" type="SM\Currency\Model\MagentoDirectory\PriceCurrency" />
+</config>

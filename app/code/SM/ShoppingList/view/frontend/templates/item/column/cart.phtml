@@ -1,0 +1,52 @@
+<?php
+/**
+ * @project    ct-corp-transmart
+ * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @author     Duc Nguyen Hoang <ducnh2@smartosc.com>
+ * @copyright  Copyright © 2020 SmartOSC. All rights reserved.
+ * @url        http://www.smartosc.com
+ */
+
+/** @var \SM\ShoppingList\Block\Item\Column\Info $block */
+
+/** @var \SM\ShoppingList\Api\Data\ShoppingListItemDataInterface $item */
+$item = $block->getItem();
+$product = $block->getProduct();
+
+?>
+<div class="product-item-inner">
+<?php if (!$product->getData('hide_cta_button')) : ?>
+    <div class="box-tocart">
+        <fieldset class="fieldset">
+            <?php $childrenIds = $product->getTypeInstance()->getChildrenIds($product->getId()); ?>
+            <?php if ($childrenIds): ?>
+                <a title="<?= $block->escapeHtmlAttr(__('View Details')) ?>"
+                   href="<?= $block->escapeUrl($product->getProductUrl()) ?>"
+                   class="action view-details primary">
+                    <?= $block->escapeHtml(__('View Details')) ?>
+                </a>
+            <?php else : ?>
+                <?php if ($product->isSaleable()) : ?>
+                    <div class="product-item-actions">
+                        <div class="actions-primary">
+                            <form action="<?=$block->getUrl("shoppinglist/action/cart", ["id" => $item->getWishlistItemId()])?>">
+                                <button type="submit" data-role="tocart" title="<?= $block->escapeHtmlAttr(__('Add to Cart')) ?>" class="action tocart primary">
+                                    <span><?= $block->escapeHtml(__('Add to Cart')) ?></span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                <?php elseif ($product->getIsSalable()) : ?>
+                    <p class="available stock" title="<?= $block->escapeHtmlAttr(__('Availability')) ?>">
+                        <span><?= $block->escapeHtml(__('In stock')) ?></span>
+                    </p>
+                <?php else : ?>
+                    <p class="unavailable stock" title="<?= $block->escapeHtmlAttr(__('Availability')) ?>">
+                        <span><?= $block->escapeHtml(__('Out of stock')) ?></span>
+                    </p>
+                <?php endif; ?>
+            <?php endif; ?>
+        </fieldset>
+    </div>
+<?php endif; ?>
+</div>

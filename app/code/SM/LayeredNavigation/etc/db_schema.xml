@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_LayeredNavigation
+ *
+ * Date: April, 27 2020
+ * Time: 10:49 AM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="category_filter_list" resource="default" engine="innodb"
+           comment="Category Product Attribute Filter Table">
+        <!-- Columns -->
+        <column xsi:type="smallint" name="id" padding="6" unsigned="true"
+                nullable="false" identity="true" comment="Entity ID"/>
+        <column xsi:type="int" name="category_id" padding="10" unsigned="true"
+                nullable="false" identity="false" comment="Category ID"/>
+        <column xsi:type="varchar" name="attribute_code" length="50" nullable="false" comment="Attribute Code"/>
+        <column xsi:type="smallint" name="position" padding="3" unsigned="true"
+                nullable="false" identity="false" comment="Attribute Position"/>
+
+        <!-- Primary key -->
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="id"/>
+        </constraint>
+
+        <!-- Foreign Key -->
+        <constraint xsi:type="foreign" referenceId="CATEGORY_FILTER_LIST_CATEGORY_ID_CATEGORY_ENTITY_ROW_ID"
+                    table="category_filter_list" column="category_id" referenceTable="catalog_category_entity"
+                    referenceColumn="entity_id" onDelete="CASCADE"/>
+
+        <!-- Index -->
+        <constraint xsi:type="unique" referenceId="CATEGORY_FILTER_LIST_CATEGORY_ID_ATTRIBUTE_ID_STORE_ID">
+            <column name="category_id"/>
+            <column name="attribute_code"/>
+        </constraint>
+    </table>
+</schema>

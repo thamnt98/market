@@ -1,0 +1,13 @@
+--- a/vendor/magento/module-configurable-product/Helper/Product/Options/Loader.php	2020-01-10 13:20:40.000000000 +0700
++++ b/vendor/magento/module-configurable-product/Helper/Product/Options/Loader.php	2020-05-05 16:07:17.884278215 +0700
+@@ -49,6 +49,10 @@
+         $options = [];
+         /** @var Configurable $typeInstance */
+         $typeInstance = $product->getTypeInstance();
++        if (get_class($typeInstance) == 'Magento\Catalog\Model\Product\Type\Simple' || get_class($typeInstance) == 'Magento\Bundle\Model\Product\Type')
++        {
++            return null;
++        }
+         $attributeCollection = $typeInstance->getConfigurableAttributeCollection($product);
+         $this->extensionAttributesJoinProcessor->process($attributeCollection);
+         foreach ($attributeCollection as $attribute) {

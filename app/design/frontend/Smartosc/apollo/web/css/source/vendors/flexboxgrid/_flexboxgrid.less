@@ -1,0 +1,58 @@
+// Core variables and mixins
+@import "_variables-flexbox.less";
+@import "_mixins-flexbox.less";
+
+@screen__xxs: 320px;
+@screen__xs: 480px;
+@screen__s: 640px;
+@screen__m: 768px;
+@screen__l: 1024px;
+@screen__xl: 1360px;
+
+//default breakpoints
+@xl-break: 1360px;
+@l-break: 1024px;
+@m-break: 768px;
+@s-break: 640px;
+@xs-break: 480px;
+
+//default sizings
+@col-names: xs, sm, md, lg, xl;
+@col-breaks: @xs-break,@s-break, @m-break, @l-break, @xl-break;
+
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+  .grid {
+    padding-right: @outer-margin;
+    padding-left: @outer-margin;
+  }
+}
+
+
+.makegrid(xs);
+
+.for-each(@col-breaks);
+.-each(@breakpoint) {
+  @media only screen and (min-width: @breakpoint) {
+    .makegrid(extract(@col-names, @i));
+  }
+}
+
+.row {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-right: @gutter-compensation;
+  margin-left: @gutter-compensation;
+}
+
+
+.row.reverse {
+  .row-reverse();
+}
+.col.reverse {
+   .col-reverse();
+}
+
+
+

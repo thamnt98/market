@@ -1,0 +1,46 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_IntegrationCategory
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   JP <jaka.pondan@ctcorpdigital.com>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- DB Model-->
+
+
+    <preference for="Trans\IntegrationCategory\Api\IntegrationJobRepositoryInterface"
+                type="Trans\IntegrationCategory\Model\IntegrationJobRepository" />
+    <preference for="Trans\IntegrationCategory\Api\Data\IntegrationJobInterface"
+                type="Trans\IntegrationCategory\Model\IntegrationJob" />
+    <preference for="Trans\IntegrationCategory\Api\Data\IntegrationJobSearchResultInterface"
+                type="Trans\IntegrationCategory\Model\IntegrationJobSearchResult" />
+
+    <preference for="Trans\IntegrationCategory\Api\IntegrationDataValueRepositoryInterface"
+                type="Trans\IntegrationCategory\Model\IntegrationDataValueRepository" />
+    <preference for="Trans\IntegrationCategory\Api\Data\IntegrationDataValueInterface"
+                type="Trans\IntegrationCategory\Model\IntegrationDataValue" />
+    <preference for="Trans\IntegrationCategory\Api\Data\IntegrationDataValueSearchResultInterface"
+                type="Trans\IntegrationCategory\Model\IntegrationDataValueSearchResult" />
+
+    <preference for="Trans\IntegrationCategory\Api\IntegrationCategoryRepositoryInterface"
+                type="Trans\IntegrationCategory\Model\IntegrationCategoryRepository" />
+    <preference for="Trans\IntegrationCategory\Api\Data\IntegrationCategoryInterface"
+                type="Trans\IntegrationCategory\Model\IntegrationCategory" />
+    <preference for="Trans\IntegrationCategory\Api\IntegrationCategoryLogicInterface"
+                type="Trans\IntegrationCategory\Model\IntegrationCategoryLogic" />
+    <!-- Logic Model-->
+    <preference for="Trans\IntegrationCategory\Api\IntegrationCheckUpdatesInterface"
+                type="Trans\IntegrationCategory\Model\IntegrationCheckUpdates" />
+
+    <preference for="Trans\IntegrationCategory\Api\IntegrationGetUpdatesInterface"
+                type="Trans\IntegrationCategory\Model\IntegrationGetUpdates" />
+
+</config>

@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="quote_item">
+        <column xsi:type="smallint" name="is_active" nullable="false" default="1" comment="Is Active"/>
+        <column xsi:type="decimal" name="base_price_by_location" scale="6" precision="20" unsigned="false"
+                default="0" comment="Base price by location"/>
+    </table>
+    <table name="quote_address">
+        <column xsi:type="varchar" name="store_pick_up" nullable="true" length="255" comment="store_pick_up"/>
+        <column xsi:type="datetime" name="store_pick_up_time" nullable="false" comment="store_pick_up_time"/>
+        <column xsi:type="varchar" name="store_pick_up_delivery" nullable="true" length="255" comment="Store Pick Up Delivery"/>
+        <column xsi:type="int" name="location" nullable="true" comment="Split Store Code"/>
+        <column xsi:type="varchar" name="item_rate" nullable="true" length="255" comment="Item Rate"/>
+        <column xsi:type="varchar" name="address_tag" nullable="true" length="255" comment="Address Tag"/>
+        <column xsi:type="varchar" name="oar_data" nullable="true" length="255" comment="Oar Response"/>
+    </table>
+    <table name="sales_order">
+        <column xsi:type="varchar" name="store_pick_up" nullable="true" length="255" comment="store_pick_up"/>
+        <column xsi:type="datetime" name="store_pick_up_time" nullable="true" comment="store_pick_up_time"/>
+        <column xsi:type="varchar" name="store_pick_up_delivery" nullable="true" length="255" comment="Store Pick Up Delivery"/>
+        <column xsi:type="smallint" name="is_parent" default="1" comment="is_parent"/>
+        <column xsi:type="int" name="parent_order" nullable="true" comment="parent_order"/>
+        <column xsi:type="int" name="location" nullable="true" comment="Split Store Code"/>
+        <column xsi:type="varchar" name="reference_number" nullable="true" length="255" comment="Reference Number"/>
+        <column xsi:type="varchar" name="reference_order_id" nullable="true" length="255" comment="Reference Order Id"/>
+        <column xsi:type="varchar" name="reference_payment_number" nullable="true" length="255" comment="Reference Payment Number"/>
+        <column xsi:type="varchar" name="reference_invoice_number" nullable="true" length="255" comment="Reference Invoice Number"/>
+        <column xsi:type="varchar" name="split_store_code" nullable="true" length="255" comment="split_store_code"/>
+        <column xsi:type="varchar" name="oar_data" nullable="true" length="255" comment="Oar Response"/>
+    </table>
+    <table name="sales_order_grid">
+        <column xsi:type="varchar" name="store_pick_up" nullable="true" length="255" comment="store_pick_up"/>
+        <column xsi:type="datetime" name="store_pick_up_time" nullable="true" comment="store_pick_up_time"/>
+        <column xsi:type="varchar" name="store_pick_up_delivery" nullable="true" length="255" comment="Store Pick Up Delivery"/>
+        <column xsi:type="smallint" name="is_parent" default="1" comment="is_parent"/>
+        <column xsi:type="int" name="parent_order" nullable="true" comment="parent_order"/>
+        <column xsi:type="int" name="location" nullable="true" comment="Split Store Code"/>
+        <column xsi:type="varchar" name="reference_number" nullable="true" length="255" comment="Reference Number"/>
+        <column xsi:type="varchar" name="reference_order_id" nullable="true" length="255" comment="Reference Order Id"/>
+        <column xsi:type="varchar" name="reference_payment_number" nullable="true" length="255" comment="Reference Payment Number"/>
+        <column xsi:type="varchar" name="reference_invoice_number" nullable="true" length="255" comment="Reference Invoice Number"/>
+    </table>
+    <table name="quote">
+        <column xsi:type="varchar" name="apply_voucher" nullable="true" length="255" comment="Apply Voucher"/>
+    </table>
+    <table name="sales_order_address">
+        <column xsi:type="varchar" name="address_tag" nullable="true" length="255" comment="Address Tag"/>
+        <column xsi:type="varchar" name="district" nullable="true" length="255" comment="Address Tag"/>
+    </table>
+</schema>

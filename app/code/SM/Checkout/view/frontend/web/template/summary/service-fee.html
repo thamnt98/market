@@ -1,0 +1,10 @@
+<!-- ko if: isShow() -->
+<tr class="total service-fee">
+    <th class="mark" scope="row">
+        <span class="label" data-bind="text: title"></span>
+    </th>
+    <td class="amount">
+        <span class="service-fee-amount" data-bind="text: getValue(), attr: {'data-th': title}"></span>
+    </td>
+</tr>
+<!-- /ko -->

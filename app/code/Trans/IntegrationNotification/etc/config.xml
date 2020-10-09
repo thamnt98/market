@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--  
+/**
+ * @category Trans
+ * @package  Trans_IntegrationNotification
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ * @author   Imam Kusuma <imam.kusuma@ctcorpdigital.com>
+ *
+ * Copyright © 2019 CT Corp Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <notification>
+            <general>
+            	<enabled>1</enabled>
+              <environtmen>0</environtmen>
+            </general>
+            <base_url>
+              <publish_url>/publish</publish_url>
+            </base_url>
+        </notification>
+    </default>
+</config>

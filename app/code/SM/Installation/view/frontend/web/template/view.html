@@ -1,0 +1,37 @@
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_Installation
+ *
+ * Date: May, 15 2020
+ * Time: 2:47 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+
+<!-- ko if: isShow($parents[1] ? $parents[1].item_id : null) -->
+<div class="installation-service-container">
+    <div class="free-install">
+        <label class="label-text" data-bind="text: getTitle($parents[1] ? $parents[1].item_id : null)"></label>
+        <span class="dpl-tooltip">
+            <img data-bind="
+                attr: {
+                    'src': tooltipUrl,
+                    'width': '13',
+                    'height': '16'
+                }
+            " />
+            <span class="tooltip-content" role="tooltip" data-bind="text: tooltip"></span>
+        </span>
+    </div>
+    <!-- ko if: isShowNote($parents[1] ? $parents[1].item_id : null) -->
+    <div class="installation-note bx-note">
+        <strong class="title" data-bind="text: $t('Note') + ':'"></strong>
+        <p class="content" data-bind="text: getNote($parents[1] ? $parents[1].item_id : null)"></p>
+    </div>
+    <!-- /ko -->
+</div>
+<!-- /ko -->

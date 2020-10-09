@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="mirasvit" translate="label" sortOrder="550">
+            <label>Mirasvit Extensions</label>
+        </tab>
+
+        <section id="blog" showInDefault="1" showInWebsite="1" showInStore="1" type="text" translate="label" sortOrder="100">
+            <label>Blog MX</label>
+            <tab>mirasvit</tab>
+            <resource>Mirasvit_Blog::blog_settings</resource>
+
+            <group id="appearance" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10">
+                <label>Appearance</label>
+
+                <field id="menu_title" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Top Menu Title</label>
+                </field>
+
+                <field id="blog_name" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Blog Name</label>
+                </field>
+
+                <field id="date_format" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Date Format</label>
+                </field>
+            </group>
+
+            <group id="display" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="20">
+                <label>Display</label>
+
+                <field id="main_menu" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Visible Navigation Menu</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="enable_excerpts" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable excerpts on list page</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>When enabeled excerpts will be inserted as follows, if there is a &#x3C;br&#x3E; &#x3C;b&#x3E; &#x26;#x3C;!--more--&#x26;#x3E; &#x3C;/b&#x3E; tag in the post content the
+                        excerpt will go until that tag, then if the post has an excerpt that will be used, lastly the first &#x3C;i&#x3E; n &#x3C;/i&#x3E; charechters of the post (as set below) will
+                        be displayed.
+                    </comment>
+                </field>
+                <field id="excerpt_size" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Defualt Excerpt Character size</label>
+                    <validate>validate-digits</validate>
+                </field>
+            </group>
+
+            <group id="seo" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="30">
+                <label>Search Engine Optimization</label>
+
+                <field id="base_route" translate="label" type="text" sortOrder="10" showInDefault="1">
+                    <label>Base URL</label>
+                </field>
+
+                <field id="base_meta_title" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Base Meta Title</label>
+                </field>
+
+                <field id="base_meta_description" translate="label" type="textarea" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Base Meta Description</label>
+                </field>
+
+                <field id="base_meta_keywords" translate="label" type="textarea" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Base Meta Keywords</label>
+                </field>
+
+                <field id="post_url_suffix" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>URL Suffix for Posts</label>
+                </field>
+
+                <field id="category_url_suffix" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>URL Suffix for Categories</label>
+                </field>
+            </group>
+
+            <group id="comments" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="40">
+                <label>Comments</label>
+
+                <field id="provider" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Provider</label>
+                    <source_model>\Mirasvit\Blog\Model\Config\Source\CommentProvider</source_model>
+                </field>
+
+                <field id="disqus_shortname" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Disqus Blog Shortname</label>
+                    <depends>
+                        <field id="*/*/provider">disqus</field>
+                    </depends>
+                </field>
+            </group>
+
+            <group id="sharing" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="50">
+                <label>Sharing</label>
+
+                <field id="enable_addthis" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable AddThis Sharing Buttons</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

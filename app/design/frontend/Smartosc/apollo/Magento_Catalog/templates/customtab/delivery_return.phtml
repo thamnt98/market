@@ -1,0 +1,32 @@
+<?php
+/** @var \SM\Catalog\Block\Product\View $block */
+$topicShowTabReturnId = $block->getTopicShowTabReturn();
+?>
+<div class="help-content">
+    <div class="help-content-topic-list">
+        <?php if(!empty($topicShowTabReturnId)): ?>
+        <?php foreach ($topicShowTabReturnId as $topicId): ?>
+        <?php $getTopicById = $block->getTopicById($topicId); ?>
+        <div class="help-topic-title">
+            <h2><?= $block->escapeHtml($getTopicById->getName()) ?></h2>
+        </div>
+        <ol class="help-list-topic-question ">
+            <?php $childQuestions = $block->getChildQuestionsFromParrentId($topicId); ?>
+            <?php if (count($childQuestions) > 0) :?>
+                <?php /** @var \SM\Help\Model\Question $childQuestion */?>
+                <?php foreach ($childQuestions as $childQuestion) : ?>
+                    <li class="childQuest">
+                        <div class="quest-title">
+                            <span><?= $block->escapeHtml($childQuestion->getTitle()) ?></span>
+                        </div>
+                        <div class="quest-content">
+                            <span><?= /* @noEscape */ $block->getQuestionContent($childQuestion->getContent()) ?></span>
+                        </div>
+                    </li>
+                <?php endforeach;?>
+            <?php endif; ?>
+        </ol>
+        <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
+</div>

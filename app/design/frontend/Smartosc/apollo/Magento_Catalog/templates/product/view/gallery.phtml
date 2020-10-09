@@ -1,0 +1,98 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/**
+ * Product media data template
+ *
+ * @var $block \Magento\Catalog\Block\Product\View\Gallery
+ * @var $helper \Magento\Catalog\Helper\Image
+ */
+?>
+
+<?php
+$images = $block->getGalleryImages()->getItems();
+$mainImage = current(array_filter($images, function ($img) use ($block) {
+    return $block->isMainImage($img);
+}));
+
+if (!empty($images) && empty($mainImage)) {
+    $mainImage = $block->getGalleryImages()->getFirstItem();
+}
+
+$helper = $this->helper('Magento\Catalog\Helper\Image');
+$mainImageData = $mainImage ?
+    $mainImage->getData('medium_image_url') :
+    $helper->getDefaultPlaceholderUrl('image');
+
+?>
+
+<div class="gallery-placeholder _block-content-loading" data-gallery-role="gallery-placeholder">
+    <img
+            alt="main product photo"
+            class="gallery-placeholder__image"
+            src="<?= /* @noEscape */ $mainImageData ?>"
+    />
+</div>
+
+<script type="text/x-magento-init">
+    {
+        "[data-gallery-role=gallery-placeholder]": {
+            "mage/gallery/gallery": {
+                "mixins":["magnifier/magnify"],
+                "magnifierOpts": <?= /* @noEscape */ $block->getMagnifier() ?>,
+                "data": <?= /* @noEscape */ $block->getGalleryImagesJson() ?>,
+                "options":
+                  <?= /* @noEscape */ $block->getGalleryOptions()->getOptionsJson() ?>,
+                "thumbmargin": 8,
+                "fullscreen": <?= /* @noEscape */ $block->getGalleryOptions()->getFSOptionsJson() ?>,
+                 "breakpoints": <?= /* @noEscape */ $block->getBreakpoints() ?>
+            }
+        }
+    }
+</script>
+<script>
+    require([
+        'jquery',
+        'SM_Catalog/js/jquery.elevatezoom'
+    ], function($){
+        if (!detectMob()) {
+            $('[data-gallery-role=gallery-placeholder]').on(
+                'fotorama:ready ' +           // Fotorama is fully ready
+                'fotorama:showend ' +         // End of the show transition
+                'fotorama:load ',       // Video iframe is removed
+                function (e, fotorama) {
+                    var activeImage = $(this).find('.fotorama__stage__frame.fotorama__active img.fotorama__img');
+                    $(activeImage).attr('data-zoom-image', fotorama.activeFrame.full);
+                    $('.zoomContainer').remove();
+                    $(activeImage).elevateZoom({
+                        cursor: 'zoom-in',
+                        galleryActiveClass: "active",
+                        zoomWindowOffety: -30,
+                        zoomWindowOffetx: 20,
+                        imageCrossfade: true,
+                        zoomWindowWidth:550,
+                        zoomWindowHeight:700
+                    });
+                }
+            ).css('position', 'relative').css('z-index', '3');
+        }
+        function detectMob() {
+            const toMatch = [
+                /Android/i,
+                /webOS/i,
+                /iPhone/i,
+                /iPad/i,
+                /iPod/i,
+                /BlackBerry/i,
+                /Windows Phone/i
+            ];
+
+            return toMatch.some((toMatchItem) => {
+                return navigator.userAgent.match(toMatchItem);
+            });
+        }
+    });
+</script>

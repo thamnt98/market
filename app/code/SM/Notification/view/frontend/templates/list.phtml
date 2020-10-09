@@ -1,0 +1,111 @@
+<?php /** @var \SM\Notification\Block\Customer\ListNotification $block */ ?>
+<?php /** @var \SM\Notification\Model\CustomerMessage[] $items */ ?>
+<?php $items = $block->getCollection()->getItems() ?>
+<div class="notifications">
+    <div class="product data items"
+         data-mage-init='{"mage/tabs": {"openedState": "active", "animate": {"duration": 100}, "active": 1}}'>
+        <?= $block->getTopToolbarHtml() ?>
+        <?php echo $this->getLayout()->createBlock("SM\Notification\Block\Customer\Tabs")->setTemplate("SM_Notification::tabs.phtml")->toHtml() ?>
+        <div id="tab-all" class="item content" data-role="content">
+            <?php if (!empty($items)) : ?>
+                <ul class="noti-list-content">
+                    <?php foreach ($items as $item) : ?>
+                        <?php $itemClass = (bool) $item->getData('is_read') ? 'read' : '' ?>
+                        <li class="noti-item <?= $block->escapeHtmlAttr($itemClass) ?>"
+                            data-redirect="<?= $block->escapeHtmlAttr($block->getRedirectUrl($item)) ?>"
+                            data-id="<?= $block->escapeHtmlAttr($item->getData('message_id')) ?>"
+                        >
+                            <div class="inner">
+                                <span class="note-img">
+                                    <img src="<?= $block->getItemImageUrl($item)?>"/>
+                                </span>
+                                <div class="noti-item-content">
+                                    <span class="noti-status">
+                                        <span><?= $block->convertEventType($item->getData('event')) ?></span>
+                                        <span class="noti-date"><?= $block->convertDate($item->getData('created_at')) ?></span>
+                                    </span>
+                                    <h4><?= $block->convertOrderContent($block->getTitle($item)) ?></h4>
+                                    <p class="noti-descrip"><?= $block->convertOrderContent($block->getContent($item)) ?></p>
+                                </div>
+                            </div>
+                        </li>
+                    <?php endforeach; ?>
+                </ul>
+            <?php else : ?>
+                <?php if ($block->issetParamRequestKey()) : ?>
+                    <!--search noresult-->
+                    <div class="search-noresult">
+                        <img width="150" src="<?= $block->getViewFileUrl('images/search-not-found.png') ?>"
+                             alt="<?= $block->escapeHtml(__('search result empty')) ?>" width="401"/>
+                        <div class="search-noresult--content">
+                            <h2><?= $block->escapeHtml(__('Oops. We can\'t find it.')) ?></h2>
+                            <p><?= $block->escapeHtml(__('But no worries. Try again with other date.')) ?></p>
+                        </div>
+                    </div>
+                    <!--search noresult-->
+                <?php else: ?>
+                    <div class="no-route shopping-list-empty">
+                        <div class="no-route-info">
+                            <img src="<?= $block->getViewFileUrl('images/shopping-list-empty.png') ?>"
+                                 alt="Your list is still empty" width="401"/>
+                            <h4><?= $block->escapeHtml(__('Sorry, it\'s currently unavailable.')) ?><br/></h4>
+                            <button type="button" name="do"
+                                    title="<?= $block->escapeHtml(__('Shop Now')) ?>"
+                                    class="action primary browse-products"
+                                    onclick="location.href = '<?= $block->getUrl() ?>'">
+                                <span><?= $block->escapeHtml(__('Shop Now')) ?></span>
+                            </button>
+                        </div>
+                    </div>
+                <?php endif; ?>
+            <?php endif; ?>
+        </div>
+    </div>
+    <?= $block->getPagingHtml() ?>
+</div>
+
+<script>
+    require([
+        'jquery',
+        'mage/url',
+        'mage/storage'
+    ],function ($, urlBuilder, storage) {
+        if (typeof dataLayerSourceObjects !== 'undefined') {
+            $('li.noti-item').on('click', function () {
+                let item     = $('.noti-item-content h4'),
+                    title    = $(this).children().find(item).text(),
+                    url      = urlBuilder.build('rest/V1/notification/read/'),
+                    element  = $(this),
+                    redirect = $(element).data('redirect'),
+                    id       = $(element).data('id');
+
+                window.dataLayer = window.dataLayer || [];
+                window.dataLayer.push({
+                    'event': 'notification_click',
+                    'uniqueUserID': dataLayerSourceObjects.customer.uniqueUserID,
+                    'userID': dataLayerSourceObjects.customer.userID,
+                    'customerID': dataLayerSourceObjects.customer.customerID,
+                    'customerType': dataLayerSourceObjects.customer.customerType,
+                    'loyalty': dataLayerSourceObjects.customer.loyalty,
+                    'customerStatus': dataLayerSourceObjects.customer.customerStatus,
+                    'loginType': dataLayerSourceObjects.customer.loginType,
+                    'menu_name': $('.notifications .product.data.items .active .switch').text(),
+                    'submenu_name': title,
+                    'store_name': dataLayerSourceObjects.customer.storeName,
+                    'store_ID': dataLayerSourceObjects.customer.storeID
+                });
+
+                if ($(this).hasClass('read')) {
+                    window.location.href = redirect;
+                } else if (id) {
+                    storage.post(
+                        url,
+                        JSON.stringify({messageIds: [id]})
+                    ).always(function () {
+                        window.location.href = redirect;
+                    });
+                }
+            })
+        }
+    })
+</script>

@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="checkout_cart_product_add_before">
+        <observer name="block_guest_add_to_cart" instance="SM\Customer\Observer\BlockGuestAddToCart"/>
+    </event>
+    <event name="controller_action_predispatch">
+        <observer name="sm_unlock_account" instance="SM\Customer\Observer\Unlock"/>
+    </event>
+    <event name="send_recovery_email">
+        <observer name="sm_customer_send_recovery_email" instance="SM\Customer\Observer\SendRecovery"/>
+    </event>
+    <event name="controller_front_send_response_before">
+        <observer name="sm_customer_change_pwd_checker" instance="SM\Customer\Observer\ChangePwdChecker"/>
+    </event>
+    <event name="customer_save_after">
+        <observer name="sm_customer_change_credential" instance="SM\Customer\Observer\ChangeCredential"/>
+    </event>
+
+    <event name="customer_account_create_before">
+        <observer name="sm_customer_create_before" instance="SM\Customer\Observer\CustomerInfo"/>
+    </event>
+    <event name="customer_login">
+        <observer name="customer_login_after" instance="SM\Customer\Observer\SocialData"/>
+    </event>
+</config>

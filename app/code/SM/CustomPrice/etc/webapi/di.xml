@@ -1,0 +1,39 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magento\ConfigurableProduct\Pricing\Price\LowestPriceOptionsProvider" type="SM\CustomPrice\Pricing\Price\LowestPriceOptionsProvider"/>
+    <preference for="Magento\ConfigurableProduct\Model\Product\Type\Configurable" type="SM\CustomPrice\Model\Product\Type\Configurable"/>
+
+    <type name="Magento\Framework\App\Http\Context">
+        <plugin name="sm_customer_store_context_plugin"
+                type="SM\CustomPrice\Plugin\Store\CustomerStoreContextPlugin" />
+    </type>
+
+    <type name="Magento\Framework\View\Element\AbstractBlock">
+        <plugin sortOrder="1" name="sm_customer_store_context_product_list_plugin"
+                type="SM\CustomPrice\Plugin\Block\BlockPlugin"/>
+    </type>
+    <type name="Magento\Framework\Search\Request\Config\FilesystemReader">
+        <plugin name="sm_custom_price_request_generator"
+                type="SM\CustomPrice\Plugin\Framework\Search\Request\Config\FilesystemReader" sortOrder="99"/>
+    </type>
+    <type name="Magento\Catalog\Model\Product">
+        <plugin name="get_price_by_store" type="SM\CustomPrice\Plugin\Product" sortOrder="1" disabled="false"/>
+    </type>
+    <type name="Magento\Catalog\Pricing\Price\FinalPrice">
+        <plugin name="sm_custom_price_pricing_price_final_price"
+                type="SM\CustomPrice\Plugin\Pricing\Price\FinalPrice" sortOrder="99"/>
+    </type>
+    <type name="Magento\Catalog\Pricing\Price\RegularPrice">
+        <plugin name="sm_custom_price_pricing_price_regular_price"
+                type="SM\CustomPrice\Plugin\Pricing\Price\RegularPrice" sortOrder="99"/>
+    </type>
+    <type name="Magento\Catalog\Pricing\Price\BasePrice">
+        <plugin name="sm_custom_price_pricing_price_base_price"
+                type="SM\CustomPrice\Plugin\Pricing\Price\BasePrice" sortOrder="99"/>
+    </type>
+    <type name="Magento\Catalog\Pricing\Price\SpecialPrice">
+        <plugin name="sm_custom_price_pricing_price_special_price"
+                type="SM\CustomPrice\Plugin\Pricing\Price\SpecialPrice" sortOrder="99"/>
+    </type>
+
+</config>

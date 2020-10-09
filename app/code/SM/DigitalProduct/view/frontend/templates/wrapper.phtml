@@ -1,0 +1,16 @@
+<?php
+/** @var \SM\DigitalProduct\Block\Main $block */
+?>
+<div class="digital-product-billing digital-tab-top">
+    <?php
+    /** @var \SM\DigitalProduct\Block\Banner $bannerBlock */
+    $bannerBlock = $block->getChildBlock("digitalproduct.banner");
+    ?>
+    <?= $bannerBlock->toHtml()?>
+    <div class="quick-transaction content">
+        <?= $block->getChildHtml("quick.transaction") ?>
+    </div>
+    <div class="product data items">
+        <?= $block->getChildBlock("digitalproduct.tab")->toHtml() ?>
+    </div>
+</div>

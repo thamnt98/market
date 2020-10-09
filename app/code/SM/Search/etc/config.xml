@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <catalog_search>
+            <global_search>
+                <debug>0</debug>
+                <search_by_id>0</search_by_id>
+            </global_search>
+            <latest_search>
+                <size>6</size>
+            </latest_search>
+            <popular_search>
+                <size>6</size>
+            </popular_search>
+            <suggestion>
+                <main_category_limit>3</main_category_limit>
+            </suggestion>
+        </catalog_search>
+    </default>
+</config>

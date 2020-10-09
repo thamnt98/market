@@ -1,0 +1,111 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+
+<?php
+$idSuffix = $block->getIdSuffix() ? $block->getIdSuffix() : '';
+/** @var \Magento\Bundle\Pricing\Render\FinalPriceBox $block */
+
+/** @var \Magento\Bundle\Pricing\Price\FinalPrice $finalPriceModel */
+$helper = $this->helper(\SM\Bundle\Helper\BundleAttribute::class);
+$product = $block->getPrice()->getProduct();
+if ($product->getTypeId() == 'bundle') {
+    $completePackagePrice = $helper->getMinPrice($product);
+    $bundleBasePrice = $helper->getRegularPrice($product);
+}
+
+$finalPriceModel = $block->getPrice();
+$minimalPrice = $finalPriceModel->getMinimalPrice();
+$maximalPrice = $finalPriceModel->getMaximalPrice();
+/** ex: \Magento\Bundle\Pricing\Price\BundleRegularPrice */
+/** @var \Magento\Framework\Pricing\Price\PriceInterface $regularPriceModel */
+$regularPriceModel = $block->getPriceType('regular_price');
+$maximalRegularPrice = $regularPriceModel->getMaximalPrice();
+$minimalRegularPrice = $regularPriceModel->getMinimalPrice();
+$regularPriceAttributes = [
+    'display_label' => __('Regular Price'),
+    'price_id' => $block->getPriceId('old-price-' . $idSuffix),
+    'include_container' => true,
+    'skip_adjustments' => true
+];
+$renderMinimalRegularPrice = $block->renderAmount($minimalRegularPrice, $regularPriceAttributes);
+
+?>
+<?php if ($block->getSaleableItem()->getPriceView()) : ?>
+    <p class="minimal-price">
+        <?= /* @noEscape */
+        $block->renderAmount($minimalPrice, [
+            'display_label' => __('As low as'),
+            'price_id' => $block->getPriceId('from-'),
+            'include_container' => true
+        ]); ?>
+        <?php if ($minimalPrice < $minimalRegularPrice) : ?>
+            <span class="old-price">
+                <?= /* @noEscape */
+                $renderMinimalRegularPrice ?>
+            </span>
+        <?php endif ?>
+    </p>
+<?php else : ?>
+    <?php if (isset($completePackagePrice)) : ?>
+    <p class="price-from1">
+        <span class="display_label"><?= __('Complete Package') ?></span>
+            <?php if ($bundleBasePrice->getValue('amount') > 0 && $bundleBasePrice->getValue('amount') > $completePackagePrice->getValue('amount')) : ?>
+                <span class="special-price">
+        <?= /* @noEscape */
+        $block->renderAmount($completePackagePrice, [
+            'price_id' => $block->getPriceId('from-'),
+            'price_type' => 'finalPrice',
+            'include_container' => true
+        ]); ?>
+                </span>
+            <span class="old-price">
+                <?= /* @noEscape */
+                $block->renderAmount($bundleBasePrice, $regularPriceAttributes) ?>
+            </span>
+            <?php else: ?>
+            <span><?php echo /* @noEscape */
+                $block->renderAmount($completePackagePrice, [
+                    'price_id' => $block->getPriceId('from-'),
+                    'price_type' => 'finalPrice',
+                    'include_container' => true
+                ]); ?></span>
+
+        <?php endif ?>
+    </p>
+    <?php elseif ($block->showRangePrice()) : ?>
+        <p class="price-from">
+            <?= /* @noEscape */
+            $block->renderAmount($minimalPrice, [
+                'display_label' => __('Complete Package'),
+                'price_id' => $block->getPriceId('from-'),
+                'price_type' => 'minPrice',
+                'include_container' => true
+            ]); ?>
+            <?php if ($minimalPrice < $minimalRegularPrice) : ?>
+                <span class="old-price">
+                    <?= /* @noEscape */
+                    $renderMinimalRegularPrice ?>
+                </span>
+            <?php endif ?>
+        </p>
+        <p class="price-to">
+        </p>
+
+    <?php else : ?>
+        <?= /* @noEscape */
+        $block->renderAmount($minimalPrice, [
+            'price_id' => $block->getPriceId('product-price-'),
+            'include_container' => true
+        ]); ?>
+        <?php if ($minimalPrice < $minimalRegularPrice) : ?>
+            <span class="old-price">
+                <?= /* @noEscape */
+                $renderMinimalRegularPrice ?>
+            </span>
+        <?php endif ?>
+    <?php endif ?>
+<?php endif ?>

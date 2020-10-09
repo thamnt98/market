@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!--
+/**
+* Copyright 2019 aheadWorks. All rights reserved.
+* See LICENSE.txt for license details.
+*/
+-->
+
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <css src="SM_Checkout::css/style.css"/>
+    </head>
+    <body>
+        <referenceBlock name="page.main.title" remove="true" />
+        <referenceContainer name="header.panel" remove="true" />
+        <referenceBlock name="header-wrapper" remove="true" />
+        <referenceBlock name="navigation.sections" remove="true" />
+        <referenceContainer name="page.wrapper">
+            <container name="checkout.header.container" as="checkout_header_container" label="Checkout Page Header Container" htmlTag="header" htmlClass="page-header" before="main.content">
+                <container name="checkout.header.wrapper" label="Checkout Page Header" as="checkout_header_wrapper" htmlTag="div" htmlClass="header content"/>
+            </container>
+        </referenceContainer>
+        <move element="logo" destination="checkout.header.wrapper"/>
+        <referenceContainer name="content">
+            <block class="SM\Checkout\Block\DigitalProduct\Confirmed" name="digital.confirmed" template="SM_Checkout::checkout/digital-product/confirmed.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

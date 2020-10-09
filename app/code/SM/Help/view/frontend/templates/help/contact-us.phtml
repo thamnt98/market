@@ -1,0 +1,265 @@
+<?php
+/**
+ * @category SM
+ * @package SM_Help
+ * @license     http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @author      Chinhvd <chinhvd@smartosc.com>
+ * @copyright   Copyright (c) SmartOSC. All rights reserved.
+ * @url http://www.smartosc.com/
+ */
+?>
+<?php /** @var SM\Help\Block\ContactUs\ContactUs $block */ ?>
+<?php
+    $_orders = $block->getOrder();
+?>
+<div class="help-pages">
+    <div class="go-back">
+        <div class="icon ic-arrow-prev"></div>
+        <a href="<?= $block->escapeUrl($block->getBackUrl()) ?>"><?= $block->escapeHtml('Back') ?></a>
+    </div>
+    <!------site content------>
+    <div class="help-content help-contactus-wrap">
+        <div class="help-content-list-top">
+            <h2><?= __('How can we help you?') ?></h2>
+        </div>
+        <form id="help-contact-us" method="post" action="" enctype="multipart/form-data">
+            <?= $block->getBlockHtml('formkey') ?>
+            <div class="help-contactus">
+                <p class="tl-contact-please"><?= __('Please complete the details to help us understand your problem.') ?></p>
+                <div class="cat-select-contact">
+                    <label class="title__contactus"><?= $block->escapeHtml(__('Category'))?></label>
+                    <div class="sortby-dropdown">
+                        <span class="action toggle category" data-toggle="dropdown" aria-expanded="true">
+                            <span><?= __('General') ?></span>
+                        </span>
+                        <ul id="sorter" data-role="sorter" class="dropdown">
+                            <li data-value="All"><?= $block->escapeHtml(__('General')) ?></li>
+                            <?php foreach ($block->getTopics() as $topic): ?>
+                                <li data-value="<?= $topic->getId()?>"><?= $block->escapeHtml(__($topic->getName())) ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                        <input type="hidden" name="category" value="">
+                    </div>
+                </div>
+                <div class="help-order-to-track" style="display: none">
+                    <label id="label-track-order" class="label-track-order"><?= $block->escapeHtml(__('Order to Track'))?></label>
+                    <a href="#" id="button-order-track" class="button-order-track"><?= $block->escapeHtml(__('Choose Order…'))?></a>
+                    <div class="help-order-list">
+                        <div class="txt-title-order-list"><?= $block->escapeHtml(__('Which order has the products with problems? Please choose one from the list below.'))?></div>
+                        <?php if ($_orders->getSize() > 0): ?>
+                            <?php foreach ($_orders->getItems() as $order): ?>
+                                <?php /** @var SM\Sales\Model\Data\SubOrderData $order */?>
+                                <div id="<?= $order->getId() ?>" class="order-track-box">
+                                    <div class="order-track-head">
+                                        <div class="gr-date-total">
+                                            <span class="date-track"><?= $block->escapeHtml($block->getFormatDate($order->getCreatedAt())) ?></span>
+                                            <span class="or-track-total"><?= $block->escapeHtml(__('Order ID ')) ?>
+                                                <span class="color-red"><?= $block->escapeHtml('#'.$order->getIncrementId()) ?></span>
+                                        </span>
+                                        </div>
+                                        <div class="gr-status"><span class="or-track-status"><?= $block->escapeHtml(__('Status:')) ?><span
+                                                    class="color-blue"><?= $block->escapeHtml($order->getStatusLabel()) ?></span>
+                                        </span>
+                                        </div>
+                                    </div>
+                                    <div class="order-track-content">
+                                        <div id="order-img" class="gr-img">
+                                            <?php /** @var \Magento\Catalog\Model\Product $item */ ?>
+                                            <?php foreach ($order->getItems() as $item): ?>
+                                            <div id="<?php echo $item->getProductId() ?>" class="img-order" style="display: inline-block">
+                                                <img src="<?php echo $block->getImageResize($item,70,70)?>"/>
+                                            </div>
+                                            <?php endforeach; ?>
+                                        </div>
+                                        <?php $itemName = array(); ?>
+                                        <div class="gr-info">
+                                            <p>
+                                                <?php foreach ($order->getItems() as $item): ?>
+                                                        <?php array_push($itemName, $item->getName()); ?>
+                                                <?php endforeach; ?>
+                                                <?= $block->escapeHtml(__(implode(", ",$itemName))) ?>
+                                            </p>
+
+                                        </div>
+                                    </div>
+                                    <input name="order_increment_id" hidden value="<?=  $order->getIncrementId() ?>" />
+                                    <input name="order_id" hidden value="<?= $order->getId() ?>" />
+                                </div>
+                            <?php endforeach;?>
+                        <?php else: ?>
+                            <div class="no-order"><?= $block->escapeHtml(__("You don't have any orders.")) ?></div>
+                        <?php endif;?>
+                    </div>
+                    <div id="order-bt-change-delete" class="bt-chage-delete" style="display: none">
+                        <a href="#" class="change-order"><?= $block->escapeHtml(__('Change Order ')) ?></a>
+                        <a href="#" id="my-order-remove-order" class="remove-order"><span
+                                class="apl-Remove"></span><?= $block->escapeHtml(__('Remove Order ')) ?></a>
+                    </div>
+                </div>
+
+                <div class="help-return-refund" style="display: none">
+                    <label class="title__contactus"><?= $block->escapeHtml(__('Have you received your order?'))?></label>
+                    <div class="radio-custom">
+                        <input type="radio" id="yes" value="return" name="is_received"/>
+                        <label for="yes"><?= $block->escapeHtml(__('Yes (full/partially)'))?></label>
+                    </div>
+                    <div class="radio-custom" id="radio-custom">
+                        <input type="radio" id="no" value="general" name="is_received"/>
+                        <label for="no"><?= $block->escapeHtml(__('No'))?></label>
+                    </div>
+
+                    <div class="return-refund-select-no" style="display: none">
+                        <div id="button-select-product">
+                            <label id="label-track-product" class="label-track-order title__contactus"><?= $block->escapeHtml(__('Product with problems'))?></label>
+                            <a href="#" class="button-order-track"><span class="svg-select-product"></span><?= $block->escapeHtml(__('Select Products'))?></a>
+                        </div>
+                        <div id="selected-product"></div>
+                    </div>
+                    <div class="return-refund-select-yes" style="display: none">
+                        <label class="title__contactus"><?= $block->escapeHtml(__('Return products to'))?></label>
+                        <div class="sortby-dropdown" id="select-store">
+                            <span class="action toggle store" data-toggle="dropdown" aria-expanded="true">
+                            <span><?= $block->escapeHtml(__('Select Store')) ?></span>
+                        </span>
+                            <ul id="store" data-role="store" class="dropdown">
+                                <?php foreach ($block->getStoreLocation() as $store):?>
+                                    <li data-value="<?= $store->getName() ?>"><?= $block->escapeHtml(__($store->getName()))?></li>
+                                <?php endforeach; ?>
+                            </ul>
+                            <input type="hidden" name="store" value="">
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="help-contact-textarea">
+                    <label class="title__contactus"><?= $block->escapeHtml(__('Tell us your concerns'))?></label>
+                    <textarea name="description" id="help-textarea" maxlength="500" rows="4" cols="50" placeholder="<?= $block->escapeHtml(__("Example: I need help to track my order because the feature doesn't seem to work."))?>" ></textarea>
+                    <span class="typ-word">0/500</span>
+                    <div class="rw-upload-photo">
+                        <label class="title__contactus"><?= $block->escapeHtml(__('Upload Photos')) ?></label>
+                        <div class="upload-wrapper upload-photo" data-bind="scope: 'uploader'">
+                            <!-- ko template: getTemplate() --><!-- /ko -->
+                        </div>
+                        <p class="note"><?= $block->escapeHtml(__('Maximum size 10 MB. You can upload up to 5 photos.')) ?></p>
+                    </div>
+                    <div class="checkbox-custom">
+                        <input name="store_id" type="hidden" value="<?= $block->getStoreId() ?>" />
+                        <input id="checkSendEmail" type="checkbox" name="help_messages" value="Yes" checked/>
+                        <label for="checkSendEmail"><?= $block->escapeHtml(__('Send me the copy of my message')) ?></label>
+                    </div>
+                    <span id="sendEmailHelp" style="display: none"><?php echo $this->getUrl('help/contactus/sendemail');?></span>
+                    <span id="getOrderProduct" style="display: none"><?php echo $this->getUrl('help/contactus/getproduct');?></span>
+                    <span id="getOrderProductById" style="display: none"><?php echo $this->getUrl('help/contactus/getproductbyid');?></span>
+                    <span id="myOrderId" style="display: none"><?php echo $block->getMyOrderId();?></span>
+                    <span id="returnRefundId" style="display: none"><?php echo $block->getReturnRefundId();?></span>
+                    <div class="align-right">
+                        <button class="action primary" id="contact-us-submit" type="submit"><?= $block->escapeHtml(__('Send'))?></button>
+                    </div>
+                    <div id="return-refund-order" class="return-refund-order" style="display: none">
+                        <label class="txt-title-order-list"><?= $block->escapeHtml(__('Select any defect, wrong, or missing products. You may select more than one item')) ?></label>
+                        <div class="table-responsive">
+                        <table class="table table-returns-refund">
+                            <thead>
+                                <div class="check-all-head">
+                                    <div class="checkbox-custom">
+                                        <input id="order-product-selected-all" class="order-product-selected-all" type="checkbox" name="selected-all" />
+                                        <label for="order-product-selected-all"><?= $block->escapeHtml(__('Select all products')) ?></label>
+                                    </div>
+                                </div>
+                            </thead>
+                            <tbody id="return-refund-product">
+                            </tbody>
+                        </table>
+                        </div>
+                        <div class="return-refund-button">
+                            <a id="back-cancel" class="back-cancel pagebuilder-banner-button pagebuilder-button-secondary" href="#">
+                                <?= $block->escapeHtml(__('Cancel'))?>
+                            </a>
+                            <a id="back-save" class="back-save pagebuilder-banner-button pagebuilder-button-primary" href="#">
+                                <?= $block->escapeHtml(__('Save'))?>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!------site content------>
+
+    <!------site bar left------>
+    <div class="sidebar sidebar-main">
+        <div class="block block-collapsible-nav">
+            <div class="title block-collapsible-nav-title">
+                <strong><?= $block->escapeHtml(__('Help Center')) ?></strong>
+            </div>
+            <div class="content block-collapsible-nav-content" id="block-collapsible-nav">
+                <ul class="nav items">
+                    <?php foreach ($block->getTopics() as $topic): ?>
+                        <?php /** @var SM\Help\Model\Topic $topic */?>
+                        <li class="item"><a href="<?= $block->escapeUrl($topic->getUrl()) ?>"><?= $block->escapeHtml(__($topic->getName())) ?></a></li>
+                    <?php endforeach; ?>
+                    <li class="nav item active"><a href="<?= $block->escapeUrl($block->getUrl('help/contactus')) ?>"><?= $block->escapeHtml(__('Contact Us'))?></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!------site bar left------>
+
+    <div class="message-notification">
+        <div class="message-content">
+            <div class="message-image">
+                <img src='<?= $block->escapeUrl($block->getViewFileUrl('images/email-confirm.png')); ?>' alt="success forgot password">
+            </div>
+            <p><?= $block->escapeHtml(__('Thank you for contacting us.'))?></p>
+            <p><?= $block->escapeHtml(__('We have received your message and we\'ll get back to you in 24 hours.'))?></p>
+        </div>
+        <div class="message-button">
+            <a class="back-to-help pagebuilder-banner-button pagebuilder-button-secondary" href="<?= $block->escapeUrl($block->getUrl('help')) ?>">
+                <?= $block->escapeHtml(__('Back to Help'))?>
+            </a>
+            <a class="back-continue pagebuilder-banner-button pagebuilder-button-primary" href="<?= $block->getBaseUrl() ?>">
+                <?= $block->escapeHtml(__('Go to Home'))?>
+            </a>
+        </div>
+    </div>
+</div>
+
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "SM_Help/js/return-refund": {},
+            "SM_Help/js/send-email": {}
+        },
+        ".upload-wrapper": {
+           "Magento_Ui/js/core/app": {
+               "components": {
+                   "uploader": {
+                       "component":"SM_Help/js/file-uploader",
+                       "template": "SM_Help/uploader",
+                       "previewTmpl":"SM_Review/image-preview",
+                       "isMultipleFiles":"true",
+                       "allowedExtensions":"jpg jpeg png",
+                       "dataScope" : "contactUsImage",
+                       "uploaderConfig": {
+                            "url": "<?= $block->getUrl('help/contactus/uploadimage'); ?>"
+                       }
+                   }
+               }
+           }
+        }
+    }
+</script>
+<script>
+    require(['jquery', 'jquery/jquery-storageapi', 'domReady!'], function ($) {
+        $(window).load(function () {
+            setTimeout(function () {
+                let triggerOrder = $.localStorage.get('order_help_form');
+                if (triggerOrder) {
+                    $('li[data-value="2"]').click().change();
+                    $.localStorage.remove('order_help_form');
+                }
+            }, 2000);
+        });
+    });
+</script>

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1"/>
+        <font src="fonts/sfuidisplay/light/sf-ui-display-light.woff2"/>
+        <font src="fonts/sfuidisplay/medium/sf-ui-display-medium.woff2"/>
+        <font src="fonts/sfuidisplay/semibold/sf-ui-display-semibold.woff2"/>
+        <font src="fonts/sfuidisplay/bold/sf-ui-display-bold.woff2"/>
+        <font src="fonts/apl-icons/fonts/apl.woff2"/>
+    </head>
+</page>

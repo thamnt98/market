@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_Notification
+ *
+ * Date: June, 17 2020
+ * Time: 11:31 AM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
+    <template id="sm_notification_email_payment_group_payment_expired"
+              label="SM Notification Payment Expired"
+              area="frontend" file="payment_expired.html" type="html" module="SM_Notification"/>
+    <template id="sm_notification_email_payment_group_payment_system_failed"
+              label="SM Notification Payment System Failed"
+              area="frontend" file="payment_system_failed.html" type="html" module="SM_Notification"/>
+    <template id="sm_notification_email_payment_group_payment_bank_reject"
+              label="SM Notification Payment Bank Reject"
+              area="frontend" file="payment_bank_reject.html" type="html" module="SM_Notification"/>
+    <template id="sm_notification_email_payment_group_payment_success_top_up"
+              label="SM Notification Payment Success - Digital Top Up"
+              area="frontend" file="empty.html" type="html" module="SM_Notification"/>
+    <template id="sm_notification_email_payment_group_payment_success_mobile_package"
+              label="SM Notification Payment Success - Digital Mobile Package"
+              area="frontend" file="empty.html" type="html" module="SM_Notification"/>
+    <template id="sm_notification_email_payment_group_payment_success_roaming"
+              label="SM Notification Payment Success - Digital Mobile Roaming Package"
+              area="frontend" file="empty.html" type="html" module="SM_Notification"/>
+    <template id="sm_notification_email_payment_group_payment_success_pln_token"
+              label="SM Notification Payment Success - Digital PLN Token"
+              area="frontend" file="empty.html" type="html" module="SM_Notification"/>
+    <template id="sm_notification_email_payment_group_payment_success_pln_bill"
+              label="SM Notification Payment Success - Digital PLN Bill"
+              area="frontend" file="empty.html" type="html" module="SM_Notification"/>
+    <template id="sm_notification_email_payment_group_payment_success_mobile_postpaid"
+              label="SM Notification Payment Success - Digital Mobile Postpaid"
+              area="frontend" file="empty.html" type="html" module="SM_Notification"/>
+    <template id="sm_notification_email_payment_group_payment_system_failed_digital"
+              label="SM Notification Payment System Failed - Digital"
+              area="frontend" file="empty.html" type="html" module="SM_Notification"/>
+    <template id="sm_notification_email_payment_group_payment_success_physical"
+              label="SM Notification Payment Success Physical"
+              area="frontend" file="payment_success.html" type="html" module="SM_Notification"/>
+</config>

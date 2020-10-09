@@ -1,0 +1,54 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// phpcs:disable Magento2.Templates.ThisInTemplate.FoundThis
+
+/**
+ * Product view template
+ *
+ * @var $block \Magento\Catalog\Block\Product\View\Description
+ */
+?>
+<?php
+$_helper = $this->helper(Magento\Catalog\Helper\Output::class);
+$_product = $block->getProduct();
+
+if (!$_product instanceof \Magento\Catalog\Model\Product) {
+    return;
+}
+
+$_call = $block->getAtCall();
+$_code = $block->getAtCode();
+$_attributeType = $block->getAtType();
+$_attributeAddAttribute = $block->getAddAttribute();
+
+if ($_attributeType && $_attributeType == 'text') {
+    $_attributeValue = ($_helper->productAttribute($_product, $_product->$_call(), $_code))
+        ? $_product->getAttributeText($_code)
+        : '';
+} else {
+    $_attributeValue = $_helper->productAttribute($_product, $_product->$_call(), $_code);
+}
+?>
+
+<?php if ($_attributeValue) : ?>
+    <div class="product-heightlight">
+        <div class="product attribute overview-active">
+            <h3><?= $block->escapeHtml(__('Product Highlight')) ?></h3>
+            <div class="value" <?= /* @noEscape */
+            $_attributeAddAttribute ?>><?= /* @noEscape */
+                $_attributeValue ?></div>
+        </div>
+        <div id="trigger-overview" class="see-more"><a href="#"><?= $block->escapeHtml(__('See more info')) ?></a></div>
+    </div>
+    <script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_Catalog/js/pdp/overview": {}
+        }
+    }
+    </script>
+<?php endif; ?>

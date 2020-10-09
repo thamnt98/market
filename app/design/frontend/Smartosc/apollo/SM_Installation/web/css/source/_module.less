@@ -1,0 +1,109 @@
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+    .installation-remove-modal {
+        &.modal-popup {
+            .modal-title {
+                .lib-font-size(21);
+                padding-bottom: @indent__base;
+            }
+            .modal-header {
+                padding-bottom:0;
+            }
+            .modal-content {
+                padding-top: 0;
+                padding-bottom: 0;
+            }
+            .modal-inner-wrap {
+                max-width: 496px;
+
+                .installation-modal-remove {
+                    text-align: center;
+                    color: #2e2a2a;
+                    .lib-font-size(16);
+                    .modal-content {
+                        padding-top: @indent__l;
+                        padding-bottom: @indent__l;
+                    }
+                }
+
+                .modal-footer {
+                    text-align: right;
+
+                    button {
+                        min-width: 134px;
+                        &.primary.action {
+                            margin-left:15px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .installation-block {
+        .label {
+            margin-bottom: 20px;
+
+            .title {
+                .lib-font-size(20);
+                color: @c-tsm-grey6;
+                font-family: @font-family-SF-UI-Display-Bold;
+            }
+        }
+
+        .installation-content {
+            margin-top: 10px;
+            width: 100%;
+            background-color: @c-tsm-grey1;
+            border-radius: @border-radius-3;
+            padding: 14px 30px 14px 20px;
+            box-sizing: border-box;
+
+            .checkbox-custom {
+                margin: 0;
+                label {
+                    cursor: pointer;
+                }
+            }
+
+            &.active {
+                background-color: @c-tsm-light-orange2;
+            }
+
+            .installation-note {
+                .installation-note-field {
+                    .lib-font-size(12);
+                    background-color: @color-white;
+                    margin-top: 15px;
+                    min-height: 123px;
+                    .lib-input-placeholder(@c-tsm-grey5, normal);
+                }
+
+                .note-validate-text {
+                    color: @c-tsm-grey35;
+                    font-size: 10px;
+                }
+            }
+        }
+    }
+
+    .installation-view {
+        .installation-service-container {
+            .label {
+                .title {
+                    color     : #494949;
+                    font-size : 14px;
+                }
+            }
+
+            .installation-note {
+                color: #2F2F2F;
+                background-color: @c-tsm-grey1;
+                border-radius: @border-radius-3;
+            }
+        }
+    }
+}

@@ -1,0 +1,26 @@
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="customer_account"/>
+    <body>
+        <referenceBlock name="breadcrumbs">
+            <action method="addCrumb">
+                <argument name="crumbName" xsi:type="string">Shopping List</argument>
+                <argument name="crumbInfo" xsi:type="array">
+                    <item name="title" xsi:type="string">Shopping List</item>
+                    <item name="label" xsi:type="string" translate="true">Shopping List</item>
+                    <item name="link" xsi:type="string">/shoppinglist</item>
+                </argument>
+            </action>
+        </referenceBlock>
+        <referenceContainer name="content">
+            <referenceBlock name="page.main.title" remove="true"/>
+            <block class="SM\ShoppingList\Block\MyList\Listing" name="shoppinglist.header" template="SM_ShoppingList::header.phtml"/>
+            <block class="SM\ShoppingList\Block\View" name="customer.wishlist.items" as="items" template="SM_ShoppingList::item/list.phtml" cacheable="false">
+                <block class="SM\ShoppingList\Block\Toolbar" name="customer.list.item.toolbar" template="SM_ShoppingList::toolbar.phtml"/>
+                <block class="SM\ShoppingList\Block\Item\Column\Info" name="customer.list.item.info" template="SM_ShoppingList::item/column/info.phtml" cacheable="false"/>
+                <block class="SM\ShoppingList\Block\Item\Column\Info" name="customer.list.item.cart" template="SM_ShoppingList::item/column/cart.phtml" cacheable="false"/>
+                <block class="SM\ShoppingList\Block\Item\Column\Actions" name="customer.list.item.actions" template="SM_ShoppingList::item/column/actions.phtml" cacheable="false"/>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

@@ -1,0 +1,23 @@
+<?php $lookBook = $this->getLookbook() ?>
+<?php if ($lookBook): ?>
+    <div class="lookbook-container">
+        <div class="mgs-lookbook-container">
+            <div class="pin__image">
+                <img src="<?php echo $this->getImageUrl($lookBook) ?>"
+                     alt="<?php $lookBook->getName() ?>"
+                     class="lookbook-image"/>
+            </div>
+            <?php echo $this->getPinHtml($lookBook) ?>
+        </div>
+    </div>
+    <script type="text/x-magento-init">
+        {
+            "[data-role=default-tocart-form]": {
+                "catalogAddToCart": {
+                    "product_sku": "sku"
+                }
+            }
+        }
+    </script>
+<?php endif ?>
+

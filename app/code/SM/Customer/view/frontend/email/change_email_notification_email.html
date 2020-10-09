@@ -1,0 +1,65 @@
+<!--@subject {{trans "You are about to change your email address"}} @-->
+<!--@vars {
+"var name":"Customer Name",
+"var email":"Customer Email",
+"var verify_email_url":"Verify email url",
+"var day":"Day",
+"var date":"Date",
+"var time":"Time"
+} @-->
+{{template config_path="design/email/header_template"}}
+<table class="greeting" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "Hello"}}
+                <b>{{var name}},</b>
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End greeting-->
+<table class="message-email" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "You just made a change on your email address on "}}{{var day}}, {{var date}} {{trans "at"}} {{var time}}.
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Message Email-->
+<table class="link-to-verify" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "To finish this setting, click the link below."}}
+            </p>
+            <a class="link" href="{{var verify_email_url}}">{{var verify_email_url}}</a>
+        </td>
+    </tr>
+</table>
+<!--End Link To Verify-->
+<table class="message-email" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "If you didn't do this, please change your password as soon as possible from your account page."}}
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Message Email-->
+<table class="sincerely" width="100%">
+    <tr>
+        <td>
+            <p>{{trans "Sincerely"}},</p>
+            <p class="signature">
+                <b>{{var store.frontend_name}}</b>
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Sincerely-->
+
+{{template config_path="design/email/footer_template"}}

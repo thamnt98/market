@@ -1,0 +1,28 @@
+<?php
+/**
+ * SMCommerce
+ *
+ * Date: August, 21 2020
+ * Time: 11:49 AM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ */ ?>
+<?php /** @var $block \SM\Promotion\Block\Cart\Summary\PromoSuggestion */ ?>
+<?php $rule = $block->getRule() ?>
+<div id="cart-promo-suggest" class="cart-promo-suggest">
+    <div class="content">
+        <span class="ic-info">
+            <img src="<?= $block->escapeHtmlAttr($block->getViewFileUrl('images/info.svg')) ?>" width="13" height="13"/>
+        </span>
+        <?= $block->escapeHtml($rule->getDescription()) ?>
+    </div>
+    <div class="actions">
+        <?php if ($rule->getData('front_redirect_url')) : ?>
+            <div class="frontend-redirect">
+                <a href="<?= $rule->getData('front_redirect_url') ?>"><?= __('Browse Products >') ?></a>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>

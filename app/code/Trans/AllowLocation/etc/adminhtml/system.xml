@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<!-- 
+/**
+ * @category Trans
+ * @package  Trans_AllowLocation
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Muhammad Randy <muhammad.randy@ctcorpdigital.com>
+ *
+ * Copyright © 2019 PT CTCORP Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="allowloc" translate="label" type="text" sortOrder="1000" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Allow Location</label>
+            <tab>trans</tab>
+            <resource>Trans_AllowLocation::config</resource>
+            <group id="generaltopsetting" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="1"
+                   translate="label">
+                <label>General Setup</label>
+                <field id="enabled" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="0" translate="label"
+                       type="select">
+                    <label>Enabled</label>
+                    <validate>required-entry</validate>
+                    <source_model>Magento\Config\Model\Config\Source\Enabledisable</source_model>
+                </field>
+                <field id="secretkey" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="2" translate="label"
+                       type="text">
+                    <label>Secret Key</label>
+                    <validate>required-entry</validate>
+                    <comment>Secret key from Google maps API</comment>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

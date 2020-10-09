@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+
+    <!-- shopping-list -->
+    <route url="/V1/shopping-lists" method="GET">
+        <service class="SM\ShoppingList\Api\ShoppingListRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/shopping-lists/:shoppingListId" method="GET">
+        <service class="SM\ShoppingList\Api\ShoppingListRepositoryInterface" method="getById"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/shopping-lists/:shoppingListId" method="DELETE">
+        <service class="SM\ShoppingList\Api\ShoppingListRepositoryInterface" method="delete"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/shopping-lists" method="POST">
+        <service class="SM\ShoppingList\Api\ShoppingListRepositoryInterface" method="create"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/shopping-lists/additems" method="POST">
+        <service class="SM\ShoppingList\Api\ShoppingListItemRepositoryInterface" method="add"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/shopping-lists/update" method="PUT">
+        <service class="SM\ShoppingList\Api\ShoppingListRepositoryInterface" method="update"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/shopping-lists/limit" method="GET">
+        <service class="SM\ShoppingList\Api\ShoppingListRepositoryInterface" method="getLimitShoppingListNumber"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/shopping-lists/default-name" method="GET">
+        <service class="SM\ShoppingList\Api\ShoppingListRepositoryInterface" method="getDefaultShoppingListName"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/shopping-list-items" method="GET">
+        <service class="SM\ShoppingList\Api\ShoppingListItemRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/shopping-list-items/:itemId" method="GET">
+        <service class="SM\ShoppingList\Api\ShoppingListItemRepositoryInterface" method="getById"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/shopping-list-items" method="POST">
+        <service class="SM\ShoppingList\Api\ShoppingListItemRepositoryInterface" method="create"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/shopping-list-items/:itemId" method="DELETE">
+        <service class="SM\ShoppingList\Api\ShoppingListItemRepositoryInterface" method="deleteById"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/shopping-list-items/move" method="POST">
+        <service class="SM\ShoppingList\Api\ShoppingListItemRepositoryInterface" method="move"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/shopping-lists/share/:shoppingListId" method="GET">
+        <service class="SM\ShoppingList\Api\ShoppingListRepositoryInterface" method="share"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+</routes>

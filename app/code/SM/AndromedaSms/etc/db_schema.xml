@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="sms_verification" resource="default" engine="innodb" comment="Sms Verification">
+        <column xsi:type="int" name="entity_id" padding="10" unsigned="true" nullable="false" identity="true"
+                comment="Entity ID"/>
+        <column xsi:type="varchar" name="phone_number" nullable="false" length="20" comment="Phone Number"/>
+        <column xsi:type="varchar" name="verification_id" nullable="false" length="255" comment="Verification ID"/>
+        <column xsi:type="tinyint" name="is_verified" nullable="false" default="0" comment="Is Verified"/>
+        <column xsi:type="tinyint" name="failed_attempt" nullable="false" default="0" comment="Failed Attempt"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Creation Time"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Update Time"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="entity_id"/>
+        </constraint>
+    </table>
+    <table name="testmode_andromeda_sms_verification" resource="default" engine="innodb" comment="Test Sms Verification">
+        <column xsi:type="int" name="verification_id" padding="10" unsigned="true" nullable="false" identity="true"
+                comment="Verification ID"/>
+        <column xsi:type="varchar" name="phone_number" nullable="false" length="20" comment="Phone Number"/>
+        <column xsi:type="varchar" name="verification_code" nullable="false" length="20" comment="Verification Code"/>
+        <column xsi:type="timestamp" name="created_at" on_update="false" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Creation Time"/>
+        <column xsi:type="timestamp" name="updated_at" on_update="true" nullable="false" default="CURRENT_TIMESTAMP"
+                comment="Update Time"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="verification_id"/>
+        </constraint>
+    </table>
+</schema>

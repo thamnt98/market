@@ -1,0 +1,26 @@
+<script>
+    require(['jquery', 'Magento_Ui/js/lib/view/utils/async', 'gtmCustomer', 'mage/translate'], function ($, async, gtmCustomer) {
+        async.async('[data-gtm-message="success"]', function () {
+            //Todo Remove Debug
+            console.log($('[data-gtm-message="success"]').text());
+            if ($('[data-gtm-message="success"]').text().includes($.mage.__('You saved the account information.'))) {
+                let data = [];
+                data['fullName'] = $('p[data-gtm="fullName"]').text();
+                data['DOB'] = $('p[data-gtm="DOB"]').text();
+                data['Gender'] = $('p[data-gtm="Gender"]').text();
+                data['marital_status'] = $('p[data-gtm="marital_status"]').text();
+                data['ktp_no'] = $('p[data-gtm="ktp_no"]').text();
+                gtmCustomer.push('personal_information_update', data);
+            }
+            if ($('[data-gtm-message="success"]').text().includes($.mage.__('Your email has saved successfully.'))) {
+                let data = [];
+                gtmCustomer.push('email_update', data);
+            }
+            if ($('[data-gtm-message="success"]').text().includes($.mage.__('Your telephone save successfully.'))) {
+                let data = [];
+                gtmCustomer.push('phoneNumber_update', data);
+            }
+        });
+    });
+</script>
+

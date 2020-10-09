@@ -1,0 +1,72 @@
+<!--@subject {{trans "Verify your email for Transmart account"}} @-->
+<!--@vars {
+"var name":"Customer Name",
+"var email":"Customer Email",
+"var verify_email_url":"Verify email url"
+} @-->
+{{template config_path="design/email/header_template"}}
+
+<table class="greeting" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "Hello"}}
+                <b>{{var name}},</b>
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End greeting-->
+<table class="message-email" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "Thank you for registering on Transmart. To complete your registration process and to get your order updates, please verify your email address."}}
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Message Email-->
+
+<table cellpadding="0" cellspacing="0" class="button-message-email" width="100%">
+    <tr>
+        <td align="center">
+            <table cellpadding="0" cellspacing="0" class="box-verify-email">
+                <tr>
+                    <td class="button">
+                        <a href="{{var verify_email_url}}" target="_blank">
+                            {{trans "Verify My Email"}}
+                        </a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+<!--End Button Message email-->
+<table class="link-to-verify" width="100%">
+    <tr>
+        <td>
+            <p>
+                Or click this link to verify
+            </p>
+            <a class="link" href="{{var verify_email_url}}">{{var
+                this.getUrl($store,'customer/account/confirm/',[_query:[id:$customer.id,key:$customer.confirmation,back_url:$back_url],_nosid:1])}}</a>
+        </td>
+    </tr>
+</table>
+<!--End Link To Verify-->
+<table class="sincerely" width="100%">
+    <tr>
+        <td>
+            <p>{{trans "Sincerely"}},</p>
+            <p class="signature">
+                <b>{{var
+                    store.frontend_name}}</b>
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Sincerely-->
+
+{{template config_path="design/email/footer_template"}}

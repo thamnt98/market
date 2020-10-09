@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <add id="SM::file_management" module="SM_FileManagement" resource="SM_FileManagement::File" sortOrder="999"
+             title="Files" parent="Magento_Backend::content"/>
+        <add action="sm_filemanagement/file/index" id="SM_FileManagement::file"
+             module="SM_FileManagement" parent="SM::file_management" resource="SM_FileManagement::File"
+             sortOrder="30"
+             title="Manage Files"/>
+    </menu>
+</config>

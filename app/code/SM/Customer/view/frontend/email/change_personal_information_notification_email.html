@@ -1,0 +1,41 @@
+<!--@subject {{trans "You just changed your profile details"}} @-->
+<!--@vars {
+"var name":"Customer Name",
+"var telephone":"Customer Telephone"
+} @-->
+{{template config_path="design/email/header_template"}}
+<table class="greeting" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "Hi"}}
+                <b>{{var name}},</b>
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End greeting-->
+<table class="message-email" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "You have successfully changed your profile details in your Transmart account. If you didn't do this, we encourage you to secure your account. Please change your password to do so." }}
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Message Email-->
+<table class="sincerely" width="100%">
+    <tr>
+        <td>
+            <p>{{trans "Sincerely"}},</p>
+            <p class="signature">
+                <b>{{var
+                    store.frontend_name}}</b>
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Sincerely-->
+
+{{template config_path="design/email/footer_template"}}

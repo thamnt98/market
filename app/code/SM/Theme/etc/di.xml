@@ -1,0 +1,42 @@
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="pagebuilder_transmart_file_grid_data_source" xsi:type="string">
+                    SM\FileManagement\Model\ResourceModel\File\Grid\Collection
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\PageBuilder\Model\WidgetInitializerConfig">
+        <plugin name="transmart-widget-config" type="SM\Theme\Plugin\WidgetInitializerConfig" sortOrder="10" />
+    </type>
+    <type name="Magento\PageBuilder\Model\WidgetInitializerConfig">
+        <arguments>
+            <argument name="config" xsi:type="array">
+                <item name="slider" xsi:type="array">
+                    <item name="default" xsi:type="array">
+                        <item name="component" xsi:type="string">SM_Theme/js/content-type/slider/appearance/carousel/widget</item>
+                    </item>
+                </item>
+                <item name="transmart_text" xsi:type="array">
+                    <item name="default" xsi:type="array">
+                        <item name="component" xsi:type="string">SM_Theme/js/content-type/transmart-text/appearance/default/widget</item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Amasty\Shopby\Block\Navigation\SwatchRenderer">
+        <plugin name="sm_amasty_swatch_renderer_plugin" type="SM\Theme\Plugin\Model\Amasty\Layer\SwatchRenderer" />
+    </type>
+
+    <type name="Magento\CatalogWidget\Block\Product\ProductsList">
+        <plugin name="product_list_widget" type="SM\Theme\Plugin\Block\ProductListWidget" />
+    </type>
+
+    <preference for="MGS\Lookbook\Model\Lookbook" type="SM\Theme\Model\MGS\Lookbook\Model\Lookbook"/>
+
+    <preference for="MGS\Lookbook\Block\Adminhtml\Edit\Tab\Image" type="SM\Theme\Block\Adminhtml\Edit\Tab\Image"/>
+</config>

@@ -1,0 +1,149 @@
+<?php
+/**
+ * Special picks product list template
+ *
+ * @var $block \SM\Theme\Block\Product\Widget\SpecialPicks
+ */
+?>
+<?php
+$_productCollection = $block->getGTMProductCollection();
+?>
+<?php if ($_productCollection && $_productCollection->getSize() > 0) : ?>
+    <?php
+    $image = 'customer_shared_wishlist';
+    ?>
+    <div class="smart-products product-special-picks">
+
+            <div class="block-title">
+                <?php if ($title = $block->getData('title')) : ?>
+                    <strong><?= $block->escapeHtml(__($title)) ?></strong>
+                <?php endif ?>
+            </div>
+            <div class="products-grid grid">
+                <ol class="product-cards product-items row">
+                    <?php $count = 1; ?>
+                    <?php /** @var $_product \Magento\Catalog\Model\product */ ?>
+                    <?php foreach ($_productCollection as $key => $_product) : ?>
+                        <?php
+                        $dataGTM = $block->escapeHtml($block->getGtm($_product));
+                        ?>
+                        <li class="product-card col-xs-4 col-sm-4">
+                            <div class="product-item product-item--hideCart">
+                            <div class="product-item-info " data-container="product-list">
+                                <div class="product-item-photo-wrapper">
+                                    <a href="<?= $block->escapeUrl($_product->getProductUrl()); ?>"
+                                       class="product-item-photo"
+                                       <?php if ($dataGTM) : ?>
+                                       data-gtm-product='<?= $dataGTM ?>'
+                                       data-position="<?= $count ?>"
+                                       <?php endif; ?>
+                                       tabindex="-1">
+                                        <?= $block->getImage($_product, $image)->toHtml() ?>
+                                    </a>
+                                </div>
+                                <div class="product details product-item-details">
+                                    <strong class="product-item-name">
+                                        <a href="<?= $block->escapeUrl($_product->getProductUrl()); ?>"
+                                           class="product-item-link <?= $_product->getId(); ?>sp"
+                                           <?php if ($dataGTM) : ?>
+                                           data-gtm-product='<?= $dataGTM ?>'
+                                           data-position="<?= $count ?>"
+                                           <?php endif; ?>
+                                           tabindex="-1">
+                                            <?= $block->escapeHtml($_product->getName()) ?>
+                                        </a>
+                                    </strong>
+                                    <?= $block->getProductPriceHtml($_product); ?>
+                                </div>
+                            </div>
+                            </div>
+                        </li>
+                        <script>
+                            require(['jquery', "gtmProduct", 'domReady!'], function ($, gtm) {
+                                if(typeof dataLayerSourceObjects != 'undefined') {
+                                    $(window).load(function () {
+                                        let data = $('.product-item-link.<?= $_product->getId() ?>sp').attr("data-gtm-product");
+
+                                        if (data) {
+                                            try {
+                                                data = JSON.parse(data);
+                                                data['position'] = $('.product-item-link.<?= $_product->getId() ?>sp').attr("data-position");
+                                                gtm.push("product_view", data);
+                                            } catch (e) {
+
+                                            }
+                                        }
+                                    });
+                                }
+                            });
+                        </script>
+                        <?php $count++; ?>
+                    <?php endforeach; ?>
+                </ol>
+            </div>
+    </div>
+    <script>
+        require(['jquery', "gtmProduct", 'Magento_Ui/js/lib/view/utils/async', 'domReady!'], function ($, gtm, async) {
+            if(typeof dataLayerSourceObjects != 'undefined') {
+                window.eventCreate = window.eventCreate || {};
+                async.async('.product-item-link',function () {
+                    if (!eventCreate['.product-item-link']) {
+                        eventCreate['.product-item-link'] = 0;
+                    }
+
+                    let current = $($('.product-item-link')[eventCreate['.product-item-link']]);
+                    $(current).click(function (e) {
+                        e.preventDefault();
+                        let data = $(this).attr("data-gtm-product");
+                        let url = $(this).attr('href');
+
+                        if (data) {
+                            try {
+                                data = JSON.parse(data);
+                                data['eventCallback'] = function () {
+                                    document.location = url;
+                                };
+                                data['position'] = $(this).attr("data-position");
+                                gtm.push("productClick", data);
+                            } catch (e) {
+                                window.location = url;
+                            }
+
+                        } else {
+                            window.location = url;
+                        }
+                    });
+                    eventCreate['.product-item-link']++;
+                });
+                async.async('.product-item-photo',function () {
+                    if (!eventCreate['.product-item-photo']) {
+                        eventCreate['.product-item-photo'] = 0;
+                    }
+
+                    let current = $($('.product-item-photo')[eventCreate['.product-item-photo']]);
+                    $(current).click(function (e) {
+                        e.preventDefault();
+                        let data = $(this).attr("data-gtm-product");
+                        let url = $(this).attr('href');
+
+                        if (data) {
+                            try {
+                                data = JSON.parse(data);
+                                data['eventCallback'] = function () {
+                                    document.location = url;
+                                };
+                                data['position'] = $(this).attr("data-position");
+                                gtm.push("productClick", data);
+                            } catch (e) {
+                                window.location = url;
+                            }
+                        } else {
+                            window.location = url;
+                        }
+                    });
+                    eventCreate['.product-item-photo']++;
+                });
+            }
+        });
+    </script>
+<?php endif; ?>

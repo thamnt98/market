@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+  ~ @project    ct-corp-transmart
+  ~ @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+  ~ @author     Duc Nguyen Hoang <ducnh2@smartosc.com>
+  ~ @copyright  Copyright © 2020 SmartOSC. All rights reserved.
+  ~ @url        http://www.smartosc.com
+  -->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <blog>
+            <paging>
+                <paging_value>21</paging_value>
+            </paging>
+            <most_popular>
+                <preset_most_popular>
+                    {
+                        "_1586253348168_168":{"mp_position":"Position 1","based_on":"0","select_article":"","select_article_id":""},
+                        "_1586253349226_226":{"mp_position":"Position 2","based_on":"0","select_article":"","select_article_id":""},
+                        "_1586253350394_394":{"mp_position":"Position 3","based_on":"0","select_article":"","select_article_id":""}
+                    }
+                </preset_most_popular>
+                <most_popular_cron>0 16 * * *</most_popular_cron>
+            </most_popular>
+            <post_homepage_block>
+                <position_type>selected</position_type>
+            </post_homepage_block>
+            <related_product_block>
+                <shop_ingredient>0</shop_ingredient>
+            </related_product_block>
+        </blog>
+    </default>
+</config>

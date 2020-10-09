@@ -1,0 +1,138 @@
+<?php
+/** @var \SM\TodayDeal\Block\Widget\LatestPromo $block */
+?>
+<div class="section-latest-promo">
+    <div class="block-title">
+        <strong><?= $block->escapeHtml(__($block->getData('title'))) ?></strong>
+        <a class="section-link "
+           href="<?= $block->escapeUrl($block->getSeeAllUrl()) ?>"
+           data-gtm-event="<?= \SM\GTM\Helper\Data::PROMO_VIEW_ALL_EVENT_NAME ?>"
+        >
+            <?= $block->escapeHtml(__('See All')) ?>
+        </a>
+    </div>
+    <div class="block-content">
+        <?php $postCollection = $block->getPost(); ?>
+        <?php if (count($postCollection)): ?>
+            <div class="block-latest-promo" id="latest-promo">
+                <div class="row">
+                    <?php /** @var \SM\TodayDeal\Model\Post $post */ ?>
+                    <?php foreach ($postCollection as $post): ?>
+                        <div class="col-xs-12 col-md-4"
+                             data-gtm='<?= $block->escapeHtml($block->getGtm($post)) ?>'
+                             data-gtm-name="<?= \SM\GTM\Helper\Data::PROMO_KEY_NAME ?>"
+                             data-gtm-event="<?= \SM\GTM\Helper\Data::PROMO_ON_LOAD_EVENT_NAME ?>"
+                        >
+                            <a class="latest-promo-card fade-img"
+                               href="<?= $block->escapeUrl($post->getPostUrl()) ?>"
+                               title="<?= $block->escapeHtml($post->getTitle()) ?>"
+                               data-gtm-event="<?= \SM\GTM\Helper\Data::PROMO_ON_CLICK_EVENT_NAME ?>"
+                               data-gtm='<?= $block->escapeHtml($block->getGtm($post)) ?>'
+                               data-gtm-name="<?= \SM\GTM\Helper\Data::PROMO_KEY_NAME ?>"
+                            >
+                                <?php if ($post->getThumbnailName()): ?>
+                                    <div class="card-img-container">
+                                        <img class="lazy-loaded" loading="lazy" width="452" height="281"
+                                             src="<?= $block->escapeUrl($block->getImageResize($post->getThumbnailName(), $post->getThumbnailPath(), 452, 281)) ?>"
+                                             alt="<?= $block->escapeHtml($post->getTitle()) ?>">
+                                    </div>
+                                <?php endif; ?>
+                                <div class="latest-promo-info">
+                                    <div class="inspire-title"><?= $block->escapeHtml($post->getTitle()) ?></div>
+                                </div>
+                            </a>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
+<?php if ($block->getGtmHelper()->isEnabled()) : ?>
+    <script>
+        require(['jquery', 'SM_GTM/js/gtm/action/refresh-data'], function ($, gtmRefresh) {
+            window.dataLayer = window.dataLayer || [];
+            $(document).ready(function () {
+                gtmRefresh.refresh().success(function () {
+                    $.each(
+                        $('[data-gtm-event="<?= \SM\GTM\Helper\Data::PROMO_ON_LOAD_EVENT_NAME ?>"]'),
+                        function (key, value) {
+                            let data = $(value).data('gtm'),
+                                eventKey = $(value).data('gtm-name'),
+                                eventName = $(value).data('gtm-event');
+
+                            if (data && eventName && eventName) {
+                                pushGTM(data, eventName, eventKey, false);
+                            }
+                        }
+                    );
+                });
+
+                $('[data-gtm-event="<?= \SM\GTM\Helper\Data::PROMO_ON_CLICK_EVENT_NAME ?>"]').click(function (e) {
+                    e.preventDefault();
+                    let data = $(this).data('gtm'),
+                        eventKey = $(this).data('gtm-name'),
+                        eventName = $(this).data('gtm-event');
+
+                    if (data && eventName && eventName) {
+                        gtmRefresh.refresh().success(function () {
+                            pushGTM(data, eventName, eventKey, true);
+                        });
+                    }
+
+                    window.location.href = $(this).attr('href');
+                });
+            });
+
+            function pushGTM(eventData, eventName, keyName, isCallback) {
+                let gtmObjData, actionType, data = Object.assign({}, dataLayerSourceObjects);
+
+                if (typeof eventData === 'string') {
+                    eventData = JSON.parse(eventData);
+                }
+
+                switch (eventName) {
+                    case "<?= \SM\GTM\Helper\Data::PROMO_ON_CLICK_EVENT_NAME ?>":
+                        actionType = 'promoClick';
+                        break;
+                    default:
+                        actionType = 'promoView';
+                }
+
+                data[keyName] = eventData;
+                gtmObjData = {
+                    'event'         : eventName,
+                    'uniqueUserID'  : data.customer.uniqueUserID,
+                    'userID'        : data.customer.userID,
+                    'customerID'    : data.customer.customerID,
+                    'customerType'  : data.customer.customerType,
+                    'loyalty'       : data.customer.loyalty,
+                    'customerStatus': data.customer.customerStatus,
+                    'loginType'     : data.customer.loginType,
+                    'ecommerce'     : {}
+                };
+
+                gtmObjData.ecommerce[actionType] = {
+                    'promotions': [{
+                        'id'      : data[keyName]['id'],
+                        'name'    : data[keyName]['name'],
+                        'creative': data[keyName]['creative'],
+                        'position': data[keyName]['position']
+                    }]
+                };
+
+                if (isCallback) {
+                    gtmObjData.eventCallback = function () {
+                        document.location = data[keyName]['url'];
+                    };
+                }
+
+                dataLayer.push(gtmObjData);
+                // TODO: Remove debug
+                console.log('Data push to DataLayer');
+                console.log(gtmObjData);
+                console.log(data);
+            }
+        });
+    </script>
+<?php endif; ?>

@@ -1,0 +1,73 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+?>
+<div class="help-pages">
+    <!------site content------>
+    <div class="help-content">
+        <div class="help-search">
+            <div class="control">
+                <a href="#"><span class="apl-ic_search"></span></a>
+                <input id="search" type="text" name="q" value=""
+                       placeholder="<?= $block->escapeHtml(__('Type your topic here (example: refund)'))?>"
+                       class="input-text" maxlength="128" role="combobox" aria-haspopup="false"
+                       aria-autocomplete="both" autocomplete="off" aria-expanded="true"/>
+            </div>
+        </div>
+
+        <div class="breadcrumbs">
+            <ul class="items">
+                <li class="item home">
+                    <a href="#" title="Go to Home Page"><?= $block->escapeHtml(__('Home'))?></a>
+                </li>
+                <li class="item home">
+                    <a href="#" title="help"><?= $block->escapeHtml(__('Help'))?></a>
+                </li>
+                <li class="item">
+                    <strong><?= $block->escapeHtml(__('My Orders'))?></strong>
+                </li>
+            </ul>
+        </div>
+        <div class="help-content-list">
+            <div class="help-content-list-top">
+                <h2>My Orders</h2>
+            </div>
+            <ol class="help-list-question help-myorder">
+                <li><a href="#"><?= $block->escapeHtml(__('Check Order Status'))?></a></li>
+                <li><a href="#"><?= $block->escapeHtml(__('Delivery Fee'))?></a></li>
+                <li><a href="#"><?= $block->escapeHtml(__('Free Installation Service'))?></a></li>
+                <li><a href="#"><?= $block->escapeHtml(__('Cancelling My Order'))?></a></li>
+                <li><a href="#"><?= $block->escapeHtml(__('Status & Notifications'))?></a></li>
+            </ol>
+        </div>
+    </div>
+    <!------site content------>
+
+    <!------site bar left------>
+    <div class="sidebar sidebar-main">
+        <div class="block block-collapsible-nav">
+            <div class="title block-collapsible-nav-title">
+                <strong>Help</strong>
+            </div>
+            <div class="content block-collapsible-nav-content" id="block-collapsible-nav">
+                <ul class="nav items">
+                    <li class="nav item">
+                        <a href="http://transmart.local/customer/account/"><?= $block->escapeHtml(__('My Orders'))?></a></li>
+                    <li class="nav item"><a href="#"><?= $block->escapeHtml(__('Return & Refund'))?></a></li>
+                    <li class="nav item"><a href="#"><?= $block->escapeHtml(__('My Account'))?></a></li>
+                    <li class="nav item"><a href="#"><?= $block->escapeHtml(__('Payment'))?></a></li>
+                    <li class="nav item"><a href="#"><?= $block->escapeHtml(__('Promos & Vouchers'))?></a></li>
+                    <li class="nav item"><a href="#"><?= $block->escapeHtml(__('Buying Guide'))?></a></li>
+                    <li class="nav item"><a href="#"><?= $block->escapeHtml(__('About Us'))?></a></li>
+                    <li class="nav item"><a href="#"><?= $block->escapeHtml(__('Delivery & Pick Up in Sto..'))?></a></li>
+                    <li class="nav item"><a href="#"><?= $block->escapeHtml(__('Contact Us'))?></a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!------site bar left------>
+
+</div>

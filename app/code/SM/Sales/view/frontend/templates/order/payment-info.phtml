@@ -1,0 +1,36 @@
+<?php
+/** @var \SM\Sales\Block\Order\Digital\Part\Content $block */
+
+/** @var \SM\Sales\Api\Data\DigitalOrderDataInterface $parentOrder */
+$parentOrder = $block->getParentOrder();
+?>
+
+<?php if ($parentOrder->getStatus() == \SM\Sales\Api\ParentOrderRepositoryInterface::STATUS_PENDING_PAYMENT): ?>
+    <?php
+    $paymentInfo = $parentOrder->getPaymentInfo();
+    $paymentMethod = $paymentInfo->getMethod();
+    $paymentMethodSplit = explode("_", $paymentMethod);
+    $isVA = false;
+    if (is_array($paymentMethodSplit)) {
+        $methodShort = $paymentMethodSplit[count($paymentMethodSplit) - 1];
+        if ($methodShort == "va") {
+            $isVA = true;
+        }
+    }
+    ?>
+    <?php if ($isVA): ?>
+        <div class="payment-info info-pln">
+        <span class="info-item">
+            <span class="label"><?= $block->escapeHtml(__("Pay Before")) ?></span>
+            <span class="content">
+                <?= is_null($paymentInfo->getExpireDate()) ? "" : $block->formatExpireDate($paymentInfo->getExpireDate()) ?>.
+            </span>
+        </span>
+            <span class="info-item"><?= $parentOrder->getPaymentMethod() ?></span>
+            <span class="info-item">
+            <span class="label"><?= $block->escapeHtml(__("Virtual Account Number")) ?></span>
+            <span class="content"><?= $paymentInfo->getVirtualAccount() ?></span>
+        </span>
+        </div>
+    <?php endif; ?>
+<?php endif; ?>

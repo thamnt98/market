@@ -1,0 +1,377 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_Sprint
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Imam Kusuma <imam.kusuma@transdigital.co.id>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../Config/etc/system_file.xsd">
+    <system>
+        <section id="payment">
+            <group id="sprint" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Sprint Payment</label>
+                <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <model>Trans\Sprint\Model\Config\Source\NotifyUrlInfo</model>
+                    </comment>
+                </field>
+                <field id="is_production" translate="label" type="select" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Is Production</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <!-- <field id="expiry" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Expired Time (D/H/M)</label>
+                    <frontend_model>Trans\Sprint\Block\Adminhtml\Config\Form\Field\YtdStart</frontend_model>
+                </field> -->
+                <field id="expiry" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Expiry in minute</label>
+                    <comment>**Required**</comment>
+                </field>
+                <field id="order_status" translate="label" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>New Order Status</label>
+                    <source_model>Magento\Sales\Model\Config\Source\Order\Status\NewStatus</source_model>
+                </field>
+                  <field id="paidorder" translate="label" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="0" >
+                    <label>Paid Order Status</label>
+                    <source_model>Trans\Sprint\Model\Config\Source\OrderStatus</source_model>
+                </field> 
+                <!-- Credit Card Section Start -->
+                <group id="sprint_channel" translate="label" type="text" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Internet Banking &amp; Virtual Account</label>
+                    <field id="secret_key_staging" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Staging Secret Key</label>
+                        <comment>**Required**</comment>
+                        <config_path>payment/sprint/secret_key_staging</config_path>
+                    </field>
+                    <field id="secret_key_prod" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Production Secret Key</label>
+                        <comment>**Required**</comment>
+                        <config_path>payment/sprint/secret_key_prod</config_path>
+                    </field>
+                    <field id="base_url_api_prod_default" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>URL API Production</label>
+                        <comment>Contoh : https://securetest.bayarind.id</comment>
+                        <validate>required-entry</validate>
+                        <config_path>payment/sprint/base_url_api_prod_default</config_path>
+                    </field>
+                    <field id="base_url_api_dev_default" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>URL API Development</label>
+                        <comment>Contoh : https://securetest.bayarind.id</comment>
+                        <validate>required-entry</validate>
+                        <config_path>payment/sprint/base_url_api_dev_default</config_path>
+                    </field>
+                    <group id="sprint_bca_va" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>BCA Virtual Acccount</label>
+                        <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Enabled</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            <config_path>payment/sprint_bca_va/active</config_path>
+                        </field>
+                        <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Title</label>
+                            <config_path>payment/sprint_bca_va/title</config_path>
+                        </field>
+                         <field id="channel_id" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Channel ID</label>
+                            <config_path>payment/sprint_bca_va/channel_id</config_path>
+                        </field>
+                        <!-- <field id="secret_key" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Secret Key</label>
+                            <config_path>payment/sprint_bca_va/secret_key</config_path>
+                        </field> -->
+                        <field id="company_code" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Company Code</label>
+                            <config_path>payment/sprint_bca_va/company_code</config_path>
+                        </field>
+                        <field id="howtopay" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>How to pay (Static Block Identifier)</label>
+                            <config_path>payment/sprint_bca_va/howtopay</config_path>
+                        </field>
+                        <field id="sort_order" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Sort Order</label>
+                            <frontend_class>validate-number</frontend_class>
+                        </field>
+                        <field id="logo" type="image" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Logo</label>
+                            <backend_model>Magento\Config\Model\Config\Backend\Image</backend_model>
+                            <upload_dir config="system/filesystem/media" scope_info="1">logo/paymentmethod</upload_dir>
+                            <base_url type="media" scope_info="1">logo/paymentmethod</base_url>
+                            <config_path>payment/sprint_bca_va/logo</config_path>
+                        </field>
+                    </group>
+                    <group id="sprint_permata_va" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Permata Virtual Acccount</label>
+                        <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Enabled</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            <config_path>payment/sprint_permata_va/active</config_path>
+                        </field>
+                        <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Title</label>
+                            <config_path>payment/sprint_permata_va/logo</config_path>
+                        </field>
+                         <field id="channel_id" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Channel ID</label>
+                            <config_path>payment/sprint_permata_va/channel_id</config_path>
+                        </field>
+                        <!-- <field id="secret_key" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Secret Key</label>
+                            <config_path>payment/sprint_permata_va/secret_key</config_path>
+                        </field> -->
+                        <field id="company_code" translate="label" type="text" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Company Code</label>
+                            <config_path>payment/sprint_permata_va/company_code</config_path>
+                        </field>
+                        <field id="howtopay" translate="label" type="text" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>How to pay (Static Block Identifier)</label>
+                            <config_path>payment/sprint_permata_va/howtopay</config_path>
+                        </field>
+                        <field id="sort_order" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Sort Order</label>
+                            <frontend_class>validate-number</frontend_class>
+                            <config_path>payment/sprint_permata_va/sort_order</config_path>
+                        </field>
+                        <field id="logo" type="image" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Logo</label>
+                            <backend_model>Magento\Config\Model\Config\Backend\Image</backend_model>
+                            <upload_dir config="system/filesystem/media" scope_info="1">logo/paymentmethod</upload_dir>
+                            <base_url type="media" scope_info="1">logo/paymentmethod</base_url>
+                            <config_path>payment/sprint_permata_va/logo</config_path>
+                        </field>
+                    </group>
+                </group>
+                <group id="sprint_cc_payment" translate="label" type="text" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="1">   
+                    <label>Credit Card / Debit Card</label>         
+                    <field id="cc_secret_key_staging" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Staging Secret Key</label>
+                        <comment>**Required**</comment>
+                        <config_path>payment/sprint/cc_secret_key_staging</config_path>
+                    </field>
+                    <field id="cc_secret_key_prod" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="0">
+                        <label>Production Secret Key</label>
+                        <comment>**Required**</comment>
+                        <config_path>payment/sprint/cc_secret_key_prod</config_path>
+                    </field>  
+                    <field id="base_url_api_prod_cc" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>URL API Production</label>
+                        <comment>Contoh : https://securetest.bayarind.id</comment>
+                        <validate>required-entry</validate>
+                        <config_path>payment/sprint/base_url_api_prod_cc</config_path>
+                    </field>
+                    <field id="base_url_api_dev_cc" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>URL API Development</label>
+                        <comment>Contoh : https://securetest.bayarind.id</comment>
+                        <validate>required-entry</validate>
+                        <config_path>payment/sprint/base_url_api_dev_cc</config_path>
+                    </field>
+                    <group id="sprint_allbankfull_cc" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Credit Card Full Payment ( All Bank )</label>
+                        <field id="active" translate="label" type="select" sortOrder="101" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Enabled</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            <config_path>payment/sprint_allbankfull_cc/active</config_path>
+                        </field>
+                        <field id="title" translate="label" type="text" sortOrder="102" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Title</label>
+                            <config_path>payment/sprint_allbankfull_cc/title</config_path>
+                        </field>
+                        <field id="channel_id" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Channel ID</label>
+                            <comment>**Required**</comment>
+                            <config_path>payment/sprint_allbankfull_cc/channel_id</config_path>
+                        </field>
+                        <field id="service_code" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Service Code</label>
+                            <validate>required-entry</validate>
+                            <comment>**Required**</comment>
+                            <config_path>payment/sprint_allbankfull_cc/service_code</config_path>
+                        </field>
+                        <field id="refund_service_code" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Service Code for Refund</label>
+                            <validate>required-entry</validate>
+                            <comment>**Required**</comment>
+                            <config_path>payment/sprint_allbankfull_cc/refund_service_code</config_path>
+                        </field>
+                        <field id="sort_order" translate="label" type="text" sortOrder="104" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Sort Order</label>
+                            <frontend_class>validate-number</frontend_class>
+                        </field>
+                        <field id="logo" type="image" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Logo</label>
+                            <backend_model>Magento\Config\Model\Config\Backend\Image</backend_model>
+                            <upload_dir config="system/filesystem/media" scope_info="1">logo/paymentmethod</upload_dir>
+                            <base_url type="media" scope_info="1">logo/paymentmethod</base_url>
+                            <config_path>payment/sprint_allbankfull_cc/logo</config_path>
+                        </field>
+                    </group>
+
+                    <group id="sprint_allbank_debit" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Debit Card ( All Bank )</label>
+                        <field id="active" translate="label" type="select" sortOrder="101" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Enabled</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            <config_path>payment/sprint_allbank_debit/active</config_path>
+                        </field>
+                        <field id="title" translate="label" type="text" sortOrder="102" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Title</label>
+                            <config_path>payment/sprint_allbank_debit/title</config_path>
+                        </field>
+                        <field id="channel_id" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Channel ID</label>
+                            <comment>**Required**</comment>
+                            <config_path>payment/sprint_allbank_debit/channel_id</config_path>
+                        </field>
+                        <field id="service_code" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Service Code</label>
+                            <validate>required-entry</validate>
+                            <comment>**Required**</comment>
+                            <config_path>payment/sprint_allbank_debit/service_code</config_path>
+                        </field>
+                        <field id="refund_service_code" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Service Code for Refund</label>
+                            <validate>required-entry</validate>
+                            <comment>**Required**</comment>
+                            <config_path>payment/sprint_allbank_debit/refund_service_code</config_path>
+                        </field>
+                        <field id="sort_order" translate="label" type="text" sortOrder="104" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Sort Order</label>
+                            <frontend_class>validate-number</frontend_class>
+                        </field>
+                        <field id="logo" type="image" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Logo</label>
+                            <backend_model>Magento\Config\Model\Config\Backend\Image</backend_model>
+                            <upload_dir config="system/filesystem/media" scope_info="1">logo/paymentmethod</upload_dir>
+                            <base_url type="media" scope_info="1">logo/paymentmethod</base_url>
+                            <config_path>payment/sprint_allbank_debit/logo</config_path>
+                        </field>
+                    </group>
+
+                    <group id="sprint_bca_cc" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>BCA Installment</label>
+                        <field id="active" translate="label" type="select" sortOrder="101" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Enabled</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            <config_path>payment/sprint_bca_cc/active</config_path>
+                        </field>
+                        <field id="title" translate="label" type="text" sortOrder="102" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Title</label>
+                            <config_path>payment/sprint_bca_cc/title</config_path>
+                        </field>
+                        <field id="term_channel_id" translate="label" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Installment Term</label>
+                            <validate>required-entry</validate>
+                            <frontend_model>Trans\Sprint\Block\Adminhtml\Form\Field\TermSet</frontend_model>
+                            <backend_model>Trans\Sprint\Model\Config\Backend\TermSet</backend_model>
+                            <upload_dir config="system/filesystem/media" scope_info="1">logo/paymentmethod</upload_dir>
+                            <base_url type="media" scope_info="1">logo/paymentmethod</base_url>
+                            <config_path>payment/sprint_bca_cc/term_channel_id</config_path>
+                            <comment>Service Fee 0 - 100 (%)</comment>
+                        </field>
+                        <field id="service_code" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Service Code</label>
+                            <validate>required-entry</validate>
+                            <comment>**Required**</comment>
+                            <config_path>payment/sprint_bca_cc/service_code</config_path>
+                        </field>
+                        <field id="refund_service_code" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Service Code for Refund</label>
+                            <validate>required-entry</validate>
+                            <comment>**Required**</comment>
+                            <config_path>payment/sprint_bca_cc/refund_service_code</config_path>
+                        </field>
+                        <field id="sort_order" translate="label" type="text" sortOrder="104" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Sort Order</label>
+                            <frontend_class>validate-number</frontend_class>
+                        </field>
+                        <field id="logo" type="image" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Logo</label>
+                            <backend_model>Magento\Config\Model\Config\Backend\Image</backend_model>
+                            <upload_dir config="system/filesystem/media" scope_info="1">logo/paymentmethod</upload_dir>
+                            <base_url type="media" scope_info="1">logo/paymentmethod</base_url>
+                            <config_path>payment/sprint_bca_cc/logo</config_path>
+                        </field>
+                    </group>
+
+                   <group id="sprint_mega_cc" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Bank Mega Credit Card Full Payment</label>
+                        <field id="active" translate="label" type="select" sortOrder="101" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Enabled</label>
+                            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                            <config_path>payment/sprint_mega_cc/active</config_path>
+                        </field>
+                        <field id="title" translate="label" type="text" sortOrder="102" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Title</label>
+                            <config_path>payment/sprint_mega_cc/title</config_path>
+                        </field>
+                        <field id="channel_id" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Channel ID</label>
+                            <comment>**Required**</comment>
+                            <config_path>payment/sprint_mega_cc/channel_id</config_path>
+                        </field>
+                        <field id="service_code" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Service Code</label>
+                            <validate>required-entry</validate>
+                            <comment>**Required**</comment>
+                            <config_path>payment/sprint_mega_cc/service_code</config_path>
+                        </field>
+                        <field id="refund_service_code" translate="label" type="text" sortOrder="103" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Service Code for Refund</label>
+                            <validate>required-entry</validate>
+                            <comment>**Required**</comment>
+                            <config_path>payment/sprint_mega_cc/refund_service_code</config_path>
+                        </field>
+                        <field id="sort_order" translate="label" type="text" sortOrder="104" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Sort Order</label>
+                            <frontend_class>validate-number</frontend_class>
+                        </field>
+                        <field id="promo_code" translate="label" type="text" sortOrder="104" showInDefault="1" showInWebsite="1" showInStore="0">
+                            <label>Promo Code</label>
+                            <config_path>payment/sprint_mega_cc/promo_code</config_path>
+                        </field>
+                        <field id="logo" type="image" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
+                            <label>Logo</label>
+                            <backend_model>Magento\Config\Model\Config\Backend\Image</backend_model>
+                            <upload_dir config="system/filesystem/media" scope_info="1">logo/paymentmethod</upload_dir>
+                            <base_url type="media" scope_info="1">logo/paymentmethod</base_url>
+                            <config_path>payment/sprint_mega_cc/logo</config_path>
+                        </field>
+                    </group>
+                </group>
+                <!-- Credit Card Section End -->
+            </group>
+            <!-- payment-group -->
+        </section>
+        <section id="installment_set" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Sprint Setting</label>
+            <tab>trans</tab>
+            <resource>Trans_Sprint::payment_installment</resource>
+            <group id="installment_term_set" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Installment Term Set</label>
+                <field id="term_set" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Installment Term</label>
+                    <frontend_model>Trans\Sprint\Block\Adminhtml\Form\Field\TermSetInstallment</frontend_model>
+                    <backend_model>Trans\Sprint\Model\Config\Backend\TermSet</backend_model>
+                </field>
+            </group>
+            <group id="payment_group_label" translate="label" type="text" sortOrder="999" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Custom Payment Group Label</label>
+                <field id="group_label" translate="label" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Label</label>
+                    <validate>required-entry</validate>
+                    <frontend_model>Trans\Sprint\Block\Adminhtml\Form\Field\PaymentGroup</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                    <config_path>payment/group/label</config_path>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

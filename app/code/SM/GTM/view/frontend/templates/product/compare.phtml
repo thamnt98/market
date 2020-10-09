@@ -1,0 +1,87 @@
+<script type="text/javascript">
+    require(['jquery', 'gtmProduct', 'mage/url', 'domReady!'], function ($, gtmProduct, urlBuilder) {
+        $(window).load(function () {
+            if (typeof dataLayerSourceObjects !== 'undefined') {
+                let productIds = [];
+                $('[data-gtm-event="compare-product"]').each(function () {
+                    //Todo Remove Debug
+                    console.log($(this).attr('data-gtm-product-id'));
+                    let data = {
+                        'productId': $(this).attr('data-gtm-product-id'),
+                    };
+                    productIds.push(data);
+                });
+                let data = {
+                    'productsInfo': productIds
+                };
+                //Todo Remove Debug
+                console.log(data);
+                $.ajax({
+                    type: 'POST',
+                    url: urlBuilder.build('sm_gtm/gtm/product'),
+                    data: data,
+                    dataType: "json",
+                    async: true,
+                    success: function (result) {
+                        //Todo Remove Debug
+                        console.log(typeof result);
+                        console.log(result);
+                        if (result) {
+                            var dataProducts = [];
+                            $.each(result, function (key, value) {
+                                try {
+                                    let product = JSON.parse(value);
+                                    dataProducts['name'] = dataProducts['name'] ? (dataProducts['name'] + product['name'] + ", ") : (product['name'] + ", ");
+                                    dataProducts['id'] = dataProducts['id'] ? (dataProducts['id'] + product['id'] + ", ") : (product['id'] + ", ");
+                                    dataProducts['price'] = dataProducts['price'] ? (dataProducts['price'] + product['price'] + ", ") : (product['price'] + ", ");
+                                    dataProducts['brand'] = dataProducts['brand'] ? (dataProducts['brand'] + product['brand'] + ", ") : (product['brand'] + ", ");
+                                    dataProducts['category'] = dataProducts['category'] ? (dataProducts['category'] + product['category'] + ", ") : (product['category'] + ", ");
+                                    dataProducts['variant'] = dataProducts['variant'] ? (dataProducts['variant'] + product['variant'] + ", ") : (product['variant'] + ", ");
+                                    dataProducts['product_size'] = dataProducts['product_size'] ? (dataProducts['product_size'] + product['product_size'] + ", ") : (product['product_size'] + ", ");
+                                    dataProducts['product_volume'] = dataProducts['product_volume'] ? (dataProducts['product_volume'] + product['product_volume'] + ", ") : (product['product_volume'] + ", ");
+                                    dataProducts['product_weight'] = dataProducts['product_weight'] ? (dataProducts['product_weight'] + product['product_weight'] + ", ") : (product['product_weight'] + ", ");
+                                    dataProducts['salePrice'] = dataProducts['salePrice'] ? (dataProducts['salePrice'] + product['salePrice'] + ", ") : (product['salePrice'] + ", ");
+                                    dataProducts['discountRate'] = dataProducts['discountRate'] ? (dataProducts['discountRate'] + product['discountRate'] + ", ") : (product['discountRate'] + ", ");
+                                    dataProducts['initialPrice'] = dataProducts['initialPrice'] ? (dataProducts['initialPrice'] + product['initialPrice'] + ", ") : (product['initialPrice'] + ", ");
+                                    dataProducts['rating'] = dataProducts['rating'] ? (dataProducts['rating'] + product['rating'] + ", ") : (product['rating'] + ", ");
+                                } catch (e) {
+
+                                }
+                            });
+                            gtmProduct.push('compare_product_review', dataProducts);
+                        }
+                    }
+                });
+                $('[data-gtm-event="compare-product-remove"]').each(function () {
+                    $(this).on('click', function () {
+                        let productIdRemove = $(this).attr('data-gtm-product-id');
+                        if (productIdRemove) {
+                            let dataRemove = {
+                                'productId' : productIdRemove
+                            }
+                            $.ajax({
+                                type: 'POST',
+                                url: urlBuilder.build('sm_gtm/gtm/product'),
+                                data: data,
+                                dataType: "json",
+                                async: true,
+                                success: function (result) {
+                                    if (result) {
+                                        try {
+                                            let product = JSON.parse(result);
+                                            gtmProduct.push('remove_compare_product', product);
+                                        } catch (e) {
+                                            //Todo Remove Debug
+                                            console.log("Err in parse");
+                                            console.log(result);
+                                        }
+                                    }
+                                }
+                            })
+                        }
+                    })
+                });
+            }
+        });
+    });
+</script>

@@ -1,0 +1,55 @@
+<?php
+/**
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_LayeredNavigation
+ *
+ * Date: April, 27 2020
+ * Time: 10:34 AM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ */
+?>
+<?php /** @var $block \SM\LayeredNavigation\Block\Adminhtml\Category\FilterList */ ?>
+<div id="category-tab-filter-list" class="merchandiser-app" data-role="filter-list">
+    <?= $block->getChildHtml('smart_category') ?>
+    <div id="filter-list-tab-regular" class="regular-category-settings">
+        <div class="actions">
+            <?= $block->getChildHtml('add_attribute_filter_btn') ?>
+        </div>
+    </div>
+    <div class="merchandiser-tabs" data-role="filter-list-tabs">
+        <div id="filter_list_grid" class="tabs-tab-grid merchandiser-tab" role="tabpanel">
+            <?= $block->getChildHtml('grid') ?>
+        </div>
+        <div class="no-display">
+            <input id="category_filter_list" type="hidden"
+                   data-form-part="category_form" name="<?= \SM\LayeredNavigation\Block\Adminhtml\Category\FilterList::FIELD_NAME ?>"
+                   value="<?= $block->escapeHtmlAttr($block->getPositionDataJson()) ?>"/>
+            <input type="hidden"
+                   data-form-part="category_form" name="<?= \SM\LayeredNavigation\Block\Adminhtml\Category\FilterList::OLD_DATA_FIELD_NAME ?>"
+                   value="<?= $block->escapeHtmlAttr($block->getPositionDataJson()) ?>"/>
+        </div>
+    </div>
+</div>
+
+<script type="text/x-magento-init">
+    {
+        "[data-role=filter-list]": {
+            "SM_LayeredNavigation/js/category/filter-list": {
+                "addAttributesUrl" : "<?= $block->escapeJs($block->escapeUrl($block->getDialogUrl())) ?>",
+                "currentCategoryId": "<?= $block->escapeJs($block->getCategoryId()) ?>",
+                "fieldName"        : "<?= $block->escapeJs($block->getFieldName()) ?>",
+                "formName"         : "category_form"
+            }
+        }
+    }
+
+
+</script>
+<script>
+    require('mage/apply/main').apply();
+</script>

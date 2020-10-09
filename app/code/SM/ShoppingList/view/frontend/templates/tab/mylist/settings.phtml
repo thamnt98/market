@@ -1,0 +1,44 @@
+<?php
+/** @var \SM\ShoppingList\Block\Toolbar $block */
+
+$list = $block->getShoppingList();
+?>
+
+<button id="open-delete-modal-<?= $block->escapeHtml($list->getWishlistId())?>" type="submit" class="mylists-action remove"><span class="apl-Remove"></span></button>
+<div id="confirm-delete-list-modal-<?= $block->escapeHtml($list->getWishlistId())?>" class="content" style="display:none;">
+    <span class="remove-wishlist-verify">
+        <span><?= $block->escapeHtml(__('Are you sure you want to delete'))?></span>
+        <b><?= $block->escapeHtml($list->getName())?></b>
+        <span><?= $block->escapeHtml(__(' from your shopping list?'))?></span>
+    </span>
+</div>
+
+<button id="open-share-modal-<?= $block->escapeHtml($list->getWishlistId())?>" type="submit" class="mylists-action share"><span class="apl-share2"></span></button>
+<div id="share-list-modal-<?= $block->escapeHtml($list->getWishlistId())?>" class="content" style="display: none">
+    <div class="title-social-share link-title"><?= $block->escapeHtml(__("Share this list and let people know about your favorite products.")) ?></div>
+    <div class="share-shoppinglist-modal">
+        <input id="value-share-url-<?= $block->escapeHtml($list->getWishlistId())?>" type="text" class="create-list-name" value="<?= $block->escapeHtml($block->getShareUrl())?>" readonly/>
+        <button id="btn-copy-share-url-<?= $block->escapeHtml($list->getWishlistId())?>" class="btn-copy-share-url"><?= $block->escapeHtml(__("Copy"))?></button>
+    </div>
+    <div class="social-share">
+        <div class="title-social-share"><?= $block->escapeHtml(__('Or share it on your social media')) ?></div>
+        <div id="social-btn-<?= $list->getWishlistId() ?>"></div>
+    </div>
+</div>
+
+
+<script type="text/x-magento-init">
+{
+    "*": {
+        "ListSettings":{
+            "remove_list_url":"<?= $block->getRemoveListUrl($list->getWishlistId())?>",
+            "list_id":"<?= $list->getWishlistId() ?>",
+            "list_name":"<?= $list->getName() ?>"
+        },
+        "SocialShare": {
+            "list_id":"<?= $list->getWishlistId() ?>",
+            "share_url":"<?= $block->getShareUrl()?>"
+        }
+    }
+}
+</script>

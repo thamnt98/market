@@ -1,0 +1,38 @@
+<?xml version="1.0" ?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route url="/V1/flashsale/get-event" method="GET">
+        <service class="SM\FlashSale\Api\FlashSaleEventInterface" method="getEvent"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <route url="/V1/flashsale/get-event-product" method="GET">
+        <service class="SM\FlashSale\Api\FlashSaleEventInterface" method="getEventProduct"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/flashsale/get-event-product-only" method="GET">
+        <service class="SM\FlashSale\Api\FlashSaleEventInterface" method="getEventProductOnly"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+
+    <route url="/V1/flashsale/get-end-time" method="GET">
+        <service class="SM\FlashSale\Api\FlashSaleEventInterface" method="getEventEndTime"/>
+        <resources>
+            <resource ref="anonymous" />
+        </resources>
+    </route>
+
+    <route url="/V1/flashsale/get-end-time-product/:productId" method="GET">
+        <service class="SM\FlashSale\Api\FlashSaleEventInterface" method="getEventEndTimeByProduct"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+    </route>
+</routes>

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_Customer
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Imam Kusuma <imam.kusuma@ctcorpdigital.com>
+ *
+ * Copyright © 2019 CT Corp Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="page.main.title" remove="true" />
+        <referenceContainer name="content">
+            <block class="Trans\Customer\Block\Account\Auth" name="auth-page" template="Trans_Customer::account/auth.phtml" cacheable="false">
+            	<block class="Trans\Customer\Block\Form\Verification" name="user-field-otp" as="field.otp" template="Trans_Customer::form/field/otp.phtml" cacheable="false">
+				    <arguments>
+                        <argument name="is_hide" xsi:type="boolean">false</argument>
+				        <argument name="redirect_if_success" xsi:type="string"></argument>
+				        <argument name="redirect_if_failed" xsi:type="string"></argument>
+				        <argument name="form_class" xsi:type="string">form-create-account</argument>
+				        <argument name="submit_if_success" xsi:type="boolean">true</argument>
+                        <argument name="is_need_check" xsi:type="boolean">false</argument>
+				    </arguments>
+            	</block>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

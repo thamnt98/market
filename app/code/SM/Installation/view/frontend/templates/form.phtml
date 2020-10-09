@@ -1,0 +1,42 @@
+<?php
+/**
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_Installation
+ *
+ * Date: April, 21 2020
+ * Time: 10:26 AM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ */
+?>
+<?php /** @var $block \SM\Installation\Block\Form */ ?>
+<?php $default = $block->getDefaultData() ?>
+<div class="fieldset installation-block" data-bind="scope:'installation<?= $block->getData('item_id') ?>'">
+    <!-- ko template: getTemplate() --><!-- /ko -->
+    <script type="text/x-magento-init">
+        {
+            "*": {
+                "Magento_Ui/js/core/app": {
+                    "components": {
+                        "installation<?= $block->getData('item_id') ?>": {
+                            "component"     : "SM_Installation/js/form",
+                            "itemId"        : <?= $block->getData('item_id') ?? 0 ?>,
+                            "productId"     : <?= $block->getProduct() ? $block->getProduct()->getId() : 0 ?>,
+                            "title"         : "<?= $block->escapeHtml($block->getTitle()) ?>",
+                            "tooltip"       : "<?= $block->escapeHtml($block->getTooltip()) ?>",
+                            "defaultNote"   : "<?= $default['defaultNote'] ?? '' ?>",
+                            "defaultChecked": <?= $block->escapeHtml($default['defaultChecked'] ?? 'false') ?>,
+                            "fee"           : <?= $block->getInstallationFee() ?>,
+                            "hasRemovePopup": <?= $block->hasRemovePopup() ?>,
+                            "tooltipUrl"    : "<?= /* @noEscape */ $block->getViewFileUrl('images/info.svg') ?>"
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</div>

@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <remove id="Magento_Backend::mgs"/>
+        <update id="MGS_Lookbook::lookbook" title="Hot Spots" module="MGS_Lookbook" sortOrder="200" parent="Magento_Backend::content" resource="SM_Theme::hot_spots"/>
+        <update id="MGS_Lookbook::manage_lookbook" title="Manage Hot Spots" module="MGS_Lookbook" sortOrder="10" parent="MGS_Lookbook::lookbook" action="adminhtml/lookbook/index" resource="SM_Theme::hot_spots"/>
+        <remove id="MGS_Lookbook::manage_slider"/>
+        <remove id="MGS_Lookbook::manage_config" />
+    </menu>
+</config>

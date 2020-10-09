@@ -1,0 +1,140 @@
+<?php
+/**
+ * @project    ct-corp-transmart
+ * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @author     Duc Nguyen Hoang <ducnh2@smartosc.com>
+ * @copyright  Copyright © 2020 SmartOSC. All rights reserved.
+ * @url        http://www.smartosc.com
+ */
+/** @var \SM\Help\Block\Help\View $block */
+?>
+<?php
+/** @var \SM\Help\Model\Topic $currentTopic */
+$currentTopic = $block->getCurrentTopic();
+
+?>
+<div class="help-pages">
+    <div class="go-back">
+        <div class="icon ic-arrow-prev"></div>
+        <a href="<?= $block->escapeUrl($block->getBackUrl()) ?>"><?= $block->escapeHtml('Back') ?></a>
+    </div>
+    <!------site content------>
+    <div class="help-content">
+        <?= $block->getChildHtml('help.search') ?>
+        <?= $block->getChildHtml('breadcrumbs') ?>
+
+        <div class="help-content-list">
+            <div class="help-content-list-top">
+                <h2><?= $block->escapeHtml($currentTopic->getName()) ?></h2>
+            </div>
+            <ol class="help-list-question ">
+                <?php $childTopics = $block->getChildTopics() ?>
+                <?php $childQuestions = $block->getChildQuestions() ?>
+                <?php if (count($childTopics)) : ?>
+                    <?php /** @var \SM\Help\Model\Topic $childTopic */?>
+                    <?php foreach ($childTopics as $childTopic) : ?>
+                        <li class="childTopic">
+                            <a href="<?= $block->escapeUrl($childTopic->getUrl()) ?>">
+                                <?= $block->escapeHtml($childTopic->getName()) ?>
+                            </a>
+                        </li>
+                    <?php endforeach;?>
+                <?php elseif (count($childQuestions)) : ?>
+                    <?php /** @var \SM\Help\Model\Question $childQuestion */?>
+                    <?php foreach ($childQuestions as $childQuestion) : ?>
+                        <li class="childQuest">
+                            <a href="<?= $block->escapeUrl($childQuestion->getUrl()) ?>">
+                                <?= $block->escapeHtml($childQuestion->getTitle()) ?>
+                            </a>
+                        </li>
+                    <?php endforeach;?>
+                <?php endif ?>
+            </ol>
+        </div>
+
+        <div class="help-content-contact">
+            <h2><?= $block->escapeHtml(__('Need more information?')) ?></h2>
+            <p><?= $block->escapeHtml(__('Send your questions to Transmart Customer Service')) ?></p>
+            <a href="<?= $block->getUrl('help/contactus') ?>"><button class="primary"><?= $block->escapeHtml(__('Contact Us'))?></button></a>
+        </div>
+    </div>
+    <!------site content------>
+
+    <!------site bar left------>
+    <div class="sidebar sidebar-main">
+        <div class="block block-collapsible-nav">
+            <div class="title block-collapsible-nav-title">
+                <?php $parentTopic = $block->getParentTopic($currentTopic) ?>
+                <?php if ($parentTopic) : ?>
+                    <strong>
+                        <?= $block->escapeHtml($parentTopic->getParentId() != 0 ? $parentTopic->getName() : __('Help Center')) ?>
+                    </strong>
+                <?php endif; ?>
+            </div>
+            <div class="content block-collapsible-nav-content" id="block-collapsible-nav">
+                <ul class="nav items">
+                    <?php $sameParentTopics = $block->getSameParentTopics() ?>
+                    <?php if (count($sameParentTopics)) : ?>
+                        <?php /** @var \SM\Help\Model\Topic $item */?>
+                        <?php foreach ($sameParentTopics as $item) : ?>
+                            <li class="nav item <?= $item->getId() === $currentTopic->getId() ? 'active': '' ?>">
+                                <a href="<?= $block->escapeUrl($item->getUrl()) ?>">
+                                    <?= $block->escapeHtml($item->getName()) ?>
+                                </a>
+                            </li>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                    <?php if ($currentTopic->getLevel() == 1) : ?>
+                    <li class="nav item">
+                        <a href="<?= $block->getUrl('help/contactus') ?>">
+                            <?= $block->escapeHtml(__('Contact Us')) ?>
+                        </a>
+                    </li>
+                    <?php endif; ?>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!------site bar left------>
+
+</div>
+
+<script>
+    require(['jquery'],function ($) {
+        window.dataLayer = window.dataLayer || [];
+        if (typeof dataLayerSourceObjects !== 'undefined') {
+            $('ul.nav.items li.nav.item').on('click', function () {
+                let menuName = $(this).text();
+                let submenuName = 'Not Available';
+                pushData($.trim(menuName), submenuName);
+            })
+            $('.help-pages .help-list-question li.childTopic').on('click', function () {
+                let menuName = $('.help-pages .help-content-list .help-content-list-top').text();
+                let submenuName = $(this).text();
+                pushData($.trim(menuName), $.trim(submenuName));
+            })
+            $('.help-pages .help-list-question li.childQuest').on('click', function () {
+                let menuName = $('.help-pages .help-content-list .help-content-list-top').text();
+                let submenuName = $(this).text();
+                pushData($.trim(menuName), $.trim(submenuName));
+            })
+        }
+
+        function pushData(menuName, submenuName) {
+            window.dataLayer.push({
+                'event': 'help_centre_menu',
+                'uniqueUserID': dataLayerSourceObjects.customer.uniqueUserID,
+                'userID': dataLayerSourceObjects.customer.userID,
+                'customerID': dataLayerSourceObjects.customer.customerID,
+                'customerType': dataLayerSourceObjects.customer.customerType,
+                'loyalty': dataLayerSourceObjects.customer.loyalty,
+                'customerStatus': dataLayerSourceObjects.customer.customerStatus,
+                'loginType': dataLayerSourceObjects.customer.loginType,
+                'store_name': dataLayerSourceObjects.customer.storeName,
+                'store_ID': dataLayerSourceObjects.customer.storeID,
+                'menu_name': menuName,
+                'submenu_name': submenuName
+            })
+        }
+    })
+</script>

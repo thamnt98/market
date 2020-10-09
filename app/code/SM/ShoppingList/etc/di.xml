@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- repositories -->
+    <preference for="SM\ShoppingList\Api\ShoppingListRepositoryInterface" type="SM\ShoppingList\Model\ShoppingListRepository" />
+    <preference for="SM\ShoppingList\Api\ShoppingListItemRepositoryInterface" type="SM\ShoppingList\Model\ShoppingListItemRepository" />
+
+    <!-- data models -->
+    <preference for="SM\ShoppingList\Api\Data\ShoppingListDataInterface" type="SM\ShoppingList\Model\Data\ShoppingList" />
+    <preference for="SM\ShoppingList\Api\Data\ShoppingListItemDataInterface" type="SM\ShoppingList\Model\Data\ShoppingListItem" />
+
+    <!-- search results -->
+    <preference for="SM\ShoppingList\Api\Data\ShoppingListSearchResultsInterface" type="Magento\Framework\Api\SearchResults" />
+    <preference for="SM\ShoppingList\Api\Data\ShoppingListItemSearchResultsInterface" type="Magento\Framework\Api\SearchResults" />
+
+    <preference for="SM\ShoppingList\Api\Data\ResultDataInterface" type="SM\ShoppingList\Model\Data\ResultData" />
+
+    <type name="Magento\MultipleWishlist\Helper\Data">
+        <plugin type="SM\ShoppingList\Plugin\WishlistData" name="wishlist_data"/>
+    </type>
+</config>

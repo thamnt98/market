@@ -1,0 +1,209 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+/** @var SM\Checkout\Block\Checkout\Success $block */
+?>
+<?php if ($block->getTimeLeft() < 1) : ?>
+<div class="payment-expired-wrapper">
+    <div class="header">
+        <div class="payment-notify">
+            <span><?= __('Your order has been cancelled. Please try again.') ?></span>
+        </div>
+        <div class="logo">
+            <img src='<?= $block->getViewFileUrl('images/payment-pailed.png'); ?>' alt="" />
+        </div>
+    </div>
+    <div class="content">
+        <h2 class="payment-status"><?= __('Payment Unsuccessful!') ?></h2>
+        <div class="date">
+            <label class="text-label-body"><?= '' ?></label>
+        </div>
+        <div class="total">
+            <label class="text-label-body"><?= $block->escapeHtml(__('Total Payment')) ?></label>
+            <div class="payment-price"><?= $block->getGrandTotal() ?></div>
+        </div>
+        <div class="payment-method">
+            <label class="text-label-body"><?= $block->escapeHtml(__('Payment Method')) ?></label>
+            <div class="bank-logo">
+                <img src='<?= $block->getLogoPayment() ?>' alt="<?= $block->escapeHtmlAttr($block->getTitlePaymentMethod()) ?>" />
+                <span><?= $block->escapeHtml($block->getTitlePaymentMethod()) ?></span>
+            </div>
+        </div>
+        <div class="invoice-number">
+            <label class="text-label-body"><?= $block->escapeHtml(__(' Reference Number')) ?></label>
+            <p class="text-body"><?= $block->getReferenceNumber() ?></p>
+        </div>
+        <div class="additional-links">
+            <a class="order-detail-btn"
+               href="<?= $block->escapeHtmlAttr($block->getUrl('sales/order/physical', ['id' => $block->getOrderId()])) ?>"
+            >
+                <?= __('Check My Order') ?>
+            </a>
+            <a class="action primary home" href="<?= $block->escapeHtmlAttr($block->getUrl('')) ?>">
+                <?= __('Back to Home') ?>
+            </a>
+        </div>
+    </div>
+</div>
+<?php else : ?>
+    <div class="wrapper-payment">
+        <h2 class="text-header"><?= $block->escapeHtml(__('Transfer '.$block->getTitlePaymentMethod())) ?></h2>
+        <div class="wrapper-payment-time">
+            <img class="oval-blue" src='<?= $block->getViewFileUrl('images/oval-blue.png'); ?>' alt=""/>
+            <img class="oval-brown" src='<?= $block->getViewFileUrl('images/oval-brown-2.png'); ?>' alt=""/>
+            <label class="text-label-body label-payment-time"><?= $block->escapeHtml(__('Please make your payment in')) ?></label>
+            <div id="timer">
+                <div id="hours"></div>
+                <div id="minutes"></div>
+                <div id="seconds"></div>
+            </div>
+            <p class="warning-payment-time">
+                <?= $block->escapeHtml(__(
+                        'Your payment is due by %1, %2',
+                        date("l", $block->getExpireTime()),
+                        $block->getExpireTimeString())
+                ) ?>
+            </p>
+        </div>
+
+        <div class="total-payment">
+            <label class="text-label-body"><?= $block->escapeHtml(__('Total Payment')) ?></label>
+            <p class="text-body"><?= $block->getGrandTotal() ?></p>
+        </div>
+
+        <div class="account-number none-expired">
+            <label class="text-label-body"><?= $block->getTitlePaymentMethod() ?></label>
+            <p class="text-body"><?= $block->getPaycode() ?></p>
+            <a class="text-link-body coppy-number" href="javascript:void(0)" data-action="copy-to-clipboard" data-copy="<?= $block->getPaycode() ?>"><?= $block->escapeHtml(__('Copy Number')) ?></a>
+            <a class="text-link-body" href="<?= $block->getWebsiteBanking() ?>"><?= $block->escapeHtml(__('Visit Website')) ?></a>
+        </div>
+
+        <div class="logo-bank none-expired">
+            <img src='<?= $block->getLogoPayment() ?>' alt=""  width="173" height="101" />
+        </div>
+
+
+        <div class="invoice-number">
+            <label class="text-label-body"><?= $block->escapeHtml(__(' Reference Number')) ?></label>
+            <p class="text-body"><?= $block->getReferenceNumber() ?></p>
+        </div>
+        <div class="none-expired">
+            <label class="text-label-body"><?= __('How to Pay with %1', $block->getTitlePaymentMethod()) ?></label>
+
+            <?= $this->getLayout()
+                ->createBlock(\Magento\Cms\Block\Block::class)
+                ->setBlockId('how-to-pay')
+                ->toHtml(); ?>
+        </div>
+        <div class="check-payment-col">
+            <a class="btn-outline-secondary" href="javascript:void(0)" data-action="checkStatus">
+                <?= __('Check Payment Status') ?>
+            </a>
+            <a class="action primary" href="<?= $block->escapeHtmlAttr($block->getUrl('')) ?>">
+                <?= __('Back to Home') ?>
+            </a>
+        </div>
+    </div>
+<?php endif ?>
+<script type="text/javascript">
+    require(
+        [
+            'jquery',
+            'gtmCheckout',
+            'accordion',
+            'domReady!'
+        ],
+        function($, gtmCheckout) {
+            var accordion = $("#accordion");
+            accordion.accordion();
+
+            // Update the count down every 1 second
+            var distance = parseInt("<?= $block->getTimeLeft() ?>")*1000;
+            var x = setInterval(function() {
+                distance=distance-1000;
+                // Find the distance between now and the count down date
+
+                // Time calculations for days, hours, minutes and seconds
+                let hours = Math.max(0, Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))),
+                    minutes = Math.max(0, Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60))),
+                    seconds = Math.max(0, Math.floor((distance % (1000 * 60)) / 1000));
+
+                $("#hours").html(
+                    "<span class='number-time'>"+ hours +"</span>" +
+                    "<span class='text-time'> hours </span>" + "<span class='two-dots'> : </span>"
+                );
+                $("#minutes").html(
+                    "<span class='number-time'>"+ minutes +"</span>" +
+                    "<span class='text-time'> minutes </span>" + "<span class='two-dots'> : </span>"
+                );
+                $("#seconds").html(
+                    "<span class='number-time'>"+ seconds +"</span>" +
+                    "<span class='text-time'> seconds </span>"
+                );
+                // If the count down is over, write some text
+                if (distance < 1) {
+                    clearInterval(x);
+                    $('.warning-payment-time').text('<?= __('Sorry, your payment session has expired.') ?>');
+                    $('.none-expired').hide();
+                    $('.check-payment-col').addClass('expired');
+                }
+            }, 1000);
+
+            // TODO: notify to customer current status
+            // now haven't design for that, just reload this page
+            $('[data-action="checkStatus"]').on('click', function () {
+                let element = $(this);
+
+                $.ajax({
+                           url       : '/rest/V1/order/status?orderId='+"<?= $block->getOrderId() ?>",
+                           type      : 'get',
+                           dataType  : "json",
+                           beforeSend: function (xhr) {
+                               xhr.setRequestHeader('Accept', 'application/json');
+                               xhr.setRequestHeader('Content-Type', 'application/json');
+                           },
+                           success   : function (response) {
+                               let data = $.localStorage.get('product-checkout-gtm');
+                                response = $.parseJSON(response);
+                               if (response.status=='success') {
+                                   location.reload();
+                                   if (data) {
+                                       data['payment_method'] = "<?= $block->getTitlePaymentMethod() ?>";
+                                       data['coupon'] = "<?= $block->getCouponCodeGTM() ?>";
+                                       data['shipping'] = "<?= $block->getShippingGTM() ?>";
+                                       data['id'] = "<?= $block->getReferenceNumber() ?>";
+                                       gtmCheckout.push('purchase',data);
+                                       // $.localStorage.remove('product-checkout-gtm');
+                                   }
+
+                                   if (!$(element).hasClass('expired') &&
+                                       !$(element).parent().hasClass('expired') &&
+                                       response.data && response.data.status &&
+                                       response.data.status === 'pending_payment'
+                                   ) {
+                                       window.location.href = '<?= $block->getUrl('sales/order/physical', ['id' => $block->getOrderId()]) ?>';
+                                   } else {
+                                       location.reload();
+                                   }
+                               }
+                           }
+                       });
+            });
+
+            $('[data-action="copy-to-clipboard"]').on('click', function () {
+                var data = $(this).attr('data-copy');
+                var textArea = document.createElement("textarea");
+                textArea.value = data;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand("Copy");
+                textArea.remove();
+                $(this).text('Copied');
+                $(this).css({'cursor':'text','color':'#7b7b7b'})
+            });
+        }
+    );
+</script>
+

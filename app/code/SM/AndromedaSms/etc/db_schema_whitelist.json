@@ -1,0 +1,28 @@
+{
+    "sms_verification": {
+        "column": {
+            "entity_id": true,
+            "phone_number": true,
+            "verification_id": true,
+            "is_verified": true,
+            "failed_attempt": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "testmode_andromeda_sms_verification": {
+        "column": {
+            "verification_id": true,
+            "phone_number": true,
+            "verification_code": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    }
+}

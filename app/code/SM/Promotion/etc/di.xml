@@ -1,0 +1,213 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Promotion
+ * @package SM\Promotion/etc
+ * @license http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @author Hung Pham <hungpv@smartosc.com>
+ * @copyright   Copyright (c) SmartOSC. All rights reserved.
+ * @url http://www.smartosc.com/
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Override -->
+    <!-- Magento -->
+    <preference for="Magento\SalesRule\Model\Rule\Action\Discount\CartFixed"
+                type="SM\Promotion\Model\MagentoSalesRule\Rule\Action\Discount\CartFixed" />
+    <preference for="Amasty\Rules\Model\DiscountBreakdownLine"
+                type="SM\Promotion\Model\Data\DiscountBreakdown" />
+    <preference for="SM\Promotion\Api\Data\DiscountBreakdownInterface"
+                type="SM\Promotion\Model\Data\DiscountBreakdown" />
+    <preference for="Amasty\Rules\Api\Data\DiscountBreakdownLineInterface"
+                type="SM\Promotion\Model\Data\DiscountBreakdown" />
+    <preference for="Magento\SalesRule\Model\RulesApplier"
+                type="SM\Promotion\Override\MagentoSalesRule\Model\RulesApplier" />
+    <preference for="Magento\OfflineShipping\Model\Quote\Address\FreeShipping"
+                type="SM\Promotion\Override\MagentoOfflineShipping\Model\Quote\Address\FreeShipping" />
+    <preference for="Magento\Reward\Model\SalesRule\SaveHandler"
+                type="SM\Promotion\Override\MagentoReward\Model\SalesRule\SaveHandler" />
+    <preference for="Magento\SalesRule\Model\Validator"
+                type="SM\Promotion\Override\MagentoSalesRule\Model\Validator" />
+    <preference for="Magento\SalesRule\Model\Coupon\UpdateCouponUsages"
+                type="SM\Promotion\Override\MagentoSalesRule\Model\Coupon\UpdateCouponUsages" />
+
+    <!-- Amasty -->
+    <preference for="Amasty\Rules\Model\Rule\Action\Discount\BuyxgetnFixdisc"
+                type="SM\Promotion\Override\AmastyRules\Model\Rule\Action\Discount\BuyXGetNFixed" />
+    <preference for="Amasty\Rules\Model\Rule\Action\Discount\BuyxgetnFixprice"
+                type="SM\Promotion\Override\AmastyRules\Model\Rule\Action\Discount\BuyXGetNFixedPrice" />
+    <preference for="Amasty\Rules\Model\Rule\Action\Discount\BuyxgetnPerc"
+                type="SM\Promotion\Override\AmastyRules\Model\Rule\Action\Discount\BuyXGetNPercent" />
+    <preference for="Amasty\Rules\Helper\Discount"
+                type="SM\Promotion\Override\AmastyRules\Helper\Discount" />
+    <!-- End Override -->
+
+
+    <!-- Plugins -->
+    <!-- Magento -->
+    <type name="Magento\SalesRule\Model\Utility">
+        <plugin name="SM_Promotion::DayOfWeekRule" type="SM\Promotion\Plugin\DayOfWeekRule" />
+    </type>
+    <type name="Magento\SalesRule\Model\Rule\Condition\Product">
+        <plugin name="SM_Promotion::SalesRuleAdditionalConditions"
+                type="SM\Promotion\Plugin\MagentoSalesRule\Model\Rule\Condition\Product" />
+        <plugin name="apply_rule_on_configurable_children" disabled="true" />
+    </type>
+    <type name="Magento\SalesRule\Model\Rule\Condition\Combine">
+        <plugin name="Amasty_Rules::Condition_Combine" disabled="true" />
+        <plugin name="SM_Promotion::SalesRuleAdditionalConditions"
+                type="SM\Promotion\Plugin\MagentoSalesRule\Model\Rule\Condition\Product" />
+    </type>
+    <type name="Magento\SalesRule\Model\Rule\Condition\Product\Combine">
+        <plugin name="SM_Promotion::SalesRuleAdditionalConditions"
+                type="SM\Promotion\Plugin\MagentoSalesRule\Model\Rule\Condition\Product" />
+        <plugin name="Amasty_Promo::Condition_Combine_Product" disabled="true" />
+        <plugin name="Amasty_Rules::Condition_Combine_Product" disabled="true" />
+    </type>
+    <type name="Magento\SalesRule\Model\Rule\Condition\Address">
+        <plugin name="SM_Promotion::RuleAddressConditionOptions"
+                type="SM\Promotion\Plugin\MagentoSalesRule\Model\Rule\Condition\RuleAddressConditionOptions"
+                sortOrder="100"
+        />
+    </type>
+    <type name="Magento\SalesRule\Model\RulesApplier">
+        <plugin name="SM_Promotion::RulesApplier"
+                type="SM\Promotion\Plugin\MagentoSalesRule\Model\RulesApplier" />
+        <plugin name="Amasty_Rules::SalesRule_RulesApplier" disabled="true" />
+    </type>
+    <type name="Amasty\Rules\Helper\Data">
+        <plugin name="SM_Promotion::RuleTypeData"
+                type="SM\Promotion\Plugin\Amasty\RuleTypeData"/>
+    </type>
+    <type name="Magento\SalesRule\Model\Rule\Action\SimpleActionOptionsProvider">
+        <plugin name="SM_Promotion::ToFixedAction"
+                type="SM\Promotion\Plugin\MagentoSalesRule\Model\Rule\Action\ToFixedAction"/>
+    </type>
+    <type name="Magento\SalesRule\Model\Rule\Action\Discount\ToFixed">
+        <plugin name="SM_Promotion::ToFixed"
+                type="SM\Promotion\Plugin\MagentoSalesRule\Model\Rule\Action\ToFixed"/>
+    </type>
+    <type name="Magento\SalesRule\Model\Rule\Action\Discount\DiscountInterface">
+        <plugin name="SM_Promotion::DiscountData"
+                type="SM\Promotion\Plugin\MagentoSalesRule\Model\Rule\Action\Discount"/>
+    </type>
+    <type name="Magento\SalesRule\Model\Rule\Action\Discount\ByFixed">
+        <plugin name="SM_Promotion::MaxDiscountForMagentoRule"
+                type="SM\Promotion\Plugin\MagentoSalesRule\FixMaxDiscount" sortOrder="999"/>
+    </type>
+    <type name="Magento\SalesRule\Model\Rule\Action\Discount\ByPercent">
+        <plugin name="SM_Promotion::MaxDiscountForMagentoRule"
+                type="SM\Promotion\Plugin\MagentoSalesRule\FixMaxDiscount" sortOrder="999"/>
+    </type>
+    <type name="Magento\SalesRule\Model\Rule\Action\Discount\CartFixed">
+        <plugin name="SM_Promotion::MaxDiscountForMagentoRule"
+                type="SM\Promotion\Plugin\MagentoSalesRule\FixMaxDiscount" sortOrder="999"/>
+    </type>
+    <type name="Magento\SalesRule\Model\Rule\Action\Discount\ToFixed">
+        <plugin name="SM_Promotion::MaxDiscountForMagentoRule"
+                type="SM\Promotion\Plugin\MagentoSalesRule\FixMaxDiscount" sortOrder="999"/>
+    </type>
+    <type name="Magento\SalesRule\Model\Rule\Action\Discount\ToPercent">
+        <plugin name="SM_Promotion::MaxDiscountForMagentoRule"
+                type="SM\Promotion\Plugin\MagentoSalesRule\FixMaxDiscount" sortOrder="999"/>
+    </type>
+    <type name="Magento\SalesRule\Model\Rule\Action\Discount\BuyXGetY">
+        <plugin name="SM_Promotion::MaxDiscountForMagentoRule"
+                type="SM\Promotion\Plugin\MagentoSalesRule\FixMaxDiscount" sortOrder="999"/>
+    </type>
+
+    <!-- Amasty -->
+    <type name="Amasty\Rgrid\Model\RuleActions">
+        <plugin name="SM_Promotion::RuleActionOptions"
+                type="SM\Promotion\Plugin\AmastyRgrid\Model\RuleActions" />
+    </type>
+    <type name="Amasty\Rules\Model\Rule\Action\Discount\Thecheapest">
+        <plugin name="SM_Promotion::AmastyRuleTheCheapest"
+                type="SM\Promotion\Plugin\AmastyRules\Model\Rule\Action\Discount\TheCheapest" />
+    </type>
+    <type name="Amasty\Rules\Model\Rule\Action\Discount\Themostexpencive">
+        <plugin name="SM_Promotion::AmastyRuleTheMostExpensive"
+                type="SM\Promotion\Plugin\AmastyRules\Model\Rule\Action\Discount\TheMostExpensive" />
+    </type>
+    <type name="Amasty\Rules\Model\Rule\Action\Discount\AbstractRule">
+        <plugin name="SM_Promotion::AmastyRule"
+                type="SM\Promotion\Plugin\AmastyRules\Model\Rule\Action\Discount" />
+    </type>
+    <type name="Amasty\Rules\Model\Rule\Action\Discount\SetofFixed">
+        <plugin name="SM_Promotion::SetOfBeforeCalculation"
+                type="SM\Promotion\Plugin\Model\Rule\Action\Discount\SetOf" />
+    </type>
+    <type name="Amasty\Rules\Model\Rule\Action\Discount\SetofPercent">
+        <plugin name="SM_Promotion::SetOfBeforeCalculation"
+                type="SM\Promotion\Plugin\Model\Rule\Action\Discount\SetOf" />
+    </type>
+    <type name="SM\Promotion\Model\Rule\Action\Discount\SetofFixedPrice">
+        <plugin name="SM_Promotion::SetOfBeforeCalculation"
+                type="SM\Promotion\Plugin\Model\Rule\Action\Discount\SetOf" />
+    </type>
+    <!-- End Plugins -->
+
+    <!-- Defined -->
+    <!-- Amasty -->
+    <type name="Amasty\Rules\Model\Rule\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validatorsData" xsi:type="array">
+                <item name="buy_x_get_y" xsi:type="array">
+                    <item name="object" xsi:type="object">SM\Promotion\Model\Rule\Validator\AmastyPromo</item>
+                    <item name="sortOrder" xsi:type="string">20</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Magento -->
+    <type name="Magento\Framework\EntityManager\Operation\ExtensionPool">
+        <arguments>
+            <argument name="extensionActions" xsi:type="array">
+                <item name="Magento\SalesRule\Api\Data\RuleInterface" xsi:type="array">
+                    <item name="create" xsi:type="array">
+                        <item name="create_reward" xsi:type="string">
+                            SM\Promotion\Override\MagentoReward\Model\SalesRule\SaveHandler
+                        </item>
+                    </item>
+                    <item name="update" xsi:type="array">
+                        <item name="update_reward" xsi:type="string">
+                            SM\Promotion\Override\MagentoReward\Model\SalesRule\SaveHandler
+                        </item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <!-- End Define -->
+
+    <!-- Logger Handler -->
+    <type name="SM\Promotion\Cron\ProcessOrderRewardRule">
+        <arguments>
+            <argument name="logger" xsi:type="object">SM\Promotion\Logger\VoucherReward</argument>
+        </arguments>
+    </type>
+
+    <virtualType name="SM\Promotion\Logger\VoucherReward" type="Monolog\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">voucherRewardLogger</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="system" xsi:type="object">SM\Promotion\Logger\Handler\VoucherReward</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="SM\Promotion\Logger\Handler\VoucherReward" type="Magento\Framework\Logger\Handler\Base">
+        <arguments>
+            <argument name="fileName" xsi:type="string">var/log/voucher_reward.log</argument>
+        </arguments>
+    </virtualType>
+
+    <preference for="Magento\SalesRule\Model\Service\CouponManagementService"
+                type="SM\Promotion\Override\MagentoSalesRule\Model\Service\CouponManagementService"/>
+    <preference for="Magento\SalesRule\Model\Coupon\Massgenerator"
+                type="SM\Promotion\Override\MagentoSalesRule\Model\Coupon\Massgenerator"/>
+    <preference for="SM\Promotion\Api\Data\RuleSuggestionInterface"
+                type="SM\Promotion\Model\Data\RuleSuggestion"/>
+</config>

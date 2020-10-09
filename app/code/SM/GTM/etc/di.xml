@@ -1,0 +1,177 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="SM\GTM\Api\EncryptorInterface" type="SM\GTM\Helper\Encryptor"/>
+    <virtualType name="SMGoogleTagManagerLogHandler" type="Magento\Framework\Logger\Handler\Base">
+        <arguments>
+            <argument name="fileName" xsi:type="string">var/log/smart_gtm.log</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="SMGoogleTagManagerLogger" type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="name" xsi:type="string">SMGoogleTagManagerLog</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="debug" xsi:type="object">SMGoogleTagManagerLogHandler</item>
+                <item name="info" xsi:type="object">SMGoogleTagManagerLogHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Declaring Mapper and Mapping Fileds -->
+    <preference for="SM\GTM\Api\MapperInterface" type="SM\GTM\Model\Mapper\Mapper"/>
+    <virtualType name="CustomerMapper" type="SM\GTM\Model\Mapper\Mapper">
+        <arguments>
+            <argument name="secureFields" xsi:type="array">
+                <item name="uniqueUserID" xsi:type="string">uniqueUserID</item>
+                <item name="userID" xsi:type="string">userID</item>
+                <item name="customerID" xsi:type="string">customerID</item>
+                <item name="fullName" xsi:type="string">fullName</item>
+                <item name="email" xsi:type="string">email</item>
+                <item name="phoneNumber" xsi:type="string">phoneNumber</item>
+            </argument>
+            <argument name="mappingFields" xsi:type="array">
+                <item name="uniqueUserID" xsi:type="string">user_id_gtm</item>
+                <item name="userID" xsi:type="string">user_id_gtm</item>
+                <item name="customerID" xsi:type="string">user_id_gtm</item>
+                <item name="loginType" xsi:type="string">login_type_gtm</item>
+                <item name="customerType" xsi:type="string">customer_type_gtm</item>
+                <item name="loyalty" xsi:type="string">loyalty_gtm</item>
+                <item name="customerStatus" xsi:type="string">customer_status_gtm</item>
+                <item name="fullName" xsi:type="string">full_name_gtm</item>
+                <item name="email" xsi:type="string">email_gtm</item>
+                <item name="phoneNumber" xsi:type="string">phone_number_gtm</item>
+                <item name="city" xsi:type="string">city_name_gtm</item>
+                <item name="district" xsi:type="string">district_name_gtm</item>
+                <item name="basketID" xsi:type="string">basket_id_gtm</item>
+                <item name="storeName" xsi:type="string">store_gtm_name</item>
+                <item name="storeID" xsi:type="string">store_gtm_id</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="StoreMapper" type="SM\GTM\Model\Mapper\Mapper">
+        <arguments>
+            <argument name="mappingFields" xsi:type="array">
+                <item name="store_ID" xsi:type="string">code</item>
+                <item name="store_name" xsi:type="string">name</item>
+                <item name="timestamp" xsi:type="string">timestamp</item>
+                <item name="currency" xsi:type="string">currency</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="CmsMapper" type="SM\GTM\Model\Mapper\Mapper">
+        <arguments>
+            <argument name="mappingFields" xsi:type="array">
+                <item name="articleId" xsi:type="string">url_key</item>
+                <item name="articleTitle" xsi:type="string">title</item>
+                <item name="articleCategory" xsi:type="string">NA</item>
+                <item name="articleSource" xsi:type="string">NA</item>
+                <item name="articlePresent" xsi:type="string">is_active</item>
+                <item name="publishedDate" xsi:type="string">creation_time</item>
+                <item name="pageCategory" xsi:type="string">NA</item>
+                <item name="pageSubCategory" xsi:type="string">NA</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="CategoryMapper" type="SM\GTM\Model\Mapper\Mapper">
+        <arguments>
+            <argument name="mappingFields" xsi:type="array">
+                <item name="menu_category" xsi:type="string">category_level_1.name</item>
+                <item name="menu_name" xsi:type="string">category_level_2.name</item>
+                <item name="submenu_name" xsi:type="string">name</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <virtualType name="CartMapper" type="SM\GTM\Model\Mapper\Mapper">
+        <arguments>
+            <argument name="secureFields" xsi:type="array">
+                <item name="email" xsi:type="string">email</item>
+            </argument>
+            <argument name="mappingFields" xsi:type="array">
+                <item name="email" xsi:type="string">customer_email</item>
+                <item name="product_quantity" xsi:type="string">items_qty</item>
+                <item name="cart_id" xsi:type="string">entity_id</item>
+                <item name="cart_total" xsi:type="string">base_grand_total</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Defining the data Collectors -->
+    <type name="SM\GTM\Model\Data\CollectorComposite">
+        <arguments>
+            <argument name="collectorList" xsi:type="array">
+                <item name="customer" xsi:type="object">SM\GTM\Model\Data\Collectors\Customer</item>
+                <item name="store" xsi:type="object">SM\GTM\Model\Data\Collectors\StoreInformation</item>
+                <item name="cms" xsi:type="object">SM\GTM\Model\Data\Collectors\Cms</item>
+                <item name="category" xsi:type="object">SM\GTM\Model\Data\Collectors\Category</item>
+            </argument>
+            <argument name="logger" xsi:type="object">SMGoogleTagManagerLogger</argument>
+        </arguments>
+    </type>
+
+    <!-- Collector Types -->
+    <type name="SM\GTM\Model\Data\Collectors\Customer">
+        <arguments>
+            <argument name="customerMapper" xsi:type="object">CustomerMapper</argument>
+        </arguments>
+    </type>
+    <type name="SM\GTM\Model\Data\Collectors\Cms">
+        <arguments>
+            <argument name="cmsMapper" xsi:type="object">CmsMapper</argument>
+        </arguments>
+    </type>
+
+    <type name="SM\GTM\Model\Data\Collectors\Category">
+        <arguments>
+            <argument name="categoryMapper" xsi:type="object">CategoryMapper</argument>
+        </arguments>
+    </type>
+
+    <type name="SM\GTM\Model\Data\Collectors\StoreInformation">
+        <arguments>
+            <argument name="storeMapper" xsi:type="object">StoreMapper</argument>
+        </arguments>
+    </type>
+
+    <type name="SM\GTM\Model\Variable\Processor">
+        <arguments>
+            <argument name="logger" xsi:type="object">SMGoogleTagManagerLogger</argument>
+        </arguments>
+    </type>
+
+    <type name="SM\GTM\Model\Data\Collectors\Quote">
+        <arguments>
+            <argument name="mapper" xsi:type="object">CartMapper</argument>
+        </arguments>
+    </type>
+
+    <type name="SM\Customer\Controller\Trans\LoginAjax">
+        <plugin name="after_execute_loginAjax_plugin" type="SM\GTM\Plugin\LoginAjax"/>
+    </type>
+
+    <type name="SM\GTM\Controller\Gtm\Refresh">
+        <arguments>
+            <argument name="collectors" xsi:type="array">
+                <item name="customer" xsi:type="object">SM\GTM\Model\Data\Collectors\Customer</item>
+                <item name="quote" xsi:type="object">SM\GTM\Model\Data\Collectors\Quote</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <preference for="Magento\Catalog\Block\Product\ListProduct" type="SM\GTM\Block\Product\ListProduct" />
+
+    <preference for="Magento\Checkout\Controller\Cart\Delete" type="SM\GTM\Controller\Cart\Delete" />
+
+    <preference for="Magento\Checkout\Controller\Sidebar\UpdateItemQty"
+                type="SM\GTM\Controller\Sidebar\UpdateItemQty" />
+
+    <type name="Magento\Catalog\Model\Product">
+        <plugin name="around_getAttributeText_plugin" type="SM\GTM\Plugin\Product"/>
+    </type>
+
+    <preference for="Magento\Theme\Block\Html\Breadcrumbs"
+                type="SM\GTM\Block\Html\Breadcrumbs" />
+</config>

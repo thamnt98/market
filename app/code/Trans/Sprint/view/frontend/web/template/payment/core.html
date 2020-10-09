@@ -1,0 +1,65 @@
+<!-- 
+/**
+ * @category Trans
+ * @package  Trans_Sprint
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ * @author   Imam Kusuma <imam.kusuma@transdigital.co.id>
+ *
+ * Copyright © 2019 CT Corp Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+
+<div class="payment-method" data-bind="css: {'_active': (getCode() == isChecked())}">
+    <div class="payment-method-title field choice">
+
+            <input type="radio"
+               name="payment[method]"
+               class="radio"
+               data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()" />
+
+        <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
+    </div>
+
+
+        <div class="payment-method-content rk1">
+            <!-- ko if: getCode() == 'sprint_klikbca' -->
+                <div class="field number required">
+                    <label data-bind="attr: {for: getCode() + '_userid'}" class="label">
+                        <span><!-- ko i18n: 'Klik BCA User ID'--><!-- /ko --></span>
+                    </label>
+                    <div class="control">
+                        <input type="text" name="klikbca_userid" class="input-text" value=""
+                               data-bind="attr: {autocomplete: off,
+                                                id: getCode() + '_userid',
+                                                title: $t('Klik BCA User ID')}"/>
+                    </div>
+                </div>
+            <!-- /ko -->
+
+            <!-- ko if: getCode() == 'sprint_bcaklikpay' -->
+                <form id="hidden-form-bcaklikpay" method="post">
+                    
+                </form>
+            <!-- /ko -->
+
+            <div class="payment-method-billing-address">
+                <!-- ko foreach: $parent.getRegion(getBillingAddressFormName()) -->
+                <!-- ko template: getTemplate() --><!-- /ko -->
+                <!--/ko-->
+            </div>
+
+            <div class="checkout-agreements-block">
+            </div>
+            <div class="actions-toolbar" style="display: none;">
+                <div class="primary placeorder-button"> 
+                    <button class="action primary checkout"
+                            type="submit"
+                            data-bind="attr: {id: 'placeOrder-' + getCode()}, click: placeOrder, enable: (getCode() == isChecked())">
+                        <i class="fas fa-lock"></i> <span data-bind="i18n: 'Pay Now'"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+</div>

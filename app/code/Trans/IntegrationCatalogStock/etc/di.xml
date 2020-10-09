@@ -1,0 +1,53 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_CatalogStock
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   JP <jaka.pondan@ctcorpdigital.com>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- DB Model-->
+    <preference for="Trans\IntegrationCatalogStock\Api\IntegrationJobRepositoryInterface"
+                type="Trans\IntegrationCatalogStock\Model\IntegrationJobRepository" />
+    <preference for="Trans\IntegrationCatalogStock\Api\Data\IntegrationJobInterface"
+                type="Trans\IntegrationCatalogStock\Model\IntegrationJob" />
+    <preference for="Trans\IntegrationCatalogStock\Api\Data\IntegrationJobSearchResultInterface"
+                type="Trans\IntegrationCatalogStock\Model\IntegrationJobSearchResult" />
+
+    <preference for="Trans\IntegrationCatalogStock\Api\IntegrationDataValueRepositoryInterface"
+                type="Trans\IntegrationCatalogStock\Model\IntegrationDataValueRepository" />
+    <preference for="Trans\IntegrationCatalogStock\Api\Data\IntegrationDataValueInterface"
+                type="Trans\IntegrationCatalogStock\Model\IntegrationDataValue" />
+    <preference for="Trans\IntegrationCatalogStock\Api\Data\IntegrationDataValueSearchResultInterface"
+                type="Trans\IntegrationCatalogStock\Model\IntegrationDataValueSearchResult" />
+
+    <!-- Logic Model-->
+    <preference for="Trans\IntegrationCatalogStock\Api\IntegrationCheckUpdatesInterface"
+                type="Trans\IntegrationCatalogStock\Model\IntegrationCheckUpdates" />
+
+    <preference for="Trans\IntegrationCatalogStock\Api\IntegrationGetUpdatesInterface"
+                type="Trans\IntegrationCatalogStock\Model\IntegrationGetUpdates" />
+
+    <!-- Product Stock-->
+    <preference for="Trans\IntegrationCatalogStock\Api\IntegrationStockInterface"
+                type="Trans\IntegrationCatalogStock\Model\IntegrationStock" />
+
+    <preference for="Trans\IntegrationCatalogStock\Api\IntegrationInventoryRepositoryInterface"
+                type="Trans\IntegrationCatalogStock\Model\IntegrationInventoryRepository" />
+
+<!--    API-->
+<!--    Initial API STOCK-->
+    <preference for="Trans\IntegrationCatalogStock\Api\IntegrationInitialStockInterface" type="Trans\IntegrationCatalogStock\Model\IntegrationInitialStock"/>
+    <preference for="Trans\IntegrationCatalogStock\Api\Data\IntegrationInitialStockResponseInterface" type="Trans\IntegrationCatalogStock\Model\IntegrationInitialStockResponse"/>
+    <!-- CHECK Stock-->
+    <preference for="Trans\IntegrationCatalogStock\Api\IntegrationCheckStockInterface" type="Trans\IntegrationCatalogStock\Model\IntegrationCheckStock"/>
+    <preference for="Trans\IntegrationCatalogStock\Api\Data\IntegrationCheckStockResponseInterface" type="Trans\IntegrationCatalogStock\Model\IntegrationCheckStockResponse"/>
+
+</config>

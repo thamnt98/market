@@ -1,0 +1,36 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<div class="block block-bank-and-card">
+    <div class="block-content">
+        <div class="block-item">
+            <div class="block-item-title">
+                <p>Your Cards</p>
+            </div>
+            <div class="block-item-content row">
+                <?php for ($i=0; $i < 5; $i ++): ?>
+                    <div class="col-xs-12 col-md-6 col-sm-6">
+                        <div class="card">
+                            <div class="content-card">
+                                <div class="bg-img">
+                                    <div class="card-info">
+                                        <span class="number-card">****5635</span>
+                                        <div class="card-type">
+                                            <span>credit</span>
+                                            <img src='<?= $block->getViewFileUrl('images/card-visa.png'); ?>' alt=""  width="61" height="35" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <a class="remove-card" href="#">Remove card</a>
+                            </div>
+                        </div>
+                    </div>
+                <?php endfor ?>
+            </div>
+        </div>
+    </div>
+</div>
+

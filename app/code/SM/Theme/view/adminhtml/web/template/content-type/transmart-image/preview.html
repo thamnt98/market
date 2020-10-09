@@ -1,0 +1,38 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+
+<div class="pagebuilder-content-type pagebuilder-image type-nested" event="{ mouseover: onMouseOver, mouseout: onMouseOut }, mouseoverBubble: false">
+    <render args="getOptions().template" />
+    <figure attr="data.main.attributes" ko-style="Object.assign({}, data.main.style(), !data.desktop_image.attributes().src ? {} : {borderStyle: 'none'})" css="data.main.css">
+        <div if="data.title_slider.html()" class="block-title">
+            <strong css="data.title_slider.css"
+                    attr="data.title_slider.attributes"
+                    ko-style="data.title_slider.style" html="data.title_slider.html"/>
+        </div>
+        <scope args="getUploader().getUiComponent()">
+            <render />
+        </scope>
+        <img if="data.desktop_image.attributes().src"
+             attr="data.desktop_image.attributes"
+             class="preview-image"
+             css="data.desktop_image.css"
+             ko-style="data.desktop_image.style" />
+        <figcaption if="data.caption.html()"
+                    attr="data.caption.attributes"
+                    css="data.caption.css"
+                    html="data.caption.html"
+                    ko-style="data.caption.style">
+        </figcaption>
+        <div if="data.contents.html()"
+                    attr="data.contents.attributes"
+                    css="data.contents.css"
+                    html="data.contents.html"
+                    ko-style="data.contents.style"
+                    class="image-content">
+        </div>
+    </figure>
+</div>

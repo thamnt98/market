@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="header.container">
+            <block class="Magento\Framework\View\Element\Template" name="city-district"
+                   template="SM_Customer::city-district.phtml"/>
+            <block class="SM\Customer\Block\Form\Login" name="customer-login"
+                   template="form/login.phtml">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">SM\Customer\ViewModel\Login</argument>
+                </arguments>
+                <container name="form.additional.info">
+                    <block class="Magento\Persistent\Block\Form\Remember" name="persistent.remember.me" template="SM_Customer::form/remember_me.phtml" before="-"/>
+                </container>
+                <block class="SM\Customer\Block\SocialLogin\Popup\Social"
+                       name="social-login-popup-authentication-social"
+                       as="login.popup.authentication.social"
+                       template="Mageplaza_SocialLogin::popup/form/authentication/social.phtml">
+                    <action method="setActionTypeIsLogin"/>
+                </block>
+            </block>
+            <block class="SM\Customer\Block\Form\Register" name="customer-register"
+                   template="form/register.phtml">
+                <block class="SM\Customer\Block\SocialLogin\Popup\Social"
+                       name="social-register-popup-authentication-social"
+                       as="register.popup.authentication.social"
+                       template="Mageplaza_SocialLogin::popup/form/authentication/social.phtml">
+                    <action method="setActionTypeIsRegister"/>
+                </block>
+                <block class="SM\Customer\Block\Form\Register"
+                       name="terms.conditions" as="terms.conditions"
+                       template="SM_Customer::terms-conditions.phtml"/>
+                <block class="SM\Customer\Block\Form\Register"
+                       name="privacy.policy" as="privacy.policy"
+                       template="SM_Customer::privacy-policy.phtml"/>
+            </block>
+            <block class="SM\Customer\Block\Form\Register" name="otp-verification"
+                   template="form/otp/verification.phtml"/>
+            <block class="SM\Customer\Block\Form\ForgotPassword" name="forgot-password"
+                   template="form/forgot-password/form.phtml"/>
+            <block class="SM\Customer\Block\Form\ForgotPassword" name="forgot-password-confirm"
+                   template="form/forgot-password/confirm.phtml"/>
+            <block class="SM\Customer\Block\Form\ForgotPassword" name="recovery-password"
+                   template="form/recovery-password/form.phtml"/>
+            <block class="SM\Customer\Block\SocialLogin\Popup\Register" name="customer-social-register"
+                   template="form/social/register.phtml"/>
+            <block class="SM\Customer\Block\Form\Register" name="customer-lock"
+                   template="form/lock/form.phtml"/>
+            <block class="SM\Customer\Block\Form\Register" name="customer-lock-reset"
+                   template="form/lock/reset.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

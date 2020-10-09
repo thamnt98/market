@@ -1,0 +1,24 @@
+<?xml version="1.0" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Quote\Model\Quote\Item">
+        <plugin name="add_fresh_product_data"
+                type="SM\FreshProductApi\Plugin\Magento\Quote\Model\Quote\Item"
+                disabled="true"/>
+    </type>
+
+    <type name="SM\MobileApi\Helper\Product">
+        <plugin name="set_fresh_product_attribute"
+                type="SM\FreshProductApi\Plugin\MobileApi\Helper\Product" />
+    </type>
+
+    <type name="SM\MobileApi\Model\Product">
+        <plugin name="add_is_fresh_category_attribute"
+                type="SM\FreshProductApi\Plugin\MobileApi\Model\Product"/>
+    </type>
+
+    <type name="Magento\Quote\Model\Cart\Totals\ItemConverter">
+        <plugin name="set_fresh_product_attribute_totals_item"
+                type="SM\FreshProductApi\Plugin\Magento\Quote\Model\Cart\Totals\ItemConverter"/>
+    </type>
+</config>

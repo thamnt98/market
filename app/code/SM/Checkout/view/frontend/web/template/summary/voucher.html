@@ -1,0 +1,18 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<!-- ko if:isDisplayed -->
+<tr class="totals discount voucher">
+    <th class="mark" scope="row">
+        <span class="totals-voucher-title" data-bind="i18n: 'Voucher'"></span>
+    </th>
+    <td class="amount">
+        <span class="price totals-price" data-bind="text: getSymbol()"></span>
+        <span class="price totals-price" data-bind="text: amount"></span>
+    </td>
+</tr>
+
+<!-- /ko -->

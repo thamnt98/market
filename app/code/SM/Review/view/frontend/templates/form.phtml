@@ -1,0 +1,161 @@
+<?php
+/** @var \SM\Review\Block\Customer\Form\Detail $block */
+/** @var \SM\Review\ViewModel\ReviewViewModel $reviewViewModel */
+
+$reviewViewModel = $block->getData("reviewViewModel");
+/** @var \Magento\Catalog\Model\Product $product */
+$product = $block->getProduct();
+/** @var \Magento\Review\Model\Rating $rating */
+$rating = $reviewViewModel->getQualityRating();
+$isEdit = $block->isEditForm();
+if ($isEdit) {
+    $review = $block->getReview();
+    $voteValue = $block->getVoteValue();
+}
+
+?>
+
+<form action="<?= ($isEdit) ?
+    $block->getUrl("review/customer/submitedit") :
+    $block->getUrl("review/product/post", ["id" => $product->getId()]) ?>"
+      method="post" id="review-form" enctype="multipart/form-data" data-bind="scope: 'uploader'">
+
+    <?php if ($block->getOrderId()):?>
+        <input type="hidden" name="order_id" value="<?= $block->getOrderId() ?>" />
+    <?php endif;?>
+
+    <ul class="list-items-review">
+        <li class="item-review">
+            <div class="item-info">
+                <a href="<?= $product->getProductUrl() ?>" title="<?= $product->getName() ?>"
+                   class="product-item-photo">
+                    <img src="<?= $block->getProductImage() ?>" width="110"
+                         alt="<?= $product->getName() ?>"/>
+                </a>
+                <div class="product-item-details">
+                    <a href="<?= $product->getProductUrl() ?>" class="product-item-name"><?= $product->getName() ?></a>
+                    <div class="product-reviews-summary short">
+                        <div class="rating-summary">
+                            <div class="field choice review-field-rating">
+                                <label class="label" id="<?= $block->escapeHtmlAttr($rating->getRatingCode()) ?>_rating_label"><span><?= $block->escapeHtml($rating->getRatingCode()) ?></span></label>
+                                <div class="control review-control-vote">
+                                    <?php $options = $rating->getOptions();?>
+                                    <?php $iterator = 1; foreach ($options as $_option) : ?>
+                                        <input
+                                            type="radio"
+                                            name="rating"
+                                            id="<?= $block->escapeHtmlAttr($rating->getRatingCode()) ?>_<?= $block->escapeHtmlAttr($_option->getValue()) ?>"
+                                            value="<?= $block->escapeHtmlAttr($_option->getId()) ?>"
+                                            class="radio"
+                                            data-validate="{'rating-required':true}"
+                                            data-msg-rating-required="<?= $block->escapeHtml(__("Please rate this product"))?>"
+                                            aria-labelledby="<?= $block->escapeHtmlAttr($rating->getRatingCode()) ?>_rating_label <?= $block->escapeHtmlAttr($rating->getRatingCode()) ?>_<?= $block->escapeHtmlAttr($_option->getValue()) ?>_label"
+                                            <?php if ($isEdit):?>
+                                                <?= (($_option->getValue() == $voteValue) ? "checked" : "") ?>
+                                            <?php endif;?>
+                                        />
+                                        <label
+                                            class="rating-<?= $block->escapeHtmlAttr($iterator) ?>"
+                                            for="<?= $block->escapeHtmlAttr($rating->getRatingCode()) ?>_<?= $block->escapeHtmlAttr($_option->getValue()) ?>"
+                                            title="<?= $block->escapeHtmlAttr(__('%1 %2', $iterator, $iterator > 1 ? __('stars') : __('star'))) ?>"
+                                            id="<?= $block->escapeHtmlAttr($rating->getRatingCode()) ?>_<?= $block->escapeHtmlAttr($_option->getValue()) ?>_label">
+                                            <span><?= $block->escapeHtml(__('%1 %2', $iterator, $iterator > 1 ? __('stars') : __('star'))) ?></span>
+                                        </label>
+                                        <?php $iterator++; ?>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </li>
+        <li class="rw-tile rw-tile-review">
+            <label><?= $block->escapeHtml(__('Title')) ?></label>
+            <input name="title" type="text" class="input-text"
+                   maxlength="256"
+                   onkeyup="jQuery('#title-counter').text(this.value.length)"
+                   placeholder="<?= $block->escapeHtml(__("Write the title of your review"))?>"
+                   data-validate="{required:true, maxlength:256}"
+                   data-msg-required="<?= $block->escapeHtml(__("This field is required"))?>"
+                   data-msg-maxlength="<?= $block->escapeHtml(__("Please enter no more than 256 characters"))?>"
+                   value="<?= (($isEdit) ? $review->getVoteTitle() : "") ?>"/>
+            <p class="note counter"><span id="title-counter"><?= (($isEdit) ? strlen($review->getVoteTitle()) : 0) ?></span><?= $block->escapeHtml(__('/256 characters')) ?></p>
+        </li>
+        <li class="rw-tile-review">
+            <label><?= $block->escapeHtml(__('Review')) ?></label>
+            <textarea
+                maxlength="1000"
+                onkeyup="jQuery('#content-counter').text(this.value.length)"
+                name="detail" class="text-area"
+                placeholder="<?= $block->escapeHtml(__("How do you like the product? Let everyone know about it!
+Please be polite and clear so others can be well informed about this product."))?>"
+                data-validate="{required:true, minlength:50, maxlength:1000}"
+                data-msg-required="<?= $block->escapeHtml(__("This field is required"))?>"
+                data-msg-minlength="<?= $block->escapeHtml(__("Make sure you write at least 50 characters"))?>"
+                data-msg-maxlength="<?= $block->escapeHtml(__("Please enter no more than 1000 characters"))?>"><?= (($isEdit) ? $review->getVoteComment() : "") ?></textarea>
+            <p class="note"><?= $block->escapeHtml(__('At least 50 characters')) ?></p>
+            <p class="note counter"><span id="content-counter"><?= (($isEdit) ? strlen($review->getVoteComment()) : 0) ?></span><?= $block->escapeHtml(__('/1000 characters')) ?></p>
+        </li>
+        <input type="hidden" name="nickname" id="nickname_field" class="input-text" value="<?= $reviewViewModel->getCustomerNickname()?>" />
+        <input type="hidden" name="rating_id" class="input-text" value="<?= $rating->getRatingId() ?>" />
+        <?php if ($isEdit):?>
+            <input type="hidden" name="review_id" value="<?= $review->getReviewId() ?>" />
+        <?php endif;?>
+        <?php if ($reviewViewModel->isUploadEnabled()) : ?>
+            <li class="rw-upload-photo">
+                <label><?= $block->escapeHtml(__('Upload Photo')) ?></label>
+                <div class="upload-wrapper upload-photo">
+                    <!-- ko template: getTemplate() --><!-- /ko -->
+                </div>
+                <p class="note"><?= $block->escapeHtml(__('Maximum size 1 MB. You can upload up to 3 photos.')) ?></p>
+            </li>
+        <?php endif; ?>
+        <li class="rw-group-button">
+            <a href="<?= $block->getUrl('review/customer/list') ?>"><button class="action secondary" type="button"><?= $block->escapeHtml(__('Cancel')) ?></button></a>
+            <button class="action primary" type="submit"><?= $block->escapeHtml(__('Submit')) ?></button>
+        </li>
+    </ul>
+</form>
+<script type="text/x-magento-init">
+{
+    "#review-form": {
+        "Magento_Review/js/error-placement": {},
+        "Magento_Review/js/validate-review": {}
+    },
+    ".upload-wrapper": {
+       "Magento_Ui/js/core/app": {
+           "components": {
+               "uploader": {
+                   "component":"SM_Review/js/form/file-uploader",
+                   "template": "SM_Review/uploader",
+                   "previewTmpl":"SM_Review/image-preview",
+                   "isMultipleFiles":"true",
+                   "allowedExtensions":"jpg jpeg png",
+                   "dataScope" : "image"
+                   <?php if ($isEdit):?>
+                   ,"getImageUrl":"<?= $block->getUrl("review/form/getimage", ["review_id" => $review->getReviewId(), "is_edit" => $isEdit])?>",
+                   <?php else: ?>
+                   ,
+                   <?php endif;?>
+                   "is_edit":"<?= $isEdit ?>",
+                   "uploaderConfig": {
+                        "url": "<?= $block->getUrl('review/customer/uploadimage'); ?>"
+                   }
+
+               }
+           }
+       }
+   }
+}
+</script>
+<div id="error-alert-modal" class="content" style="display:none;">
+    <span id="error-alert-content">
+
+    </span>
+</div>
+<div id="attention-modal" class="content" style="display:none;">
+    <span id="attention-content">
+
+    </span>
+</div>

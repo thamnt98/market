@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="SM\FreshProductApi\Api\Data\FreshProductInterface" type="SM\FreshProductApi\Model\Data\FreshProduct" />
+
+    <type name="Magento\Catalog\Model\ResourceModel\Product\Collection">
+        <plugin name="add_fresh_product_attribute"
+                type="SM\FreshProductApi\Plugin\Magento\Catalog\Model\ResourceModel\Product\Collection"/>
+    </type>
+</config>

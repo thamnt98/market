@@ -1,0 +1,147 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+
+<div class="myorder-invoice">
+    <div class="wr-logo">
+        <a class="logo" href="#" title="" aria-label="store logo">
+            <img src="<?= $block->getViewFileUrl('images/logo.svg'); ?>" title="" alt="" width="231" height="30">
+        </a>
+    </div>
+    <div class="wrap-inv-number-date">
+        <div class="wrap-invoice-number">
+            <span><?= $block->escapeHtml(__('Invoice Number')) ?></span>
+            <h3><?= $block->escapeHtml(__('(INV/20190401/XVII/IV/76373236)')) ?></h3>
+        </div>
+        <div class="wrap-invoice-date">
+            <span><?= $block->escapeHtml(__('Invoice Date')) ?></span>
+            <h3><?= $block->escapeHtml(__('October, 10th 2019')) ?></h3>
+        </div>
+    </div>
+    <div class="wrap-pay-method">
+        <span><?= $block->escapeHtml(__('Payment Method')) ?></span>
+        <h3><?= $block->escapeHtml(__('Bank Mega VA')) ?></h3>
+        <h3><?= $block->escapeHtml(__('Debit Card   : Visa (4231 **** **** 1922)')) ?></h3>
+    </div>
+    <div class="table-order">
+        <table cellpadding="0" cellspacing="0" border="0">
+            <thead>
+                <tr>
+                    <th class="col id"><?= $block->escapeHtml(__('Order ID')) ?></th>
+                    <th class="col item"><?= $block->escapeHtml(__('Item Amount')) ?></th>
+                    <th class="col subtotal"><?= $block->escapeHtml(__('Subtotal')) ?></th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td class="col id"><?= $block->escapeHtml(__('ID/29038321')) ?></td>
+                    <td class="col item"><?= $block->escapeHtml(__('1')) ?></td>
+                    <td class="col subtotal"><?= $block->escapeHtml(__('Rp 298.000')) ?></td>
+                </tr>
+                <tr>
+                    <td class="col id"><?= $block->escapeHtml(__('ID/29038321')) ?></td>
+                    <td class="col item"><?= $block->escapeHtml(__('1')) ?></td>
+                    <td class="col subtotal"><?= $block->escapeHtml(__('Rp 298.000')) ?></td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td class="col id"></td>
+                    <td class="col subtotal-text"><?= $block->escapeHtml(__('Subtotal')) ?></td>
+                    <td class="col subtotal"><?= $block->escapeHtml(__('Rp 798.000')) ?></td>
+                </tr>
+                <tr>
+                    <td class="col id"></td>
+                    <td class="col subtotal-text">
+                        <?= $block->escapeHtml(__('Service Fee')) ?>
+                        <span><?= $block->escapeHtml(__('Debit & Credit Card')) ?></span>
+                    </td>
+                    <td class="col subtotal"><?= $block->escapeHtml(__('Rp 50.000')) ?></td>
+                </tr>
+                <tr class="discount">
+                    <td class="col id"></td>
+                    <td class="col subtotal-text">
+                        <?= $block->escapeHtml(__('Discount/Promo/Voucher')) ?>
+                    </td>
+                    <td class="col subtotal"><?= $block->escapeHtml(__('-Rp 50.000')) ?></td>
+                </tr>
+                <tr class="total">
+                    <td class="col id"></td>
+                    <td class="col subtotal-text">
+                        <?= $block->escapeHtml(__('Total Payment')) ?>
+                    </td>
+                    <td class="col subtotal"><?= $block->escapeHtml(__('Rp 798.000')) ?></td>
+                </tr>
+            </tfoot>
+
+        </table>
+    </div>
+    <div class="wrap-pay-method">
+        <span><?= $block->escapeHtml(__('Product List')) ?></span>
+        <h3><?= $block->escapeHtml(__('Order ID ID/29038321')) ?></h3>
+    </div>
+    <div class="wrap-pay-method">
+        <span><?= $block->escapeHtml(__('Delivery Address')) ?></span>
+        <h3><?= $block->escapeHtml(__('Rosita (Home)')) ?></h3>
+        <p><?= $block->escapeHtml(__('Jl. Cempaka Raya Gang Haji Munasir III No. 6, Cempaka Putih Barat, Jakarta Pusat')) ?></p>
+    </div>
+    <div class="table-order tale-order2">
+        <table cellpadding="0" cellspacing="0" border="0">
+            <thead>
+            <tr>
+                <th class="col id"><?= $block->escapeHtml(__('Product Name')) ?></th>
+                <th class="col item"><?= $block->escapeHtml(__('Item Amount')) ?></th>
+                <th class="col subtotal"><?= $block->escapeHtml(__('Subtotal')) ?></th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr>
+                <td class="col id"><?= $block->escapeHtml(__('Mediheal Line Friends E.G.T. Timetox Ampoule Mask')) ?></td>
+                <td class="col item"><?= $block->escapeHtml(__('1')) ?></td>
+                <td class="col subtotal"><?= $block->escapeHtml(__('Rp 298.000')) ?></td>
+            </tr>
+            <tr>
+                <td class="col id"><?= $block->escapeHtml(__('Missha Line Friends Edition Glow Tension Cushion')) ?></td>
+                <td class="col item"><?= $block->escapeHtml(__('1')) ?></td>
+                <td class="col subtotal"><?= $block->escapeHtml(__('Rp 500.000')) ?></td>
+            </tr>
+            </tbody>
+            <tfoot>
+            <tr>
+                <td class="col id"></td>
+                <td class="col subtotal-text"><?= $block->escapeHtml(__('Subtotal Product Price')) ?></td>
+                <td class="col subtotal"><?= $block->escapeHtml(__('Rp 798.000')) ?></td>
+            </tr>
+            <tr>
+                <td class="col id"></td>
+                <td class="col subtotal-text">
+                    <?= $block->escapeHtml(__('Subtotal Delivery Fee')) ?>
+                    <span><?= $block->escapeHtml(__('Regular Shipping Method')) ?></span>
+                </td>
+                <td class="col subtotal"><?= $block->escapeHtml(__('Rp 20.000')) ?></td>
+            </tr>
+            <tr>
+                <td class="col id"></td>
+                <td class="col subtotal-text">
+                    <?= $block->escapeHtml(__('Subtotal Additional Fee')) ?>
+                    <span><?= $block->escapeHtml(__('Delivery Insurance')) ?></span>
+                </td>
+                <td class="col subtotal"><?= $block->escapeHtml(__('Rp 0')) ?></td>
+            </tr>
+            <tr class="total-order-id">
+                <td class="col id"></td>
+                <td class="col subtotal-text">
+                    <?= $block->escapeHtml(__('Total Order ID/29038321')) ?>
+                </td>
+                <td class="col subtotal"><?= $block->escapeHtml(__('Rp 818.000')) ?></td>
+            </tr>
+            </tfoot>
+
+        </table>
+    </div>
+</div>

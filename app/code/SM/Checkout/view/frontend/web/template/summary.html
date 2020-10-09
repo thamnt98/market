@@ -1,0 +1,33 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<div class="opc-block-summary" data-bind="blockLoader: isLoading">
+    <!-- ko if:isVirtual() -->
+        <!-- ko foreach: getRegion('virtual_order_detail') -->
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <!-- /ko -->
+        <span data-bind="i18n: 'Payment Summary'" class="title"></span>
+    <!-- /ko -->
+    <!-- ko ifnot:isVirtual() -->
+        <span data-bind="i18n: 'Payment Details'" class="title"></span>
+        <!-- ko if:isStepShipping -->
+            <!-- ko if:splitOrder -->
+            <a data-bind="i18n: 'Edit Cart', attr: { href: getCartUrl()}" class="edit-cart"></a>
+            <!-- /ko -->
+        <!-- /ko -->
+        <!-- ko ifnot:isStepShipping -->
+        <span data-bind="text: seeDetails(), click: function(){showPaymentDetails()}" class="see-details"></span>
+        <!-- /ko -->
+    <!-- /ko -->
+
+    <!-- ko foreach: getRegion('voucher') -->
+    <!-- ko template: getTemplate() --><!-- /ko -->
+    <!-- /ko -->
+
+    <!-- ko foreach: getRegion('totals') -->
+    <!-- ko template: getTemplate() --><!-- /ko -->
+    <!-- /ko -->
+</div>

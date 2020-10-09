@@ -1,0 +1,7 @@
+<?php
+/** @var \SM\DigitalProduct\Block\Banner $block */
+
+?>
+<div class="dpb-bn-top">
+    <?php echo $block->getLayout()->createBlock(\Magento\Cms\Block\Block::class)->setBlockId($block->getBannerIdentifier())->toHtml();?>
+</div>

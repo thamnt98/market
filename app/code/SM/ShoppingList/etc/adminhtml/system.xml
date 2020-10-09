@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="wishlist" translate="label" type="text" sortOrder="140" showInDefault="0" showInWebsite="0" showInStore="0"/>
+        <section id="shoppinglist" translate="label" type="text" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Shopping List</label>
+            <tab>transmart</tab>
+            <resource>SM_ShoppingList::configuration</resource>
+            <group id="general" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                <label>General</label>
+                <field id="shopping_list_number" translate="label comment" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Number of Shopping Lists</label>
+                    <comment>The number of shopping lists should be equal to or more than 2.</comment>
+                    <frontend_class>required-entry validate-number-range number-range-2-99</frontend_class>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

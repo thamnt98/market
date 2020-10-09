@@ -1,0 +1,83 @@
+<?php
+/**
+ * @category    SM
+ * @package     SM_Customer
+ * @license     http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ *
+ * @author      Logan Ta <phuongtt2@smartosc.com>
+ *
+ * @copyright   Copyright (c) SmartOSC. All rights reserved.
+ * @url http://www.smartosc.com/
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var \SM\Customer\Block\Form\ForgotPassword $block */
+if (!$block->isLoggedIn()) :
+    ?>
+    <div class="block-container-signin block-container--forgot-password" id="tab-forgot-password"
+         style="display: none;">
+        <div class="row no-gutters">
+            <div class="container-signin--left col-xs-12 col-xl-6">
+                <img src='<?= $block->escapeUrl($block->getViewFileUrl('images/reliable.jpg')); ?>' alt="Welcome" loading="lazy" width="585" height="859">
+            </div>
+            <div class="container-signin--right col-xs-12 col-xl-6">
+                <div class="container-signin--content">
+                    <div class="block-title">
+                        <strong id="block-customer-forgot-password-heading"
+                                aria-level="2"><?= $block->escapeHtml(__('FORGOT PASSWORD')) ?></strong>
+                    </div>
+                    <p class="block-subtitle-recover">
+                        <?= /* @escapeNotVerified */
+                        __('We will send a verification message to your email or mobile number.') ?>
+                    </p>
+                    <div class="forgot-password-notification-field" id="forgot-password-success-field"></div>
+                    <div class="block-content" aria-labelledby="block-customer-forgot-password-heading">
+                        <form class="form-customer-forgot-password"
+                              id="form-customer-forgot-password"
+                              action=""
+                              method=""
+                              data-mage-init='{"validation":{}}'>
+                            <fieldset class="fieldset forgot-password" >
+                                <div class="field fgPass-request fieldInputText">
+                                    <label class="label" for="fgPass-request"><span><?= /* @escapeNotVerified */
+                                            __('Email or Mobile Number') ?></span></label>
+                                    <div class="control">
+                                        <input name="fgPass-request"
+                                               id="fgPass-request" type="text" class="input-text"
+                                               title="<?= /* @escapeNotVerified */
+                                               __('Email or Mobile Number') ?>"
+                                               data-validate="{required:true, 'validate-username':true}">
+                                        <div id="forgot-password-error" class="mage-error field-error"></div>
+                                    </div>
+                                    <div class="forgot-password-notification-field"
+                                         id="fgPass-request-notification-field"></div>
+                                </div>
+                                <div class="actions-toolbar">
+                                    <button type="submit" class="action forgot-password primary" id="form-forgot-password">
+                                <span><?= /* @escapeNotVerified */
+                                    __('Continue') ?></span></button>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                    <div class="block-footer back-to-login">
+                        <p><?= __('Remember your password?') ?></p>
+                        <button class="button" id="back-login"><?= __('Sign In') ?></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        require(
+            [
+                'ForgotPassword',
+                'domReady!'
+            ],
+            function (ForgotPassword) {
+                ForgotPassword.init();
+            }
+        );
+    </script>
+<?php endif; ?>

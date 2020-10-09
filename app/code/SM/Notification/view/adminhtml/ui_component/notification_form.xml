@@ -1,0 +1,633 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">notification_form.notification_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Notification Detail</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="save" class="SM\Notification\Ui\Component\Form\Button\Save"/>
+            <button name="back" class="SM\Notification\Ui\Component\Form\Button\Back"/>
+        </buttons>
+        <namespace>notification_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>notification_form.notification_form_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="notification_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="*/*/save"/>
+            <validateUrl path="*/*/validate"/>
+        </settings>
+        <dataProvider class="SM\Notification\Ui\Component\Form\DataProvider" name="notification_form_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    <fieldset name="period">
+        <settings>
+            <label translate="true">Period Time</label>
+        </settings>
+        <field name="start_date" sortOrder="10" formElement="date">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">notification</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Start Date</label>
+                <dataScope>start_date</dataScope>
+            </settings>
+            <formElements>
+                <date>
+                    <settings>
+                        <options>
+                            <option name="showsTime" xsi:type="boolean">true</option>
+                            <option name="dateFormat" xsi:type="string">M-d-yy</option>
+                            <option name="timeFormat" xsi:type="string">HH:mm:ss</option>
+                        </options>
+                    </settings>
+                </date>
+            </formElements>
+        </field>
+        <field name="end_date" sortOrder="20" formElement="date">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">notification</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">End Date</label>
+                <dataScope>end_date</dataScope>
+                <notice translate="true">
+                    `End Date` must be after `Start Date`
+                </notice>
+            </settings>
+            <formElements>
+                <date>
+                    <settings>
+                        <options>
+                            <option name="showsTime" xsi:type="boolean">true</option>
+                            <option name="dateFormat" xsi:type="string">M-d-yy</option>
+                            <option name="timeFormat" xsi:type="string">HH:mm:ss</option>
+                        </options>
+                    </settings>
+                </date>
+            </formElements>
+        </field>
+    </fieldset>
+    <fieldset name="web">
+        <settings>
+            <label translate="true">Information</label>
+        </settings>
+        <field name="title" sortOrder="10" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">notification</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Title</label>
+                <dataScope>title</dataScope>
+            </settings>
+        </field>
+        <field name="event" sortOrder="20" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">notification</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Event Type</label>
+                <dataScope>event</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="SM\Notification\Model\Source\EventType"/>
+                        <caption translate="true">-- Please Select --</caption>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="admin_type" sortOrder="30" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">notification</item>
+                    <item name="default" xsi:type="number">1</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>number</dataType>
+                <label translate="true">Customer Type</label>
+                <dataScope>admin_type</dataScope>
+                <switcherConfig>
+                    <rules>
+                        <rule name="0">
+                            <value>1</value>
+                            <actions>
+                                <action name="0">
+                                    <target>notification_form.notification_form.web.customer_ids</target>
+                                    <callback>disable</callback>
+                                </action>
+                                <action name="1">
+                                    <target>notification_form.notification_form.web.customer_ids</target>
+                                    <callback>hide</callback>
+                                </action>
+                                <action name="2">
+                                    <target>notification_form.notification_form.web.segment_ids</target>
+                                    <callback>disable</callback>
+                                </action>
+                                <action name="3">
+                                    <target>notification_form.notification_form.web.segment_ids</target>
+                                    <callback>hide</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="1">
+                            <value>2</value>
+                            <actions>
+                                <action name="0">
+                                    <target>notification_form.notification_form.web.customer_ids</target>
+                                    <callback>enable</callback>
+                                </action>
+                                <action name="1">
+                                    <target>notification_form.notification_form.web.customer_ids</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="2">
+                                    <target>notification_form.notification_form.web.segment_ids</target>
+                                    <callback>disable</callback>
+                                </action>
+                                <action name="3">
+                                    <target>notification_form.notification_form.web.segment_ids</target>
+                                    <callback>hide</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="2">
+                            <value>3</value>
+                            <actions>
+                                <action name="0">
+                                    <target>notification_form.notification_form.web.customer_ids</target>
+                                    <callback>disable</callback>
+                                </action>
+                                <action name="1">
+                                    <target>notification_form.notification_form.web.customer_ids</target>
+                                    <callback>hide</callback>
+                                </action>
+                                <action name="2">
+                                    <target>notification_form.notification_form.web.segment_ids</target>
+                                    <callback>enable</callback>
+                                </action>
+                                <action name="3">
+                                    <target>notification_form.notification_form.web.segment_ids</target>
+                                    <callback>show</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                    </rules>
+                    <enabled>true</enabled>
+                </switcherConfig>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="SM\Notification\Model\Source\CustomerType"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="customer_ids" sortOrder="40" formElement="multiselect">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">notification</item>
+                    <item name="elementTmpl" xsi:type="string">ui/grid/filters/elements/ui-select</item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/form/element/ui-select</item>
+                    <item name="filterOptions" xsi:type="boolean">true</item>
+                    <item name="showCheckbox" xsi:type="boolean">true</item>
+                    <item name="disableLabel" xsi:type="boolean">true</item>
+                    <item name="multiple" xsi:type="boolean">true</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>int</dataType>
+                <label translate="true">Customer (s)</label>
+                <dataScope>customer_ids</dataScope>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="SM\Notification\Model\Source\Customers"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+        <field name="segment_ids" sortOrder="40" formElement="multiselect">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">notification</item>
+                    <item name="elementTmpl" xsi:type="string">ui/grid/filters/elements/ui-select</item>
+                    <item name="component" xsi:type="string">Magento_Ui/js/form/element/ui-select</item>
+                    <item name="filterOptions" xsi:type="boolean">true</item>
+                    <item name="showCheckbox" xsi:type="boolean">true</item>
+                    <item name="disableLabel" xsi:type="boolean">true</item>
+                    <item name="multiple" xsi:type="boolean">true</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>int</dataType>
+                <label translate="true">Segment (s)</label>
+                <dataScope>segment_ids</dataScope>
+            </settings>
+            <formElements>
+                <multiselect>
+                    <settings>
+                        <options class="SM\Notification\Model\Source\Segments"/>
+                    </settings>
+                </multiselect>
+            </formElements>
+        </field>
+        <field name="image" sortOrder="50">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">string</item>
+                    <item name="source" xsi:type="string">notification</item>
+                    <item name="label" xsi:type="string" translate="true">Image</item>
+                    <item name="formElement" xsi:type="string">imageUploader</item>
+                    <item name="elementTmpl" xsi:type="string">ui/form/element/uploader/image</item>
+                    <item name="previewTmpl" xsi:type="string">Magento_Catalog/image-preview</item>
+                    <item name="allowedExtensions" xsi:type="string">jpeg jpg gif png</item>
+                    <item name="notice" xsi:type="string" translate="true">
+                        <![CDATA[
+                            Allowed file types: jpeg, jpg, gif, png.<br/>
+                            Image's size is 118 x 118.
+                        ]]>
+                    </item>
+                    <item name="uploaderConfig" xsi:type="array">
+                        <item name="url" xsi:type="string">sm_filemanagement/file/upload</item>
+                    </item>
+                    <item name="required" xsi:type="boolean">false</item>
+                </item>
+            </argument>
+        </field>
+        <field name="content" template="ui/form/field" sortOrder="60" formElement="wysiwyg">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="wysiwygConfigData" xsi:type="array">
+                        <item name="height" xsi:type="string">100px</item>
+                        <item name="add_variables" xsi:type="boolean">false</item>
+                        <item name="add_widgets" xsi:type="boolean">false</item>
+                        <item name="add_images" xsi:type="boolean">true</item>
+                        <item name="add_directives" xsi:type="boolean">true</item>
+                        <item name="is_pagebuilder_enabled" xsi:type="boolean">false</item>
+                    </item>
+                </item>
+            </argument>
+            <settings>
+                <label>Content</label>
+            </settings>
+            <formElements>
+                <wysiwyg>
+                    <settings>
+                        <rows>8</rows>
+                        <wysiwyg>true</wysiwyg>
+                    </settings>
+                </wysiwyg>
+            </formElements>
+        </field>
+        <field name="redirect_type" sortOrder="80" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">notification</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Redirect Type</label>
+                <dataScope>redirect_type</dataScope>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="SM\Notification\Model\Source\RedirectType"/>
+                        <caption translate="true">-- Please Select --</caption>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="redirect_id" sortOrder="90" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">notification</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Redirect Key</label>
+                <dataScope>redirect_id</dataScope>
+            </settings>
+        </field>
+    </fieldset>
+    <fieldset name="push">
+        <settings>
+            <label translate="true">Push to Device</label>
+            <collapsible>true</collapsible>
+        </settings>
+        <field name="is_push" sortOrder="0" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">notification</item>
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Enabled</label>
+                <dataScope>is_push</dataScope>
+                <tooltip>
+                    <description translate="true">Enable Push to Device</description>
+                </tooltip>
+                <dataType>number</dataType>
+                <switcherConfig>
+                    <rules>
+                        <rule name="0">
+                            <value>0</value>
+                            <actions>
+                                <action name="0">
+                                    <target>notification_form.notification_form.push.push_title</target>
+                                    <callback>disable</callback>
+                                </action>
+                                <action name="1">
+                                    <target>notification_form.notification_form.push.push_content</target>
+                                    <callback>disable</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="1">
+                            <value>1</value>
+                            <actions>
+                                <action name="0">
+                                    <target>notification_form.notification_form.push.push_title</target>
+                                    <callback>enable</callback>
+                                </action>
+                                <action name="1">
+                                    <target>notification_form.notification_form.push.push_content</target>
+                                    <callback>enable</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                    </rules>
+                    <enabled>true</enabled>
+                </switcherConfig>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <prefer>toggle</prefer>
+                        <valueMap>
+                            <map name="false" xsi:type="boolean">0</map>
+                            <map name="true" xsi:type="boolean">1</map>
+                        </valueMap>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="push_title" sortOrder="10" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">notification</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Title</label>
+                <dataScope>push_title</dataScope>
+            </settings>
+        </field>
+        <field name="push_content" sortOrder="20" formElement="textarea">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">notification</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Content (Push to Device)</label>
+                <dataScope>push_content</dataScope>
+            </settings>
+        </field>
+    </fieldset>
+    <fieldset name="send_email">
+        <settings>
+            <label translate="true">Send Email</label>
+            <collapsible>true</collapsible>
+        </settings>
+        <field name="is_send_email" sortOrder="0" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">notification</item>
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Enabled</label>
+                <dataScope>is_send_email</dataScope>
+                <tooltip>
+                    <description translate="true">Enable Send Email</description>
+                </tooltip>
+                <dataType>number</dataType>
+                <switcherConfig>
+                    <rules>
+                        <rule name="0">
+                            <value>0</value>
+                            <actions>
+                                <action name="0">
+                                    <target>notification_form.notification_form.send_email.email_subject</target>
+                                    <callback>disable</callback>
+                                </action>
+                                <action name="1">
+                                    <target>notification_form.notification_form.send_email.email_template</target>
+                                    <callback>disable</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="1">
+                            <value>1</value>
+                            <actions>
+                                <action name="0">
+                                    <target>notification_form.notification_form.send_email.email_subject</target>
+                                    <callback>enable</callback>
+                                </action>
+                                <action name="1">
+                                    <target>notification_form.notification_form.send_email.email_template</target>
+                                    <callback>enable</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                    </rules>
+                    <enabled>true</enabled>
+                </switcherConfig>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <prefer>toggle</prefer>
+                        <valueMap>
+                            <map name="false" xsi:type="boolean">0</map>
+                            <map name="true" xsi:type="boolean">1</map>
+                        </valueMap>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="email_subject" sortOrder="10" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">notification</item>
+                </item>
+            </argument>
+            <settings>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <dataType>text</dataType>
+                <label translate="true">Subject</label>
+                <dataScope>email_subject</dataScope>
+            </settings>
+        </field>
+        <field name="email_template" sortOrder="20" formElement="select">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">notification</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Email Template</label>
+                <dataScope>email_template</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="SM\Notification\Model\Source\EmailTemplate"/>
+                        <caption translate="true">-- Please Select --</caption>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+    </fieldset>
+    <fieldset name="send_sms">
+        <settings>
+            <label translate="true">Send SMS</label>
+            <collapsible>true</collapsible>
+        </settings>
+        <field name="is_send_sms" sortOrder="0" formElement="checkbox">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">notification</item>
+                    <item name="default" xsi:type="number">0</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Enabled</label>
+                <dataScope>is_send_sms</dataScope>
+                <tooltip>
+                    <description translate="true">Enable Send SMS</description>
+                </tooltip>
+                <dataType>number</dataType>
+                <switcherConfig>
+                    <rules>
+                        <rule name="0">
+                            <value>0</value>
+                            <actions>
+                                <action name="0">
+                                    <target>notification_form.notification_form.send_sms.sms</target>
+                                    <callback>disable</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="1">
+                            <value>1</value>
+                            <actions>
+                                <action name="0">
+                                    <target>notification_form.notification_form.send_sms.sms</target>
+                                    <callback>enable</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                    </rules>
+                    <enabled>true</enabled>
+                </switcherConfig>
+            </settings>
+            <formElements>
+                <checkbox>
+                    <settings>
+                        <prefer>toggle</prefer>
+                        <valueMap>
+                            <map name="false" xsi:type="boolean">0</map>
+                            <map name="true" xsi:type="boolean">1</map>
+                        </valueMap>
+                    </settings>
+                </checkbox>
+            </formElements>
+        </field>
+        <field name="sms" sortOrder="10" formElement="textarea">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">notification</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Content</label>
+                <dataScope>sms</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+            </settings>
+        </field>
+    </fieldset>
+</form>

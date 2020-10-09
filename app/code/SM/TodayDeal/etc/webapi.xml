@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category SM
+ * @package SM_TodayDeal
+ * @license     http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ *
+ * @author      Chinhvd <chinhvd@smartosc.com>
+ *
+ * @copyright   Copyright (c) SmartOSC. All rights reserved.
+ * @url http://www.smartosc.com/
+ */
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <!-- Today Deals Post -->
+    <route url="/V1/todaydeal/post/:postId" method="GET">
+        <service class="SM\TodayDeal\Api\PostRepositoryInterface" method="getById"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/todaydeal/getList" method="GET">
+        <service class="SM\TodayDeal\Api\PostRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/todaydeal/getAllProducts" method="GET">
+        <service class="SM\TodayDeal\Api\PostRepositoryInterface" method="getProducts"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/todaydeal/getListDeals" method="GET">
+        <service class="SM\TodayDeal\Api\PostRepositoryInterface" method="getListDeals"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+    <route url="/V1/todaydeal/flashsale" method="GET">
+        <service class="SM\TodayDeal\Api\PostRepositoryInterface" method="getFlashSaleDetail"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+</routes>

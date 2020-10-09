@@ -1,0 +1,113 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_IntegrationOrder
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Muhammad Randy <muhammad.randy@transdigital.co.id>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    
+    <type name="Trans\IntegrationOrder\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+    
+    <type name="Trans\IntegrationOrder\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">integrationorder</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="system" xsi:type="object">Trans\IntegrationOrder\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- Order -->
+    <preference for="Trans\IntegrationOrder\Api\Data\IntegrationOrderInterface" 
+                type="Trans\IntegrationOrder\Model\IntegrationOrder"/>
+
+    <preference for="Trans\IntegrationOrder\Api\IntegrationOrderRepositoryInterface" 
+                type="Trans\IntegrationOrder\Model\IntegrationOrderRepository"/>  
+    <!-- End Order -->
+
+    <!-- Item -->
+    <preference for="Trans\IntegrationOrder\Api\Data\IntegrationOrderItemInterface" 
+                type="Trans\IntegrationOrder\Model\IntegrationOrderItem"/>
+
+    <preference for="Trans\IntegrationOrder\Api\IntegrationOrderItemRepositoryInterface" 
+                type="Trans\IntegrationOrder\Model\IntegrationOrderItemRepository"/>
+    <!-- End Item -->
+
+    <!-- Payment -->
+    <preference for="Trans\IntegrationOrder\Api\Data\IntegrationOrderPaymentInterface" 
+                type="Trans\IntegrationOrder\Model\IntegrationOrderPayment"/>
+
+    <preference for="Trans\IntegrationOrder\Api\IntegrationOrderPaymentRepositoryInterface" 
+                type="Trans\IntegrationOrder\Model\IntegrationOrderPaymentRepository"/>
+
+    <preference for="Trans\IntegrationOrder\Api\PaymentStatusInterface" 
+                type="Trans\IntegrationOrder\Model\PaymentStatus"/>
+    <!-- End Payment -->
+
+    <!-- OAR -->
+    <preference for="Trans\IntegrationOrder\Api\Data\IntegrationOrderAllocationRuleInterface" 
+                type="Trans\IntegrationOrder\Model\IntegrationOrderAllocationRule"/>
+
+    <preference for="Trans\IntegrationOrder\Api\IntegrationOrderAllocationRuleRepositoryInterface" 
+                type="Trans\IntegrationOrder\Model\IntegrationOrderAllocationRuleRepository"/>
+
+    <preference for="Trans\IntegrationOrder\Api\OrderAllocationRuleInterface" 
+                type="Trans\IntegrationOrder\Model\AllocationRuleIntegration"/>
+    <!-- End OAR -->
+    
+    <!-- OMS -->
+    <preference for="Trans\IntegrationOrder\Api\OmsIntegrationInterface" 
+                type="Trans\IntegrationOrder\Model\OmsIntegration"/>
+    <!-- End OMS -->  
+
+    <!-- Status Shipping -->
+    <preference for="Trans\IntegrationOrder\Api\OrderStatusInterface" 
+                type="Trans\IntegrationOrder\Model\OrderStatus"/>
+
+    <preference for="Trans\IntegrationOrder\Api\Data\IntegrationOrderStatusInterface" 
+                type="Trans\IntegrationOrder\Model\IntegrationOrderStatus"/>
+
+    <preference for="Trans\IntegrationOrder\Api\IntegrationOrderStatusRepositoryInterface" 
+                type="Trans\IntegrationOrder\Model\IntegrationOrderStatusRepository"/>
+    <!-- End Status Shipping --> 
+
+    <!-- History Order -->
+    <preference for="Trans\IntegrationOrder\Api\Data\IntegrationOrderHistoryInterface" 
+                type="Trans\IntegrationOrder\Model\IntegrationOrderHistory"/>
+
+    <preference for="Trans\IntegrationOrder\Api\IntegrationOrderHistoryRepositoryInterface" 
+                type="Trans\IntegrationOrder\Model\IntegrationOrderHistoryRepository"/>
+    <!-- End History Order --> 
+
+    <!-- Refund -->
+    <preference for="Trans\IntegrationOrder\Api\Data\RefundInterface" 
+                type="Trans\IntegrationOrder\Model\Refund"/>
+    <preference for="Trans\IntegrationOrder\Api\RefundRepositoryInterface" 
+                type="Trans\IntegrationOrder\Model\RefundRepository"/>
+    <!-- End Refund --> 
+
+    <!-- return -->
+    <preference for="Trans\IntegrationOrder\Api\ReturnStatusInterface" 
+                type="Trans\IntegrationOrder\Model\ReturnStatus"/>
+
+    <preference for="Trans\IntegrationOrder\Api\Data\IntegrationOrderReturnInterface" 
+                type="Trans\IntegrationOrder\Model\IntegrationOrderReturn"/>
+
+    <preference for="Trans\IntegrationOrder\Api\IntegrationOrderReturnRepositoryInterface" 
+                type="Trans\IntegrationOrder\Model\IntegrationOrderReturnRepository"/>
+    <!-- End return --> 
+
+</config>

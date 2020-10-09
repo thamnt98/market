@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_LayeredNavigation
+ *
+ * Date: April, 25 2020
+ * Time: 5:18 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="SM_LayeredNavigation" setup_version="0.0.1">
+        <sequence>
+            <module name="Amasty_Shopby"/>
+            <module name="Magento_Catalog"/>
+            <module name="Magento_LayeredNavigation"/>
+            <module name="Magento_LayeredNavigationStaging"/>
+        </sequence>
+    </module>
+</config>

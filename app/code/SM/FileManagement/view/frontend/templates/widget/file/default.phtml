@@ -1,0 +1,16 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/* @var $block \SM\FileManagement\Block\Widget\File */
+
+?>
+<div class="video file">
+    <?= /* @noEscape */ $block->getContentHtml() ?>
+    <video width="490" height="298" poster="<?= $block->escapeUrl($block->getThumbnailUrl())?>" controls>
+        <source src="<?= $block->escapeUrl($block->getFileUrl())?>">
+        <?= __('Your browser does not support the video tag.') //phpcs:ignore Magento2.Security.XssTemplate.FoundUnescaped?>
+    </video>
+</div>

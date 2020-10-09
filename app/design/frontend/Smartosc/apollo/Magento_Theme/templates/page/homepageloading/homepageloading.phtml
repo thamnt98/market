@@ -1,0 +1,29 @@
+<?php
+/**
+ * @category    Magento
+ * @package     Magento_Theme
+ * @license     http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ *
+ * @author      Logan Ta <phuongtt2@smartosc.com>
+ *
+ * @copyright   Copyright (c) SmartOSC. All rights reserved.
+ * @url http://www.smartosc.com/
+ *
+ * @var \SM\Theme\Block\Page\Loading $block
+ */
+?>
+<?php if($block->isHomepage()):?>
+<script type="text/x-magento-init">
+            {
+                "*": {
+                    "Magento_Ui/js/core/app": {
+                        "components": {
+                            "pageloading": {
+                                "component": "Magento_Theme/js/view/homepageloading/pageloading"
+                                        }
+                                    }
+                                }
+                }
+            }
+</script>
+<?php endif; ?>

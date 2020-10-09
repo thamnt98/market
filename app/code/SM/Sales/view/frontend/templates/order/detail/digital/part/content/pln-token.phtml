@@ -1,0 +1,53 @@
+<?php
+/** @var \SM\Sales\Block\Order\Digital\Part\Content $block */
+
+/** @var \SM\Sales\Api\Data\DigitalOrderDataInterface $digitalOrder */
+$digitalOrder = $block->getParentOrder();
+$ext = $digitalOrder->getProductOption()->getExtensionAttributes();
+$digital = $ext->getDigitalData()->getDigital();
+$digitalTransaction = $ext->getDigitalData()->getDigitalTransaction();
+?>
+<div class="bx-order-status bx-order-status-digital">
+    <div class="od-delivery-address">
+        <div class="tracking-order-service">
+            <span class="service-type"><?= $block->escapeHtml(__('Service Type')) ?></span>
+            <h4><?= $digital->getServiceType() ?></h4>
+        </div>
+        <div class="product-name">
+            <span class="delivery-address"><?= $block->escapeHtml(__('Name')) ?></span>
+            <h4><?= $digital->getCustomerName() ?></h4>
+        </div>
+        <?php if ($serialNumber = $digitalTransaction->getSerialNumber()): ?>
+        <div class="serial-number">
+            <span class="delivery-address"><?= $block->escapeHtml(__('Serial Number')) ?></span>
+            <h4><?=  $block->escapeHtml($serialNumber) ?></h4>
+        </div>
+        <?php endif; ?>
+    </div>
+    <div class="tracking-order">
+        <div class="mobile-number">
+            <span class="delivery-address"><?= $block->escapeHtml(__('Customer ID')) ?></span>
+            <h4><?= $digital->getCustomerId() ?></h4>
+        </div>
+        <div class="serial-number">
+            <span class="delivery-address"><?= $block->escapeHtml(__('Power')) ?></span>
+            <h4><?= $digital->getPower() ?></h4>
+        </div>
+        <?php if ($tokenNumber = $digitalTransaction->getTokenNumber()): ?>
+        <div class="serial-number">
+            <span class="delivery-address"><?= $block->escapeHtml(__('Token Number')) ?></span>
+            <h4><?= $tokenNumber ?></h4>
+        </div>
+        <?php endif; ?>
+    </div>
+    <div class="od-delivery-address-last">
+        <div class="operator">
+            <span class="delivery-address"><?= $block->escapeHtml(__('Material Number')) ?></span>
+            <h4><?= $digital->getMaterialNumber() ?></h4>
+        </div>
+        <div class="operator">
+            <span class="delivery-address"><?= $block->escapeHtml(__('Product Name')) ?></span>
+            <h4><?= $digitalOrder->getProductName() ?></h4>
+        </div>
+    </div>
+</div>

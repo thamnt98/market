@@ -1,0 +1,40 @@
+{
+    "sm_review_edit": {
+        "column": {
+            "entity_id": true,
+            "review_id": true,
+            "detail": true,
+            "title": true,
+            "vote_value": true,
+            "created_at": true,
+            "image_changed": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "SM_REVIEW_EDIT_REVIEW_ID_REVIEW_REVIEW_ID": true
+        }
+    },
+    "review": {
+        "column": {
+            "is_email_sent": true,
+            "invoice_id": true,
+            "order_id": true
+        },
+        "constraint": {
+            "REVIEW_ORDER_ID_SALES_ORDER_ENTITY_ID": true,
+            "REVIEW_INVOICE_ID_SALES_INVOICE_ENTITY_ID": true
+        }
+    },
+    "review_image": {
+        "column": {
+            "id": true,
+            "review_id": true,
+            "image": true,
+            "is_edit": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "REVIEW_IMAGE_REVIEW_ID_REVIEW_REVIEW_ID": true
+        }
+    }
+}

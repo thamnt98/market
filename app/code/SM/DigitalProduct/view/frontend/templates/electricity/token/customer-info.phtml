@@ -1,0 +1,16 @@
+<?php
+/** @var \SM\DigitalProduct\Block\Electricity\Token\CustomerInformation $block */
+
+$information = $block->getInformation();
+?>
+
+<?php if ($information->getResponseCode() == \SM\DigitalProduct\Api\ReorderRepositoryInterface::SUCCESS): ?>
+    <td class="data data-ajax"><?= $block->escapeHtml($information->getSubscriberId()) ?></td>
+    <td class="data data-ajax"><?= $block->escapeHtml($information->getMaterialNumber()) ?></td>
+    <td class="data data-ajax"><?= $block->escapeHtml($information->getSubscriberName()) ?></td>
+    <td class="data data-ajax"><?= $block->escapeHtml(__("%1 VA", $information->getPower())) ?></td>
+    <input class="data-ajax" type="hidden" value="<?= $information->getMaterialNumber() ?>"
+           name="digital[material_number]"/>
+    <input class="data-ajax" type="hidden" value="<?= $information->getSubscriberName() ?>" name="digital[name]"/>
+    <input class="data-ajax" type="hidden" value="<?= $information->getPower() . " VA" ?>" name="digital[power]"/>
+<?php endif; ?>

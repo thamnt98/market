@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <store_locator>
+            <general>
+                <max_distance>20</max_distance>
+                <delete_uploaded_file>0</delete_uploaded_file>
+                <number_location_displayed>5</number_location_displayed>
+            </general>
+        </store_locator>
+    </default>
+</config>

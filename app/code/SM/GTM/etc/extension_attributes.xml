@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Api/etc/extension_attributes.xsd">
+    <extension_attributes for="Magento\Customer\Api\Data\CustomerInterface">
+        <attribute code="unique_user_id_gtm" type="string"/>
+        <attribute code="user_id_gtm" type="string"/>
+        <attribute code="login_type_gtm" type="string"/>
+        <attribute code="customer_type_gtm" type="string"/>
+        <attribute code="loyalty_gtm" type="string"/>
+        <attribute code="customer_status_gtm" type="string"/>
+        <attribute code="full_name_gtm" type="string"/>
+        <attribute code="email_gtm" type="string"/>
+        <attribute code="phone_number_gtm" type="string"/>
+        <attribute code="city_name_gtm" type="string"/>
+        <attribute code="district_name_gtm" type="string"/>
+        <attribute code="social_type" type="string"/>
+        <attribute code="identity" type="string"/>
+        <attribute code="avatar" type="string"/>
+        <attribute code="basket_id_gtm" type="string"/>
+        <attribute code="store_gtm_name" type="string"/>
+        <attribute code="store_gtm_id" type="string"/>
+    </extension_attributes>
+</config>

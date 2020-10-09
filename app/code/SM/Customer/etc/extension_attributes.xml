@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Api/etc/extension_attributes.xsd">
+    <extension_attributes for="Magento\Customer\Api\Data\CustomerInterface">
+        <attribute code="login_type" type="string"/>
+        <attribute code="identifier" type="string"/>
+
+        <attribute code="gender_option" type="SM\Customer\Api\Data\CustomerOptionInterface[]"/>
+        <attribute code="marital_status_option" type="SM\Customer\Api\Data\CustomerOptionInterface[]"/>
+
+    </extension_attributes>
+</config>

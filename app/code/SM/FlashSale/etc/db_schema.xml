@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="magento_catalogevent_event" resource="default" engine="innodb" comment="Enterprise Catalogevent Event">
+        <column xsi:type="varchar" name="flash_sale_image" nullable="true" length="255" comment="Image"/>
+    </table>
+    <table name="magento_catalogevent_event_image" resource="default" engine="innodb"
+           comment="Enterprise Catalogevent Event Image">
+        <column xsi:type="text" name="terms_conditions" nullable="true" comment="Flash Sale Terms And Conditions"/>
+        <column xsi:type="varchar" name="mb_short_title" length="255" nullable="true"
+                comment="Flash Sale Short Title Mobile"/>
+        <column xsi:type="text" name="mb_short_description" nullable="true" comment="Flash Sale Short Description"/>
+        <column xsi:type="varchar" name="mb_title" length="255" nullable="true"
+                comment="Flash Sale Detail Title Mobile"/>
+    </table>
+</schema>

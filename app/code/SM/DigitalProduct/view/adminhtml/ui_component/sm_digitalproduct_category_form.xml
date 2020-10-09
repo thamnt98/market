@@ -1,0 +1,152 @@
+<?xml version="1.0" ?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+	<argument name="data" xsi:type="array">
+		<item name="js_config" xsi:type="array">
+			<item name="provider" xsi:type="string">sm_digitalproduct_category_form.category_form_data_source</item>
+		</item>
+		<item name="label" translate="true" xsi:type="string">General Information</item>
+		<item name="template" xsi:type="string">templates/form/collapsible</item>
+	</argument>
+	<settings>
+		<buttons>
+			<button class="SM\DigitalProduct\Block\Adminhtml\Category\Edit\BackButton" name="back"/>
+			<button class="SM\DigitalProduct\Block\Adminhtml\Category\Edit\SaveButton" name="save"/>
+		</buttons>
+		<namespace>sm_digitalproduct_category_form</namespace>
+		<dataScope>data</dataScope>
+		<deps>
+			<dep>sm_digitalproduct_category_form.category_form_data_source</dep>
+		</deps>
+	</settings>
+	<dataSource name="category_form_data_source">
+		<argument name="data" xsi:type="array">
+			<item name="js_config" xsi:type="array">
+				<item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+			</item>
+		</argument>
+		<settings>
+			<submitUrl path="*/*/save"/>
+		</settings>
+		<dataProvider class="SM\DigitalProduct\Model\Category\DataProvider" name="category_form_data_source">
+			<settings>
+				<requestFieldName>category_id</requestFieldName>
+				<primaryFieldName>category_id</primaryFieldName>
+			</settings>
+		</dataProvider>
+	</dataSource>
+    <fieldset name="product_mapping">
+        <settings>
+            <label>Category Mapping</label>
+        </settings>
+        <field name="type" formElement="select" sortOrder="80">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">category</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Digital Category</label>
+                <dataScope>type</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <scopeLabel>[GLOBAL]</scopeLabel>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="SM\DigitalProduct\Ui\Component\Form\Category\Type\Options"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+        <field name="magento_category_ids" formElement="select" sortOrder="70">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">category</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Magento Category</label>
+                <dataScope>magento_category_ids</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
+                <scopeLabel>[GLOBAL]</scopeLabel>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options class="SM\DigitalProduct\Ui\Component\Form\Category\Options"/>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+    </fieldset>
+    <fieldset name="category_content">
+        <settings>
+            <label>Content</label>
+        </settings>
+        <field formElement="textarea" name="tooltip" sortOrder="40">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">category</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Tooltip</label>
+                <dataScope>tooltip</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+                <scopeLabel>[STORE VIEW]</scopeLabel>
+            </settings>
+        </field>
+        <field formElement="textarea" name="info" sortOrder="50">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">category</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Info (Use in Payment Page)</label>
+                <dataScope>info</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">false</rule>
+                </validation>
+                <scopeLabel>[STORE VIEW]</scopeLabel>
+            </settings>
+        </field>
+        <field name="information" template="ui/form/field" sortOrder="60" formElement="wysiwyg">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="wysiwygConfigData" xsi:type="array">
+                        <item name="is_pagebuilder_enabled" xsi:type="boolean">false</item>
+                        <item name="height" xsi:type="string">100px</item>
+                        <item name="add_variables" xsi:type="boolean">false</item>
+                        <item name="add_widgets" xsi:type="boolean">false</item>
+                        <item name="add_images" xsi:type="boolean">true</item>
+                        <item name="add_directives" xsi:type="boolean">true</item>
+                    </item>
+                    <item name="source" xsi:type="string">category</item>
+                </item>
+            </argument>
+            <settings>
+                <label translate="true">Information</label>
+                <dataScope>information</dataScope>
+            </settings>
+            <formElements>
+                <wysiwyg class="Magento\Catalog\Ui\Component\Category\Form\Element\Wysiwyg">
+                    <settings>
+                        <rows>8</rows>
+                        <wysiwyg>true</wysiwyg>
+                    </settings>
+                </wysiwyg>
+            </formElements>
+        </field>
+    </fieldset>
+</form>

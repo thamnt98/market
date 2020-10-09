@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
+    <template id="sm_customer_verify_email_template" label="Verify Email" file="verify_email.html" type="html"
+              module="SM_Customer" area="frontend"/>
+    <template id="sm_customer_registration_success_email_template" label="Registration Success"
+              file="registration_success_email.html" type="html" module="SM_Customer" area="frontend"/>
+    <template id="customer_password_forgot_email_template" label="Forgot Password"
+              file="password_reset_confirmation.html" type="html" module="SM_Customer" area="frontend"/>
+    <template id="sm_customer_change_email_notification_template" label="Change Email Notification Email"
+              file="change_email_notification_email.html" type="html" module="SM_Customer" area="frontend"/>
+    <template id="sm_customer_change_telephone_notification_template" label="Change Telephone Notification Email"
+              file="change_telephone_notification_email.html" type="html" module="SM_Customer" area="frontend"/>
+    <template id="sm_customer_change_personal_information_notification_template"
+              label="Change Personal Information Notification Email"
+              file="change_personal_information_notification_email.html"
+              type="html" module="SM_Customer" area="frontend"/>
+    <template id="sm_customer_recovery_template" label="Recovery Email"
+              file="recovery_email.html" type="html" module="SM_Customer" area="frontend"/>
+    <template id="sm_customer_recovery_lock" label="Lock Customer Notification Email"
+              file="lock_customer_email.html" type="html" module="SM_Customer" area="frontend"/>
+    <template id="sm_customer_recovery_success_email" label="Recovery Success"
+              file="recovery_success.html" type="html" module="SM_Customer" area="frontend"/>
+    <template id="sm_customer_change_password_notification_template" label="Change Password" file="change_password.html" type="html"
+              module="SM_Customer" area="frontend"/>
+    <template id="sm_customer_deletion_confirmation" label="Account Deletion Confirmation" file="deletion_confirmation.html" type="html"
+              module="SM_Customer" area="frontend"/>
+    <template id="sm_customer_deletion_success" label="Account Deletion Success" file="deletion_success.html" type="html"
+              module="SM_Customer" area="frontend"/>
+</config>

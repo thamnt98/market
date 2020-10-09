@@ -1,0 +1,13 @@
+<?php
+/** @var $block \SM\Checkout\Block\Onepage\Shipping */
+?>
+<div class="shipping-block" data-bind="scope:'shipping-block'">
+    <!-- ko template: getTemplate() --><!-- /ko -->
+    <script type="text/x-magento-init">
+        {
+            "#step1": {
+                "Magento_Ui/js/core/app":  <?php /* @escapeNotVerified */ echo $block->getJsLayout();?>
+            }
+        }
+    </script>
+</div>

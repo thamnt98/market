@@ -1,0 +1,81 @@
+<?php
+/**
+ * @category    SM
+ * @package     SM_Customer
+ * @license     http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ *
+ * @author      Logan Ta <phuongtt2@smartosc.com>
+ *
+ * @copyright   Copyright (c) SmartOSC. All rights reserved.
+ * @url http://www.smartosc.com/
+ */
+
+// @codingStandardsIgnoreFile
+
+/** @var \SM\Customer\Block\Form\ForgotPassword $block */
+if (!$block->isLoggedIn()) :
+    ?>
+    <div class="block-container-signin block-container--lock" id="tab-lock"
+         style="display: none;">
+        <div class="row no-gutters">
+            <div class="container-signin--left col-xs-12 col-xl-6">
+                <img src='<?= $block->escapeUrl($block->getViewFileUrl('images/reliable.jpg')); ?>' alt="Welcome" loading="lazy" width="585" height="859">
+            </div>
+            <div class="container-signin--right col-xs-12 col-xl-6">
+                <button class="action-close" selector="close" type="button">
+                    <span><?= __('Close') ?></span>
+                </button>
+                <div class="container-signin--content">
+                    <div class="block-title">
+                        <strong id="block-customer-forgot-password-heading"
+                                aria-level="2"><?= $block->escapeHtml(__('Recover your account')) ?></strong>
+                    </div>
+                    <div class="block-subtitle-recover">
+                        <?= /* @escapeNotVerified */
+                        __('Sorry, your account has been temporarily locked for exceeding the maximum number of attempts to sign in. To recover it, please enter your email or mobile number.') ?>
+                    </div>
+                    <div class="block-content">
+                        <form class="form-customer-lock"
+                              id="form-customer-lock"
+                              action=""
+                              method=""
+                              data-mage-init='{"validation":{}}'>
+                            <fieldset class="fieldset forgot-password">
+                                <div class="field fgPass-request fieldInputText">
+                                    <label class="label" for="fgPass-request"><span><?= /* @escapeNotVerified */
+                                            __('Email or Mobile Number') ?></span></label>
+                                    <div class="control">
+                                        <input name="username" type="text" class="input-text"
+                                               title="<?= /* @escapeNotVerified */
+                                               __('Email or Mobile Number') ?>"
+                                               data-validate="{required:true, 'validate-username':true}">
+                                        <div generated="true" class="mage-error" id="user-not-exist" style="display: none"></div>
+                                    </div>
+                                </div>
+                                <div class="message-otp-notice" selector="message-otp-notice"></div>
+                                <div class="actions-toolbar">
+                                    <button type="submit" class="action primary">
+                                <span><?= /* @escapeNotVerified */
+                                    __('Continue') ?></span></button>
+                                </div>
+                            </fieldset>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/x-magento-init">
+        {
+            "*": {
+                "SM_Customer/js/lock": {
+                    "tabLockSelector": "#tab-lock",
+                    "checkUserUrl": "<?= $block->escapeUrl($block->getUrl('customer/account/userexist')); ?>",
+                    "loginUrl": "<?= $block->escapeUrl($block->getUrl('customer/trans/loginAjax')); ?>",
+                    "sendRecoveryUrl": "<?= $block->escapeUrl($block->getUrl('customer/account/sendrecovery')); ?>",
+                    "redirectUrl": "<?= $block->escapeUrl($block->getUrl('customer/account/resetpasstk')); ?>"
+                }
+            }
+        }
+    </script>
+<?php endif; ?>

@@ -1,0 +1,11 @@
+<?php
+/** @var \SM\Review\Block\Customer\Tabs $block */
+?>
+
+    <div class="item title <?= $block->checkTabActive('to-be-reviewed') ?>">
+        <a class="switch" href="<?= $block->getUrl("review/customer/list", ['tab' => 'to-be-reviewed']) ?>"><?= __('To be Reviewed') ?></a>
+    </div>
+    <div class="item title <?= $block->checkTabActive('reviewed') ?>">
+        <a class="switch" href="<?= $block->getUrl("review/customer/list", ['tab' => 'reviewed']) ?>"><?= __('Reviewed') ?></a>
+    </div>
+

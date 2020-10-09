@@ -1,0 +1,103 @@
+<?php
+/**
+ * @category    Magento
+ * @package     Magento_Catalog
+ * @license     http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ *
+ * @author      Logan Ta <phuongtt2@smartosc.com>
+ *
+ * @copyright   Copyright (c) SmartOSC. All rights reserved.
+ * @url http://www.smartosc.com/
+ *
+ * @var \SM\Catalog\Block\Product\View $block
+ */
+$sourceListTypeSimple = $block->getSourcesListSimple($block->getProduct());
+$sourceListTypeConfig = $block->getSourcesListConfigurable($block->getProduct());
+$sourceListTypeBundle = $block->getSourcesListBundle($block->getProduct());
+$hasSourceListAvailable = $block->hasSourceListAvailable($sourceListTypeSimple, $sourceListTypeConfig, $sourceListTypeBundle);
+$productType = $block->getProduct()->getTypeId();
+$checkHasSource = ($hasSourceListAvailable ||
+    $productType == \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE) ? 'true' : 'false';
+?>
+<div class="block-container-object-php block-container-pickup" id="pdp-pickup-connect" style="display: none;">
+    <div class="block-content" aria-labelledby="block-product-pickup-heading">
+        <fieldset class="fieldset pickup">
+            <div class="pdp-pickup pdp-delivery">
+                <h2 class="title">
+                    <i class="apl-Location"></i><?= $block->escapeHtml(__('Product Available at')) ?>
+                </h2>
+                <?php if ($hasSourceListAvailable):?>
+                    <!--simple product-->
+                    <?php if (!empty($sourceListTypeSimple)): ?>
+                        <ul class="pdp-pickup-container">
+                            <?php foreach ($sourceListTypeSimple as $key => $value): ?>
+                                <li class="pdp-pickup location-content">
+                                    <h3 class="txt-title"><span><?= $block->escapeHtml(__($value['name'])) ?></span><span><?= $block->escapeHtml(__(' (' . $key . ' km)')) ?></span></h3>
+                                    <p><?= $block->escapeHtml(__($value['street'])) ?></p>
+                                    <p><?= $block->escapeHtml(__($value['city'])) ?></p>
+                                    <p><?= $block->escapeHtml(__($value['region'])) ?></p>
+                                    <p><?= $block->escapeHtml(__($value['postcode'])) ?></p>
+                                    <p><?= $block->escapeHtml(__('Open until: ' . $block->getStoreTimeAvailable())) ?></p>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+
+                    <!--configurable product-->
+                    <?php if (!empty($sourceListTypeConfig)): ?>
+                        <ul class="pdp-pickup-container">
+                            <?php foreach ($sourceListTypeConfig as $key => $value): ?>
+                                <li class="pdp-pickup location-content">
+                                    <h3 class="txt-title"><span><?= $block->escapeHtml(__($value['name'])) ?></span><span><?= $block->escapeHtml(__(' (' . $key . ' km)')) ?></span></h3>
+                                    <p><?= $block->escapeHtml(__($value['street'])) ?></p>
+                                    <p><?= $block->escapeHtml(__($value['city'])) ?></p>
+                                    <p><?= $block->escapeHtml(__($value['region'])) ?></p>
+                                    <p><?= $block->escapeHtml(__($value['postcode'])) ?></p>
+                                    <p><?= $block->escapeHtml(__('Open until: ' . $block->getStoreTimeAvailable())) ?></p>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+
+                    <!--bundle product-->
+                    <?php if (!empty($sourceListTypeBundle)): ?>
+                        <ul class="pdp-pickup-container">
+                            <?php foreach ($sourceListTypeBundle as $key => $value): ?>
+                                <li class="pdp-pickup location-content">
+                                    <h3 class="txt-title"><span><?= $block->escapeHtml(__($value['name'])) ?></span><span><?= $block->escapeHtml(__(' (' . $key . ' km)')) ?></span></h3>
+                                    <p><?= $block->escapeHtml(__($value['street'])) ?></p>
+                                    <p><?= $block->escapeHtml(__($value['city'])) ?></p>
+                                    <p><?= $block->escapeHtml(__($value['region'])) ?></p>
+                                    <p><?= $block->escapeHtml(__($value['postcode'])) ?></p>
+                                    <p><?= $block->escapeHtml(__('Open until: ' . $block->getStoreTimeAvailable())) ?></p>
+                                </li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+                <?php endif; ?>
+            </div>
+        </fieldset>
+    </div>
+</div>
+
+<!--end store pickup container content -->
+<script type="text/x-magento-init">
+                    {
+                    "*": {
+                        "Magento_Ui/js/core/app": {
+                            "components": {
+                                "pdp-pickup-container": {
+                                    "component": "Magento_Catalog/js/pdp/store-pickup",
+                                        "config": {
+                                            "hasSourceListAvailable": <?php echo $checkHasSource; ?>,
+                                            "countListTypeSimple": <?php echo count($sourceListTypeSimple); ?>,
+                                            "countListTypeConfig": <?php echo count($sourceListTypeConfig); ?>,
+                                            "countListTypeBundle": <?php echo count($sourceListTypeBundle); ?>,
+                                            "productType" : "<?= $productType ?>"
+                                                 }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+</script>

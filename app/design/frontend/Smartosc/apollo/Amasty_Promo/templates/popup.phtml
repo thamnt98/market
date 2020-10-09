@@ -1,0 +1,61 @@
+<?php
+/**
+ * SMCommerce
+ *
+ * Date: September, 22 2020
+ * Time: 2:04 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ */ ?>
+<?php /** @var $block \Amasty\Promo\Block\Popup */ ?>
+<?= $block->getChildHtml('html_calendar') ?>
+<div class="ampromo-overlay" data-role="ampromo-overlay">
+    <div class="ampromo-items-content" data-ampromo-js="items-content">
+        <div class="ampromo-close" data-role="ampromo-popup-hide"></div>
+        <div class="ampromo-header">
+            <h2>
+                <?= $block->escapeHtml($block->getPopupName()) ?>
+            </h2>
+        </div>
+        <div class="ampromo-popup-container" data-ampromo-js="popup-container">
+            <?= $block->getChildHtml('items') ?>
+        </div>
+        <div class="ampromo-footer">
+            <p class="close-popup" data-action="closePopup">
+                <?= __(' No, thanks. I\'ll skip the free gift.') ?>
+            </p>
+            <button id="add-to-cart-gift-btn" class="action primary" type="button">
+                <?= __('Add to Cart') ?>
+            </button>
+        </div>
+    </div>
+</div>
+<script>
+    require(
+        [
+            'jquery'
+        ],
+        function ($) {
+            let addToCartBtn = $('#add-to-cart-gift-btn'),
+                closeBtn = $('[data-action="closePopup"]');
+
+            $(addToCartBtn).click(function () {
+                let formId = $('[name="selected_gift"]:checked').val();
+
+                if (!formId) {
+                    $('[data-role="ampromo-popup-hide"]').trigger('click');
+
+                    return;
+                }
+
+                $('#' + formId).submit();
+            });
+
+            $(closeBtn).click(function () {
+                $('[data-role="ampromo-popup-hide"]').trigger('click');
+            });
+        }
+    );
+</script>

@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="trans_catalog" translate="label" type="text" sortOrder="10" showInDefault="1"
+                 showInWebsite="1" showInStore="1">
+            <label>Catalog</label>
+            <tab>transmart</tab>
+            <resource>SM_Catalog::configuration</resource>
+            <group id="product" translate="label" type="text" sortOrder="10" showInDefault="1"
+                   showInWebsite="1"
+                   showInStore="1">
+                <label>Product</label>
+                <field id="group_name_prefix" type="text" translate="label comment" sortOrder="1" canRestore="1"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Group Product Prefix</label>
+                    <comment>Only in Listing Page</comment>
+                </field>
+                <field id="bundle_name_prefix" type="text" translate="label comment" sortOrder="1" canRestore="1"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Bundle Product Prefix</label>
+                    <comment>Only in Listing Page</comment>
+                </field>
+                <field id="update_cta_cron" type="select" translate="label comment" sortOrder="1" canRestore="1"
+                       showInDefault="1">
+                    <label>Update CTA buttons by Cron Job</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <comment>
+                        <![CDATA[<strong style="color:red">Warning</strong>:
+                        Please set "Yes" when the category has more than 10.000 products.
+                        If set "No", When You Save Category, All product will update directly. It's take a long time.]]>
+                    </comment>
+                </field>
+                <field id="update_cta_cron_time" translate="label" type="text" sortOrder="50" showInDefault="1"
+                       canRestore="1">
+                    <label>Update CTA button Cron Time</label>
+                </field>
+            </group>
+
+            <group id="available_store_pickup" translate="label" type="text" sortOrder="20" showInDefault="1"
+                   showInWebsite="1">
+                <label>Available For Pickup Info</label>
+                <field id="open_time" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1">
+                    <label>Store Open Time</label>
+                </field>
+                <field id="close_time" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1">
+                    <label>Store Close Time</label>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

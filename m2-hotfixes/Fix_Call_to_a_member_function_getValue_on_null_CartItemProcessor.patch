@@ -1,0 +1,12 @@
+--- a/vendor/magento/module-configurable-product/Model/Quote/Item/CartItemProcessor.php	2020-01-10 13:20:40.000000000+0700
++++ b/vendor/magento/module-configurable-product/Model/Quote/Item/CartItemProcessor.php	2020-05-05 16:36:31.205812644 +0700
+@@ -83,6 +83,9 @@
+     public function processOptions(CartItemInterface $cartItem)
+     {
+         $attributesOption = $cartItem->getProduct()->getCustomOption('attributes');
++        if (!$attributesOption) {
++            return $cartItem;
++        }
+         $selectedConfigurableOptions = $this->serializer->unserialize($attributesOption->getValue());
+
+         if (is_array($selectedConfigurableOptions)) {

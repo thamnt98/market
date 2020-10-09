@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Declare interface -->
+    <preference for="SM\Review\Api\ToBeReviewedRepositoryInterface" type="SM\Review\Model\ToBeReviewedRepository"/>
+
+    <preference for="SM\Review\Api\ReviewedRepositoryInterface" type="SM\Review\Model\ReviewedRepository"/>
+
+    <preference for="SM\Review\Api\Data\ToBeReviewedInterface" type="SM\Review\Model\Data\ToBeReviewedData"/>
+
+    <preference for="SM\Review\Api\Data\ReviewedInterface" type="SM\Review\Model\Data\ReviewedData"/>
+
+    <preference for="SM\Review\Api\Data\Product\ProductReviewedInterface" type="SM\Review\Model\Data\Product\ProductReviewedData"/>
+
+    <preference for="SM\Review\Api\Data\Product\ProductToBeReviewedInterface" type="SM\Review\Model\Data\Product\ProductToBeReviewedData"/>
+
+    <preference for="SM\Review\Api\Data\Product\ReviewDetailInterface" type="SM\Review\Model\Data\Product\ReviewDetailData"/>
+
+    <!--  Review Data Interface  -->
+    <preference for="SM\Review\Api\ReviewRepositoryInterface" type="SM\Review\Model\ReviewRepository"/>
+    <preference for="SM\Review\Api\Data\ReviewDataInterface" type="SM\Review\Model\Data\ReviewData"/>
+    <preference for="SM\Review\Api\Data\ReviewSearchResultsInterface" type="Magento\Framework\Api\SearchResults" />
+
+    <!--  Review Image Interface  -->
+    <preference for="SM\Review\Api\ReviewImageRepositoryInterface" type="SM\Review\Model\ReviewImageRepository"/>
+    <preference for="SM\Review\Api\Data\ReviewImageInterface" type="SM\Review\Model\ReviewImage"/>
+    <preference for="SM\Review\Api\Data\ReviewImageSearchResultsInterface" type="Magento\Framework\Api\SearchResults" />
+
+    <!--  Review Edit Interface  -->
+    <preference for="SM\Review\Api\ReviewEditRepositoryInterface" type="SM\Review\Model\ReviewEditRepository"/>
+    <preference for="SM\Review\Api\Data\ReviewEditInterface" type="SM\Review\Model\ReviewEdit"/>
+    <preference for="SM\Review\Api\Data\ReviewEditSearchResultsInterface" type="Magento\Framework\Api\SearchResults" />
+
+    <preference for="SM\Review\Api\Data\CheckResultDataInterface" type="SM\Review\Model\Data\CheckResultData"/>
+
+    <virtualType name="SM\Review\Model\ResourceModel\Grid\Collection" type="Magento\Framework\View\Element\UiComponent\DataProvider\SearchResult">
+        <arguments>
+            <argument name="mainTable" xsi:type="string">sm_review_edit</argument>
+            <argument name="resourceModel" xsi:type="string">SM\Review\Model\ResourceModel\EditReview</argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">
+        <arguments>
+            <argument name="collections" xsi:type="array">
+                <item name="review_edit_listing_data_source" xsi:type="string">SM\Review\Model\ResourceModel\Grid\Collection</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

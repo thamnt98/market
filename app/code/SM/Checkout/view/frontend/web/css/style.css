@@ -1,0 +1,57 @@
+.main .wrapper-payment .check-payment-row a:first-child,.main .wrapper-payment .check-payment-col a:first-child {
+    background-image: none;
+    background: transparent;
+    border: 2px solid #fb9e0d;
+    border-radius: 8px;
+    color: #fb9e0d;
+    cursor: pointer;
+    font-family: 'SF UI Display Semibold';
+    font-weight: normal;
+    padding: 10px 15px;
+    font-size: 1.6rem;
+    line-height: 100%;
+    box-sizing: border-box;
+    vertical-align: middle;
+}
+
+.main .wrapper-payment .check-payment-row a ,.main .wrapper-payment .check-payment-col a{
+    width: 291px;
+    margin: 5px 30px ;
+}
+
+@media screen and (min-width: 768px) {
+
+    .main .wrapper-payment .check-payment-row a{
+        display: inline-block;
+    }
+
+    .main .wrapper-payment .check-payment-row a:last-child {
+        margin: 0 0 0 32px;
+    }
+
+
+    .main .wrapper-payment .check-payment-col a{
+        margin: 5px 30px ;
+        display: inline-block;
+    }
+    .main .wrapper-payment{
+        padding-bottom: 32px;
+    }
+    .main .ck-payment .bx-payment .radio-custom label{
+        position: absolute;
+    }
+    .main .ck-payment .bx-payment .radio-custom {
+        margin-right: 30px;
+    }
+
+    .accept-terms {
+        display: block;
+        font-size: 12px;
+        margin-bottom: 15px;
+    }
+
+    .accept-terms span {
+        color: #777777;
+    }
+
+}

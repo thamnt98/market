@@ -1,0 +1,297 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="sm_notification" translate="label" type="text" sortOrder="140"
+                 showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Notification Configuration</label>
+            <tab>transmart</tab>
+            <resource>SM_Review::sm_notification</resource>
+            <group id="event_type_config" translate="label" type="text" sortOrder="10" showInDefault="1"
+                   showInWebsite="1" showInStore="1">
+                <label>Event Type Configuration</label>
+                <field id="event_type" translate="label" sortOrder="0" canRestore="1"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Event Type</label>
+                    <frontend_model>SM\Notification\Block\Adminhtml\Form\Field\EventType</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+            </group>
+            <group id="sync" translate="label" type="text" sortOrder="20"
+                   showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Sync</label>
+                <field id="push_device" translate="label" type="text" sortOrder="0" canRestore="1"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Cron Sync Push Device</label>
+                    <comment>
+                        <![CDATA[Time auto sync.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
+                    </comment>
+                </field>
+                <field id="sms" translate="label" type="text" sortOrder="0" canRestore="1"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Cron Sync SMS</label>
+                    <comment>
+                        <![CDATA[Time auto sync.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
+                    </comment>
+                </field>
+                <field id="email" translate="label" type="text" sortOrder="0" canRestore="1"
+                       showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>Cron Sync Email</label>
+                    <comment>
+                        <![CDATA[Time auto sync.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
+                    </comment>
+                </field>
+            </group>
+            <group id="generate" translate="label" type="text" sortOrder="20"
+                   showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Generate Notification</label>
+                <group id="limit_stock_group" translate="label" type="text" sortOrder="0"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Limit Stock</label>
+                    <field id="limit_stock" translate="label" type="text" sortOrder="0" canRestore="1"
+                           showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Cron</label>
+                        <config_path>sm_notification/generate/limit_stock</config_path>
+                        <comment>
+                            <![CDATA[Time auto sync.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
+                        </comment>
+                    </field>
+                </group>
+
+                <group id="abandoned_cart_group" translate="label" type="text" sortOrder="10" canRestore="1"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Abandoned Cart</label>
+                    <field id="abandoned_cart_time" translate="label" type="text" sortOrder="0" canRestore="1"
+                           showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Time (hour)</label>
+                        <config_path>sm_notification/generate/abandoned_cart_time</config_path>
+                        <validate>validate-zero-or-greater</validate>
+                    </field>
+                    <field id="abandoned_cart" translate="label" type="text" sortOrder="10" canRestore="1"
+                           showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Cron</label>
+                        <config_path>sm_notification/generate/abandoned_cart</config_path>
+                        <comment>
+                            <![CDATA[Time auto sync.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
+                        </comment>
+                    </field>
+                    <field id="abandoned_cart_repeat_time" translate="label" type="text" sortOrder="20" canRestore="1"
+                           showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Repeat Time (day)</label>
+                        <config_path>sm_notification/generate/abandoned_cart_repeat_time</config_path>
+                        <validate>validate-zero-or-greater</validate>
+                    </field>
+                    <field id="abandoned_cart_repeat" translate="label" type="text" sortOrder="30" canRestore="1"
+                           showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Repeat Cron</label>
+                        <config_path>sm_notification/generate/abandoned_cart_repeat</config_path>
+                        <comment>
+                            <![CDATA[Time auto sync.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
+                        </comment>
+                    </field>
+                </group>
+
+                <group id="payment_group" translate="label" type="text" sortOrder="20"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Payment</label>
+                    <field id="payment_expiring_soon_time" translate="label" type="text" sortOrder="0" canRestore="1"
+                           showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Virtual Account Expiring Soon Time (minute)</label>
+                        <config_path>sm_notification/generate/payment_expiring_soon_time</config_path>
+                        <validate>validate-zero-or-greater</validate>
+                        <comment><![CDATA[The value of 0 then turn off.]]>
+                        </comment>
+                    </field>
+                </group>
+
+                <group id="order_group" translate="label" type="text" sortOrder="30"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Order</label>
+                    <field id="remind_pickup_cron" translate="label" type="text" sortOrder="0" canRestore="1"
+                           showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Cron Reminder Order Picked Up</label>
+                        <config_path>sm_notification/generate/remind_pickup_cron</config_path>
+                        <comment>
+                            <![CDATA[Time auto sync.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
+                        </comment>
+                    </field>
+                    <field id="remind_pickup" translate="label" type="text" sortOrder="10" canRestore="1"
+                           showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Remind after "Ready to be picked up" (day)</label>
+                        <config_path>sm_notification/generate/remind_pickup</config_path>
+                        <validate>validate-zero-or-greater</validate>
+                        <comment>
+                            <![CDATA[The value of 0 then turn off.<br />"Ready to collect" reminder notification X day(s) before pick up time limit.]]>
+                        </comment>
+                    </field>
+                    <field id="remind_pickup_expired" translate="label" type="text" sortOrder="20" canRestore="1"
+                           showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Remind before "Pickup time limit" (day)</label>
+                        <config_path>sm_notification/generate/remind_pickup_expired</config_path>
+                        <validate>validate-zero-or-greater</validate>
+                        <comment>
+                            <![CDATA[The value of 0 then turn off.<br />"Ready to collect" reminder notification X day(s) after the order can "Ready to be picked up".]]>
+                        </comment>
+                    </field>
+                </group>
+            </group>
+            <group id="email" translate="label" type="text" sortOrder="30"
+                   showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Email Template</label>
+                <group id="payment_group" translate="label" type="text" sortOrder="0"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Payment</label>
+                    <field id="payment_expired" translate="label" type="select" sortOrder="0" canRestore="1"
+                           showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Expired</label>
+                        <config_path>sm_notification/email/payment_expired</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    </field>
+                    <field id="payment_bank_reject" translate="label" type="select" sortOrder="10" canRestore="1"
+                           showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Reject By Bank</label>
+                        <config_path>sm_notification/email/payment_bank_reject</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    </field>
+                    <field id="payment_system_failed" translate="label" type="select" sortOrder="20" canRestore="1"
+                           showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>System Failed</label>
+                        <config_path>sm_notification/email/payment_system_failed</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    </field>
+                    <field id="payment_system_failed_digital" translate="label" type="select" sortOrder="30"
+                           canRestore="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>System Failed (Digital)</label>
+                        <config_path>sm_notification/email/payment_system_failed_digital</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    </field>
+                    <field id="payment_success_top_up" translate="label" type="select" sortOrder="40" canRestore="1"
+                           showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Digital Top Up (Success)</label>
+                        <config_path>sm_notification/email/payment_success_top_up</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    </field>
+                    <field id="payment_success_mobile_package" translate="label" type="select" sortOrder="50"
+                           canRestore="1"
+                           showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Digital Mobile Package (Success)</label>
+                        <config_path>sm_notification/email/payment_success_mobile_package</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    </field>
+                    <field id="payment_success_roaming" translate="label" type="select" sortOrder="60" canRestore="1"
+                           showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Digital Mobile Roaming Package (Success)</label>
+                        <config_path>sm_notification/email/payment_success_roaming</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    </field>
+                    <field id="payment_success_pln_token" translate="label" type="select" sortOrder="70" canRestore="1"
+                           showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Digital PLN Token (Success)</label>
+                        <config_path>sm_notification/email/payment_success_pln_token</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    </field>
+                    <field id="payment_success_pln_bill" translate="label" type="select" sortOrder="80" canRestore="1"
+                           showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Digital PLN Bill (Success)</label>
+                        <config_path>sm_notification/email/payment_success_pln_bill</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    </field>
+                    <field id="payment_success_mobile_postpaid" translate="label" type="select" sortOrder="90"
+                           canRestore="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Digital Mobile Postpaid (Success)</label>
+                        <config_path>sm_notification/email/payment_success_mobile_postpaid</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    </field>
+                    <field id="payment_success_physical" translate="label" type="select" sortOrder="100"
+                           canRestore="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Payment Success</label>
+                        <config_path>sm_notification/email/payment_success_physical</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    </field>
+                </group>
+            </group>
+            <group id="image" translate="label" type="text" sortOrder="40"
+                   showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Images</label>
+                <field id="default" translate="label" sortOrder="0" type="image"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Default Image</label>
+                    <backend_model>Magento\Config\Model\Config\Backend\Image</backend_model>
+                    <upload_dir config="system/filesystem/media" scope_info="1">notification</upload_dir>
+                    <base_url type="media" scope_info="1">notification</base_url>
+                    <comment>
+                        <![CDATA[Allowed file types: jpg, jpeg, gif, png.<br/>Image's size is 118 x 118 px]]>
+                    </comment>
+                </field>
+                <group id="order_status" translate="label" type="text" sortOrder="10"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Order Status</label>
+                    <field id="completed" translate="label" sortOrder="0" type="image"
+                           showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Completed</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Image</backend_model>
+                        <upload_dir config="system/filesystem/media" scope_info="1">notification</upload_dir>
+                        <base_url type="media" scope_info="1">notification</base_url>
+                        <comment>
+                            <![CDATA[Allowed file types: jpg, jpeg, gif, png.<br/>Image's size is 118 x 118 px]]>
+                        </comment>
+                    </field>
+                    <field id="ready_to_pickup" translate="label" sortOrder="10" type="image"
+                           showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Ready To Pickup</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Image</backend_model>
+                        <upload_dir config="system/filesystem/media" scope_info="1">notification</upload_dir>
+                        <base_url type="media" scope_info="1">notification</base_url>
+                        <comment>
+                            <![CDATA[Allowed file types: jpg, jpeg, gif, png.<br/>Image's size is 118 x 118 px]]>
+                        </comment>
+                    </field>
+                    <field id="delivered" translate="label" sortOrder="20" type="image"
+                           showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Delivered</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Image</backend_model>
+                        <upload_dir config="system/filesystem/media" scope_info="1">notification</upload_dir>
+                        <base_url type="media" scope_info="1">notification</base_url>
+                        <comment>
+                            <![CDATA[Allowed file types: jpg, jpeg, gif, png.<br/>Image's size is 118 x 118 px]]>
+                        </comment>
+                    </field>
+                    <field id="in_delivery" translate="label" sortOrder="30" type="image"
+                           showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>In Delivery</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Image</backend_model>
+                        <upload_dir config="system/filesystem/media" scope_info="1">notification</upload_dir>
+                        <base_url type="media" scope_info="1">notification</base_url>
+                        <comment>
+                            <![CDATA[Allowed file types: jpg, jpeg, gif, png.<br/>Image's size is 118 x 118 px]]>
+                        </comment>
+                    </field>
+                </group>
+                <group id="payment" translate="label" type="text" sortOrder="20"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Payment</label>
+                    <field id="failed" translate="label" sortOrder="0" type="image"
+                           showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Failed</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Image</backend_model>
+                        <upload_dir config="system/filesystem/media" scope_info="1">notification</upload_dir>
+                        <base_url type="media" scope_info="1">notification</base_url>
+                        <comment>
+                            <![CDATA[Allowed file types: jpg, jpeg, gif, png.<br/>Image's size is 118 x 118 px]]>
+                        </comment>
+                    </field>
+                    <field id="success" translate="label" sortOrder="10" type="image"
+                           showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Success</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Image</backend_model>
+                        <upload_dir config="system/filesystem/media" scope_info="1">notification</upload_dir>
+                        <base_url type="media" scope_info="1">notification</base_url>
+                        <comment>
+                            <![CDATA[Allowed file types: jpg, jpeg, gif, png.<br/>Image's size is 118 x 118 px]]>
+                        </comment>
+                    </field>
+                </group>
+            </group>
+        </section>
+    </system>
+</config>

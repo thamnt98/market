@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="sm_mobile" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1"
+                 showInStore="1">
+            <resource>SM_MobileApi::configuration</resource>
+            <label>Mobile Config</label>
+            <tab>transmart</tab>
+
+            <group id="mobile_homepage" showInStore="1" showInWebsite="1" showInDefault="1" translate="label comment"
+                   sortOrder="10">
+                <label>HomePage</label>
+                <field id="most_popular" sortOrder="10"  type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Most Popular Category Id</label>
+                    <comment>Pls fill only one category id to define which category is most popular in home page</comment>
+                    <validate>validate-zero-or-greater validate-digits</validate>
+                </field>
+                <field id="surprise_deal" sortOrder="15"  type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Surprise Deal Category Id</label>
+                    <comment>Pls fill only one category id to define which category is surprise deal in home page</comment>
+                    <validate>validate-zero-or-greater validate-digits</validate>
+                </field>
+            </group>
+            <group id="cms_page" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1"
+                   showInStore="0">
+                <label>Setup Terms and Privacy Page</label>
+                <field id="terms_conditions" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Terms And Conditions</label>
+                    <comment>Pls fill only one page id to define which page is terms and conditions</comment>
+                    <validate>validate-zero-or-greater validate-digits</validate>
+                </field>
+                <field id="privacy_policy"  translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Privacy Policy</label>
+                    <comment>Pls fill only one page id to define which page is privacy and policy</comment>
+                    <validate>validate-zero-or-greater validate-digits</validate>
+                </field>
+                <field id="about_us" translate="label" type="text" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>About Us</label>
+                    <comment>Pls fill only one page id to define which page is about us</comment>
+                    <validate>validate-zero-or-greater validate-digits</validate>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

@@ -1,0 +1,61 @@
+<?php
+/**
+ * @var \Magento\Framework\View\Element\Template $block
+ * @var \SM\DigitalProduct\ViewModel\QuickTransaction $quickTransaction
+ */
+
+$quickTransaction = $block->getViewModel();
+$items = $quickTransaction->getList();
+?>
+
+<?php if (count($items)) :?>
+    <h3 class="title"><?= $block->escapeHtml(__("Quick Transactions"))?></h3>
+    <div class="section-carousel quick-transaction">
+        <div class="quick-transaction-carousel transaction-items">
+            <?php
+            /** @var \Magento\Sales\Api\Data\OrderItemInterface $item */
+            foreach ($items as $item) :?>
+            <?php
+            $buyRequest = $item->getProductOptionByCode('info_buyRequest') ?? [];
+                $ext = $item->getProductOption()->getExtensionAttributes();
+                $serviceType = $ext->getDigitalData()->getServiceType(); ?>
+
+                <div class="quick-transaction-item"
+                    data-buy-request='<?= json_encode($buyRequest) ?>'
+                    data-sku='<?= $item->getSku() ?>'
+                    data-price='<?= $item->getPrice() ?>'
+                    style="cursor: pointer">
+                    <div class="header">
+                        <img src="<?= ($ext->getDigitalData()->getDigitalTransaction()->getOperatorImage() ?? $quickTransaction->getPlaceHolderImage())?>" class="operator-icon"/>
+                        <span class="service-type"><?= $ext->getDigitalData()->getDigital()->getServiceType()?></span>
+                    </div>
+                    <div class="content">
+                        <?php if ($serviceType == \SM\DigitalProduct\Helper\Category\Data::ELECTRICITY_BILL_VALUE):?>
+                            <span class="title"><?= $quickTransaction->getNextElectricityBillPeriod($ext->getDigitalData()->getDigital()->getPeriod()) ?></span>
+                            <span class="number"><?= $ext->getDigitalData()->getDigital()->getCustomerId() ?></span>
+                        <?php elseif ($serviceType == \SM\DigitalProduct\Helper\Category\Data::ELECTRICITY_TOKEN_VALUE):?>
+                            <?php $denomAttr = $item->getProduct()->getCustomAttribute("denom"); ?>
+                            <span class="title"><?= ($denomAttr ? $denomAttr->getValue() : "0") ?></span>
+                            <span class="number"><?= $ext->getDigitalData()->getDigital()->getCustomerId() ?></span>
+                        <?php elseif ($serviceType == \SM\DigitalProduct\Helper\Category\Data::TOP_UP_VALUE):?>
+                            <?php $denomAttr = $item->getProduct()->getCustomAttribute("denom");?>
+                            <span class="title"><?= ($denomAttr ? $denomAttr->getValue() : "0") ?></span>
+                            <span class="number"><?= $ext->getDigitalData()->getDigital()->getMobileNumber() ?></span>
+                        <?php else:?>
+                            <span class="title"><?= $item->getName() ?></span>
+                            <span class="number"><?= $ext->getDigitalData()->getDigital()->getMobileNumber() ?></span>
+                        <?php endif;?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <script type="text/x-magento-init">
+    {
+        ".quick-transaction-carousel": {
+            "SM_DigitalProduct/js/slider":{},
+            "SM_DigitalProduct/js/reorder":{}
+        }
+    }
+    </script>
+<?php endif; ?>

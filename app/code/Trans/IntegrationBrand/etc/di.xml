@@ -1,0 +1,61 @@
+<?xml version="1.0" ?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_Integration
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   JP <jaka.pondan@ctcorpdigital.com>
+ * @author   Anan Fauzi <anan.fauzi@transdigital.co.id>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- DB Model-->
+
+
+    <preference for="Trans\IntegrationBrand\Api\IntegrationJobRepositoryInterface"
+                type="Trans\IntegrationBrand\Model\IntegrationJobRepository" />
+    <preference for="Trans\IntegrationBrand\Api\Data\IntegrationJobInterface"
+                type="Trans\IntegrationBrand\Model\IntegrationJob" />
+    <preference for="Trans\IntegrationBrand\Api\Data\IntegrationJobSearchResultInterface"
+                type="Trans\IntegrationBrand\Model\IntegrationJobSearchResult" />
+
+    <preference for="Trans\IntegrationBrand\Api\IntegrationDataValueRepositoryInterface"
+                type="Trans\IntegrationBrand\Model\IntegrationDataValueRepository" />
+    <preference for="Trans\IntegrationBrand\Api\Data\IntegrationDataValueInterface"
+                type="Trans\IntegrationBrand\Model\IntegrationDataValue" />
+    <preference for="Trans\IntegrationBrand\Api\Data\IntegrationDataValueSearchResultInterface"
+                type="Trans\IntegrationBrand\Model\IntegrationDataValueSearchResult" />
+
+    <!-- Logic Model-->
+    <preference for="Trans\IntegrationBrand\Api\IntegrationCheckUpdatesInterface"
+                type="Trans\IntegrationBrand\Model\IntegrationCheckUpdates" />
+
+    <preference for="Trans\IntegrationBrand\Api\IntegrationGetUpdatesInterface"
+                type="Trans\IntegrationBrand\Model\IntegrationGetUpdates" />
+    <!-- Brand Logic Model-->
+      <preference for="Trans\IntegrationBrand\Api\IntegrationBrandLogicInterface"
+                type="Trans\IntegrationBrand\Model\IntegrationBrandLogic" />
+
+    <!-- @anan.fauzi: add console for checking pim integration functionalities-->
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <!-- pim check brand console-->
+            <argument name="commands" xsi:type="array">
+               <item name="Trans_IntegrationBrand_Console_Pim_Check_Brand" xsi:type="object">Trans\IntegrationBrand\Console\Pim\Check\Brand</item>
+            </argument>
+            <!-- pim get brand console-->
+            <argument name="commands" xsi:type="array">
+               <item name="Trans_IntegrationBrand_Console_Pim_Get_Brand" xsi:type="object">Trans\IntegrationBrand\Console\Pim\Get\Brand</item>
+            </argument>
+            <!-- pim save brand console-->
+            <argument name="commands" xsi:type="array">
+               <item name="Trans_IntegrationBrand_Console_Pim_Save_Brand" xsi:type="object">Trans\IntegrationBrand\Console\Pim\Save\Brand</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

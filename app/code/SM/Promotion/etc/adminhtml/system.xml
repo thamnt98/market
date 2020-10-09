@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_Promotion
+ *
+ * Date: July, 16 2020
+ * Time: 3:13 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="amrules">
+            <group id="skip_price" showInDefault="0" showInWebsite="0" showInStore="0"/>
+        </section>
+        <section id="ampromo">
+            <group id="messages">
+                <field id="gift_selection_method" showInDefault="0" showInWebsite="0" showInStore="0" />
+                <field id="display_remaining_gifts_counter" showInDefault="0" showInWebsite="0" showInStore="0" />
+                <field id="show_review_in_popup" translate="label" type="select" sortOrder="80"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show Product Review in the Popup</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

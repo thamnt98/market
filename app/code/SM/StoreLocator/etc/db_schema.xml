@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="transmart_store_location" resource="default" engine="innodb"
+           comment="Store Location of Transmart">
+        <column xsi:type="int" name="place_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Place ID"/>
+        <column xsi:type="varchar" name="store_code" nullable="true" comment="Store Code"/>
+        <column xsi:type="varchar" name="name" nullable="true" comment="Name of Store"/>
+        <column xsi:type="text" name="address_line_1" nullable="true" comment="Address of Store"/>
+        <column xsi:type="text" name="address_line_2" nullable="true" comment="Address of Store"/>
+        <column xsi:type="text" name="district_id" nullable="true" comment="District"/>
+        <column xsi:type="text" name="city" nullable="true" comment="City"/>
+        <column xsi:type="text" name="lat" nullable="true" comment="Latitude"/>
+        <column xsi:type="text" name="long" nullable="true" comment="Longitude"/>
+        <column xsi:type="text" name="opening_hours" nullable="true" comment="Open hours"/>
+        <column xsi:type="boolean" name="status" nullable="false" comment="Store status" default="1"/>
+        <column xsi:type="int" name="position" padding="10" unsigned="true" nullable="false" comment="Sort order position"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="place_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="STORE_CODE">
+            <column name="store_code"/>
+        </constraint>
+    </table>
+</schema>

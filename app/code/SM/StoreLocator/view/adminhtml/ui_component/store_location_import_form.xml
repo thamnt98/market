@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">store_location_import_form.form_data_source</item>
+            <item name="deps" xsi:type="string">store_location_import_form.form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">Import Form</item>
+        <item name="layout" xsi:type="array">
+            <item name="type" xsi:type="string">tabs</item>
+        </item>
+
+        <item name="buttons" xsi:type="array">
+            <item name="back" xsi:type="string">SM\StoreLocator\Block\Adminhtml\Form\BackButton</item>
+            <item name="save" xsi:type="string">SM\StoreLocator\Block\Adminhtml\Location\ImportButton</item>
+        </item>
+    </argument>
+    <dataSource name="form_data_source">
+        <argument name="dataProvider" xsi:type="configurableObject">
+            <argument name="class" xsi:type="string">SM\StoreLocator\Ui\DataProvider</argument>
+            <argument name="name" xsi:type="string">form_data_source</argument>
+            <argument name="primaryFieldName" xsi:type="string">file_to_update</argument>
+            <argument name="requestFieldName" xsi:type="string">file_to_update</argument>
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="submit_url" xsi:type="url" path="store_locator/location/import"/>
+                </item>
+            </argument>
+        </argument>
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+    </dataSource>
+    <fieldset name="import_form">
+        <argument name="data" xsi:type="array">
+            <item name="config" xsi:type="array">
+                <item name="label" xsi:type="string" translate="true">Chose Import File:</item>
+            </item>
+        </argument>
+        <field name="file_to_update">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="dataType" xsi:type="string">string</item>
+                    <item name="isMultipleFiles" xsi:type="boolean">false</item>
+                    <item name="label" xsi:type="string" translate="true">Select CSV File</item>
+                    <item name="visible" xsi:type="boolean">true</item>
+                    <item name="formElement" xsi:type="string">imageUploader</item>
+                    <item name="elementTmpl" xsi:type="string">ui/form/element/uploader/uploader</item>
+                    <item name="required" xsi:type="boolean">true</item>
+                    <item name="previewType" xsi:type="boolean">false</item>
+                    <item name="sortOrder" xsi:type="number">20</item>
+                    <item name="allowedExtensions" xsi:type="string">csv</item>
+                    <item name="uploaderConfig" xsi:type="array">
+                        <item name="url" xsi:type="url" path="store_locator/location/upload"/>
+                    </item>
+                </item>
+            </argument>
+        </field>
+    </fieldset>
+</form>

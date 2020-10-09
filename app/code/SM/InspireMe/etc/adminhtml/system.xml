@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ @project    ct-corp-transmart
+  ~ @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+  ~ @author     Duc Nguyen Hoang <ducnh2@smartosc.com>
+  ~ @copyright  Copyright © 2020 SmartOSC. All rights reserved.
+  ~ @url        http://www.smartosc.com
+  -->
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="mirasvit" translate="label" sortOrder="550">
+            <label>Mirasvit Extensions</label>
+        </tab>
+
+        <section id="blog" showInDefault="1" showInWebsite="1" showInStore="1" type="text" translate="label"
+                 sortOrder="100">
+            <label>Blog MX</label>
+            <tab>mirasvit</tab>
+            <resource>Mirasvit_Blog::blog_settings</resource>
+
+            <group id="paging" showInDefault="1" showInWebsite="1" showInStore="1" sortOrder="60">
+                <label>Pagination</label>
+
+                <field id="paging_value" translate="label" type="text" sortOrder="10" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Items For Each Page</label>
+                    <validate>required-entry validate-number validate-zero-or-greater</validate>
+                </field>
+            </group>
+
+            <group id="most_popular" translate="label" sortOrder="80" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Most Popular Articles</label>
+                <field id="preset_most_popular" translate="label" sortOrder="4" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Preset Most Popular</label>
+                    <frontend_model>SM\InspireMe\Block\Adminhtml\Form\FrontendModel\MostPopular</frontend_model>
+                    <backend_model>SM\InspireMe\Block\Adminhtml\Form\BackendModel\MostPopular</backend_model>
+                </field>
+                <field id="most_popular_cron" translate="label" type="text" sortOrder="50" showInDefault="1"
+                       canRestore="1">
+                    <label>Cron Time</label>
+                </field>
+            </group>
+
+            <group id="post_homepage_block" translate="label" sortOrder="90" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Article Position On Homepage</label>
+                <field id="position_type" type="select" translate="label" sortOrder="10" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Set Position By</label>
+                    <source_model>SM\InspireMe\Model\Config\Source\HomepagePosition</source_model>
+                </field>
+            </group>
+
+            <group id="related_product_block" translate="label" sortOrder="100" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Related Products Block</label>
+                <field id="shop_ingredient" type="multiselect" translate="label comment" sortOrder="10" showInDefault="1"
+                       showInWebsite="1" showInStore="1">
+                    <label>Shop The Ingredients</label>
+                    <comment>
+                        <![CDATA[
+                            If an article belong to one of selected topics, its related products block will show as
+                            this type.
+                        ]]>
+                    </comment>
+                    <source_model>SM\InspireMe\Model\Config\Source\Topics</source_model>
+                </field>
+            </group>
+
+            <group id="appearance" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10">
+                <field id="menu_title" showInDefault="0" showInWebsite="0" showInStore="0"/>
+                <field id="date_format" showInDefault="0" showInWebsite="0" showInStore="0"/>
+            </group>
+            <group id="display" showInDefault="0" showInStore="0" showInWebsite="0"/>
+            <group id="comments" showInDefault="0" showInStore="0" showInWebsite="0"/>
+            <group id="sharing" showInDefault="0" showInStore="0" showInWebsite="0"/>
+        </section>
+    </system>
+</config>

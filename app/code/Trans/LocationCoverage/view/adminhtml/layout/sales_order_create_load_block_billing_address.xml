@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_LocationCoverage
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Muhammad Randy <muhammad.randy@transdigital.co.id>
+ *
+ * Copyright © 2019 PT Trans Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="content">
+            <block class="Trans\LocationCoverage\Block\Checkout\CityUpdater"
+                   template="Trans_LocationCoverage::order/create/form/address.phtml"
+                   name="billing_address">
+                <arguments>
+                    <argument name="customerAddressFormatter" xsi:type="object">Magento\Sales\ViewModel\Customer\AddressFormatter</argument>
+                    <argument name="customerAddressCollection" xsi:type="object">Magento\Customer\Model\ResourceModel\Address\Collection</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

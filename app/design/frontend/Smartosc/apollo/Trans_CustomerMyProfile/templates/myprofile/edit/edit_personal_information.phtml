@@ -1,0 +1,236 @@
+<?php
+
+/**
+ * SMCommerce
+ *
+ * @category  Trans
+ * @package   Trans_CustomerMyProfile
+ *
+ * Date: April, 25 2020
+ * Time: 8:26 AM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ */
+?>
+<?php /** @var $block \Magento\Customer\Block\Form\Edit */ ?>
+<?php
+/** @var $viewModel \Trans\CustomerMyProfile\ViewModel\MyProfile */
+$viewModel = $block->getViewModel();
+?>
+<?php /** @var $profileHelper \Trans\CustomerMyProfile\Helper\Data */ ?>
+<?php $profileHelper = $this->helper(\Trans\CustomerMyProfile\Helper\Data::class) ?>
+<?php
+$customer = $block->getCustomer();
+if ($customer->getFirstname() == $customer->getLastname()) {
+    $name = $customer->getFirstname();
+} else {
+    $name = $customer->getFirstname() . ' ' . $customer->getLastname();
+}
+$profilePicture = $viewModel->getProfilePicture($customer);
+$customerData = ['profile_picture' => $profilePicture, 'fullname' => $name, 'dob' => '', 'gender' => '', 'marital_status' => '', 'nik' => $viewModel->getNik($customer)];
+?>
+<form class="form form-edit-account" action="<?= /* @noEscape */ $block->getUrl('customer/account/editPost') ?>" method="post" id="form-validate" enctype="multipart/form-data" data-hasrequired="<?= $block->escapeHtmlAttr(__('* Required Fields')) ?>" autocomplete="off">
+    <?= $block->getBlockHtml('formkey') ?>
+    <legend class="legend"><span><?= $block->escapeHtml(__('Edit Personal Information')) ?></span></legend>
+    <div class="profile-wrap-picture-detail">
+        <div class="profile-detail">
+            <!--Name-->
+            <?= $block->getLayout()->createBlock(\Magento\Customer\Block\Widget\Name::class)->setObject($block->getCustomer())->toHtml() ?>
+
+            <!--Date of Birth-->
+            <?php $_dob = $block->getLayout()->createBlock(\Magento\Customer\Block\Widget\Dob::class) ?>
+            <?php if ($_dob->isEnabled()) : ?>
+                <?php $_dob->setDate($block->getCustomer()->getDob()); ?>
+                <?php $customerData['dob'] = $_dob->getMonth() . '/' . $_dob->getDay() . '/' . $_dob->getYear(); ?>
+                <div class="field birthday fieldset">
+                    <label class="label" for="birthday">
+                        <span><?= /* @escapeNotVerified */ $block->escapeHtml($_dob->getStoreLabel('dob')); ?></span>
+                    </label>
+                    <div class="control">
+                        <input type="hidden" name="dob" id="dob" value="<?= $block->escapeHtmlAttr($customerData['dob']); ?>" autocomplete="off">
+                    </div>
+                </div>
+            <?php endif ?>
+
+            <!--Gender-->
+            <?php $_gender = $block->getLayout()->createBlock(\Magento\Customer\Block\Widget\Gender::class) ?>
+            <?php if ($_gender->isEnabled()) : ?>
+                <div class="field gender fieldset">
+                    <label class="label" for="gender">
+                        <span><?= /* @escapeNotVerified */ $block->escapeHtml($_gender->getStoreLabel('gender')); ?></span>
+                    </label>
+                    <div class="control">
+                        <?php $options = $_gender->getGenderOptions(); ?>
+                        <?php $value = $viewModel->getGenderValue($customer); ?>
+                        <?php foreach (array_reverse($options) as $option): ?>
+                            <?php if($option->getValue() == '' || $option->getValue() == 3) continue; ?>
+                            <li class="choice radio-custom">
+                                <input type="radio"
+                                       class="radio"
+                                       id="gender-option-<?= /* @escapeNotVerified */ $block->escapeHtmlAttr($option->getValue()); ?>"
+                                       name="gender"
+                                       data-selector="gender"
+                                       data-validate="{'required-radio':true}"
+                                       data-msg-required-radio="<?= $block->escapeHtml(__("This field is required"))?>"
+                                    <?php if ($option->getValue() == $value) {$customerData['gender'] = $option->getValue(); echo ' checked="checked"';} ?>
+                                       value="<?= /* @escapeNotVerified */ $block->escapeHtmlAttr($option->getValue()); ?>"/>
+                                <label class="label"
+                                       for="gender-option-<?= /* @escapeNotVerified */ $block->escapeHtmlAttr($option->getValue()); ?>">
+                                    <span><?= /* @escapeNotVerified */ $block->escapeHtml(__($option->getLabel())); ?></span>
+                                </label>
+                            </li>
+                        <?php endforeach;?>
+                    </div>
+                </div>
+            <?php endif; ?>
+
+            <!--Marital Status-->
+            <div class="field maritalstatus fieldset">
+                <label class="label" for="maritalstatus">
+                    <span><?= /* @escapeNotVerified */ $block->escapeHtml(__('Marital Status'))?></span>
+                </label>
+                <div class="control">
+                    <?php $options = $viewModel->getMaritalStatusOptions(); ?>
+                    <?php $value = $viewModel->getMaritalStatusValue($customer); ?>
+                    <?php foreach ($options as $option): ?>
+                        <?php if(!$option['value']) continue; ?>
+                        <li class="choice radio-custom">
+                            <input type="radio"
+                                   class="radio"
+                                   id="marital-status-option-<?= /* @escapeNotVerified */ $block->escapeHtmlAttr($option['value']); ?>"
+                                   name="marital_status"
+                                   data-selector="marital_status"
+                                   data-validate="{'required-radio':true}"
+                                   data-msg-required-radio="<?= $block->escapeHtml(__("This field is required"))?>"
+                                <?php if ($option['value'] == $value) {$customerData['marital_status'] = $option['value']; echo ' checked="checked"';} ?>
+                                   value="<?= /* @escapeNotVerified */ $block->escapeHtmlAttr($option['value']); ?>"/>
+                            <label class="label"
+                                   for="marital-status-option-<?= /* @escapeNotVerified */ $block->escapeHtmlAttr($option['value']); ?>">
+                                <span><?= /* @escapeNotVerified */ $block->escapeHtml(__($option['label'])); ?></span>
+                            </label>
+                        </li>
+                    <?php endforeach;?>
+                </div>
+            </div>
+
+            <!--Tax-->
+            <?php $_taxvat = $block->getLayout()->createBlock(\Magento\Customer\Block\Widget\Taxvat::class) ?>
+            <?php if ($_taxvat->isEnabled()) : ?>
+                <?= $_taxvat->setTaxvat($block->getCustomer()->getTaxvat())->toHtml() ?>
+            <?php endif ?>
+
+            <!--Custom Attribute-->
+            <div class="field field-nik">
+                <label class="label" for="nik"><span><?= $block->escapeHtml(__("KTP Number"))?></span></label>
+                <div class="control">
+                    <?php
+                    $nikAttribute = $block->getCustomer()->getCustomAttribute("nik");
+                    $nikValue = $nikAttribute? $nikAttribute->getValue():"";
+                    ?>
+                    <input type="text" id="nik" name="nik"
+                           value="<?= $nikValue ?>"
+                           class="input-text"
+                           data-validate="{'minlength':16}"
+                           data-msg-minlength="<?= $block->escapeHtml(__("Must be 16 digits long"))?>">
+                </div>
+            </div>
+        </div>
+        <div class="profile-picture">
+            <label for="profile_picture" class="image-photo-profile">
+                <img src="<?= $profilePicture; ?>" width="150px" height="150px" alt="profile-picture" title="<?= $block->escapeHtml(__('Edit Profile Picture')) ?>" class="profile-picture-image"/>
+                <div class="profile-picture-overlay">
+                    <div class="profile-picture-text"><?= $block->escapeHtml(__('Edit')) ?></div>
+                </div>
+            </label>
+            <div class="add-photo-profile">
+                <label for="profile_picture" id="add-photo-profile"><?= $block->escapeHtml(__('Upload photo')) ?></label>
+            </div>
+            <div class="control">
+                <input type="file" id="profile_picture" name="profile_picture" value="" title="<?= $block->escapeHtml(__('Profile Picture')) ?>" class="profile-picture-input validate-picture-type validate-picture-size" />
+            </div>
+        </div>
+    </div>
+    <div class="actions-toolbar">
+        <a href="<?= $block->getUrl('customer/account') ?>" class="profile-cancel action">
+            <?= $block->escapeHtml(__('Cancel')) ?>
+        </a>
+        <button type="submit" class="profile-save primary action"><?= $block->escapeHtml(__('Save')) ?></button>
+    </div>
+</form>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_CustomerCustomAttributes/validation": {
+                "isDobEnabled": <?= (int) $_dob->isEnabled() ?>,
+                "mixins": [
+                    "Magento_CustomerCustomAttributes/error-placement",
+                    "Magento_CustomerCustomAttributes/validation-ignore"
+                ]
+            }
+        }
+    }
+</script>
+<script type="text/x-magento-init">
+    {
+        "*" : {
+             "validateprofilepicturejs": {}
+        }
+    }
+</script>
+<script type="text/x-magento-init">
+        {
+            "*": {
+                "Trans_CustomerMyProfile/js/profile": {
+                    "dob": "#form-validate input[name=dob]",
+                    "picturePreview": "#form-validate .profile-picture-image",
+                    "picture": "#form-validate input[name=profile_picture]",
+                    "default": "<?= $customerData['dob']; ?>",
+                    "reset": "#form-validate button.profile-cancel",
+                    "customer": <?= json_encode($customerData); ?>
+                }
+            }
+        }
+</script>
+<script>
+    window.getMaxsizePicture = '<?php /* @escapeNotVerified */ echo $block->getConfigMaxsize(); ?>';
+</script>
+
+<script>
+    require([
+        "jquery",
+        "mage/mage"
+    ], function($){
+        var dataForm = $('#form-validate');
+        var ignore = <?= /* @noEscape */ $_dob->isEnabled() ? '\'input[id$="full"]\'' : 'null' ?>;
+
+        <?php if ($_dob->isEnabled()) : ?>
+            <?php $dobChangeLimitCurrent = (int) ($customer->getCustomAttribute('dob_change_number') ? $customer->getCustomAttribute('dob_change_number')->getValue() : 0) ?>
+            <?php $dobChangeLimit = (int) $profileHelper->getDobChangeLimit(); ?>
+            <?php  if ($dobChangeLimitCurrent >= $dobChangeLimit): ?>
+                $('.dob-date-dropdown input').prop('disabled', true);
+            <?php endif; ?>
+        <?php endif; ?>
+        dataForm.mage('validation', {
+            <?php if ($_dob->isEnabled()) : ?>
+            errorPlacement: function(error, element) {
+                if (element.prop('id').search('full') !== -1) {
+                    var dobElement = $(element).parents('.customer-dob'),
+                        errorClass = error.prop('class');
+                    error.insertAfter(element.parent());
+                    dobElement.find('.validate-custom').addClass(errorClass)
+                        .after('<div class="' + errorClass + '"></div>');
+                }
+                else {
+                    error.insertAfter(element);
+                }
+            },
+            ignore: ':hidden:not(' + ignore + ')'
+            <?php else : ?>
+            ignore: ignore ? ':hidden:not(' + ignore + ')' : ':hidden'
+            <?php endif ?>
+        });
+
+    });
+</script>

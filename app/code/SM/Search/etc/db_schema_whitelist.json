@@ -1,0 +1,49 @@
+{
+    "search_query_personal": {
+        "column": {
+            "entity_id": true,
+            "query_text": true,
+            "customer_id": true,
+            "created_at": true,
+            "updated_at": true,
+            "store_id": true
+        },
+        "index": {
+            "SEARCH_QUERY_PERSONAL_CUSTOMER_ID": true,
+            "SEARCH_QUERY_PERSONAL_STORE_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "SEARCH_QUERY_PERSONAL_CUSTOMER_ID_CUSTOMER_ENTITY_ENTITY_ID": true,
+            "SEARCH_QUERY_PERSONAL_CUSTOMER_ID_QUERY_TEXT": true,
+            "SEARCH_QUERY_PERSONAL_STORE_ID_STORE_STORE_ID": true,
+            "SEARCH_QUERY_PERSONAL_CUSTOMER_ID_STORE_ID_QUERY_TEXT": true
+        }
+    },
+    "search_query_category": {
+        "column": {
+            "entity_id": true,
+            "query_text": true,
+            "num_results": true,
+            "popularity": true,
+            "store_id": true,
+            "category_id": true,
+            "query_id": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "index": {
+            "SEARCH_QUERY_CATEGORY_CATEGORY_ID": true,
+            "SEARCH_QUERY_CATEGORY_STORE_ID": true,
+            "SEARCH_QUERY_CATEGORY_QUERY_ID": true,
+            "SEARCH_QUERY_CATEGORY_CATEGORY_ID_STORE_ID": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "SRCH_QR_CTGR_CTGR_ID_CAT_CTGR_ENTT_ENTT_ID": true,
+            "SEARCH_QUERY_CATEGORY_STORE_ID_STORE_STORE_ID": true,
+            "SEARCH_QUERY_CATEGORY_QUERY_ID_SEARCH_QUERY_QUERY_ID": true,
+            "SEARCH_QUERY_CATEGORY_QUERY_TEXT_STORE_ID_CATEGORY_ID": true
+        }
+    }
+}

@@ -1,0 +1,91 @@
+<?php
+/** @var \SM\DigitalProduct\Block\MobilePackage\Index $block */
+
+?>
+<div class="digital-product-billing">
+    <div class="product data items">
+        <div id="mobile-postpaid" class="item mobile-postpaid" data-role="content">
+            <h3 class="title-head-ct"><?= $block->escapeHtml(__("Buy Mobile Package for Any Operator"))?></h3>
+            <p class="description">
+                <?= $block->escapeHtml(__("Find various types of mobile packages from different operators. To see available packages, please enter your mobile number."))?>
+            </p>
+            <label class="label-input"><?= $block->escapeHtml(__("Mobile Number"))?>
+                <span class="dpl-tooltip">
+                    <a href="#" aria-describedby="tooltip-8" >
+                        <img src='<?= $block->getViewFileUrl('images/info.svg'); ?>' alt=""  width="13" height="16" />
+                    </a>
+                    <span class="tooltip-content" id="tooltip-8" role="tooltip">
+                        <?= $block->getCategoryContent()->getTooltip() ?>
+                    </span>
+                </span>
+            </label>
+            <form action="<?= $block->getFormActionUrl() ?>" method="post">
+                <?= $block->getBlockHtml('formkey')?>
+                <input id="form-current-type" type="hidden" value="<?= \SM\DigitalProduct\Helper\Category\Data::MOBILE_PACKAGE_INTERNET_VALUE ?>" name="service_type">
+                <input type="hidden" value="<?= $block->escapeHtml(
+                    \SM\DigitalProduct\Api\DigitalProductRepositoryInterface::SERVICE_TYPE[
+                    \SM\DigitalProduct\Helper\Category\Data::MOBILE_PACKAGE_INTERNET_VALUE
+                    ]
+                )?>" name="digital[service_type]"/>
+                <input id="selected-product-price-value" type="hidden" value="" name="price"/>
+                <div class="wrap-input">
+                    <input
+                        id="input-number"
+                        class="input-text validate-length minimum-length-8 maximum-length-15"
+                        type="text"
+                        name="digital[mobile_number]"
+                        placeholder="<?= __("Example: 0812345678XXX") ?>"/>
+                    <div class="mage-error" id="error-message"></div>
+                    <img id="operator-icon" src="" alt="" />
+                </div>
+                <div id="product-list">
+                </div>
+                <input id="selected-product-name" type="hidden" value="" name="digital[product_name]"/>
+                <input id="selected-product-price" type="hidden" value="" name="digital[price]"/>
+                <input id="selected-product-id-vendor" type="hidden" value="" name="digital_transaction[product_id_vendor]"/>
+                <input id="operator-image-value" type="hidden" value="" name="digital_transaction[operator_image]"/>
+                <div id="information">
+                    <?php if (!(is_null($block->getCategoryContent()->getInformation()) || $block->getCategoryContent()->getInformation() == "")):?>
+                        <div class="dpb-block-mobile">
+                            <h3 class="info-title"><?= $block->escapeHtml(__("Information"))?></h3>
+                            <div class="info-content">
+                                <?= $block->getCategoryContent()->getInformation()?>
+                            </div>
+                        </div>
+                    <?php endif;?>
+                </div>
+                <div id="product-detail-wrapper" class="dpb-block-mobile active" style="display: none">
+                    <h3><?= $block->escapeHtml(__("Mobile Package Details"))?></h3>
+                    <div id="product-detail"></div>
+                </div>
+
+                <div id="product-price-wrapper" class="dpb-bottom-price dpb-price-noprice">
+                    <div id="product-price" class="dpb-price">
+                        <label><?= $block->escapeHtml(__("Price"))?></label>
+                        <span id="product-price-value"></span>
+                    </div>
+                    <button id="btn-buy-product" disabled type="submit" class="action primary disabled"><?= $block->escapeHtml(__("Buy"))?></button>
+                </div>
+            </form>
+            <?php if ($howToBuy = $block->getCategoryContent()->getHowToBuy()): ?>
+            <div class="dpb-policy">
+                <div class="dpb-title-head"><h3><?= $block->escapeHtml(__("How to Buy Mobile Package Through Transmart")) ?></h3></div>
+                <div class="dpd-policy-content">
+                    <?= $howToBuy ?>
+                </div>
+            </div>
+            <?php endif ?>
+            <!-- content-end------->
+        </div>
+    </div>
+</div>
+<script type="text/x-magento-init">
+{
+    "*": {
+        "SM_DigitalProduct/js/validate":{
+            "check_url":"<?= $block->getUrl("digitalproduct/index/checkprefix")?>",
+            "category_id":"<?= \SM\DigitalProduct\Model\CategoryRepository::MOBILE_PACKAGE ?>"
+        }
+    }
+}
+</script>

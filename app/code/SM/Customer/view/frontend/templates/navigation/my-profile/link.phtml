@@ -1,0 +1,43 @@
+<?php
+/**
+ * @project    ct-corp-transmart
+ * @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+ * @author     Duc Nguyen Hoang <ducnh2@smartosc.com>
+ * @copyright  Copyright © 2020 SmartOSC. All rights reserved.
+ * @url        http://www.smartosc.com
+ */
+
+/** @var \Magento\Customer\Block\Account\SortLinkInterface $block */
+?>
+
+<?php
+$highlight = '';
+
+if ($block->getIsHighlighted()) {
+    $highlight = 'current';
+}
+?>
+
+<?php if ($block->isCurrent()) : ?>
+    <li class="nav item current">
+        <strong>
+            <?= $block->escapeHtml(__($block->getLabel())) ?>
+            <?= $block->getChildHtml('my-profile-notification-icon'); ?>
+        </strong>
+    </li>
+<?php else : ?>
+    <li class="nav item <?= $highlight ?>">
+        <a href="<?= $block->escapeHtml($block->getHref()) ?>"
+            <?= $block->getTitle() ? ' title="' . $block->escapeHtml(__($block->getTitle())) . '"' : ''; ?>
+            <?= $block->getAttributesHtml() ?> >
+
+            <?php if ($block->getIsHighlighted()) : ?>
+                <strong><?= $block->escapeHtml(__($block->getLabel())); ?></strong>
+            <?php else : ?>
+                <?= $block->escapeHtml(__($block->getLabel())); ?>
+            <?php endif; ?>
+
+            <?= $block->getChildHtml('my-profile-notification-icon'); ?>
+        </a>
+    </li>
+<?php endif; ?>

@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <route url="/V1/customer/notification/list/mobile" method="GET">
+        <service class="SM\Notification\Api\CustomerMessageRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+            <parameter name="isMobile" force="true">1</parameter>
+        </data>
+    </route>
+    <route url="/V1/customer/notification/list" method="GET">
+        <service class="SM\Notification\Api\CustomerMessageRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/customer/notification-setting/:area" method="GET">
+        <service class="SM\Notification\Api\NotificationSettingRepositoryInterface" method="getNotificationSetting"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/customer/notification-setting/update" method="POST">
+        <service class="SM\Notification\Api\NotificationSettingRepositoryInterface" method="updateNotificationSettingData"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/notification/:type/" method="POST">
+        <service class="SM\Notification\Api\CustomerMessageRepositoryInterface" method="updateReadByIds"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/notification/:type/updateAll" method="POST">
+        <service class="SM\Notification\Api\CustomerMessageRepositoryInterface" method="updateReadAll"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/notification/types" method="GET">
+        <service class="SM\Notification\Api\CustomerMessageRepositoryInterface" method="getEnabledEvents"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+    </route>
+
+    <route url="/V1/customer/notification/unread-number" method="GET">
+        <service class="SM\Notification\Api\CustomerMessageRepositoryInterface" method="getCountUnread"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+</routes>

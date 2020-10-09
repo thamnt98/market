@@ -1,0 +1,58 @@
+<?php 
+/**
+ * @category Trans
+ * @package  Trans_AllowLocation
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Muhammad Randy <muhammad.randy@ctcorpdigital.cm>
+ *
+ * Copyright © 2019 PT CTCORP Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+?>
+
+<?php
+// @codingStandardsIgnoreFile
+
+/** @var \Trans\AllowLocation\Block\Locationallow $block */
+?>
+<?php /* Extensions placeholder */ ?>
+<?php if($block->enabledLocation()) : ?>
+<script>
+      // Note: This example requires that you consent to location sharing when
+      // prompted by your browser. If you see the error "The Geolocation service
+      // failed.", it means you probably did not give permission for the browser to
+      // locate you.
+      var infoWindow;
+      function initMap() {
+        infoWindow = new google.maps.InfoWindow;
+
+        // Try HTML5 geolocation.
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+            var pos = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude
+            };
+            console.log(pos);
+
+            infoWindow.setPosition(pos);
+          }, function() {
+            handleLocationError(true, infoWindow);
+          });
+        } else {
+          // Browser doesn't support Geolocation
+          handleLocationError(false, infoWindow);
+        }
+      }
+
+      function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+        infoWindow.setPosition(pos);
+        infoWindow.setContent(browserHasGeolocation ?
+                              'Error: The Geolocation service failed.' :
+                              'Error: Your browser doesn\'t support geolocation.');
+      }
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key='<?php  echo $block->getSecret(); ?>'&callback=initMap"> </script>
+<?php endif; ?>

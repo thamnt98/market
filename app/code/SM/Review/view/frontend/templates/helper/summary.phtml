@@ -1,0 +1,34 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \SM\Review\Block\ReviewRenderer $block */
+
+$url = $block->getReviewsUrl() . '#review-form';
+
+?>
+<?php if ($block->isReviewEnabled()) : ?>
+    <?php
+    $rating = $block->getRatingSummary();
+    $label = $rating;
+    $reviewCount = $block->getReviewsCount();
+    if (is_null($rating)) {
+        $rating = 1;
+        $label = 0;
+        $reviewCount = 0;
+    }
+    ?>
+    <div class="product-reviews-summary short<?= !$rating ? ' no-rating' : '' ?>">
+        <div class="rating-summary">
+            <div class="rating-result" title="<?= $block->escapeHtmlAttr($label) ?>%">
+                <span style="width:<?= $rating ?>%"><span><?= $block->escapeHtml($label) ?>%</span></span>
+            </div>
+        </div>
+        <a href="<?= $block->escapeUrl($url) ?>" data-gtm-pdp="view-review">
+                <span class="rating-count reviews-actions">(<?= $block->escapeHtml($reviewCount . (($reviewCount > 1) ? __(" Reviews") : __(" Review"))) ?>)
+                </span>
+        </a>
+    </div>
+<?php endif; ?>

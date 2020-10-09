@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+
+<!--
+  ~ @project    ct-corp-transmart
+  ~ @license    http://opensource.org/licenses/osl-3.0.php Open Software License (OSL 3.0)
+  ~ @author     Hung Pham <hungpv@smartosc.com>
+  ~ @copyright  Copyright © 2020 SmartOSC. All rights reserved.
+  ~ @url        http://www.smartosc.com
+  -->
+
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="salesrule" resource="default" engine="innodb" comment="Salesrule">
+        <column xsi:type="varchar" name="day_of_week" nullable="true"
+                comment="Days of Week"/>
+        <column xsi:type="boolean" name="skip_special" nullable="false" default="false" comment="Skip Special Price"/>
+        <column xsi:type="boolean" name="voucher_reward" nullable="false" default="false" comment="Voucher Reward"/>
+        <column xsi:type="int" name="reward_rule" nullable="true" comment="Reward Rule"/>
+        <column xsi:type="boolean" name="is_suggestion" nullable="true" default="false" comment="Show Suggestion on Cart Page"/>
+    </table>
+    <table name="quote_address">
+        <column xsi:type="text" name="shipping_rule_ids" nullable="true" comment="Shipping Rule IDs"/>
+    </table>
+    <table name="quote">
+        <column xsi:type="text" name="shipping_rule_ids" nullable="true" comment="Shipping Rule IDs"/>
+    </table>
+    <table name="sales_order">
+        <column xsi:type="text" name="shipping_rule_ids" nullable="true" comment="Shipping Rule IDs"/>
+        <column xsi:type="smallint" name="voucher_rewarded" nullable="false" default="0" comment="Voucher Rewarded"/>
+    </table>
+</schema>

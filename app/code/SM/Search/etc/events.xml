@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <!-- save category_names in product -->
+    <event name="catalog_product_save_before">
+        <observer name="sm_search_catalog_product_save_before" instance="SM\Search\Observer\CatalogProductSaveBefore"/>
+    </event>
+</config>

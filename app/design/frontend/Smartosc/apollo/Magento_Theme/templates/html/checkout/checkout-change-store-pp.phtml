@@ -1,0 +1,226 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+?>
+
+<div class="new-checkout">
+    <div class="new-checkout-head">
+        <a href="#" class="bt-delivery active active-both">
+            <span class="apl-ic_delivery-long"></span>
+            <?= $block->escapeHtml(__('Delivery')) ?>
+            <span class="cirl-checkbox"></span>
+        </a>
+        <a href="#" class="bt-pick-up active active-both">
+            <span class="apl-Pick-Up-in-Store-Grey"></span>
+            <?= $block->escapeHtml(__('Pick Up in Store')) ?>
+            <span class="cirl-checkbox"></span>
+        </a>
+    </div>
+    <div class="chek-note active" id="note-coachmark">
+        <span class="dpl-tooltip">
+            <a href="#" aria-describedby="tooltip-1" ><img src='<?= $block->getViewFileUrl('images/info.svg'); ?>' alt=""  width="13" height="16" /></a>
+            <span class="tooltip-content" id="tooltip-1" role="tooltip">Your mobile number or the number used for your modem.</span>
+        </span>
+        <span class="text-note"><?= $block->escapeHtml(__('or do both')) ?></span>
+        <span class="icon-toggle"></span>
+    </div>
+    <div class="box-delivery-address">
+        <h3><?= $block->escapeHtml(__('Store Selection')) ?></h3>
+        <ul class="one-address"> <!--if multi address add class multi-address-->
+            <li>
+                <div class="inner">
+                    <span class="status status-green"><?= $block->escapeHtml(__('Home')) ?></span>
+                    <span class="apl-Remove"></span>
+                    <h4><?= $block->escapeHtml(__('Rosita')) ?></h4>
+                    <p class="da-detail">
+                        Jl. Kebagusan Kecil no 33, Kel. Kebagusan,<br/>
+                        Kecamatan Pasar Minggu,<br/>
+                        Jakarta Selatan 42115<br/>
+                        +628176888763
+                    </p>
+                    <div class="gr-change-adress">
+                        <a href="#" class="bt-change" data-trigger="change-store"><?= $block->escapeHtml(__('Change Store')) ?></a>
+                    </div>
+                </div>
+            </li>
+            <li>
+                <div class="inner">
+                    <span class="status status-blue"><?= $block->escapeHtml(__('Apartment')) ?></span>
+                    <span class="apl-Remove"></span>
+                    <h4><?= $block->escapeHtml(__('Bangkit')) ?></h4>
+                    <p class="da-detail">
+                        Apartment Bassura City, Jl. Jendral Basuki<br/>
+                        Rachmat No.13 Kel. Cipinang Besar Selatan, Kec<br/>
+                        Jatinegara, Jakarta Timur 13410<br/>
+                        +628176888763
+                    </p>
+                    <a href="#"><?= $block->escapeHtml(__('Change')) ?></a>
+                </div>
+            </li>
+        </ul>
+    </div>
+    <div class="checkout-list-items">
+        <!------start item------>
+        <div class="item">
+            <div class="item-info">
+                <a href="#" title="thaole1233" class="product-item-photo">
+                    <img src="https://apollo11-dev.ctdigital.id/media/catalog/product/cache/6410bdb417f1097c90b11783ebe3d82c/2/_/2_1_1.jpg" width="110" height="110" alt="thaole1233" />
+                </a>
+                <div class="product-item-details">
+                    <a href="https://apollo11-dev.ctdigital.id/thaole1233.html" class="product-item-name">thaole1233</a>
+                </div>
+                <ul class="delivery-choose-adres">
+                    <li>
+                        <label><?= $block->escapeHtml(__('Delivery Method')) ?></label>
+                        <div class="sortby-dropdown">
+                                <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+                                    <span><?= $block->escapeHtml('Regular (2-7 Days)') ?></span>
+                                </span>
+                            <ul class="dropdown">
+                                <li class="item"><?= $block->escapeHtml('Regular (2-7 Days)') ?></li>
+                                <li class="item"><?= $block->escapeHtml('Regular (2-7 Days)') ?></li>
+                                <li class="item"><?= $block->escapeHtml('Regular (2-7 Days)') ?></li>
+                                <li class="item"><?= $block->escapeHtml('Regular (2-7 Days)') ?></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li>
+                        <label><?= $block->escapeHtml(__('Choose Address')) ?></label>
+                        <div class="sortby-dropdown">
+                                <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+                                    <span><?= $block->escapeHtml('home') ?></span>
+                                </span>
+                            <ul class="dropdown">
+                                <li class="item"><?= $block->escapeHtml('home') ?></li>
+                                <li class="item"><?= $block->escapeHtml('home') ?></li>
+                                <li class="item"><?= $block->escapeHtml('home') ?></li>
+                                <li class="item"><?= $block->escapeHtml('home') ?></li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="subtotal">
+                <span class="price">Rp 1.490.000</span>
+            </div>
+        </div>
+        <!------End item------>
+        <!------start item------>
+        <div class="item">
+            <div class="item-info">
+                <a href="#" title="thaole1233" class="product-item-photo">
+                    <img  src="https://apollo11-dev.ctdigital.id/media/catalog/product/cache/6410bdb417f1097c90b11783ebe3d82c/2/_/2_1_1.jpg" width="110" height="110" alt="thaole1233" />
+                </a>
+                <div class="product-item-details">
+                    <a href="https://apollo11-dev.ctdigital.id/thaole1233.html" class="product-item-name">Bundle - Bundle-Laptop LG</a>
+                    <dl class="item-options">
+                        <dt>Ram</dt>
+                        <dd>
+                            1 x RAM 8GB <span class="price">$100.00</span> </dd>
+                        <dt>Monitor</dt>
+                        <dd>
+                            1 x Monitor 32 inch <span class="price">$200.00</span> </dd>
+                        <dt>CPU</dt>
+                        <dd>
+                            1 x CPU core i3 <span class="price">$300.00</span> </dd>
+                    </dl>
+                </div>
+                <ul class="delivery-choose-adres">
+                    <li>
+                        <label><?= $block->escapeHtml(__('Delivery Method')) ?></label>
+                        <div class="sortby-dropdown">
+                                <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+                                    <span><?= $block->escapeHtml('Regular (2-7 Days)') ?></span>
+                                </span>
+                            <ul class="dropdown">
+                                <li class="item"><?= $block->escapeHtml('Regular (2-7 Days)') ?></li>
+                                <li class="item"><?= $block->escapeHtml('Regular (2-7 Days)') ?></li>
+                                <li class="item"><?= $block->escapeHtml('Regular (2-7 Days)') ?></li>
+                                <li class="item"><?= $block->escapeHtml('Regular (2-7 Days)') ?></li>
+                            </ul>
+                        </div>
+                    </li>
+                    <li>
+                        <label><?= $block->escapeHtml(__('Choose Address')) ?></label>
+                        <div class="sortby-dropdown">
+                                <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+                                    <span><?= $block->escapeHtml('home') ?></span>
+                                </span>
+                            <ul class="dropdown">
+                                <li class="item"><?= $block->escapeHtml('home') ?></li>
+                                <li class="item"><?= $block->escapeHtml('home') ?></li>
+                                <li class="item"><?= $block->escapeHtml('home') ?></li>
+                                <li class="item"><?= $block->escapeHtml('home') ?></li>
+                            </ul>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="subtotal">
+                <span class="price">Rp 1.490.000</span>
+            </div>
+        </div>
+        <!------End item------>
+    </div>
+</div>
+
+<div data-bind="mageInit: {
+    'Magento_Ui/js/modal/modal':{
+    'type': 'popup',
+    'title': 'Change Store',
+    'trigger': '[data-trigger=change-store]',
+    'modalClass': 'pp-change-store',
+    'responsive': true
+    }}">
+    <div class="ct-delivery-adrress">
+        <div class="gr-search-ck">
+            <input type="text" class="input-text"  placeholder="Kuningan Barat, Kec. Mampang Prapatan" />
+            <button type="submit" class="action secondary"><?= $block->escapeHtml(__('Find Stores')) ?></button>
+        </div>
+        <p class="note-current">or use <a href="#">Current Location</a></p>
+        <div class="current-data">
+            <div class="gr-data">
+                <h5><?= $block->escapeHtml('Transmart Carrefour ITC Kuningan') ?></h5>
+                <p>Jl. Cempaka Raya Gang Haji Munasir III No. 6<br/>
+                    Cempaka Putih Barat, Jakarta Pusat</p>
+                <div class="note-your-pick">
+                    <span class="choose-address"></span>
+                    <span class="note-main-adrress"><?= $block->escapeHtml('Your Pick Up Store') ?></span></div>
+            </div>
+            <div class="direction">
+                <span class="apl-ArrowIcon"></span>
+                <span>10Km</span>
+            </div>
+        </div>
+        <h4><?= $block->escapeHtml('Store List') ?></h4>
+        <ul class="list-address">
+            <li>
+                <div class="gr-data">
+                    <h5><?= $block->escapeHtml('Transmart Carrefour Cempaka Putih') ?></h5>
+                    <p>Jl. Jend. Sudirman Kav. 29-31. Additional<br/>
+                        address information, 15th floor WTC 1. City, Jakarta</p>
+                    <button type="submit" class="action secondary"><?= $block->escapeHtml('Pick Up from This Store') ?></button>
+                </div>
+                <div class="direction">
+                    <span class="apl-ArrowIcon"></span>
+                    <span>10Km</span>
+                </div>
+            </li>
+            <li>
+                <div class="gr-data">
+                    <h5><?= $block->escapeHtml('Transmart Carrefour Cempaka Putih') ?></h5>
+                    <p>Jl. Jend. Sudirman Kav. 29-31. Additional<br/>
+                        address information, 15th floor WTC 1. City, Jakarta</p>
+                    <button type="submit" class="action secondary"><?= $block->escapeHtml('Pick Up from This Store') ?></button>
+                </div>
+                <div class="direction">
+                    <span class="apl-ArrowIcon"></span>
+                    <span>10Km</span>
+                </div>
+            </li>
+        </ul>
+    </div>
+</div>

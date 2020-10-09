@@ -1,0 +1,84 @@
+<script>
+    require(['jquery', 'Magento_Ui/js/lib/view/utils/async', 'gtmCustomer', 'mage/translate', 'jquery/jquery-storageapi'], function ($, async, gtmCustomer) {
+        $(window).load(function () {
+            async.async('[data-gtm-message="success"]', function () {
+                //Todo Remove Debug
+                console.log($('[data-gtm-message="success"]').text());
+                console.log(window);
+                if ($('[data-gtm-message="success"]').text().includes($.mage.__('You saved the account information.'))) {
+                    let data = [];
+                    data['fullName'] = $('p[data-gtm="fullName"]').text();
+                    data['DOB'] = $('p[data-gtm="DOB"]').text();
+                    data['Gender'] = $('p[data-gtm="Gender"]').text();
+                    data['marital_status'] = $('p[data-gtm="marital_status"]').text();
+                    data['ktp_no'] = $('p[data-gtm="ktp_no"]').text();
+                    gtmCustomer.push('personal_information_update', data);
+                }
+                if ($('[data-gtm-message="success"]').text().includes($.mage.__('Your email has saved successfully.'))) {
+                    let data = [];
+                    gtmCustomer.push('email_update', data);
+                }
+                if ($('[data-gtm-message="success"]').text().includes($.mage.__('Your telephone save successfully.'))) {
+                    let data = [];
+                    gtmCustomer.push('phoneNumber_update', data);
+                }
+                if ($('[data-gtm-message="success"]').text().includes($.mage.__('You saved the address.'))) {
+                    try {
+                        let data = $.localStorage.get('address-gtm');
+                        console.log(data);
+                        if (data) {
+                            gtmCustomer.push('update_myAddress', data);
+                            $.localStorage.remove('address-gtm');
+                        }
+                    } catch (e) {
+
+                    }
+                }
+                if ($('[data-gtm-message="success"]').text().includes($.mage.__('You have successfully added a new address.'))) {
+                    try {
+                        let data = $.localStorage.get('address-gtm');
+                        console.log(data);
+                        if (data) {
+                            gtmCustomer.push('create_new_address', data);
+                        }
+                    } catch (e) {
+
+                    }
+                }
+            });
+            $('[data-gtm-event="set_mainaddress"]').each(function () {
+                $(this).on('click', function () {
+                    let data = [];
+                    data['address_title']= $(this).attr('data-gtm-address-title');
+                    data['recepient_name']= $(this).attr('data-gtm-recepient-name');
+                    data['phoneNumber']= $(this).attr('data-gtm-phonenumber');
+                    data['province']= $(this).attr('data-gtm-province');
+                    data['district']= $(this).attr('data-gtm-district');
+                    data['city']= $(this).attr('data-gtm-city');
+                    data['address']= $(this).attr('data-gtm-address');
+                    data['pinpoint']= $(this).attr('data-gtm-pinpoint');
+                    //Todo Remove Debug
+                    console.log(data);
+                    gtmCustomer.push('set_mainaddress', data);
+                });
+            });
+            $('[data-gtm-event="delete_address"]').each(function () {
+                $(this).on('click', function () {
+                    let data = [];
+                    data['address_title']= $(this).attr('data-gtm-address-title');
+                    data['recepient_name']= $(this).attr('data-gtm-recepient-name');
+                    data['phoneNumber']= $(this).attr('data-gtm-phonenumber');
+                    data['province']= $(this).attr('data-gtm-province');
+                    data['district']= $(this).attr('data-gtm-district');
+                    data['city']= $(this).attr('data-gtm-city');
+                    data['address']= $(this).attr('data-gtm-address');
+                    data['pinpoint']= $(this).attr('data-gtm-pinpoint');
+                    //Todo Remove Debug
+                    console.log(data);
+                    gtmCustomer.push('delete_address', data);
+                });
+            });
+        });
+    });
+</script>
+
