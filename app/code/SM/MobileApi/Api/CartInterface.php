@@ -1,7 +1,10 @@
 <?php
 namespace SM\MobileApi\Api;
 
-interface CartInterface{
+use Magento\Framework\Exception\CouldNotSaveException;
+
+interface CartInterface
+{
 
     /**
      * @param \Magento\Quote\Api\Data\CartItemInterface[] $cartItem
@@ -22,8 +25,7 @@ interface CartInterface{
      * @param int $customerId
      * @return boolean
      */
-    public function removeCart($customerId,$cartId,$id);
-
+    public function removeCart($customerId, $cartId, $id);
 
     /**
      * Lists items that are assigned to a specified cart.
@@ -33,4 +35,16 @@ interface CartInterface{
      * @throws \Magento\Framework\Exception\NoSuchEntityException The specified cart does not exist.
      */
     public function getItems($cartId);
+
+    /**
+     * This API using for homepage screen - mobile app
+     * To prevent call api rest/V1/cart/getcartitems frequently in homepage screen that will make feature show error
+     * messages won't work (APO-4614)
+     *
+     * @param int $customerId
+     * @return int
+     * @throws NoSuchEntityException The specified cart does not exist.
+     * @throws CouldNotSaveException Can't create quote for customer
+     */
+    public function getCartIdForCustomer($customerId);
 }

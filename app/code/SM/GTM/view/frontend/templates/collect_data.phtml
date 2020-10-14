@@ -222,31 +222,36 @@
                 }
             };
 
-            $('.footer-site-list').find('a').each(function () {
-                $(this).on('click', function () {
-                    if ($(this).attr('href').search("facebook") >= 0) {
-                        let data = [];
-                        data['socialMedia'] = "Facebook";
-                        pushGTM("social_media_engagement", data);
-                    } else if ($(this).attr('href').search("instagram") >= 0) {
-                        let data = [];
-                        data['socialMedia'] = "Instagram";
-                        pushGTM("social_media_engagement", data);
-                    } else if ($(this).attr('href').search("twitter") >= 0) {
-                        let data = [];
-                        data['socialMedia'] = "Twitter";
-                        pushGTM("social_media_engagement", data);
-                    } else if ($(this).attr('href').search("youtube") >= 0) {
-                        let data = [];
-                        data['socialMedia'] = "Youtube";
-                        pushGTM("social_media_engagement", data);
-                    } else {
-                        let data = [];
-                        data['menuName'] = $(this).parents().eq(1).find('.footer-site-heading').text().trim();;
-                        data['subMenu'] = $(this).html().trim().replace(/&amp;/g, '&');
-                        pushGTM("bottom_navigation", data);
-                    }
+            $('.footer-site-list').find('.pagebuilder-column').each(function () {
+                var $this = $(this);
+                $this.find('a').each(function () {
+                    var $that = $(this);
+                    $that.on('click', function () {
+                        if ($(this).attr('href').search("facebook") >= 0) {
+                            let data = [];
+                            data['socialMedia'] = "Facebook";
+                            pushGTM("social_media_engagement", data);
+                        } else if ($(this).attr('href').search("instagram") >= 0) {
+                            let data = [];
+                            data['socialMedia'] = "Instagram";
+                            pushGTM("social_media_engagement", data);
+                        } else if ($(this).attr('href').search("twitter") >= 0) {
+                            let data = [];
+                            data['socialMedia'] = "Twitter";
+                            pushGTM("social_media_engagement", data);
+                        } else if ($(this).attr('href').search("youtube") >= 0) {
+                            let data = [];
+                            data['socialMedia'] = "Youtube";
+                            pushGTM("social_media_engagement", data);
+                        } else {
+                            let data = [];
+                            data['menuName'] = $this.find('h5').text().trim();
+                            data['subMenu'] = $(this).html().trim().replace(/&amp;/g, '&');
+                            pushGTM("bottom_navigation", data);
+                        }
+                    });
                 });
+
             });
 
             $('.reorder-card').click(function () {

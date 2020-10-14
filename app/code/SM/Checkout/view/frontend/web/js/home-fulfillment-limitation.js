@@ -38,12 +38,15 @@ define(
             },
 
             showPopup: function () {
+                console.log(customerData.get('fulfillment')());
+                console.log(customerData.get('fulfillment')().show);
                 if (Object.keys(customerData.get('fulfillment')()).length > 0 && customerData.get('fulfillment')().show) {
                     return;
                 }
                 if (!maincoachmarks.coachMarks()) {
                     return;
                 }
+                customerData.set('fulfillment', {show: true});
                 var options = {
                     type: 'popup',
                     responsive: true,
@@ -60,7 +63,6 @@ define(
                 };
                 var popup = modal(options, $('#home-fulfillment-limitation'));
                 $('#home-fulfillment-limitation').modal('openModal');
-                customerData.set('fulfillment', {show: true});
             }
         }
     );

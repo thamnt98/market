@@ -8,11 +8,9 @@
 
 namespace SM\Checkout\Controller\Index;
 
-use Magento\Braintree\Block\Payment;
 use Magento\Checkout\Model\Session as CheckoutSession;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
-use SM\DigitalProduct\Api\Data\DigitalInterface;
 use Trans\MasterPayment\Model\MasterPaymentFactory;
 
 /**
@@ -92,17 +90,13 @@ class Success extends Action
         \SM\Checkout\Model\Payment $payment,
         \SM\Checkout\Helper\Payment $paymentHelper,
         CheckoutSession $checkoutSession,
-        \Magento\Framework\Session\Generic $session,
-        \SM\FlashSale\Model\HistoryFactory $historyFactory,
-        \Magento\Customer\Model\Session $customerSession
+        \Magento\Framework\Session\Generic $session
     ) {
         $this->resultPageFactory = $pageFactory;
         $this->checkoutSession = $checkoutSession;
         $this->session = $session;
         $this->orderFactory = $orderFactory;
         $this->payment = $payment;
-        $this->customerSession = $customerSession;
-        $this->historyFactory = $historyFactory;
         parent::__construct($context);
         $this->paymentHelper = $paymentHelper;
     }
@@ -133,27 +127,6 @@ class Success extends Action
         $this->session->setOrderIds(null);
         $this->checkoutSession->setIsSucceed(null);
 
-        $flashSaleData = $this->customerSession->getFlashSaleData() ?? [];
-        if (!empty($flashSaleData)) {
-            foreach ($flashSaleData as $data) {
-                $history = $this->historyFactory->create();
-                $qtyCustomer = $history->getCollection()
-                    ->addFieldToFilter('event_id', $data['event_id'])
-                    ->addFieldToFilter('item_id', $data['item_id'])
-                    ->addFieldToFilter('customer_id', $this->customerSession->getCustomerId())->getFirstItem();
-                if ($qtyCustomer->getId()) {
-                    $qtyCustomer->setData('item_qty_purchase',$data['item_qty_purchase']);
-                    $qtyCustomer->save();
-                }else {
-                    $history->setData('event_id', $data['event_id']);
-                    $history->setData('item_id', $data['item_id']);
-                    $history->setData('customer_id', $this->customerSession->getCustomerId());
-                    $history->setData('item_qty_purchase', $data['item_qty_purchase']);
-                    $history->save();
-                }
-            }
-        }
-        $this->customerSession->setFlashSaleData([]);
         return $resultPage;
     }
 

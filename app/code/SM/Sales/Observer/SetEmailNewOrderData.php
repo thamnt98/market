@@ -5,6 +5,7 @@ namespace SM\Sales\Observer;
 use Magento\Framework\DataObject;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Pricing\Helper\Data as PriceHelper;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
@@ -27,15 +28,24 @@ class SetEmailNewOrderData implements ObserverInterface
     protected $url;
 
     /**
+     * @var PriceHelper
+     */
+    protected $priceHelper;
+
+    /**
      * SetEmailNewOrderData constructor.
+     * @param PriceHelper $priceHelper
      * @param UrlInterface $url
+     * @param SprintResponseRepositoryInterface $sprintResponseRepository
      */
     public function __construct(
+        PriceHelper $priceHelper,
         UrlInterface $url,
         SprintResponseRepositoryInterface $sprintResponseRepository
     ) {
         $this->sprintResponseRepository = $sprintResponseRepository;
         $this->url = $url;
+        $this->priceHelper = $priceHelper;
     }
 
     /**
@@ -63,7 +73,7 @@ class SetEmailNewOrderData implements ObserverInterface
 
         $additionalData = [
             "order_increment" => $order->getReferenceNumber(),
-            "order_total" => (float)$order->getGrandTotal(),
+            "order_total" => $this->getPrice($order->getGrandTotal()),
             "virtual_account_number" => $this->getPaycode($order->getReferenceNumber()),
             "payment_method_title" => $paymentMethodTitle,
             "order_url" => $orderUrl,
@@ -121,5 +131,16 @@ class SetEmailNewOrderData implements ObserverInterface
             return $sprintOrder->getCustomerAccount();
         } catch (\Exception $e) {
         }
+    }
+
+    /**
+     * Get currency symbol for current locale and currency code
+     *
+     * @param $price
+     * @return string
+     */
+    public function getPrice($price)
+    {
+        return $this->priceHelper->currency($price, true, false);
     }
 }

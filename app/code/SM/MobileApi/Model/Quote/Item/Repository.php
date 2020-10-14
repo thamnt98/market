@@ -2,17 +2,17 @@
 namespace SM\MobileApi\Model\Quote\Item;
 
 use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\CatalogEvent\Model\Event as SaleEvent;
+use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Model\Session;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Message\MessageInterface;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Quote\Api\Data\CartItemInterfaceFactory;
 use Magento\Quote\Model\Quote\Item\CartItemOptionsProcessor;
-use Magento\Framework\Exception\InputException;
-use Magento\Customer\Api\CustomerRepositoryInterface;
-use Magento\Framework\Message\MessageInterface;
-use Magento\CatalogEvent\Model\Event as SaleEvent;
 
-class Repository extends \Magento\Quote\Model\Quote\Item\Repository{
-
+class Repository extends \Magento\Quote\Model\Quote\Item\Repository
+{
     protected $tokenUserContext;
 
     protected $customer;
@@ -24,24 +24,27 @@ class Repository extends \Magento\Quote\Model\Quote\Item\Repository{
     protected $historyFactory;
 
     protected $categoryEventList;
+
     protected $productStock;
+
     protected $customerSession;
+
     protected $cartMessageFactory;
 
-    public function __construct(CartRepositoryInterface $quoteRepository,
-                                ProductRepositoryInterface $productRepository,
-                                CartItemInterfaceFactory $itemDataFactory,
-                                CartItemOptionsProcessor $cartItemOptionsProcessor,
-                                \Magento\Webapi\Model\Authorization\TokenUserContext $tokenUserContext,
-                                CustomerRepositoryInterface $customer,
-                                \SM\FlashSale\Model\HistoryFactory $historyFactory,
-                                \Magento\CatalogEvent\Model\Category\EventList $categoryEventList,
-                                $cartItemProcessors = [],
-                                \SM\MobileApi\Model\Quote\Item\Stock $productStock,
-                                \SM\Checkout\Model\Data\CartMessageFactory $cartMessageFactory,
-                                Session $customerSession
-    )
-    {
+    public function __construct(
+        CartRepositoryInterface $quoteRepository,
+        ProductRepositoryInterface $productRepository,
+        CartItemInterfaceFactory $itemDataFactory,
+        CartItemOptionsProcessor $cartItemOptionsProcessor,
+        \Magento\Webapi\Model\Authorization\TokenUserContext $tokenUserContext,
+        CustomerRepositoryInterface $customer,
+        \SM\FlashSale\Model\HistoryFactory $historyFactory,
+        \Magento\CatalogEvent\Model\Category\EventList $categoryEventList,
+        $cartItemProcessors = [],
+        \SM\MobileApi\Model\Quote\Item\Stock $productStock,
+        \SM\Checkout\Model\Data\CartMessageFactory $cartMessageFactory,
+        Session $customerSession
+    ) {
         $this->customerSession = $customerSession;
         $this->tokenUserContext = $tokenUserContext;
         $this->customer = $customer;
@@ -53,6 +56,15 @@ class Repository extends \Magento\Quote\Model\Quote\Item\Repository{
         parent::__construct($quoteRepository, $productRepository, $itemDataFactory, $cartItemOptionsProcessor, $cartItemProcessors);
     }
 
+    /**
+     * Update the specified cart item.
+     * @param \Magento\Quote\Api\Data\CartItemInterface $cartItem
+     * @return \Magento\Quote\Api\Data\CartItemInterface
+     * @throws InputException
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Magento\Framework\Webapi\Exception
+     */
     public function save(\Magento\Quote\Api\Data\CartItemInterface $cartItem)
     {
         /** @var \Magento\Quote\Model\Quote $quote */
@@ -65,20 +77,21 @@ class Repository extends \Magento\Quote\Model\Quote\Item\Repository{
         $message = "";
         $quote = $this->quoteRepository->getActive($cartId);
 
-        if ($cartItem->getData('item_id')){
+        if ($cartItem->getData('item_id')) {
             $item = $quote->getItemById($cartItem->getData('item_id'));
-
             $availableStock = $this->productStock->getStock($item);
-            if($availableStock <= 0 ){
+            Validate::validateQtyInCart($quote, $item->getQty(), $cartItem->getQty());
+
+            if ($availableStock <= 0) {
                 $extensionAttributes = $item->getExtensionAttributes();
                 $cartMessageFactory = $this->cartMessageFactory->create();
                 $cartMessageFactory->setMessage(__('This item is out of stock. Please remove it and find something else.'));
                 $cartMessageFactory->setMessageType(MessageInterface::TYPE_WARNING);
                 $extensionAttributes->setCartMessage($cartMessageFactory);
                 $item->setExtensionAttributes($extensionAttributes);
-            }else{
-                if($cartItem->getQty() > $availableStock) {
-                    $cartItem->setData('qty',$availableStock);
+            } else {
+                if ($cartItem->getQty() > $availableStock) {
+                    $cartItem->setData('qty', $availableStock);
                     $extensionAttributes = $item->getExtensionAttributes();
                     $cartMessageFactory = $this->cartMessageFactory->create();
                     $cartMessageFactory->setMessage(__('The quantity has been adjusted due to stock limitation.'));
@@ -162,7 +175,7 @@ class Repository extends \Magento\Quote\Model\Quote\Item\Repository{
 
                                 $item->setCustomPrice($price);
                                 $item->setOriginalCustomPrice($price);
-                                $cartItem->setData('qty',$qtyNow);
+                                $cartItem->setData('qty', $qtyNow);
                             } else {
                                 $item->setEventId(null);
                                 if ($item->getParentItem()) {
@@ -185,17 +198,17 @@ class Repository extends \Magento\Quote\Model\Quote\Item\Repository{
                 }
             }
         }
+
         $quoteItems = $quote->getItems();
         $quoteItems[] = $cartItem;
         $quote->setItems($quoteItems);
         $quote->setTotalsCollectedFlag(false)->collectTotals();
         $this->quoteRepository->save($quote);
-        if($message != ""){
-            throw new \Magento\Framework\Webapi\Exception(__($message),444,404);
+        if ($message != "") {
+            throw new \Magento\Framework\Webapi\Exception(__($message), 444, 404);
         }
         return $quote->getLastAddedItem();
     }
-
 
     protected function _initializeEventsForQuoteItems(\Magento\Quote\Model\Quote $quote)
     {

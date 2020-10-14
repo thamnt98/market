@@ -18,14 +18,12 @@ use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Webapi\Exception;
 use Magento\Quote\Api\Data\CartInterface;
 use Magento\Quote\Api\Data\CartItemInterface;
 use Magento\Quote\Model\Quote\Item\CartItemOptionsProcessor;
 
 class CartItemPersister
 {
-    const MAXIMUM_QTY_WHOLE_CART = 99;
 
     /**
      * @var ProductRepositoryInterface
@@ -93,6 +91,7 @@ class CartItemPersister
                 }
                 $productType = $currentItem->getProduct()->getTypeId();
                 $buyRequestData = $this->cartItemOptionProcessor->getBuyRequest($productType, $item);
+
                 if (is_object($buyRequestData)) {
                     /** Update item product options */
                     $item = $quote->updateItem($itemId, $buyRequestData);
@@ -113,16 +112,7 @@ class CartItemPersister
                     /** add new item to shopping cart */
                     $product = $this->productRepository->get($item->getSku());
                     $productType = $product->getTypeId();
-                    $itemQtyCart = (int)$quote->getItemsQty();
                     $price = $item->getPrice();
-
-                    if ($itemQtyCart + (int)$item->getQty() > self::MAXIMUM_QTY_WHOLE_CART) {
-                        throw new Exception(
-                            __(sprintf('The maximum number of the whole cart does not exceed %s', self::MAXIMUM_QTY_WHOLE_CART)),
-                            Exception::HTTP_BAD_REQUEST,
-                            Exception::HTTP_BAD_REQUEST
-                        );
-                    }
 
                     $item = $quote->addProduct(
                         $product,

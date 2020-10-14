@@ -61,14 +61,14 @@
                 {{trans "Reference Number: %order_increment" order_increment=$additional_data.order_increment}}
             </p>
             <p>
-                {{trans "Total: Rp %order_total" order_total=$additional_data.order_total}}
+                {{trans "Virtual Account number: %va_number" va_number=$additional_data.virtual_account_number}}
             </p>
             <p>
-                {{trans "Virtual Account number: %va_number" va_number=$additional_data.virtual_account_number}}
+                {{trans "Total: Rp %order_total" order_total=$additional_data.order_total}}
             </p>
             {{else}}
             <p>
-                {{trans "Thank you for shopping at Transmart. We are currently preparing your order to be delivered to your address/picked up at the selected store."}}
+                {{trans "Thank you for shopping at Transmart. We are currently preparing your order with reference number: %order_increment to be delivered to your address/picked up at the selected store." order_increment=$additional_data.order_increment}}
             </p>
             <br>
             <br>
@@ -280,8 +280,7 @@
         <td>
             <p>{{trans "Sincerely"}},</p>
             <p class="signature">
-                <b>{{var
-                    store.frontend_name}}</b>
+                <b>{{trans "Transmart"}}</b>
             </p>
         </td>
     </tr>

@@ -19,6 +19,9 @@ var config = {
         mixins: {
             'Magento_Catalog/js/product/list/columns/final-price': {
                 'SM_Theme/js/product/list/columns/special-price': true
+            },
+            'Magento_Catalog/js/product/list/columns/price-box': {
+                'SM_Theme/js/product/list/columns/price-box': true
             }
         }
     }

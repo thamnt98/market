@@ -385,6 +385,58 @@ $helperSMCatalog = $this->helper('SM\Catalog\Helper\Data');
                     });
                     eventCreate['.action.towishlist']++;
                 });
+
+                async.async('.action.tocart.primary', function () {
+                    if (!eventCreate['.action.tocart.primary']) {
+                        eventCreate['.action.tocart.primary'] = 0;
+                    }
+
+                    let current = $($('.action.tocart.primary')[eventCreate['.action.tocart.primary']]);
+                    $(current).click(function (e) {
+                        let data = $(this).attr("data-gtm-product");
+
+                        if (data) {
+                            try {
+                                data = JSON.parse(data);
+                                data['position'] = $(this).attr("data-position");
+                                gtm.push("addToCart", data);
+                            } catch (e) {
+
+                            }
+                        }
+                    });
+                    eventCreate['.action.tocart.primary']++;
+                });
+
+                async.async('.action.view-details.primary', function () {
+                    if (!eventCreate['.action.view-details.primary']) {
+                        eventCreate['.action.view-details.primary'] = 0;
+                    }
+
+                    let current = $($('.action.view-details.primary')[eventCreate['.action.view-details.primary']]);
+                    $(current).click(function (e) {
+                        e.preventDefault();
+                        let data = $(this).attr("data-gtm-product");
+                        let url = $(this).attr('href');
+
+                        if (data) {
+                            try {
+                                data = JSON.parse(data);
+                                data['eventCallback'] = function () {
+                                    document.location = url;
+                                };
+                                data['position'] = $(this).attr("data-position");
+                                gtm.push("productClick", data);
+                            } catch (e) {
+                                window.location = url;
+                            }
+
+                        } else {
+                            window.location = url;
+                        }
+                    });
+                    eventCreate['.action.view-details.primary']++;
+                });
             }
         });
     </script>

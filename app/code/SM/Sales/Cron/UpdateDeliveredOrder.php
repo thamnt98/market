@@ -93,8 +93,16 @@ class UpdateDeliveredOrder
          * @var \Magento\Sales\Model\ResourceModel\Order\Collection $orderCollection
          */
         $orderCollection = $this->orderCollectionFactory->create();
-        $orderCollection->addFieldToFilter(OrderInterface::ENTITY_ID, ["in" => $orderIds])
-            ->setPage(1, 100);
+        $orderCollection->addFieldToFilter(
+                OrderInterface::ENTITY_ID,
+                ["in" => $orderIds]
+            )->addFieldToFilter(
+                OrderInterface::STATE,
+                ["neq" => ParentOrderRepositoryInterface::STATUS_COMPLETE]
+            )->addFieldToFilter(
+                OrderInterface::STATUS,
+                ["neq" => ParentOrderRepositoryInterface::STATUS_COMPLETE]
+            )->setPage(1, 100);
 
         foreach ($orderCollection as $order) {
             $order->setState(ParentOrderRepositoryInterface::STATUS_COMPLETE)

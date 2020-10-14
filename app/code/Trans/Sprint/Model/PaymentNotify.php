@@ -168,27 +168,27 @@ class PaymentNotify implements \Trans\Sprint\Api\PaymentNotifyInterface
             if ($paymentSuccess) {
                 $invoice = $this->saveInvoice($mainOrder);
                 $this->saveOrderPaymentTransaction($mainOrder, $postData, $invoice);
-            }
-
-            if (!$postData['transactionStatus'] != Config::PAYMENT_FLAG_DECLINED_02) {
-                if ($mainOrder instanceof \Magento\Sales\Api\Data\OrderInterface) {
-                    // $orderEntityId = $mainOrder->getEntityId();
-                    $this->orderCancelled($mainOrder);
-                    // $orderHistory = $this->orderStatusHistoryInterfaceFactory->create();
-                    // if ($this->orderCancelled($mainOrder)) {
-                    //     $orderHistory->setParentId($orderEntityId);
-                    //     $orderHistory->setStatus('canceled');
-                    //     $this->orderStatusHistoryRepoInterface->save($orderHistory);
-                    // }
-                    /**
-                     * Digital Order is not sent to OMS
-                     * Reference: APO-1418
-                     */
-                    if (!$mainOrder->getIsVirtual()) {
-                        $this->updateStatusToOms(
-                            $postData['transactionNo'],
-                            Config::OMS_CANCEL_PAYMENT_ORDER
-                        );
+            } else {
+                if (!$postData['transactionStatus'] != Config::PAYMENT_FLAG_DECLINED_02) {
+                    if ($mainOrder instanceof \Magento\Sales\Api\Data\OrderInterface) {
+                        // $orderEntityId = $mainOrder->getEntityId();
+                        $this->orderCancelled($mainOrder);
+                        $orderHistory = $this->orderStatusHistoryInterfaceFactory->create();
+                        if ($this->orderCancelled($mainOrder)) {
+                            $orderHistory->setParentId($orderEntityId);
+                            $orderHistory->setStatus('canceled');
+                            $this->orderStatusHistoryRepoInterface->save($orderHistory);
+                        }
+                        /**
+                         * Digital Order is not sent to OMS
+                         * Reference: APO-1418
+                         */
+                        if (!$mainOrder->getIsVirtual()) {
+                            $this->updateStatusToOms(
+                                $postData['transactionNo'],
+                                Config::OMS_CANCEL_PAYMENT_ORDER
+                            );
+                        }
                     }
                 }
             }
@@ -242,10 +242,29 @@ class PaymentNotify implements \Trans\Sprint\Api\PaymentNotifyInterface
                         $dataOrder->setStatus($orderSuccessState);
 
                         try {
+
+                            /**
+                             * Handle Digital success or fail
+                             * Reference: APO-1418, APO-3123
+                             */
+                            $this->eventManager->dispatch(
+                                'trans_sprint_payment_success_update_before',
+                                ['order' => $dataOrder]
+                            );
+
                             // $payment->save();
                             $dataOrder->save();
                             // $transaction->save();
                             $this->logger->info('Transaction Message = ' . $postData['transactionMessage']);
+
+                            /**
+                             * Handle Flash sales ... after Payment success
+                             * Reference APO-587
+                             */
+                            $this->eventManager->dispatch(
+                                'trans_sprint_payment_success_update_after',
+                                ['order' => $dataOrder]
+                            );
 
                             /**
                              * Digital Order is not sent to OMS
@@ -472,15 +491,6 @@ class PaymentNotify implements \Trans\Sprint\Api\PaymentNotifyInterface
             $dataOrder->setStatus($orderSuccessState);
 
             try {
-                /**
-                 * Handle Digital success or fail
-                 * Reference: APO-1418, APO-3123
-                 */
-                $this->eventManager->dispatch(
-                    'trans_sprint_payment_success_update_before',
-                    ['order' => $dataOrder]
-                );
-
                 $payment->save();
                 $dataOrder->save();
                 $transaction->save();

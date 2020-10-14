@@ -36,7 +36,7 @@
                             </td>
                             <td class="title-td-3 title-td item-qty">
                                 <p>
-                                    <?= $block->escapeHtml(__('Qty')) ?>
+                                    <?= $block->escapeHtml(__('Quantity')) ?>
                                 </p>
                             </td>
                             <td class="title-td-4 title-td text-right item-price">
@@ -46,10 +46,14 @@
                             </td>
                         </tr>
                     </thead>
+                    <?php $position = 0; ?>
                     <?php foreach ($_items as $_item) : ?>
                         <?php if (!$_item->getParentItem()) : ?>
                             <tbody>
-                                <?= $block->getItemHtml($_item) ?>
+                                <tr>
+                                    <td class="pl-10"><?= $position ++ ?></td>
+                                    <?= $block->getItemHtml($_item) ?>
+                                </tr>
                                 <tr>
                                     <td colspan="4">
                                         <hr class="hr"/>

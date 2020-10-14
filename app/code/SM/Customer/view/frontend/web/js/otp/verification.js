@@ -100,79 +100,106 @@ define(
 
         mod.initInputEvent = function () {
             mod.inputs.each(function () {
-                // todo why do not move to inside 48 <= keyCode <= 57
+                let inputs      = $('.form-verification input.otp-input'),
+                    inputParent = null;
 
-                $(this).on("keyup touchend",function (e) {
-                    var parent = $(this).parent();
-                    parent.removeClass('wrong');
-                    if(e.keyCode === 8 || e.keyCode === 37) {
-                        var prev = parent.find('input#' + $(this).data('previous'));
-                        if(prev.length) {
-                            prev.select();
-                        }
+                $(inputs).on('keydown', function (event) {
+                    if (!inputParent) {
+                        inputParent = $(this).parent();
                     }
-                    if(this.value.length === 1 && $.isNumeric(this.value)) {
+
+                    if ($(this).val().length > 0) {
+                        $(this).val('');
+                    }
+
+                    if (mod.currentCountDown.text() == 0 && !mod.submit.hasClass('disabled')) {
+                        mod.submit.addClass('disabled');
+
+                        return false;
+                    }
+
+                    if (event.keyCode === 8 ||
+                        event.keyCode === 37 ||
+                        (event.keyCode >= 48 && event.keyCode <= 57) ||
+                        (event.keyCode >= 96 && event.keyCode <= 105)
+                    ) {
                         $(this).removeClass('mage-error');
+
+                        return true;
                     } else {
                         if (!$(this).hasClass('mage-error')) {
                             $(this).addClass('mage-error');
                         }
-                        if (!mod.submit.hasClass('disabled')) {
-                            mod.submit.addClass('disabled');
-                        }
-                    }
-                    var i = 0;
-                        mod.inputs.each(function () {
-                        i++;
-                        if(this.value.length === 1 && $.isNumeric(this.value)) {
-                            $(this).removeClass('mage-error');
-                            if (i == mod.inputs.length) {
-                                mod.errorLabel.hide();
-                                mod.submit.removeClass('disabled');
-                                if(mod.currentCountDown.text() == 0){
-                                    mod.submit.addClass('disabled');
-                                }
-                            }
-                            return;
-                        }
-                        mod.errorLabel.text($.mage.__(''));
-                        mod.errorLabel.show();
+
                         return false;
-                    })
-
-                });
-                $(this).on("keypress touchend", function (e) {
-                    var parent = $(this).parent();
-                    var reg = new RegExp(/^\d+$/);
-                    if(((e.keyCode >= 48 && e.keyCode <= 57) || (e.keyCode >= 96 && e.keyCode <= 105) || e.keyCode === 39)&&(reg.test(String.fromCharCode(e.keyCode)))) {
-                        var next = parent.find('input#' + $(this).data('next'));
-                        if(next.length) {
-                            next.select();
-                        }
-                        else {
-                            if(parent.data('autosubmit')) {
-                                parent.submit();
-                            }
-                        }
                     }
                 });
 
-                $(this).on("keydown touchend",function (e){
-                    if ($(this).val().length >= 1&&((e.keyCode >= 48 && e.keyCode <= 57) || (e.keyCode >= 96 && e.keyCode <= 105) || e.keyCode === 39)) {
-                        $(this).removeClass('mage-error');
-                        e.preventDefault();
-                    }
-                });
+                $(inputs).on('input', function () {
+                    let value = $(this).val();
 
-
-
-                // todo why do not move to inside 48 <= keyCode <= 57
-                $(this).on("input",function () {
                     mod.combine.val(
-                        mod.inputs.map(function() {
+                        mod.inputs.map(function () {
                             return $(this).val();
                         }).get().join('')
                     );
+
+                    if (value.length === 1 && $.isNumeric(value)) {
+                        let next = inputParent.find('input[name=' + $(this).data('next') + ']'),
+                            errorField = $('.form-verification input.otp-input.mage-error'),
+                            emptyField = $(inputs).filter(function () {
+                                return $(this).val() == "";
+                            });
+
+                        if (errorField.length < 1 && emptyField.length < 1) {
+                            mod.submit.removeClass('disabled');
+                        } else if (!mod.submit.hasClass('disabled')) {
+                            mod.submit.addClass('disabled');
+                        }
+
+                        $(this).removeClass('mage-error');
+                        if (next.length && $(this).data('next')) {
+                            next.select();
+                        } else if (inputParent.data('autosubmit') && errorField.length < 1 && emptyField.length < 1) {
+                            $(this).parents('form').submit();
+                        }
+                    } else if (!mod.submit.hasClass('disabled')) {
+                        mod.submit.addClass('disabled');
+                    }
+                });
+
+                $(inputs).on('keyup', function (event) {
+                    if (!inputParent) {
+                        inputParent = $(this).parent();
+                    }
+
+                    if ((event.which === 8 || event.keyCode === 37) && $(this).data('previous')) {
+                        let prev = inputParent.find('input[name=' + $(this).data('previous') + ']');
+
+                        if (prev.length) {
+                            prev.select();
+                        }
+                    }
+                });
+
+                $(inputs).on('focus', function () {
+                    let element = $(this);
+
+                    $(this).select();
+                    if (!inputParent) {
+                        inputParent = $(this).parent();
+                    }
+
+                    while ($(element).data('previous')) {
+                        element = inputParent.find('input[name=' + $(element).data('previous') + ']');
+                        if (element.length) {
+                            if (!$(element).hasClass('mage-error') && !$(element).val()) {
+                                $(element).addClass('mage-error');
+                            }
+                        } else {
+                            break;
+                        }
+                    }
                 });
             });
         };

@@ -43,6 +43,8 @@
     <preference for="Trans\IntegrationCatalog\Api\IntegrationProductLogicInterface"
                 type="Trans\IntegrationCatalog\Model\IntegrationProductLogic" />
 
+    <preference for="Magento\Catalog\Model\ProductRepository" type="Trans\IntegrationCatalog\Preference\Catalog\Model\MageProductRepository" />
+
     <!-- Product Image -->
     <preference for="Trans\IntegrationCatalog\Api\IntegrationProductImageInterface"
                 type="Trans\IntegrationCatalog\Model\IntegrationProductImage" />

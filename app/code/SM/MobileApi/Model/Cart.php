@@ -25,6 +25,7 @@ use SM\FreshProductApi\Helper\Fresh;
 use SM\GTM\Model\BasketFactory;
 use SM\Installation\Block\Form as Installation;
 use SM\MobileApi\Model\Quote\Item\Stock;
+use SM\MobileApi\Model\Quote\Item\Validate;
 
 class Cart implements \SM\MobileApi\Api\CartInterface
 {
@@ -106,6 +107,8 @@ class Cart implements \SM\MobileApi\Api\CartInterface
 
     private $basketInterfaceFactory;
 
+    public $quoteManagement;
+
     public function __construct(
         \SM\MobileApi\Api\Data\GTM\BasketInterfaceFactory $basketInterfaceFactory,
         \SM\GTM\Model\ResourceModel\Basket\CollectionFactory $basketCollectionFactory,
@@ -142,7 +145,8 @@ class Cart implements \SM\MobileApi\Api\CartInterface
         \SM\GTM\Block\Product\ListProduct $productGtm,
         \SM\Checkout\Model\Price $pricehelper,
         \SM\MobileApi\Api\Data\GTM\GTMCartInterfaceFactory $gtmCart,
-        Fresh $fresh
+        Fresh $fresh,
+        \Magento\Quote\Api\CartManagementInterface $quoteManagement
     ) {
         $this->fresh                    = $fresh;
         $this->quoteRepository          = $quoteRepository;
@@ -180,14 +184,19 @@ class Cart implements \SM\MobileApi\Api\CartInterface
         $this->productGtm               = $productGtm;
         $this->gtmCart                  = $gtmCart;
         $this->pricehelper              = $pricehelper;
+        $this->quoteManagement          = $quoteManagement;
     }
 
     /**
+     * Add product to cart
      * @param \Magento\Quote\Api\Data\CartItemInterface[] $cartItem
      * @return bool
      * @throws Exception
      * @throws InputException
+     * @throws NoSuchEntityException
+     * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Webapi\Exception
+     * @throws \Zend_Json_Exception
      */
     public function addToCart($cartItem)
     {
@@ -293,7 +302,7 @@ class Cart implements \SM\MobileApi\Api\CartInterface
                                         if ($remainQty < $qtyNow) {
                                             $message = __('You exceeded the maximum quantity of Surprise Deals product. The excess items have been removed & can be purchased later in normal price.
 ');
-                                            $notAdd = true;
+                                            $qtyNow = $remainQty;
                                         }
                                     }
                                     $truePrice = $price;
@@ -324,6 +333,7 @@ class Cart implements \SM\MobileApi\Api\CartInterface
                 }
 
                 if ($notAdd == false) {
+                    Validate::validateQtyInCart($quote, 0, $item->getQty());
                     $quoteItems = $quote->getItems();
                     $quoteItems[] = $item;
                     $quote->setItems($quoteItems);
@@ -601,10 +611,11 @@ class Cart implements \SM\MobileApi\Api\CartInterface
      */
     public function getItems($cartId)
     {
-        $output = [];
+        $output             = [];
         $cartMessageFactory = [];
+        $isRemoveProduct    = false;
+        $isAdjustQty        = false;
 
-        $isRemoveProduct = false;
         /** @var  \Magento\Quote\Model\Quote $quote */
         $quote      = $this->quoteRepository->getActive($cartId);
         $customerId = $quote->getCustomerId();
@@ -640,6 +651,7 @@ class Cart implements \SM\MobileApi\Api\CartInterface
             } else {
                 if ($item->getQty() > $availableStock) {
                     $item->setQty($availableStock);
+                    $isAdjustQty         = true;
                     $extensionAttributes = $item->getExtensionAttributes();
                     $cartMessageFactory->setMessage(__('The quantity has been adjusted due to stock limitation.'));
                     $cartMessageFactory->setMessageType(MessageInterface::TYPE_WARNING);
@@ -653,7 +665,7 @@ class Cart implements \SM\MobileApi\Api\CartInterface
             $output[] = $this->cartItemOptionsProcessor->applyCustomOptions($item);
         }
 
-        if ($quote->hasDataChanges()) {
+        if ($isRemoveProduct || $isAdjustQty) {
             $this->quoteRepository->save($quote);
         }
 
@@ -914,5 +926,25 @@ class Cart implements \SM\MobileApi\Api\CartInterface
         $data["allow_installation"] = $allowInstallation;
 
         return  $installation->setObjectData($data);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getCartIdForCustomer($customerId)
+    {
+        try {
+            //Get active quote by customer id
+            $quote = $this->quoteRepository->getActiveForCustomer($customerId);
+        } catch (NoSuchEntityException $e) {
+            //If quote is not active or customer don't have
+            //We will create new quote for customer
+            $quote = $this->quoteManagement->createEmptyCartForCustomer($customerId);
+            return (int)$quote;
+        } catch (CouldNotSaveException $e) {
+            throw new CouldNotSaveException(__("The cart can't be created."));
+        }
+
+        return (int)$quote->getId();
     }
 }

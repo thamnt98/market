@@ -314,7 +314,7 @@ class ReviewedRepository implements ReviewedRepositoryInterface
                 $jsonImage = $reviewImage->getImage();
 
                 $reviewImageData->setImage($jsonImage);
-                $images[$reviewImage->getReviewId()][] = $reviewImageData;
+                $images[] = $reviewImageData;
             }
         }
         return $images;

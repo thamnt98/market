@@ -20,7 +20,6 @@
                 <push_device>* * * * *</push_device>
                 <sms>* * * * *</sms>
                 <email>* * * * *</email>
-                <delivered>0 * * * *</delivered>
             </sync>
             <generate>
                 <limit_stock>0 0 * * *</limit_stock>

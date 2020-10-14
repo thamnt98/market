@@ -4,12 +4,15 @@ define(
     ],
     function (ko) {
         'use strict';
-        let mod = {};
-
-        mod.timeSlotListStatus = ko.observable(false);
-        mod.singleScheduleDate = ko.observable('');
-        mod.singleScheduleTime = ko.observable('');
-        mod.timeSlot = ko.observableArray([]);
-        return mod;
+        let timeSlotListStatus = ko.observable(false),
+            singleScheduleDate = ko.observable(''),
+            singleScheduleTime = ko.observable(''),
+            timeSlot = ko.observableArray([]);
+        return {
+            timeSlotListStatus: timeSlotListStatus,
+            singleScheduleDate: singleScheduleDate,
+            singleScheduleTime: singleScheduleTime,
+            timeSlot: timeSlot
+        };
     }
 );

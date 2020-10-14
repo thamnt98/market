@@ -45,10 +45,6 @@
             <schedule>* * * * *</schedule>
         </job>
 
-        <job name="sm_notification_delivered" instance="SM\Notification\Cron\DeliveredIntoDestination" method="execute">
-            <config_path>sm_notification/sync/delivered</config_path>
-        </job>
-
         <!-- Generate message remind pickup -->
         <job name="sm_notification_remind_pickup" instance="SM\Notification\Cron\Order\RemindPickup" method="execute">
             <config_path>sm_notification/sync/remind_pickup</config_path>

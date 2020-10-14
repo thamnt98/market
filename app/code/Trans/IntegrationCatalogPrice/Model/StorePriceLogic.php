@@ -423,9 +423,9 @@ class StorePriceLogic implements StorePriceLogicInterface {
 						$indexW++;
 					}
 
-					$isPriceInKg = 'n';
+					$isPriceInKg = 0;
 					if(($isOwnCourier == 'iya' || $isOwnCourier == 1) && $soldIn == 'kg') {
-						$isPriceInKg = 'y';
+						$isPriceInKg = 1;
 					}
 					
 					$product->addData(['price_in_kg' => $isPriceInKg]);

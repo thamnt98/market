@@ -190,7 +190,7 @@ $stores = $block->getStores();
                                 </div>
 
                                 <!--otp-->
-                                <div class="otp-block" selector="otp-block" style="display: none">
+                                <div id="login-otp" class="otp-block" selector="otp-block" style="display: none">
                                     <div class="txt-description-modal ">
                                         <div class="message-verify">
                                             <span class="block-subtitle-verify" selector="phone-number"><?= $block->escapeHtml(__('We have sent a verification message to ')) ?></span>
@@ -199,12 +199,18 @@ $stores = $block->getStores();
                                         <div class="block-subtitle"><?= $block->escapeHtml(__('Enter your code here')) ?></div>
                                     </div>
                                     <div class="digit-group" data-group-name="digits" data-autosubmit="false">
-                                        <input disabled class="combine" type="text" onkeypress="if(event.which &lt; 48 || event.which &gt; 57 ) if(event.which != 8) if(event.keyCode != 9) return false;"  name="digit-1" data-next="digit-2" maxlength="1" />
-                                        <input disabled class="combine" type="text" onkeypress="if(event.which &lt; 48 || event.which &gt; 57 ) if(event.which != 8) if(event.keyCode != 9) return false;" name="digit-2" data-next="digit-3" data-previous="digit-1" maxlength="1" />
-                                        <input disabled class="combine" type="text" onkeypress="if(event.which &lt; 48 || event.which &gt; 57 ) if(event.which != 8) if(event.keyCode != 9) return false;" name="digit-3" data-next="digit-4" data-previous="digit-2" maxlength="1" />
-                                        <input disabled class="combine" type="text" onkeypress="if(event.which &lt; 48 || event.which &gt; 57 ) if(event.which != 8) if(event.keyCode != 9) return false;" name="digit-4" data-next="digit-5" data-previous="digit-3" maxlength="1" />
-                                        <input disabled class="combine" type="text" onkeypress="if(event.which &lt; 48 || event.which &gt; 57 ) if(event.which != 8) if(event.keyCode != 9) return false;" name="digit-5" data-next="digit-6" data-previous="digit-4" maxlength="1" />
-                                        <input disabled class="combine" type="text" onkeypress="if(event.which &lt; 48 || event.which &gt; 57 ) if(event.which != 8) if(event.keyCode != 9) return false;" name="digit-6" data-previous="digit-5" maxlength="1" />
+                                        <input disabled class="combine otp-input" type="number" name="digit-1"
+                                               data-next="digit-2" maxlength="1" />
+                                        <input disabled class="combine otp-input" type="number" name="digit-2"
+                                               data-next="digit-3" data-previous="digit-1" maxlength="1" />
+                                        <input disabled class="combine otp-input" type="number" name="digit-3"
+                                               data-next="digit-4" data-previous="digit-2" maxlength="1" />
+                                        <input disabled class="combine otp-input" type="number" name="digit-4"
+                                               data-next="digit-5" data-previous="digit-3" maxlength="1" />
+                                        <input disabled class="combine otp-input" type="number" name="digit-5"
+                                               data-next="digit-6" data-previous="digit-4" maxlength="1" />
+                                        <input disabled class="combine otp-input" type="number" name="digit-6"
+                                               data-previous="digit-5" maxlength="1" />
                                     </div>
                                    <div class="message-otp-error field-error" id="message-otp-error" selector="message-otp-error"></div>
                                 </div>

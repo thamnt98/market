@@ -11,11 +11,51 @@ body{
         font-weight: 600;
     }
 }
+
 .wrapper{
     margin: 0 auto;
     max-width: 700px;
     table{
         width: 100%;
+    }
+    table.email-items{
+        padding-top: 50px;
+        border-spacing: 0;
+        thead{
+            text-align: left;
+
+            th{
+                background: #EDEDED;
+                border: none;
+
+                padding: 10px 15px;
+            }
+        }
+        tbody{
+            tr{
+                td{
+                    border-bottom: 2px solid #E5E5E5;
+                    padding: 10px 15px;
+                }
+
+            }
+        }
+        tfoot{
+            > tr:first-child{
+                td{
+                    border: none !important;
+                }
+            }
+            td{
+                padding: 10px 15px;
+            }
+            .emailfoot-total{
+                .text-left,
+                .text-right{
+                    border-top: 2px solid #E5E5E5;
+                }
+            }
+        }
     }
     .main-content{
         font-size: 19px;

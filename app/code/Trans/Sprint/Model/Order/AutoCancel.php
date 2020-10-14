@@ -88,9 +88,9 @@ class AutoCancel implements \Trans\Sprint\Api\AutoCancelInterface
      */
     public function __construct(
         OrderRepositoryInterface $orderRepository,
-        SearchCriteriaBuilder $searchCriteriaBuilder,
         OrderStatusHistoryInterfaceFactory $orderStatusHistoryInterfaceFactory,
         OrderStatusHistoryRepositoryInterface $orderStatusHistoryRepoInterface,
+        SearchCriteriaBuilder $searchCriteriaBuilder,
         FilterBuilder $filterBuilder,
         FilterGroup $filterGroup,
         OrderManagementInterface $orderManagement,
@@ -100,10 +100,10 @@ class AutoCancel implements \Trans\Sprint\Api\AutoCancelInterface
         \Trans\Sprint\Helper\Data $dataHelper
     ) {
         $this->orderRepository                    = $orderRepository;
-        $this->searchCriteriaBuilder              = $searchCriteriaBuilder;
-        $this->filterBuilder                      = $filterBuilder;
         $this->orderStatusHistoryInterfaceFactory = $orderStatusHistoryInterfaceFactory;
         $this->orderStatusHistoryRepoInterface    = $orderStatusHistoryRepoInterface;
+        $this->searchCriteriaBuilder              = $searchCriteriaBuilder;
+        $this->filterBuilder                      = $filterBuilder;
         $this->filterGroup                        = $filterGroup;
         $this->orderManagement                    = $orderManagement;
         $this->salesCollection                    = $salesCollection;
@@ -156,14 +156,14 @@ class AutoCancel implements \Trans\Sprint\Api\AutoCancelInterface
                     if ($order instanceof \Magento\Sales\Api\Data\OrderInterface) {
                         try {
                             $this->orderManagement->cancel($order->getId()); //cancel order
-                            // $orderEntityId = $order->getEntityId();
-                            // $orderHistory  = $this->orderStatusHistoryInterfaceFactory->create();
-                            // $orderHistory->setParentId($orderEntityId);
-                            // $orderHistory->setStatus('canceled');
-                            // $this->orderStatusHistoryRepoInterface->save($orderHistory);
-                            $refNumber = $order->getData('reference_number');
-
+                            $refNumber     = $order->getData('reference_number');
+                            $orderEntityId = $order->getEntityId();
+                            $orderHistory  = $this->orderStatusHistoryInterfaceFactory->create();
+                            $orderHistory->setParentId($orderEntityId);
+                            $orderHistory->setStatus('canceled');
+                            $this->orderStatusHistoryRepoInterface->save($orderHistory);
                             $this->logger->info('$refNumber = ' . $refNumber);
+                            $this->logger->info('$orderEntityId = ' . $orderEntityId);
 
                             /**
                              * Digital Order is not sent to OMS

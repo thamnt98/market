@@ -18,22 +18,20 @@ foreach ($block->getTotals() as $_code => $_total) : ?>
         <?= $block->getChildHtml($_total->getBlockName(), false) ?>
     <?php else :?>
         <?php if ($_count_item === $_check_last_item):?>
-            <tr>
-                <td colspan="4">
-                    <hr class="hr"/>
-                </td>
-            </tr>
+
         <?php endif;?>
-        <tr class="<?= $block->escapeHtmlAttr($_code) ?>">
-            <th></th>
-            <th <?= /* @noEscape */ $block->getLabelProperties() ?> scope="row" class="text-left">
-                <?php if ($_total->getStrong()) : ?>
-                    <strong style="font-size: 20px;margin: 15px 0; display:block;"><?= $block->escapeHtml($_total->getLabel()) ?></strong>
-                <?php else : ?>
-                    <?= $block->escapeHtml($_total->getLabel()) ?>
-                <?php endif ?>
-            </th>
+        <tr class="<?= $block->escapeHtmlAttr($_code) ?> emailfoot-total">
             <td></td>
+            <td scope="row" class="text-left">
+                <?php if ($_total->getStrong()) : ?>
+                    <strong style="font-size: 20px; display:block;">
+                        <?= ($_total->getLabel() == "Grand Total") ? $block->escapeHtml(__('Total')) : $block->escapeHtml($_total->getLabel()) ?>
+                    </strong>
+                <?php else : ?>
+                    <?= ($_total->getLabel() == "Shipping & Handling") ? $block->escapeHtml(__('Delivery fee')) : $block->escapeHtml($_total->getLabel()) ?>
+                <?php endif ?>
+            </td>
+
             <td class="text-right" <?= /* @noEscape */ $block->getValueProperties() ?> data-th="<?= $block->escapeHtmlAttr($_total->getLabel()) ?>">
                 <?php if ($_total->getStrong()) : ?>
                      <strong class="pr-15 d-block" style="font-size: 20px;color: #ed4a12;"><?= /* @noEscape */ $block->formatValue($_total) ?></strong>

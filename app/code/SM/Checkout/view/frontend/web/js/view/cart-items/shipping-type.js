@@ -156,7 +156,12 @@ define([
         },
 
         isError: function (item_id) {
-            return this.shippingMethodSelectListError[item_id];
+            var selectedAddressId = this.addressSelected(item_id)(),
+                selectedAddress = initShippingType.getCustomerAddressData()[selectedAddressId];
+            if (selectedAddress.customAttributes.support_shipping.value) {
+                return this.shippingMethodSelectListError[item_id];
+            }
+            return false;
         },
 
         isFullFill: function (item_id) {

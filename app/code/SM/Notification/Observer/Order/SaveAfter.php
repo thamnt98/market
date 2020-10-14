@@ -241,7 +241,7 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
     public function generateDeliveredData($order)
     {
         if ($order->getShippingMethod() !== \SM\Checkout\Model\MultiShippingHandle::STORE_PICK_UP) {
-            $title = '%1, order ID/%2 has been delivered to your address';
+            $title = '%1, order ID/%2 has been delivered to your address.';
             $content = 'Tap here to confirm your order delivery.';
             $params = [
                 'title'   => [

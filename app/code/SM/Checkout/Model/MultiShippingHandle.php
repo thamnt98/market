@@ -649,12 +649,12 @@ class MultiShippingHandle
                 $reload = true;
                 break;
             } elseif ($shippingMethod == self::STORE_PICK_UP) {
-                $date = $this->timezone->date(new \DateTime($storeDateTime['date']))->format('Y-m-d');
+                $date = $this->timezone->convertConfigTimeToUtc($storeDateTime['date']);
                 $time = $storeDateTime['time'];
             } else {
                 if ($shippingMethod == self::SCHEDULE) {
                     $dateTime = $deliveryDateTime[$address->getCustomerAddressId()];
-                    $date = $this->timezone->date(new \DateTime($dateTime['date']))->format('Y-m-d');
+                    $date = $this->timezone->convertConfigTimeToUtc($dateTime['date']);
                     $time = $dateTime['time'];
                 }
             }

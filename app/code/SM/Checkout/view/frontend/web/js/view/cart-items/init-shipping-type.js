@@ -777,22 +777,27 @@ define([
     };
 
     mod.getDateTime = function () {
+        var date = new Date(),
+            hour = (date.getHours().toString().length === 1) ? '0' + date.getHours().toString() : date.getHours().toString(),
+            minutes = (date.getMinutes().toString().length === 1) ? '0' + date.getMinutes().toString() : date.getMinutes().toString(),
+            seconds = (date.getSeconds().toString().length === 1) ? '0' + date.getSeconds().toString() : date.getSeconds().toString(),
+            time = hour + ':' + minutes + ':' + seconds;
         var orderSelectAddressList = updateStatus.getOrderSelectAddressList()(),
             orderDeliveryType = setShippingType.getValue()(),
             addressListDateTime = [];
         if (orderSelectAddressList.length == 1 && orderDeliveryType == '0') {
             if (singleDateTime.singleScheduleDate() != '') {
-                addressListDateTime[orderSelectAddressList[0]] = {'date': singleDateTime.singleScheduleDate(), 'time': singleDateTime.singleScheduleTime()};
+                addressListDateTime.push({'address': orderSelectAddressList[0], 'date': singleDateTime.singleScheduleDate() + ' ' + time, 'time': singleDateTime.singleScheduleTime()});
             }
         } else {
             $.each(addressListDate, function (addressId, date) {
                 if (date() && date() !='') {
-                    addressListDateTime.push({'address': addressId, 'date': date(), 'time': addressListTime[addressId]()});
+                    addressListDateTime.push({'address': addressId, 'date': date() + ' ' + time, 'time': addressListTime[addressId]()});
                 }
             });
         }
         return {
-            'store_date_time': {'date': pickup.storePickUpDate(), 'time': pickup.storePickUpTime()},
+            'store_date_time': {'date': (pickup.storePickUpDate() == '') ? '': pickup.storePickUpDate() + ' ' + time, 'time': pickup.storePickUpTime()},
             'delivery_date_time': addressListDateTime,
             'is_split_order': globalVar.splitOrder()
         };

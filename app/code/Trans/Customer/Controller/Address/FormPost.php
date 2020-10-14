@@ -161,8 +161,8 @@ class FormPost extends \Magento\Customer\Controller\Address\FormPost
                 if ($this->getRequest()->getParam('current_address_id') && $this->getRequest()->getParam('current_address_id') != '') {
                     $currentAddressId = $this->getRequest()->getParam('current_address_id');
                 }
-                if ($this->getRequest()->getParam('action') && $this->getRequest()->getParam('action') != '') {
-                    $currentAction = $this->getRequest()->getParam('action');
+                if ($this->getRequest()->getParam('action_after') && $this->getRequest()->getParam('action_after') != '') {
+                    $currentAction = $this->getRequest()->getParam('action_after');
                 }
                 if ($currentAddressId && $currentAction) {
                     $this->checkoutSession->setCurrentAddressId($currentAddressId);

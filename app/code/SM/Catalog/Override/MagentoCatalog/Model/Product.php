@@ -150,7 +150,9 @@ class Product extends \Magento\Catalog\Model\Product
     {
         if ($this->getTypeId() !== \Magento\Bundle\Model\Product\Type::TYPE_CODE) {
             $minProduct = $this->helper->getMinProduct($this);
-        } else {
+        }
+
+        if (empty($minProduct)) {
             $minProduct = $this;
         }
 

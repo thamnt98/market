@@ -37,13 +37,13 @@ define([
     priceUtils
 ) {
     'use strict';
-
     return Component.extend({
         ccFullPaymentCode           : 'sprint_allbankfull_cc',
         selectedMethod              : ko.observable(),
         instalmentTerms             : ko.observable(),
         paymentDescription          : ko.observable(),
         paymentTooltipDescription   : ko.observable(),
+        grandTotalAmount: ko.observable(0),
         canPay:true,
         defaults                    : {
             template   : 'SM_Checkout/payment-methods/list',
@@ -59,11 +59,16 @@ define([
          */
         initialize                  : function () {
             this._super();
+            let self = this;
+            self.grandTotalAmount(window.checkoutConfig.totalsData.grand_total);
+            quote.totals.subscribe(function (newValue) {
+                self.grandTotalAmount(newValue.grand_total);
+            });
         },
         invalidMinimumAmount:function(payment_type){
             if (typeof window.checkoutConfig.payment.sm_config[payment_type]!=='undefined'){
                 var minimum = window.checkoutConfig.payment.sm_config[payment_type].minimum_amount;
-                var grand_total = window.checkoutConfig.totalsData.grand_total;
+                var grand_total = this.grandTotalAmount();
                 if (typeof minimum !== 'undefined' && grand_total < minimum) {
                     return minimum;
                 }

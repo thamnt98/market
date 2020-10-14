@@ -41,6 +41,8 @@
                 type="SM\Promotion\Override\AmastyRules\Model\Rule\Action\Discount\BuyXGetNPercent" />
     <preference for="Amasty\Rules\Helper\Discount"
                 type="SM\Promotion\Override\AmastyRules\Helper\Discount" />
+    <preference for="Amasty\Coupons\Observer\UpdateCouponUsage"
+                type="SM\Promotion\Override\AmastyCoupons\Observer\UpdateCouponUsage" />
     <!-- End Override -->
 
 

@@ -124,7 +124,8 @@ class SendOMS
         \Trans\LocationCoverage\Model\CityFactory $cityFactory,
         \SM\Checkout\Model\Price $price,
         \Magento\Framework\Serialize\SerializerInterface $serializer,
-        \Magento\Framework\Event\ManagerInterface $eventManager
+        \Magento\Framework\Event\ManagerInterface $eventManager,
+        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
     ) {
         $this->multiShipping = $multiShipping;
         $this->orderFactory = $orderFactory;
@@ -143,6 +144,7 @@ class SendOMS
         $this->price = $price;
         $this->serializer = $serializer;
         $this->eventManager = $eventManager;
+        $this->timezone = $timezone;
     }
 
     /**
@@ -369,6 +371,45 @@ class SendOMS
         $interface->setIsOwnCourier($isOwnCourier);
         $interface->setWarehouseSource($warehouseSource);
         $interface->setCodeName($codeName);
+
+        $createAt = $order->getCreatedAt();
+        $time = $this->timezone->date($order->getCreatedAt())->format('H:i:s');
+        $date = $this->timezone->date($order->getCreatedAt())->format('Y-m-d');
+        $timeslot = '';
+        if ($logisticType == 1 || $logisticType == 4) {
+            if (strtotime($time) > strtotime('13:30:00')) {
+                $date = date('Y-m-d', strtotime("+1 day", strtotime($date)));
+            }
+            $timeslot = $date . ' ' . $time;
+        } elseif ($logisticType == 2) {
+            if (strtotime($time) < strtotime('08:00:00')) {
+                $time = '09:00:00';
+            } elseif (strtotime($time) <= strtotime('15:30:00')) {
+                $time = date('H:i:s', strtotime("+2 hour", strtotime($date)));
+            } else {
+                $time = '09:00:00';
+                $date = date('Y-m-d', strtotime("+1 day", strtotime($date)));
+            }
+            $timeslot = $date . ' ' . $time;
+        } elseif ($logisticType == 3) {
+            $time = $order->getTime();
+            $timeArray = explode("-", $time);
+            $timeFrom = $timeArray[0];
+            if (strpos($timeFrom, 'AM') !== false) {
+                $timeFrom = str_replace("AM", "", $timeFrom);
+                $timeFrom = preg_replace('/\s+/', '', $timeFrom);
+                $timeFrom .= ':00';
+                $timeFrom = date('H:i:s', strtotime("-1 hour", strtotime($timeFrom)));
+            } else {
+                $timeFrom = str_replace("PM", "", $timeFrom);
+                $timeFrom = preg_replace('/\s+/', '', $timeFrom);
+                $timeFrom .= ':00';
+                $timeFrom = date('H:i:s', strtotime("+11 hour", strtotime($timeFrom)));
+            }
+            $date = $this->timezone->date($order->getDate())->format('Y-m-d');
+            $timeslot = $date . ' ' . $timeFrom;
+        }
+        $interface->setTimeSlot($timeslot);
         return $interface;
     }
 
