@@ -545,7 +545,12 @@ define(
                                 tabLoginModal.find('.fieldInputText ').removeClass('fieldInputError');
                                 $(document).trigger('customer:login');
                                 caseCustomerOnEco = false;
-                                window.location.href = result.redirectUrl;
+                                if (window.location.href === result.redirectUrl) {
+                                    window.location.reload();
+                                } else {
+                                    window.location.href = result.redirectUrl;
+                                }
+
                             }
                         },
                     });
