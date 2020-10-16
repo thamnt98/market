@@ -72,6 +72,12 @@ class SubOrderRepository implements SubOrderRepositoryInterface
     protected $parentOrder;
 
     /**
+     * @var \Magento\Framework\UrlInterface
+     */
+    protected $urlInterface;
+
+
+    /**
      * SubOrderRepository constructor.
      * @param SubOrder $subOrder
      * @param OrderRepository $orderRepository
@@ -81,6 +87,7 @@ class SubOrderRepository implements SubOrderRepositoryInterface
      * @param StatusHistoryCollectionFactory $statusHistoryCollectionFactory
      * @param Order\Status\HistoryFactory $historyFactory
      * @param ParentOrder $parentOrder
+     * @param \Magento\Framework\UrlInterface $urlInterface
      */
     public function __construct(
         SubOrder $subOrder,
@@ -90,7 +97,8 @@ class SubOrderRepository implements SubOrderRepositoryInterface
         StatusCollectionFactory $orderStatusCollectionFactory,
         StatusHistoryCollectionFactory $statusHistoryCollectionFactory,
         Order\Status\HistoryFactory $historyFactory,
-        ParentOrder $parentOrder
+        ParentOrder $parentOrder,
+        \Magento\Framework\UrlInterface $urlInterface
     ) {
         $this->parentOrder = $parentOrder;
         $this->historyFactory = $historyFactory;
@@ -100,6 +108,7 @@ class SubOrderRepository implements SubOrderRepositoryInterface
         $this->searchResultsFactory = $searchResultsFactory;
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->orderRepository = $orderRepository;
+        $this->urlInterface = $urlInterface;
     }
 
     /**
@@ -107,6 +116,7 @@ class SubOrderRepository implements SubOrderRepositoryInterface
      * @return ParentOrderDataInterface
      * @throws NoSuchEntityException
      * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Exception
      */
     public function getById($subOrderId)
     {
@@ -125,20 +135,11 @@ class SubOrderRepository implements SubOrderRepositoryInterface
             throw new NoSuchEntityException(__("Order ID %1 is not exists", $subOrderId));
         }
 
-        /** @var OrderCollection $orderCollection */
-        $orderCollection = $this->orderCollectionFactory->create();
-        $orderCollection->selectParent();
-        $orderCollection->addFieldToFilter("main_table.entity_id", $parentOrderId);
-
-        if (!$orderCollection->getSize()) {
-            throw new NoSuchEntityException(__("Order ID %1 is not exists", $subOrderId));
-        }
-
-        $result = $this->subOrder->handleSubOrders($subOrderCollection, $cancelType);
-        $subOrders = $result->getData("sub_orders");
-        $hasInvoice = $result->getData("has_invoice");
         /** @var Order $parentOrderModel */
-        $parentOrderModel = $orderCollection->getFirstItem();
+        $parentOrderModel = $this->getParentOrder($parentOrderId, $subOrderId);
+        $hasInvoice = (bool) $parentOrderModel->getReferenceInvoiceNumber();
+        $result = $this->subOrder->handleSubOrders($subOrderCollection, $cancelType, $hasInvoice);
+        $subOrders = $result->getData("sub_orders");
 
         return $this->parentOrder->parentOrderProcess(
             $parentOrderModel,
@@ -153,6 +154,7 @@ class SubOrderRepository implements SubOrderRepositoryInterface
      * @return SubOrderSearchResultsInterface
      * @throws NoSuchEntityException
      * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Exception
      */
     public function getList(SearchCriteria $searchCriteria, $customerId)
     {
@@ -173,11 +175,18 @@ class SubOrderRepository implements SubOrderRepositoryInterface
         $result = $this->subOrder->handleSubOrders($subOrderCollection, $cancelType);
         $list = $result->getData("sub_orders");
         $subOrderResults = [];
+
         /** @var SubOrderDataInterface[] $subOrders */
         foreach ($list as $subOrders) {
             /** @var SubOrderDataInterface $subOrder */
             foreach ($subOrders as $subOrder) {
                 if ($subOrder->getSubOrderId() != null && $subOrder->getSubOrderId() != '') {
+                    /** @var Order $parentOrderModel */
+                    $parentOrderModel = $this->getParentOrder($subOrder->getParentOrder(), $subOrder->getId());
+                    if ($parentOrderModel->getReferenceInvoiceNumber()) {
+                        $invoiceLink = $this->urlInterface->getUrl('sales/invoice/view') . 'id/' . $subOrder->getParentOrder();
+                        $subOrder->setInvoiceLink($invoiceLink);
+                    }
                     $subOrderResults[] = $subOrder;
                 }
             }
@@ -186,6 +195,25 @@ class SubOrderRepository implements SubOrderRepositoryInterface
         $searchResults->setTotalCount($subOrderCollection->getSize());
         $searchResults->setItems($subOrderResults);
         return $searchResults;
+    }
+
+    /**
+     * @param $parentOrderId
+     * @param $subOrderId
+     * @return OrderInterface
+     * @throws InputException
+     * @throws NoSuchEntityException
+     */
+    protected function getParentOrder($parentOrderId, $subOrderId)
+    {
+        /** @var OrderCollection $orderCollection */
+        try {
+            return $this->orderRepository->get($parentOrderId);
+        } catch (InputException $e) {
+            throw new InputException(__($e->getMessage()));
+        } catch (NoSuchEntityException $e) {
+            throw new NoSuchEntityException(__("Order ID %1 is not exists", $subOrderId));
+        }
     }
 
     /**

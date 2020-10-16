@@ -155,4 +155,20 @@ class DeliveryAddressData extends DataObject implements DeliveryAddressDataInter
     {
         return $this->setData(self::PROVINCE, $value);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getDistrict()
+    {
+        return $this->getData(self::DISTRICT);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setDistrict($value)
+    {
+        return $this->setData(self::DISTRICT, $value);
+    }
 }

@@ -18,6 +18,7 @@ interface DeliveryAddressDataInterface
     const ADDRESS_NAME = 'address_name';
     const POSTCODE = "postcode";
     const TELEPHONE = "telephone";
+    const DISTRICT = "district";
 
     /**
      * @return string
@@ -117,4 +118,15 @@ interface DeliveryAddressDataInterface
      * @return $this
      */
     public function setTelephone($value);
+
+    /**
+     * @return string
+     */
+    public function getDistrict();
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setDistrict($value);
 }

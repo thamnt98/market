@@ -42,6 +42,13 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
                 [
                     'attribute_label' => 'attr.frontend_label'
                 ]
+            )->joinLeft(
+                ['eet' => $this->getResource()->getTable('eav_entity_type')],
+                'attr.entity_type_id = eet.entity_type_id',
+                []
+            )->where(
+                'eet.entity_type_code = ?',
+                \Magento\Catalog\Model\Product::ENTITY
             );
 
         return $this;

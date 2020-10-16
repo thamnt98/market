@@ -302,7 +302,11 @@ class Cart implements \SM\MobileApi\Api\CartInterface
                                         if ($remainQty < $qtyNow) {
                                             $message = __('You exceeded the maximum quantity of Surprise Deals product. The excess items have been removed & can be purchased later in normal price.
 ');
-                                            $qtyNow = $remainQty;
+                                            if ($remainQty > 0) {
+                                                $qtyNow = $remainQty;
+                                            } else {
+                                                $notAdd = true;
+                                            }
                                         }
                                     }
                                     $truePrice = $price;
@@ -334,7 +338,19 @@ class Cart implements \SM\MobileApi\Api\CartInterface
 
                 if ($notAdd == false) {
                     Validate::validateQtyInCart($quote, 0, $item->getQty());
-                    $quoteItems = $quote->getItems();
+                    $quoteItems = $quote->getItemsV2();
+                    $updateItemId = null;
+
+                    foreach ($quoteItems as $product) {
+                        if ($product->getSku() == $item->getSku()) {
+                            $updateItemId = (int)$product->getItemId();
+                            continue;
+                        }
+                    }
+                    if (isset($updateItemId)) {
+                        $item->setItemId($updateItemId);
+                    }
+
                     $quoteItems[] = $item;
                     $quote->setItems($quoteItems);
                     $this->quoteRepository->save($quote);

@@ -1,6 +1,5 @@
 <?php
 
-
 namespace SM\Checkout\Preference\Quote\Model;
 
 /*
@@ -146,5 +145,20 @@ class Quote extends \Magento\Quote\Model\Quote
             }
         }
         return $countItems == 0 ? false : $isVirtual;
+    }
+
+    /**
+     * get items active & inactive
+     * @return array
+     */
+    public function getItemsV2()
+    {
+        $items = [];
+        foreach ($this->getItemsCollection() as $item) {
+            if (!$item->isDeleted() && !$item->getParentItemId() && !$item->getParentItem() && !$item->getIsVirtual()) {
+                $items[] = $item;
+            }
+        }
+        return $items;
     }
 }

@@ -981,7 +981,7 @@
             display: inline-block;
         }
     }
-    
+
   //
   //  footer
   //  ---------------------------------------------
@@ -1014,10 +1014,23 @@
         }
     }
       .payment-options{
-          ul {margin: 0 -3px;
+          ul {
+              display: grid;
+              -ms-grid-columns:1fr 8px 1fr;
+              grid-template-columns: 1fr 1fr;
+              grid-gap: 8px;
               li{
-                  padding: 3px;
-                  display: inline-block;
+                  background: @color-white;
+                  border-radius: 3px;
+                  padding: 2px;
+                  display: flex;
+                  align-items: center;
+              }
+              a{
+                  display: block;
+                  &:hover{
+                      opacity: 0.8;
+                  }
               }
           }
       }

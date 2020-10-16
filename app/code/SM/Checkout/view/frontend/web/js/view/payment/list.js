@@ -331,15 +331,14 @@ define([
             );
         },
         getPaymentLogo: function (method) {
-            var url = window.BASE_URL + '/pub/media/logo/paymentmethod/';
             var paymentList = window.checkoutConfig.paymentMethods;
             var logo;
             paymentList.forEach(function(item){
                 if (item.method == method) {
                     if (item.logo){
-                        logo =  url + item.logo;
+                        logo = item.logo;
                     } else {
-                        logo =  require.toUrl('images/svg-icons/Voucher.svg');
+                        logo = require.toUrl('images/svg-icons/Voucher.svg');
                     }
                 }
             });

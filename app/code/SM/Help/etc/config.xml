@@ -20,6 +20,9 @@
                 <template>sm_help_email_template</template>
                 <sender>general</sender>
             </send_help_email>
+            <main_page>
+                <contact_us_delivery>9</contact_us_delivery>
+            </main_page>
         </sm_help>
     </default>
 </config>

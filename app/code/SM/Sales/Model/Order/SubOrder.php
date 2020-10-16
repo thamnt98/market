@@ -417,11 +417,13 @@ class SubOrder
 
     /**
      * @param OrderCollection $orderCollection
+     * @param $cancelType
+     * @param bool $hasInvoice
      * @return DataObject
      * @throws NoSuchEntityException
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function handleSubOrders($orderCollection, &$cancelType)
+    public function handleSubOrders($orderCollection, &$cancelType, $hasInvoice = false)
     {
         $result = $this->dataObjectFactory->create();
         $this->appEmulation->startEnvironmentEmulation(
@@ -433,7 +435,6 @@ class SubOrder
         $sourceInformation = $this->getStoreInformation($orderCollection);
 
         $subOrders = [];
-        $hasInvoice = [];
         /** @var Order $subOrder */
         foreach ($orderCollection as $subOrder) {
             /** @var SubOrderDataInterface $subOrderData */
@@ -448,16 +449,17 @@ class SubOrder
                 ->setSubtotal($subOrder->getSubtotal())
                 ->setStoreInfo($this->getStoreInfo($subOrder, $sourceInformation));
 
-            if ($subOrder->getReferenceInvoiceNumber()) {
+            if ($hasInvoice) {
                 $invoiceLink = $this->urlInterface->getUrl('sales/invoice/view') . 'id/' . $subOrder->getParentOrder();
                 $subOrderData->setInvoiceLink($invoiceLink);
-                $hasInvoice[$subOrder->getData("parent_order")] = true;
             }
+
             if (!$subOrder->getIsVirtual()) {
                 $this->setDeliveryData($subOrder, $subOrderData);
                 $this->setStatusHistoriesData($subOrder, $subOrderData);
                 $cancelType[] = $this->history->getCancelType();
             }
+
             $this->setItemsData($subOrder, $subOrderData);
             $subOrders[$subOrder->getData("parent_order")][] = $subOrderData;
         }
@@ -519,6 +521,7 @@ class SubOrder
                 ->setProvince($subOrderModel->getData("region"))
                 ->setStreet($addressDetails)
                 ->setCountry($subOrderModel->getData("district"))
+                ->setDistrict($subOrderModel->getData("district"))
                 ->setCity($subOrderModel->getData("city"))
                 ->setTelephone($subOrderModel->getData("telephone"))
                 ->setPostcode($subOrderModel->getData("postcode"))

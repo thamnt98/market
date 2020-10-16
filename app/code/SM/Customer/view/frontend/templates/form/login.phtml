@@ -2,7 +2,7 @@
 // @codingStandardsIgnoreFile
 
 /** @var \SM\Customer\Block\Form\Login $block */
-if (!$block->isLoggedIn()) : ?>
+if (!$block->isShowLogin()) : ?>
 
 <?php
 $helper = $this->helper(SM\AndromedaSms\Helper\Config::class);

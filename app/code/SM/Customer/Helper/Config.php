@@ -38,8 +38,8 @@ class Config extends AbstractHelper
     const XML_PATH_CUSTOMER_CHANGE_PASSWORD_NOTIFICATION_EMAIL_SENDER = 'sm_customer/change_password_notification/sender';
     const IS_EDIT_ADDRESS_ATTRIBUTE_CODE = 'is_edit_address';
 
-    const XML_PATH_TERMS_CONDITIONS = 'sm_customer/terms_privacy/terms_conditions';
-    const XML_PATH_PRIVACY_POLICY = 'sm_customer/terms_privacy/privacy_policy';
+    const XML_PATH_TERMS_CONDITIONS = 'sm_help/terms_privacy/terms_conditions';
+    const XML_PATH_PRIVACY_POLICY = 'sm_help/terms_privacy/privacy_policy';
 
     /**
      * @param $telephone

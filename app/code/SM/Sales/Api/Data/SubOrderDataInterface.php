@@ -24,6 +24,7 @@ interface SubOrderDataInterface
     const ID = "id";
     const DELIVERY_ADDRESS = "delivery_address";
     const TRACKING_NUMBER = "tracking_number";
+    const TRACKING_LINK = "tracking_link";
     const DELIVERY_FEE = "delivery_fee";
     const SUBTOTAL = "subtotal";
     const TOTAL_PAYMENT = "total_payment";
@@ -159,6 +160,17 @@ interface SubOrderDataInterface
      * @return $this
      */
     public function setTrackingNumber($value);
+
+    /**
+     * @return string
+     */
+    public function getTrackingLink();
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setTrackingLink($value);
 
     /**
      * @return string

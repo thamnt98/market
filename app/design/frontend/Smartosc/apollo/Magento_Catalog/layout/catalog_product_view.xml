@@ -12,7 +12,7 @@
     <update handle="catalog_product_opengraph" />
     <update handle="page_calendar"/>
     <body>
-        <move element="product.info.sku" destination="page.main.title" before="-"/>
+        <move element="product.info.sku" destination="page.main.title" after="-"/>
         <referenceContainer name="product.info.media">
             <block class="Magento\Catalog\Block\Product\View\Gallery" name="product.info.media.image" template="Magento_Catalog::product/view/gallery.phtml">
                 <arguments>

@@ -199,14 +199,29 @@ class Repository extends \Magento\Quote\Model\Quote\Item\Repository
             }
         }
 
-        $quoteItems = $quote->getItems();
+        $quoteItems = $quote->getItemsV2();
+        $updateItemId = [];
+        foreach ($quoteItems as $item) {
+            if ($item->getSku() == $cartItem->getSku()) {
+                $updateItemId['item_id'] = (int)$item->getItemId();
+                $updateItemId['qty'] = $item->getQty();
+                continue;
+            }
+        }
+        if (!empty($updateItemId)) {
+            $cartItem->setItemId($updateItemId['item_id']);
+            $cartItem->setQty($updateItemId['qty'] + 1);
+        }
+
         $quoteItems[] = $cartItem;
         $quote->setItems($quoteItems);
         $quote->setTotalsCollectedFlag(false)->collectTotals();
         $this->quoteRepository->save($quote);
+
         if ($message != "") {
             throw new \Magento\Framework\Webapi\Exception(__($message), 444, 404);
         }
+
         return $quote->getLastAddedItem();
     }
 

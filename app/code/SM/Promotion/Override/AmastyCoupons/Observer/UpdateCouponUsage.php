@@ -155,9 +155,7 @@ class UpdateCouponUsage extends \Amasty\Coupons\Observer\UpdateCouponUsage
      */
     protected function getResultTimesUsed($couponEntity)
     {
-        if (empty($this->timesUsed['coupon_times_used'][$couponEntity->getId()]) &&
-            $couponEntity->getTimesUsed() === $this->timesUsed['coupon_times_used'][$couponEntity->getId()]
-        ) {
+        if (!isset($this->timesUsed['coupon_times_used'][$couponEntity->getId()])) {
             return $couponEntity->getTimesUsed();
         } else {
             return (int) $this->timesUsed['coupon_times_used'][$couponEntity->getId()];

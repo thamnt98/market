@@ -45,7 +45,7 @@ $schema = ($block->getZone() == 'item_view') ? true : false;
             'schema' => $schema
         ]); ?>
     </span>
-    <span class="old-price" style="display: <?=$freshHelper->isShowPromoPrice($product) ? 'none':'block'?> ;">
+    <span class="old-price" style="display: <?= ($freshHelper->isShowPromoPrice($product) && $freshHelper->isCategoryPage()) ? 'none' : 'block'?> ;">
         <?= /* @noEscape */
         $block->renderAmount($priceModel->getAmount(), [
             'display_label' => __('Regular Price'),

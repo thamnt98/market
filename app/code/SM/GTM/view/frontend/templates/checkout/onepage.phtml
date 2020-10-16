@@ -16,20 +16,22 @@
                             let items = getItems();
                             let deliveryOption = getDeliveryOption();
                             console.log(items);
-                            $.each(items, function (key, value) {
-                                let delivery = "Not available";
-                                if (deliveryOption[key].shipping_method_selected !== 'store_pickup_store_pickup') {
-                                    delivery = "Delivery";
-                                } else {
-                                    delivery = $('h4[data-bind="html: currentStoreName"]').text();
-                                }
-                                let data = {
-                                    'productId': value.product_id,
-                                    'productQty': value.qty,
-                                    'delivery_option': delivery
-                                };
-                                productIds.push(data);
-                            });
+                            if (productIds.length === 0) {
+                                $.each(items, function (key, value) {
+                                    let delivery = "Not available";
+                                    if (deliveryOption[key].shipping_method_selected !== 'store_pickup_store_pickup') {
+                                        delivery = "Delivery";
+                                    } else {
+                                        delivery = $('h4[data-bind="html: currentStoreName"]').text();
+                                    }
+                                    let data = {
+                                        'productId': value.product_id,
+                                        'productQty': value.qty,
+                                        'delivery_option': delivery
+                                    };
+                                    productIds.push(data);
+                                });
+                            }
                             console.log(productIds);
                             let data = {
                                 'productsInfo': productIds

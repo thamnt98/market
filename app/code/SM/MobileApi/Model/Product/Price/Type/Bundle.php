@@ -53,20 +53,23 @@ class Bundle
         $completePackagePrice = $this->bundleAttribute->getMinPrice($product, true);
         $bundlePrice          = $product->getPriceInfo()->getPrice(\Magento\Catalog\Pricing\Price\RegularPrice::PRICE_CODE);
         $showRange            = $bundlePrice->getMinimalPrice() != $bundlePrice->getMaximalPrice();
-        if (!$showRange) {
-            //Check the custom options, if any
-            /** @var \Magento\Catalog\Pricing\Price\CustomOptionPrice $customOptionPrice */
-            $customOptionPrice = $product->getPriceInfo()->getPrice(\Magento\Catalog\Pricing\Price\CustomOptionPrice::PRICE_CODE);
-            $showRange         = $customOptionPrice->getCustomOptionRange(true) != $customOptionPrice->getCustomOptionRange(false);
-        }
-        if ($showRange) {
-            $regularPrice = $product->getPriceInfo()->getPrice(
-                \Magento\Catalog\Pricing\Price\RegularPrice::PRICE_CODE
-            )->getAmount()->getValue();
-            $finalPrice   = $product->getPriceInfo()->getPrice('final_price')->getAmount()->getValue();
-        } elseif (isset($completePackagePrice)) {
+
+        if (isset($completePackagePrice)) {
             $regularPrice = $this->bundleAttribute->getMinAmount($product, true, true, true);
             $finalPrice   = $completePackagePrice->getValue();
+        } else {
+            if (!$showRange) {
+                //Check the custom options, if any
+                /** @var \Magento\Catalog\Pricing\Price\CustomOptionPrice $customOptionPrice */
+                $customOptionPrice = $product->getPriceInfo()->getPrice(\Magento\Catalog\Pricing\Price\CustomOptionPrice::PRICE_CODE);
+                $showRange         = $customOptionPrice->getCustomOptionRange(true) != $customOptionPrice->getCustomOptionRange(false);
+            }
+            if ($showRange) {
+                $regularPrice = $product->getPriceInfo()->getPrice(
+                    \Magento\Catalog\Pricing\Price\RegularPrice::PRICE_CODE
+                )->getAmount()->getValue();
+                $finalPrice   = $product->getPriceInfo()->getPrice('final_price')->getAmount()->getValue();
+            }
         }
 
         $productInfo->setFinalPrice($this->priceHelper->formatPrice($finalPrice));

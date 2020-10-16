@@ -25,13 +25,19 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected $priceHelper;
 
+    /**
+     * @var \Magento\Framework\App\Request\Http
+     */
+    protected $request;
 
     public function __construct(
         PriceHelper $priceHelper,
-        \Magento\Framework\App\Helper\Context $context
+        \Magento\Framework\App\Helper\Context $context,
+        \Magento\Framework\App\Request\Http $request
     ) {
         parent::__construct($context);
         $this->priceHelper = $priceHelper;
+        $this->request = $request;
     }
 
     public function isFreshCategory($category)
@@ -118,12 +124,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     public function formatPrice($value)
     {
-        return  $this->priceHelper->currency($value, true, false);
+        return $this->priceHelper->currency($value, true, false);
     }
 
     public function isShowPromoPrice($product)
     {
-        if ($this->isFreshProduct($product)) {
+        if ($this->isFreshProduct($product) && $this->isPriceInKg($product)) {
             if (($this->getPromoPrice($product) < $this->getBasePrice($product))
                 && ($this->getPromoPrice($product) > 0)
             ) {
@@ -139,5 +145,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             self::XML_TOOLTIP_CONTENT,
             ScopeInterface::SCOPE_STORE
         );
+    }
+
+    public function isCategoryPage()
+    {
+        $currentUrl = $this->request->getFullActionName();
+        if ($currentUrl == 'catalog_category_view') {
+            return true;
+        }
+        return false;
     }
 }

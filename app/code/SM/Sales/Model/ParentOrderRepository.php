@@ -219,9 +219,6 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
                 ["eq" => $orderId]
             ]);
 
-        $result = $this->subOrder->handleSubOrders($subOrderCollection, $cancelType);
-        $subOrders = $result->getData("sub_orders");
-        $hasInvoice = $result->getData("has_invoice");
         /** @var Order $parentOrder */
         $parentOrder = $this->orderCollectionFactory
             ->create()
@@ -229,10 +226,13 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
             ->addFieldToFilter(OrderInterface::ENTITY_ID, $orderId)
             ->getFirstItem();
 
+        $hasInvoice = (bool) $parentOrder->getReferenceInvoiceNumber();
+        $result = $this->subOrder->handleSubOrders($subOrderCollection, $cancelType, $hasInvoice);
+        $subOrders = $result->getData("sub_orders");
+
         $orderData = $this->parentOrder->parentOrderProcess(
             $parentOrder,
-            $subOrders[$parentOrder->getEntityId()]??[],
-            $hasInvoice
+            $subOrders[$parentOrder->getEntityId()]??[]
         );
 
         if (!empty($cancelType) && $orderData->getStatus() == ParentOrderRepositoryInterface::STATUS_ORDER_CANCELED) {
@@ -349,14 +349,12 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
 
         $result = $this->subOrder->handleSubOrders($subOrderCollection, $cancelType);
         $subOrders = $result->getData("sub_orders");
-        $hasInvoice = $result->getData("has_invoice");
         $orderResults = [];
         /** @var Order $parentOrder */
         foreach ($orderCollection as $parentOrder) {
             $orderData = $this->parentOrder->parentOrderProcess(
                 $parentOrder,
-                $subOrders[$parentOrder->getEntityId()]??[],
-                $hasInvoice
+                $subOrders[$parentOrder->getEntityId()]??[]
             );
 
             if (!empty($cancelType)

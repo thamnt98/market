@@ -289,7 +289,8 @@ class Onepage
             if ($methodInstance->isAvailable($quote) && $this->canUseMethod($methodInstance, $quote)) {
                 $description = $this->helperConfig->getPaymentDescription($method->getCode());
                 $tooltipDescription = $this->helperConfig->getPaymentTooltipDescription($method->getCode());
-                $logo = $this->helperConfig->getPaymentLogo($method->getCode());
+                $logo = "logo/paymentmethod/" . $this->helperConfig->getPaymentLogo($method->getCode());
+                $logoUrl = $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA);
                 $methods[] = [
                     'code'  => $method->getCode(),
                     'title' => $method->getTitle(),
@@ -297,7 +298,7 @@ class Onepage
                     'isActive'  => $method->getIsActive(),
                     'description'   => $description,
                     'tooltip_description'   => $tooltipDescription,
-                    'logo'      => $logo
+                    'logo'      => $logoUrl . $logo
                 ];
             }
         }

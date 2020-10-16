@@ -550,7 +550,6 @@ define(
                                 } else {
                                     window.location.href = result.redirectUrl;
                                 }
-
                             }
                         },
                     });

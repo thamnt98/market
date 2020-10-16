@@ -9,6 +9,7 @@ use Magento\Framework\UrlInterface;
 use Magento\Framework\View\Element\Template;
 use Magento\Store\Block\Switcher;
 use Magento\Store\Model\Store;
+use SM\Help\Api\QuestionRepositoryInterface;
 
 /**
  * Class Login
@@ -16,6 +17,19 @@ use Magento\Store\Model\Store;
  */
 class Login extends \Magento\Framework\View\Element\Template
 {
+    const XML_PATH_TERMS_CONDITIONS = 'sm_help/show_form_login_terms_privacy/terms_conditions';
+    const XML_PATH_PRIVACY_POLICY = 'sm_help/show_form_login_terms_privacy/privacy_policy';
+
+    /**
+     * @var \Magento\Framework\App\Request\Http
+     */
+    protected $request;
+
+    /**
+     * @var QuestionRepositoryInterface
+     */
+    protected $questionRepository;
+
     /**
      * @var \Magento\Framework\App\Http\Context
      */
@@ -35,6 +49,8 @@ class Login extends \Magento\Framework\View\Element\Template
 
     /**
      * Login constructor.
+     * @param \Magento\Framework\App\Request\Http $request
+     * @param QuestionRepositoryInterface $questionRepository
      * @param Template\Context $context
      * @param \Magento\Framework\App\Http\Context $httpContext
      * @param \Magento\Persistent\Helper\Session $cookiePersistent
@@ -44,6 +60,8 @@ class Login extends \Magento\Framework\View\Element\Template
      * @param array $data
      */
     public function __construct(
+        \Magento\Framework\App\Request\Http $request,
+        QuestionRepositoryInterface $questionRepository,
         Template\Context $context,
         \Magento\Framework\App\Http\Context $httpContext,
         \Magento\Persistent\Helper\Session $cookiePersistent,
@@ -58,6 +76,8 @@ class Login extends \Magento\Framework\View\Element\Template
         $this->helperFlags = $helperFlags;
         $this->switcherBlock = $switcherBlock;
         $this->encoder = $encoder;
+        $this->request = $request;
+        $this->questionRepository = $questionRepository;
     }
 
     /**
@@ -197,6 +217,57 @@ class Login extends \Magento\Framework\View\Element\Template
                     $store->getCurrentUrl(false)
                 ),
             ]
+        );
+    }
+
+
+    /**
+     *
+     * @return bool
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function isShowLogin()
+    {
+        $topicId = $this->request->getParam('topic_id');
+        $questionId = $this->request->getParam('question_id');
+        if ($topicId) {
+            if ($topicId == $this->getTermCondition() || $topicId == $this->getPrivacyPolicy()) {
+                return true;
+            }
+        }
+        if ($questionId) {
+            if ($this->getTopicId($questionId) == $this->getTermCondition()
+                || $this->getTopicId($questionId) == $this->getPrivacyPolicy()) {
+                return true;
+            }
+        }
+        return $this->isLoggedIn();
+    }
+
+    /**
+     *
+     * @param $value
+     * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function getTopicId($value)
+    {
+        $question = $this->questionRepository->getById($value);
+        return $question->getTopicId();
+
+    }
+
+    protected function getTermCondition()
+    {
+        return $this->_scopeConfig->getValue(
+            self::XML_PATH_TERMS_CONDITIONS
+        );
+    }
+
+    protected function getPrivacyPolicy()
+    {
+        return $this->_scopeConfig->getValue(
+            self::XML_PATH_PRIVACY_POLICY
         );
     }
 }

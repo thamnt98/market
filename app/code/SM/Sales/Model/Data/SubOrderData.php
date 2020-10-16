@@ -371,4 +371,20 @@ class SubOrderData extends DataObject implements SubOrderDataInterface
     {
         return $this->setData(self::CANCEL_TYPE, $value);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTrackingLink()
+    {
+        return $this->getData(self::TRACKING_LINK);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setTrackingLink($value)
+    {
+        return $this->setData(self::TRACKING_LINK, $value);
+    }
 }

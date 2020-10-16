@@ -5,6 +5,7 @@ namespace SM\MobileApi\Helper;
 use Magento\Catalog\Model\ResourceModel\Product\Collection;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Webapi\Exception;
 use Magento\Store\Model\ScopeInterface;
 
 class Product extends \Magento\Framework\App\Helper\AbstractHelper
@@ -634,6 +635,10 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
             return null;
         }
 
+        if ($this->_getProductStockQty($product) <= 0) {
+            throw new Exception(__('Product is out of stock or product is alcohol, tobacco'), 0, Exception::HTTP_NOT_FOUND);
+        }
+
         $this->registry->register('current_product', $product, true);
         $this->registry->register('product', $product, true);
 
@@ -1009,7 +1014,6 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return ((float) $value) . " " . $this->getWeightUnit();
     }
-
 
     /**
      * Get installation of product

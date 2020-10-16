@@ -11,10 +11,10 @@ $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
         <?php if ($freshHelper->isShowPromoPrice($_product)) : ?>
          <div class="fresh-price">
               <span class="old-price">
-                                <?= $block->escapeHtml($freshHelper->formatPrice($freshHelper->getBasePrice($_product)) . ' / kg') ?>
+                                <?= $block->escapeHtml($freshHelper->formatPrice($freshHelper->getBasePrice($_product))) ?>
              </span>
              <span class="special-price">
-                                <?= $block->escapeHtml($freshHelper->formatPrice($freshHelper->getPromoPrice($_product)) . ' / kg') ?>
+                                <?= $block->escapeHtml($freshHelper->formatPrice($freshHelper->getPromoPrice($_product)) . '/kg') ?>
              </span>
 
 

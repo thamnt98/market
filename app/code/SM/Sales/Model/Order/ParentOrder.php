@@ -115,7 +115,7 @@ class ParentOrder
      * @param bool $hasInvoice
      * @return ParentOrderDataInterface
      */
-    public function parentOrderProcess($parentOrder, $subOrders, $hasInvoice)
+    public function parentOrderProcess($parentOrder, $subOrders)
     {
         /** @var \Magento\Sales\Api\Data\OrderPaymentInterface $payment */
         $payment = $parentOrder->getPayment();
@@ -142,7 +142,7 @@ class ParentOrder
             ->setSubOrders($subOrders)
             ->setConvertDate($this->convertDate($parentOrder->getCreatedAt()));
 
-        if (isset($hasInvoice[$parentOrder->getEntityId()]) || $parentOrder->getReferenceInvoiceNumber()) {
+        if ($parentOrder->getReferenceInvoiceNumber()) {
             $invoiceLink = $this->getUrl('sales/invoice/view', ['id' => $parentOrder->getId()]);
             $parentOrderData->setInvoiceLink($invoiceLink);
         }

@@ -27,6 +27,7 @@ define([
                             {
                                 that.addFile(JSON.parse(item));
                             }
+                            $('div[data-role=loader]').hide();
                         }
                     }
                 });

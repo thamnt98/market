@@ -28,6 +28,7 @@ class TopicRepository implements TopicRepositoryInterface
     const TOPIC_MY_ORDER = 'my_order';
     const TOPIC_RETURN_REFUND = 'return_refund';
     const TOPIC_NORMAL = 'normal';
+    const TOPIC_DELIVERY = 'delivery';
 
     /**
      * @var ResourceModel\Topic\CollectionFactory
@@ -187,11 +188,15 @@ class TopicRepository implements TopicRepositoryInterface
 
         foreach ($topics as $topic) {
             $topic->setType(self::TOPIC_NORMAL);
-            if ($topic->getId() == $this->getMyOrderId()) {
+            $topicId = $topic->getId();
+            if ($topicId == $this->getMyOrderId()) {
                 $topic->setType(self::TOPIC_MY_ORDER);
             }
-            if ($topic->getId() == $this->getReturnRefundId()) {
+            if ($topicId == $this->getReturnRefundId()) {
                 $topic->setType(self::TOPIC_RETURN_REFUND);
+            }
+            if ($topicId == $this->getDeliveryId()) {
+                $topic->setType(self::TOPIC_DELIVERY);
             }
         }
 
@@ -294,7 +299,7 @@ class TopicRepository implements TopicRepositoryInterface
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getMyOrderId()
     {
@@ -305,12 +310,23 @@ class TopicRepository implements TopicRepositoryInterface
     }
 
     /**
-     * @return string
+     * @return int
      */
     public function getReturnRefundId()
     {
         return $this->scopeConfig->getValue(
             'sm_help/main_page/contact_us_return_refund',
+            ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * @return int
+     */
+    public function getDeliveryId()
+    {
+        return $this->scopeConfig->getValue(
+            'sm_help/main_page/contact_us_delivery',
             ScopeInterface::SCOPE_STORE
         );
     }
