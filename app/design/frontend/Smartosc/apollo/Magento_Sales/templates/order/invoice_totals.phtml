@@ -28,9 +28,8 @@ foreach ($block->getTotals() as $_code => $_total) : ?>
                 <?php else : ?>
                     <?= ($_total->getLabel() == "Shipping & Handling") ? $block->escapeHtml(__('Delivery fee')) : $block->escapeHtml($_total->getLabel()) ?>
                 <?php endif ?>
-
             </td>
-            <td></td>
+
 
             <td class="text-right" <?= /* @noEscape */ $block->getValueProperties() ?> data-th="<?= $block->escapeHtmlAttr($_total->getLabel()) ?>">
                 <?php if ($_total->getStrong()) : ?>

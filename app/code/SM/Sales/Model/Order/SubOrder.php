@@ -442,6 +442,7 @@ class SubOrder
                 ->create()
                 ->setId($subOrder->getEntityId())
                 ->setSubOrderId($subOrder->getData("reference_order_id"))
+                ->setParentOrder($subOrder->getData("parent_order"))
                 ->setStatus($subOrder->getStatus())
                 ->setStatusLabel($subOrder->getStatusLabel())
                 ->setCreatedAt($subOrder->getCreatedAt())

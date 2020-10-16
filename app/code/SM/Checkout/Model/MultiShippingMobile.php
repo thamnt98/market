@@ -269,7 +269,15 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
      */
     protected $supportShippingInterfaceFactory;
 
-    protected $topicFactory;
+    /**
+     * @var \SM\Help\Model\QuestionRepository
+     */
+    private $questionRepository;
+
+    /**
+     * @var \SM\Help\Api\Data\QuestionInterfaceFactory
+     */
+    private $questionFactory;
 
     /**
      * MultiShippingMobile constructor.
@@ -364,9 +372,11 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         \SM\Checkout\Helper\DeliveryType $deliveryType,
         \SM\FreshProductApi\Helper\Fresh $fresh,
         \SM\Checkout\Api\Data\Checkout\SupportShippingInterfaceFactory $supportShippingInterfaceFactory,
-        \SM\Help\Model\TopicFactory $topicFactory
+        \SM\Help\Model\QuestionRepository $questionRepository,
+        \SM\Help\Api\Data\QuestionInterfaceFactory $questionFactory
     ) {
-        $this->topicFactory = $topicFactory;
+        $this->questionRepository = $questionRepository;
+        $this->questionFactory = $questionFactory;
         $this->fresh = $fresh;
         $this->configurationPool = $configurationPool;
         $this->appEmulation = $appEmulation;
@@ -942,6 +952,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
     /**
      * @param $data
      * @return mixed
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function getCheckoutData($data)
     {
@@ -952,10 +963,13 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         }
         $data[CheckoutDataInterface::SUPPORT_SHIPPING] = $this->supportShippingData;
 
-        /** @var \SM\Help\Model\Topic $topic */
-        $topic = $this->topicFactory->create()->loadByUrlKey("terms-conditions");
-        if ($topic->getId()) {
-            $data[CheckoutDataInterface::TOPIC_ID] = $topic->getId();
+        /** @var \SM\Help\Model\Question $question */
+        try {
+            $question = $this->questionRepository->getById($this->checkoutHelperConfig->getTermAndConditionFaq());
+            if ($question->getStatus()) {
+                $data[CheckoutDataInterface::TERM_AND_CONDITION] = $question;
+            }
+        } catch (\Exception $e){
         }
 
         return $this->checkoutDataInterfaceFactory->create()->setData($data);

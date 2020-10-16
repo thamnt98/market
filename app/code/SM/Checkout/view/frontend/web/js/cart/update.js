@@ -4,6 +4,8 @@ define([
     'Magento_Checkout/js/model/cart/cache',
     'Amasty_Conditions/js/action/recollect-totals',
     'Magento_Customer/js/customer-data',
+    'gtmCheckout',
+    'SM_GTM/js/gtm/sm-gtm-cart-collect-data',
     'mage/translate',
     'loader'
 ], function (
@@ -11,7 +13,9 @@ define([
     confirm,
     cartCache,
     recollect,
-    customerData
+    customerData,
+    gtmCheckout,
+    gtmCollectData
 ) {
     /**
      * process selected all
@@ -93,6 +97,9 @@ define([
             content: $.mage.__('Would you like to remove items?'),
             actions: {
                 confirm: function () {
+                    //Remove selected items GTM
+                    gtmCollectData.collectData();
+
                     const form = $("form[name='remove_selected_item']");
                     form.children('input[name="remove_ids"]').val(removeIds);
                     form.children('button').trigger('click');
@@ -224,6 +231,9 @@ define([
     });
 
     cartContainer.on("click", ".decrease-qty", function () {
+        //Decrease quantity GTM
+        gtmCollectData.collectData();
+
         let itemId = $(this).attr('itemId');
         let itemQty = $('#cart-qty-'+ itemId);
         let elementId = $('a#subtract-cart-item-' + itemId);

@@ -380,12 +380,13 @@ class SendOMS
             if (strtotime($time) > strtotime('13:30:00')) {
                 $date = date('Y-m-d', strtotime("+1 day", strtotime($date)));
             }
+            $time = '17:00:00';
             $timeslot = $date . ' ' . $time;
         } elseif ($logisticType == 2) {
             if (strtotime($time) < strtotime('08:00:00')) {
                 $time = '09:00:00';
             } elseif (strtotime($time) <= strtotime('15:30:00')) {
-                $time = date('H:i:s', strtotime("+2 hour", strtotime($date)));
+                $time = date('H:i:s', strtotime("+2 hour", strtotime($time)));
             } else {
                 $time = '09:00:00';
                 $date = date('Y-m-d', strtotime("+1 day", strtotime($date)));

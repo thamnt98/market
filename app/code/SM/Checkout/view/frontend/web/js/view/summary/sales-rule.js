@@ -14,11 +14,25 @@
 define([
     'Amasty_Rules/js/view/cart/totals/discount-breakdown',
     'jquery',
-    'Magento_Checkout/js/model/quote'
-], function (Component, $, quote) {
+    'ko',
+    'SM_Checkout/js/view/global-observable'
+], function (Component, $, ko, globalVar) {
     'use strict';
 
     return Component.extend({
+        default: {
+            isShow: ko.observable(false)
+        },
+
+        initialize: function () {
+            this._super();
+            this.isShow = ko.computed(function () {
+                return globalVar.isStepShipping() || globalVar.showPaymentDetails();
+            }, this);
+
+            return this;
+        },
+
         initCollapseBreakdown: function () {},
 
         getDiscountDataFromTotals: function (totals) {

@@ -241,4 +241,14 @@ class Config extends AbstractHelper
             ScopeInterface::SCOPE_STORE
         );
     }
+
+    /**
+     * @return int
+     */
+    public function getTermAndConditionFaq()
+    {
+        return $this->scopeConfig->getValue(
+            'sm_help/payment_page/terms_conditions_mobile'
+        );
+    }
 }

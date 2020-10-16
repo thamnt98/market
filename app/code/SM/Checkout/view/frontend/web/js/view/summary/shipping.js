@@ -144,9 +144,10 @@ define([
         },
 
         getDeliverySubTotalTitle: function () {
-            if (globalVar.isStepPreviewOrder()) {
+            if (globalVar.isStepPreviewOrder() && globalVar.showPaymentDetails()) {
                 return $t('Subtotal Delivery Fee');
             }
+
             return $t('Delivery Fee');
         },
 

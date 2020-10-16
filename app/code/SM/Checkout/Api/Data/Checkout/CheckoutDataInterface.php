@@ -27,7 +27,7 @@ interface CheckoutDataInterface
     const BASKET_ID = 'basket_id';
     const BASKET_QTY = 'basket_qty';
     const BASKET_VALUE = 'basket_value';
-    const TOPIC_ID = "topic_id";
+    const TERM_AND_CONDITION = "term_and_condition";
 
     /**
      * @param \Magento\Customer\Api\Data\AddressInterface[] $data
@@ -252,13 +252,13 @@ interface CheckoutDataInterface
     public function setBasketQty($value);
 
     /**
-     * @return int
+     * @return \SM\Help\Api\Data\QuestionInterface
      */
-    public function getTopicId();
+    public function getTermAndCondition();
 
     /**
-     * @param int $value
+     * @param \SM\Help\Api\Data\QuestionInterface $value
      * @return $this
      */
-    public function setTopicId($value);
+    public function setTermAndCondition($value);
 }

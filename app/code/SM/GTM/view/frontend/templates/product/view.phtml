@@ -13,6 +13,21 @@ if ($GTMViewModel) {
                 window.eventCreate = window.eventCreate || {};
                 let data = <?= $data ?>;
 
+                let position = 1;
+                $('.block-content.content').find('li[style=""]').each(function () {
+                    var $this =  $(this);
+                    $this.find('[data-gtm-event="product_click"]').each(function () {
+                        var $that =  $(this);
+                        $that.attr('data-gtm-position', position);
+                    });
+                    $this.find('[data-gtm-event="product_view"]').each(function () {
+                        var $that =  $(this);
+                        $that.attr('data-gtm-position', position);
+                    });
+                    position++;
+                });
+
+
                 $('.cloud-zoom-gallery').on('click', function () {
                     data['picture_position'] = $(this).attr('data-gtm-position');
                     gtm.push('click_picture_PDP', data);

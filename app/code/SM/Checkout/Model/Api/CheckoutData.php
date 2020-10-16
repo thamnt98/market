@@ -328,16 +328,16 @@ class CheckoutData extends AbstractExtensibleObject implements CheckoutDataInter
     /**
      * @inheritDoc
      */
-    public function getTopicId()
+    public function getTermAndCondition()
     {
-        return $this->_get(self::TOPIC_ID);
+        return $this->_get(self::TERM_AND_CONDITION);
     }
 
     /**
      * @inheritDoc
      */
-    public function setTopicId($value)
+    public function setTermAndCondition($value)
     {
-        return $this->setData(self::TOPIC_ID, $value);
+        return $this->setData(self::TERM_AND_CONDITION, $value);
     }
 }

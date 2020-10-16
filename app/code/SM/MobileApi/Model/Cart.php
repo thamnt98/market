@@ -337,20 +337,7 @@ class Cart implements \SM\MobileApi\Api\CartInterface
                 }
 
                 if ($notAdd == false) {
-                    Validate::validateQtyInCart($quote, 0, $item->getQty());
-                    $quoteItems = $quote->getItemsV2();
-                    $updateItemId = null;
-
-                    foreach ($quoteItems as $product) {
-                        if ($product->getSku() == $item->getSku()) {
-                            $updateItemId = (int)$product->getItemId();
-                            continue;
-                        }
-                    }
-                    if (isset($updateItemId)) {
-                        $item->setItemId($updateItemId);
-                    }
-
+                    $quoteItems = $quote->getItems();
                     $quoteItems[] = $item;
                     $quote->setItems($quoteItems);
                     $this->quoteRepository->save($quote);

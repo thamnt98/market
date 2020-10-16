@@ -169,8 +169,12 @@ $helperSMCatalog = $this->helper('SM\Catalog\Helper\Data');
                                                             $postParams['data'][Action::PARAM_NAME_URL_ENCODED] ?>">
                                                             <?= $block->getBlockHtml('formkey') ?>
                                                             <button type="submit"
-                                                                    title="<?= $block->escapeHtml(__('Add to Cart')) ?>"
-                                                                    class="action tocart primary">
+                                                                    title="<?= $block->escapeHtmlAttr(__('Add to Cart')) ?>"
+                                                                    class="action tocart primary"
+                                                                    <?php if ($dataGTM) : ?>
+                                                                    data-gtm-product='<?= $dataGTM ?>'
+                                                                    data-position="<?= $position ?>"
+                                                                    <?php endif; ?>>
                                                                 <span><?= $block->escapeHtml(__('Add to Cart')) ?></span>
                                                             </button>
                                                         </form>

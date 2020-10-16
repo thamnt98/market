@@ -259,7 +259,7 @@ class Config extends AbstractHelper
     {
         return $this->scopeConfig->getValue(
             self::XML_PATH_TERMS_CONDITIONS,
-            \Magento\Framework\App\Config\ScopeConfigInterface::SCOPE_TYPE_DEFAULT
+            ScopeInterface::SCOPE_STORE
         );
     }
 
@@ -270,7 +270,7 @@ class Config extends AbstractHelper
     {
         return $this->scopeConfig->getValue(
             self::XML_PATH_PRIVACY_POLICY,
-            \Magento\Framework\App\Config\ScopeConfigInterface::SCOPE_TYPE_DEFAULT
+            ScopeInterface::SCOPE_STORE
         );
     }
 }

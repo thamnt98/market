@@ -46,7 +46,7 @@
                 </field>
                 <field id="contact_us_delivery" translate="label" type="select" sortOrder="30" showInDefault="1"
                        showInWebsite="1">
-                    <label>Select Contact Us Delivery</label>
+                    <label>Select Contact Us Delivery (Mobile)</label>
                     <source_model>SM\Help\Model\Config\Source\Topic</source_model>
                 </field>
             </group>
@@ -89,6 +89,15 @@
                        showInWebsite="1" showInStore="1">
                     <label>Privacy Policy</label>
                     <source_model>Magento\Cms\Model\Config\Source\Block</source_model>
+                </field>
+            </group>
+            <group id="payment_page" translate="label" sortOrder="150" showInDefault="1" showInWebsite="0"
+                   showInStore="0">
+                <label>Payment Page</label>
+                <field id="terms_conditions_mobile" translate="label" type="select" sortOrder="0" showInDefault="1"
+                       showInWebsite="0" showInStore="0">
+                    <label>Terms &amp; Conditions FAQ (Mobile)</label>
+                    <source_model>SM\Help\Model\Config\Source\Question</source_model>
                 </field>
             </group>
             <group id="show_form_login_terms_privacy" translate="label" sortOrder="150" showInDefault="1" showInWebsite="0"

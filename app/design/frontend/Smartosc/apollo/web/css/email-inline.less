@@ -132,14 +132,10 @@ body{
                 vertical-align: top;
             }
         }
-        .two-column{
-            .content-two-column{
-                margin-top: 15px;
-            }
-            .one-of-two-column{
-                width: 50%;
-            }
+        .content-two-column{
+            margin-top: 15px;
         }
+
         .one-column{
             .happy-shoping{
                 >tr{
@@ -163,23 +159,37 @@ body{
             .one-of-two-column{
                 vertical-align: top;
             }
-            .total{
-               .content{
-                   .title{
-                       font-size: 18px;
-                       font-weight: 600;
-                       p{
-                           margin: 10px 0;
-                       }
-                   }
-                   .description{
-                       p{
-                           margin: 10px 0;
-                           color: #7b7b7b;
-                           font-size: 15px;
-                       }
-                   }
-               }
+            .title{
+                font-size: 18px;
+                font-weight: 600;
+                p{
+                    margin: 10px 0;
+                }
+            }
+            .one-of-two-column{
+                width: 50%;
+            }
+            .description{
+                color:#7B7B7B;
+                font-size: 16px;
+            }
+            .virtual-column{
+                text-align: center;
+                padding: 10px 0;
+                p{
+                    margin:0;
+                }
+                h3{
+                    margin-top: 0;
+                }
+            }
+
+            .column-heading{
+                font-size: 18px;
+                font-weight: 600;
+            }
+            .column-text{
+                color:#7B7B7B;
             }
         }
         .order-detail{
@@ -212,11 +222,15 @@ body{
                 .text-right{
                     text-align: right;
                 }
+                .text-center{
+                    text-align: center;
+                }
                 .pr-15{
                     padding-right: 15px;
                 }
                 .pl-10{
                     padding-left: 10px;
+                    padding-right: 10px;
                 }
                 .title-td{
                     padding: 5px;

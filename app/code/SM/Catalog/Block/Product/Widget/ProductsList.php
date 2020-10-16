@@ -344,7 +344,7 @@ class ProductsList extends WidgetProductListDefault
             "product_size" => $this->getGTMProductSize($product),
             "product_volume" => $this->getGTMProductVolume($product),
             "product_weight" => $this->getGTMProductWeight($product),
-            "salePrice" => $priceGTM['sale_price'],
+            "salePrice" => $initPrice - $price,
             "discountRate" => $priceGTM['discount_rate'],
             "rating" => $this->getGTMProductRating($productBase),
             "initialPrice" => $initPrice,

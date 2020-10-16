@@ -23,6 +23,9 @@
             <main_page>
                 <contact_us_delivery>9</contact_us_delivery>
             </main_page>
+            <payment_page>
+                <terms_conditions_mobile>56</terms_conditions_mobile>
+            </payment_page>
         </sm_help>
     </default>
 </config>

@@ -97,7 +97,7 @@ class GtmProduct extends \Magento\Framework\App\Action\Action
             $data['product_size'] = $this->getGTMProductSize($product);
             $data['product_volume'] = $this->getGTMProductVolume($product);
             $data['product_weight'] = $this->getGTMProductWeight($productMin);
-            $data['salePrice'] = $priceGTM['sale_price'];
+            $data['salePrice'] = $initPrice - $price;
             $data['discountRate'] = $priceGTM['discount_rate'];
             $data['rating'] = $this->getGTMProductRating($product);
             $data['initialPrice'] = $initPrice;

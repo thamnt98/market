@@ -13,14 +13,7 @@ define([
             template: 'SM_Checkout/summary/service-fee'
         },
         isShow: function () {
-            if (!globalVar.isStepPayment()) {
-                return true;
-            } else {
-                if (globalVar.showPaymentDetails()) {
-                    return true;
-                }
-            }
-            return false;
+            return globalVar.isStepPayment() && globalVar.showPaymentDetails();
         }
     };
 

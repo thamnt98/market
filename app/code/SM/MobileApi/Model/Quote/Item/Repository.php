@@ -80,7 +80,6 @@ class Repository extends \Magento\Quote\Model\Quote\Item\Repository
         if ($cartItem->getData('item_id')) {
             $item = $quote->getItemById($cartItem->getData('item_id'));
             $availableStock = $this->productStock->getStock($item);
-            Validate::validateQtyInCart($quote, $item->getQty(), $cartItem->getQty());
 
             if ($availableStock <= 0) {
                 $extensionAttributes = $item->getExtensionAttributes();
@@ -199,20 +198,7 @@ class Repository extends \Magento\Quote\Model\Quote\Item\Repository
             }
         }
 
-        $quoteItems = $quote->getItemsV2();
-        $updateItemId = [];
-        foreach ($quoteItems as $item) {
-            if ($item->getSku() == $cartItem->getSku()) {
-                $updateItemId['item_id'] = (int)$item->getItemId();
-                $updateItemId['qty'] = $item->getQty();
-                continue;
-            }
-        }
-        if (!empty($updateItemId)) {
-            $cartItem->setItemId($updateItemId['item_id']);
-            $cartItem->setQty($updateItemId['qty'] + 1);
-        }
-
+        $quoteItems = $quote->getItems();
         $quoteItems[] = $cartItem;
         $quote->setItems($quoteItems);
         $quote->setTotalsCollectedFlag(false)->collectTotals();

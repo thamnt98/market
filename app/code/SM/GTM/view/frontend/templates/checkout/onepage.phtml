@@ -85,9 +85,7 @@
                                         dataProducts['eventTimeout'] = 2000;
                                         gtmCheckout.push('checkout', dataProducts);
                                         console.log(productForStep3);
-                                        if (!$.localStorage.get('product-checkout-gtm')) {
-                                            $.localStorage.set('product-checkout-gtm', productForStep3);
-                                        }
+                                        $.localStorage.set('product-checkout-gtm', productForStep3);
                                     }
                                 },
                                 error: function () {
