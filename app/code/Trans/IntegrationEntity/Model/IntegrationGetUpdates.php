@@ -160,11 +160,11 @@ class IntegrationGetUpdates implements IntegrationGetUpdatesInterface
 
         $result[IntegrationChannelInterface::URL] = $channel['channel']->getUrl().$channel['method']->getDataPath();
         $result[IntegrationChannelMethodInterface::QUERY_PARAMS]  = $this->curl->jsonToArray($channel['method']->getQueryParams());
-        if($channel['jobs']->getSize()){
+        if(isset($channel['jobs'])) {
 //            print $channel['jobs']->getLastItem()->getId()."====".$channel['waiting_jobs']->getId();
-            if($channel['jobs']->getLastItem()->getBatchId() != $channel['waiting_jobs']->getBatchId()){
+            if($channel['jobs']->getBatchId() != $channel['waiting_jobs']->getBatchId()){
                 // API date format / TBD format
-                $dateFormat = date('Y-m-d H:i:s',strtotime($channel['jobs']->getLastItem()->getLastUpdated()));
+                $dateFormat = date('Y-m-d H:i:s',strtotime($channel['jobs']->getLastUpdated()));
                 // Greather than equal format param / TBD Format
                 $paramGte = '$gte.';
                 // Set last updated for API if not initial call
@@ -172,6 +172,7 @@ class IntegrationGetUpdates implements IntegrationGetUpdatesInterface
             }
 
         }
+
         // Set Limit
         $result[IntegrationChannelMethodInterface::QUERY_PARAMS]['_limit'] =$channel['waiting_jobs']->getLimits();
 

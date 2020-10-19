@@ -188,7 +188,8 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
 
         try {
 
-            $channel['jobs'] = $this->jobRepository->getByMdIdWithStatus($channel['method']->getId(),IntegrationJobInterface::STATUS_COMPLETE);
+            $channel['jobs'] = $this->jobRepository->getLastCompleteJobBatch($channel);
+            // $channel['jobs'] = $this->jobRepository->getByMdIdWithStatus($channel['method']->getId(),IntegrationJobInterface::STATUS_COMPLETE);
 
         } catch (\Exception $ex) {
             throw new StateException(
@@ -334,9 +335,9 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
         $result[IntegrationChannelInterface::URL] = $channel['channel']->getUrl().$channel['method']->getDataPath();
         $result[IntegrationChannelMethodInterface::QUERY_PARAMS]  = $this->curl->jsonToArray($channel['method']->getQueryParams());
         $result[IntegrationChannelMethodInterface::QUERY_PARAMS]['_count'] ='*';
-        if($channel['jobs']->getSize()){
+        if(isset($channel['jobs'])){
             // API date format / TBD format
-            $dateFormat = date('Y-m-d H:i:s',strtotime($channel['jobs']->getLastItem()->getLastUpdated()));
+            $dateFormat = date('Y-m-d H:i:s',strtotime($channel['jobs']->getLastUpdated()));
             // Greather than equal format param / TBD Format
             $paramGte = '$gte.';
             // Set last updated for API if not initial call
@@ -445,7 +446,7 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
         $result[IntegrationJobInterface::METHOD_ID] = $method->getId();
         $result[IntegrationJobInterface::LIMIT] = (!empty($method->getLimits()))?$method->getLimits():IntegrationChannelMethodInterface::VAL_LIMIT;
         $result[IntegrationJobInterface::LAST_UPDATED] = NULL ;
-        $result[IntegrationJobInterface::LAST_JB_ID] = $channel['jobs']->getLastItem()->getId();
+        $result[IntegrationJobInterface::LAST_JB_ID] = isset($channel['jobs']) ? $channel['jobs']->getId() : null;
         $result['job'] = ceil( $result[IntegrationJobInterface::TOTAL_DATA]/ $result[IntegrationJobInterface::LIMIT]);
         return $result;
     }

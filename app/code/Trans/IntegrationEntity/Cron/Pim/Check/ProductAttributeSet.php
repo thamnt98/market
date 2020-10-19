@@ -67,6 +67,8 @@ class ProductAttributeSet {
             $this->logger->info("=".$class." Set Parameter Request Data");
             $data       = $this->checkUpdates->prepareCall($channel);
 
+            $this->logger->info(print_r($data ,true));
+
             $this->logger->info("=".$class." Sending Request Data to API");
             $response = $this->commonRepository->get($data);
 
