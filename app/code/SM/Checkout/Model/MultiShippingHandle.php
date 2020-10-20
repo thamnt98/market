@@ -9,9 +9,19 @@ namespace SM\Checkout\Model;
 class MultiShippingHandle
 {
     const STORE_PICK_UP = 'store_pickup_store_pickup';
-    const SCHEDULE = 'transshipping_transshipping3';
+    const NOT_AVAILABLE = 'transshipping_transshipping0';
     const DEFAULT_METHOD = 'transshipping_transshipping1';
     const SAME_DAY = 'transshipping_transshipping2';
+    const SCHEDULE = 'transshipping_transshipping3';
+    const DC = 'transshipping_transshipping5';
+    const TRANS_COURIER = 'transshipping_transshipping6';
+
+    protected $hasNormal = false;
+    protected $hasSpo = false;
+    protected $hasFresh = false;
+    protected $itemsUpdate = [];
+
+    protected $addressEachItems = false;
 
     /**
      * @var bool
@@ -86,17 +96,18 @@ class MultiShippingHandle
      */
     public function handleData($items, $additionalInfo, $customer, $checkoutSession)
     {
+        $this->itemsUpdate = $items;
         $this->updateStockItem->updateStock($checkoutSession->getQuote());
         $data = ['error' => false, 'data' => [], 'split' => false];
         $splitOrderData = $this->getSplitOrderData($items, $additionalInfo, $customer, $checkoutSession);
         $data['error'] = $splitOrderData['error'];
         $data['split'] = $this->orderIsSplit;
-        //die();
         $this->reBuildQuoteAddress($splitOrderData['data'], $checkoutSession);
-        //
+        if (!empty($this->itemsUpdate)) {
+            $items = $this->itemsUpdate;
+        }
         $addressShippingMethod = [];
         $itemShippingMethod = [];
-        $itemShippingMethodMerge = [];
         $error = false;
         foreach ($checkoutSession->getQuote()->getAllShippingAddresses() as $_address) {
             $shippingMethod = $_address->getPreShippingMethod();
@@ -107,13 +118,21 @@ class MultiShippingHandle
                 $addressShippingMethod[$_address->getId()] = true;
                 $_shippingRateGroups = $_address->getGroupedAllShippingRates();
                 $shippingMethodList = [];
+                $shippingMethodListFake = [];
                 if ($_shippingRateGroups) {
                     foreach ($_shippingRateGroups as $code => $_rates) {
                         if ($code == 'transshipping') {
                             foreach ($_rates as $_rate) {
                                 $shippingMethodList[] = $_rate->getCode();
-                                if (!in_array($_rate->getCode(), $itemShippingMethodMerge)) {
-                                    $itemShippingMethodMerge[] = $_rate->getCode();
+                                if ($_rate->getCode() == self::DC) {
+                                    $rateCode = self::DEFAULT_METHOD;
+                                } elseif ($_rate->getCode() == self::TRANS_COURIER) {
+                                    $rateCode = self::SAME_DAY;
+                                } else {
+                                    $rateCode = $_rate->getCode();
+                                }
+                                if (!in_array($rateCode, $shippingMethodListFake)) {
+                                    $shippingMethodListFake[] = $rateCode;
                                 }
                             }
                         }
@@ -125,7 +144,10 @@ class MultiShippingHandle
                     } else {
                         $quoteItemId = $item->getId();
                     }
-                    $itemShippingMethod[$quoteItemId] = $shippingMethodList;
+                    if (empty($shippingMethodListFake)) {
+                        $shippingMethodListFake[] = 'transshipping_transshipping0';
+                    }
+                    $itemShippingMethod[$quoteItemId] = $shippingMethodListFake;
                     if (!in_array($items[$quoteItemId]['shipping_method'], $shippingMethodList)) {
                         unset($addressShippingMethod[$_address->getId()]);
                         $error = true;
@@ -143,8 +165,19 @@ class MultiShippingHandle
         //
         $data['error_stock'] = $this->reload;
         $data['error_stock_message'] = $this->reloadMessage;
+        $data['addressEachItems'] = $this->addressEachItems;
+        $data['current_items'] = [];
         foreach ($checkoutSession->getQuote()->getAllItems() as $item) {
             $item->unsetData('product_option');
+            if ($item->getParentItemId() && $item->getParentItemId() != null) {
+                continue;
+            }
+            if ($item instanceof \Magento\Quote\Model\Quote\Address\Item) {
+                $quoteItemId = $item->getQuoteItemId();
+            } else {
+                $quoteItemId = $item->getId();
+            }
+            $data['current_items'][] = $quoteItemId;
         }
         $billing = $checkoutSession->getCustomer()->getDefaultBilling();
         $checkoutSession->setQuoteCustomerBillingAddress($billing);
@@ -170,7 +203,7 @@ class MultiShippingHandle
 
     /**
      * @param $items
-     * @return array
+     * @return array[]
      */
     public function itemsFormat($items)
     {
@@ -300,7 +333,8 @@ class MultiShippingHandle
                         if (isset($child[$quoteItemId])) {
                             // parent quote item id
                             foreach ($child[$quoteItemId] as $itemData) {
-                                $ownCourier = $itemData->getProduct()->getData('own_courier');
+                                $product = $itemData->getProduct();
+                                $ownCourier = $product->getData('own_courier');
                                 if ($ownCourier) {
                                     $ownCourier = 1;
                                 } else {
@@ -308,7 +342,7 @@ class MultiShippingHandle
                                 }
                                 $sku = $itemData->getSku();
                                 $childQty = (int)$qty * (int)$itemData->getQty();
-                                $price = ((int)$itemData->getPrice() != 0) ? (int)$itemData->getPrice() : (int)$itemData->getProduct()->getFinalPrice();
+                                $price = ((int)$itemData->getPrice() != 0) ? (int)$itemData->getPrice() : (int)$product->getFinalPrice();
                                 if (isset($orderToSendOar['items'][$sku])) {
                                     $orderToSendOar['items'][$sku]['quantity'] += $childQty;
                                 } else {
@@ -330,7 +364,8 @@ class MultiShippingHandle
                                 }
                             }
                         } else {
-                            $ownCourier = $itemData->getProduct()->getData('own_courier');
+                            $product = $itemData->getProduct();
+                            $ownCourier = $product->getData('own_courier');
                             if ($ownCourier) {
                                 $ownCourier = 1;
                             } else {
@@ -338,7 +373,7 @@ class MultiShippingHandle
                             }
                             // sing quote item id
                             $sku = $itemData->getSku();
-                            $price = ((int)$itemData->getPrice() != 0) ? (int)$itemData->getPrice() : (int)$itemData->getProduct()->getFinalPrice();
+                            $price = ((int)$itemData->getPrice() != 0) ? (int)$itemData->getPrice() : (int)$product->getFinalPrice();
                             if (isset($orderToSendOar['items'][$sku])) {
                                 $orderToSendOar['items'][$sku]['quantity'] += (int)$qty;
                             } else {
@@ -378,7 +413,6 @@ class MultiShippingHandle
                         $orderToSendOar['items'] = $resetItems;
                         $splitOrder[$i][$addressId]['oar'] = $this->split->getOarResponse([$orderToSendOar]);
                     }
-
                     if (isset($splitOrder[$i][$addressId]['oar']['error'])) {
                         unset($splitOrder[$i]);
                         foreach ($itemsData as $quoteItemId) {
@@ -421,8 +455,10 @@ class MultiShippingHandle
         $ship = [];
         $validShippingMethod = [];
         $splitOrderWithSku = [];
+        $addressIdList = [];
         foreach ($splitOrder as $data) {
             foreach ($data as $addressId => $order) {
+                $i = 0;
                 foreach ($order['oar']['content'] as $contentData) {
                     if (!$contentData['status']) {
                         continue;
@@ -434,8 +470,10 @@ class MultiShippingHandle
                     $storeCode = $orderDetail['store']['store_code'];
                     $orderItems = $orderDetail['items'];
                     $orderShippingMethod = $this->getShippingListFromOrderSplit($orderDetail['shipping_list']);
+                    $hasInStockProduct = false;
                     foreach ($orderItems as $item) {
-                        if (isset($item['sku']) && isset($item['quantity'])) {
+                        if (isset($item['sku']) && isset($item['quantity']) && (int)$item['quantity'] > 0) {
+                            $hasInStockProduct = true;
                             if (isset($splitOrderWithSku[$item['sku']])) {
                                 $splitOrderWithSku[$item['sku']]['quantity_allocated'] += (int)$item['quantity'];
                             } else {
@@ -458,6 +496,12 @@ class MultiShippingHandle
                             }
                         }
                     }
+                    if ($hasInStockProduct) {
+                        $i++;
+                    }
+                }
+                if ($i > 1) {
+                    $this->orderIsSplit = true;
                 }
             }
         }
@@ -480,6 +524,24 @@ class MultiShippingHandle
                         $qty = (int)$itemFromOAR['quantity_allocated'];
                     }
                     if ($qty > 0) {
+                        $shippingList = $itemFromOAR['shipping_list'];
+                        if (count($shippingList) == 1 && in_array(self::DC, $shippingList)) {
+                            // is_spo
+                            $this->hasSpo = true;
+                            if ($itemData['shipping_method'] == self::DEFAULT_METHOD) {
+                                $itemData['shipping_method'] = self::DC;
+                            }
+                        } elseif (count($shippingList) <= 2 && in_array(self::TRANS_COURIER, $shippingList)) {
+                            // own_courier
+                            $this->hasFresh = true;
+                            if ($itemData['shipping_method'] == self::SAME_DAY) {
+                                $itemData['shipping_method'] = self::TRANS_COURIER;
+                            }
+                        } elseif (count($shippingList) == 1 && in_array(self::SAME_DAY, $shippingList)) {
+                            $this->hasFresh = true;
+                        } else {
+                            $this->hasNormal = true;
+                        }
                         $itemAddToQuoteAddress = [
                             'qty' => $qty,
                             'address' => $itemData['shipping_address'],
@@ -487,6 +549,10 @@ class MultiShippingHandle
                             'split_store_code' => $itemFromOAR['store'],
                             'oar_data' => $itemFromOAR['oar_data']
                         ];
+                        if (!in_array($itemData['shipping_address'], $addressIdList)) {
+                            $addressIdList[] = $itemData['shipping_address'];
+                        }
+                        $this->itemsUpdate[$quoteItemId]['shipping_method'] = $itemData['shipping_method'];
                         $ship[][$quoteItemId] = $itemAddToQuoteAddress;
                         $itemsResponseOar[$quoteItemId] = $itemAddToQuoteAddress;
                         $splitOrderWithSku = $this->rePareQtyFromOAR([$itemData['sku'] => $qty], $splitOrderWithSku);
@@ -500,6 +566,9 @@ class MultiShippingHandle
                     'shipping_method' => $itemData['shipping_method'],
                     'split_store_code' => 0,
                 ];
+                if (!in_array($itemData['shipping_address'], $addressIdList)) {
+                    $addressIdList[] = $itemData['shipping_address'];
+                }
                 $useQtyFromOar = [];
                 $outStockFromOar = false;
                 foreach ($itemData['child'] as $childItem) {
@@ -513,6 +582,20 @@ class MultiShippingHandle
                     } else {
                         $childSku = $childItem->getSku();
                         $itemFromOAR = $splitOrderWithSku[$childSku];
+                        $shippingList = $itemFromOAR['shipping_list'];
+                        if (count($shippingList) == 1 && isset($shippingList[self::DC])) {
+                            // is_spo
+                            $this->hasSpo = true;
+                            $itemData['shipping_method'] = self::DC;
+                        } elseif (count($shippingList) <= 2 && isset($shippingList[self::TRANS_COURIER])) {
+                            // own_courier
+                            $this->hasFresh = true;
+                            $itemData['shipping_method'] = self::TRANS_COURIER;
+                        } elseif (count($shippingList) == 1 && in_array(self::SAME_DAY, $shippingList)) {
+                            $this->hasFresh = true;
+                        } else {
+                            $this->hasNormal = true;
+                        }
                         $childItemTotalQty = (int)$childItem->getQty() * $itemAddToQuoteAddress['qty'];
                         if ($childItemTotalQty <= (int)$itemFromOAR['quantity_allocated']) {
                             $useQtyFromOar[$childSku] = $itemData['qty'];
@@ -543,10 +626,16 @@ class MultiShippingHandle
                     $splitOrderWithSku = $this->rePareQtyFromOAR($useQtyFromOar, $splitOrderWithSku);
                     $itemsResponseOar[$quoteItemId] = $itemAddToQuoteAddress;
                     $ship[][$quoteItemId] = $itemAddToQuoteAddress;
+                    $this->itemsUpdate[$quoteItemId]['shipping_method'] = $itemAddToQuoteAddress['shipping_method'];
                 }
             }
         }
         $this->checkoutOarStock($items, $itemsResponseOar);
+        if (count($addressIdList) == 1
+            && (($this->hasNormal && $this->hasFresh) || ($this->hasNormal && $this->hasSpo) || ($this->hasFresh && $this->hasSpo))
+        ) {
+            $this->orderIsSplit = true;
+        }
         return ['ship' => $ship, 'validShippingMethod' => $validShippingMethod];
     }
 
@@ -569,7 +658,6 @@ class MultiShippingHandle
      */
     protected function checkoutOarStock($items, $itemsResponseOar)
     {
-        $storeCode = [];
         foreach ($items as $itemId => $item) {
             if ($item['shipping_method'] == self::STORE_PICK_UP) {
                 continue;
@@ -577,16 +665,11 @@ class MultiShippingHandle
             if (!isset($itemsResponseOar[$itemId])) {
                 $this->reloadMessage['out_stock'][] = $itemId;
                 $this->reload = true;
+                return;
             } elseif ($item['qty'] != $itemsResponseOar[$itemId]['qty']) {
                 $this->reloadMessage['low_stock'][] = $itemId;
                 $this->reload = true;
-                if (!in_array($itemsResponseOar[$itemId]['split_store_code'], $storeCode)) {
-                    $storeCode[] = $itemsResponseOar[$itemId]['split_store_code'];
-                }
             }
-        }
-        if (count($storeCode) > 1) {
-            $this->orderIsSplit = true;
         }
     }
 

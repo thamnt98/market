@@ -218,12 +218,9 @@ class VoucherManagement implements \SM\Checkout\Api\VoucherInterface
             $this->quoteRepository->save($quote);
 
         } catch (LocalizedException $e) {
-            throw new \Exception(__('The coupon code couldn\'t be applied: ' . $e->getMessage()), $e);
+            throw new \Exception(__("The coupon code couldn't be applied: " . $e->getMessage()));
         } catch (\Exception $e) {
-            throw new \Exception(
-                __("The coupon code couldn't be applied. Verify the coupon code and try again."),
-                $e
-            );
+            throw new \Exception(__("The coupon code couldn't be applied. Verify the coupon code and try again."));
         }
         /*$couponAfterCollect = explode(',', $quote->getCouponCode());
         if (!in_array($couponCode, $couponAfterCollect)) {

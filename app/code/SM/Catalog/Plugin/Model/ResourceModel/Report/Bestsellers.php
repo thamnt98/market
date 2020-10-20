@@ -189,7 +189,7 @@ class Bestsellers
             $data = [
                 'value' => $row['qty_ordered'],
             ];
-            $connection->update($tableName, $data, "`row_id`='{$productRowId}'");
+            $connection->update($tableName, $data, "`row_id`='{$productRowId}' AND `attribute_id`='{$attributeId}'");
         }
     }
 

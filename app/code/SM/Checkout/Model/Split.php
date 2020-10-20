@@ -362,6 +362,38 @@ class Split
                             'is_lowest' => 1
                         ]
                     ],
+                    [
+                        'name' => 'DC',
+                        'service_type' => 5,
+                        'courier' => [
+                            'id' => 5,
+                            'name' => 'DC',
+                            'service_type' => 5,
+                            'insurance' => 0,
+                            'fee' => [
+                                'base' => 50000,
+                                'additional' => 0,
+                                'total' => 50000
+                            ],
+                            'is_lowest' => 1
+                        ]
+                    ],
+                    [
+                        'name' => 'TransCourier',
+                        'service_type' => 6,
+                        'courier' => [
+                            'id' => 6,
+                            'name' => 'Transmart Courier',
+                            'service_type' => 6,
+                            'insurance' => 0,
+                            'fee' => [
+                                'base' => 20000,
+                                'additional' => 5000,
+                                'total' => 25000
+                            ],
+                            'is_lowest' => 1
+                        ]
+                    ]
                 ],
                 //'total_weight' => 0,
                 //'total_price' => 0,
@@ -395,6 +427,27 @@ class Split
                 //$order['total_weight'] += $item['weight'];
                 //$order['total_price'] += $item['price'];
                 //$order['total_qty'] += $item['quantity'];
+                /*if ($item['sku'] == '14346002001001') {
+                    unset($order['data']['shipping_list'][0]);
+                    unset($order['data']['shipping_list'][1]);
+                    unset($order['data']['shipping_list'][2]);
+                    unset($order['data']['shipping_list'][3]);
+                    unset($order['data']['shipping_list'][5]);
+                } elseif ($item['sku'] == 'Whiskas') {
+                    unset($order['data']['shipping_list'][0]);
+                    unset($order['data']['shipping_list'][2]);
+                    unset($order['data']['shipping_list'][3]);
+                    unset($order['data']['shipping_list'][4]);
+                } else {
+                    unset($order['data']['shipping_list'][0]);
+                    unset($order['data']['shipping_list'][1]);
+                    unset($order['data']['shipping_list'][2]);
+                    unset($order['data']['shipping_list'][3]);
+                    unset($order['data']['shipping_list'][4]);
+                    unset($order['data']['shipping_list'][5]);
+                }
+                $order['data']['store']['store_code'] += $j;
+                $sampleResponse['content'][] = $order;*/
             }
             $sampleResponse['content'][] = $order;
         }
@@ -405,6 +458,21 @@ class Split
      * @return array
      */
     public function getListMethodName()
+    {
+        return [
+            1 => __('Regular (2-7 days)'),
+            2 => __('Same day (3 hours)'),
+            3 => __('Scheduling'),
+            4 => __('Next day (1 day)'),
+            5 => __('Regular (2-7 days)'),
+            6 => __('Same day (3 hours)')
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function getListMethodFakeName()
     {
         return [
             1 => __('Regular (2-7 days)'),
@@ -458,7 +526,7 @@ class Split
                 [$table],
                 ['post_code']
             )
-            ->where('post_code = :post_code');
+                ->where('post_code = :post_code');
             $bind = [
                 ':post_code' => $postCode,
             ];

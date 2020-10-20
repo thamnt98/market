@@ -46,14 +46,15 @@ define([
     'use strict';
 
     let mod = {};
-    var imageData = window.checkoutConfig.imageData,
+    var notAvailableMethod = 'transshipping_transshipping0',
+        imageData = window.checkoutConfig.imageData,
         preSelectItems = window.checkoutConfig.pre_select_items,
         singleOrderIsFresh = false,
         processing = false,
         first = true,
         updateShortestStore = ko.observable(false),
         singleDeliveryMethodError = ko.observable(false),
-        singleDeliveryMethodValid = ko.observableArray(['transshipping_transshipping1', 'transshipping_transshipping2', 'transshipping_transshipping3', 'transshipping_transshipping4']),
+        singleDeliveryMethodValid = ko.observableArray(['transshipping_transshipping0', 'transshipping_transshipping1', 'transshipping_transshipping2', 'transshipping_transshipping3', 'transshipping_transshipping4']),
         singleStorePickUpError = ko.observable(false),
         firstOrderSelectAddressList = true,
         deliveryMethodListSingle = ko.observableArray([]),
@@ -130,13 +131,7 @@ define([
         });
         /* disableDeliveryList init each item id*/
         timeSlotListStatus[item.item_id] = ko.observable(true);
-        if (imageData[item.item_id] && imageData[item.item_id].own_courier == 1) {
-            singleOrderIsFresh = true;
-            shippingMethod = 'transshipping_transshipping2';
-            shippingMethodListValid[item.item_id] = ko.observableArray(['transshipping_transshipping2']);
-        } else {
-            shippingMethodListValid[item.item_id] = ko.observableArray(['transshipping_transshipping1', 'transshipping_transshipping2', 'transshipping_transshipping3', 'transshipping_transshipping4']);
-        }
+        shippingMethodListValid[item.item_id] = ko.observableArray(['transshipping_transshipping0', 'transshipping_transshipping1', 'transshipping_transshipping2', 'transshipping_transshipping3', 'transshipping_transshipping4']);
         storePickUpListError[item.item_id] = ko.observable(true);
         deliveryMethodListError[item.item_id] = ko.observable(false);
         if (preSelectThisItem.type == '1') {
@@ -170,15 +165,12 @@ define([
         dataSingleAddress[item.item_id] = defaultBillingId;
         if (preSelectThisItem.shipping_method == 'store_pickup_store_pickup') {
             var shippingMethod = 'transshipping_transshipping1';
-            if (imageData[item.item_id] && imageData[item.item_id].own_courier == 1) {
-                shippingMethod = 'transshipping_transshipping2';
-            }
         } else {
             var shippingMethod = preSelectThisItem.shipping_method;
         }
         shippingMethodSelectList[item.item_id] = ko.observable(shippingMethod);
         shippingMethodSelectList[item.item_id].subscribe(function (value) {
-            if (typeof value !== 'undefined' && !processing) {
+            if (typeof value !== 'undefined' && !processing && value != notAvailableMethod) {
                 console.log('shipping-method-change');
                 console.log(processing);
                 if (!processing) {
@@ -210,7 +202,7 @@ define([
     }, this);
 
     selectSingleShippingMethod.subscribe(function (value) {
-        if (typeof value !== 'undefined') {
+        if (typeof value !== 'undefined' && value != notAvailableMethod) {
             console.log('selectSingleShippingMethod => set shipping');
             mod.getShippingMethod();
         }
@@ -256,8 +248,32 @@ define([
                 return false;
             }
         });
+        console.log(oldValue);
+        console.log(newValue);
         if (typeof oldValue !== "undefined") {
+            console.log('store-pick-up-change');
             mod.getShippingMethod(true);
+        }
+    });
+
+    globalVar.splitOrder.subscribe(function (newValue) {
+        console.log('slit-order-change-status');
+        if (setShippingType.getValue()() == '0' && addressTagList().length == 1) {
+            if (newValue && !processing) {
+                // one address, delivery shipping, split order
+                mod.getShippingMethod();
+            } else {
+                // one address, delivery shipping, not split order
+                let currentItemsListId = currentItemsData.getCurrentItemsListId()().split(',');
+                if (currentItemsListId.length > 0) {
+                    let shippingMethod = shippingMethodSelectList[currentItemsListId[0]]();
+                    $('select[name="order-delivery-method"]  option[value="' + shippingMethod + '"]').prop("selected", true);
+                    selectSingleShippingMethod(shippingMethod);
+                    if (!processing) {
+                        $('select[name="order-delivery-method"]').trigger('change');
+                    }
+                }
+            }
         }
     });
 
@@ -462,29 +478,49 @@ define([
                 }
             },
             orderSelectAddressList = updateStatus.getOrderSelectAddressList()(),
-            orderDeliveryType = setShippingType.getValue()();
+            orderDeliveryType = setShippingType.getValue()(),
+            currentItemsListId = currentItemsData.getCurrentItemsListId()().split(',');
         if (orderSelectAddressList.length == 1) { // single address
             if (orderDeliveryType == '0') { // delivery
-                if (typeof selectSingleShippingMethod() !== 'undefined') {
-                    $.each(itemsDataSingleAddress(), function( itemId, addressId ) {
-                        let currentItems = currentItemsData.getCurrentItems();
-                        if (currentItems.indexOf(itemId.toString()) === -1) {
-                            return true;
-                        }
-                        let currentItem = currentItemsData.getCurrentItemsData(itemId),
-                            qty = itemsDataList[itemId]().qty;
-                        if (typeof currentItem !== "undefined") {
-                            if (parseInt(currentItem().qty) != parseInt(itemsDataList[itemId]().qty)) {
-                                qty = currentItem().qty;
+                if (globalVar.splitOrder()) {
+                    $.each(shippingMethodSelectList, function( itemId, rateSelected ) {
+                        if (typeof rateSelected() === 'undefined') {
+                            items = [];
+                            return false;
+                        } else {
+                            if($.inArray(itemId.toString(), currentItemsListId) === -1) {
+                                return true;
                             }
+                            let currentItem = currentItemsData.getCurrentItemsData(itemId),
+                                qty = itemsDataList[itemId]().qty;
+                            if (typeof currentItem !== "undefined") {
+                                if (parseInt(currentItem().qty) != parseInt(itemsDataList[itemId]().qty)) {
+                                    qty = currentItem().qty;
+                                }
+                            }
+                            items.push({"item_id": itemId, "qty": qty, "shipping_address_id": addressSelectedList[itemId](), "shipping_method_selected": rateSelected()});
                         }
-                        items.push({"item_id": itemId, "qty": qty, "shipping_address_id": addressId, "shipping_method_selected": selectSingleShippingMethod()});
                     });
+                } else {
+                    if (typeof selectSingleShippingMethod() !== 'undefined') {
+                        $.each(itemsDataSingleAddress(), function( itemId, addressId ) {
+                            if($.inArray(itemId.toString(), currentItemsListId) === -1) {
+                                return true;
+                            }
+                            let currentItem = currentItemsData.getCurrentItemsData(itemId),
+                                qty = itemsDataList[itemId]().qty;
+                            if (typeof currentItem !== "undefined") {
+                                if (parseInt(currentItem().qty) != parseInt(itemsDataList[itemId]().qty)) {
+                                    qty = currentItem().qty;
+                                }
+                            }
+                            items.push({"item_id": itemId, "qty": qty, "shipping_address_id": addressId, "shipping_method_selected": selectSingleShippingMethod()});
+                        });
+                    }
                 }
             } else if(orderDeliveryType == '1') { // store pickup
                 $.each(itemsDataSingleAddress(), function( itemId, addressId ) {
-                    let currentItems = currentItemsData.getCurrentItems();
-                    if (currentItems.indexOf(itemId.toString()) === -1) {
+                    if($.inArray(itemId.toString(), currentItemsListId) === -1) {
                         return true;
                     }
                     let currentItem = currentItemsData.getCurrentItemsData(itemId),
@@ -503,8 +539,7 @@ define([
             } else { // both
                 $.each(shippingMethodSelectList, function( itemId, rateSelected ) {
                     if (disableDeliveryList[itemId]()) {
-                        let currentItems = currentItemsData.getCurrentItems();
-                        if (currentItems.indexOf(itemId.toString()) === -1) {
+                        if($.inArray(itemId.toString(), currentItemsListId) === -1) {
                             return true;
                         }
                         let currentItem = currentItemsData.getCurrentItemsData(itemId),
@@ -524,8 +559,7 @@ define([
                             items = [];
                             return false;
                         } else {
-                            let currentItems = currentItemsData.getCurrentItems();
-                            if (currentItems.indexOf(itemId.toString()) === -1) {
+                            if($.inArray(itemId.toString(), currentItemsListId) === -1) {
                                 return true;
                             }
                             let currentItem = currentItemsData.getCurrentItemsData(itemId),
@@ -548,8 +582,7 @@ define([
                         items = [];
                         return false;
                     } else {
-                        let currentItems = currentItemsData.getCurrentItems();
-                        if (currentItems.indexOf(itemId.toString()) === -1) {
+                        if($.inArray(itemId.toString(), currentItemsListId) === -1) {
                             return true;
                         }
                         let currentItem = currentItemsData.getCurrentItemsData(itemId),
@@ -565,8 +598,7 @@ define([
             } else if(orderDeliveryType == '1') { // store pickup
                 console.log('two address store pickup');
                 $.each(itemsData(), function( itemId, addressId ) {
-                    let currentItems = currentItemsData.getCurrentItems();
-                    if (currentItems.indexOf(itemId.toString()) === -1) {
+                    if($.inArray(itemId.toString(), currentItemsListId) === -1) {
                         return true;
                     }
                     let currentItem = currentItemsData.getCurrentItemsData(itemId),
@@ -586,8 +618,7 @@ define([
                 console.log('two address both');
                 $.each(shippingMethodSelectList, function( itemId, rateSelected ) {
                     if (disableDeliveryList[itemId]()) {
-                        let currentItems = currentItemsData.getCurrentItems();
-                        if (currentItems.indexOf(itemId.toString()) === -1) {
+                        if($.inArray(itemId.toString(), currentItemsListId) === -1) {
                             return true;
                         }
                         let currentItem = currentItemsData.getCurrentItemsData(itemId),
@@ -607,8 +638,7 @@ define([
                             items = {};
                             return false;
                         } else {
-                            let currentItems = currentItemsData.getCurrentItems();
-                            if (currentItems.indexOf(itemId.toString()) === -1) {
+                            if($.inArray(itemId.toString(), currentItemsListId) === -1) {
                                 return true;
                             }
                             let currentItem = currentItemsData.getCurrentItemsData(itemId),
@@ -641,10 +671,12 @@ define([
             return;
         }
         if (!updateShortestStore() && Object.keys(storePickupItems).length !== 0) {
+            console.log('update-shortest-store');
             updateShortestStore(true);
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function (position) {
                     var latlng = {lat: Number(position.coords.latitude), lng: Number(position.coords.longitude)};
+
                     findStoreAction.searchShortestStoreAction(latlng, storePickupItems, true).done(
                         function (response) {
                             data.additional_info.store_pick_up.store_code = pickup.currentPickupId();
@@ -652,47 +684,45 @@ define([
                         }
                     ).fail(
                         function (response) {
-
+                            mod.getShippingMethodHandleAction(JSON.stringify(data));
                         }
                     );
-                    return;
                 }, function (error) {
+                    mod.getShippingMethodHandleAction(JSON.stringify(data));
                 });
+            } else {
+                mod.getShippingMethodHandleAction(JSON.stringify(data));
             }
 
         } else if (!first && Object.keys(storePickupItems).length !== 0) {
             findStoreAction.findStore(storePickupItems, true, true);
+            mod.getShippingMethodHandleAction(JSON.stringify(data));
+        } else {
+            mod.getShippingMethodHandleAction(JSON.stringify(data));
         }
-        mod.getShippingMethodHandleAction(JSON.stringify(data));
     };
 
     mod.getShippingMethodHandleAction = function (data) {
         first = false;
         singleDeliveryMethodError(false);
         singleDeliveryMethodValid.removeAll();
-        if (singleOrderIsFresh) {
-            singleDeliveryMethodValid.push('transshipping_transshipping2');
-        } else {
-            singleDeliveryMethodValid.push('transshipping_transshipping1');
-            singleDeliveryMethodValid.push('transshipping_transshipping2');
-            singleDeliveryMethodValid.push('transshipping_transshipping3');
-            singleDeliveryMethodValid.push('transshipping_transshipping4');
-        }
+        singleDeliveryMethodValid.push('transshipping_transshipping1');
+        singleDeliveryMethodValid.push('transshipping_transshipping2');
+        singleDeliveryMethodValid.push('transshipping_transshipping3');
+        singleDeliveryMethodValid.push('transshipping_transshipping4');
         $.each(itemsData(), function( itemId, addressId ) {
+            shippingMethodListValid[itemId].removeAll();
+            shippingMethodListValid[itemId].push('transshipping_transshipping1');
+            shippingMethodListValid[itemId].push('transshipping_transshipping2');
+            shippingMethodListValid[itemId].push('transshipping_transshipping3');
+            shippingMethodListValid[itemId].push('transshipping_transshipping4');
             deliveryMethodListError[itemId](false);
-            if (shippingMethodListValid[itemId]().length < 4) {
-                shippingMethodListValid[itemId].removeAll();
-                if (imageData[itemId] && imageData[itemId].own_courier == 1) {
-                    shippingMethodListValid[itemId].push('transshipping_transshipping2');
-                } else {
-                    shippingMethodListValid[itemId].push('transshipping_transshipping1');
-                    shippingMethodListValid[itemId].push('transshipping_transshipping2');
-                    shippingMethodListValid[itemId].push('transshipping_transshipping3');
-                    shippingMethodListValid[itemId].push('transshipping_transshipping4');
-                }
-            }
         });
         processing = true;
+        let updateIsSplitOrderStatus = false;
+        if (updateStatus.getOrderSelectAddressList()().length && setShippingType.getValue()() == 0) {
+            updateIsSplitOrderStatus = true;
+        }
         getShippingMethod(data).done(
             function (response) {
                 processing = false;
@@ -700,62 +730,98 @@ define([
                 if (response.reload) {
                     window.location.href = urlBuilder.build("transcheckout");
                     return;
-                } else if (response.error) {
-                    globalVar.disableGoPaymentButton(true);
-                    if (updateStatus.getOrderSelectAddressList()().length == 1) { // single address
-                        if (setShippingType.getValue()() == '2') { // both
-                            $.each(response.items_valid_method, function (index, data) {
-                                var itemId = data.item_id;
-                                if (shippingMethodSelectList[itemId]() == 'store_pickup_store_pickup') {
-                                    return true;
-                                }
-                                shippingMethodListValid[itemId].removeAll();
-                                $.each(data.valid_method, function (key, method) {
-                                    shippingMethodListValid[itemId].push(method.method_code);
-                                });
-                                if (shippingMethodListValid[itemId].indexOf(shippingMethodSelectList[itemId]()) === -1) {
-                                    deliveryMethodListError[itemId](true);
-                                }
-                            });
-                        } else if (setShippingType.getValue()() == '0') { // delivery
-                            singleDeliveryMethodValid.removeAll();
-                            $.each(response.items_valid_method, function (index, data) {
-                                $.each(data.valid_method, function (key, method) {
-                                    singleDeliveryMethodValid.push(method.method_code);
-                                });
-                                if (singleDeliveryMethodValid.indexOf(selectSingleShippingMethod()) === -1) {
-                                    singleDeliveryMethodError(true);
-                                }
-                                return false;
-                            });
+                }
+                if (updateIsSplitOrderStatus) {
+                    var currentItems = '';
+                    $.each(response.items_valid_method, function (index, data) {
+                        if (currentItems != '') {
+                            currentItems += ',';
                         }
-                    } else { // multiple address
+                        currentItems += data.item_id;
+                    });
+                    currentItemsData.setCurrentItemsListId(currentItems);
+                }
+                globalVar.disableGoPaymentButton(true);
+                if (updateStatus.getOrderSelectAddressList()().length == 1) { // single address
+                    if (setShippingType.getValue()() == '2' || response.is_split_order) { // both
                         $.each(response.items_valid_method, function (index, data) {
                             var itemId = data.item_id;
                             if (shippingMethodSelectList[itemId]() == 'store_pickup_store_pickup') {
                                 return true;
                             }
                             shippingMethodListValid[itemId].removeAll();
+                            var firsValidShippingMethod = notAvailableMethod,
+                                i = 0;
                             $.each(data.valid_method, function (key, method) {
+                                i++;
+                                if (i == 1) {
+                                    firsValidShippingMethod = method.method_code;
+                                }
                                 shippingMethodListValid[itemId].push(method.method_code);
                             });
                             if (shippingMethodListValid[itemId].indexOf(shippingMethodSelectList[itemId]()) === -1) {
                                 deliveryMethodListError[itemId](true);
+                                shippingMethodSelectList[itemId](firsValidShippingMethod);
                             }
                         });
+                    } else if (setShippingType.getValue()() == '0') { // delivery
+                        singleDeliveryMethodValid.removeAll();
+                        var firsValidShippingMethod = notAvailableMethod,
+                            i = 0;
+                        $.each(response.items_valid_method, function (index, data) {
+                            $.each(data.valid_method, function (key, method) {
+                                i++;
+                                if (i == 1) {
+                                    firsValidShippingMethod = method.method_code;
+                                }
+                                if (singleDeliveryMethodValid.indexOf(method.method_code) === -1) {
+                                    singleDeliveryMethodValid.push(method.method_code);
+                                }
+                            });
+                            if (singleDeliveryMethodValid.indexOf(selectSingleShippingMethod()) === -1) {
+                                singleDeliveryMethodError(true);
+                                selectSingleShippingMethod(firsValidShippingMethod);
+                            }
+                            return false;
+                        });
                     }
-                    if (!window.checkoutConfig.address_complete && setShippingType.getValue()() == '0' && currentItemsData.getCountItems() > 0) {
-                        globalVar.disableGoPaymentButton(false);
-                    }
-                    if (response.stock_message != '') {
-                        $('body').append("<p id='stock-message'>" + response.stock_message + "</p>");
-                        setTimeout(function()
-                        {
-                            $('#stock-message').remove();
-                        }, 6000);
-                    }
+                } else { // multiple address
+                    $.each(response.items_valid_method, function (index, data) {
+                        var itemId = data.item_id;
+                        if (shippingMethodSelectList[itemId]() == 'store_pickup_store_pickup') {
+                            return true;
+                        }
+                        shippingMethodListValid[itemId].removeAll();
+                        var firsValidShippingMethod = notAvailableMethod,
+                            i = 0;
+                        $.each(data.valid_method, function (key, method) {
+                            i++;
+                            if (i == 1) {
+                                firsValidShippingMethod = method.method_code;
+                            }
+                            shippingMethodListValid[itemId].push(method.method_code);
+                        });
+                        if (shippingMethodListValid[itemId].indexOf(shippingMethodSelectList[itemId]()) === -1) {
+                            deliveryMethodListError[itemId](true);
+                            shippingMethodSelectList[itemId](firsValidShippingMethod);
+                        }
+                    });
+                }
+                if (updateIsSplitOrderStatus) {
+                    var split = response.is_split_order;
+                    setShippingRates.refreshTotal().done(function (res) {
+                        globalVar.splitOrder(split);
+                    }).error(function (res) {
+                        globalVar.splitOrder(split);
+                    }).always(function () {
+                        globalVar.splitOrder(split);
+                    });
+                } else {
                     setShippingRates.refreshTotal();
-                    return;
+                }
+
+                if (!response.error) {
+                    globalVar.disableGoPaymentButton(false);
                 }
                 if (response.stock_message != '') {
                     $('body').append("<p id='stock-message'>" + response.stock_message + "</p>");
@@ -764,9 +830,6 @@ define([
                         $('#stock-message').remove();
                     }, 6000);
                 }
-                globalVar.splitOrder(response.is_split_order);
-                globalVar.disableGoPaymentButton(false);
-                setShippingRates.refreshTotal();
             }
         ).fail(
             function (response) {

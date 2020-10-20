@@ -53,7 +53,7 @@ define(
         };
 
         mod.refreshTotal = function () {
-            getTotalsAction([], $.Deferred());
+            return getTotalsAction([], $.Deferred());
         };
         return mod;
     }

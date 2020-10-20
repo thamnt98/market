@@ -38,48 +38,40 @@
                 <!-- ko ifnot: isMaxAddress() -->
                     <span class="line">|</span>
                     <a  class="sendtwo-address" href="#" data-bind="click: function(){ addMoreSelectedAddress(address().customerAddressId) }, i18n: '+ Send To 2 Addresses'"></a>
-                    <!-- ko if: isShow() -->
+                    <div data-bind="css: {'hidden': isHidden()}">
                         <p  class="title-delivery-method" data-bind="i18n: 'Delivery Method'"></p>
                         <select data-bind="attr: {'name': 'order-delivery-method'}, value: selectSingleShippingMethod, foreach: deliveryMethodListSingle">
-                            <option data-bind="attr: { disabled: $parent.isDisable(value), value: value }, i18n: label"></option>
+                            <option data-bind="css: {'hidden': $parent.isDisable(value)}, attr: { disabled: $parent.isDisable(value), value: value }, i18n: label"></option>
                         </select>
-                        <!-- ko if: isError -->
-                            <!-- ko ifnot: showNotify(address()) -->
-                                <p class="error-message abc"><!-- ko i18n: 'OAR: shipping method not available' --><!-- /ko --></p>
-                            <!-- /ko -->
-                        <!-- /ko -->
                         <!-- ko if: isShowSelectDateTime() -->
-                            <div class="store-pickup-datetime">
-                                <div class="store-pickup-date">
-                                    <p class="delivery-date-label" data-bind="i18n: 'Delivery Date'"></p>
-                                    <input readonly type="text" class="input-text" style="width: auto" name="single-schedule-date" data-bind="value: singleScheduleDate" afterRender="renderDate('single-schedule-date')"/>
-                                </div>
-                                <div class="store-pickup-time" data-bind="event: { mouseleave: closeTimeSlotList() }">
-                                    <p class="delivery-time-label" data-bind="i18n: 'Delivery Time'"></p>
-                                    <div class="wrap-timeslot">
+                        <div class="store-pickup-datetime">
+                            <div class="store-pickup-date">
+                                <p class="delivery-date-label" data-bind="i18n: 'Delivery Date'"></p>
+                                <input readonly type="text" class="input-text" style="width: auto" name="single-schedule-date" data-bind="value: singleScheduleDate" afterRender="renderDate('single-schedule-date')"/>
+                            </div>
+                            <div class="store-pickup-time" data-bind="event: { mouseleave: closeTimeSlotList() }">
+                                <p class="delivery-time-label" data-bind="i18n: 'Delivery Time'"></p>
+                                <div class="wrap-timeslot">
                                     <input readonly type="text" class="input-text _has-timepicker" style="width: auto" name="single-schedule-time" data-bind="click: function(){ openTimeSlotList() }, value: singleScheduleTime" afterRender="preSelectTimeSlot()"/>
                                     <!-- ko if: timeSlotListStatus-->
                                     <ul class="time-slot" data-bind="foreach: timeSlot">
                                         <li class="time-slot-item" data-bind="css: { selected: $parent.timeSlotSelected($data) }, text: $data, click: function(){ $parent.selectTimeSlot($data) }"></li>
                                     </ul>
                                     <!-- /ko -->
-                                    </div>
                                 </div>
                             </div>
+                        </div>
                         <!-- /ko -->
-                    <!-- /ko -->
+                    </div>
                 <!-- /ko -->
             <!-- /ko -->
             <!-- ko ifnot: isAddressComplete() -->
-                <!-- ko if: isShow() -->
+                <div data-bind="css: {'hidden': isHidden()}">
                     <p  class="title-delivery-method" data-bind="i18n: 'Delivery Method'"></p>
                     <select data-bind="attr: {'name': 'order-delivery-method'}, value: selectSingleShippingMethod, foreach: deliveryMethodListSingle">
                         <option data-bind="attr: { disabled: $parent.isDisable(value), value: value }, i18n: label"></option>
                     </select>
-                    <!-- ko if: showNotify(address()) -->
-                    <p class="error-message"><!-- ko i18n: 'shipping method not available' --><!-- /ko --></p>
-                    <!-- /ko -->
-                <!-- /ko -->
+                </div>
             <!-- /ko -->
         </div>
         <!-- ko if: showNotify(address()) -->

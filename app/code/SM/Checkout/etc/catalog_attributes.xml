@@ -7,6 +7,7 @@
         <attribute name="is_flashsale"/>
         <attribute name="flashsale_qty"/>
         <attribute name="flashsale_qty_per_customer"/>
+        <attribute name="is_service"/>
     </group>
     <group name="sale_order_item">
         <attribute name="is_warehouse"/>

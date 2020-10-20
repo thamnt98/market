@@ -15,8 +15,9 @@ define([
     'SM_Checkout/js/view/cart-items/init-shipping-type',
     'SM_Checkout/js/view/shipping-address/current-pickup',
     'SM_Checkout/js/view/default-shipping-method',
-    'SM_Checkout/js/view/shipping-address/single-date-time-select'
-], function ($, ko, Component, addressList, totals, setShippingType, getShippingMethod, updateStatus, initShippingType, pickup, defaultShipping, singleDateTime) {
+    'SM_Checkout/js/view/shipping-address/single-date-time-select',
+    'SM_Checkout/js/view/global-observable'
+], function ($, ko, Component, addressList, totals, setShippingType, getShippingMethod, updateStatus, initShippingType, pickup, defaultShipping, singleDateTime, globalVar) {
     'use strict';
 
     return Component.extend({
@@ -55,34 +56,25 @@ define([
             var self = this;
 
             self.deliveryPerItem = ko.computed(function() {
-                if (updateStatus.getOrderSelectAddressList()().length == 1 && setShippingType.getValue()() != '2') {
-                    return false;
-                }
                 var orderShippingType = setShippingType.getValue()();
-                if (orderShippingType == '0') {
+                if (
+                    orderShippingType == '2'
+                    || (orderShippingType == '0' && initShippingType.getAddressTagList()().length > 1)
+                    || (orderShippingType == '0' && initShippingType.getAddressTagList()().length == 1 && globalVar.splitOrder())
+                ) {
                     return true;
-                } else if (orderShippingType == '1') {
+                } else {
                     return false;
-                } else if (orderShippingType == '2') {
-                    return true;
                 }
-                return false;
             }, this);
 
             self.storePickUpPerItem = ko.computed(function() {
-                if (updateStatus.getOrderSelectAddressList()().length == 1 && setShippingType.getValue()() != '2') {
-                    return false;
-                }
-
                 var orderShippingType = setShippingType.getValue()();
-                if (orderShippingType == '0') {
+                if (orderShippingType == '2') {
+                    return true;
+                } else {
                     return false;
-                } else if (orderShippingType == '1') {
-                    return true;
-                } else if (orderShippingType == '2') {
-                    return true;
                 }
-                return false;
             }, this);
 
             self.isShowAddress = ko.computed(function() {

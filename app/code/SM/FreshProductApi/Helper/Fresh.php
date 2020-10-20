@@ -13,6 +13,7 @@ use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use SM\FreshProductApi\Api\Data\FreshProductInterface;
 use SM\FreshProductApi\Api\Data\FreshProductInterfaceFactory;
+use SM\FreshProduct\Helper\Data as HelperData;
 
 /**
  * Class Populate
@@ -32,18 +33,26 @@ class Fresh extends AbstractHelper
     protected $dataObjectHelper;
 
     /**
+     * @var HelperData
+     */
+    protected $freshHelper;
+
+    /**
      * Populate constructor.
      * @param Context $context
      * @param FreshProductInterfaceFactory $freshProductDataFactory
      * @param DataObjectHelper $dataObjectHelper
+     * @param HelperData $freshHelper
      */
     public function __construct(
         Context $context,
         FreshProductInterfaceFactory $freshProductDataFactory,
-        DataObjectHelper $dataObjectHelper
+        DataObjectHelper $dataObjectHelper,
+        HelperData $freshHelper
     ) {
         $this->dataObjectHelper = $dataObjectHelper;
         $this->freshProductDataFactory = $freshProductDataFactory;
+        $this->freshHelper = $freshHelper;
         parent::__construct($context);
     }
 
@@ -78,6 +87,7 @@ class Fresh extends AbstractHelper
             FreshProductInterface::WEIGHT => $this->getProduct()->getWeight(),
             FreshProductInterface::SOLD_IN => $this->validateAttribute(FreshProductInterface::SOLD_IN),
             FreshProductInterface::PRICE_IN_KG => $this->validateAttribute(FreshProductInterface::PRICE_IN_KG) ?? false,
+            FreshProductInterface::TOOLTIP => $this->freshHelper->getTooltip(),
         ];
     }
 

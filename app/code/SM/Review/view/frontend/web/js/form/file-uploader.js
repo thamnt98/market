@@ -164,7 +164,7 @@ define([
                 type: 'popup',
                 responsive: true,
                 modalClass: 'pp-shopping-list',
-                title: 'This format is not supported',
+                title: $.mage.__('This format is not supported'),
                 buttons: [{
                     text: $.mage.__('Got it!'),
                     class: 'action primary',

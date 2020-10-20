@@ -12,6 +12,7 @@ $GTMViewModel = $block->getData('gtm_view_model');
 /* @var $helper \SM\Catalog\Helper\Data */
 $helper = $this->helper('SM\Catalog\Helper\Data');
 $type = $helper->checkTypeBlock($block->getType());
+$freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
 ?>
 
 <?php
@@ -226,6 +227,15 @@ switch ($type) {
                                     </strong>
 
                                     <?= /* @noEscape */ $block->getProductPrice($_item) ?>
+
+                                    <?php if ($freshHelper->isFreshProduct($_item)) : ?>
+                                        <?php /** @var $freshBlock \SM\FreshProduct\Block\Product\View */ ?>
+                                        <?php $freshBlock = $block->getLayout()->getBlock('product.fresh') ?>
+
+                                        <?php if ($freshBlock) : ?>
+                                            <?= $freshBlock->setProduct($_item)->toHtml() ?>
+                                        <?php endif; ?>
+                                    <?php endif; ?>
 
                                     <?php if ($templateType) :?>
                                         <?php

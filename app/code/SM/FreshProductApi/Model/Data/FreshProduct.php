@@ -130,4 +130,20 @@ class FreshProduct extends DataObject implements FreshProductInterface
     {
         return $this->setData(self::PRICE_IN_KG, $value);
     }
+
+    /**
+     * @inheridoc
+     */
+    public function getTooltip()
+    {
+        return $this->getData(self::TOOLTIP);
+    }
+
+    /**
+     * @inheridoc
+     */
+    public function setTooltip($value)
+    {
+        return $this->setData(self::TOOLTIP, $value);
+    }
 }

@@ -32,6 +32,8 @@ class Onepage
     protected $cartUpdate = false;
     protected $isVirtual = false;
     protected $notFulFillMessage;
+    protected $currentItemsListId = [];
+    protected $isAddressEachItem = false;
     /**
      * @var \Magento\Framework\Api\SearchCriteriaBuilder
      */
@@ -266,8 +268,10 @@ class Onepage
         }
         if ($this->helperConfig->isActiveFulfillmentStore()) {
             $data['shipping_support'] = __('Transmart now delivers only to Jabodetabek area.');
-            $data['shipping_address_notify'] = __('Please change your delivery address to %1.', '<strong>Jabodetabek area</strong>' );
+            $data['shipping_address_notify'] = __('Please change your delivery address to %1.', '<strong>Jabodetabek area</strong>');
         }
+        $data['is_address_each_items'] = $this->isAddressEachItem;
+        $data['currentItemsListId'] = implode(",", $this->currentItemsListId);
         return $this->serializer->serialize($data);
     }
 
@@ -429,6 +433,10 @@ class Onepage
         }
         foreach ($quote->getAllVisibleItems() as $item) {
             $product = $item->getProduct();
+            if ($product->getData('is_spo') || $product->getData('own_courier')) {
+                $this->hasSpecialProduct = true;
+            }
+
             $isWarehouse = $product->getIsWarehouse();
             if ($isWarehouse == 1) {
                 $fulFill = false;
@@ -509,8 +517,7 @@ class Onepage
         $this->getCurrentQuoteItems($quote);
         foreach ($allShippingQuoteAddress as $address) {
             if (!$address->getShippingMethod() || $address->getShippingMethod() == '') {
-                $preSelect = false;
-                break;
+                $address->setShippingMethod(\SM\Checkout\Model\MultiShippingHandle::DEFAULT_METHOD);
             }
             if ($countShippingQuoteAddress == 1 && $address->getShippingMethod() != \SM\Checkout\Model\MultiShippingHandle::STORE_PICK_UP) {
                 $this->preSelectSingleShippingMethod = $address->getShippingMethod();
@@ -567,7 +574,6 @@ class Onepage
     protected function getItemPreSelect($quoteAddress, $allCustomerAddresses)
     {
         $items = [];
-        $updateShippingMethod = false;
         foreach ($quoteAddress->getAllVisibleItems() as $item) {
             if (!isset($this->currentQuoteItems[$item->getQuoteItemId()]) || $this->currentQuoteItems[$item->getQuoteItemId()]->getQty() != $item->getQty()) {
                 $this->cartUpdate = true;
@@ -579,13 +585,12 @@ class Onepage
                 $customerAddressId = $this->getDefaultShippingAddressId();
             }
             $shippingMethod = $quoteAddress->getShippingMethod();
-            $ownCourier = $item->getProduct()->getData('own_courier');
-            if ($ownCourier
-                && $shippingMethod != \SM\Checkout\Model\MultiShippingHandle::SAME_DAY
-                && $shippingMethod != \SM\Checkout\Model\MultiShippingHandle::STORE_PICK_UP
-            ) {
-                $updateShippingMethod = true;
+            /*if ($shippingMethod == \SM\Checkout\Model\MultiShippingHandle::DC) {
+                $shippingMethod = \SM\Checkout\Model\MultiShippingHandle::DEFAULT_METHOD;
             }
+            if ($shippingMethod == \SM\Checkout\Model\MultiShippingHandle::TRANS_COURIER) {
+                $shippingMethod = \SM\Checkout\Model\MultiShippingHandle::SAME_DAY;
+            }*/
             if ($shippingMethod == \SM\Checkout\Model\MultiShippingHandle::STORE_PICK_UP) {
                 $type = '1';
             } else {
@@ -602,14 +607,6 @@ class Onepage
                 'type' => $type,
                 'isSchedule' => $isSchedule
             ];
-        }
-        if ($updateShippingMethod) {
-            foreach ($items as $itemId => $item) {
-                $item['shipping_method'] = \SM\Checkout\Model\MultiShippingHandle::SAME_DAY;
-                $item['type'] = 0;
-                $item['isSchedule'] = false;
-                $items[$itemId] = $item;
-            }
         }
         return $items;
     }
@@ -632,14 +629,7 @@ class Onepage
             ];
         }
         foreach ($this->currentQuoteItems as $itemId => $item) {
-            $ownCourier = $item->getProduct()->getData('own_courier');
-            if ($ownCourier) {
-                $preSelectDataNew = $preSelectData;
-                $preSelectDataNew['shipping_method'] = \SM\Checkout\Model\MultiShippingHandle::SAME_DAY;
-                $items[$itemId] = $preSelectDataNew;
-            } else {
-                $items[$itemId] = $preSelectData;
-            }
+            $items[$itemId] = $preSelectData;
         }
         return $items + $preSelectItems;
     }
@@ -651,10 +641,7 @@ class Onepage
     {
         foreach ($quote->getAllVisibleItems() as $item) {
             $this->currentQuoteItems[$item->getId()] = $item;
-            $ownCourier = $item->getProduct()->getData('own_courier');
-            if ($ownCourier) {
-                $this->preSelectSingleShippingMethod = \SM\Checkout\Model\MultiShippingHandle::SAME_DAY;
-            }
+            $this->currentItemsListId[] = $item->getId();
         }
     }
 

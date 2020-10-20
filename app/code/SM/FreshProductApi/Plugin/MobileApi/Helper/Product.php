@@ -8,6 +8,7 @@
 
 namespace SM\FreshProductApi\Plugin\MobileApi\Helper;
 
+use SM\FreshProductApi\Api\Data\FreshProductInterface;
 use SM\FreshProductApi\Helper\Fresh;
 
 /**
@@ -16,6 +17,8 @@ use SM\FreshProductApi\Helper\Fresh;
  */
 class Product
 {
+    const SAME_DAY = 2;
+
     /**
      * @var Fresh
      */
@@ -36,7 +39,8 @@ class Product
      * @param \Magento\Catalog\Model\Product $product
      * @return \SM\MobileApi\Api\Data\Product\ListItemInterface
      */
-    public function afterGetProductListToResponseV2($subject, $result, $product) {
+    public function afterGetProductListToResponseV2($subject, $result, $product)
+    {
         if ($result) {
             $freshProductData = $this->fresh->populateObject($product);
             $result->setFreshProduct($freshProductData);
@@ -50,10 +54,20 @@ class Product
      * @param \Magento\Catalog\Model\Product $product
      * @return \SM\MobileApi\Api\Data\Product\ProductDetailsInterface
      */
-    public function afterGetProductDetailsToResponseV2($subject, $result, $product) {
+    public function afterGetProductDetailsToResponseV2($subject, $result, $product)
+    {
+        $data = [
+            [
+                'value' => self::SAME_DAY,
+                'label' => __('Instant (3 hours)')
+            ]
+        ];
         if ($result) {
             $freshProductData = $this->fresh->populateObject($product);
             $result->setFreshProduct($freshProductData);
+            if ($freshProductData[FreshProductInterface::OWN_COURIER] == true) {
+                $result->setDeliveryInto($data);
+            }
         }
         return $result;
     }

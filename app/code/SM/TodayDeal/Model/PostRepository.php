@@ -598,9 +598,12 @@ class PostRepository implements PostRepositoryInterface
                 continue;
             }
             $product = $this->productHelper->getProductListToResponseV2($product);
+            if (!is_array($product->getCategoryNames())) {
+                $product->setCategoryNames([]);
+            }
         }
 
-        return $result->setItems($products);
+        return $products;
     }
 
     /**
@@ -689,7 +692,7 @@ class PostRepository implements PostRepositoryInterface
             $searchCriteria->setCurrentPage($p);
 
             /** @var \SM\MobileApi\Api\Data\Product\ListItemInterface[] $products */
-            $products = $this->getProducts($searchCriteria)->getItems();
+            $products = $this->getProducts($searchCriteria);
 
             if (empty($event->getData('terms_conditions'))) {
                 $termCond = $event->getData('terms_conditions_default');

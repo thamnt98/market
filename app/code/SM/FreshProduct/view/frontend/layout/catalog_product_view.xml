@@ -22,5 +22,10 @@
                    before="-">
             </block>
         </referenceContainer>
+
+        <block class="SM\FreshProduct\Block\Product\View"
+               name="product.fresh"
+               template="SM_FreshProduct::checkout/cart/fresh-item.phtml"
+        />
     </body>
 </page>

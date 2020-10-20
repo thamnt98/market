@@ -15,6 +15,7 @@ interface FreshProductInterface
     const WEIGHT = "weight";
     const SOLD_IN = "sold_in";
     const PRICE_IN_KG = "price_in_kg";
+    const TOOLTIP = "tooltip";
 
 
     /**
@@ -93,4 +94,15 @@ interface FreshProductInterface
      * @return $this
      */
     public function setPriceInKg($value);
+
+    /**
+     * @return string
+     */
+    public function getTooltip();
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setTooltip($value);
 }

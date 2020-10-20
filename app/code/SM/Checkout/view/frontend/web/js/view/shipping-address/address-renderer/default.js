@@ -22,8 +22,10 @@ define([
     'SM_Checkout/js/view/cart-items/set-shipping-type',
     'SM_Checkout/js/view/default-shipping-method',
     'SM_Checkout/js/view/shipping-address/single-date-time-select',
+    'SM_Checkout/js/view/global-observable',
+    'SM_Checkout/js/view/cart-items/current-items',
     'mage/calendar'
-], function ($, ko, urlBuilder, Component, _, selectShippingAddressAction, quote, formPopUpState, checkoutData, customerData, shippingService, addressList, modal, updateStatus, initShippingType, setShippingType, defaultShipping, singleDateTime) {
+], function ($, ko, urlBuilder, Component, _, selectShippingAddressAction, quote, formPopUpState, checkoutData, customerData, shippingService, addressList, modal, updateStatus, initShippingType, setShippingType, defaultShipping, singleDateTime, globalVar, currentItemsData) {
     'use strict';
 
     var countryData = customerData.get('directory-data'),
@@ -158,11 +160,17 @@ define([
             }
         },
 
-        isShow: function () {
-            if (setShippingType.getValue()() == '2') {
+        isHidden: function () {
+            var orderShippingType = setShippingType.getValue()();
+            if (
+                orderShippingType == '2'
+                || (orderShippingType == '0' && initShippingType.getAddressTagList()().length > 1)
+                || (orderShippingType == '0' && initShippingType.getAddressTagList()().length == 1 && globalVar.splitOrder())
+            ) {
+                return true;
+            } else {
                 return false;
             }
-            return true;
         },
 
         isDisable: function (value) {

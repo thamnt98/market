@@ -249,7 +249,7 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
         $sprintOrder = $this->getSprintOrder();
 
         if ($sprintOrder->getId()) {
-            return $this->timeZone->date($sprintOrder->getExpireDate())->format('S F Y h:i A');
+            return $this->timeZone->date($sprintOrder->getExpireDate())->format('d F Y h:i A');
         }
         return '';
     }

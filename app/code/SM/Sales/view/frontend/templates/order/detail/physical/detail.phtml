@@ -293,8 +293,14 @@ if ($parentOrder) {
             <!--end shopping summary-->
             <div class="order-detail-bottom">
                 <div class="inner">
-                    <?php if ($parentOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::STATUS_IN_DELIVERY ||
-                        $parentOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::PICK_UP_BY_CUSTOMER): ?>
+                    <?php
+                        $statusesToShow = [
+                            \SM\Sales\Model\ParentOrderRepository::STATUS_IN_DELIVERY,
+                            \SM\Sales\Model\ParentOrderRepository::PICK_UP_BY_CUSTOMER,
+                            \SM\Sales\Model\ParentOrderRepository::STATUS_DELIVERED,
+                        ]
+                    ?>
+                    <?php if (in_array($parentOrder->getStatus(), $statusesToShow)): ?>
                         <button class="action secondary help-order-form"
                                 onclick="window.location.href='<?= $block->getUrl("help/contactus") ?>'"><?= $block->escapeHtml(__('I have a problem with this order')) ?></button>
                     <?php endif; ?>

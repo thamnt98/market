@@ -20,12 +20,9 @@
                 <input class="hidden" data-bind="attr: {'type': 'radio', 'name': 'delivery-type-per-item[' + $parents[1].item_id + ']', 'value': 0}, checked: isChecked($parents[1].item_id)" />
             </a>
             <!-- /ko -->
-            <select data-bind="value: selectShippingMethod($parents[1].item_id), foreach: getDeliveryMethodList($parents[1].item_id)">
-                <option data-bind="attr: { disabled: $parent.isDisable($parents[2].item_id, value), value: value }, text: label"></option>
+            <select data-bind="attr: {id: 'shipping-method-' + $parents[1].item_id}, disable: disableDelivery($parents[1].item_id), value: selectShippingMethod($parents[1].item_id), foreach: getDeliveryMethodList($parents[1].item_id)">
+                <option data-bind="css: {'hidden': $parent.isDisable($parents[2].item_id, value)}, attr: { disabled: $parent.isDisable($parents[2].item_id, value), value: value }, text: label"></option>
             </select>
-            <!-- ko if: isError($parents[1].item_id) -->
-                <p class="error-message" data-bind="i18n: 'OAR: shipping method not available'"></p>
-            <!-- /ko -->
         </div>
     </div>
     <!-- ko if: isShowSelectDateTime($parents[1].item_id) -->

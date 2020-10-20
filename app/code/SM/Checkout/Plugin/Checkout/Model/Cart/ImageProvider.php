@@ -76,11 +76,13 @@ class ImageProvider
         $items = $this->itemRepository->getList($cartId);
         /** @var \Magento\Quote\Model\Quote\Item $cartItem */
         foreach ($items as $cartItem) {
+            $product = $cartItem->getProduct();
             $allData = $this->customerDataItem->getItemData($cartItem);
             $imageData = $allData['product_image'];
-            $imageData['url'] = $cartItem->getProduct()->getProductUrl();
+            $imageData['url'] = $product->getProductUrl();
             $weight = $cartItem->getQty() * $cartItem->getProduct()->getWeight();
             $imageData['weight'] = round($weight, 2);
+            $imageData['is_spo'] = $product->getData('is_spo');
             $itemData[$cartItem->getItemId()] = $imageData;
         }
         return $itemData;

@@ -13,9 +13,18 @@ define([
 
     let currentItems = ko.observableArray([]),
         countItems = ko.observable(0),
+        currentItemsListId = ko.observable(window.checkoutConfig.currentItemsListId),
         currentItemsData = {};
 
     return {
+
+        setCurrentItemsListId: function (listId) {
+            currentItemsListId(listId);
+        },
+
+        getCurrentItemsListId: function () {
+            return currentItemsListId;
+        },
 
         setCurrentItems: function (itemId) {
             currentItems(itemId);

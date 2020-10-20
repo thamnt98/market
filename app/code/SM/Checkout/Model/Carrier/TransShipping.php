@@ -10,6 +10,7 @@ use Magento\Shipping\Model\Rate\Result;
 class TransShipping extends AbstractCarrier implements CarrierInterface
 {
     protected $freshOrder = false;
+    protected $isSpo = false;
     protected $postCode;
     protected $districtId;
 
@@ -172,10 +173,9 @@ class TransShipping extends AbstractCarrier implements CarrierInterface
         }
         foreach ($response['content'] as $data) {
             foreach ($data['data']['shipping_list'] as $shipping) {
-                if (isset($shipping['courier']['reason']) && $shipping['courier']['fee']['total'] == 0) {
-                    continue;
-                }
-                if ($this->freshOrder && $shipping['service_type'] != 2) {
+                if (
+                    isset($shipping['courier']['reason']) && $shipping['courier']['fee']['total'] == 0
+                ) {
                     continue;
                 }
                 $shippingMethodList[$shipping['service_type']] = $shipping['courier']['fee']['total'];
@@ -215,7 +215,8 @@ class TransShipping extends AbstractCarrier implements CarrierInterface
                 $rowTotal = (int)$all[$itemId]->getRowTotal();
                 $totalPrice += $rowTotal;
                 foreach ($parent[$itemId] as $childItem) {
-                    $ownCourier = $childItem->getProduct()->getData('own_courier');
+                    $product = $childItem->getProduct();
+                    $ownCourier = $product->getData('own_courier');
                     if ($ownCourier) {
                         $this->freshOrder = true;
                         $ownCourier = 1;
@@ -247,7 +248,8 @@ class TransShipping extends AbstractCarrier implements CarrierInterface
                 $itemsTrue = $all[$itemId];
                 $rowTotal = (int)$itemsTrue->getRowTotal();
                 $totalPrice += $rowTotal;
-                $ownCourier = $itemsTrue->getProduct()->getData('own_courier');
+                $product = $itemsTrue->getProduct();
+                $ownCourier = $product->getData('own_courier');
                 if ($ownCourier) {
                     $this->freshOrder = true;
                     $ownCourier = 1;
