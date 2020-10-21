@@ -24,6 +24,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
     const QUOTE_OPTION_KEY = 'installation_service';
 
+    const PRODUCT_ATTRIBUTE = 'installation';
+
     const OPTION_YES = 1;
     const OPTION_NO  = 0;
 

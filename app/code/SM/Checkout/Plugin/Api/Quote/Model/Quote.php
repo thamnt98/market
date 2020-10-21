@@ -434,7 +434,7 @@ class Quote extends \SM\Checkout\Plugin\Quote\Model\Quote
 
         $item = $this->getItem();
         $product = $this->productRepository->getById($item->getProduct()->getId());
-        $allowInstallation = $product->getData('is_service');
+        $allowInstallation = $product->getData(\SM\Installation\Helper\Data::PRODUCT_ATTRIBUTE);
         if ($allowInstallation == null || $allowInstallation == "") {
             $allowInstallation = false;
         }

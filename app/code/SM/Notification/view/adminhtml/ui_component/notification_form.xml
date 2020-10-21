@@ -343,6 +343,203 @@
                 <dataType>text</dataType>
                 <label translate="true">Redirect Type</label>
                 <dataScope>redirect_type</dataScope>
+                <switcherConfig>
+                    <rules>
+                        <rule name="0">
+                            <actions>
+                                <action name="0">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>disable</callback>
+                                </action>
+                                <action name="1">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>hide</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="1">
+                            <value>order</value>
+                            <actions>
+                                <action name="0">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>enable</callback>
+                                </action>
+                                <action name="1">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="2">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>filterOrderOptions</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="2">
+                            <value>voucher</value>
+                            <actions>
+                                <action name="0">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>enable</callback>
+                                </action>
+                                <action name="1">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="2">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>filterVoucherOptions</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="3">
+                            <value>help</value>
+                            <actions>
+                                <action name="0">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>enable</callback>
+                                </action>
+                                <action name="1">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="2">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>filterHelpOptions</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="4">
+                            <value>product</value>
+                            <actions>
+                                <action name="0">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>enable</callback>
+                                </action>
+                                <action name="1">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="2">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>filterProductOptions</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="5">
+                            <value>brand</value>
+                            <actions>
+                                <action name="0">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>enable</callback>
+                                </action>
+                                <action name="1">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="2">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>filterBrandOptions</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="6">
+                            <value>campaign</value>
+                            <actions>
+                                <action name="0">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>enable</callback>
+                                </action>
+                                <action name="1">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>show</callback>
+                                </action>
+                                <action name="2">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>filterCampaignOptions</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="7">
+                            <value>home</value>
+                            <actions>
+                                <action name="0">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>disable</callback>
+                                </action>
+                                <action name="1">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>hide</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="8">
+                            <value>cart</value>
+                            <actions>
+                                <action name="0">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>disable</callback>
+                                </action>
+                                <action name="1">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>hide</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="9">
+                            <value>shopping_list</value>
+                            <actions>
+                                <action name="0">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>disable</callback>
+                                </action>
+                                <action name="1">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>hide</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="10">
+                            <value>voucher_list</value>
+                            <actions>
+                                <action name="0">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>disable</callback>
+                                </action>
+                                <action name="1">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>hide</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="11">
+                            <value>subs</value>
+                            <actions>
+                                <action name="0">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>disable</callback>
+                                </action>
+                                <action name="1">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>hide</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                        <rule name="12">
+                            <value>gift</value>
+                            <actions>
+                                <action name="0">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>disable</callback>
+                                </action>
+                                <action name="1">
+                                    <target>notification_form.notification_form.web.redirect_id</target>
+                                    <callback>hide</callback>
+                                </action>
+                            </actions>
+                        </rule>
+                    </rules>
+                    <enabled>true</enabled>
+                </switcherConfig>
             </settings>
             <formElements>
                 <select>
@@ -353,17 +550,33 @@
                 </select>
             </formElements>
         </field>
-        <field name="redirect_id" sortOrder="90" formElement="input">
+        <field name="redirect_id" sortOrder="90" formElement="select">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="source" xsi:type="string">notification</item>
+                    <item name="elementTmpl" xsi:type="string">ui/grid/filters/elements/ui-select</item>
+                    <item name="component" xsi:type="string">SM_Notification/js/ui/form/element/redirect-key</item>
+                    <item name="filterOptions" xsi:type="boolean">true</item>
+                    <item name="showCheckbox" xsi:type="boolean">true</item>
+                    <item name="disableLabel" xsi:type="boolean">true</item>
+                    <item name="multiple" xsi:type="boolean">false</item>
                 </item>
             </argument>
             <settings>
                 <dataType>text</dataType>
                 <label translate="true">Redirect Key</label>
                 <dataScope>redirect_id</dataScope>
+                <validation>
+                    <rule name="required-entry" xsi:type="boolean">true</rule>
+                </validation>
             </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <caption translate="true">-- Please Select --</caption>
+                    </settings>
+                </select>
+            </formElements>
         </field>
     </fieldset>
     <fieldset name="push">

@@ -86,7 +86,7 @@ class Form extends \Magento\Framework\View\Element\Template
     {
         $product = $this->getProduct();
 
-        return (bool)$product->getData('is_service') && $this->helper->isEnabled();
+        return (bool)$product->getData(\SM\Installation\Helper\Data::PRODUCT_ATTRIBUTE) && $this->helper->isEnabled();
     }
 
     /**

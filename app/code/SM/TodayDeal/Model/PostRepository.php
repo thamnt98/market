@@ -590,17 +590,15 @@ class PostRepository implements PostRepositoryInterface
      */
     public function getProducts($searchCriteria)
     {
-        $result = $this->productRepository->getList($searchCriteria);
-        $products = $result->getItems();
-
-        foreach ($products as &$product) {
+        $results = $this->productRepository->getList($searchCriteria);
+        $items = $results->getItems();
+        $products = [];
+        foreach ($items as $product) {
             if ($product->getData("is_tobacco")) {
                 continue;
             }
             $product = $this->productHelper->getProductListToResponseV2($product);
-            if (!is_array($product->getCategoryNames())) {
-                $product->setCategoryNames([]);
-            }
+            $products[] = $product;
         }
 
         return $products;

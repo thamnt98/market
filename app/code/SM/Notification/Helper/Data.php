@@ -57,8 +57,26 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $state;
 
     /**
+     * @var \Amasty\ShopbyBrand\Helper\Data
+     */
+    protected $brandHelper;
+    
+    /**
+     * @var \SM\Help\Model\Url
+     */
+    protected $helpUrl;
+    
+    /**
+     * @var \SM\Help\Model\TopicRepository
+     */
+    protected $helpRepository;
+
+    /**
      * Data constructor.
      *
+     * @param \SM\Help\Model\Url                         $helpUrl
+     * @param \SM\Help\Model\TopicRepository             $helpRepository
+     * @param \Amasty\ShopbyBrand\Helper\Data            $brandHelper
      * @param \Magento\Framework\App\State               $state
      * @param \Magento\Catalog\Model\ProductRepository   $productRepository
      * @param \Magento\Framework\View\Asset\Repository   $assetRepo
@@ -66,6 +84,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Framework\App\Helper\Context      $context
      */
     public function __construct(
+        \SM\Help\Model\Url $helpUrl,
+        \SM\Help\Model\TopicRepository $helpRepository,
+        \Amasty\ShopbyBrand\Helper\Data $brandHelper,
         \Magento\Framework\App\State $state,
         \Magento\Catalog\Model\ProductRepository $productRepository,
         \Magento\Framework\View\Asset\Repository $assetRepo,
@@ -77,6 +98,9 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->storeManager = $storeManager;
         $this->productRepository = $productRepository;
         $this->state = $state;
+        $this->brandHelper = $brandHelper;
+        $this->helpUrl = $helpUrl;
+        $this->helpRepository = $helpRepository;
     }
 
     /**
@@ -213,14 +237,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             switch ($type) {
                 case RedirectType::TYPE_PDP:
                     return $this->productRepository->get($id)->getProductUrl();
-                case RedirectType::TYPE_TERM:
-                    return $this->_getUrl('') . '/help/terms-conditions.html';
+                case RedirectType::TYPE_HELP_PAGE:
+                    return $this->getHelpPageUrlById($id);
                 case RedirectType::TYPE_GIFT_LIST:
                     return $this->_getUrl('giftregistry');
                 case RedirectType::TYPE_SUBSCRIPTION_LIST:
                     return $this->_getUrl('amasty_recurring/customer/subscriptions');
                 case RedirectType::TYPE_BRAND:
-                    return $this->_getUrl($id);
+                    return $this->getBrandUrlByKey($id);
                 case RedirectType::TYPE_VOUCHER_LIST:
                     return $this->_getUrl('myvoucher/voucher/');
                 case RedirectType::TYPE_VOUCHER_DETAIL:
@@ -266,6 +290,41 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             }
         } catch (\Exception $e) {
             return false;
+        }
+    }
+
+    /**
+     * @param string $key
+     *
+     * @return string
+     */
+    public function getBrandUrlByKey($key)
+    {
+        $url = '#';
+
+        if ($key) {
+            $urlKey = $this->brandHelper->getBrandUrlKey();
+            $urlSuffix = $this->brandHelper->getSuffix();
+            $url = $this->_getUrl('') . (!!$urlKey ? $urlKey . '/' . $key : $key) . $urlSuffix;
+        }
+
+        return $url;
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return string
+     */
+    public function getHelpPageUrlById($id)
+    {
+        try {
+            /** @var \SM\Help\Model\Topic $help */
+            $help = $this->helpRepository->getById($id);
+
+            return $this->helpUrl->getTopicUrl($help);
+        } catch (\Exception $e) {
+            return '#';
         }
     }
 }

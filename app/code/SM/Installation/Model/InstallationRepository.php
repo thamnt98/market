@@ -60,7 +60,9 @@ class InstallationRepository implements \SM\Installation\Api\InstallationReposit
             $productId = $item->getProduct()->getId();
             /** @var \Magento\Catalog\Model\Product $product */
             $product = $this->productRepository->getById($productId);
-            if ($this->helper->isEnabled() && $product->getIsService()) {
+            if ($this->helper->isEnabled()
+                && $product->getData(\SM\Installation\Helper\Data::PRODUCT_ATTRIBUTE)
+            ) {
                 switch ($action) {
                     case 'remove':
                         $this->removeInstallationItem($item);

@@ -93,8 +93,8 @@ define([
             }
         });
         confirm({
-            title: $.mage.__('Delete Items'),
-            content: $.mage.__('Would you like to remove items?'),
+            title: $.mage.__('Remove Item(s)'),
+            content: $.mage.__('Are you sure you want to remove the item(s)?'),
             actions: {
                 confirm: function () {
                     //Remove selected items GTM
@@ -106,7 +106,28 @@ define([
                 },
                 cancel: function (){},
                 always: function (){}
-            }
+            },
+            buttons: [{
+                text: $.mage.__('Cancel'),
+                class: 'action-secondary action-dismiss',
+
+                /**
+                 * Click handler.
+                 */
+                click: function (event) {
+                    this.closeModal(event);
+                }
+            }, {
+                text: $.mage.__('Remove'),
+                class: 'action-primary action-accept',
+
+                /**
+                 * Click handler.
+                 */
+                click: function (event) {
+                    this.closeModal(event, true);
+                }
+            }]
         });
 
     });

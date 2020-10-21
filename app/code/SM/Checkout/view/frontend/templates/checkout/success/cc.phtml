@@ -22,9 +22,6 @@ $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
     <div class="total-payment">
         <label class="text-label-body"><?= $block->escapeHtml(__('Total Payment')) ?></label>
         <p class="text-body"><?= $block->getGrandTotal() ?></p>
-        <span class="text-label-body">
-        <?= $block->escapeHtml(__('We have authorized your card temporarily. You will be charged once your order is completed.')) ?>
-        </span>
     </div>
 
     <div class="total-payment payment-method">

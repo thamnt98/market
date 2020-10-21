@@ -12,10 +12,11 @@ define(
         'Magento_Ui/js/modal/modal',
         'Magento_Customer/js/customer-data',
         'SM_Coachmarks/js/view/maincoachmarks-flag',
+        'mage/url',
         'mage/translate',
-    ], function ($, modal, customerData, maincoachmarks) {
+    ], function ($, modal, customerData, maincoachmarks, urlBuilder) {
         'use strict';
-
+    let showPopup = false;
     $.widget(
         'sm.limitation', {
             _create: function () {
@@ -38,15 +39,19 @@ define(
             },
 
             showPopup: function () {
-                console.log(customerData.get('fulfillment')());
-                console.log(customerData.get('fulfillment')().show);
-                if (Object.keys(customerData.get('fulfillment')()).length > 0 && customerData.get('fulfillment')().show) {
+                if (customerData.get('fulfillment')().show || !maincoachmarks.coachMarks() || showPopup) {
                     return;
                 }
-                if (!maincoachmarks.coachMarks()) {
-                    return;
-                }
-                customerData.set('fulfillment', {show: true});
+                showPopup = true;
+                $.ajax({
+                    type: "POST",
+                    url: urlBuilder.build('transcheckout/Fulfillment/update'),
+                    dataType: "json",
+                    data: JSON.stringify({action: 'update'}),
+                    success: function (response) {
+
+                    }
+                });
                 var options = {
                     type: 'popup',
                     responsive: true,

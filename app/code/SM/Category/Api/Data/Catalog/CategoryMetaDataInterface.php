@@ -12,6 +12,10 @@ interface CategoryMetaDataInterface extends \Magento\Framework\Api\ExtensibleDat
     const GALLERY = 'gallery';
     const COLOR = 'color';
 
+    const IS_TOBACCO = "is_tobacco";
+    const IS_ALCOHOL = "is_alcohol";
+    const IS_FRESH = "is_fresh";
+
     /**
      * @return int
      */
@@ -46,4 +50,37 @@ interface CategoryMetaDataInterface extends \Magento\Framework\Api\ExtensibleDat
      * @return $this
      */
     public function setColor($data);
+
+    /**
+     * @return bool
+     */
+    public function getIsTobacco();
+
+    /**
+     * @return bool
+     */
+    public function getIsAlcohol();
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function setIsTobacco($value);
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function setIsAlcohol($value);
+
+    /**
+     * @return bool
+     */
+    public function getIsFresh();
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function setIsFresh($value);
 }

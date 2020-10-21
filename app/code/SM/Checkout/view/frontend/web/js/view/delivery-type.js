@@ -65,6 +65,9 @@ define([
                     });
                 }
             }, null, "arrayChange");
+            if (sortSourceDefault.length == 0) {
+                this.showNotFulfillmentPopup();
+            }
         },
 
         /**
@@ -98,14 +101,7 @@ define([
         deliveryTypeClick: function(value){
             var self = this;
             if (value == 1 && sortSourceDefault.length == 0) {
-                if ($('.pickup-not-avaliable-message').length == 0) {
-                    var message = window.checkoutConfig.notFulFillMessage;
-                    $('body').append('<div class="pickup-not-avaliable-message" style="display:none">' + message + '</div>');
-                }
-                $('.pickup-not-avaliable-message').fadeIn('slow');
-                setTimeout(function(){
-                    $('.pickup-not-avaliable-message').fadeOut('slow');
-                },2000);
+                this.showNotFulfillmentPopup();
                 return;
             }
             if (self.orderDeliveryType().length != deliveryTypeList.length && self.orderDeliveryType.indexOf(value) == -1) {
@@ -123,14 +119,7 @@ define([
                 orderShippingType.setAddressNotCompleteNotify(true);
                 return;
             } else if (sortSourceDefault.length == 0) {
-                if ($('.showboth-not-avaliable-message').length == 0) {
-                    var message = window.checkoutConfig.notFulFillMessage;
-                    $('body').append('<div class="pickup-not-avaliable-message showboth-not-avaliable-message" style="display:none">' + message + '</div>');
-                }
-                $('.showboth-not-avaliable-message').fadeIn('slow');
-                setTimeout(function(){
-                    $('.showboth-not-avaliable-message').fadeOut('slow');
-                },2000);
+                this.showNotFulfillmentPopup();
                 return;
             }
             if (this.orderDeliveryType().length == deliveryTypeList.length) {
@@ -157,6 +146,19 @@ define([
                 return false;
             }
             return true;
+        },
+
+        showNotFulfillmentPopup: function () {
+            var time = 2000;
+            if ($('.pickup-not-avaliable-message').length == 0) {
+                var message = window.checkoutConfig.notFulFillMessage;
+                $('body').append('<div class="pickup-not-avaliable-message" style="display:none">' + message + '</div>');
+                time = 5000;
+            }
+            $('.pickup-not-avaliable-message').fadeIn('slow');
+            setTimeout(function(){
+                $('.pickup-not-avaliable-message').fadeOut('slow');
+            },time);
         }
     });
 });

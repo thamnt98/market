@@ -18,4 +18,48 @@
     <!-- *** Amasty *** -->
     <preference for="Amasty\Rgrid\Controller\Adminhtml\Promo\Quote\Duplicate"
                 type="SM\Promotion\Override\AmastyRgrid\Controller\Adminhtml\Promo\Quote\Duplicate" />
+
+    <!-- Defined -->
+    <type name="SM\Notification\Ui\Component\Form\Modify\Columns\RedirectKey">
+        <arguments>
+            <argument name="options" xsi:type="array">
+                <item name="order" xsi:type="object">
+                    SM\Notification\Model\Source\RedirectKey\Order
+                </item>
+                <item name="product" xsi:type="object">
+                    SM\Notification\Model\Source\RedirectKey\Product
+                </item>
+                <item name="voucher" xsi:type="object">
+                    SM\Notification\Model\Source\RedirectKey\Voucher
+                </item>
+                <item name="brand" xsi:type="object">
+                    SM\Notification\Model\Source\RedirectKey\Brand
+                </item>
+                <item name="campaign" xsi:type="object">
+                    SM\Notification\Model\Source\RedirectKey\Campaign
+                </item>
+                <item name="help" xsi:type="object">
+                    SM\Notification\Model\Source\RedirectKey\Help
+                </item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="SM\Notification\Ui\Component\Form\DataProvider">
+        <arguments>
+            <argument name="pool" xsi:type="object">SM\Notification\DataProvider\Modifier\Pool</argument>
+        </arguments>
+    </type>
+    <virtualType name="SM\Notification\DataProvider\Modifier\Pool"
+                 type="Magento\Ui\DataProvider\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="sm_notification_redirect_key" xsi:type="array">
+                    <item name="class" xsi:type="string">
+                        SM\Notification\Ui\Component\Form\Modify\Columns\RedirectKey
+                    </item>
+                    <item name="sortOrder" xsi:type="number">10</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
 </config>

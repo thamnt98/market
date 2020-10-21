@@ -16,6 +16,7 @@
 
 namespace SM\LayeredNavigation\Plugin\MagentoElasticsearch\Model\Adapter\BatchDataMapper;
 
+use Magento\Catalog\Model\Product\Attribute\Source\Status as ProductStatus;
 use SM\CustomPrice\Model\Customer as CustomerPrice;
 
 class ProductDataMapper
@@ -24,19 +25,14 @@ class ProductDataMapper
     const DISCOUNT_PERCENT_PREFIX     = 'discount_percent_';
 
     /**
-     * @var \Magento\GroupedProduct\Model\ResourceModel\Product\Link
+     * @var \Magento\Framework\DB\Adapter\AdapterInterface
      */
-    protected $groupLink;
+    protected $connection;
 
     /**
-     * @var \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable
+     * @var \Magento\CatalogSearch\Model\Indexer\Fulltext\Action\DataProvider
      */
-    protected $configurableLink;
-
-    /**
-     * @var \Magento\Bundle\Model\Product\Type
-     */
-    protected $bundleLink;
+    protected $dataProvider;
 
     /**
      * @var int
@@ -49,9 +45,9 @@ class ProductDataMapper
     protected $specialAttrId;
 
     /**
-     * @var \Magento\Framework\DB\Adapter\AdapterInterface
+     * @var int
      */
-    protected $connection;
+    protected $statusAttrId;
 
     /**
      * @var array
@@ -61,44 +57,86 @@ class ProductDataMapper
     /**
      * @var array
      */
-    protected $attributeIds = [];
+    protected $basePriceAttributes = [];
 
     /**
      * @var array
      */
-    protected $basePriceAttributes = [];
+    protected $dynamicPriceAttributes = [];
+
+    /**
+     * @var array
+     */
+    protected $allProductId = [];
+
+    /**
+     * @var array
+     */
+    protected $parentProduct = [];
+
+    /**
+     * @var array
+     */
+    protected $productRawData = [];
+
+    /**
+     * @var array
+     */
+    protected $bundleOptions = [];
 
     /**
      * ProductDataMapper constructor.
      *
-     * @param \Magento\Framework\App\ResourceConnection                                  $resource
-     * @param \Magento\Catalog\Model\ResourceModel\Eav\Attribute                         $attribute
-     * @param \Magento\Bundle\Model\Product\Type                                         $bundleLink
-     * @param \Magento\GroupedProduct\Model\ResourceModel\Product\Link                   $groupLink
-     * @param \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable $configurableLink
+     * @param \Magento\CatalogSearch\Model\Indexer\Fulltext\Action\DataProvider $dataProvider
+     * @param \Magento\Framework\App\ResourceConnection                         $resource
      */
     public function __construct(
-        \Magento\Framework\App\ResourceConnection $resource,
-        \Magento\Catalog\Model\ResourceModel\Eav\Attribute $attribute,
-        \Magento\Bundle\Model\Product\Type $bundleLink,
-        \Magento\GroupedProduct\Model\ResourceModel\Product\Link $groupLink,
-        \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable $configurableLink
+        \Magento\CatalogSearch\Model\Indexer\Fulltext\Action\DataProvider $dataProvider,
+        \Magento\Framework\App\ResourceConnection $resource
     ) {
         $this->connection = $resource->getConnection();
-        $this->groupLink = $groupLink;
-        $this->configurableLink = $configurableLink;
-        $this->bundleLink = $bundleLink;
-        $this->priceAttrId = $attribute->getIdByCode(\Magento\Catalog\Model\Product::ENTITY, 'price');
-        $this->specialAttrId = $attribute->getIdByCode(\Magento\Catalog\Model\Product::ENTITY, 'special_price');
+        $this->dataProvider = $dataProvider;
         $this->construct();
     }
 
-    public function construct()
+    protected function construct()
     {
-        $select = $this->connection->select();
-        $select->from('eav_attribute', 'attribute_code')
-            ->where('attribute_code like ?', '%' . CustomerPrice::PREFIX_OMNI_NORMAL_PRICE . '%');
-        $this->basePriceAttributes = $this->connection->fetchCol($select);
+        if (empty($this->dynamicPriceAttributes)) {
+            $select = $this->connection->select();
+            $select->from(['a' => 'eav_attribute'], ['attribute_code', 'attribute_id'])
+                ->join(
+                    ['t' => 'eav_entity_type'],
+                    'a.entity_type_id = t.entity_type_id',
+                    []
+                )->where(
+                    't.entity_type_code = ?',
+                    \Magento\Catalog\Model\Product::ENTITY
+                )->where(
+                    "attribute_code LIKE '%" . CustomerPrice::PREFIX_OMNI_NORMAL_PRICE . "%' "
+                    . "OR attribute_code LIKE '%" . CustomerPrice::PREFIX_OMNI_FINAL_PRICE . "%' "
+                    . "OR attribute_code IN ('price','status','special_price')"
+                );
+            $data = $this->connection->fetchAll($select);
+            $this->dynamicPriceAttributes = array_combine(
+                array_column($data, 'attribute_code'),
+                array_column($data, 'attribute_id')
+            );
+
+            if (isset($this->dynamicPriceAttributes['price'])) {
+                $this->priceAttrId = $this->dynamicPriceAttributes['price'];
+                unset($this->dynamicPriceAttributes['price']);
+            }
+
+            if (isset($this->dynamicPriceAttributes['special_price'])) {
+                $this->specialAttrId = $this->dynamicPriceAttributes['special_price'];
+                unset($this->dynamicPriceAttributes['special_price']);
+            }
+
+            if (isset($this->dynamicPriceAttributes['status'])) {
+                $this->statusAttrId = $this->dynamicPriceAttributes['status'];
+                unset($this->dynamicPriceAttributes['status']);
+            }
+        }
     }
 
     /**
@@ -112,142 +150,189 @@ class ProductDataMapper
         $result
     ) {
         $this->result = $result;
+        $this->prepareProductData(array_keys($result));
+
         foreach ($this->result as $productId => $data) {
-            $this->convertData($data, $productId);
+            $this->convertData($productId);
         }
 
         return $this->result;
     }
 
-    protected function convertData($document, $productId)
-    {
-        $type = $this->getProductType($productId);
-        foreach ($this->basePriceAttributes as $attrCode) {
-            $this->updateBasePrice($attrCode, $productId, $document, $type);
-            $locationCode = str_replace(CustomerPrice::PREFIX_OMNI_NORMAL_PRICE, '', $attrCode);
-            $code = self::DISCOUNT_PERCENT_PREFIX . $locationCode;
-            $document[$code] = $this->prepareDiscountValue(
-                (float)$document[$attrCode],
-                (float)$document[CustomerPrice::PREFIX_OMNI_FINAL_PRICE . $locationCode] ?? 0
-            );
-        }
-
-        // Discount percent by magento price
-//        $magentoPrice = (float)$this->getPrice($productId);
-//        $magentoSpecial = (float)$this->getPrice($productId, true);
-//        if ($magentoPrice > $magentoSpecial) {
-//            $document[self::DISCOUNT_PERCENT_FIELD_NAME] = $this->prepareDiscountValue(
-//                $magentoSpecial,
-//                $magentoSpecial
-//            );
-//        } else {
-//            $document[self::DISCOUNT_PERCENT_FIELD_NAME] = 0;
-//        }
-
-        $this->result[$productId] = $document;
-    }
-
     /**
-     * @param string $code
-     * @param int|string $productId
-     * @param array $document
-     * @param string $type
+     * @param int   $productId
      */
-    protected function updateBasePrice($code, $productId, &$document, $type)
+    protected function convertData($productId)
     {
-        if (strpos($code, CustomerPrice::PREFIX_OMNI_NORMAL_PRICE) !== 0) {
+        if (empty($this->productRawData[$productId]['type_id'])) {
             return;
         }
 
-        $specialCode = str_replace(
-            CustomerPrice::PREFIX_OMNI_NORMAL_PRICE,
-            CustomerPrice::PREFIX_OMNI_FINAL_PRICE,
-            $code
-        );
+        $type = $this->productRawData[$productId]['type_id'];
+        foreach ($this->basePriceAttributes as $attrCode) {
+            $locationCode = (int)str_replace(CustomerPrice::PREFIX_OMNI_NORMAL_PRICE, '', $attrCode);
 
-        if ($type === 'simple') {
-            $document[$code] = $document[$code] ?? 0;
-            $document[$specialCode] = $document[$specialCode] ?? 0;
-        } else {
-            $childrenIds = $this->getChildrenIds($productId);
-            if ($type === \Magento\Bundle\Model\Product\Type::TYPE_CODE) {
-                $minPrice = ['price' => 0, 'special' => 0];
-                foreach ($childrenIds as $optionId => $optionProductIds) {
-                    $minOptionPrice = $this->getMinPrice($optionProductIds, $code, $specialCode);
-                    $qty = $this->getBundleOptionQty($productId, $optionId, $minOptionPrice['productId'] ?? 0);
-                    $minPrice['price'] += ($minOptionPrice['price'] ?? 0) * $qty;
-                    $minPrice['special'] += ($minOptionPrice['special'] ?? 0) * $qty;
-                }
-            } else {
-                $minPrice = $this->getMinPrice($childrenIds, $code, $specialCode);
+            if (!$locationCode) {
+                continue;
             }
 
-            $document[$code] = $minPrice['price'] ?? 0;
-            $document[$specialCode] = $minPrice['special'] ?? 0;
-        }
+            switch ($type) {
+                case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
+                case \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE:
+                    $this->updateConfigGroup($productId, $locationCode);
+                    break;
+                case \Magento\Bundle\Model\Product\Type::TYPE_CODE:
+                    $this->updateBundlePrice($productId, $locationCode);
+                    break;
+                default:
+                    $this->updateSimplePrice($productId, $locationCode);
+            }
 
-        $locationCode = str_replace(CustomerPrice::PREFIX_OMNI_NORMAL_PRICE, '', $code);
-        $saleOffCode = \SM\LayeredNavigation\Helper\Data\FilterList::DISCOUNT_OPTION_CODE . '_' . $locationCode;
-        if ($document[$specialCode] == 0 || $document[$specialCode] > $document[$code]) {
-            $document[$specialCode] = $document[$code];
-            $document[$saleOffCode] = 0;
-        } else {
-            $document[$saleOffCode] = $document[$specialCode] < $document[$code] ? 1 : 0;
+            $this->updateOnSale($productId, $locationCode);
+            $this->updateDiscountPercent($productId, $locationCode);
         }
     }
 
     /**
-     * @param array $productIds
-     * @param       $baseCode
-     * @param       $promoCode
+     * Update base price for single product.
+     *
+     * @param int|string $productId
+     * @param string     $code
+     */
+    protected function updateSimplePrice($productId, $code)
+    {
+        if (empty($this->result[$productId])) {
+            return;
+        }
+
+        $baseAttr = CustomerPrice::PREFIX_OMNI_NORMAL_PRICE . $code;
+        $specialAttr = CustomerPrice::PREFIX_OMNI_FINAL_PRICE . $code;
+        $this->result[$productId][$baseAttr] = $this->getPrice($productId, $baseAttr);
+        $this->result[$productId][$specialAttr] = $this->getPrice($productId, $specialAttr, true);
+    }
+
+    /**
+     * Update base price for configurable, group product.
+     *
+     * @param int|string $productId
+     * @param string     $code
+     */
+    protected function updateConfigGroup($productId, $code)
+    {
+        if (empty($this->result[$productId]) || empty($this->parentProduct[$productId])) {
+            return;
+        }
+
+        $baseAttr = CustomerPrice::PREFIX_OMNI_NORMAL_PRICE . $code;
+        $specialAttr = CustomerPrice::PREFIX_OMNI_FINAL_PRICE . $code;
+        $minPrice = $this->getMinChildrenPrice($this->parentProduct[$productId], $baseAttr, $specialAttr);
+        $this->result[$productId][$baseAttr] = $minPrice['price'] ?? 0;
+        $this->result[$productId][$specialAttr] = $minPrice['special'] ?? 0;
+    }
+
+    /**
+     * Update base price for bundle product.
+     *
+     * @param int|string $productId
+     * @param string     $code
+     */
+    protected function updateBundlePrice($productId, $code)
+    {
+        if (empty($this->result[$productId]) || empty($this->bundleOptions[$productId])) {
+            return;
+        }
+
+        $minPrice = ['price' => 0, 'special' => 0];
+        $baseAttr = CustomerPrice::PREFIX_OMNI_NORMAL_PRICE . $code;
+        $specialAttr = CustomerPrice::PREFIX_OMNI_FINAL_PRICE . $code;
+
+        foreach ($this->bundleOptions[$productId] as $optionId => $optionProduct) {
+            $minOption = $this->getMinChildrenPrice(array_keys($optionProduct), $code);
+            $qty = $optionProduct[$minOption['productId']] ?? 1;
+            $minPrice['price'] += ($minOption['price'] ?? 0) * $qty;
+            $minPrice['special'] += ($minOption['special'] ?? 0) * $qty;
+        }
+
+        $this->result[$productId][$baseAttr] = $minPrice['price'] ?? 0;
+        $this->result[$productId][$specialAttr] = $minPrice['special'] ?? 0;
+    }
+
+    /**
+     * Update on sale product by location code.
+     *
+     * @param int|string $productId
+     * @param string     $code
+     */
+    protected function updateOnSale($productId, $code)
+    {
+        if (empty($this->result[$productId])) {
+            return;
+        }
+
+        $baseAttr = CustomerPrice::PREFIX_OMNI_NORMAL_PRICE . $code;
+        $specialAttr = CustomerPrice::PREFIX_OMNI_FINAL_PRICE . $code;
+        $saleOffCode = \SM\LayeredNavigation\Helper\Data\FilterList::DISCOUNT_OPTION_CODE . '_' . $code;
+        $data = $this->result[$productId];
+        if ($data[$specialAttr] == 0 || $data[$specialAttr] > $data[$baseAttr]) {
+            $this->result[$productId][$specialAttr] = $data[$baseAttr];
+            $this->result[$productId][$saleOffCode] = 0;
+        } else {
+            $this->result[$productId][$saleOffCode] = $data[$specialAttr] < $data[$baseAttr] ? 1 : 0;
+        }
+    }
+
+    /**
+     * Update discount percent product by location code.
+     *
+     * @param int|string $productId
+     * @param string     $code
+     */
+    protected function updateDiscountPercent($productId, $code)
+    {
+        if (empty($this->result[$productId])) {
+            return;
+        }
+
+        $discountCode = self::DISCOUNT_PERCENT_PREFIX . $code;
+        $baseAttr = CustomerPrice::PREFIX_OMNI_NORMAL_PRICE . $code;
+        $specialAttr = CustomerPrice::PREFIX_OMNI_FINAL_PRICE . $code;
+        $this->result[$productId][$discountCode] = $this->prepareDiscountValue(
+            (float)$this->result[$productId][$baseAttr],
+            (float)$this->result[$productId][$specialAttr] ?? 0
+        );
+    }
+
+    /**
+     * @param array    $productIds
+     * @param string   $code
+     * @param null|int $returnId
      *
      * @return array
      */
-    protected function getMinPrice($productIds, $baseCode, $promoCode)
+    protected function getMinChildrenPrice($productIds, $code, $returnId = null)
     {
-        $realPrice = 0;
-        $realSpecial = 0;
-        $minProductId = 0;
+        $realPrice = $realSpecial = $minProductId = 0;
+        $baseAttr = CustomerPrice::PREFIX_OMNI_NORMAL_PRICE . $code;
+        $specialAttr = CustomerPrice::PREFIX_OMNI_FINAL_PRICE . $code;
         foreach ($productIds as $childrenId) {
             if (!$this->isSalable($childrenId)) {
                 continue;
             }
 
-            $childrenType = $this->getProductType($childrenId);
-            if ($childrenType === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
-                $configPrice = $this->getMinPrice(
-                    $this->getChildrenIds($childrenId),
-                    $baseCode,
-                    $promoCode
+            if (!empty($this->parentProduct[$childrenId])) {
+                $min = $this->getMinChildrenPrice(
+                    $this->parentProduct[$childrenId],
+                    $code,
+                    $returnId ?: $childrenId
                 );
 
-                $price = $configPrice['price'] ?? 0;
-                $special = $configPrice['special'] ?? 0;
+                $price = (float)($min['price'] ?? 0);
+                $special = (float)($min['special'] ?? 0);
             } else {
-                if (isset($this->result[$childrenId][$baseCode])) {
-                    $price = $this->result[$childrenId][$baseCode] ?? 0;
-                } else {
-                    $price = $this->getRawBasePrice($childrenId, $baseCode);
-                }
-
-                if (isset($this->result[$childrenId][$promoCode])) {
-                    $special = $this->result[$childrenId][$promoCode] ?? 0;
-                } else {
-                    $special = $this->getRawBasePrice($childrenId, $promoCode);
-                }
+                $price = $this->getPrice($childrenId, $baseAttr);
+                $special = $this->getPrice($childrenId, $specialAttr, true);
             }
 
-            if ($childrenType === \Magento\Bundle\Model\Product\Type::TYPE_CODE) {
-                if (((float) $price) <= 0) {
-                    $price = $this->getPrice($childrenId);
-                }
-                if (((float) $special) <= 0) {
-                    $special = $this->getPrice($childrenId, true);
-                }
-            }
-
-            $price = (float) $price;
-            $special = (float) $special;
             if (!$special || $special > $price) {
                 $special = $price;
             }
@@ -266,7 +351,26 @@ class ProductDataMapper
             }
         }
 
-        return ['price' => $realPrice, 'special' => $realSpecial, 'productId' => $minProductId];
+        return ['price' => $realPrice, 'special' => $realSpecial, 'productId' => $returnId ?: $minProductId];
+    }
+
+    /**
+     * @param int    $productId
+     * @param string $priceCode
+     * @param false  $isSpecial
+     *
+     * @return float
+     */
+    protected function getPrice($productId, $priceCode, $isSpecial = false)
+    {
+        $price = (float)($this->productRawData[$productId][$priceCode] ?? 0);
+
+        if (!$price) {
+            $rawCode = $isSpecial ? 'special_price' : 'price';
+            $price = (float)($this->productRawData[$productId][$rawCode] ?? 0);
+        }
+
+        return $price;
     }
 
     /**
@@ -277,40 +381,14 @@ class ProductDataMapper
      */
     protected function prepareDiscountValue($basePrice, $promoPrice)
     {
-        if (is_array($basePrice)) {
-            $result = [];
-            foreach ($basePrice as $key => $item) {
-                $result[$key] = $this->prepareDiscountValue($item, $promoPrice[$key] ?? null);
-            }
-        } else {
-            $result = null;
-            $basePrice = (float) $basePrice;
-            $promoPrice = (float) $promoPrice;
-            if (!empty($promoPrice) && !empty($basePrice) && $basePrice > $promoPrice) {
-                $result = ceil(($basePrice - $promoPrice) / $basePrice * 10) * 10;
-            }
+        $result = null;
+        $basePrice = (float)$basePrice;
+        $promoPrice = (float)$promoPrice;
+        if (!empty($promoPrice) && !empty($basePrice) && $basePrice > $promoPrice) {
+            $result = ceil(($basePrice - $promoPrice) / $basePrice * 10) * 10;
         }
 
         return $result;
-    }
-
-    /**
-     * @param int|string $productId
-     * @param bool       $isSpecial
-     *
-     * @return float
-     */
-    protected function getPrice($productId, $isSpecial = false)
-    {
-        $attrId = $isSpecial ? $this->specialAttrId : $this->priceAttrId;
-        $select = $this->connection->select();
-        $select->from(['decimal' => 'catalog_product_entity_decimal'], 'value')
-            ->joinInner(['entity' => 'catalog_product_entity'], 'decimal.row_id = entity.row_id', [])
-            ->where('entity.entity_id = ?', $productId)
-            ->where('decimal.attribute_id = ?', $attrId)
-            ->limit(1);
-
-        return (float)$this->connection->fetchOne($select);
     }
 
     /**
@@ -330,62 +408,22 @@ class ProductDataMapper
 
     /**
      * @param int|string $id
+     * @param string     $type
      *
      * @return array
      */
-    protected function getChildrenIds($id)
+    protected function getChildrenIds($id, $type)
     {
-        $type = $this->getProductType($id);
-        switch ($type) {
-            case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
-                return $this->configurableLink->getChildrenIds($id)[0] ?? [];
-            case \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE:
-                return $this->groupLink->getChildrenIds(
-                    $id,
-                    \Magento\GroupedProduct\Model\ResourceModel\Product\Link::LINK_TYPE_GROUPED
-                )[\Magento\GroupedProduct\Model\ResourceModel\Product\Link::LINK_TYPE_GROUPED] ?? [];
-            case \Magento\Bundle\Model\Product\Type::TYPE_CODE:
-                return $this->bundleLink->getChildrenIds($id);
-            default:
-                return [$id];
-        }
-    }
-
-    /**
-     * @param int|string $productId
-     * @param string     $attrCode
-     *
-     * @return float
-     */
-    public function getRawBasePrice($productId, $attrCode)
-    {
-        $attrId = $this->getBasePriceId($attrCode);
-        $select = $this->connection->select();
-        $select->from(['decimal' => 'catalog_product_entity_decimal'], 'value')
-            ->joinInner(['entity' => 'catalog_product_entity'], 'decimal.row_id = entity.row_id', [])
-            ->where('entity.entity_id = ?', $productId)
-            ->where('decimal.attribute_id = ?', $attrId)
-            ->limit(1);
-
-        return (float)$this->connection->fetchOne($select);
-    }
-
-    /**
-     * @param string $attrCode
-     *
-     * @return int
-     */
-    protected function getBasePriceId($attrCode)
-    {
-        if (!isset($this->attributeIds[$attrCode])) {
-            $select = $this->connection->select();
-            $select->from('eav_attribute', 'attribute_id')
-                ->where('attribute_code = ?', $attrCode)
-                ->limit(1);
-            $this->attributeIds[$attrCode] = (int)$this->connection->fetchOne($select);
+        $hasChildrenCode = [
+            \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE,
+            \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE,
+            \Magento\Bundle\Model\Product\Type::TYPE_CODE,
+        ];
+        if (!in_array($type, $hasChildrenCode)) {
+            return null;
         }
 
-        return $this->attributeIds[$attrCode];
+        return $this->dataProvider->getProductChildIds($id, $type);
     }
 
     /**
@@ -395,31 +433,178 @@ class ProductDataMapper
      */
     protected function isSalable($productId)
     {
-        $select = $this->connection->select();
-        $select->from(['i' => 'inventory_source_item'], 'count(i.source_item_id)')
-            ->joinInner(['p' => 'catalog_product_entity'], 'p.sku = i.sku')
-            ->where('p.entity_id = ?', $productId)
-            ->where('i.status = ?', 1);
-
-        return (bool)$this->connection->fetchOne($select);
+        return isset($this->productRawData[$productId]['status'])
+            && $this->productRawData[$productId]['status'] == ProductStatus::STATUS_ENABLED
+            && (
+                !empty($this->productRawData[$productId]['source']) ||
+                !empty($this->parentProduct[$productId])
+            );
     }
 
     /**
-     * @param $bundleId
-     * @param $optionId
-     * @param $productId
+     * Generate product data.
      *
-     * @return int
+     * @param $productIds
      */
-    protected function getBundleOptionQty($bundleId, $optionId, $productId)
+    protected function prepareProductData($productIds)
     {
+        $this->prepareChildren($productIds);
         $select = $this->connection->select();
-        $select->from(['catalog_product_bundle_selection'], 'selection_qty')
-            ->where('option_id = ?', $optionId)
-            ->where('product_id = ?', $productId)
-            ->where('parent_product_id = ?', $bundleId)
-            ->limit(1);
+        $select->from(
+            ['p' => 'catalog_product_entity'],
+            ['entity_id', 'type_id']
+        )->joinLeft(
+            ['i' => 'inventory_source_item'],
+            'p.sku = i.sku and i.status = 1',
+            'count(i.source_item_id) as source'
+        )->where(
+            'entity_id IN (?)',
+            $this->allProductId
+        )->group('p.entity_id');
 
-        return (int) $this->connection->fetchOne($select);
+        $this->generatePriceQuery($select);
+        $this->productRawData = $this->connection->fetchAssoc($select);
+        $this->prepareBundleOptions();
+    }
+
+    /**
+     * Generate children product.
+     *
+     * @param $productIds
+     */
+    protected function prepareChildren($productIds)
+    {
+        $data = $this->getProductTypes($productIds);
+        foreach ($data as $productData) {
+            $this->allProductId[] = $productData['entity_id'];
+            if (empty($this->parentProduct[$productData['entity_id']])) {
+                if ($children = $this->getChildrenIds($productData['entity_id'], $productData['type_id'])) {
+                    $this->parentProduct[$productData['entity_id']] = $children;
+                    $this->prepareChildren($children);
+                }
+            }
+        }
+    }
+
+    /**
+     * Get product types by product ids.
+     *
+     * @param $productIds
+     *
+     * @return array
+     */
+    protected function getProductTypes($productIds)
+    {
+        if (empty($productIds) || !is_array($productIds)) {
+            return [];
+        }
+
+        $select = $this->connection->select();
+        $select->from(
+            ['p' => 'catalog_product_entity'],
+            ['entity_id', 'type_id']
+        )->where(
+            'entity_id IN (?)',
+            $productIds
+        )->group('p.entity_id');
+
+        return $this->connection->fetchAssoc($select);
+    }
+
+    /**
+     * Generate bundle options
+     */
+    protected function prepareBundleOptions()
+    {
+        $bundleIds = [];
+        foreach ($this->productRawData as $id => $data) {
+            if (isset($data['type_id']) && $data['type_id'] === \Magento\Bundle\Model\Product\Type::TYPE_CODE) {
+                $bundleIds[] = $id;
+            }
+        }
+
+        if (empty($bundleIds)) {
+            return;
+        }
+
+        $select = $this->connection->select();
+        $select->from(
+            ['option' => 'catalog_product_bundle_selection'],
+            ['option_id', 'product_id', 'selection_qty']
+        )->joinInner(
+            ['p' => 'catalog_product_entity'],
+            'p.row_id = option.parent_product_id',
+            ['entity_id']
+        )->where('p.entity_id IN (?)', $bundleIds);
+
+        $data = $this->connection->fetchAll($select);
+        foreach ($data as $item) {
+            $this->bundleOptions[$item['entity_id']]
+            [$item['option_id']]
+            [$item['product_id']] = $item['selection_qty'];
+        }
+    }
+
+    /**
+     * @param \Magento\Framework\DB\Select $select
+     */
+    protected function generatePriceQuery($select)
+    {
+        $stores = [0];
+        $priceAttrs = $this->dynamicPriceAttributes;
+        $priceAttrs['price'] = $this->priceAttrId;
+        $priceAttrs['special_price'] = $this->specialAttrId;
+
+        foreach ($this->result as $item) {
+            if (isset($item['store_id'])) {
+                $stores[] = (int)$item['store_id'];
+                break;
+            }
+        }
+
+        $defaultSelect = $this->connection->select()
+            ->from(
+                ['decimal' => 'catalog_product_entity_decimal'],
+                'value'
+            )->where(
+                'row_id = p.row_id'
+            )->where(
+                'store_id IN (?)',
+                $stores
+            )->order(
+                'store_id DESC'
+            )->limit(1);
+
+        foreach ($priceAttrs as $attrCode => $attrId) {
+            $attrSelect = clone $defaultSelect;
+            $attrSelect->where('attribute_id = ?', $attrId);
+            $select->columns([
+                '(' . $attrSelect->__toString() . ') AS ' . $attrCode,
+            ]);
+
+            // Add attribute to `basePriceAttributes` property.
+            if (strpos($attrCode, CustomerPrice::PREFIX_OMNI_NORMAL_PRICE) === 0) {
+                $this->basePriceAttributes[] = $attrCode;
+            }
+        }
+
+        $statusSelect = $this->connection->select()
+            ->from(
+                ['int' => 'catalog_product_entity_int'],
+                'value'
+            )->where(
+                'row_id = p.row_id'
+            )->where(
+                'attribute_id = ?',
+                $this->statusAttrId
+            )->where(
+                'store_id IN (?)',
+                $stores
+            )->order(
+                'store_id DESC'
+            )->limit(1);
+        $select->columns([
+            '(' . $statusSelect->__toString() . ') AS status',
+        ]);
     }
 }

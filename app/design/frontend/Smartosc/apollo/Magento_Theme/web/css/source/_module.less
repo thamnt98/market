@@ -1015,15 +1015,12 @@
     }
       .payment-options{
           ul {
-              display: grid;
-              -ms-grid-columns:1fr 8px 1fr;
-              grid-template-columns: 1fr 1fr;
-              grid-gap: 8px;
+
               li{
                   background: @color-white;
                   border-radius: 3px;
-                  padding: 2px;
-                  display: flex;
+                  padding: 1px;
+                  display: inline-block;
                   align-items: center;
               }
               a{
@@ -1844,6 +1841,21 @@
 }
 
 .media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__xl) {
+    .footerColumn--social{
+        width: 22% !important;
+    }
+
+    .footerColumn--security{
+        width: 15.5% !important;
+    }
+
+    .footer-site-list .payment-options ul{
+        display: grid;
+        -ms-grid-columns:70px 8px 70px;
+        grid-template-columns: 70px 70px;
+        grid-gap: 8px;
+    }
+
     .notification-search {
         width: 458px;
     }

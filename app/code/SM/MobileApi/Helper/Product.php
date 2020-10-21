@@ -1024,7 +1024,9 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     public function getInstallation($product)
     {
         $installation = $this->installationFactory->create();
-        if ($this->helperInstallation->isEnabled() && $product->getIsService()) {
+        if ($this->helperInstallation->isEnabled()
+            && $product->getData(\SM\Installation\Helper\Data::PRODUCT_ATTRIBUTE)
+        ) {
             $installation->setStatus(1);
         } else {
             $installation->setStatus(0);

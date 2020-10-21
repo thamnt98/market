@@ -11,4 +11,7 @@
     <action name="digitalproduct/index/addtocart">
         <section name="cart"/>
     </action>
+    <action name="transcheckout/Fulfillment/update">
+        <section name="fulfillment"/>
+    </action>
 </config>

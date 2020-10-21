@@ -47,6 +47,8 @@ class Price
         $bundleOption = $infoBuyRequest['bundle_option'];
         foreach ($productOption as $optionId => $productOpt) {
             foreach ($bundleOption as $opt) {
+                //For case radio button, should send only int value but api require int array (should use for case multiple select)
+                $opt = is_array($opt) ? $opt[0] : $opt;
                 if ($optionId == $opt) {
                     $optionSelected[] = $productOpt;
                     if ($productOpt->getTypeId() == Configurable::TYPE_CODE) {

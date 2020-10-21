@@ -17,6 +17,7 @@ use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Exception\StateException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Exception\CouldNotSaveException;
 
 use \Trans\Integration\Api\Data\IntegrationChannelInterface;
 use \Trans\Integration\Api\Data\IntegrationChannelInterfaceFactory;

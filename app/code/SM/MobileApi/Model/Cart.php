@@ -922,7 +922,7 @@ class Cart implements \SM\MobileApi\Api\CartInterface
         $data = $buyRequest->getData(\SM\Installation\Helper\Data::QUOTE_OPTION_KEY);
 
         $product = $this->productRepository->getById($item->getProduct()->getId());
-        $allowInstallation = $product->getData('is_service');
+        $allowInstallation = $product->getData(\SM\Installation\Helper\Data::PRODUCT_ATTRIBUTE);
         if ($allowInstallation == null || $allowInstallation == "") {
             $allowInstallation = false;
         }

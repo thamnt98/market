@@ -24,7 +24,7 @@ class RedirectType implements \Magento\Framework\Data\OptionSourceInterface
     const TYPE_VOUCHER_DETAIL    = 'voucher';
     const TYPE_VOUCHER_LIST      = 'voucher_list';
     const TYPE_BRAND             = 'brand';
-    const TYPE_TERM              = 'term';
+    const TYPE_HELP_PAGE         = 'help';
     const TYPE_SUBSCRIPTION_LIST = 'subs';
     const TYPE_GIFT_LIST         = 'gift';
     const TYPE_PDP               = 'product';
@@ -58,11 +58,11 @@ class RedirectType implements \Magento\Framework\Data\OptionSourceInterface
                 'value' => self::TYPE_VOUCHER_LIST,
             ],
             [
-                'label' => __('Brand Page'),
+                'label' => __('Brand Page (For Desktop)'),
                 'value' => self::TYPE_BRAND,
             ],
             [
-                'label' => __('Campaign'),
+                'label' => __('Campaign (For Mobile)'),
                 'value' => self::TYPE_CAMPAIGN,
             ],
             [
@@ -74,8 +74,8 @@ class RedirectType implements \Magento\Framework\Data\OptionSourceInterface
                 'value' => self::TYPE_GIFT_LIST,
             ],
             [
-                'label' => __('T&C Detail'),
-                'value' => self::TYPE_TERM,
+                'label' => __('Help Page'),
+                'value' => self::TYPE_HELP_PAGE,
             ],
             [
                 'label' => __('Product Detail Page'),

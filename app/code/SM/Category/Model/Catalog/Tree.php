@@ -6,6 +6,7 @@ use Magento\Checkout\Exception;
 use Magento\Store\Model\ScopeInterface;
 use SM\HeroBanner\Model\Banner;
 use SM\MobileApi\Api\Data\Product\ListInterface;
+use SM\Category\Api\Data\Catalog\CategoryMetaDataInterface;
 
 class Tree
 {
@@ -193,6 +194,9 @@ class Tree
                 $metaInfo->setEntityId($category->getId());
                 $metaInfo->setGallery($this->bannerModel->getBannersByCategoryId($category->getId()));
                 $metaInfo->setColor($this->getColorCategory($category));
+                $metaInfo->setIsAlcohol($category->getData(CategoryMetaDataInterface::IS_FRESH));
+                $metaInfo->setIsTobacco($category->getData(CategoryMetaDataInterface::IS_FRESH));
+                $metaInfo->setIsFresh($category->getData(CategoryMetaDataInterface::IS_FRESH) ?? false);
                 return $metaInfo;
             } else {
                 return null;

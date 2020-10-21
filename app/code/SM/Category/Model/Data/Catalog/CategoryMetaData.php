@@ -58,4 +58,51 @@ class CategoryMetaData extends \Magento\Framework\Model\AbstractExtensibleModel 
         return $this->setData(self::COLOR,$data);
     }
 
+    /**
+     * @inheritDoc
+     */
+    public function getIsTobacco()
+    {
+        return $this->getData(self::IS_TOBACCO) ?? false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getIsAlcohol()
+    {
+        return $this->getData(self::IS_ALCOHOL) ?? false;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setIsTobacco($value)
+    {
+        return $this->setData(self::IS_TOBACCO, $value);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setIsAlcohol($value)
+    {
+        return $this->setData(self::IS_ALCOHOL, $value);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getIsFresh()
+    {
+        return $this->getData(self::IS_FRESH);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setIsFresh($value)
+    {
+        return $this->setData(self::IS_FRESH, $value);
+    }
 }

@@ -593,7 +593,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
     {
         $installationInfo = $this->installationFactory->create();
         $buyRequest = $item->getBuyRequest();
-        $allowInstallation = $item->getProduct()->getData('is_service');
+        $allowInstallation = $item->getProduct()->getData(\SM\Installation\Helper\Data::PRODUCT_ATTRIBUTE);
         if ($allowInstallation == null || $allowInstallation == "") {
             $allowInstallation = false;
         }

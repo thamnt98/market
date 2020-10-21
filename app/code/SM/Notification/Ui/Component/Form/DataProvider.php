@@ -35,8 +35,14 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
     protected $storeManager;
 
     /**
+     * @var \Magento\Ui\DataProvider\Modifier\PoolInterface
+     */
+    protected $pool;
+
+    /**
      * DataProvider constructor.
      *
+     * @param \Magento\Ui\DataProvider\Modifier\PoolInterface                     $pool
      * @param \Magento\Store\Model\StoreManagerInterface                          $storeManager
      * @param \SM\Notification\Model\ResourceModel\Notification\CollectionFactory $collectionFactory
      * @param string                                                              $name
@@ -46,6 +52,7 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
      * @param array                                                               $data
      */
     public function __construct(
+        \Magento\Ui\DataProvider\Modifier\PoolInterface $pool,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \SM\Notification\Model\ResourceModel\Notification\CollectionFactory $collectionFactory,
         $name,
@@ -57,6 +64,7 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
         parent::__construct($name, $primaryFieldName, $requestFieldName, $meta, $data);
         $this->collection = $collectionFactory->create();
         $this->storeManager = $storeManager;
+        $this->pool = $pool;
     }
 
     /**
@@ -119,5 +127,23 @@ class DataProvider extends \Magento\Ui\DataProvider\AbstractDataProvider
             'main_table.' . $filter->getField(),
             [$filter->getConditionType() => $filter->getValue()]
         );
+    }
+
+    /**
+     * @override
+     * @return array
+     */
+    public function getMeta()
+    {
+        $meta = parent::getMeta();
+
+        try {
+            foreach ($this->pool->getModifiersInstances() as $modifier) {
+                $meta = $modifier->modifyMeta($meta);
+            }
+        } catch (\Exception $e) {
+        }
+
+        return $meta;
     }
 }

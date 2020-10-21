@@ -153,6 +153,7 @@ class CustomerMessageRepository implements \SM\Notification\Api\CustomerMessageR
     /**
      * @param int                                            $customerId
      * @param \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria
+     * @param int                                            $isMobile
      *
      * @return \SM\Notification\Api\CustomerMessageResultInterface
      */
