@@ -76,6 +76,7 @@ class Curl extends \Magento\Framework\App\Helper\AbstractHelper
         $dateModel = $this->dateTimeFactory->create();
         $datetime  = $dateModel->gmtDate('YmdHi');
         var_dump($datetime);
+        var_dump(date('YmdHi'));
         $authToken = strtolower(md5($key . $datetime));
 
         return $authToken;
