@@ -638,43 +638,6 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
     }
 
     /**
-     * @inheritDoc
-     */
-    public function saveMobilePayment($cartId, $paymentMethod, $term = null)
-    {
-        $payment = [
-            'method' => $paymentMethod,
-            'check' => [
-                self::CHECK_USE_FOR_COUNTRY,
-                self::CHECK_USE_FOR_CURRENCY,
-                self::CHECK_ORDER_TOTAL_MIN_MAX,
-                self::CHECK_ZERO_TOTAL,
-            ]
-        ];
-
-        try {
-            $quote = $this->quoteRepository->getActive($cartId);
-            $quote->getPayment()->importData($payment);
-            // shipping totals may be affected by payment method
-            if (!$quote->isVirtual() && $quote->getShippingAddress()) {
-                foreach ($quote->getAllShippingAddresses() as $shippingAddress) {
-                    $shippingAddress->setCollectShippingRates(true);
-                }
-                $quote->setTotalsCollectedFlag(false)->collectTotals();
-                if (!empty($term)) {
-                    $quote->setSprintTermChannelid($term);
-                    $termInfo=$this->paymentHelper->getTermInfo($paymentMethod, $term, $quote);
-                    $quote->setData('service_fee', ((int)$quote->getGrandTotal() * $termInfo['serviceFeeValue'])/100);
-                }
-            }
-            $this->quoteRepository->save($quote);
-            return true;
-        } catch (\Exception $e) {
-            throw new \Exception(__($e->getMessage()));
-        }
-    }
-
-    /**
      * set payment method
      *
      * @param int $customerId

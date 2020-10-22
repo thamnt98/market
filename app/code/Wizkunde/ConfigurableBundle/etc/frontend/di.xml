@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../vendor/magento/framework/ObjectManager/etc/config.xsd">
+    <type name="Magento\Framework\View\Layout">
+        <plugin name="cb_before_generate_xml" type="Wizkunde\ConfigurableBundle\Plugin\LayoutPlugin" sortOrder="1"/>
+    </type>
+
+    <type name="Magento\Catalog\Model\Product">
+        <plugin name="set_category_for_validation" type="Wizkunde\ConfigurableBundle\Plugin\ConfigurableProductPlugin" sortOrder="1"/>
+    </type>
+</config>

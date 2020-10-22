@@ -79,4 +79,12 @@ interface MultiShippingMobileInterface
      * @return \SM\Checkout\Api\Data\Checkout\CheckoutDataInterface
      */
     public function applyVoucher($shippingAddress, $items, $additionalInfo, $isStoreFulFill, $isSplitOrder, $isAddressComplete, $isErrorCheckout, $voucher, $currencySymbol, $digitalCheckout, $digitalDetail, $customerId, $cartId);
+
+    /**
+     * @param string $paymentMethod
+     * @param int $customerId
+     * @param int $cartId
+     * @return \SM\Checkout\Api\Data\Checkout\CheckoutDataInterface
+     */
+    public function saveMobilePayment($paymentMethod, $customerId, $cartId);
 }

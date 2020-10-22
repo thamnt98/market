@@ -219,8 +219,9 @@ class Cart implements \SM\MobileApi\Api\CartInterface
                 $customer = $this->customer->getById($customerId);
                 $truePrice = 0;
                 $currentProduct = $this->productRepository->get($item->getSku());
+                $event = $this->event;
+
                 if ($this->categoryEventId != null && array_search($this->categoryEventId, $currentProduct->getCategoryIds()) !== false) {
-                    $event = $this->event;
                     if ($event) {
                         if ($event->getStatus() !== \Magento\CatalogEvent\Model\Event::STATUS_OPEN) {
                             $item->setHasError(true)->setMessage(__('This product is no longer on sale.'));
@@ -280,10 +281,10 @@ class Cart implements \SM\MobileApi\Api\CartInterface
                                         }
                                     } else {
                                         $qtyNow = $availableQty;
+                                        $message = __('You exceeded the maximum quantity of Surprise Deals product. The excess items have been removed & can be purchased later in normal price.
+');
                                         if ($qtyNow > $availableCustomerQty) {
                                             $qtyNow = $availableCustomerQty;
-                                            $message = __('You exceeded the maximum quantity of Surprise Deals product. The excess items have been removed & can be purchased later in normal price.
-');
                                         }
                                     }
                                     if ($currentProduct->getSpecialPrice()) {
@@ -348,8 +349,10 @@ class Cart implements \SM\MobileApi\Api\CartInterface
                         $quote->getLastAddedItem()->getProduct()->setIsSuperMode(true);
                         $quote->getLastAddedItem()->save();
                     }
-                    $quote->getLastAddedItem()->setEventId($this->categoryEventId);
-                    $quote->getLastAddedItem()->setEvent($this->event);
+                    if ($event->getId()) {
+                        $quote->getLastAddedItem()->setEventId($event->getId());
+                        $quote->getLastAddedItem()->setEvent($event);
+                    }
                     $quote->collectTotals();
 
                     $this->setOriginalPrice($customer, $quote->getLastAddedItem());

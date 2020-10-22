@@ -23,22 +23,31 @@ define(
                 let self = this,
                     customer = customerData.get('customer');
                 if (customer().firstname) {
+                    console.log('customer');
                     self.showPopup()
                 }
                 customer.subscribe(function (customerUpdate) {
                     if (customerUpdate.firstname) {
+                        console.log('customer change');
                         self.showPopup()
                     }
                 });
                 maincoachmarks.coachMarks.subscribe(function (newValue) {
                     var customer = customerData.get('customer');
                     if (customer().firstname) {
+                        console.log('coachMarks finish');
                         self.showPopup()
                     }
+                });
+                customerData.get('fulfillment').subscribe(function (newValue) {
+                    console.log(newValue);
                 });
             },
 
             showPopup: function () {
+                console.log(customerData.get('fulfillment')().show);
+                console.log(maincoachmarks.coachMarks());
+                console.log(showPopup);
                 if (customerData.get('fulfillment')().show || !maincoachmarks.coachMarks() || showPopup) {
                     return;
                 }

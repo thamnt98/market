@@ -56,6 +56,16 @@ class BundleProduct extends \SM\MobileApi\Helper\Product\Common
     protected $appEmulation;
 
     /**
+     * @var \SM\GTM\Block\Product\ListProduct
+     */
+    protected $productGtm;
+
+    /**
+     * @var \SM\MobileApi\Model\Data\GTM\GTMFactory
+     */
+    protected $gtmDataFactory;
+
+    /**
      * BundleProduct constructor.
      * @param Context $context
      * @param ObjectManagerInterface $objectManagerInterface
@@ -76,6 +86,8 @@ class BundleProduct extends \SM\MobileApi\Helper\Product\Common
      * @param Configurable $helperConfigurable
      * @param Image $productHelperImage
      * @param Emulation $appEmulation
+     * @param \SM\GTM\Block\Product\ListProduct $productGtm
+     * @param \SM\MobileApi\Model\Data\GTM\GTMFactory $gtmDataFactory
      */
     public function __construct(
         Context $context,
@@ -96,13 +108,17 @@ class BundleProduct extends \SM\MobileApi\Helper\Product\Common
         ProductItemsFactory $bundleItemsFactory,
         Configurable $helperConfigurable,
         Image $productHelperImage,
-        Emulation $appEmulation
+        Emulation $appEmulation,
+        \SM\GTM\Block\Product\ListProduct $productGtm,
+        \SM\MobileApi\Model\Data\GTM\GTMFactory $gtmDataFactory
     ) {
         $this->optionsFactory = $optionsFactory;
         $this->bundleItemsFactory = $bundleItemsFactory;
         $this->helperConfigurable = $helperConfigurable;
         $this->productHelperImage = $productHelperImage;
         $this->appEmulation = $appEmulation;
+        $this->gtmDataFactory = $gtmDataFactory;
+        $this->productGtm = $productGtm;
         parent::__construct(
             $context,
             $objectManagerInterface,
@@ -160,6 +176,9 @@ class BundleProduct extends \SM\MobileApi\Helper\Product\Common
                     if ($product->getTypeId() == \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
                         $productData->setConfigurableAttributes($this->helperConfigurable->getConfigurableAttributes($product));
                     }
+                    $gtmData = $this->getGTMData($product);
+                    $productData->setGtmData($gtmData);
+
                     $productItem[] = $productData;
                 }
                 $optionsFactory->setSelections($productItem);
@@ -183,5 +202,36 @@ class BundleProduct extends \SM\MobileApi\Helper\Product\Common
         $this->appEmulation->stopEnvironmentEmulation();
 
         return $mainImage;
+    }
+
+    public function getGTMData($product)
+    {
+        $data = $this->productGtm->getGtm($product);
+        $data = \Zend_Json_Decoder::decode($data);
+        /** @var \SM\MobileApi\Api\Data\GTM\GTMInterface $gtmData */
+        $gtmData = $this->gtmDataFactory->create();
+        $gtmData
+            ->setProductName($data['name'])
+            ->setProductId($data['id'])
+            ->setProductPrice($data['price'])
+            ->setProductBrand($data['brand'])
+            ->setProductCategory($data['category'])
+            ->setProductSize($data['product_size'])
+            ->setProductVolume($data['product_volume'])
+            ->setProductWeight($data['product_weight'])
+            ->setProductVariant($data['variant'])
+            ->setDiscountPrice($data['salePrice'])
+            ->setProductList($data['list'])
+            ->setProductRating($data['rating'])
+            ->setInitialPrice($data['initialPrice'])
+            ->setDiscountRate($data['discountRate'])
+            ->setProductType($product->getTypeId());
+        if ($data['salePrice'] && $data['salePrice'] > 0) {
+            $gtmData->setProductOnSale(__('Yes'));
+        } else {
+            $gtmData->setProductOnSale(__('Not on sale'));
+        }
+
+        return $gtmData;
     }
 }

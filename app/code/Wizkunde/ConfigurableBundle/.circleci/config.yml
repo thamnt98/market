@@ -1,0 +1,15 @@
+version: 2.1
+jobs:
+  test_meqp:
+    machine: true
+    working_directory: ~/repo
+    steps:
+      - checkout
+      - run: docker run --rm --init -it -e "COMPOSER_AUTH=${COMPOSER_AUTH}" -v ~/repo:/extension wizkunde/docker-meqp
+
+workflows:
+  version: 2
+  test_extension:
+    jobs:
+      - test_meqp:
+          context: wiz-ext

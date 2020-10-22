@@ -76,7 +76,7 @@ class PaymentSuccessUpdateAfter implements ObserverInterface
                     $historyExist->getData('item_qty_purchase') + $item->getQtyOrdered()
                 );
                 $this->resourceHistory->save($historyExist);
-            } else {
+            } elseif($item->getEventId()) {
                 $history = $this->historyFactory->create();
                 $history->setData('event_id', $item->getEventId());
                 $history->setData('item_id', $item->getProductId());

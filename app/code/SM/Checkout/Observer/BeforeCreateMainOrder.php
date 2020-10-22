@@ -93,5 +93,7 @@ class BeforeCreateMainOrder implements ObserverInterface
         $order->setBaseGrandTotal($baseSubtotal + $baseShip - $baseDiscount + $serviceFee);
         $order->setTotalAmount('shipping', $ship);
         $order->setBaseTotalAmount('shipping', $baseShip);
+        $order->setShippingInclTax($ship);
+        $order->setBaseShippingInclTax($baseShip);
     }
 }

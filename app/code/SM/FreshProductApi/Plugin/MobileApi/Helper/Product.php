@@ -58,7 +58,7 @@ class Product
     {
         $data = [
             [
-                'value' => self::SAME_DAY,
+                'value' => (string)self::SAME_DAY,
                 'label' => __('Instant (3 hours)')
             ]
         ];

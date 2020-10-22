@@ -28,6 +28,8 @@ interface ProductItemsInterface extends ExtensibleDataInterface
     const CONFIGURABLE_ATTRIBUTES = 'configurable_attributes';
     const PRICE = 'price';
     const IMAGE = 'image';
+
+    const GTM_DATA = "gtm_data";
     /**
      * Get product ID
      *
@@ -243,4 +245,15 @@ interface ProductItemsInterface extends ExtensibleDataInterface
      * @return $this
      */
     public function setConfigurableAttributes($data);
+
+    /**
+     * @return \SM\MobileApi\Api\Data\GTM\GTMInterface
+     */
+    public function getGtmData();
+
+    /**
+     * @param \SM\MobileApi\Api\Data\GTM\GTMInterface $value
+     * @return mixed
+     */
+    public function setGtmData($value);
 }

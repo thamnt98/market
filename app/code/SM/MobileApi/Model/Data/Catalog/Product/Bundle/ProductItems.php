@@ -175,4 +175,20 @@ class ProductItems extends AbstractExtensibleModel implements ProductItemsInterf
     {
         return $this->setData(self::CONFIGURABLE_ATTRIBUTES, $data);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getGtmData()
+    {
+        return $this->getData(self::GTM_DATA);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setGtmData($value)
+    {
+        return $this->setData(self::GTM_DATA, $value);
+    }
 }

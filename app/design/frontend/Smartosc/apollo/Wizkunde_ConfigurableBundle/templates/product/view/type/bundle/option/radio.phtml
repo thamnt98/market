@@ -9,16 +9,16 @@
 ?>
 
 <script type="text/javascript">
-    require(['configurable'],function($){
+    require(['configurable'], function ($) {
     })
 </script>
 
 <?php /* @var $block \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle\Option\Select */ ?>
-<?php $_option      = $block->getOption(); ?>
-<?php $_selections  = $_option->getSelections(); ?>
-<?php $_default     = $_option->getDefaultSelection(); ?>
+<?php $_option = $block->getOption(); ?>
+<?php $_selections = $_option->getSelections(); ?>
+<?php $_default = $block->getDefaultSelection(); ?>
 <?php list($_defaultQty, $_canChangeQty) = $block->getDefaultValues(); ?>
-<div class="field option <?php echo ($_option->getRequired()) ? ' required': ''; ?>">
+<div class="field option <?php echo ($_option->getRequired()) ? ' required' : ''; ?>">
     <label class="label" for="bundle-option-<?php echo $_option->getId() ?>">
         <span><?php echo $block->escapeHtml($_option->getTitle()) ?></span>
     </label>
@@ -29,11 +29,18 @@
             <?php echo ($_option->getRequired()) ? 'min="1"' : '' ?>
                value="<?php echo $_defaultQty ?>"/>
 
-        <div class="select-images<?php echo ($block->getBundleHelper()->mustShowImages() == false) ? ' no-images' : '' ?>" data-role="select-option-<?php echo $_option->getId() ?>">
+        <div
+            class="select-images<?php echo ($block->getBundleHelper()->mustShowImages() == false) ? ' no-images' : '' ?>"
+            data-role="select-option-<?php echo $_option->getId() ?>">
             <?php if ($block->getBundleHelper()->mustShowImages() == true) : ?>
-                <?php foreach($_selections as $selection) : ?>
-                    <a class="select-link<?php if ($block->isSelected($selection)) echo ' active' ?> <?= (sizeof($_selections) == 1 && $_selections[0]->getTypeId() == 'configurable') ? 'hidden' : 'wrapper-option-config' ?>" data-selection-id="<?php echo $selection->getSelectionId() ?>">
-                        <?php if ($selection->getTypeId() != 'configurable') : ?><div class="option-data" childid="<?= (int)$selection->getId() ?>" oldprice="<?= (int)$selection->getPrice() ?>" finalprice="<?= (int)$selection->getFinalPrice() ?>"></div> <?php endif; ?>
+                <?php foreach ($_selections as $selection) : ?>
+                    <a class="select-link<?php if ($selection->getId() == $_default->getId()) echo ' active' ?>
+                    <?= (sizeof($_selections) == 1 &&  $_selections[0]->getTypeId() == 'configurable') ? 'hidden' : 'wrapper-option-config' ?>"
+                       data-selection-id="<?php echo $selection->getSelectionId() ?>">
+                        <?php if ($selection->getTypeId() != 'configurable') : ?>
+                            <div class="option-data" childid="<?= (int)$selection->getId() ?>"
+                                 oldprice="<?= (int)$selection->getPrice() ?>"
+                                 finalprice="<?= (int)$selection->getFinalPrice() ?>"></div> <?php endif; ?>
                         <span><?php echo $selection->getName() ?></span>
                     </a>
                 <?php endforeach; ?>
@@ -46,14 +53,19 @@
                     <input type="radio"
                            class="radio product bundle option bundle-option-radio change-container-classname"
                            id="bundle-option-<?= $block->escapeHtmlAttr($_option->getId()) ?>-<?= $block->escapeHtmlAttr($_selection->getSelectionId()) ?>"
-                        <?php if ($_option->getRequired()) { echo 'data-validate="{\'validate-one-required-by-name\':true}"'; }?>
+                        <?php if ($_option->getRequired()) {
+                            echo 'data-validate="{\'validate-one-required-by-name\':true}"';
+                        } ?>
                            name="bundle_option[<?= $block->escapeHtmlAttr($_option->getId()) ?>]"
                            data-selector="bundle_option[<?= $block->escapeHtmlAttr($_option->getId()) ?>]"
-                        <?php if ($block->isSelected($_selection)) { echo ' checked="checked"'; } ?>
+                        <?php if ($_selection->getId() == $_default->getId()) {
+                            echo ' checked="checked"';
+                        } ?>
                            value="<?= $block->escapeHtmlAttr($_selection->getSelectionId()) ?>"/>
                     <label class="label"
                            for="bundle-option-<?= $block->escapeHtmlAttr($_option->getId()) ?>-<?= $block->escapeHtmlAttr($_selection->getSelectionId()) ?>">
-                        <span><?= /* @noEscape */ $block->getSelectionTitlePrice($_selection) ?></span>
+                        <span><?= /* @noEscape */
+                            $block->getSelectionTitlePrice($_selection) ?></span>
                     </label>
                 </div>
             <?php endforeach; ?>
@@ -67,36 +79,54 @@
                     }
                 }
             }
+
+
+
         </script>
 
-        <?php foreach($_selections as $selection) : ?>
-            <div class="bundle-selection-data<?php if($selection->getSelectionId() == $block->getDefaultSelectionId()) echo " visible-selection" ?>" data-role="data-option-<?php echo $block->getOption()->getId() ?>" data-selection-id="<?php echo $selection->getSelectionId() ?>">
-                <div class="swatch-opt" data-swatch-id="<?php echo $block->getOption()->getId() ?>-<?php echo $selection->getSelectionId() ?>" data-option-id="<?php echo $block->getOption()->getId() ?>" data-sub-id="<?php echo $selection->getSelectionId() ?>" data-role="swatch-options-<?php echo $block->getOption()->getId() ?>"></div>
-                <div class="swatch-opt-price" data-role="swatch-options-price-<?php echo $block->getOption()->getId() ?>"></div>
-                <div class="bundle-custom-options product-custom-options-<?php echo $block->getOption()->getId() ?>"></div>
+        <?php foreach ($_selections as $selection) : ?>
+            <div
+                class="bundle-selection-data<?php if ($selection->getSelectionId() == $block->getDefaultSelectionId()) echo " visible-selection" ?>"
+                data-role="data-option-<?php echo $block->getOption()->getId() ?>"
+                data-selection-id="<?php echo $selection->getSelectionId() ?>">
+                <div class="swatch-opt"
+                     data-swatch-id="<?php echo $block->getOption()->getId() ?>-<?php echo $selection->getSelectionId() ?>"
+                     data-option-id="<?php echo $block->getOption()->getId() ?>"
+                     data-sub-id="<?php echo $selection->getSelectionId() ?>"
+                     data-role="swatch-options-<?php echo $block->getOption()->getId() ?>"></div>
+                <div class="swatch-opt-price"
+                     data-role="swatch-options-price-<?php echo $block->getOption()->getId() ?>"></div>
+                <div
+                    class="bundle-custom-options product-custom-options-<?php echo $block->getOption()->getId() ?>"></div>
 
-                <div class="bundle-custom-options-template" data-option-id="<?php echo $block->getOption()->getId() ?>" data-selection-id="<?php echo $selection->getSelectionId() ?>"><?php /* @escapeNotVerified */ echo $block->getConfigurableOptions($selection); ?></div>
+                <div class="bundle-custom-options-template" data-option-id="<?php echo $block->getOption()->getId() ?>"
+                     data-selection-id="<?php echo $selection->getSelectionId() ?>"><?php /* @escapeNotVerified */
+                    echo $block->getConfigurableOptions($selection); ?></div>
             </div>
 
-        <?php if($block->isConfigurableSelection($selection)) : ?>
+        <?php if ($block->isConfigurableSelection($selection)) : ?>
         <?php $configurableRenderer = $block->getConfigurableRenderer($selection); ?>
         <?php $jsonSwatchSizeConfig = $configurableRenderer->getJsonSwatchSizeConfig(); ?>
 
         <?php
-        if($jsonSwatchSizeConfig == null) {
+        if ($jsonSwatchSizeConfig == null) {
             $jsonSwatchSizeConfig = '{"swatchImage":{"width":100,"height":100},"swatchThumb":{"height":110,"width":110}}';
         }
         ?>
 
             <script type="text/x-magento-init">
                     {
-                        "div[data-swatch-id='<?php echo $block->getOption()->getId() ?>-<?php echo $selection->getSelectionId() ?>']": {
+                        "div[data-swatch-id='<?php echo $block->getOption()->getId() ?>
+                -<?php echo $selection->getSelectionId() ?>']": {
                             "Wizkunde_ConfigurableBundle/js/swatch-renderer": {
-                                "jsonConfig": <?= /* @escapeNotVerified */ $swatchOptions = $configurableRenderer->getJsonConfigByQuantity((int) $selection->getSelectionQty()) ?>,
+                                "jsonConfig": <?= /* @escapeNotVerified */
+                $swatchOptions = $configurableRenderer->getJsonConfigByQuantity((int)$selection->getSelectionQty()) ?>,
                                 "jsonSwatchConfig": <?php /* @escapeNotVerified */
                 echo $swatchOptions = $configurableRenderer->getJsonSwatchConfig(); ?>,
-                                "mediaCallback": "<?= /* @escapeNotVerified */ $configurableRenderer->getMediaCallback() ?>",
-                                "jsonSwatchImageSizeConfig": <?php /* @escapeNotVerified */  echo $jsonSwatchSizeConfig ?>,
+                                "mediaCallback": "<?= /* @escapeNotVerified */
+                $configurableRenderer->getMediaCallback() ?>",
+                                "jsonSwatchImageSizeConfig": <?php /* @escapeNotVerified */
+                echo $jsonSwatchSizeConfig ?>,
                                 "gallerySwitchStrategy": "prepend"
                             }
                         },
@@ -104,7 +134,10 @@
                             "Magento_Swatches/js/catalog-add-to-cart": {}
                         }
                     }
-                </script>
+
+
+
+            </script>
         <?php endif; ?>
         <?php endforeach; ?>
     </div>

@@ -118,7 +118,7 @@ class OrderItemRepository implements OrderItemRepositoryInterface
                 $quote->collectTotals()->save();
 
                 $resultData->setStatus(1);
-                $resultData->setMessage(__('%1 has been added to cart.', $item->getName()));
+                $resultData->setMessage(__("\"%1\" has been added to cart.", $item->getName()));
             } else {
                 $resultData->setStatus(0);
                 $resultData->setMessage(__($item));

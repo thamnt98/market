@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="wizkunde" sortOrder="2001">
+            <label>Wizkunde Extensions</label>
+        </tab>
+        <section id="configurablebundle" translate="label" type="text" sortOrder="2000" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Configurable Bundle</label>
+            <tab>wizkunde</tab>
+            <resource>Wizkunde_ConfigurableBundle::bundle</resource>
+            <group id="general" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General Settings</label>
+                <field id="move_options" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Move options to the top right</label>
+                    <comment>This will move the bundle options to the top right, next to the image for a more compact page layout</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="remove_customize" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show Options On Page Load</label>
+                    <comment>This will remove the customize button and immediately show the options when the page is loaded</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="configurablebundle/general/move_options">0</field>
+                    </depends>
+                </field>
+                <field id="input_visibility" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Frontend Display Settings</label>
+                    <source_model>Wizkunde\ConfigurableBundle\Model\Config\Source\InputType</source_model>
+                </field>
+                <field id="short_description" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show selected short description under the selection label</label>
+                    <comment>The short description can be disabled when you have products which have very long short descriptions, to prevent the page from clutteing up</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+            <group id="grouped" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Grouped Settings</label>
+                <field id="zero_qty_hide_options" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Hide Configurable Attributes for products with zero quantity</label>
+                    <comment>Showing Configurable Attributes like the swatches can be confusing if the quantity for that product is set to 0 on the grouped page. Setting this setting to yes will cause inputs to be hidden</comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

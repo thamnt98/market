@@ -1,0 +1,133 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+/**
+ * Grouped product data template
+ *
+ * @var $block \Magento\Catalog\Block\Product\View\BaseImage
+ * @var $block \Magento\GroupedProduct\Block\Product\View\Type\Grouped
+ */
+?>
+<?php $block->setPreconfiguredValue(); ?>
+<?php $_product = $block->getProduct(); ?>
+<?php $_associatedProducts = $block->getAssociatedProducts(); ?>
+<?php $_hasAssociatedProducts = count($_associatedProducts) > 0; ?>
+
+    <div class="table-wrapper grouped <?= $block->mustHideOptionsOnZeroQty() ? 'hide-options-zero-qty' : '' ?>">
+        <table class="table data grouped <?= $block->mustHideOptionsOnZeroQty() ? 'hide-options-zero-qty' : '' ?>"
+               id="super-product-table"
+               data-mage-init='{ "Magento_GroupedProduct/js/product-ids-resolver": {} }'>
+            <caption class="table-caption"><?= $block->escapeHtml(__('Grouped product items')) ?></caption>
+            <thead>
+            <tr>
+                <th class="col item" scope="col"><?= $block->escapeHtml(__('Product Name')) ?></th>
+                <?php if ($_product->isSaleable()) : ?>
+                    <th class="col qty" scope="col"><?= $block->escapeHtml(__('Qty')) ?></th>
+                <?php endif; ?>
+            </tr>
+            </thead>
+
+            <?php if ($_hasAssociatedProducts) : ?>
+                <tbody>
+                <?php foreach ($_associatedProducts as $_item) : ?>
+                    <tr>
+                        <td data-th="<?= $block->escapeHtml(__('Product Name')) ?>" class="col item">
+                            <div class="grouped-item">
+                                <div class="grouped-image">
+                                    <img src="<?= /* @escapeNotVerified */ $block->getProductThumbnail($_item) ?>"
+                                         alt="<?= /* @escapeNotVerified */ $_item->getName() ?>"/>
+                                </div>
+                                <div class="grouped-info">
+                                    <strong class="product-item-name"><?= /* @escapeNotVerified */ $block->escapeHtml($_item->getName()) ?></strong>
+                                    <?php if ($block->getCanShowProductPrice($_product)): ?>
+                                        <?php if ($block->getCanShowProductPrice($_item)): ?>
+                                            <?php /* @escapeNotVerified */
+                                            echo $block->getProductPrice($_item) ?>
+                                        <?php endif; ?>
+                                    <?php endif; ?>
+                                </div>
+                                <div class="grouped-super">
+                                    <div class="swatch-opt" data-option-id="<?= /* @escapeNotVerified */ $_item->getId() ?>" data-role="swatch-options-<?= /* @escapeNotVerified */ $_item->getId() ?>"></div>
+                                    <div class="swatch-opt-price"
+                                         data-role="swatch-options-price-<?= /* @escapeNotVerified */ $_item->getId() ?>"></div>
+                                    <div class="product-custom-options-<?= /* @escapeNotVerified */ $_item->getId() ?>"></div>
+                                </div>
+                            </div>
+                        </td>
+                        <?php if ($_product->isSaleable()) : ?>
+                            <td data-th="<?= $block->escapeHtml(__('Qty')) ?>" class="col qty">
+                                <?php if ($_item->isSaleable()) : ?>
+                                    <div class="control qty">
+                                        <input type="number"
+                                               name="super_group[<?= /* @escapeNotVerified */ $block->escapeHtmlAttr($_item->getId()) ?>]"
+                                               data-selector="super_group[<?= /* @escapeNotVerified */ $block->escapeHtmlAttr($_item->getId()) ?>]"
+                                               value="<?= /* @escapeNotVerified */ $block->escapeHtmlAttr($_item->getQty() * 1) ?>"
+                                               title="<?= /* @escapeNotVerified */ $block->escapeHtmlAttr(__('Qty')) ?>"
+                                               class="input-text qty"
+                                               data-validate="{'validate-grouped-qty':'#super-product-table'}"
+                                               data-errors-message-box="#validation-message-box"/>
+                                    </div>
+                                <?php else : ?>
+                                    <div class="stock unavailable" title="<?= /* @escapeNotVerified */ $block->escapeHtmlAttr(__('Availability')) ?>">
+                                        <span><?= /* @escapeNotVerified */ $block->escapeHtml(__('Out of stock')) ?></span>
+                                    </div>
+                                <?php endif; ?>
+                            </td>
+                        <?php endif; ?>
+                    </tr>
+                    <?php if ($block->getCanShowProductPrice($_product)
+                        && $block->getCanShowProductPrice($_item)
+                        && trim($block->getProductPriceHtml(
+                            $_item,
+                            \Magento\Catalog\Pricing\Price\TierPrice::PRICE_CODE
+                        ))) : ?>
+                        <tr class="row-tier-price">
+                            <td colspan="2">
+                                <?= $block->getProductPriceHtml(
+                                    $_item,
+                                    \Magento\Catalog\Pricing\Price\TierPrice::PRICE_CODE
+                                ) ?>
+                            </td>
+                        </tr>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+                </tbody>
+            <?php else : ?>
+                <tbody>
+                <tr>
+                    <td class="unavailable"
+                        colspan="<?php if ($_product->isSaleable()) : ?>4<?php else : ?>3<?php endif; ?>">
+                        <?= $block->escapeHtml(__('No options of this product are available.')) ?>
+                    </td>
+                </tr>
+                </tbody>
+            <?php endif; ?>
+        </table>
+    </div>
+    <div id="validation-message-box"></div>
+
+<?php if ($_hasAssociatedProducts): ?>
+    <?php foreach ($_associatedProducts as $_item): ?>
+        <script type="text/x-magento-init">
+            {
+                "[data-role=swatch-options-<?= $_item->getId() ?>]": {
+                    "Magento_Swatches/js/swatch-renderer": {
+                        "jsonConfig": <?= /* @escapeNotVerified */ $block->getJsonConfig($_item); ?>,
+                        "jsonSwatchConfig": <?= /* @escapeNotVerified */ $block->getJsonSwatchConfig($_item); ?>,
+                        "mediaCallback": "<?= /* @escapeNotVerified */ $_item->getMediaCallback() ?>",
+                        "jsonSwatchImageSizeConfig": {"swatchImage":{"width":100,"height":100},"swatchThumb":{"height":110,"width":110}},
+                        "gallerySwitchStrategy": "prepend"
+                    }
+                },
+                "*" : {
+                    "Magento_Swatches/js/catalog-add-to-cart": {}
+                }
+            }
+        </script>
+    <?php endforeach; ?>
+<?php endif; ?>

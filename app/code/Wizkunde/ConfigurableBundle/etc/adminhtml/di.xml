@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../vendor/magento/framework/ObjectManager/etc/config.xsd">
+    <preference for="Magento\Bundle\Model\ResourceModel\Selection" type="Wizkunde\ConfigurableBundle\Model\ResourceModel\Selection" />
+    <preference for="Magento\Bundle\Model\Product\Type" type="Wizkunde\ConfigurableBundle\Model\Product\Type" />
+    <preference for="Magento\Bundle\Model\ResourceModel\Option\Collection" type="Wizkunde\ConfigurableBundle\Model\ResourceModel\Option\Collection" />
+    <preference for="Magento\Bundle\Block\Adminhtml\Catalog\Product\Composite\Fieldset\Options\Type\Select" type="Wizkunde\ConfigurableBundle\Block\Catalog\Product\View\Type\Bundle\Option\Single" />
+    <preference for="Magento\Bundle\Block\Adminhtml\Catalog\Product\Composite\Fieldset\Options\Type\Radio" type="Wizkunde\ConfigurableBundle\Block\Catalog\Product\View\Type\Bundle\Option\Single" />
+    <preference for="Magento\Bundle\Block\Adminhtml\Catalog\Product\Composite\Fieldset\Options\Type\Multi" type="Wizkunde\ConfigurableBundle\Block\Catalog\Product\View\Type\Bundle\Option\Multi" />
+    <preference for="Magento\Bundle\Block\Adminhtml\Catalog\Product\Composite\Fieldset\Options\Type\Checkbox" type="Wizkunde\ConfigurableBundle\Block\Catalog\Product\View\Type\Bundle\Option\Multi" />
+    <preference for="Magento\GroupedProduct\Model\ResourceModel\Product\Type\Grouped\AssociatedProductsCollection" type="Wizkunde\ConfigurableBundle\Model\ResourceModel\Product\Type\Grouped\AssociatedProductsCollection"/>
+    <preference for="Magento\GroupedProduct\Model\Product\Type\Grouped" type="Wizkunde\ConfigurableBundle\Model\Product\Type\Grouped"/>
+
+    <type name="Magento\Bundle\Block\Adminhtml\Catalog\Product\Edit\Tab\Bundle\Option\Search\Grid">
+        <plugin name="after_grid_types" type="Wizkunde\ConfigurableBundle\Plugin\AfterTypes" sortOrder="1"/>
+    </type>
+
+    <type name="Magento\Bundle\Block\Adminhtml\Sales\Order\View\Items\Renderer">
+        <plugin name="around_view_get_value_html" type="Wizkunde\ConfigurableBundle\Plugin\AroundViewGetValueHtml" sortOrder="1"/>
+    </type>
+
+    <type name="Magento\Bundle\Block\Adminhtml\Sales\Order\Items\Renderer">
+        <plugin name="around_get_value_html" type="Wizkunde\ConfigurableBundle\Plugin\AroundGetValueHtml" sortOrder="1"/>
+    </type>
+</config>

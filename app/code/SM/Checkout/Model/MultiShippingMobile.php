@@ -13,6 +13,14 @@ use SM\GTM\Model\BasketFactory;
  */
 class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterface
 {
+    const CHECK_USE_FOR_COUNTRY = 'country';
+
+    const CHECK_USE_FOR_CURRENCY = 'currency';
+
+    const CHECK_ORDER_TOTAL_MIN_MAX = 'total';
+
+    const CHECK_ZERO_TOTAL = 'zero_total';
+
     protected $supportShippingData;
 
     /**
@@ -1373,6 +1381,68 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
             $response = $this->getCheckoutData($data);
         }
         return $response;
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function saveMobilePayment($paymentMethod, $customerId, $cartId)
+    {
+        $payment = [
+            'method' => $paymentMethod,
+            'check' => [
+                self::CHECK_USE_FOR_COUNTRY,
+                self::CHECK_USE_FOR_CURRENCY,
+                self::CHECK_ORDER_TOTAL_MIN_MAX,
+                self::CHECK_ZERO_TOTAL,
+            ]
+        ];
+        $quote = $this->quoteRepository->getActive($cartId);
+        $digitalOrder = false;
+        if ($quote->getIsVirtual()) {
+            $digitalOrder = true;
+        }
+        try {
+            $quote->getPayment()->importData($payment);
+            // shipping totals may be affected by payment method
+            if (!$quote->isVirtual() && $quote->getShippingAddress()) {
+                foreach ($quote->getAllShippingAddresses() as $shippingAddress) {
+                    $shippingAddress->setCollectShippingRates(true);
+                }
+                $quote->setTotalsCollectedFlag(false)->collectTotals();
+                if (!empty($term)) {
+                    $quote->setSprintTermChannelid($term);
+                    $termInfo=$this->paymentHelper->getTermInfo($paymentMethod, $term, $quote);
+                    $quote->setData('service_fee', ((int)$quote->getGrandTotal() * $termInfo['serviceFeeValue'])/100);
+                }
+            }
+            $this->quoteRepository->save($quote);
+            $isErrorCheckout = true;
+        } catch (\Exception $e) {
+            $isErrorCheckout = false;
+        }
+        $previewOrderProcess = $this->multiShippingHandle->getPreviewOrderData($quote, false);
+        $data = [
+            CheckoutDataInterface::SHIPPING_ADDRESS => [],
+            CheckoutDataInterface::ITEMS => [],
+            CheckoutDataInterface::ITEMS_MESSAGE => '',
+            CheckoutDataInterface::ADDITIONAL_INFO => [],
+            CheckoutDataInterface::PREVIEW_ORDER => $previewOrderProcess['preview_order'],
+            CheckoutDataInterface::CHECKOUT_TOTAL => $this->cartTotalRepository->get($cartId),
+            CheckoutDataInterface::IS_STORE_FULFILL => true,
+            CheckoutDataInterface::IS_SPLIT_ORDER => false,
+            CheckoutDataInterface::IS_ADDRESS_COMPLETE => true,
+            CheckoutDataInterface::IS_ERROR_CHECKOUT => $isErrorCheckout,
+            CheckoutDataInterface::PAYMENT_METHODS => [],
+            CheckoutDataInterface::VOUCHER => [],
+            CheckoutDataInterface::CURRENCY_SYMBOL => $this->getCurrencySymbol(),
+            CheckoutDataInterface::DIGITAL_CHECKOUT => $digitalOrder,
+            CheckoutDataInterface::DIGITAL_DETAIL => [],
+            CheckoutDataInterface::BASKET_ID => $this->getBasketId($customerId),
+            CheckoutDataInterface::BASKET_VALUE => $quote->getGrandTotal(),
+            CheckoutDataInterface::BASKET_QTY => $quote->getItemsQty(),
+        ];
+        return $this->getCheckoutData($data);
     }
 
     /**

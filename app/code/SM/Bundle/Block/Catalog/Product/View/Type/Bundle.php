@@ -196,7 +196,11 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
         if (!$optionBlock) {
             return $this->escapeHtml(__('There is no defined renderer for "%1" option type.', $option->getType()));
         }
-        return $optionBlock->setOption($option)->toHtml();
+
+        return $optionBlock
+            ->setOption($option)
+            ->setDefaultSelection($this->getDefaultSelection($option))
+            ->toHtml();
     }
 
     /**
@@ -443,4 +447,20 @@ class Bundle extends \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle
         ];
     }
 
+    /**
+     * @param \Magento\Bundle\Model\Option $option
+     * @return null|\Magento\Catalog\Model\Product
+     */
+    public function getDefaultSelection($option)
+    {
+        $selections = $option->getSelections();
+        $defaultSelection = current($selections);
+        foreach ($selections as $selection) {
+            if ($defaultSelection->getFinalPrice() > $selection->getFinalPrice()) {
+                $defaultSelection = $selection;
+                break;
+            }
+        }
+        return $defaultSelection;
+    }
 }

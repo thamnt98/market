@@ -24,15 +24,6 @@ interface MultiShippingInterface
     public function placeOrder($customerId);
 
     /**
-     * @param int $cartId
-     * @param string $paymentMethod
-     * @param integer $term
-     * @throws \Magento\Framework\Webapi\Exception
-     * @return boolean
-     */
-    public function saveMobilePayment($cartId, $paymentMethod,$term=null);
-
-    /**
      * @param int    $customerId
      * @param string $paymentMethod
      * @param int    $serviceFee

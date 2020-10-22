@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../vendor/magento/framework/ObjectManager/etc/config.xsd">
+    <preference for="Magento\Bundle\Model\ResourceModel\Indexer\Stock" type="Wizkunde\ConfigurableBundle\Model\ResourceModel\Indexer\Stock" />
+    <preference for="Magento\Bundle\Model\ResourceModel\Indexer\Price" type="Wizkunde\ConfigurableBundle\Model\ResourceModel\Indexer\Price" />
+    <preference for="Magento\Bundle\Model\ResourceModel\Selection" type="Wizkunde\ConfigurableBundle\Model\ResourceModel\Selection" />
+    <preference for="Magento\Bundle\Model\ResourceModel\Option\Collection" type="Wizkunde\ConfigurableBundle\Model\ResourceModel\Option\Collection" />
+    <preference for="Magento\Bundle\Model\Product\Type" type="Wizkunde\ConfigurableBundle\Model\Product\Type" />
+    <preference for="Magento\Bundle\Ui\DataProvider\Product\BundleDataProvider" type="Wizkunde\ConfigurableBundle\Ui\DataProvider\Product\BundleDataProvider" />
+    <preference for="Magento\Bundle\Api\ProductLinkManagementInterface" type="Wizkunde\ConfigurableBundle\Model\LinkManagement" />
+    <preference for="Magento\Bundle\Helper\Catalog\Product\Configuration" type="Wizkunde\ConfigurableBundle\Helper\Bundle" />
+    <preference for="Magento\Bundle\Block\Catalog\Product\View\Type\Bundle\Option\Select" type="Wizkunde\ConfigurableBundle\Block\Catalog\Product\View\Type\Bundle\Option\Select" />
+    <preference for="Magento\Bundle\Block\Catalog\Product\View\Type\Bundle\Option\Multi" type="Wizkunde\ConfigurableBundle\Block\Catalog\Product\View\Type\Bundle\Option\Multiselect" />
+    <preference for="Magento\Bundle\Block\Catalog\Product\View\Type\Bundle\Option\Radio" type="Wizkunde\ConfigurableBundle\Block\Catalog\Product\View\Type\Bundle\Option\Radio" />
+    <preference for="Magento\Bundle\Block\Catalog\Product\View\Type\Bundle\Option\Checkbox" type="Wizkunde\ConfigurableBundle\Block\Catalog\Product\View\Type\Bundle\Option\Checkbox" />
+    <preference for="Magento\Catalog\Model\ResourceModel\Product" type="Wizkunde\ConfigurableBundle\Model\ResourceModel\Product" />
+    <preference for="Magento\Catalog\Model\Indexer\Category\Product\Action\Full" type="Wizkunde\ConfigurableBundle\Model\Indexer\Category\Product\Full" />
+    <preference for="Magento\Catalog\Model\Indexer\Category\Product\Action\Rows" type="Wizkunde\ConfigurableBundle\Model\Indexer\Category\Product\Rows" />
+    <preference for="Magento\Bundle\Pricing\Price\BundleRegularPrice" type="Wizkunde\ConfigurableBundle\Pricing\RegularPrice" />
+    <preference for="Magento\Bundle\Pricing\Price\FinalPrice" type="Wizkunde\ConfigurableBundle\Pricing\FinalPrice" />
+
+    <type name="Wizkunde\ConfigurableBundle\Block\Catalog\Product\View\Type\Bundle\Option\Single">
+        <arguments>
+            <argument name="context" xsi:type="object">\Magento\Framework\View\Element\Template\Context</argument>
+            <argument name="jsonEncoder" xsi:type="object">\Magento\Framework\Json\EncoderInterface</argument>
+            <argument name="jsonDecoder" xsi:type="object">\Magento\Framework\Json\DecoderInterface</argument>
+            <argument name="productRepository" xsi:type="object">\Magento\Catalog\Model\ProductRepository</argument>
+            <argument name="productOptionRepository" xsi:type="object">\Magento\Catalog\Model\Product\Option\Repository</argument>
+            <argument name="catalogData" xsi:type="object">\Magento\Catalog\Helper\Data</argument>
+            <argument name="imageFactory" xsi:type="object">\Magento\Catalog\Helper\ImageFactory</argument>
+            <argument name="registry" xsi:type="object">\Magento\Framework\Registry</argument>
+            <argument name="string" xsi:type="object">\Magento\Framework\Stdlib\StringUtils</argument>
+            <argument name="mathRandom" xsi:type="object">\Magento\Framework\Math\Random</argument>
+            <argument name="cartHelper" xsi:type="object">\Magento\Checkout\Helper\Cart</argument>
+            <argument name="taxData" xsi:type="object">\Magento\Tax\Helper\Data</argument>
+            <argument name="pricingHelper" xsi:type="object">\Magento\Framework\Pricing\Helper\Data</argument>
+            <argument name="configurableRenderer" xsi:type="object">\Wizkunde\ConfigurableBundle\Block\Catalog\Product\Renderer\Configurable</argument>
+            <argument name="otherRenderer" xsi:type="object">\Wizkunde\ConfigurableBundle\Block\Catalog\Product\Renderer\Other</argument>
+            <argument name="data" xsi:type="array"></argument>
+        </arguments>
+    </type>
+
+    <type name="Wizkunde\ConfigurableBundle\Helper\Bundle">
+        <arguments>
+            <argument name="context" xsi:type="object">\Magento\Framework\App\Helper\Context</argument>
+            <argument name="productConfiguration" xsi:type="object">\Magento\Catalog\Helper\Product\Configuration</argument>
+            <argument name="pricingHelper" xsi:type="object">\Magento\Framework\Pricing\Helper\Data</argument>
+            <argument name="escaper" xsi:type="object">\Magento\Framework\Escaper</argument>
+            <argument name="productModel" xsi:type="object">\Magento\Catalog\Model\Product</argument>
+            <argument name="eavConfig" xsi:type="object">\Magento\Eav\Model\Config</argument>
+        </arguments>
+    </type>
+
+    <type name="Wizkunde\ConfigurableBundle\Plugin\BeforePrepareForCart">
+        <arguments>
+            <argument name="productRepository" xsi:type="object">\Magento\Catalog\Api\ProductRepositoryInterface</argument>
+        </arguments>
+    </type>
+
+    <type name="Wizkunde\ConfigurableBundle\Plugin\AfterToHtml">
+        <arguments>
+            <argument name="productModel" xsi:type="object">\Magento\Catalog\Api\ProductRepositoryInterface</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Framework\DB\Adapter\AdapterInterface">
+        <plugin name="before_query" type="Wizkunde\ConfigurableBundle\Plugin\BeforeQuery" sortOrder="1"/>
+    </type>
+
+    <type name="Magento\Bundle\Helper\Data">
+        <plugin name="after_types" type="Wizkunde\ConfigurableBundle\Plugin\AfterTypes" sortOrder="1"/>
+    </type>
+
+    <type name="Magento\Bundle\Block\Catalog\Product\View\Type\Bundle\Option\Select">
+        <plugin name="after_select_to_html" type="Wizkunde\ConfigurableBundle\Plugin\AfterToHtml" sortOrder="1"/>
+    </type>
+
+    <type name="Magento\Bundle\Block\Catalog\Product\View\Type\Bundle\Option\Radio">
+        <plugin name="after_select_to_html" type="Wizkunde\ConfigurableBundle\Plugin\AfterToHtml" sortOrder="1"/>
+    </type>
+
+    <type name="Magento\ConfigurableProduct\Model\Product\Type\Configurable">
+        <plugin name="cb_prepare_for_cart_configurable" type="Wizkunde\ConfigurableBundle\Plugin\BeforePrepareForCart" sortOrder="10"/>
+    </type>
+
+    <type name="Magento\ConfigurableProduct\Model\Product\Type\Configurable">
+        <plugin name="cb_duplicate_co_in_configurable" type="Wizkunde\ConfigurableBundle\Plugin\AfterConfigurablePrepareForCart" sortOrder="10"/>
+    </type>
+
+    <type name="Magento\Bundle\Block\Sales\Order\Items\Renderer">
+        <plugin name="cb_around_order_view" type="Wizkunde\ConfigurableBundle\Plugin\AroundOrderViewGetValueHtml" sortOrder="1"/>
+    </type>
+
+    <type name="Magento\CatalogInventory\Model\StockStateProvider">
+        <plugin name="cb_before_check_quote_item_qty" type="Wizkunde\ConfigurableBundle\Plugin\BeforeCheckQuoteItemQty" sortOrder="1"/>
+    </type>
+
+    <type name="Magento\CatalogInventory\Model\Quote\Item">
+        <plugin name="quote_item_children_plugin" type="Wizkunde\ConfigurableBundle\Plugin\QuoteItemPlugin" sortOrder="1"/>
+    </type>
+
+    <type name="Magento\CatalogInventory\Model\Quote\Item\QuantityValidator\Initializer\Option">
+        <plugin name="quantity_validator_plugin" type="Wizkunde\ConfigurableBundle\Plugin\OptionQuantityValidatorPlugin" sortOrder="1"/>
+    </type>
+
+    <!-- This provides the integration with Configurable Bundle -->
+    <type name="Wizkunde\ConfigurableBundle\Block\Catalog\Product\View\Type\Bundle\Option\Single">
+        <plugin name="after_get_options_block" type="Wizkunde\ConfigurableBundle\Plugin\AfterGetOptionsBlock" sortOrder="3" />
+    </type>
+
+    <!-- Grouped Functionality -->
+    <preference for="Magento\GroupedProduct\Model\ResourceModel\Product\Type\Grouped\AssociatedProductsCollection"
+                type="Wizkunde\ConfigurableBundle\Model\ResourceModel\Product\Type\Grouped\AssociatedProductsCollection"/>
+    <preference for="Magento\GroupedProduct\Model\ResourceModel\Indexer\Stock\Grouped"
+                type="Wizkunde\ConfigurableBundle\Model\ResourceModel\Indexer\Stock\Grouped"/>
+    <preference for="Magento\GroupedProduct\Model\Product\Type\Grouped"
+                type="Wizkunde\ConfigurableBundle\Model\Product\Type\Grouped"/>
+    <preference for="Magento\GroupedProduct\Block\Product\View\Type\Grouped"
+                type="Wizkunde\ConfigurableBundle\Block\Product\View\Type\Grouped"/>
+    <preference for="Magento\GroupedProduct\Model\ResourceModel\Product\Indexer\Price\GroupedInterface"
+                type="Magento\GroupedProduct\Model\ResourceModel\Product\Indexer\Price\Grouped"/>
+    <type name="Wizkunde\ConfigurableBundle\Block\Product\View\Type\Grouped">
+        <arguments>
+            <argument name="context" xsi:type="object">\Magento\Catalog\Block\Product\Context</argument>
+            <argument name="arrayUtils" xsi:type="object">\Magento\Framework\Stdlib\ArrayUtils</argument>
+            <argument name="jsonEncoder" xsi:type="object">\Magento\Framework\Json\EncoderInterface</argument>
+            <argument name="jsonDecoder" xsi:type="object">\Magento\Framework\Json\DecoderInterface</argument>
+            <argument name="productRepository" xsi:type="object">\Magento\Catalog\Model\ProductRepository</argument>
+            <argument name="productOptionRepository" xsi:type="object">
+                \Magento\Catalog\Model\Product\Option\Repository
+            </argument>
+            <argument name="configurableRenderer" xsi:type="object">
+                \Wizkunde\ConfigurableBundle\Block\Catalog\Product\Renderer\Configurable
+            </argument>
+            <argument name="imageFactory" xsi:type="object">\Magento\Catalog\Helper\ImageFactory</argument>
+            <argument name="data" xsi:type="array"></argument>
+        </arguments>
+    </type>
+
+    <!-- Split Bundle Functionality -->
+    <type name="Wizkunde\SplitProducts\Plugin\BeforeOnepage">
+        <arguments>
+            <argument name="scopeConfig" xsi:type="object">\Magento\Framework\App\Config\ScopeConfigInterface</argument>
+            <argument name="cartItemFactory" xsi:type="object">\Magento\Quote\Api\Data\CartItemInterfaceFactory</argument>
+            <argument name="productRepository" xsi:type="object">\Magento\Catalog\Api\ProductRepositoryInterface</argument>
+            <argument name="checkoutSession" xsi:type="object">\Magento\Checkout\Model\Session</argument>
+            <argument name="logger" xsi:type="object">\Psr\Log\LoggerInterface</argument>
+        </arguments>
+    </type>
+</config>

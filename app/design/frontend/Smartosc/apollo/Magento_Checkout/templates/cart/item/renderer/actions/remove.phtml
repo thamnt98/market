@@ -12,7 +12,7 @@ if ($item = $block->getItem()) {
 }
 ?>
 <a href="#"
-   title="<?= $block->escapeHtmlAttr(__('Remove item')) ?>"
+   title="<?= $block->escapeHtmlAttr(__('Remove')) ?>"
    class="action action-delete"
    <?php if (!empty($productId)) : ?>
        data-gtm-event="removeFromCart"
@@ -20,6 +20,6 @@ if ($item = $block->getItem()) {
    <?php endif; ?>
    data-post='<?= /* @noEscape */ $block->getDeletePostJson() ?>'>
     <span>
-        <?= $block->escapeHtml(__('Remove item')) ?>
+        <?= $block->escapeHtml(__('Remove')) ?>
     </span>
 </a>

@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <configurablebundle>
+            <general>
+                <remove_customize>0</remove_customize>
+                <move_options>0</move_options>
+                <input_visibility>normal</input_visibility>
+                <short_description>1</short_description>
+            </general>
+            <grouped>
+                <zero_qty_hide_options>0</zero_qty_hide_options>
+            </grouped>
+        </configurablebundle>
+    </default>
+</config>

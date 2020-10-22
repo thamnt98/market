@@ -16,7 +16,7 @@
 <?php /* @var $block \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle\Option\Select */ ?>
 <?php $_option      = $block->getOption(); ?>
 <?php $_selections  = $_option->getSelections(); ?>
-<?php $_default     = $_option->getDefaultSelection(); ?>
+<?php $_default = $block->getDefaultSelection(); ?>
 <?php list($_defaultQty, $_canChangeQty) = $block->getDefaultValues(); ?>
 <div class="field option <?php echo ($_option->getRequired()) ? ' required': ''; ?>">
     <label class="label" for="bundle-option-<?php echo $_option->getId() ?>">
@@ -32,7 +32,7 @@
         <div class="select-images<?php echo ($block->getBundleHelper()->mustShowImages() == false) ? ' no-images' : '' ?>" data-role="select-option-<?php echo $_option->getId() ?>">
             <?php if ($block->getBundleHelper()->mustShowImages() == true) : ?>
                 <?php foreach($_selections as $selection) : ?>
-                    <a class="select-link<?php if ($block->isSelected($selection)) echo ' active' ?> <?= (sizeof($_selections) == 1 && $_selections[0]->getTypeId() == 'configurable') ? 'hidden' : 'wrapper-option-config' ?>" data-selection-id="<?php echo $selection->getSelectionId() ?>">
+                    <a class="select-link<?php if ($selection->getId() == $_default->getId()) echo ' active' ?> <?= (sizeof($_selections) == 1 && $_selections[0]->getTypeId() == 'configurable') ? 'hidden' : 'wrapper-option-config' ?>" data-selection-id="<?php echo $selection->getSelectionId() ?>">
                         <?php if ($selection->getTypeId() != 'configurable') : ?><div class="option-data" childid="<?= (int)$selection->getId() ?>" oldprice="<?= (int)$selection->getPrice() ?>" finalprice="<?= (int)$selection->getFinalPrice() ?>"></div> <?php endif; ?>
                         <span><?php echo $selection->getName() ?></span>
                     </a>
@@ -49,7 +49,7 @@
                         <?php if ($_option->getRequired()) { echo 'data-validate="{\'validate-one-required-by-name\':true}"'; }?>
                            name="bundle_option[<?= $block->escapeHtmlAttr($_option->getId()) ?>]"
                            data-selector="bundle_option[<?= $block->escapeHtmlAttr($_option->getId()) ?>]"
-                        <?php if ($block->isSelected($_selection)) { echo ' checked="checked"'; } ?>
+                        <?php if ($_selection->getId() == $_default->getId()) { echo ' checked="checked"'; } ?>
                            value="<?= $block->escapeHtmlAttr($_selection->getSelectionId()) ?>"/>
                     <label class="label"
                            for="bundle-option-<?= $block->escapeHtmlAttr($_option->getId()) ?>-<?= $block->escapeHtmlAttr($_selection->getSelectionId()) ?>">

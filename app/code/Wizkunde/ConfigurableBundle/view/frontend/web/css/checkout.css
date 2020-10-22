@@ -1,0 +1,15 @@
+.multicheckout .item-options dt, .cart.table-wrapper .item-options dt, .block-giftregistry-shared-items .product .item-options dt {
+    font-weight: 400;
+    color: #333333;
+    font-size: 1.8rem;
+    float: none !important;
+}
+
+.multicheckout .item-options dt:after, .cart.table-wrapper .item-options dt:after, .block-giftregistry-shared-items .product .item-options dt:after {
+    content: '';
+}
+
+.bundle-cart-item-option {
+    margin-left: 28px;
+    display: block;
+}

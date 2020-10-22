@@ -1,0 +1,499 @@
+<?php
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// @codingStandardsIgnoreFile
+
+?>
+
+<?php /* @var $block \Magento\Bundle\Block\Catalog\Product\View\Type\Bundle\Option\Select */ ?>
+<?php $_option      = $block->getOption(); ?>
+<?php $_selections  = $_option->getSelections();?>
+<?php $_default     = $_option->getDefaultSelection(); ?>
+<?php $_selected_option = $block->getSuperOptions(); ?>
+<?php 
+$conf_selected_opt = [];
+$custom_selected_opt = [];
+if(isset($_selected_option['super_attribute']) && isset($_selected_option['super_attribute'][$_option->getId()]))
+{
+	$conf_selected_opt = $_selected_option['super_attribute'][$_option->getId()];
+}
+if(isset($_selected_option['bundle_custom_options']) && isset($_selected_option['bundle_custom_options'][$_option->getId()]))
+{
+	$custom_selected_opt = $_selected_option['bundle_custom_options'][$_option->getId()];
+}
+?>
+<?php list($_defaultQty, $_canChangeQty) = $block->getDefaultValues(); ?>
+<div class="field admin__field options<?php if ($_option->getRequired()) echo ' required' ?>">
+<?php //print_r($_selected_option['super_attribute'][$_option->getId() ]);?>
+    <label class="label admin__field-label"><span><?php echo $block->escapeHtml($_option->getTitle()) ?></span></label>
+    <div class="control admin__field-control">
+        <div class="nested<?php if ($_option->getDecoratedIsLast()):?> last<?php endif; ?>">
+            <div class="field option <?php echo ($_option->getRequired()) ? ' required': ''; ?>">
+                <label class="label" for="bundle-option-<?php echo $_option->getId() ?>">
+                    <span><?php echo $block->escapeHtml($_option->getTitle()) ?></span>
+                </label>
+                <div class="control">
+                    <div class="select-images" id="option-swatch-<?php echo $_option->getId() ?>">
+                        <select id="bundle-option-<?php echo $_option->getId() ?>"
+                                name="bundle_option[<?php echo $_option->getId() ?>]"
+                                data-selector="bundle_option[<?php echo $_option->getId() ?>]"
+                                class="bundle-option-<?php echo $_option->getId() ?> product bundle option bundle-option-select change-container-classname<?php if ($_option->getRequired()) echo ' required' ?>"
+                            <?php if ($_option->getRequired()) echo 'data-validate={required:true}' ?>>
+                            <option value option-id="0"><?php echo __('Choose a selection...') ?></option>
+                            <?php foreach ($_selections as $_selection): ?>
+                                <option value="<?php echo $_selection->getSelectionId() ?>"
+                                    <?php if ($block->isSelected($_selection)) echo ' selected="selected"' ?>
+                                    <?php if (!$_selection->isSaleable()) echo ' disabled="disabled"' ?>>
+                                    <?php echo $block->getSelectionTitlePrice($_selection, false) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div class="swatch-opt" data-role="swatch-options-<?php echo $block->getOption()->getId() ?>"></div>
+                    <div class="swatch-opt-price" data-role="swatch-options-price-<?php echo $block->getOption()->getId() ?>"></div>
+                    <div class="product-custom-options-<?php echo $block->getOption()->getId() ?>"></div>
+
+                    <div class="nested">
+                        <div class="field qty qty-holder">
+                            <label class="label" for="bundle-option-<?php echo $_option->getId() ?>-qty-input">
+                                <span><?php echo __('Quantity') ?></span>
+                            </label>
+                            <div class="control">
+                                <input <?php if (!$_canChangeQty) echo ' disabled="disabled"' ?>
+                                        id="bundle-option-<?php echo $_option->getId() ?>-qty-input"
+                                        class="input-text qty<?php if (!$_canChangeQty) echo ' qty-disabled' ?>"
+                                        type="number"
+                                        name="bundle_option_qty[<?php echo $_option->getId() ?>]"
+                                        data-selector="bundle_option_qty[<?php echo $_option->getId() ?>]"
+                                        value="<?php echo $_defaultQty ?>"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    require([
+        'jquery',
+        'underscore',
+        'mage/template',
+        'jquery/ui',
+        'jquery/jquery.parsequery'
+    ], function($,  _, mageTemplate) {
+        OptionControl = Class.create();
+
+        OptionControl.prototype = {
+            options: {
+                classes: {
+                    attributeClass: 'swatch-attribute',
+                    attributeLabelClass: 'swatch-attribute-label',
+                    attributeSelectedOptionLabelClass: 'swatch-attribute-selected-option',
+                    attributeOptionsWrapper: 'swatch-attribute-options',
+                    attributeInput: 'swatch-input',
+                    optionClass: 'swatch-option',
+                    selectClass: 'swatch-select',
+                    moreButton: 'swatch-more',
+                    loader: 'swatch-option-loading'
+                },
+
+                // option's json config
+                multiJsonConfig: <?php /* @escapeNotVerified */ echo $block->getMultiJsonConfig(); ?>,
+
+                // swatch's json config
+                multiJsonSwatchConfig: <?php /* @escapeNotVerified */ echo $block->getMultiJsonSwatchConfig(); ?>,
+
+                // option's json config
+                jsonConfig: <?php /* @escapeNotVerified */ echo $block->getJsonConfig(); ?>,
+
+                // swatch's json config
+                jsonSwatchConfig: <?php /* @escapeNotVerified */ echo $block->getJsonSwatchConfig(); ?>,
+
+                selectedProduct: "<?php /* @escapeNotVerified */ echo $block->getSelectedProduct() ?>",
+				
+                confSelectedOpt : <?php /* @escapeNotVerified */ echo json_encode($conf_selected_opt ) ?>,
+				
+                custSelectedOpt : <?php /* @escapeNotVerified */ echo json_encode($custom_selected_opt ) ?>,
+
+                // Get the custom option html
+                customOptions: <?php /* @escapeNotVerified */ echo $block->getMultiConfigurableOptions(); ?>,
+
+                // Id of the selected option
+                optionId: <?php echo $block->getOption()->getId() ?>,
+
+                productSelector: '.bundle-option-<?php echo $_option->getId() ?>',
+
+                // selector of parental block of prices and swatches (need to know where to seek for price block)
+                selectorProduct: '.product-configure-popup',
+
+                optionsSelector: '.product-custom-option',
+
+                //selector of product images gallery wrapper
+                mediaGallerySelector: '[data-gallery-role=gallery-placeholder]',
+
+                // number of controls to show (false or zero = show all)
+                numberToShow: false,
+
+                // show only swatch controls
+                onlySwatches: false,
+
+                // enable label for control
+                enableControlLabel: true,
+
+                // text for more button
+                moreButtonText: 'More',
+
+                // Callback url for media
+                mediaCallback: "<?php /* @escapeNotVerified */ echo $block->getMediaCallback() ?>",
+
+                // Local media cache
+                mediaCache: {},
+
+                // Cache for BaseProduct images. Needed when option unset
+                mediaGalleryInitial: [{}],
+
+                onlyMainImg: <?php /* @escapeNotVerified */ echo $block->getVar('change_only_base_image',
+                'Magento_Swatches') ?: 'false'; ?>
+            },
+
+            initialize: function () {
+                if (this.options.jsonConfig !== '') {
+                    this._sortAttributes();
+                    this._RenderControls();
+                } else {
+                    console.log('SwatchRenderer: No input data received');
+                }
+
+                var $widget = this;
+
+                $($widget.options.productSelector).change(function (e) {
+                    $('[data-role=swatch-options-<?php echo $_option->getId() ?>]').empty();
+
+                    if ($(this).val() != null) {
+                        $widget.options.jsonConfig = $widget.options.multiJsonConfig[$(this).val()];
+                        $widget.options.jsonSwatchConfig = $widget.options.multiJsonSwatchConfig[$(this).val()];
+                        $widget.options.selectedProduct = $(this).val();
+
+                        if ($widget.options.jsonConfig) {
+                            $widget._sortAttributes();
+                            $widget._RenderControls();
+                        } else {
+                            $widget._RenderCustomOptions();
+                        }
+                    }
+                });
+            },
+
+            getProduct: function () {
+                return this._CalcProducts().shift();
+            },
+
+            /**
+             * @private
+             */
+            _sortAttributes: function () {
+                if (typeof(this.options.jsonConfig) != 'undefined') {
+                    this.options.jsonConfig.attributes = _.sortBy(this.options.jsonConfig.attributes, function (attribute) {
+                        return attribute.position;
+                    });
+                }
+            },
+
+            /**
+             * @private
+             */
+            _create: function () {
+                var options = this.options,
+                    gallery = $('[data-gallery-role=gallery-placeholder]', '.column.main'),
+                    isProductViewExist = $('body.catalog-product-view').size() > 0,
+                    $main = isProductViewExist ?
+                        this.element.parents('.column.main') :
+                        this.element.parents('.product-item-info');
+
+                if (isProductViewExist) {
+                    gallery.on('gallery:loaded', function () {
+                        var galleryObject = gallery.data('gallery');
+
+                        options.mediaGalleryInitial = galleryObject.returnCurrentImages();
+                    });
+                } else {
+                    options.mediaGalleryInitial = [{
+                        'img': $main.find('.product-image-photo').attr('src')
+                    }];
+                }
+            },
+
+            /**
+             * Render controls
+             *
+             * @private
+             */
+            _RenderControls: function () {
+                var $widget = this,
+                    container = $('[data-role=swatch-options-<?php echo $_option->getId() ?>]'),
+                    classes = this.options.classes,
+                    chooseText = this.options.jsonConfig.chooseText;
+
+                $widget.optionsMap = {};
+
+                $.each(this.options.jsonConfig.attributes, function () {
+                    var item = this;
+
+                    if ($widget.options.optionId) {
+                        var inputs = container.find(
+                            '[name^="super_attribute[' + $widget.options.optionId + ']"]'
+                        );
+
+                        inputs.remove();
+                    }
+                });
+
+                $.each(this.options.jsonConfig.attributes, function () {
+                    var item = this,
+                        select = $widget._RenderSwatchSelect(item, chooseText,$widget),
+                        label = '';
+
+                    if ($widget.options.enableControlLabel) {
+                        label +=
+                            '<span class="' + classes.attributeLabelClass + '">' + item.label + '</span>' +
+                            '<span class="' + classes.attributeSelectedOptionLabelClass + '"></span>';
+                    }
+
+                    // Create new control
+                    container.append(
+                        '<div class="' + classes.attributeClass + ' ' + item.code +
+                        '" attribute-code="' + item.code +
+                        '" attribute-id="' + item.id + '">' +
+                        label +
+                        '<div class="' + classes.attributeOptionsWrapper + ' clearfix">' +
+                        select +
+                        '</div>' +
+                        '</div>'
+                    );
+
+                    $widget.optionsMap[item.id] = {};
+
+                    // Aggregate options array to hash (key => value)
+                    $.each(item.options, function () {
+                        if (this.products.length > 0 && $widget.options.jsonConfig.optionPrices[this.products[0]]) {
+                            $widget.optionsMap[item.id][this.id] = {
+                                price: parseInt(
+                                    $widget.options.jsonConfig.optionPrices[this.products[0]].finalPrice.amount,
+                                    10
+                                ),
+                                products: this.products
+                            };
+                        }
+                    });
+                });
+
+                $widget._RenderCustomOptions();
+
+                // Rewind options
+                $widget._Rewind(container);
+            },
+
+            _RenderCustomOptions: function () {
+
+                var $widget = this;
+
+                var $customOptionInput = $('.product-custom-options-' + $widget.options.optionId);
+                $customOptionInput.empty();
+                $customOptionInput.append($widget.options.customOptions[$widget.options.selectedProduct]);
+				$.each($widget.options.custSelectedOpt, function (index, value) {
+					var selector = '[id*=bundle_custom_options_' + $widget.options.optionId+"_"+index+"]";
+					var input = $(selector);
+					input.val(value);
+				});
+            },
+
+            /**
+             * Render select by part of config
+             *
+             * @param {Object} config
+             * @param {String} chooseText
+             * @returns {String}
+             * @private
+             */
+            _RenderSwatchSelect: function (config, chooseText,$widget) {
+                var html;
+                var attributes = '';
+                var requiredClass = '';
+                var requiredData = '';
+
+                attributes = 'name="super_attribute[' + this.options.optionId + '][' + config.id + ']"';
+                requiredData = 'data-validate="{required:true}" ' + 'aria-required="true" ' +
+                    'data-selector="' + 'super_attribute[' + this.options.optionId + '][' + config.id + ']"';
+
+                requiredClass = ' required';
+
+                html =
+                    '<select class="super-attribute-select ' +
+                    this.options.classes.selectClass +
+                    ' ' +
+                    config.code +
+                    requiredClass +
+                    '" ' +
+                    requiredData +
+                    'attribute-id="' +
+                    config.id +
+                    '"' +
+                    attributes +
+                    '>' +
+                    '<option value="" option-id="0">' + chooseText + '</option>';
+
+                $.each(config.options, function () {
+                    var label = this.label,
+                        attr = ' value="' + this.id + '" option-id="' + this.id + '"';
+					if( $widget.options.confSelectedOpt[config.id]==this.id)
+					{
+						attr +="selected";
+					}
+					
+                    if (!this.hasOwnProperty('products') || this.products.length <= 0) {
+                        attr += ' option-empty="true"';
+                    }
+					
+                    html += '<option ' + attr + '>' + label + '</option>';
+                });
+
+                html += '</select>';
+
+                return html;
+            },
+
+            /**
+             * Rewind options for controls
+             *
+             * @private
+             */
+            _Rewind: function (controls) {
+                controls.find('div[option-id], option[option-id]').removeClass('disabled').removeAttr('disabled');
+                controls.find('div[option-empty], option[option-empty]').attr('disabled', true).addClass('disabled');
+            },
+
+            /**
+             * Rebuild container
+             *
+             * @private
+             */
+            _Rebuild: function () {
+
+                var $widget = this,
+                    controls = $widget.element.find('.' + $widget.options.classes.attributeClass + '[attribute-id]'),
+                    selected = controls.filter('[option-selected]');
+
+                // Enable all options
+                $widget._Rewind(controls);
+
+                // done if nothing selected
+                if (selected.size() <= 0) {
+                    return;
+                }
+
+                // Disable not available options
+                controls.each(function () {
+                    var $this = $(this),
+                        id = $this.attr('attribute-id'),
+                        products = $widget._CalcProducts(id);
+
+                    if (selected.size() === 1 && selected.first().attr('attribute-id') === id) {
+                        return;
+                    }
+
+                    $this.find('[option-id]').each(function () {
+                        var $element = $(this),
+                            option = $element.attr('option-id');
+
+                        if (!$widget.optionsMap.hasOwnProperty(id) || !$widget.optionsMap[id].hasOwnProperty(option) ||
+                            $element.hasClass('selected') ||
+                            $element.is(':selected')) {
+                            return;
+                        }
+
+                        if (_.intersection(products, $widget.optionsMap[id][option].products).length <= 0) {
+                            $element.attr('disabled', true).addClass('disabled');
+                        }
+                    });
+                });
+            },
+
+            /**
+             * Get selected product list
+             *
+             * @returns {Array}
+             * @private
+             */
+            _CalcProducts: function ($skipAttributeId) {
+                var $widget = this,
+                    products = [];
+
+                // Generate intersection of products
+                $widget.element.find('.' + $widget.options.classes.attributeClass + '[option-selected]').each(function () {
+                    var id = $(this).attr('attribute-id'),
+                        option = $(this).attr('option-selected');
+
+                    if ($skipAttributeId !== undefined && $skipAttributeId === id) {
+                        return;
+                    }
+
+                    if (!$widget.optionsMap.hasOwnProperty(id) || !$widget.optionsMap[id].hasOwnProperty(option)) {
+                        return;
+                    }
+
+                    if (products.length === 0) {
+                        products = $widget.optionsMap[id][option].products;
+                    } else {
+                        products = _.intersection(products, $widget.optionsMap[id][option].products);
+                    }
+                });
+
+                return products;
+            },
+
+            /**
+             * Kill doubled AJAX requests
+             *
+             * @private
+             */
+            _XhrKiller: function () {
+                var $widget = this;
+
+                if ($widget.xhr !== undefined && $widget.xhr !== null) {
+                    $widget.xhr.abort();
+                    $widget.xhr = null;
+                }
+            },
+
+            /**
+             * Get default options values settings with either URL query parameters
+             * @private
+             */
+            _getSelectedAttributes: function () {
+                var hashIndex = window.location.href.indexOf('#'),
+                    selectedAttributes = {},
+                    params;
+
+                if (hashIndex !== -1) {
+                    params = $.parseQuery(window.location.href.substr(hashIndex + 1));
+
+                    selectedAttributes = _.invert(_.mapObject(_.invert(params), function (attributeId) {
+                        var attribute = this.options.jsonConfig.attributes[attributeId];
+
+                        return attribute ? attribute.code : attributeId;
+                    }.bind(this)));
+                }
+
+                return selectedAttributes;
+            }
+        };
+
+        var optionControl = new OptionControl({});
+    });
+</script>

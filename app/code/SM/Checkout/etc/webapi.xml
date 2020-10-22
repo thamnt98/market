@@ -40,15 +40,6 @@
             <parameter name="cartId" force="true">%cart_id%</parameter>
         </data>
     </route>
-    <route url="/V1/trans-checkout/mobile/savepayment" method="POST">
-        <service class="SM\Checkout\Api\MultiShippingInterface" method="saveMobilePayment"/>
-        <resources>
-            <resource ref="self"/>
-        </resources>
-        <data>
-            <parameter name="cartId" force="true">%cart_id%</parameter>
-        </data>
-    </route>
     <route url="/V1/trans-checkout/me/savepayment" method="POST">
         <service class="SM\Checkout\Api\MultiShippingInterface" method="savePayment"/>
         <resources>
@@ -223,6 +214,17 @@
 
     <route url="/V1/trans-checkout/applyVoucher" method="POST">
         <service class="SM\Checkout\Api\MultiShippingMobileInterface" method="applyVoucher"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/trans-checkout/mobile/savepayment" method="POST">
+        <service class="SM\Checkout\Api\MultiShippingMobileInterface" method="saveMobilePayment"/>
         <resources>
             <resource ref="self"/>
         </resources>

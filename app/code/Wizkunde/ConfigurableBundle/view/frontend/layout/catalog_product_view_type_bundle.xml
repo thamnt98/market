@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2016 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="bundle.summary" template="Wizkunde_ConfigurableBundle::catalog/product/view/summary.phtml" />
+        <referenceContainer name="product.info.main">
+            <referenceBlock name="product.info.bundle.options">
+                <action method="setTemplate" ifconfig="configurablebundle/general/move_options">
+                    <argument name="template" xsi:type="string">Wizkunde_ConfigurableBundle::catalog/product/view/type/bundle/options.phtml</argument>
+                </action>
+            </referenceBlock>
+            <referenceBlock name="customize.button">
+                <action method="setTemplate" ifconfig="configurablebundle/general/remove_customize">
+                    <argument name="template" xsi:type="string">Wizkunde_ConfigurableBundle::catalog/product/view/type/bundle/customize.phtml</argument>
+                </action>
+                <action method="setTemplate" ifconfig="configurablebundle/general/move_options">
+                    <argument name="template" xsi:type="string">Wizkunde_ConfigurableBundle::catalog/product/view/type/bundle/customize.phtml</argument>
+                </action>
+            </referenceBlock>
+
+            <referenceBlock name="product.info">
+                <action method="setTemplate" ifconfig="configurablebundle/general/remove_customize">
+                    <argument name="template" xsi:type="string">Wizkunde_ConfigurableBundle::catalog/product/view/type/bundle/form.phtml</argument>
+                </action>
+            </referenceBlock>
+        </referenceContainer>
+    </body>
+</page>
