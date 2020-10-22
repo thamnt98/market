@@ -19,10 +19,6 @@
         "amasty": {
             "type": "composer",
             "url": "https://composer.amasty.com/enterprise/"
-        },
-        "wizkunde-16513": {
-            "type": "composer",
-            "url": "https://teamwizkunde.repo.packagist.com/wizkunde-16513/"
         }
     },
     "require": {
@@ -36,8 +32,7 @@
         "endroid/qr-code": "2.5.0",
         "livechat/module-magento-livechat": "^2.3",
         "magento/magento-cloud-metapackage": ">=2.3.3 <2.3.5",
-        "mpdf/mpdf": "^8.0",
-        "wizkunde/configurable-bundle": "~1.14.12"
+        "mpdf/mpdf": "^8.0"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "~2.14.0",
