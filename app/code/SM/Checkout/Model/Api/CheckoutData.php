@@ -340,4 +340,20 @@ class CheckoutData extends AbstractExtensibleObject implements CheckoutDataInter
     {
         return $this->setData(self::TERM_AND_CONDITION, $value);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getShowEachItems()
+    {
+        return $this->_get(self::SHOW_EACH_ITEMS);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setShowEachItems($value)
+    {
+        return $this->setData(self::SHOW_EACH_ITEMS, $value);
+    }
 }

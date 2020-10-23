@@ -21,26 +21,32 @@ define(
         'sm.limitation', {
             _create: function () {
                 let self = this,
-                    customer = customerData.get('customer');
-                if (customer().firstname) {
+                    customer = customerData.get('customer'),
+                    fulfillment = customerData.get('fulfillment');
+                if (customer().firstname && fulfillment().show && typeof customer().firstname !== "undefined" && typeof fulfillment().show !== "undefined") {
                     console.log('customer');
                     self.showPopup()
                 }
                 customer.subscribe(function (customerUpdate) {
-                    if (customerUpdate.firstname) {
+                    if (customerUpdate.firstname && customerData.get('fulfillment').show !== "undefined") {
                         console.log('customer change');
                         self.showPopup()
                     }
                 });
                 maincoachmarks.coachMarks.subscribe(function (newValue) {
-                    var customer = customerData.get('customer');
-                    if (customer().firstname) {
+                    var customer = customerData.get('customer'),
+                        fulfillment = customerData.get('fulfillment');
+                    if (customer().firstname && fulfillment().show && typeof customer().firstname !== "undefined" && typeof fulfillment().show !== "undefined") {
                         console.log('coachMarks finish');
                         self.showPopup()
                     }
                 });
                 customerData.get('fulfillment').subscribe(function (newValue) {
-                    console.log(newValue);
+                    var customer = customerData.get('customer');
+                    if (newValue.show && customer().firstname && typeof customer().firstname !== "undefined") {
+                        console.log('fulfillment change');
+                        self.showPopup()
+                    }
                 });
             },
 

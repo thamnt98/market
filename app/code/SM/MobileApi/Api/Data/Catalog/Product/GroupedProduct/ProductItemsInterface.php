@@ -27,6 +27,8 @@ interface ProductItemsInterface extends ExtensibleDataInterface
     const NAME = 'name';
     const TYPE = 'type_id';
     const IMAGE = 'image';
+
+    const GTM_DATA = "gtm_data";
     /**
      * Get product ID
      *
@@ -230,4 +232,15 @@ interface ProductItemsInterface extends ExtensibleDataInterface
      * @return $this
      */
     public function setStoresInfo($data);
+
+    /**
+     * @return \SM\MobileApi\Api\Data\GTM\GTMInterface
+     */
+    public function getGtmData();
+
+    /**
+     * @param \SM\MobileApi\Api\Data\GTM\GTMInterface $value
+     * @return mixed
+     */
+    public function setGtmData($value);
 }

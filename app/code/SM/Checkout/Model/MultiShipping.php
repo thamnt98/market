@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace SM\Checkout\Model;
 
-use Magento\Framework\App\Config\ScopeConfigInterface;
 use SM\Checkout\Api\Data\Checkout\PaymentMethods\BankInterfaceFactory;
 use SM\Checkout\Model\Payment\Authorization;
 use SM\DigitalProduct\Api\Data\DigitalInterface;
@@ -411,7 +410,8 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
             ->setItemsValidMethod($itemsValidMethod)
             ->setError($dataHandle['error'])
             ->setIsSplitOrder($dataHandle['split'])
-            ->setStockMessage($message);
+            ->setStockMessage($message)
+            ->setShowEachItems($this->multiShippingHandle->isShowEachItems($checkoutSession->getQuote()->getAllShippingAddresses()));
     }
 
     /**

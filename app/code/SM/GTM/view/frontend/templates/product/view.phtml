@@ -234,6 +234,28 @@ if ($GTMViewModel) {
                         gtm.push('compare_product', data);
                     }
                 });
+
+                async.async('.action.tocart.primary', function () {
+                    if (!eventCreate['.action.tocart.primary']) {
+                        eventCreate['.action.tocart.primary'] = 0;
+                    }
+
+                    let current = $($('.action.tocart.primary')[eventCreate['.action.tocart.primary']]);
+                    $(current).click(function (e) {
+                        let data = $(this).attr("data-gtm-product");
+
+                        if (data) {
+                            try {
+                                data = JSON.parse(data);
+                                data['position'] = $(this).attr("data-position");
+                                gtm.push("addToCart", data);
+                            } catch (e) {
+
+                            }
+                        }
+                    });
+                    eventCreate['.action.tocart.primary']++;
+                });
             });
         });
     </script>

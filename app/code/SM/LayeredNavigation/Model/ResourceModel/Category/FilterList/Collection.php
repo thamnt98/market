@@ -47,7 +47,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
                 'attr.entity_type_id = eet.entity_type_id',
                 []
             )->where(
-                'eet.entity_type_code = ?',
+                'eet.entity_type_code IS NULL OR eet.entity_type_code = ?',
                 \Magento\Catalog\Model\Product::ENTITY
             );
 

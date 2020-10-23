@@ -156,7 +156,7 @@ class InvoiceRepository implements \SM\Sales\Api\InvoiceRepositoryInterface
      */
     public function convertMonth($date)
     {
-        return $this->date->date('M,dS Y', $date);
+        return $this->date->date('d F Y', $date);
     }
 
     /**

@@ -48,6 +48,16 @@ class GroupedProduct
     protected $_priceHelper;
 
     /**
+     * @var \SM\GTM\Block\Product\ListProduct
+     */
+    protected $productGtm;
+
+    /**
+     * @var \SM\MobileApi\Model\Data\GTM\GTMFactory
+     */
+    protected $gtmDataFactory;
+
+    /**
      * GroupedProduct constructor.
      * @param \SM\MobileApi\Model\Data\Catalog\Product\Grouped\ProductItemsFactory $productItemsFactory
      * @param \SM\MobileApi\Model\Product\Image $productHelperImage
@@ -56,6 +66,8 @@ class GroupedProduct
      * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
      * @param \SM\MobileApi\Model\Product\Stock $productStock
      * @param Price $priceHelper
+     * @param \SM\GTM\Block\Product\ListProduct $productGtm
+     * @param \SM\MobileApi\Model\Data\GTM\GTMFactory $gtmDataFactory
      */
     public function __construct(
         \SM\MobileApi\Model\Data\Catalog\Product\Grouped\ProductItemsFactory $productItemsFactory,
@@ -64,7 +76,9 @@ class GroupedProduct
         \SM\MobileApi\Helper\Product\Common $_commonProductHelper,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
         \SM\MobileApi\Model\Product\Stock $productStock,
-        Price $priceHelper
+        Price $priceHelper,
+        \SM\GTM\Block\Product\ListProduct $productGtm,
+        \SM\MobileApi\Model\Data\GTM\GTMFactory $gtmDataFactory
     ) {
         $this->productItemsFactory = $productItemsFactory;
         $this->_productImageHelper = $productHelperImage;
@@ -73,6 +87,8 @@ class GroupedProduct
         $this->_productRepository = $productRepository;
         $this->_productStock = $productStock;
         $this->_priceHelper = $priceHelper;
+        $this->gtmDataFactory = $gtmDataFactory;
+        $this->productGtm = $productGtm;
     }
 
     /**
@@ -122,9 +138,43 @@ class GroupedProduct
                 $groupedProduct->setConfigurableAttributes($this->_configurableHelper->getConfigurableAttributes($item));
             }
 
+            $gtmData = $this->getGTMData($productRepo);
+            $groupedProduct->setGtmData($gtmData);
+
             $result[] = $groupedProduct;
         }
 
         return $result;
+    }
+
+    public function getGTMData($product)
+    {
+        $data = $this->productGtm->getGtm($product);
+        $data = \Zend_Json_Decoder::decode($data);
+        /** @var \SM\MobileApi\Api\Data\GTM\GTMInterface $gtmData */
+        $gtmData = $this->gtmDataFactory->create();
+        $gtmData
+            ->setProductName($data['name'])
+            ->setProductId($data['id'])
+            ->setProductPrice($data['price'])
+            ->setProductBrand($data['brand'])
+            ->setProductCategory($data['category'])
+            ->setProductSize($data['product_size'])
+            ->setProductVolume($data['product_volume'])
+            ->setProductWeight($data['product_weight'])
+            ->setProductVariant($data['variant'])
+            ->setDiscountPrice($data['salePrice'])
+            ->setProductList($data['list'])
+            ->setProductRating($data['rating'])
+            ->setInitialPrice($data['initialPrice'])
+            ->setDiscountRate($data['discountRate'])
+            ->setProductType($product->getTypeId());
+        if ($data['salePrice'] && $data['salePrice'] > 0) {
+            $gtmData->setProductOnSale(__('Yes'));
+        } else {
+            $gtmData->setProductOnSale(__('Not on sale'));
+        }
+
+        return $gtmData;
     }
 }

@@ -28,6 +28,7 @@ interface CheckoutDataInterface
     const BASKET_QTY = 'basket_qty';
     const BASKET_VALUE = 'basket_value';
     const TERM_AND_CONDITION = "term_and_condition";
+    const SHOW_EACH_ITEMS = "show_each_items";
 
     /**
      * @param \Magento\Customer\Api\Data\AddressInterface[] $data
@@ -261,4 +262,15 @@ interface CheckoutDataInterface
      * @return $this
      */
     public function setTermAndCondition($value);
+
+    /**
+     * @return bool
+     */
+    public function getShowEachItems();
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function setShowEachItems($value);
 }

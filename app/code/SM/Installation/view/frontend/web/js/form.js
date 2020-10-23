@@ -149,7 +149,7 @@ define([
         },
 
         getInstallationFeeText: function () {
-            return $t('Add %1 Installation').replace('%1', this.getFeeText());
+            return $t('Add free installation to this product.**');
         },
 
         /**

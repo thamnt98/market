@@ -38,7 +38,7 @@ class Save extends CustomerController
     {
         $request = $this->_request->getParam('item');
         if ($this->notificationSettingRepository->updateNotificationSetting($this->customerSession->getCustomerId(), $request)) {
-            $this->messageManager->addSuccessMessage(__('Notification setting have been saved successful.'));
+            $this->messageManager->addSuccessMessage(__('Your notification settings have been saved.'));
         } else {
             $this->messageManager->addErrorMessage(__('Notification setting couldn\'t be saved. Please try again!'));
         }

@@ -279,11 +279,43 @@ switch ($type) {
                                                                 <?php $postDataHelper = $this->helper(Magento\Framework\Data\Helper\PostHelper::class);
                                                                 $postData = $postDataHelper->getPostData($block->escapeUrl($block->getAddToCartUrl($_item)), ['product' => $_item->getEntityId()])
                                                                 ?>
-                                                                <button class="action tocart primary"
-                                                                        data-post='<?= /* @noEscape */ $postData ?>'
-                                                                        type="button" title="<?= $block->escapeHtmlAttr(__('Add to Cart')) ?>">
-                                                                    <span><?= $block->escapeHtml(__('Add to Cart')) ?></span>
-                                                                </button>
+                                                                <form data-role="tocart-form"
+                                                                      data-product-sku="<?= $block->escapeHtml($_item->getSku()) ?>"
+                                                                      action="<?= $block->escapeUrl($block->getAddToCartUrl($_item)) ?>"
+                                                                      method="post">
+                                                                    <input type="hidden" name="product"
+                                                                           value="<?= $block->escapeHtmlAttr($_item->getEntityId()) ?>">
+                                                                    <div class="update-cart-qty">
+                                                                        <input type="hidden" name="item_id" value="0"/>
+                                                                        <input type="hidden" name="qty_type" value="1"/>
+                                                                        <button type="submit"
+                                                                                title="<?= $block->escapeHtmlAttr(__('Decrease qty')) ?>"
+                                                                                class="action decrease-qty">
+                                                                            <span><?= __('-') ?></span>
+                                                                        </button>
+                                                                        <label for="item_qty" class="label-item-qty">
+                                                                            <input type="number" name="item_qty" value="0"/>
+                                                                        </label>
+                                                                        <button type="submit" title="<?= $block->escapeHtmlAttr(__('Increase qty')) ?>"
+                                                                                value="increase" class="action increase-qty"
+                                                                                <?php if ($data) : ?>
+                                                                                    data-gtm-product="<?= $block->escapeHtml($data); ?>"
+                                                                                    data-gtm-position="<?= $position ?>"
+                                                                                <?php endif; ?>>
+                                                                            <span><?= __('+') ?></span>
+                                                                        </button>
+                                                                    </div>
+                                                                    <?= $block->getBlockHtml('formkey') ?>
+                                                                    <button type="submit"
+                                                                            title="<?= $block->escapeHtmlAttr(__('Add to Cart')) ?>"
+                                                                            class="action tocart primary"
+                                                                            <?php if ($data) : ?>
+                                                                                data-gtm-product="<?= $block->escapeHtml($data); ?>"
+                                                                                data-gtm-position="<?= $position ?>"
+                                                                            <?php endif; ?>>
+                                                                        <span><?= $block->escapeHtml(__('Add to Cart')) ?></span>
+                                                                    </button>
+                                                                </form>
                                                             <?php endif; ?>
                                                         <?php else :?>
                                                             <?php if ($_item->getIsSalable()) :?>
@@ -314,4 +346,16 @@ switch ($type) {
                 </div>
             </div>
         </div>
+
+            <?php if (!$block->isRedirectToCartEnabled()) :?>
+                <script type="text/x-magento-init">
+                {
+                    "[data-role=tocart-form], .form.map.checkout": {
+                        "catalogAddToCartAdvanced": {
+                            "product_sku": "<?= $block->escapeJs($_item->getSku()) ?>"
+                        }
+                    }
+                }
+                </script>
+            <?php endif; ?>
         <?php endif;?>

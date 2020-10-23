@@ -48,13 +48,7 @@
                         <div class="no-route-info">
                             <img src="<?= $block->getViewFileUrl('images/shopping-list-empty.png') ?>"
                                  alt="Your list is still empty" width="401"/>
-                            <h4><?= $block->escapeHtml(__('Sorry, it\'s currently unavailable.')) ?><br/></h4>
-                            <button type="button" name="do"
-                                    title="<?= $block->escapeHtml(__('Shop Now')) ?>"
-                                    class="action primary browse-products"
-                                    onclick="location.href = '<?= $block->getUrl() ?>'">
-                                <span><?= $block->escapeHtml(__('Shop Now')) ?></span>
-                            </button>
+                            <h4><?= $block->escapeHtml(__('Currently, there is no notification for you.')) ?></h4>
                         </div>
                     </div>
                 <?php endif; ?>

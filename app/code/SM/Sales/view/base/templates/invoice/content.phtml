@@ -141,11 +141,10 @@ $invoice = $block->getInvoice();
                     $storeInfo = $subInvoice->getStoreInfo();
                     $preparedStreet = $block->prepareStreet($storeInfo->getStreet());
                     ?>
-                    <span><?= $block->escapeHtml(__('Store Information')) ?></span>
+                    <span><?= $block->escapeHtml(__('Pick up in Store')) ?></span>
                     <h3><?= $block->escapeHtml($storeInfo->getName()) ?></h3>
                     <p><?= $block->escapeHtml($preparedStreet["street"]) ?></p>
                     <p><?= $block->escapeHtml($preparedStreet["last"]) ?></p>
-                    <p><?= $block->escapeHtml($block->pickUpTimeDateFormat($storeInfo->getPickUpDate()) . ", " . $storeInfo->getPickUpTime()) ?></p>
                 <?php endif;?>
                 <?php if ($subInvoice->getDeliveryAddress()):?>
                     <?php

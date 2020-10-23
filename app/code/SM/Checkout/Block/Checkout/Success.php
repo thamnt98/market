@@ -303,7 +303,7 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
 
     public function getBlockHowToPay()
     {
-        return $this->paymentHelper->getBlockHowToPay();
+        return $this->paymentHelper->getBlockHowToPay($this->getPaymentMethod(), true);
     }
 
     public function getLogoPayment()

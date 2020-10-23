@@ -32,7 +32,7 @@
             <input type="checkbox"
                    data-bind="
                             attr: {
-                                'name': usedFieldName + (itemId ? itemId : ''),
+                                'name': usedFieldName + itemId,
                                 'title': title,
                                 'checked': isChecked()
                             },
@@ -50,7 +50,7 @@
         <div class="control">
                 <textarea data-bind="
                               attr: {
-                                  'name': noteFieldName + (itemId ? itemId : ''),
+                                  'name': noteFieldName + itemId,
                                   'enable': isChecked(),
                                   'placeholder': getNotePlaceholder()
                               },
@@ -69,7 +69,7 @@
 <!-- ko if: hasRemovePopup -->
 <div class="installation-modal-remove" style="display: none">
     <div class="modal-content">
-        <div data-bind="text: $t('Are you sure want to remove ' + getFeeText() + ' installation?')"></div>
+        <div data-bind="text: $t('Are you sure you want to remove free installation?')"></div>
         <div data-bind="text: $t('Your note will be automatic removed.')"></div>
     </div>
 </div>

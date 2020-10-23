@@ -62,6 +62,11 @@ class StorePriceLogic implements StorePriceLogicInterface {
 	protected $storePriceInterfaceFactory;
 
 	/**
+	 * @var \Magento\Catalog\Model\Product\Action
+	 */
+	protected $productAction;
+
+	/**
 	 * @var \Trans\IntegrationCatalogPrice\Api\OnlinePriceRepositoryInterface
 	 */
 	protected $onlinePriceRepositoryInterface;
@@ -145,6 +150,7 @@ class StorePriceLogic implements StorePriceLogicInterface {
 	 * @param Logger $Logger
 	 * @param StorePriceRepositoryInterface $storePriceRepositoryInterface
 	 * @param StorePriceInterfaceFactory $StorePriceInterfaceFactory
+	 * @param \Magento\Catalog\Model\Product\Action $productAction
 	 * @param \Trans\IntegrationCatalogPrice\Api\OnlinePriceRepositoryInterface $onlinePriceRepositoryInterface
 	 * @param \Trans\IntegrationCatalogPrice\Api\Data\OnlinePriceInterfaceFactory $onlinePriceInterfaceFactory
 	 * @param IntegrationDataValueRepositoryInterface $IntegrationDataValueRepositoryInterface
@@ -165,30 +171,32 @@ class StorePriceLogic implements StorePriceLogicInterface {
 	 */
 	public function __construct
 	(
-		Logger $logger
-		,StorePriceRepositoryInterface $storePriceRepositoryInterface
-		,StorePriceInterfaceFactory $storePriceInterfaceFactory
-		,\Trans\IntegrationCatalogPrice\Api\OnlinePriceRepositoryInterface $onlinePriceRepositoryInterface
-		,\Trans\IntegrationCatalogPrice\Api\Data\OnlinePriceInterfaceFactory $onlinePriceInterfaceFactory
-		,IntegrationDataValueRepositoryInterface $integrationDataValueRepositoryInterface
-		,Validation $validation
-		,IntegrationJobRepositoryInterface $integrationJobRepositoryInterface
-		,\Magento\Catalog\Model\ResourceModel\Eav\Attribute $eavAttribute
-		,ProductAttributeManagementInterface $productAttributeManagement
-		,AttributeOption $attributeOptionHelper
-		,EavConfig $eavConfig
-		,ProductAttributeInterfaceFactory $productAttributeFactory
-		,ProductAttributeRepositoryInterface $productAttributeRepository
-		,IntegrationProductRepositoryInterface $integrationProductRepositoryInterface
-		,CoreHelper $coreHelper
-		,ProductRepositoryInterface $productRepositoryInterface
-		,IntegrationProductAttributeRepositoryInterface $integrationAttributeRepository
-		,\Trans\IntegrationCatalogStock\Api\IntegrationStockInterface $integrationStock
-		,\Trans\IntegrationCatalogPrice\Helper\Data $helperPrice
+		Logger $logger,
+		StorePriceRepositoryInterface $storePriceRepositoryInterface,
+		StorePriceInterfaceFactory $storePriceInterfaceFactory,
+		\Magento\Catalog\Model\Product\Action $productAction,
+		\Trans\IntegrationCatalogPrice\Api\OnlinePriceRepositoryInterface $onlinePriceRepositoryInterface,
+		\Trans\IntegrationCatalogPrice\Api\Data\OnlinePriceInterfaceFactory $onlinePriceInterfaceFactory,
+		IntegrationDataValueRepositoryInterface $integrationDataValueRepositoryInterface,
+		Validation $validation,
+		IntegrationJobRepositoryInterface $integrationJobRepositoryInterface,
+		\Magento\Catalog\Model\ResourceModel\Eav\Attribute $eavAttribute,
+		ProductAttributeManagementInterface $productAttributeManagement,
+		AttributeOption $attributeOptionHelper,
+		EavConfig $eavConfig,
+		ProductAttributeInterfaceFactory $productAttributeFactory,
+		ProductAttributeRepositoryInterface $productAttributeRepository,
+		IntegrationProductRepositoryInterface $integrationProductRepositoryInterface,
+		CoreHelper $coreHelper,
+		ProductRepositoryInterface $productRepositoryInterface,
+		IntegrationProductAttributeRepositoryInterface $integrationAttributeRepository,
+		\Trans\IntegrationCatalogStock\Api\IntegrationStockInterface $integrationStock,
+		\Trans\IntegrationCatalogPrice\Helper\Data $helperPrice
 	) {
 		$this->logger                           		= $logger;
 		$this->storePriceRepositoryInterface			= $storePriceRepositoryInterface;
 		$this->storePriceInterfaceFactory				= $storePriceInterfaceFactory;
+		$this->productAction							= $productAction;
 		$this->onlinePriceRepositoryInterface			= $onlinePriceRepositoryInterface;
 		$this->onlinePriceInterfaceFactory				= $onlinePriceInterfaceFactory;
 		$this->integrationDataValueRepositoryInterface	= $integrationDataValueRepositoryInterface;
@@ -347,18 +355,7 @@ class StorePriceLogic implements StorePriceLogicInterface {
 			if (empty($sku)) {
 				continue;
 			}
-			// $query[$index] = $this->integrationProductRepositoryInterface->loadDataByPimSku($sku);
-			// if (is_null($query[$index])) {
-			// 	if (isset($dataProduct[$sku])) {
-			// 		foreach($dataProduct[$sku] as $failData) {
-			// 			$this->updateDataValueStatus($failData['data_id'], IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE_MAPPING, "SKU Mapping not exist--->".print_r($sku,true));
-			// 		}
-			// 	}
-			// 	$this->logger->info("SKU Mapping not exist--->".print_r($sku,true));
-			// 	continue;
-			// }
 			
-			// $productIds[$index] = $query[$index]->getMagentoEntityId();
 			try {
 				$productInterface[$index] = $this->productRepositoryInterface->get($sku);
 				if($productInterface[$index] instanceof \Magento\Catalog\Api\Data\ProductInterface) {
@@ -379,7 +376,6 @@ class StorePriceLogic implements StorePriceLogicInterface {
 			}
 
 			$indexO = 0;
-			$defaultPrice=0;
 			
 			try{
 				foreach ($data as $value) {
@@ -393,9 +389,13 @@ class StorePriceLogic implements StorePriceLogicInterface {
 					}
 					
 					$indexW = 0;
-			
-					$product->addData(['base_price_in_kg' => '']);
-					$product->addData(['promo_price_in_kg' => '']);
+					
+					$dataAttr['base_price_in_kg'] = '';
+					$dataAttr['promo_price_in_kg'] = '';
+
+					// $product->addData(['base_price_in_kg' => '']);
+					// $product->addData(['promo_price_in_kg' => '']);
+					
 					foreach ($productMapingData[$sku][$indexO] as $priceType => $priceValue) {
 						$productMapingData[$sku][$indexO][$indexW]['code'] = $priceType;
 						$productMapingData[$sku][$indexO][$indexW]['price'] = $priceValue;
@@ -410,15 +410,17 @@ class StorePriceLogic implements StorePriceLogicInterface {
 							}
 
 							if($priceInKg) {
-								$product->addData([$priceKgAttr => $priceInKg]);
+								$dataAttr[$priceKgAttr] = $priceInKg;
+								// $product->addData([$priceKgAttr => $priceInKg]);
 							}
 						}
 
 						if($priceType == 'default_price'){
-							$productInterface[$index]->setPrice($priceValue);
-							$defaultPrice = $priceValue;
+							$dataAttr['price'] = $priceValue;
+							// $productInterface[$index]->setPrice($priceValue);
 						} else {
-							$productInterface[$index]->addData(array($priceType => $priceValue));
+							$dataAttr[$priceType] = $priceValue;
+							// $productInterface[$index]->addData(array($priceType => $priceValue));
 						}
 						$indexW++;
 					}
@@ -428,7 +430,8 @@ class StorePriceLogic implements StorePriceLogicInterface {
 						$isPriceInKg = 1;
 					}
 					
-					$product->addData(['price_in_kg' => $isPriceInKg]);
+					$dataAttr['price_in_kg'] = $isPriceInKg;
+					// $product->addData(['price_in_kg' => $isPriceInKg]);
 					
 					$indexO++;
 					
@@ -490,7 +493,13 @@ class StorePriceLogic implements StorePriceLogicInterface {
 				}
 				
 				// Save Product Price
-				$this->productRepositoryInterface->save($productInterface[$index]);
+				// $this->productRepositoryInterface->save($productInterface[$index]);
+
+				$this->productAction->updateAttributes(
+		            [$product->getId()],
+		            $dataAttr,
+		            0
+		        );
 			} catch (\Exception $exception) {
 				$msgError[] =$exception->getMessage();
 				$this->updateDataValueStatus($value['data_id'], IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE, $exception->getMessage());

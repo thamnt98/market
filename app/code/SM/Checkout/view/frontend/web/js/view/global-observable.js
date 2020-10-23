@@ -4,8 +4,9 @@
  */
 
 define([
-    'ko'
-], function (ko) {
+    'ko',
+    'Magento_Checkout/js/action/get-payment-information'
+], function (ko, getPaymentInformation) {
     'use strict';
     /**
      * current step
@@ -14,6 +15,10 @@ define([
         isVirtual = window.checkoutConfig.is_virtual;
 
     if (paymentFail || isVirtual) {
+        let deferred = $.Deferred();
+
+        getPaymentInformation(deferred);
+
         var isStepShipping = ko.observable(false),
             isStepPreviewOrder = ko.observable(false),
             isStepPayment = ko.observable(true),

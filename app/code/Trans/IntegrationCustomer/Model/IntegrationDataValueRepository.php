@@ -15,6 +15,7 @@ namespace Trans\IntegrationCustomer\Model;
 
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\StateException;
+use Magento\Framework\Exception\CouldNotSaveException;
 use \Trans\IntegrationCustomer\Api\Data\IntegrationDataValueInterface;
 use \Trans\IntegrationCustomer\Api\Data\IntegrationDataValueInterfaceFactory;
 use \Trans\IntegrationCustomer\Api\Data\IntegrationDataValueSearchResultInterfaceFactory;

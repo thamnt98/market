@@ -33,7 +33,7 @@
                 <remind_pickup_expired>2</remind_pickup_expired>
             </generate>
             <event_type_config>
-                <event_type><![CDATA[[{"event_type":"order_status","name":"Order Status","enable":"1"},{"event_type":"update","name":"Update","enable":"1"},{"event_type":"service","name":"Service","enable":"1"},{"event_type":"chat_recap","name":"Chat Recap","enable":"0"},{"event_type":"my_appointment","name":"My Appointment","enable":"0"},{"event_type":"promo","name":"Promotion","enable":"0"},{"event_type":"subscription","name":"Subscription","enable":"0"},{"event_type":"unknown_device","name":"Unknown Device","enable":"0"}]]]></event_type>
+                <event_type><![CDATA[[{"event_type":"order_status","name":"Order Status","enable":"1"},{"event_type":"update","name":"Updates","enable":"1"},{"event_type":"service","name":"Services","enable":"1"},{"event_type":"chat_recap","name":"Chat Recap","enable":"0"},{"event_type":"my_appointment","name":"My Appointment","enable":"0"},{"event_type":"promo","name":"Promotion","enable":"0"},{"event_type":"subscription","name":"Subscription","enable":"0"},{"event_type":"unknown_device","name":"Unknown Device","enable":"0"}]]]></event_type>
             </event_type_config>
         </sm_notification>
     </default>

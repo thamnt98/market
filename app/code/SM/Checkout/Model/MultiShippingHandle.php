@@ -110,8 +110,8 @@ class MultiShippingHandle
         $itemShippingMethod = [];
         $error = false;
         foreach ($checkoutSession->getQuote()->getAllShippingAddresses() as $_address) {
-            $shippingMethod = $_address->getPreShippingMethod();
-            if ($shippingMethod == self::STORE_PICK_UP) {
+            $preShippingMethod = $_address->getPreShippingMethod();
+            if ($preShippingMethod == self::STORE_PICK_UP) {
                 $addressShippingMethod[$_address->getId()] = true;
                 continue;
             } else {
@@ -138,6 +138,7 @@ class MultiShippingHandle
                         }
                     }
                 }
+                sort($shippingMethodListFake);
                 foreach ($_address->getAllVisibleItems() as $item) {
                     if ($item instanceof \Magento\Quote\Model\Quote\Address\Item) {
                         $quoteItemId = $item->getQuoteItemId();
@@ -155,6 +156,7 @@ class MultiShippingHandle
                 }
             }
         }
+
         if ($error) {
             $data['error'] = true;
             $data['data'] = $itemShippingMethod;
@@ -874,5 +876,34 @@ class MultiShippingHandle
     public function checkShippingPostCode($postCode)
     {
         return $this->split->checkShippingPostCode($postCode);
+    }
+
+    /**
+     * @param $allShippingAddress
+     * @return bool
+     */
+    public function isShowEachItems($allShippingAddress)
+    {
+        $showEachItems = false;
+        $shippingListFromQuoteAddress = [];
+        foreach ($allShippingAddress as $_address) {
+            $shippingMethod = $_address->getShippingMethod();
+            if (!$shippingMethod) {
+                $shippingMethod = 'not_set';
+            }
+            if ($shippingMethod == self::DC) {
+                $shippingMethod = self::DEFAULT_METHOD;
+            }
+            if ($shippingMethod == self::TRANS_COURIER) {
+                $shippingMethod = self::SAME_DAY;
+            }
+            if (!in_array($shippingMethod, $shippingListFromQuoteAddress)) {
+                $shippingListFromQuoteAddress[] = $shippingMethod;
+            }
+        }
+        if (count($shippingListFromQuoteAddress) > 1) {
+            $showEachItems = true;
+        }
+        return $showEachItems;
     }
 }

@@ -24,7 +24,7 @@
                         </div>
                         <?php foreach ($row['type'] as $key => $type) : ?>
                             <div class="title <?= $class != 'container-two-col' ? 'col-' . ($key + 2) : '' ?>">
-                                <p><?= ucfirst($type) ?></p>
+                                <p><?= strtolower($type) === 'sms' ? strtoupper($type) : ucfirst($type) ?></p>
                             </div>
                         <?php endforeach; ?>
                     </div>

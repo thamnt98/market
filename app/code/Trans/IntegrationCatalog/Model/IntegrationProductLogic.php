@@ -495,8 +495,9 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	 * @return \Magento\Catalog\Api\Data\ProductInterface
 	 * @throws CouldNotSaveException
 	 */
-	protected function saveDataToMagento($dataProduct, $integrationDataValue) {
-		
+	protected function saveDataToMagento($dataProduct, $integrationDataValue) 
+	{
+		$isConfigurable = 0;	
 		try {
 			// Check SKU
 			$productMapingData = $this->integrationProductRepositoryInterface->loadDataByPimSku($dataProduct['sku']);
@@ -572,6 +573,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 
 			$visibility = IntegrationProductInterface::VISIBILITY_BOTH; // visibility of product (catalog, search)
 			if ($this->integrationProductRepositoryInterface->checkPosibilityConfigurable($dataProduct['sku'])) {
+				$isConfigurable = 1;
 				$visibility = IntegrationProductInterface::VISIBILITY_NOT_VISIBLE; // Not visible
 			}
 			
@@ -614,12 +616,8 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			$this->logger->info($dataProduct['sku']." ---- Product = ".strtoupper($dataProduct[IntegrationProductInterface::PRODUCT_TYPE])." ---");
 			$product->setProductType($dataProduct[IntegrationProductInterface::PRODUCT_TYPE]);
 
-			// is configurable
-			$dataConfigurable = $this->checkConfigurable($dataProduct['sku']);
-			$is_configurable = $dataConfigurable['is_configurable'];
-
 			// Create Attribute Item Code
-			$dataAttributes = $this->addAttributeSellingForConfigurable($dataProduct, $dataConfigurable);
+			$dataAttributes = $this->addAttributeSellingForConfigurable($dataProduct);
 			
 			// Set Attributes
 			if(isset($dataAttributes['attributes']) && is_array($dataAttributes['attributes'])){
@@ -675,7 +673,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		}
 
 		return $result = [
-			"is_configurable" => $is_configurable,
+			"is_configurable" => $isConfigurable,
 			"entity_id" => $product->getEntityId()
 		];
 	}
@@ -753,12 +751,14 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		}
 		$result['sku']=$sku;
 		$skuConfigurable 	= $this->getItemId($sku);
-		if($skuConfigurable<1){
+		if(!$skuConfigurable){
 			$msg2 = __FUNCTION__." Error Item Id Empty!";
 			$this->logger->info($msg2);
 			return $result;
 		}
 		$result['sku_configurable']=$skuConfigurable;
+		// $check = $this->integrationProductRepositoryInterface->checkPosibilityConfigurable($dataProduct['sku']);
+		// var_dump($check);
 		$queryIntegrationProduct = $this->integrationProductRepositoryInterface->loadDataByItemId($skuConfigurable);
 		if ($queryIntegrationProduct->getSize() > 0) {
 			$countProduct = 0;
@@ -782,7 +782,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	 * @param string $sku
 	 * @param array $dataAttributes
 	 */
-	protected function addAttributeSellingForConfigurable($dataProduct, $dataConfigurable="")
+	protected function addAttributeSellingForConfigurable($dataProduct)
 	{	
 		$dataAttributes = $dataProduct['data_attributes'];
 		try {
@@ -790,25 +790,6 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 				$sellingUnit = substr($dataProduct['sku'], -3); //get 3 last char from SKU 
 				$attributeCode = IntegrationProductInterface::SELLING_UNIT_CODE;
 				$attributeId = $this->saveAttributeProduct($attributeCode);
-
-				// if ($dataConfigurable['is_configurable'] > 0) {
-				// 	$i=0;
-				// 	$checkSku = 0;
-				// 	foreach($dataConfigurable['query_integration_product'] as $rows){
-				// 		// $this->logger->info(__FUNCTION__.": ".$rows->getItemId()." - ".$dataConfigurable['sku_configurable']);
-				// 		if($rows->getPimSku()==$dataConfigurable['sku']){
-				// 			$checkSku++;
-				// 		}
-				// 		$i++;
-				// 	}
-				// 	if($checkSku < 1){
-				// 		$dataAttributes[] = [
-				// 			"attribute_code" => $attributeCode,
-				// 			"attribute_value" => (int) $sellingUnit
-				// 		];
-				// 	}				
-				// } else {
-				// }
 
 				$dataAttributes[] = [
 					"attribute_code" => $attributeCode,

@@ -392,8 +392,14 @@ class SendOMS
                 $date = date('Y-m-d', strtotime("+1 day", strtotime($date)));
             }
             $timeslot = $date . ' ' . $time;
-        } elseif ($logisticType == 3) {
-            $time = $order->getTime();
+        } elseif ($logisticType == 3 || $shippingMethod == 'store_pickup_store_pickup') {
+            if ($logisticType == 3) {
+                $time = $order->getTime();
+                $date = $this->timezone->date($order->getDate())->format('Y-m-d');
+            } else {
+                $time = $order->getStorePickUpDelivery();
+                $date = $this->timezone->date($order->getStorePickUpTime())->format('Y-m-d');
+            }
             $timeArray = explode("-", $time);
             $timeFrom = $timeArray[0];
             if (strpos($timeFrom, 'AM') !== false) {
@@ -407,7 +413,6 @@ class SendOMS
                 $timeFrom .= ':00';
                 $timeFrom = date('H:i:s', strtotime("+11 hour", strtotime($timeFrom)));
             }
-            $date = $this->timezone->date($order->getDate())->format('Y-m-d');
             $timeslot = $date . ' ' . $timeFrom;
         }
         $interface->setTimeSlot($timeslot);

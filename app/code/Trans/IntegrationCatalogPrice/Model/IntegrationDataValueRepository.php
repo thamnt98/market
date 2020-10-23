@@ -15,6 +15,7 @@ namespace Trans\IntegrationCatalogPrice\Model;
 
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Exception\StateException;
+use Magento\Framework\Exception\CouldNotSaveException;
 use \Trans\IntegrationCatalogPrice\Api\Data\IntegrationDataValueInterface;
 use \Trans\IntegrationCatalogPrice\Api\Data\IntegrationDataValueInterfaceFactory;
 use \Trans\IntegrationCatalogPrice\Api\Data\IntegrationDataValueSearchResultInterfaceFactory;

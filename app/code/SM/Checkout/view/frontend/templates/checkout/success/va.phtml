@@ -91,11 +91,22 @@
         </div>
         <div class="none-expired">
             <label class="text-label-body"><?= __('How to Pay with %1', $block->getTitlePaymentMethod()) ?></label>
-
-            <?= $this->getLayout()
-                ->createBlock(\Magento\Cms\Block\Block::class)
-                ->setBlockId('how-to-pay')
-                ->toHtml(); ?>
+            <div id="accordion">
+                <?php foreach ($block->getBlockHowToPay() as $item): ?>
+                    <div data-role="collapsible" class="title-accordion">
+                        <div data-role="trigger" class="arrow-title">
+                            <span><?= $item->getBlockTitle(); ?></span>
+                        </div>
+                    </div>
+                    <div data-role="content">
+                        <ul>
+                            <?php foreach($item->getBlockContent() as $line): ?>
+                            <li><?= $line ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endforeach; ?>`
+            </div>
         </div>
         <div class="check-payment-col">
             <a class="btn-outline-secondary" href="javascript:void(0)" data-action="checkStatus">
@@ -117,7 +128,7 @@
         ],
         function($, gtmCheckout) {
             var accordion = $("#accordion");
-            accordion.accordion();
+            accordion.accordion({ active: [0] });
 
             // Update the count down every 1 second
             var distance = parseInt("<?= $block->getTimeLeft() ?>")*1000;

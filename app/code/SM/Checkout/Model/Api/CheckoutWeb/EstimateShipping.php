@@ -9,6 +9,7 @@ class EstimateShipping extends \Magento\Framework\Api\AbstractExtensibleObject i
     const ERROR = 'error';
     const IS_SPLIT_ORDER = 'is_split_order';
     const STOCK_MESSAGE = 'stock_message';
+    const SHOW_EACH_ITEMS = 'show_each_items';
 
     /**
      * {@inheritdoc}
@@ -88,5 +89,21 @@ class EstimateShipping extends \Magento\Framework\Api\AbstractExtensibleObject i
     public function getStockMessage()
     {
         return $this->_get(self::STOCK_MESSAGE);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setShowEachItems($showEachItems)
+    {
+        return $this->setData(self::SHOW_EACH_ITEMS, $showEachItems);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getShowEachItems()
+    {
+        return $this->_get(self::SHOW_EACH_ITEMS);
     }
 }

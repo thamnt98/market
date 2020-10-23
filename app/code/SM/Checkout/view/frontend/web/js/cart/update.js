@@ -184,6 +184,9 @@ define([
     });
 
     cartContainer.on("click", ".increase-qty", function () {
+        //Increase quantity GTM
+        gtmCollectData.collectData();
+
         let itemId = $(this).attr('itemId');
         let itemStockQty = $(this).attr('itemstock');
         let itemQty = $('#cart-qty-'+ itemId);

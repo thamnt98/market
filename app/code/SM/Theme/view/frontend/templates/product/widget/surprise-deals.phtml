@@ -160,7 +160,11 @@ $helperSMCatalog = $this->helper('SM\Catalog\Helper\Data');
                                                                     <input type="number" name="item_qty" value="0"/>
                                                                 </label>
                                                                 <button type="submit" title="<?= $block->escapeHtmlAttr(__('Increase qty')) ?>"
-                                                                        value="increase" class="action increase-qty">
+                                                                        value="increase" class="action increase-qty"
+                                                                        <?php if ($dataGTM) : ?>
+                                                                            data-gtm-product='<?= $dataGTM ?>'
+                                                                            data-position="<?= $position ?>"
+                                                                        <?php endif; ?>>
                                                                     <span><?= __('+') ?></span>
                                                                 </button>
                                                             </div>
@@ -440,6 +444,28 @@ $helperSMCatalog = $this->helper('SM\Catalog\Helper\Data');
                         }
                     });
                     eventCreate['.action.view-details.primary']++;
+                });
+
+                async.async('.action.increase-qty', function () {
+                    if (!eventCreate['.action.increase-qty']) {
+                        eventCreate['.action.increase-qty'] = 0;
+                    }
+
+                    let current = $($('.action.increase-qty')[eventCreate['.action.increase-qty']]);
+                    $(current).click(function (e) {
+                        let data = $(this).attr("data-gtm-product");
+
+                        if (data) {
+                            try {
+                                data = JSON.parse(data);
+                                data['position'] = $(this).attr("data-position");
+                                gtm.push("addToCart", data);
+                            } catch (e) {
+
+                            }
+                        }
+                    });
+                    eventCreate['.action.increase-qty']++;
                 });
             }
         });

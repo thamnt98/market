@@ -58,4 +58,15 @@ interface EstimateShippingInterface
      * @return string
      */
     public function getStockMessage();
+
+    /**
+     * @param bool $showEachItems
+     * @return $this
+     */
+    public function setShowEachItems($showEachItems);
+
+    /**
+     * @return bool
+     */
+    public function getShowEachItems();
 }
