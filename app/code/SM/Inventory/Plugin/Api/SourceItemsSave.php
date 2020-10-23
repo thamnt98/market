@@ -162,7 +162,7 @@ class SourceItemsSave
     private function calculateItemQuantity($data)
     {
         $sku = explode($this->getBaseSkuPreFix(), $data[SourceItemInterface::SKU]);
-        if (!isset($sku[1]) || !is_numeric($sku[1] || $sku[1] == 0)) {
+        if (!isset($sku[1]) || !is_numeric($sku[1]) || $sku[1] == 0) {
             throw new \Exception(__('Can\t get quantity from this sku %1', $sku));
         }
         return intval($data[SourceItemInterface::QUANTITY] / (int)$sku[1]);
