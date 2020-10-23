@@ -736,14 +736,15 @@ class MultiShippingHandle
             } elseif ($shippingMethod == self::STORE_PICK_UP) {
                 $date = $this->timezone->convertConfigTimeToUtc($storeDateTime['date']);
                 $time = $storeDateTime['time'];
+                $this->saveStorePickUpDateTime($address, $date, $time);
             } else {
                 if ($shippingMethod == self::SCHEDULE) {
                     $dateTime = $deliveryDateTime[$address->getCustomerAddressId()];
                     $date = $this->timezone->convertConfigTimeToUtc($dateTime['date']);
                     $time = $dateTime['time'];
+                    $this->saveScheduleDateTime($address, $date, $time);
                 }
             }
-            $this->saveAddressData($address, $date, $time);
         }
         return $reload;
     }
@@ -753,9 +754,19 @@ class MultiShippingHandle
      * @param $date
      * @param $time
      */
-    protected function saveAddressData($address, $date, $time)
+    protected function saveScheduleDateTime($address, $date, $time)
     {
         $address->setDate($date)->setTime($time)->save();
+    }
+
+    /**
+     * @param $address
+     * @param $date
+     * @param $time
+     */
+    protected function saveStorePickUpDateTime($address, $date, $time)
+    {
+        $address->setStorePickUpTime($date)->setStorePickUpDelivery($time)->save();
     }
 
     /**

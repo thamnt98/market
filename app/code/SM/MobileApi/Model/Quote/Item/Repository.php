@@ -76,7 +76,6 @@ class Repository extends \Magento\Quote\Model\Quote\Item\Repository
         }
         $message = "";
         $quote = $this->quoteRepository->getActive($cartId);
-
         if ($cartItem->getData('item_id')) {
             $item = $quote->getItemById($cartItem->getData('item_id'));
             $availableStock = $this->productStock->getStock($item);
@@ -201,8 +200,8 @@ class Repository extends \Magento\Quote\Model\Quote\Item\Repository
         $quoteItems = $quote->getItems();
         $quoteItems[] = $cartItem;
         $quote->setItems($quoteItems);
-        $quote->setTotalsCollectedFlag(false)->collectTotals();
         $this->quoteRepository->save($quote);
+        $quote->collectTotals();
 
         if ($message != "") {
             throw new \Magento\Framework\Webapi\Exception(__($message), 444, 404);

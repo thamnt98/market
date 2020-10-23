@@ -18,7 +18,7 @@ use Trans\Sprint\Helper\Config as SprintHelper;
  */
 class Success extends \Magento\Checkout\Block\Onepage\Success
 {
-
+    protected $rendermap = false;
     /**
      * @var \Magento\Sales\Model\Order
      */
@@ -322,9 +322,14 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
         return $this->order->getShippingMethod();
     }
 
-    public function isPickupAtStore()
+    public function isPickupAtStore($order)
     {
-        return $this->getShippingMethod() == 'store_pickup_store_pickup';
+        if ($order->getShippingMethod() == 'store_pickup_store_pickup') {
+            $this->rendermap = true;
+            $this->getPickupAtStore($order);
+            return true;
+        }
+        return false;
     }
 
     public function getPickupStoreName()
@@ -343,16 +348,18 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
         return  $this->pickupAtStore->getData($data)??'';
     }
 
-    public function getPickupAtStore()
+    public function getPickupAtStore($order)
     {
-        $storePickupCode = $this->order->getStorePickUp();
+        $storePickupCode = $order->getStorePickUp();
         $this->pickupAtStore= $this->sourceRepository->get($storePickupCode);
         return $this->pickupAtStore;
     }
 
-    public function getStorePickupTime()
+    public function getStorePickupTime($order)
     {
-        return $this->order->getStorePickUpTime();
+        $date = $this->timeZone->date($order->getStorePickUpTime())->format('d F Y');
+        $time = $order->getStorePickUpDelivery();
+        return $date . ' ' . $time;
     }
 
     public function getOrderIsVirtual()
@@ -493,5 +500,10 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
             return '';
         }
         return  'Deliver to: ' . $address->getAddressTag() . ' - ' . implode($address->getStreet(), ' ') . ', ' . $this->getCityName($address->getCity()) . ', ' . $this->getDistrictName($address->getDistrict()) . ' ' . $address->getPostcode();
+    }
+
+    public function isRendermap()
+    {
+        return $this->rendermap;
     }
 }

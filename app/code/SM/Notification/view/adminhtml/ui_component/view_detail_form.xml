@@ -161,34 +161,18 @@
                 </select>
             </formElements>
         </field>
-        <field name="customer_ids" sortOrder="40" formElement="multiselect">
+        <field name="customer_ids" sortOrder="40" formElement="textarea">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
-                    <item name="source" xsi:type="string">notification</item>
                     <item name="disabled" xsi:type="boolean">true</item>
-                    <item name="elementTmpl" xsi:type="string">ui/grid/filters/elements/ui-select</item>
-                    <item name="component" xsi:type="string">Magento_Ui/js/form/element/ui-select</item>
-                    <item name="filterOptions" xsi:type="boolean">true</item>
-                    <item name="showCheckbox" xsi:type="boolean">true</item>
-                    <item name="disableLabel" xsi:type="boolean">true</item>
-                    <item name="multiple" xsi:type="boolean">true</item>
+                    <item name="source" xsi:type="string">notification</item>
                 </item>
             </argument>
             <settings>
-                <validation>
-                    <rule name="required-entry" xsi:type="boolean">true</rule>
-                </validation>
-                <dataType>int</dataType>
-                <label translate="true">Customer (s)</label>
+                <dataType>text</dataType>
+                <label translate="true">Customer ID(s)</label>
                 <dataScope>customer_ids</dataScope>
             </settings>
-            <formElements>
-                <multiselect>
-                    <settings>
-                        <options class="SM\Notification\Model\Source\Customers"/>
-                    </settings>
-                </multiselect>
-            </formElements>
         </field>
         <field name="image" sortOrder="50">
             <argument name="data" xsi:type="array">
@@ -264,17 +248,11 @@
                 </select>
             </formElements>
         </field>
-        <field name="redirect_id" sortOrder="90" formElement="select">
+        <field name="redirect_id" sortOrder="90" formElement="input">
             <argument name="data" xsi:type="array">
                 <item name="config" xsi:type="array">
                     <item name="disabled" xsi:type="boolean">true</item>
                     <item name="source" xsi:type="string">notification</item>
-                    <item name="elementTmpl" xsi:type="string">ui/grid/filters/elements/ui-select</item>
-                    <item name="component" xsi:type="string">SM_Notification/js/ui/form/element/redirect-key</item>
-                    <item name="filterOptions" xsi:type="boolean">true</item>
-                    <item name="showCheckbox" xsi:type="boolean">true</item>
-                    <item name="disableLabel" xsi:type="boolean">true</item>
-                    <item name="multiple" xsi:type="boolean">false</item>
                 </item>
             </argument>
             <settings>
@@ -285,13 +263,6 @@
                     <rule name="required-entry" xsi:type="boolean">true</rule>
                 </validation>
             </settings>
-            <formElements>
-                <select>
-                    <settings>
-                        <caption translate="true">-- Please Select --</caption>
-                    </settings>
-                </select>
-            </formElements>
         </field>
     </fieldset>
     <fieldset name="push">

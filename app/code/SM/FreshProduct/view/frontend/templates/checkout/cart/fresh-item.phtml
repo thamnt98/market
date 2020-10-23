@@ -20,7 +20,7 @@ $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
 
          </div>
         <?php else : ?>
-            <span class="fresh-price"><?= $block->escapeHtml($freshHelper->getPricePerKg($_product) . ' / kg') ?></span>
+            <span class="fresh-price"><?= $block->escapeHtml($freshHelper->getPricePerKg($_product) . '/kg') ?></span>
         <?php endif; ?>
     <?php else : ?>
         <div class="fresh-price"><?= $block->escapeHtml($block->getSoldIn($_product)) ?></div>

@@ -17,6 +17,13 @@ foreach ($block->getTotals() as $_code => $_total) : ?>
     <?php if ($_total->getBlockName()) : ?>
         <?= $block->getChildHtml($_total->getBlockName(), false) ?>
     <?php else :?>
+        <?php if ($_count_item == $_check_last_item ) : ?>
+        <tr>
+            <td colspan="4">
+                <hr class="hr">
+            </td>
+        </tr>
+        <?php endif?>
 
         <tr class="<?= $block->escapeHtmlAttr($_code) ?> emailfoot-total">
             <td></td>

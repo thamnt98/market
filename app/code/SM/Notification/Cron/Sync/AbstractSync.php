@@ -51,8 +51,9 @@ abstract class AbstractSync
 
     public function execute()
     {
-        $ids = [];
-        foreach ($this->getRecords() as $id => $record) {
+        $records = $this->getRecords();
+        $this->updateStatus(array_keys($records));
+        foreach ($records as $id => $record) {
             if (empty($record['event']) ||
                 empty($record['message_id']) ||
                 empty($record['customer_id'])
@@ -64,12 +65,8 @@ abstract class AbstractSync
                 continue;
             }
 
-            if ($this->syncRecord($record)) {
-                $ids[] = $id;
-            }
+            $this->syncRecord($record);
         }
-
-        $this->updateStatus($ids);
     }
 
     /**
@@ -123,7 +120,10 @@ abstract class AbstractSync
                 'message.start_date IS NULL OR message.start_date <= NOW()'
             )->where(
                 'message.end_date IS NULL OR message.end_date >= NOW()'
-            )->group(["main_table.message_id", "main_table.customer_id"]);
+            )->group(
+                ["main_table.message_id", "main_table.customer_id"]
+            )->limit(500);
+
 
         return $select;
     }

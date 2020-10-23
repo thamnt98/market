@@ -68,7 +68,6 @@ class UpdatePriceAttributeToSearch implements \Magento\Framework\Setup\Patch\Dat
             ->orWhere('attribute_code LIKE \'%promo_price%\'');
 
         $attrIds = $conn->fetchCol($select);
-        var_dump($attrIds);
         if (empty($attrIds)) {
             return;
         }

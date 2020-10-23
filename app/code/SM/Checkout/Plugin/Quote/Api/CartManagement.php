@@ -41,16 +41,20 @@ class CartManagement
     ) {
         try {
             $quote = $this->cartRepository->getActiveForCustomer($customerId);
-            if ($quote->isMultipleShippingAddresses()) {
+            if ($quote->isMultipleShippingAddresses() || $quote->getIsMultiShipping()) {
                 foreach ($quote->getAllShippingAddresses() as $address) {
                     $quote->removeAddress($address->getId());
                 }
-
                 $shippingAddress = $quote->getShippingAddress();
                 $defaultShipping = $quote->getCustomer()->getDefaultShipping();
                 if ($defaultShipping) {
                     $defaultCustomerAddress = $this->addressRepository->getById($defaultShipping);
                     $shippingAddress->importCustomerAddressData($defaultCustomerAddress);
+                }
+                $quote->setIsMultiShipping(0);
+                $extensionAttributes = $quote->getExtensionAttributes();
+                if ($extensionAttributes && $extensionAttributes->getShippingAssignments()) {
+                    $extensionAttributes->setShippingAssignments([]);
                 }
                 $this->cartRepository->save($quote);
             }

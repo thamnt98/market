@@ -93,47 +93,49 @@ $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
             <p class="text-body"><?/*= $block->getReferenceNumber() */?></p>
         </div>-->
     </div>
-
-    <!-- please style Pickup at store information -->
-    <?php if ($block->isPickupAtStore()):?>
-        <div class="block-payment product-purchased">
-            <div class="block-header product-header">
-                <div>
-                    <h4 class="tl-order-id"><?= $block->escapeHtml(__('Pick-Up Store Information')) ?></h4>
-                </div>
-                <div class="arrown-scroll">
-                    <a class="arrow pickup" href="javascript:void(0)" onclick="togglePickup()"></a>
-                </div>
-            </div>
-            <div class="pick-at-store-info ">
-                <div class="pick-store-name">
-                    <h4><?= $block->getPickupStoreName() ?></h4>
-                    <p><?= $block->getFullAddress() ?>
-                    </p>
-                </div>
-                <div class="pick-store-date">
-                    <h4><?= $block->escapeHtml(__('Pick Up Date')) ?></h4>
-                    <p><?= $block->getStorePickupTime() ?></p>
-                </div>
-                <div class="map-store">
-                    <div id="map" style="width: 100%;height: 300px"></div>
-                </div>
-                <div class="direction">
-                    <span class="apl-ArrowIcon"></span>
-                    <span>Direction</span>
-                </div>
-            </div>
-        </div>
-    <?php
-    endif;
-    ?>
     <?php $childOrders = $block->getChildOrders($block->getOrderId()); ?>
+    <?php if (!empty($childOrders)): ?>
+        <?php foreach ($childOrders as $child): ?>
+            <?php if ($block->isPickupAtStore($child)): ?>
+                <div class="block-payment product-purchased">
+                    <div class="block-header product-header">
+                        <div>
+                            <h4 class="tl-order-id"><?= $block->escapeHtml(__('Pick-Up Store Information')) ?></h4>
+                        </div>
+                        <div class="arrown-scroll">
+                            <a class="arrow pickup" href="javascript:void(0)" onclick="togglePickup()"></a>
+                        </div>
+                    </div>
+                    <div class="pick-at-store-info ">
+                        <div class="pick-store-name">
+                            <h4><?= $block->getPickupStoreName($child) ?></h4>
+                            <p><?= $block->getFullAddress($child) ?>
+                            </p>
+                        </div>
+                        <div class="pick-store-date">
+                            <h4><?= $block->escapeHtml(__('Pick Up Date')) ?></h4>
+                            <p><?= $block->getStorePickupTime($child) ?></p>
+                        </div>
+                        <div class="map-store">
+                            <div id="map" style="width: 100%;height: 300px"></div>
+                        </div>
+                        <div class="direction">
+                            <span class="apl-ArrowIcon"></span>
+                            <span>Direction</span>
+                        </div>
+                    </div>
+                </div>
+                <?php break; ?>
+            <?php endif; ?>
+        <?php endforeach; ?>
+    <?php endif; ?>
     <?php if (empty($childOrders)): ?>
+        <?php $parentOrder = $block->getParentOrder(); ?>
         <div class="block-payment product-purchased">
             <div class="block-header product-header">
                 <div class="">
                     <h4 class="tl-order-id"><?= $block->escapeHtml(__('Order ID')).' '.$block->getReferenceNumber() ?></h4>
-                    <p><?= $block->isPickupAtStore()?$block->getPickupStoreName():$block->getDeliveryAddress() ?></p>
+                    <p><?= $block->isPickupAtStore($parentOrder)?$block->getPickupStoreName():$block->getDeliveryAddress() ?></p>
                 </div>
                 <div class="arrown-scroll arrown-scroll-<?= $block->getOrderId() ?>">
                     <a class="arrow" href="javascript:void(0)" onclick="toggleContent(<?= $block->getOrderId(); ?>)"></a>
@@ -414,7 +416,7 @@ $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
 <?php endif;?>
 
 <?php
-if ($block->isPickupAtStore()):
+if ($block->isRendermap()):
     ?>
     <script>
         function initMap() {

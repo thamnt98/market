@@ -146,7 +146,8 @@ class Cart implements \SM\MobileApi\Api\CartInterface
         \SM\Checkout\Model\Price $pricehelper,
         \SM\MobileApi\Api\Data\GTM\GTMCartInterfaceFactory $gtmCart,
         Fresh $fresh,
-        \Magento\Quote\Api\CartManagementInterface $quoteManagement
+        \Magento\Quote\Api\CartManagementInterface $quoteManagement,
+        \Magento\Customer\Api\AddressRepositoryInterface $addressRepository
     ) {
         $this->fresh                    = $fresh;
         $this->quoteRepository          = $quoteRepository;
@@ -185,6 +186,7 @@ class Cart implements \SM\MobileApi\Api\CartInterface
         $this->gtmCart                  = $gtmCart;
         $this->pricehelper              = $pricehelper;
         $this->quoteManagement          = $quoteManagement;
+        $this->addressRepository = $addressRepository;
     }
 
     /**
@@ -626,7 +628,23 @@ class Cart implements \SM\MobileApi\Api\CartInterface
         $quote      = $this->quoteRepository->getActive($cartId);
         $customerId = $quote->getCustomerId();
         $totalQty   = 0;
-
+        if ($quote->isMultipleShippingAddresses() || $quote->getIsMultiShipping()) {
+            foreach ($quote->getAllShippingAddresses() as $address) {
+                $quote->removeAddress($address->getId());
+            }
+            $shippingAddress = $quote->getShippingAddress();
+            $defaultShipping = $quote->getCustomer()->getDefaultShipping();
+            if ($defaultShipping) {
+                $defaultCustomerAddress = $this->addressRepository->getById($defaultShipping);
+                $shippingAddress->importCustomerAddressData($defaultCustomerAddress);
+            }
+            $quote->setIsMultiShipping(0);
+            $extensionAttributes = $quote->getExtensionAttributes();
+            if ($extensionAttributes && $extensionAttributes->getShippingAssignments()) {
+                $extensionAttributes->setShippingAssignments([]);
+            }
+            $this->quoteRepository->save($quote);
+        }
         /** @var \Magento\Quote\Model\Quote\Item $item */
         foreach ($quote->getItemsCollection() as $item) {
             if (!$this->itemIsActive($item)) {

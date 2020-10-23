@@ -87,6 +87,10 @@ class Validate extends Action implements HttpPostActionInterface, HttpGetActionI
             empty($data['segment_ids'])
         ) {
             $error[] = __('`Segment (s)` is required!');
+        } elseif (strlen($data['content']) > 500) {
+            $error[] = __('`Content` must be less than or equal to 500 characters.');
+        } elseif (strlen($data['push_content']) > 500) {
+            $error[] = __('`Push Device Content` must be less than or equal to 500 characters.');
         }
 
         if (count($error)) {

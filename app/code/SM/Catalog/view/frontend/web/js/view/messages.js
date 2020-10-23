@@ -33,6 +33,10 @@ define([
             }
 
             $.cookieStorage.set('mage-messages', '');
+
+            $(window).on('beforeunload', function () {
+                $.cookieStorage.set('mage-messages', '');
+            });
         },
 
         initObservable: function () {
@@ -49,6 +53,7 @@ define([
                 if (document.readyState === 'complete') {
                     setTimeout(function () {
                         el.hide();
+                        $.cookieStorage.set('mage-messages', '');
                     }, 10000);
                 }
             };
@@ -67,6 +72,7 @@ define([
                 //Hide Message In PDP
                 setTimeout(function () {
                     $(self.selector).hide();
+                    $.cookieStorage.set('mage-messages', '');
                 }, 10000);
             }
             this.isHidden(false);

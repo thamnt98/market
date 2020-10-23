@@ -344,13 +344,10 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $data = [];
 
         //select all attributes
-        $collection
-            ->addAttributeToSelect('*');
+        $collection->addAttributeToSelect('*');
 
+        //Should not filter product in here, that will make filter and toolbar working not correctly
         foreach ($collection as $product) {
-            if ($product->getData("is_tobacco")) {
-                continue;
-            }
             /* @var $product \Magento\Catalog\Model\Product */
             $productInfo = $this->getProductListToResponseV2($product);
             $data[] = $productInfo;

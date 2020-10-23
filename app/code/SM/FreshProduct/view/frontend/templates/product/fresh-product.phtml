@@ -26,7 +26,7 @@ $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
                     });
                 </script>
             <?php else : ?>
-                <span class="price-box"><?= $block->escapeHtml($freshHelper->getPricePerKg($product) . ' / kg') ?></span>
+                <span class="price-box"><?= $block->escapeHtml($freshHelper->getPricePerKg($product) . '/kg') ?></span>
             <?php endif; ?>
             <div class="block-remark tooltip">
                 <label class="remark"><?= $block->escapeHtml('Weight & final price will be adjusted after weighing.') ?></label>

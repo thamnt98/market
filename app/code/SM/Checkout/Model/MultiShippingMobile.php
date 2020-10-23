@@ -882,41 +882,41 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         }
 
         $customerId = $customer->getId();
-        if ($init) {
-            $rebuild = false;
-            foreach ($quoteItems as $item) {
-                $ShippingMethodSelected = $item->getShippingMethodSelected();
-                if ($ShippingMethodSelected == \SM\Checkout\Model\MultiShippingHandle::STORE_PICK_UP) {
-                    continue;
-                }
-                $shippingMethodList = $item->getShippingMethod();
-                $shippingMethodListEnable = [];
-                foreach ($shippingMethodList as $shippingMethod) {
-                    if (!$shippingMethod->getDisabled()) {
-                        $shippingMethodListEnable[] = $shippingMethod->getValue();
-                    }
-                }
-                if (!in_array($ShippingMethodSelected, $shippingMethodListEnable)) {
-                    $rebuild = true;
-                    $items[$item->getItemId()]['shipping_method'] = (empty($shippingMethodListEnable)) ? \SM\Checkout\Model\MultiShippingHandle::NOT_AVAILABLE : $shippingMethodListEnable[0];
+        $rebuild = false;
+        foreach ($quoteItems as $item) {
+            $ShippingMethodSelected = $item->getShippingMethodSelected();
+            if ($ShippingMethodSelected == \SM\Checkout\Model\MultiShippingHandle::STORE_PICK_UP) {
+                continue;
+            }
+            $shippingMethodList = $item->getShippingMethod();
+            $shippingMethodListEnable = [];
+            foreach ($shippingMethodList as $shippingMethod) {
+                if (!$shippingMethod->getDisabled()) {
+                    $shippingMethodListEnable[] = $shippingMethod->getValue();
                 }
             }
-            if ($rebuild) {
-                return $this->handleCheckoutData(
-                    $cartId,
-                    $items,
-                    $additionalInfo,
-                    $customer,
-                    $checkoutSession,
-                    $isAddressComplete,
-                    $isStoreFulFill,
-                    $addressesList,
-                    $paymentMethodsAvailable,
-                    $collectVoucher,
-                    $init = false,
-                    $message
-                );
+            if (empty($shippingMethodListEnable)) {
+                $items[$item->getItemId()]['shipping_method'] = \SM\Checkout\Model\MultiShippingHandle::NOT_AVAILABLE;
+            } elseif (!in_array($ShippingMethodSelected, $shippingMethodListEnable)) {
+                $rebuild = true;
+                $items[$item->getItemId()]['shipping_method'] = $shippingMethodListEnable[0];
             }
+        }
+        if ($rebuild) {
+            return $this->handleCheckoutData(
+                $cartId,
+                $items,
+                $additionalInfo,
+                $customer,
+                $checkoutSession,
+                $isAddressComplete,
+                $isStoreFulFill,
+                $addressesList,
+                $paymentMethodsAvailable,
+                $collectVoucher,
+                $init = false,
+                $message
+            );
         }
         $data = [
             CheckoutDataInterface::SHIPPING_ADDRESS => $addressesList,
