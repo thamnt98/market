@@ -39,7 +39,7 @@ define([
             },
             buttons: [{
                 text: $t('Yes'),
-                class: 'action-primary action-accept',
+                class: 'action primary action-accept',
 
                 /**
                  * Click handler.

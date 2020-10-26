@@ -242,21 +242,20 @@ class AllocationRuleIntegration implements OrderAllocationRuleInterface
                         $itemIsOwnCourier = $itemsOrder->is_own_courier;
                     }
 
-                    /* Parsing data store SPO (Warehouse) */
-                    $spoDetail           = json_encode($data->data->warehouse);
-                    $storeSpoCode        = $data->data->warehouse->store_code;
-                    $storeSpoName        = $data->data->warehouse->store_name;
-                    $storeSpoAddress     = $data->data->warehouse->store_address;
-                    $storeSpoEmail       = $data->data->warehouse->email;
-                    $storeSpoProv        = $data->data->warehouse->province;
-                    $storeSpoPhone       = $data->data->warehouse->phone;
-                    $storeSpoCity        = $data->data->warehouse->city;
-                    $storeSpoDistrict    = $data->data->warehouse->district;
-                    $storeSpoZipcode     = $data->data->warehouse->store_zipcode;
-                    $storeSpoLat         = $data->data->warehouse->latitude;
-                    $storeSpoLng         = $data->data->warehouse->longitude;
-                    $storeSpoCodename    = $data->data->warehouse->code_name;
-                    $storeSpoDistanceRad = $data->data->warehouse->distance_radius;
+                    $spoDetail = json_encode($data->data->warehouse) ? json_encode($data->data->warehouse) : '';
+                    // $storeSpoCode        = $data->data->warehouse->store_code ? $data->data->warehouse->store_code :  ;
+                    // $storeSpoName        = $data->data->warehouse->store_name;
+                    // $storeSpoAddress     = $data->data->warehouse->store_address;
+                    // $storeSpoEmail       = $data->data->warehouse->email;
+                    // $storeSpoProv        = $data->data->warehouse->province;
+                    // $storeSpoPhone       = $data->data->warehouse->phone;
+                    // $storeSpoCity        = $data->data->warehouse->city;
+                    // $storeSpoDistrict    = $data->data->warehouse->district;
+                    // $storeSpoZipcode     = $data->data->warehouse->store_zipcode;
+                    // $storeSpoLat         = $data->data->warehouse->latitude;
+                    // $storeSpoLng         = $data->data->warehouse->longitude;
+                    // $storeSpoCodename    = $data->data->warehouse->code_name;
+                    // $storeSpoDistanceRad = $data->data->warehouse->distance_radius;
 
                     /* Parsing data store */
                     $storeCode        = $data->data->store->store_code;

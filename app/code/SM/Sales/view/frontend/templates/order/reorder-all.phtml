@@ -4,7 +4,7 @@
 
 <form id="form-reorder-all-<?= $block->getParentOrderId()?>" action="<?= $block->getReorderAllUrl()?>" method="post">
     <input type="hidden" name="parent_order_id" value="<?= $block->getParentOrderId() ?>"/>
-    <a type="button" data-gtm-event="reorder-all" data-gtm="<?= $block->escapeHtml($block->getParentOrderId()) ?>" id="btn-reorder-all-<?= $block->getParentOrderId()?>" class="action secondary pagebuilder-slide-button pagebuilder-button-secondary"><?= $block->escapeHtml(__('Reorder all')) ?></a>
+    <a type="button" data-gtm-event="reorder-all" data-gtm="<?= $block->escapeHtml($block->getParentOrderId()) ?>" id="btn-reorder-all-<?= $block->getParentOrderId()?>" class="action secondary pagebuilder-slide-button pagebuilder-button-secondary"><?= $block->escapeHtml(__('Reorder All')) ?></a>
 </form>
 
 <div id="confirm-reorder-all-<?= $block->getParentOrderId()?>" class="content" style="display:none;">

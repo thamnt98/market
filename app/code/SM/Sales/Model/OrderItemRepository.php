@@ -159,7 +159,7 @@ class OrderItemRepository implements OrderItemRepositoryInterface
             $quote->collectTotals()->save();
 
             $resultData->setStatus(1);
-            $resultData->setMessage(__("You have added all products from a completed order to shopping cart"));
+            $resultData->setMessage(__("You have added all products from a completed order to shopping cart."));
         } catch (Exception $e) {
             $resultData->setStatus(0);
             $resultData->setMessage(__($e->getMessage()));

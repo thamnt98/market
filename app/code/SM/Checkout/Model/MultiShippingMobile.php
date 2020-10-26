@@ -1429,7 +1429,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
             CheckoutDataInterface::SHIPPING_ADDRESS => [],
             CheckoutDataInterface::ITEMS => [],
             CheckoutDataInterface::ITEMS_MESSAGE => '',
-            CheckoutDataInterface::ADDITIONAL_INFO => [],
+            CheckoutDataInterface::ADDITIONAL_INFO => null,
             CheckoutDataInterface::PREVIEW_ORDER => $previewOrderProcess['preview_order'],
             CheckoutDataInterface::CHECKOUT_TOTAL => $this->cartTotalRepository->get($cartId),
             CheckoutDataInterface::IS_STORE_FULFILL => true,

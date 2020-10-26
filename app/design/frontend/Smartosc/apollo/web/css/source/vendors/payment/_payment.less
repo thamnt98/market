@@ -265,11 +265,16 @@
             }
         }
     }
-
-    #accordion {
+    .none-expired{
         text-align: left;
-        max-width: 761px;
+        max-width: 760px;
         margin: 0 auto;
+        .text-label-body{
+            padding: 0 15px 10px;
+        }
+    }
+    #accordion {
+
         .title-accordion{
             border-radius: 4px;
             background-color: @c-tsm-grey23;
@@ -282,14 +287,23 @@
                 line-height: 31px;
                 font-size: 24px;
             }
+            &:hover{
+                background-color: #bbb8b8;
+            }
         }
         .content-accordion{
             padding: 0px 15px 15px;
-            p{
-                font-size: 16px;
-                line-height: 25px;
-                color: @c-tsm-grey20;
+            color: @c-tsm-grey20;
+            font-size: 16px;
+            ul{
+                list-style: none;
+                margin: 0;
+                padding: 0;
+                li{
+                    margin-bottom: 8px;
+                }
             }
+
         }
         .arrow-title{
             &::after{
@@ -510,6 +524,14 @@
                     margin-right: 0;
                     margin-bottom: 20px;
                 }
+            }
+        }
+        .check-payment-col{
+            .btn-outline-secondary,
+            .primary{
+                width: 100% !important;
+                margin: 10px 0 !important;
+                display: block;
             }
         }
     }

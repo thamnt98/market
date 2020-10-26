@@ -498,7 +498,7 @@ class OrderStatus implements OrderStatusInterface
          * trigger capture - refund by payment method
          */
         if ($status == 2 && $action == 2 && $subAction == 7) {
-            if ($paymentMethod === 'sprint_mega_cc' || 'sprint_allbankfull_cc' || 'sprint_bca_va' || 'sprint_permata_va') {
+            if ($paymentMethod === 'sprint_mega_cc' || 'sprint_allbankfull_cc' || 'sprint_bca_va' || 'sprint_permata_va' || 'sprint_mega_debit') {
                 if ($itemData['quantity'] > $itemData['quantity_allocated']) {
                     $this->helperData->sprintLog()->info('===== Capture Process ===== Start');
 

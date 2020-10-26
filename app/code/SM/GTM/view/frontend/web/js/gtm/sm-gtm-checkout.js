@@ -244,6 +244,50 @@ define([
                         });
                     }
                         break;
+                    case "addToCart": {
+                        let dataProduct = [];
+                        $.each(data,function (key, value) {
+                            let product = {
+                                'product_size': value['product_size'],
+                                'product_volume': value['product_volume'],
+                                'product_weight': value['product_weight'],
+                                'product_type': value['type'],
+                                'salePrice': value['salePrice'],
+                                'discountRate': value['discountRate'],
+                                'rating': value['rating'],
+                                'initialPrice': value['initialPrice'],
+                                'name': value['name'],
+                                'id': value['id'],
+                                'price': value['price'],
+                                'brand': value['brand'],
+                                'category': value['category'],
+                                'variant': value['variant'],
+                                'quantity': value['quantity']
+                            };
+                            dataProduct.push(product);
+                        });
+                        window.dataLayer.push({
+                            'event': "addToCart",
+                            'uniqueUserID': dataLayerSourceObjects.customer.uniqueUserID,
+                            'userID': dataLayerSourceObjects.customer.userID,
+                            'customerID': dataLayerSourceObjects.customer.customerID,
+                            'customerType': dataLayerSourceObjects.customer.customerType,
+                            'loyalty': dataLayerSourceObjects.customer.loyalty,
+                            'customerStatus': dataLayerSourceObjects.customer.customerStatus,
+                            'loginType': dataLayerSourceObjects.customer.loginType,
+                            'timestamp': moment().format('DD\/MM\/YYYY HH:mm:ss'),
+                            'email': dataLayerSourceObjects.quote.email,
+                            'basket_id': dataLayerSourceObjects.customer.basketID,
+                            'basket_value': data['basket_value'],
+                            'basket_quantity': data['basket_quantity'],
+                            'ecommerce': {
+                                'remove': {
+                                    'products': dataProduct
+                                }
+                            }
+                        });
+                    }
+                        break;
                 }
             }
         },

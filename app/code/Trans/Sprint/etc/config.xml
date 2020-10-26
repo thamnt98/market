@@ -62,6 +62,19 @@
                 <promo_code></promo_code>
                 <ipg>sprint</ipg>
             </sprint_mega_cc>
+            <sprint_mega_debit>
+                <active>1</active>
+                <payment_action>authorize</payment_action><!-- You can use another methor like capture  -->
+                <model>Trans\Sprint\Model\Payment\MegaDebit</model>
+                <active>1</active>
+                <title>Bank Mega Debit Card</title>
+                <order_status>pending_payment</order_status><!-- set default order status-->
+                <payment_channel>credit_card</payment_channel>
+                <promo_code></promo_code>
+                <ipg>sprint</ipg>
+                <description>Get 5% discount with your Mega Debit Card</description>
+                <tooltip_description>Please use payment with Bank Mega to get discount</tooltip_description>
+            </sprint_mega_debit>
             <sprint_allbankfull_cc>
                 <active>1</active>
                 <payment_action>authorize</payment_action><!-- You can use another methor like capture  -->

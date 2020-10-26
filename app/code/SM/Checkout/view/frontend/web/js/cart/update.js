@@ -185,7 +185,7 @@ define([
 
     cartContainer.on("click", ".increase-qty", function () {
         //Increase quantity GTM
-        gtmCollectData.collectData();
+        gtmCollectData.collectData('addToCart');
 
         let itemId = $(this).attr('itemId');
         let itemStockQty = $(this).attr('itemstock');
@@ -256,7 +256,7 @@ define([
 
     cartContainer.on("click", ".decrease-qty", function () {
         //Decrease quantity GTM
-        gtmCollectData.collectData();
+        gtmCollectData.collectData('removeFromCart');
 
         let itemId = $(this).attr('itemId');
         let itemQty = $('#cart-qty-'+ itemId);
@@ -333,9 +333,9 @@ define([
             }
         });
         if (i <= 1) {
-            $('.totals .sub >  .mark').html($.mage.__('Subtotal <span class="totals-count-items"> (%1 item) </span>').replace('%1', i));
+            $('.totals .sub >  .mark').html('Subtotal <span class="totals-count-items">' + $.mage.__("(%1 item)").replace('%1', i) + '</span>');
         } else {
-            $('.totals .sub >  .mark').html($.mage.__('Subtotal <span class="totals-count-items"> (%1 items) </span>').replace('%1', i));
+            $('.totals .sub >  .mark').html('Subtotal <span class="totals-count-items">' + $.mage.__("(%1 items)").replace('%1', i) + '</span>');
         }
     }
 });

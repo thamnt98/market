@@ -5,7 +5,7 @@ define([
 ], function ($, gtmCheckout, urlBuilder) {
     'use strict';
     return {
-        collectData: function () {
+        collectData: function (event) {
             if (typeof dataLayerSourceObjects !== 'undefined') {
                 let productIds = [];
                 $('input.item-checked:checked').each(function () {
@@ -42,7 +42,7 @@ define([
                             });
                             dataProducts['basket_value'] = total;
                             dataProducts['basket_quantity'] = quantity;
-                            gtmCheckout.push('removeFromCart',dataProducts);
+                            gtmCheckout.push(event,dataProducts);
                         }
                     },
                     error: function () {

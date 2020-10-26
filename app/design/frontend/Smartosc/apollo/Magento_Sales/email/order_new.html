@@ -108,71 +108,57 @@
     <tbody>
     <tr>
         <td class="one-of-two-column">
-            <table class="total">
+            {{depend order_data.is_not_virtual}}
+            <table class="content">
                 <tbody>
                 <tr>
-                    <td class="inner-td">
-                        {{depend order_data.is_not_virtual}}
-                        <table class="content">
-                            <tbody>
-                            <tr>
-                                <td class="title">
-                                    {{if additional_data.is_store_pick_up}}
-                                    <p>
-                                        {{trans "Store Information"}}
-                                    </p>
-                                    {{else}}
-                                    <p>
-                                        {{trans "Deliver to"}}
-                                    </p>
-                                    {{/if}}
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="description">
-                                    {{var formattedShippingAddress|raw}}
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                        {{/depend}}
+                    <td class="title">
+                        {{if additional_data.is_store_pick_up}}
+                        <p>
+                            {{trans "Store Information"}}
+                        </p>
+                        {{else}}
+                        <p>
+                            {{trans "Deliver to"}}
+                        </p>
+                        {{/if}}
+                    </td>
+                </tr>
+                <tr>
+                    <td class="description">
+                        {{var formattedShippingAddress|raw}}
                     </td>
                 </tr>
                 </tbody>
             </table>
+            {{/depend}}
+
         </td>
         <td class="one-of-two-column">
-            <table class="total">
+            {{depend order_data.is_not_virtual}}
+            <table class="content">
                 <tbody>
                 <tr>
-                    <td class="inner-td">
-                        {{depend order_data.is_not_virtual}}
-                        <table class="content">
-                            <tbody>
-                            <tr>
-                                <td class="title">
-                                    <p>
-                                        {{trans "Delivery method"}}
-                                    </p>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="description">
-                                    <p>
-                                        {{var additional_data.delivery_method}}
-                                    </p>
-                                    {{if shipping_msg}}
-                                    <p>{{var shipping_msg}}</p>
-                                    {{/if}}
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                        {{/depend}}
+                    <td class="title">
+                        <p>
+                            {{trans "Delivery method"}}
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="description">
+                        <p>
+                            {{var additional_data.delivery_method}}
+                        </p>
+                        {{if shipping_msg}}
+                        <p>{{var shipping_msg}}</p>
+                        {{/if}}
                     </td>
                 </tr>
                 </tbody>
             </table>
+            {{/depend}}
+
         </td>
     </tr>
     </tbody>

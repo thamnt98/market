@@ -35,6 +35,14 @@ interface IntegrationProductAttributeRepositoryInterface {
 	public function getAttributeGroupId($attributeCode);
 
 	/**
+    * Get attribute
+    * @param string $attributeCode
+    * @return int attributeGroupId
+    * @return int $attributeSetId
+    */
+    public function getAttributeGroupIdBySet($attributeCode, $attributeSetId);
+
+	/**
 	 * Get Attribute Type Map Data
 	 * @param string $attrId
    	 * @return array $result data type

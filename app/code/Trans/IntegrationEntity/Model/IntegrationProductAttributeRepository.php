@@ -161,6 +161,28 @@ class IntegrationProductAttributeRepository implements IntegrationProductAttribu
 	}
 
 	/**
+    * Get attribute
+    * @param string $attributeCode
+    * @return int attributeGroupId
+    * @return int $attributeSetId
+    */
+    public function getAttributeGroupIdBySet($attributeCode, $attributeSetId)
+    {
+         $attributeCollection = $this->_attributeGroupCollection->create()
+         ->addFieldToSelect('attribute_group_id')
+         ->addFieldToFilter('attribute_group_code', $attributeCode)
+         ->addFieldToFilter('attribute_set_id', $attributeSetId)
+         ->getFirstItem()
+         ->toArray();
+ 
+         $attributeGroupId = (int) $attributeCollection['attribute_group_id'];
+         // OR (see benchmark below for make your choice)
+         $attributeGroupId = (int) implode($attributeCollection);
+ 
+         return $attributeGroupId;
+    }
+
+    /**
    	*
    	* @param string $attrId
    	* @return array $result data type

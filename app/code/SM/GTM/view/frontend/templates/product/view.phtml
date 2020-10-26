@@ -120,7 +120,7 @@ if ($GTMViewModel) {
                 async.async('[data-gtm-message="success"]', function () {
                     //Todo Remove Debug
                     console.log($('[data-gtm-message="success"]').text());
-                    if ($('[data-gtm-message="success"]').text().includes($.mage.__('shopping cart'))) {
+                    if ($('[data-gtm-message="success"]').text().includes($.mage.__(data['name']))) {
                         data['quantity'] = $('input[name="qty"]').val();
                         gtm.push('addToCartPDP', data);
                     }
@@ -255,6 +255,28 @@ if ($GTMViewModel) {
                         }
                     });
                     eventCreate['.action.tocart.primary']++;
+                });
+
+                async.async('.action.increase-qty', function () {
+                    if (!eventCreate['.action.increase-qty']) {
+                        eventCreate['.action.increase-qty'] = 0;
+                    }
+
+                    let current = $($('.action.increase-qty')[eventCreate['.action.increase-qty']]);
+                    $(current).click(function (e) {
+                        let data = $(this).attr("data-gtm-product");
+
+                        if (data) {
+                            try {
+                                data = JSON.parse(data);
+                                data['position'] = $(this).attr("data-position");
+                                gtm.push("addToCart", data);
+                            } catch (e) {
+
+                            }
+                        }
+                    });
+                    eventCreate['.action.increase-qty']++;
                 });
             });
         });

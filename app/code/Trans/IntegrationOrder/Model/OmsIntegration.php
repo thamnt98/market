@@ -308,11 +308,11 @@ class OmsIntegration implements OmsIntegrationInterface
 
             /*smart osc start remove code*/
             /*$allocationRuleDataByQuoteId = $this->orderAllocationRepo->loadDataByQuoteId($dataOrder['quote_id']);
-                                $warehouse                   = $allocationRuleDataByQuoteId->getSpoDetail();
-                                $orderOriginId               = $allocationRuleDataByQuoteId->getOarOriginOrderId();
-                                $isSpo                       = $allocationRuleDataByQuoteId->getIsSpo();
-                                $isOwnCourier                = $allocationRuleDataByQuoteId->getIsOwnCourier();
-                                $warehouseSource             = $allocationRuleDataByQuoteId->getWarehouseSource();
+                                                                                                $warehouse                   = $allocationRuleDataByQuoteId->getSpoDetail();
+                                                                                                $orderOriginId               = $allocationRuleDataByQuoteId->getOarOriginOrderId();
+                                                                                                $isSpo                       = $allocationRuleDataByQuoteId->getIsSpo();
+                                                                                                $isOwnCourier                = $allocationRuleDataByQuoteId->getIsOwnCourier();
+                                                                                                $warehouseSource             = $allocationRuleDataByQuoteId->getWarehouseSource();
             */
             /*smart osc end remove code*/
 
@@ -322,6 +322,7 @@ class OmsIntegration implements OmsIntegrationInterface
             $isSpo           = $dataOrder['is_spo'];
             $isOwnCourier    = $dataOrder['is_own_courier'];
             $warehouseSource = $dataOrder['warehouse_source'];
+            $warehouseCode   = $dataOrder['warehouse_code']; // added new 26 Oct
             $codeName        = $dataOrder['code_name'];
             /*smart osc end custom*/
 
@@ -335,14 +336,14 @@ class OmsIntegration implements OmsIntegrationInterface
             $modelPayment->setTotalAmountPaid($amount);
 
             $orderPaymentSave = $this->orderPaymentRepo->save($modelPayment);
-
-            $model     = $this->orderIntegrationInterfaceFactory->create();
-            $request[] = array(
+            $model            = $this->orderIntegrationInterfaceFactory->create();
+            $request[]        = array(
                 "order_id" => $dataOrder['order_id'],
                 "order_id_origin" => $orderOriginId, //new
                 "is_spo" => (int) $isSpo, //new
                 "is_own_courier" => (int) $isOwnCourier, //new
                 "warehouse_source" => $warehouseSource, //new
+                "warehouse_code" => $warehouseCode, // added new 26 Oct
                 "warehouse" => json_decode($warehouse), //new
                 "code_name" => $codeName, //new
                 "merchant_code" => $merchantCode,
