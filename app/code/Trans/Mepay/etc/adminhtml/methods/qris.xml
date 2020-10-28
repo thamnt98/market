@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_Mepay
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Anan Fauzi <anan.fauzi@transdigital.co.id>
+ *
+ * Copyright © 2020 PT CT Corp Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+  <group id="trans_mepay_qris" sortOrder="220" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
+      <label>Mepay: Mega Payment QRIS Code Solution</label>
+      <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Enabled</label>
+          <config_path>payment/trans_mepay_qris/active</config_path>
+          <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+      </field>
+      <field id="title" translate="label" type="text" showInDefault="10" showInWebsite="1" showInStore="1">
+          <label>Title</label>
+          <config_path>payment/trans_mepay_qris/title</config_path>
+      </field>
+      <field id="order_status" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+          <label>New Order Status</label>
+          <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+          <config_path>payment/trans_mepay_qris/order_status</config_path>
+      </field>
+      <field id="allowspecific" translate="label" type="allowspecific" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Payment from Applicable Countries</label>
+          <config_path>payment/trans_mepay_qris/allowspecific</config_path>
+          <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
+      </field>
+      <field id="specificcountry" translate="label" type="multiselect" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Payment from Specific Countries</label>
+          <config_path>payment/trans_mepay_qris/specificcountry</config_path>
+          <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
+          <can_be_empty>1</can_be_empty>
+      </field>
+  </group>
+</include>
