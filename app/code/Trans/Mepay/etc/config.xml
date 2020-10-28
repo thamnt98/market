@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_Mepay
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Anan Fauzi <anan.fauzi@transdigital.co.id>
+ *
+ * Copyright © 2020 PT CT Corp Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <payment>
+            <trans_mepay>
+                <active>1</active>
+                <environment>development</environment>
+                <merchant_host backend_model="Magento\Config\Model\Config\Backend\Encrypted">Transmart</merchant_host>
+                <api_key backend_model="Magento\Config\Model\Config\Backend\Encrypted">w5iuTMMX2pD9hXLHUJLWNZ</api_key>
+                <secret_key backend_model="Magento\Config\Model\Config\Backend\Encrypted">mEqYGgXpDMJk5pBGZeate</secret_key>
+                <model>TransMepayFacade</model>
+                <dev_base_url>https://api.dev.megapay.app</dev_base_url>
+                <prod_base_url>https://api.dev.megapay.app</prod_base_url>
+                <merchant_reference_url>https://magento.com/checkout/onepage/success</merchant_reference_url>
+                <inquiry_url>/inquiries</inquiry_url>
+                <status_pull_format>/inquiries/{{inquiry_id}}/transactions/</status_pull_format>
+                <status_pull_dynamic>{{inquiry_id}}</status_pull_dynamic>
+                <status_capture_init_url>/inquiry/{{inquiry_id}}/payments/{{transaction_id}}/capture</status_capture_init_url>
+                <status_capture_init>{{inqury_id}};{{transaction_id}}</status_capture_init>
+                <content_type>application/json</content_type>
+                <debug>1</debug>
+            </trans_mepay>
+
+            <trans_mepay_cc>
+                <active>1</active>
+                <title>Mepay Credit Card Solution</title>
+                <model>TransMepayCcFacade</model>
+                <group>trans_mepay</group>
+                <payment_code>trans_mepay_cc</payment_code>
+                <order_status>processing</order_status>
+                <allowspecific>1</allowspecific>
+                <payment_action>authorize</payment_action>
+                <is_gateway>1</is_gateway>
+                <can_use_checkout>1</can_use_checkout>
+                <can_authorize>1</can_authorize>
+                <can_capture>1</can_capture>
+                <payment_channel>credit_card</payment_channel>
+            </trans_mepay_cc>
+
+            <trans_mepay_va>
+                <active>1</active>
+                <title>Mepay Virtual Account Solution</title>
+                <model>TransMepayVaFacade</model>
+                <group>trans_mepay</group>
+                <payment_code>trans_mepay_va</payment_code>
+                <order_status>processing</order_status>
+                <allowspecific>1</allowspecific>
+                <payment_action>authorize</payment_action>
+                <is_gateway>1</is_gateway>
+                <can_use_checkout>1</can_use_checkout>
+                <can_authorize>1</can_authorize>
+                <can_capture>1</can_capture>
+                <payment_channel>virtual_account</payment_channel>
+            </trans_mepay_va>
+
+            <trans_mepay_qris>
+                <active>1</active>
+                <title>Mepay QRIS Code Solution</title>
+                <model>TransMepayQrisFacade</model>
+                <group>trans_mepay</group>
+                <payment_code>trans_mepay_qris</payment_code>
+                <order_status>processing</order_status>
+                <allowspecific>1</allowspecific>
+                <payment_action>authorize</payment_action>
+                <is_gateway>1</is_gateway>
+                <can_use_checkout>1</can_use_checkout>
+                <can_authorize>1</can_authorize>
+                <can_capture>1</can_capture>
+                <payment_channel>qris_code</payment_channel>
+            </trans_mepay_qris>
+
+        </payment>
+    </default>
+</config>
