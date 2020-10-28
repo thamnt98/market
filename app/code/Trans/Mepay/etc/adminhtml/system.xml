@@ -30,14 +30,17 @@
                 <field id="merchant_host" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Merchant ID</label>
                     <config_path>payment/trans_mepay/merchant_host</config_path>
+                    <backend_model>\Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 </field>
                 <field id="api_key" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Api key</label>
                     <config_path>payment/trans_mepay/api_key</config_path>
+                    <backend_model>\Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 </field>
                 <field id="secret_key" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Secret key</label>
                     <config_path>payment/trans_mepay/secret_key</config_path>
+                    <backend_model>\Magento\Config\Model\Config\Backend\Encrypted</backend_model>
                 </field>
                 <field id="dev_base_url" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Development Base Url</label>
