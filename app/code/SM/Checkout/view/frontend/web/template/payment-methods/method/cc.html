@@ -12,7 +12,7 @@
             <p data-bind="i18n: 'Full payment & installment available'"></p>
             <div class="full-install-payment hidden" data-href="payment-method-options" data-id="payment-method-cc">
                 <a href="javascript:void(0)" class="fullpayment active" data-bind="click:activeMethod,i18n: 'FULL PAYMENT'" data-href="cc-method" data-id="full-payment"></a>
-                <a href="javascript:void(0)" class="installment" data-bind="click:(data,event)=>{activeMethod(data,event),showInstalmentOptions(data,event)},i18n: 'INSTALLMENT'" data-href="cc-method" data-id="installment"></a>
+                <a style="display: none;" href="javascript:void(0)" class="installment" data-bind="click:(data,event)=>{activeMethod(data,event),showInstalmentOptions(data,event)},i18n: 'INSTALLMENT'" data-href="cc-method" data-id="installment"></a>
             </div>
 
             <!-- ko if: getListPaymentCreditCard() -->
