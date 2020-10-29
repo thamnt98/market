@@ -218,53 +218,64 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 		try {
 			$this->logger->info('start loop ' . date('d-M-Y H:i:s'));
 			foreach ($productData as $sku => $images) {
-				$this->logger->info('start loop row ' . $index . ' ' . date('d-M-Y H:i:s'));
 				try {
-					$this->logger->info(__FUNCTION__ . ' SKU ' . $sku);
-					$product[$index] = $this->product->get($sku);
-
-				} catch (\Exception $exception) {
-					$this->logger->info("=" . $this->class . "-" . __FUNCTION__ . " " . $exception->getMessage());
-					$product[$index] = false;
-				}
-
-				if ($product[$index]) {
-					$this->deleteImage($product[$index]);
-					// $this->unsetImageGalerry($product[$index]);
-					$no = 0;
-
+					$this->logger->info('start loop row ' . $index . ' ' . date('d-M-Y H:i:s'));
 					try {
-						foreach ($images as $img) {
-							if (isset($img['image_url']) && !empty($img['image_url'])) {
-								$dataImages[$index][$no] = $img['image_url'];
-								$no++;
-							}
-						}
+						$this->logger->info(__FUNCTION__ . ' SKU ' . $sku);
+						$product[$index] = $this->product->get($sku);
+
 					} catch (\Exception $exception) {
-						$this->logger->info("=" . __FUNCTION__ . " " . $exception->getMessage());
-						$this->logger->info('end loop row ' . $index . ' ' . date('d-M-Y H:i:s'));
+						$this->logger->info("=" . $this->class . "-" . __FUNCTION__ . " " . $exception->getMessage());
+						$product[$index] = false;
+					}
 
-						$msgFailed = $exception->getMessage();
+					if ($product[$index]) {
+						$this->deleteImage($product[$index]);
+						// $this->unsetImageGalerry($product[$index]);
+						$no = 0;
 
-						foreach ($images as $statusFailed) {
-							$this->saveStatusMessage($statusFailed['data_id'], $msgFailed, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
+						try {
+							foreach ($images as $img) {
+								if (isset($img['image_url']) && !empty($img['image_url'])) {
+									$dataImages[$index][$no] = $img['image_url'];
+									$no++;
+								}
+							}
+						} catch (\Exception $exception) {
+							$this->logger->info("=" . __FUNCTION__ . " " . $exception->getMessage());
+							$this->logger->info('end loop row ' . $index . ' ' . date('d-M-Y H:i:s'));
+
+							$msgFailed = $exception->getMessage();
+
+							foreach ($images as $statusFailed) {
+								$this->saveStatusMessage($statusFailed['data_id'], $msgFailed, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
+							}
+
+							continue;
 						}
 
-						continue;
+						// $this->logger->info("= test " . __FUNCTION__ . print_r($dataImages[$index], true));
+						$tmp[$index] = $this->saveImageData($product[$index], $dataImages[$index]);
+						$this->deleteTmpFile($tmp[$index]);
+						$this->product->save($product[$index]);
+
+						foreach ($images as $statusSuccess) {
+							$this->saveStatusMessage($statusSuccess['data_id'], null, IntegrationDataValueInterface::STATUS_DATA_SUCCESS);
+						}
 					}
 
-					$this->logger->info("= test " . __FUNCTION__ . print_r($dataImages[$index], true));
-					$tmp[$index] = $this->saveImageData($product[$index], $dataImages[$index]);
-					$this->deleteTmpFile($tmp[$index]);
-					$this->product->save($product[$index]);
-
+					$this->logger->info('end loop row ' . $index . ' ' . date('d-M-Y H:i:s'));
+					$this->logger->info('-----------------------------------------------------');
+					$index++;
+				} catch (\Exception $exception) {
+					$this->logger->info("= SAVE :: " . $this->class . "-" . __FUNCTION__ . " " . $exception->getMessage());
 					foreach ($images as $statusSuccess) {
-						$this->saveStatusMessage($statusSuccess['data_id'], null, IntegrationDataValueInterface::STATUS_DATA_SUCCESS);
+						$this->saveStatusMessage($statusSuccess['data_id'], $exception->getMessage(), IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
 					}
+					$this->logger->info('end loop row ' . $index . ' ' . date('d-M-Y H:i:s'));
+					$this->logger->info('-----------------------------------------------------');
+					continue;
 				}
-
-				$this->logger->info('end loop row ' . $index . ' ' . date('d-M-Y H:i:s'));
-				$index++;
 			}
 			$this->logger->info('end loop ' . date('d-M-Y H:i:s'));
 

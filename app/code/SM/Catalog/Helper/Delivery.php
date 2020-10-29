@@ -69,7 +69,6 @@ class Delivery
      */
     public function getDeliveryMethod($product)
     {
-        //TODO is_warehouse attribute waiting for PIM. Maybe have to change this attribute
         $regular = [
             [
                 'value' => Method::REGULAR,
@@ -77,7 +76,7 @@ class Delivery
             ],
             [
                 'value' => Method::SCHEDULED,
-                'label' => __('Scheduling')
+                'label' => __('Schedule')
             ]
         ];
 

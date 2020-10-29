@@ -28,7 +28,7 @@ define(
                     self.showPopup()
                 }
                 customer.subscribe(function (customerUpdate) {
-                    if (customerUpdate.firstname && customerData.get('fulfillment').show !== "undefined") {
+                    if (customerUpdate.firstname && typeof customerData.get('fulfillment').show !== "undefined") {
                         console.log('customer change');
                         self.showPopup()
                     }
@@ -36,14 +36,14 @@ define(
                 maincoachmarks.coachMarks.subscribe(function (newValue) {
                     var customer = customerData.get('customer'),
                         fulfillment = customerData.get('fulfillment');
-                    if (customer().firstname && fulfillment().show && typeof customer().firstname !== "undefined" && typeof fulfillment().show !== "undefined") {
+                    if (typeof customer().firstname !== "undefined" && typeof fulfillment().show !== "undefined" && customer().firstname && fulfillment().show) {
                         console.log('coachMarks finish');
                         self.showPopup()
                     }
                 });
                 customerData.get('fulfillment').subscribe(function (newValue) {
                     var customer = customerData.get('customer');
-                    if (newValue.show && customer().firstname && typeof customer().firstname !== "undefined") {
+                    if (newValue.show && typeof customer().firstname !== "undefined" && customer().firstname) {
                         console.log('fulfillment change');
                         self.showPopup()
                     }

@@ -41,12 +41,7 @@ class Split
         foreach ($data as &$address) {
             if (isset($address['items'])) {
                 foreach ($address['items'] as &$item) {
-                    $item['sku_basic'] = '';
-                    if ($this->configurableStock->checkIsConfigurableBaseSku($item['sku'])
-                        || $this->configurableStock->checkIsConfigurableStockSku($item['sku'])
-                    ) {
-                        $item['sku_basic'] = $this->configurableStock->getBaseSku($item['sku']);
-                    }
+                    $item['sku_basic'] = $this->configurableStock->getSkuBasic($item['sku']);
                 }
             }
         }

@@ -67,7 +67,6 @@ class Index extends \Magento\Framework\App\Action\Action
 
             if (!$item) {
                 $data = ['error' => 'Quote Item Not Found'];
-                $resultJson->setHttpResponseCode(502);
             } else {
                 switch ($action) {
                     case 'remove':

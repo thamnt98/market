@@ -248,6 +248,13 @@ define([
                         let dataProduct = [];
                         $.each(data,function (key, value) {
                             let product = {
+                                'name': value['name'],
+                                'id': value['id'],
+                                'price': value['price'],
+                                'brand': value['brand'],
+                                'category': value['category'],
+                                'variant': value['variant'],
+                                'quantity': value['quantity'],
                                 'product_size': value['product_size'],
                                 'product_volume': value['product_volume'],
                                 'product_weight': value['product_weight'],
@@ -255,14 +262,7 @@ define([
                                 'salePrice': value['salePrice'],
                                 'discountRate': value['discountRate'],
                                 'rating': value['rating'],
-                                'initialPrice': value['initialPrice'],
-                                'name': value['name'],
-                                'id': value['id'],
-                                'price': value['price'],
-                                'brand': value['brand'],
-                                'category': value['category'],
-                                'variant': value['variant'],
-                                'quantity': value['quantity']
+                                'initialPrice': value['initialPrice']
                             };
                             dataProduct.push(product);
                         });
@@ -281,7 +281,7 @@ define([
                             'basket_value': data['basket_value'],
                             'basket_quantity': data['basket_quantity'],
                             'ecommerce': {
-                                'remove': {
+                                'add': {
                                     'products': dataProduct
                                 }
                             }

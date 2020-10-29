@@ -121,10 +121,6 @@ define([
          * Send Ajax save installation note.
          */
         saveNote: function () {
-            if (!this.itemId) {
-                return;
-            }
-
             let self   = this,
                 params = {isAjax: 1, item_id: self.itemId, product_id: self.productId, action: 'update'};
 

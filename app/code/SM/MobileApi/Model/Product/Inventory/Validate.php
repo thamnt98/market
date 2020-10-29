@@ -56,7 +56,6 @@ class Validate
         foreach ($childProductIds as $id) {
             $product           = $this->productRepository->getById($id);
             $isTobacco         = (boolean)$product->getIsTobacco();
-            $isAlcohol         = (boolean)$product->getIsAlcohol();
 
             //Check product out of stock then return false
             if ($checkStock) {
@@ -70,8 +69,8 @@ class Validate
                 }
             }
 
-            //Check product is alcohol, tobacco then return false
-            if ($isAlcohol || $isTobacco) {
+            //Check product is tobacco then return false
+            if ($isTobacco) {
                 $isStock = false;
                 break;
             }

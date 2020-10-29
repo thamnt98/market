@@ -19,6 +19,39 @@ interface TransCustomerRepositoryInterface
      */
     public function getByPhone($telephone);
 
+
+    /**
+     * Trans Create a customer.
+     *
+     * @param \Magento\Customer\Api\Data\CustomerInterface $customer
+     * @param string $passwordHash
+     * @param string $password
+     * @return \Magento\Customer\Api\Data\CustomerInterface
+     * @throws \Magento\Framework\Exception\InputException If bad input is provided
+     * @throws \Magento\Framework\Exception\State\InputMismatchException If the provided email is already used
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function createCustomer(\Magento\Customer\Api\Data\CustomerInterface $customer, $passwordHash = null, $password = null);
+
+    /**
+     * Trans update a customer.
+     *
+     * @param int $customerId
+     * @param \Magento\Customer\Api\Data\CustomerInterface $customer
+     * @param string $passwordHash
+     * @param string $password
+     * @return \Magento\Customer\Api\Data\CustomerInterface
+     * @throws \Magento\Framework\Exception\InputException If bad input is provided
+     * @throws \Magento\Framework\Exception\State\InputMismatchException If the provided email is already used
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function updateCustomer(
+        int $customerId,
+        \Magento\Customer\Api\Data\CustomerInterface $customer,
+        $passwordHash = null,
+        $password = null
+    );
+
     /**
      * Trans Create or update a customer.
      *

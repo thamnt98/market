@@ -13,6 +13,7 @@ namespace SM\Sales\Model;
 use Exception;
 use Magento\Customer\Api\Data\CustomerInterface;
 use Magento\Customer\Model\ResourceModel\CustomerRepository;
+use Magento\Customer\Model\Session;
 use Magento\Framework\DataObject;
 use Magento\Framework\DataObjectFactory;
 use Magento\Quote\Api\Data\CartItemInterfaceFactory;
@@ -67,6 +68,11 @@ class OrderItemRepository implements OrderItemRepositoryInterface
     protected $customerRepository;
 
     /**
+     * @var Session
+     */
+    protected $session;
+
+    /**
      * OrderItemRepository constructor.
      * @param ResultDataInterfaceFactory $resultDataFactory
      * @param ItemRepository $orderItemRepository
@@ -76,6 +82,7 @@ class OrderItemRepository implements OrderItemRepositoryInterface
      * @param QuoteResource $quoteModel
      * @param CartItemInterfaceFactory $cartItemFactory
      * @param CustomerRepository $customerRepository
+     * @param Session $customerSession
      */
     public function __construct(
         ResultDataInterfaceFactory $resultDataFactory,
@@ -85,8 +92,10 @@ class OrderItemRepository implements OrderItemRepositoryInterface
         QuoteFactory $quoteFactory,
         QuoteResource $quoteModel,
         CartItemInterfaceFactory $cartItemFactory,
-        CustomerRepository $customerRepository
+        CustomerRepository $customerRepository,
+        Session $customerSession
     ) {
+        $this->session = $customerSession;
         $this->customerRepository = $customerRepository;
         $this->cartItemFactory = $cartItemFactory;
         $this->quoteFactory = $quoteFactory;
@@ -141,7 +150,8 @@ class OrderItemRepository implements OrderItemRepositoryInterface
         /** @var ResultDataInterface $resultData */
         $resultData = $this->resultDataFactory->create();
         try {
-            $parentOrder = $this->parentOrderRepository->getById($parentOrderId);
+            $customerId = $this->session->getCustomerId();
+            $parentOrder = $this->parentOrderRepository->getById($customerId, $parentOrderId);
 
             /** @var Quote $quote */
             $quote = $this->quoteFactory->create();

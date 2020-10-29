@@ -46,8 +46,6 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     protected $helperOutput;
     protected $specificationFactory;
     protected $helperCommon;
-    protected $helperInstallation;
-    protected $installationFactory;
     protected $helperGrouped;
     protected $helperBundle;
     protected $productPreparator;
@@ -69,6 +67,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     protected $customer;
     protected $quote;
     protected $adjustPrice;
+    protected $productInstallation;
 
     public function __construct(
         \SM\GTM\Block\Product\ListProduct $productGtm,
@@ -101,8 +100,6 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Catalog\Helper\Output $helperOutput,
         \SM\MobileApi\Model\Data\Catalog\Product\SpecificationFactory $specificationFactory,
         \SM\MobileApi\Helper\Product\Common $helperCommon,
-        \SM\Installation\Helper\Data $helperInstallation,
-        \SM\MobileApi\Model\Data\ProductInstallation\InstallationFactory $installationFactory,
         \SM\MobileApi\Helper\GroupedProduct $helperGrouped,
         \SM\MobileApi\Helper\BundleProduct $helperBundle,
         \SM\Search\Model\Search\Suggestion\Product\Preparator $productPreparator,
@@ -117,7 +114,8 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Webapi\Model\Authorization\TokenUserContext $tokenUserContext,
         \Magento\Customer\Model\Customer $customer,
         \Magento\Quote\Model\QuoteManagement $quote,
-        \SM\MobileApi\Model\Product\Price\AdjustPrice $adjustPrice
+        \SM\MobileApi\Model\Product\Price\AdjustPrice $adjustPrice,
+        \SM\MobileApi\Model\Product\Common\Installation $productInstallation
     ) {
         $this->productGtm = $productGtm;
         $this->optionFactory = $optionFactory;
@@ -143,8 +141,6 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $this->helperOutput = $helperOutput;
         $this->specificationFactory = $specificationFactory;
         $this->helperCommon = $helperCommon;
-        $this->helperInstallation = $helperInstallation;
-        $this->installationFactory = $installationFactory;
         $this->catalogProduct = $catalogProduct;
         $this->productLabelHelper = $productLabelHelper;
         $this->helperGrouped = $helperGrouped;
@@ -165,6 +161,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $this->customer = $customer;
         $this->quote = $quote;
         $this->adjustPrice = $adjustPrice;
+        $this->productInstallation = $productInstallation;
         parent::__construct($context);
     }
 
@@ -695,7 +692,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $productInfo->setReviewEnable($review_enable);
         $productInfo->setReview($this->_getReviewSummary($review_enable, $product));
         $productInfo->setProductLabel($this->helperCommon->getProductLabel($product));
-        $productInfo->setInstallation($this->getInstallation($product));
+        $productInfo->setInstallation($this->productInstallation->getInstallationTooltip($product));
 
         $productInfo->setCouponLabel($this->getRuleLabel($product));
         $productInfo->setCouponTooltip($this->getRuleToolTip($product));
@@ -1010,26 +1007,6 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     public function formatWeight($value)
     {
         return ((float) $value) . " " . $this->getWeightUnit();
-    }
-
-    /**
-     * Get installation of product
-     *
-     * @param $product
-     * @return \SM\MobileApi\Model\Data\ProductInstallation\Installation
-     */
-    public function getInstallation($product)
-    {
-        $installation = $this->installationFactory->create();
-        if ($this->helperInstallation->isEnabled()
-            && $product->getData(\SM\Installation\Helper\Data::PRODUCT_ATTRIBUTE)
-        ) {
-            $installation->setStatus(1);
-        } else {
-            $installation->setStatus(0);
-        }
-        $installation->setTooltip($this->helperInstallation->getTooltip());
-        return $installation;
     }
 
     /**

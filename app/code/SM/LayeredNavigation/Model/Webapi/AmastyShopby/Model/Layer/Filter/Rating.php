@@ -156,6 +156,8 @@ class Rating extends \Amasty\Shopby\Model\Layer\Filter\Rating
         }
 
         foreach ($listData as $data) {
+//            $data['label'] = __(sprintf('Rating %s', $data['value']));
+            $data['label'] = __('Rating') . ' ' . $data['value'];
             $this->itemDataBuilder->addItemData(
                 $data['label'],
                 $data['value'],

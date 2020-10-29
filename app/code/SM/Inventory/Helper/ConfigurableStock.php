@@ -117,4 +117,21 @@ class ConfigurableStock
 
         return false;
     }
+
+    /**
+     * @param $sku
+     * @return string
+     */
+    public function getSkuBasic($sku)
+    {
+        if ($this->checkIsConfigurableStockSku($sku)) {
+            if ($baseSku = $this->getBaseSku($sku)) {
+                return $baseSku;
+            }
+        } elseif ($this->checkIsConfigurableBaseSku($sku)) {
+            return $sku;
+        }
+
+        return '';
+    }
 }

@@ -300,7 +300,7 @@ class Common extends \Magento\Framework\App\Helper\AbstractHelper
         foreach ($deliveryMethod as $key => $value) {
             $deliveryFactory = $this->deliveryIntoFactory->create();
             $deliveryFactory->setValue($value['value']);
-            $deliveryFactory->setLabel($value['label']->getText());
+            $deliveryFactory->setLabel(__($value['label']->getText()));
 
             $data[] = $deliveryFactory;
         }

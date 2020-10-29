@@ -221,22 +221,41 @@ class Category extends \Magento\Catalog\Block\Product\ListProduct
      */
     public function getFilters()
     {
-        $filters = $this->_getFilters();
-        /** @var \Magento\Catalog\Model\Layer\Filter\AbstractFilter $filter */
-        foreach ($filters as &$filter) {
-            $filter->setCode(
-                $filter->hasAttributeModel() ?
-                    $filter->getAttributeModel()->getAttributeCode() :
-                    $filter->getRequestVar()
-            );
-            $filter->setIsMultiselect($this->getFilterSetting($filter)->isMultiselect());
+        $filters = [];
+
+        /** @var \Magento\Catalog\Model\Layer\Filter\Category $filter */
+        foreach ($this->_getFilters() as $filter) {
+            $filterInfo = $this->productFilterFactory->create();
+            $items      = [];
+            foreach ($filter->getItems() as $item) {
+                $filterItemInfo = $this->productFilterItemFactory->create();
+                $filterItemInfo->setValue($item->getValue());
+                $filterItemInfo->setLabel($item->getLabel());
+                $filterItemInfo->setCount($item->getCount());
+                $items[] = $filterItemInfo;
+            }
+
+            if ($filter->hasAttributeModel()) {
+                $filterInfo->setName(__($filter->getAttributeModel()->getStoreLabel()));
+                $filterInfo->setCode($filter->getAttributeModel()->getAttributeCode());
+            } else {
+                $filterInfo->setName(__($filter->getName()));
+                $filterInfo->setCode($filter->getRequestVar());
+            }
+
             if ($filter instanceof \Amasty\Shopby\Api\Data\FromToFilterInterface) {
                 $setting = $filter->getFromToConfig();
-                $filter->setData(\SM\MobileApi\Model\Data\Catalog\ProductFilter::FROM, $setting['from'] ?? 0);
-                $filter->setData(\SM\MobileApi\Model\Data\Catalog\ProductFilter::TO, $setting['to'] ?? 0);
-                $filter->setData(\SM\MobileApi\Model\Data\Catalog\ProductFilter::MAX, $setting['max'] ?? 0);
-                $filter->setData(\SM\MobileApi\Model\Data\Catalog\ProductFilter::MIN, $setting['min'] ?? 0);
+                $filterInfo->setData(\SM\MobileApi\Model\Data\Catalog\ProductFilter::FROM, $setting['from'] ?? 0);
+                $filterInfo->setData(\SM\MobileApi\Model\Data\Catalog\ProductFilter::TO, $setting['to'] ?? 0);
+                $filterInfo->setData(\SM\MobileApi\Model\Data\Catalog\ProductFilter::MAX, $setting['max'] ?? 0);
+                $filterInfo->setData(\SM\MobileApi\Model\Data\Catalog\ProductFilter::MIN, $setting['min'] ?? 0);
             }
+
+            $filterInfo->setIsMultiselect($this->getFilterSetting($filter)->isMultiselect());
+
+            $filterInfo->setItems($items);
+
+            $filters[] = $filterInfo;
         }
 
         return $filters;
