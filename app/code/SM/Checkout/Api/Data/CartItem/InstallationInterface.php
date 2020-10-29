@@ -13,7 +13,8 @@ namespace SM\Checkout\Api\Data\CartItem;
 
 interface InstallationInterface
 {
-    const ALLOW_INSTALLATION= 'allow_installation';
+    const ALLOW_INSTALLATION = 'allow_installation';
+    const TOOLTIP            = 'tooltip_message';
 
     /**
      * @return string
@@ -59,4 +60,15 @@ interface InstallationInterface
      * @return $this
      */
     public function setAllowInstallation($value);
+
+    /**
+     * @return string
+     */
+    public function getTooltipMessage();
+
+    /**
+     * @param string $message
+     * @return $this
+     */
+    public function setTooltipMessage($message);
 }

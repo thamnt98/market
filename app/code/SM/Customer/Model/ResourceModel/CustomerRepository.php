@@ -6,10 +6,10 @@
 
 namespace SM\Customer\Model\ResourceModel;
 
-use Magento\Customer\Api\AccountManagementInterface;
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Api\Data\AddressInterfaceFactory;
 use Magento\Customer\Api\Data\CustomerInterface;
+use Magento\Customer\Api\Data\CustomerInterfaceFactory;
 use Magento\Customer\Model\ResourceModel\AddressRepository;
 use Magento\Customer\Model\ResourceModel\Customer\CollectionFactory as CustomerCollectionFactory;
 use Magento\Directory\Model\ResourceModel\Region\CollectionFactory as RegionCollectionFactory;
@@ -19,6 +19,7 @@ use Magento\Framework\App\State;
 use Magento\Framework\Encryption\EncryptorInterface as Encryptor;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Webapi\Exception;
 use Magento\Framework\Webapi\Rest\Request as RequestRestApi;
 use SM\Customer\Helper\Config;
 use SM\Customer\Model\Api\Data\ResultFactory;
@@ -73,11 +74,6 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
      * @var CustomerInterface[]
      */
     protected $customerByPhone = [];
-
-    /**
-     * @var AccountManagementInterface
-     */
-    protected $accountManagement;
 
     /**
      * @var AddressInterfaceFactory
@@ -136,6 +132,11 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
      */
     protected $helperGtm;
 
+    /**
+     * @var CustomerInterfaceFactory
+     */
+    private $customerFactory;
+
     public function __construct(
         State $state,
         RequestRestApi $requestRestApi,
@@ -143,7 +144,6 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
         Encryptor $encryptor,
         \Magento\Framework\Serialize\SerializerInterface $serializer,
         \Trans\Customer\Api\AccountManagementInterface $account,
-        AccountManagementInterface $accountManagement,
         AddressInterfaceFactory $addressFactory,
         RegionCollectionFactory $regionCollection,
         CityCollection $cityCollection,
@@ -154,7 +154,8 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
         CustomerCollectionFactory $customerCollectionFactory,
         TransCustomerHelper $transCustomerHelper,
         ResultFactory $resultFactory,
-        Data $helperGtm
+        Data $helperGtm,
+        CustomerInterfaceFactory $customerFactory
     ) {
         $this->state                       = $state;
         $this->requestRestApi              = $requestRestApi;
@@ -162,7 +163,6 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
         $this->encryptor                   = $encryptor;
         $this->serializer                  = $serializer;
         $this->account                     = $account;
-        $this->accountManagement           = $accountManagement;
         $this->addressFactory              = $addressFactory;
         $this->regionCollection            = $regionCollection;
         $this->cityCollection              = $cityCollection;
@@ -174,6 +174,7 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
         $this->transCustomerHelper         = $transCustomerHelper;
         $this->resultFactory               = $resultFactory;
         $this->helperGtm                   = $helperGtm;
+        $this->customerFactory             = $customerFactory;
 
         //Logger for debug
         $writer       = new \Zend\Log\Writer\Stream(BP . '/var/log/trans-api-request.log');
@@ -202,6 +203,133 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
         }
 
         return $this->customerByPhone[$telephone];
+    }
+
+    /**
+     * @param CustomerInterface $customer
+     * @param null $passwordHash
+     * @param null $password
+     * @return CustomerInterface
+     * @throws LocalizedException
+     * @throws \Magento\Framework\Webapi\Exception
+     * @throws \Exception
+     */
+    public function createCustomer(CustomerInterface $customer, $passwordHash = null, $password = null)
+    {
+        if ($customer->getId()) {
+             $this->throwException();
+        }
+
+        if ($customer->getCustomAttribute('telephone')) {
+            $telephone = $customer->getCustomAttribute('telephone')->getValue();
+            $telephone = preg_replace("/^(^\+628|^628|^08|^8)/", '08', $telephone);
+            if (!$this->customerResourceModel->checkTelephoneIsVerified($telephone)) {
+                $this->throwException();
+            }
+        } else {
+            $this->throwException();
+        }
+
+        $customer = $this->prepareCustomerDataToSave($customer, true);
+        return $this->transSave($customer, $passwordHash, $password);
+    }
+
+    /**
+     * @param int $customerId
+     * @param CustomerInterface $customer
+     * @param null $passwordHash
+     * @param null $password
+     * @return CustomerInterface|void
+     * @throws Exception|LocalizedException
+     */
+    public function updateCustomer(int $customerId, CustomerInterface $customer, $passwordHash = null, $password = null)
+    {
+        if (!empty($customer->getId()) && $customerId != $customer->getId()) {
+            $this->throwException();
+        } else {
+            $customer->setId($customerId);
+        }
+
+        $customer = $this->prepareCustomerDataToSave($customer);
+        return $this->transSave($customer, $passwordHash, $password);
+    }
+
+    /**
+     * @param CustomerInterface $customer
+     * @param bool $isNew
+     * @return CustomerInterface|void
+     */
+    private function prepareCustomerDataToSave($customer, $isNew = false)
+    {
+        /**
+         * @var \Magento\Customer\Model\Data\Customer $customer
+         */
+
+        list($attributesToUnset, $attributesRequireForNewCustomer) = $this->getListDisableAttributes();
+
+        $customAttributes = $customer->getCustomAttributes();
+        $customerData = $customer->__toArray();
+        $customerToSave = $this->customerFactory->create();
+
+        // Unset Data
+        unset($customerData['custom_attributes']);
+        foreach ($attributesToUnset as $attribute) {
+            if ($isNew && in_array($attribute, $attributesRequireForNewCustomer)) {
+                continue;
+            }
+
+            if (array_key_exists($attribute, $customerData)) {
+                unset($customerData[$attribute]);
+            }
+
+            if (array_key_exists($attribute, $customAttributes)) {
+                unset($customAttributes[$attribute]);
+            }
+        }
+
+        // Set New Data
+        foreach ($customerData as $attribute => $value) {
+            $customerToSave->setData($attribute, $value);
+        }
+
+        if (!empty($customAttributes)) {
+            $customerToSave->setCustomAttributes($customAttributes);
+        }
+
+        $customerToSave->setExtensionAttributes($customer->getExtensionAttributes());
+
+        return $customerToSave;
+    }
+
+
+    /**
+     * @return String[][]
+     */
+    private function getListDisableAttributes()
+    {
+        $attributesToUnset = [
+            'group_id',
+            'email',
+            'telephone',
+            'is_edit_address',
+            'created_in',
+            'store_id',
+            'website_id',
+            'is_alcohol_informed',
+            'is_verified_email',
+            'coachmarks',
+            'selected_categories',
+            'created_at',
+            'updated_at'
+        ];
+
+        $attributesRequireForNewCustomer = [
+            "email",
+            "telephone",
+            "group_id"
+        ];
+
+        return [$attributesToUnset, $attributesRequireForNewCustomer];
     }
 
     /**
@@ -251,8 +379,15 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
 
             //Edit customer
             if ($customer->getId()) {
+
                 //verify dob change number
-                $currentCustomerData = $this->customerRepositoryInterface->getById($customer->getId());
+                try {
+                    $currentCustomerData = $this->customerRepositoryInterface->getById($customer->getId());
+                    $customer->setEmail($currentCustomerData->getEmail());
+                } catch (\Exception $e) {
+                    $this->throwException($e);
+                }
+
                 $currentDobChangeNumber = $currentCustomerData->getCustomAttribute('dob_change_number');
 
                 $currentDob = $currentCustomerData->getDob();
@@ -296,8 +431,7 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
 
             return $customerDataObject;
         } catch (\Exception $e) {
-            $this->logResponse($e->getMessage());
-            throw new \Magento\Framework\Webapi\Exception(__($e->getMessage()));
+            $this->throwException($e);
         }
     }
 
@@ -495,5 +629,20 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
     public function getPasswordHash($password)
     {
         return $this->encryptor->getHash($password, true);
+    }
+
+    /**
+     * @param $e
+     * @throws Exception
+     * @throws LocalizedException
+     */
+    private function throwException($e = null)
+    {
+        $message = "Can't save the Customer, please try again later.";
+        if ($e) {
+            $message = $e->getMessage();
+            $this->logResponse($message);
+        }
+        throw new \Magento\Framework\Webapi\Exception(__($message));
     }
 }

@@ -76,15 +76,33 @@ class Installation extends AbstractSimpleObject implements InstallationInterface
     /**
      * @inheritDoc
      */
-    public function getAllowInstallation(){
+    public function getAllowInstallation()
+    {
         return $this->_get(self::ALLOW_INSTALLATION);
     }
 
     /**
      * @inheritDoc
      */
-    public function setAllowInstallation($value){
-        return $this->setData(self::ALLOW_INSTALLATION,$value);
+    public function setAllowInstallation($value)
+    {
+        return $this->setData(self::ALLOW_INSTALLATION, $value);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getTooltipMessage()
+    {
+        return $this->_get(self::TOOLTIP);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setTooltipMessage($tooltip)
+    {
+        return $this->setData(self::TOOLTIP, $tooltip);
     }
 
     /**

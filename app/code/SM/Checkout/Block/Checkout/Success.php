@@ -479,7 +479,7 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
 
     public function getParentOrder()
     {
-        return $this->parentOrderRepository->getById($this->order->getId());
+        return $this->parentOrderRepository->getById($this->order->getCustomerId(), $this->order->getId());
     }
 
     public function getChildOrders($parentId)

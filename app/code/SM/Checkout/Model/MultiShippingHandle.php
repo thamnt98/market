@@ -338,9 +338,9 @@ class MultiShippingHandle
                                 $product = $itemData->getProduct();
                                 $ownCourier = $product->getData('own_courier');
                                 if ($ownCourier) {
-                                    $ownCourier = 1;
+                                    $ownCourier = true;
                                 } else {
-                                    $ownCourier = 0;
+                                    $ownCourier = false;
                                 }
                                 $sku = $itemData->getSku();
                                 $childQty = (int)$qty * (int)$itemData->getQty();
@@ -354,7 +354,7 @@ class MultiShippingHandle
                                         'quantity' => $childQty,
                                         'price' => $price,
                                         'weight' => (int)$itemData->getWeight(),
-                                        'is_spo' => 0,
+                                        'is_spo' => false,
                                         'is_own_courier' => $ownCourier
                                     ];
                                 }
@@ -369,9 +369,9 @@ class MultiShippingHandle
                             $product = $itemData->getProduct();
                             $ownCourier = $product->getData('own_courier');
                             if ($ownCourier) {
-                                $ownCourier = 1;
+                                $ownCourier = true;
                             } else {
-                                $ownCourier = 0;
+                                $ownCourier = false;
                             }
                             // sing quote item id
                             $sku = $itemData->getSku();
@@ -385,7 +385,7 @@ class MultiShippingHandle
                                     'quantity' => (int)$qty,
                                     'price' => $price,
                                     'weight' => (int)$itemData->getWeight(),
-                                    'is_spo' => 0,
+                                    'is_spo' => false,
                                     'is_own_courier' => $ownCourier
                                 ];
                             }
@@ -692,6 +692,11 @@ class MultiShippingHandle
     {
         $methodList = [];
         foreach ($orderShippingMethod as $method) {
+            if (
+                isset($method['courier']['reason']) && $method['courier']['fee']['base'] == 0
+            ) {
+                continue;
+            }
             $methodList[] = 'transshipping_transshipping' . $method['service_type'];
         }
         return $methodList;

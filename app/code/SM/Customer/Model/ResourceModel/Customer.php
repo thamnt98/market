@@ -88,4 +88,21 @@ class Customer extends BaseResourceModel
 
         return $result ? (int) $result['entity_id'] : null;
     }
+
+    /**
+     * @param $telephone
+     * @return bool
+     */
+    public function checkTelephoneIsVerified($telephone)
+    {
+        $connection = $this->getConnection();
+        $table = "sms_verification";
+        $query = $connection->select()
+            ->from(
+                $connection->getTableName($table),
+                'is_verified'
+            )->where('phone_number = ?', $telephone);
+
+        return (bool) $connection->fetchOne($query) ?? false;
+    }
 }

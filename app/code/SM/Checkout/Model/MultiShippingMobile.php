@@ -288,51 +288,10 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
     private $questionFactory;
 
     /**
-     * MultiShippingMobile constructor.
-     * @param \SM\MobileApi\Api\Data\GTM\GTMCartInterfaceFactory $gtmCart
-     * @param \SM\GTM\Block\Product\ListProduct $productGtm
-     * @param \SM\GTM\Model\ResourceModel\Basket\CollectionFactory $basketCollectionFactory
-     * @param BasketFactory $basketFactory
-     * @param \Magento\Framework\Stdlib\DateTime\DateTime $date
-     * @param \Magento\SalesRule\Model\Coupon $couponModel
-     * @param \SM\MyVoucher\Model\RuleRepository $ruleRepository
-     * @param \Magento\Catalog\Helper\Product\ConfigurationPool $configurationPool
-     * @param \Magento\Store\Model\App\Emulation $appEmulation
-     * @param \Magento\Customer\Model\CustomerFactory $customerFactory
-     * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param \Magento\Customer\Api\AddressRepositoryInterface $addressRepository
-     * @param \Magento\Quote\Api\CartItemRepositoryInterface $quoteItemRepository
-     * @param \Magento\Catalog\Helper\Image $imageHelper
-     * @param \Magento\Quote\Api\CartTotalRepositoryInterface $cartTotalRepository
-     * @param \SM\Checkout\Helper\Config $checkoutHelperConfig
-     * @param MultiShippingHandle $multiShippingHandle
-     * @param Checkout\Type\Multishipping $multiShipping
-     * @param Split $split
-     * @param MsiFullFill $msiFullFill
-     * @param \SM\Checkout\Api\Data\Checkout\CheckoutDataInterfaceFactory $checkoutDataInterfaceFactory
-     * @param \SM\Checkout\Api\Data\Checkout\QuoteItems\ItemInterfaceFactory $itemInterfaceFactory
-     * @param \SM\Checkout\Api\Data\Checkout\ShippingMethodInterfaceFactory $shippingMethodInterfaceFactory
-     * @param \SM\Checkout\Api\Data\Checkout\Estimate\PreviewOrderInterfaceFactory $previewOrderInterfaceFactory
-     * @param \SM\Checkout\Api\Data\Checkout\Estimate\ItemAdditionalInfo\AdditionalInfoInterfaceFactory $itemAdditionalInfoInterfaceFactory
-     * @param \SM\Checkout\Api\Data\Checkout\Estimate\ItemAdditionalInfo\Delivery\DeliveryInterfaceFactory $deliveryInterfaceFactory
-     * @param \SM\Checkout\Api\Data\Checkout\Estimate\AdditionalInfoInterfaceFactory $additionalInfoInterfaceFactory
-     * @param \SM\Checkout\Api\Data\Checkout\Estimate\AdditionalInfo\StorePickUpInterfaceFactory $storePickUpInterfaceFactory
-     * @param \SM\Checkout\Api\Data\Checkout\ConfigInterfaceFactory $configInterfaceFactory
-     * @param \SM\Checkout\Api\Data\Checkout\Config\StorePickUpInterfaceFactory $pickUpConfigInterfaceFactory
-     * @param \SM\Checkout\Api\Data\Checkout\Config\DeliveryInterfaceFactory $deliveryConfigInterfaceFactory
-     * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
-     * @param Api\PaymentMethods $paymentMethods
-     * @param \SM\Checkout\Api\Data\Checkout\SearchStoreResponseInterfaceFactory $searchStoreResponseFactory
-     * @param \SM\Checkout\Api\Data\Checkout\QuoteItems\ProductOptions\ProductOptionsInterfaceFactory $productOptionsInterfaceFactory
-     * @param \SM\Checkout\Api\VoucherInterface $voucherInterface
-     * @param \SM\Checkout\Api\Data\Checkout\Voucher\VoucherInterfaceFactory $voucherFactoryInterface
-     * @param \SM\Checkout\Api\Data\CartItem\InstallationInterfaceFactory $installationInterfaceFactory
-     * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
-     * @param \SM\Checkout\Api\Data\CheckoutWeb\DigitalInterfaceFactory $digitalInterfaceFactory
-     * @param \Magento\Framework\Registry $registry
-     * @param Price $price
-     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     * @var \SM\MobileApi\Model\Product\Common\Installation
      */
+    public $productInstallation;
+
     public function __construct(
         \SM\MobileApi\Api\Data\GTM\GTMCartInterfaceFactory $gtmCart,
         \SM\GTM\Block\Product\ListProduct $productGtm,
@@ -381,7 +340,9 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         \SM\FreshProductApi\Helper\Fresh $fresh,
         \SM\Checkout\Api\Data\Checkout\SupportShippingInterfaceFactory $supportShippingInterfaceFactory,
         \SM\Help\Model\QuestionRepository $questionRepository,
-        \SM\Help\Api\Data\QuestionInterfaceFactory $questionFactory
+        \SM\Help\Api\Data\QuestionInterfaceFactory $questionFactory,
+        \SM\Checkout\Helper\Payment $paymentHelper,
+        \SM\MobileApi\Model\Product\Common\Installation $productInstallation
     ) {
         $this->questionRepository = $questionRepository;
         $this->questionFactory = $questionFactory;
@@ -431,6 +392,8 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         $this->gtmCart = $gtmCart;
         $this->deliveryType = $deliveryType;
         $this->supportShippingInterfaceFactory = $supportShippingInterfaceFactory;
+        $this->paymentHelper = $paymentHelper;
+        $this->productInstallation = $productInstallation;
     }
 
     /**
@@ -593,35 +556,43 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
     }
 
     /**
-     * @param \Magento\Quote\Api\Data\CartItemInterface $item
+     * @param \Magento\Quote\Model\Quote\Item $item
      * @return \SM\Checkout\Api\Data\CartItem\InstallationInterface
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function getInstallationProduct($item)
     {
-        $installationInfo = $this->installationFactory->create();
-        $buyRequest = $item->getBuyRequest();
-        $allowInstallation = $item->getProduct()->getData(\SM\Installation\Helper\Data::PRODUCT_ATTRIBUTE);
+        $installationInfo    = $this->installationFactory->create();
+        $buyRequest          = $item->getOptionByCode('info_buyRequest');
+        $allowInstallation   = $item->getProduct()->getData(\SM\Installation\Helper\Data::PRODUCT_ATTRIBUTE);
+        $installationTooltip = $this->productInstallation->getTooltipMessage();
+        $installationFee     = 0;
+        $isInstallationFee   = 0;
+        $installationNote    = '';
+
         if ($allowInstallation == null || $allowInstallation == "") {
             $allowInstallation = false;
         }
-        $installationFee = 0;
-        $isInstallationFee = 0;
-        $installationNote = '';
+
         if ($buyRequest) {
-            $installationService = $buyRequest->getData(\SM\Installation\Helper\Data::QUOTE_OPTION_KEY);
+            $installationService = json_decode(
+                $buyRequest->getValue(),
+                true
+            )[\SM\Installation\Helper\Data::QUOTE_OPTION_KEY] ?? null;
             if ($installationService) {
-                $installationFee = isset($installationService['installation_fee']) ? $installationService['installation_fee'] : 0;
-                $isInstallationFee = isset($installationService['is_installation']) ? $installationService['is_installation'] : 0;
-                $installationNote = isset($installationService['installation_note']) ? $installationService['installation_note'] : '';
+                $installationFee = $installationService['installation_fee'] ?? 0;
+                $isInstallationFee = $installationService['is_installation'] ?? 0;
+                $installationNote = $installationService['installation_note'] ?? '';
             }
         }
         $installationInfo->setAllowInstallation($allowInstallation);
         $installationInfo->setInstallationFee($installationFee);
         $installationInfo->setIsInstallation($isInstallationFee);
         $installationInfo->setInstallationNote($installationNote);
+        $installationInfo->setTooltipMessage($installationTooltip);
         return $installationInfo;
     }
+
     /**
      * {@inheritdoc}
      */
@@ -1013,7 +984,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
             if ($question->getStatus()) {
                 $data[CheckoutDataInterface::TERM_AND_CONDITION] = $question;
             }
-        } catch (\Exception $e){
+        } catch (\Exception $e) {
         }
 
         return $this->checkoutDataInterfaceFactory->create()->setData($data);
@@ -1389,7 +1360,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
     /**
      * @inheritDoc
      */
-    public function saveMobilePayment($paymentMethod, $customerId, $cartId)
+    public function saveMobilePayment($paymentMethod, $term = null, $customerId, $cartId)
     {
         $payment = [
             'method' => $paymentMethod,
@@ -1415,14 +1386,16 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
                 $quote->setTotalsCollectedFlag(false)->collectTotals();
                 if (!empty($term)) {
                     $quote->setSprintTermChannelid($term);
-                    $termInfo=$this->paymentHelper->getTermInfo($paymentMethod, $term, $quote);
+                    $termInfo = $this->paymentHelper->getTermInfo($paymentMethod, $term, $quote);
                     $quote->setData('service_fee', ((int)$quote->getGrandTotal() * $termInfo['serviceFeeValue'])/100);
+                } else {
+                    $quote->setData('service_fee', 0);
                 }
             }
             $this->quoteRepository->save($quote);
-            $isErrorCheckout = true;
-        } catch (\Exception $e) {
             $isErrorCheckout = false;
+        } catch (\Exception $e) {
+            $isErrorCheckout = true;
         }
         $previewOrderProcess = $this->multiShippingHandle->getPreviewOrderData($quote, false);
         $data = [

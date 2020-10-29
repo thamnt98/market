@@ -212,7 +212,16 @@ class GtmProduct extends \Magento\Framework\App\Action\Action
      */
     public function getGTMProductVariant($product)
     {
-        return $product->getAttributeText('color') ? $product->getAttributeText('color') : "Not available";
+        if ($product->getAttributeText('color') && $product->getAttributeText('product_size')) {
+            return $product->getAttributeText('color') . ', ' . $product->getAttributeText('product_size');
+        }
+        if ($product->getAttributeText('color')) {
+            return $product->getAttributeText('color');
+        }
+        if ($product->getAttributeText('product_size')) {
+            return $product->getAttributeText('product_size');
+        }
+        return "Not available";
     }
 
     /**
