@@ -9,7 +9,6 @@ use Magento\Shipping\Model\Rate\Result;
 
 class TransShipping extends AbstractCarrier implements CarrierInterface
 {
-    protected $freshOrder = false;
     protected $isSpo = false;
     protected $postCode;
     protected $districtId;
@@ -106,9 +105,6 @@ class TransShipping extends AbstractCarrier implements CarrierInterface
         if (!$this->getConfigFlag('active')) {
             return false;
         }
-        if (strpos($request->getPreShippingMethod(), $this->_code) === false) {
-            return false;
-        }
         $shippingMethodList = $this->getShippingMethodList($request);
         if (!$shippingMethodList) {
             return false;
@@ -174,7 +170,7 @@ class TransShipping extends AbstractCarrier implements CarrierInterface
         foreach ($response['content'] as $data) {
             foreach ($data['data']['shipping_list'] as $shipping) {
                 if (
-                    isset($shipping['courier']['reason']) && $shipping['courier']['fee']['total'] == 0
+                    isset($shipping['courier']['reason']) && $shipping['courier']['fee']['base'] == 0
                 ) {
                     continue;
                 }
@@ -218,10 +214,9 @@ class TransShipping extends AbstractCarrier implements CarrierInterface
                     $product = $childItem->getProduct();
                     $ownCourier = $product->getData('own_courier');
                     if ($ownCourier) {
-                        $this->freshOrder = true;
-                        $ownCourier = 1;
+                        $ownCourier = true;
                     } else {
-                        $ownCourier = 0;
+                        $ownCourier = false;
                     }
                     $sku = $childItem->getSku();
                     $childQty = (int)$childItem->getQty() * (int)$item->getQty();
@@ -235,7 +230,7 @@ class TransShipping extends AbstractCarrier implements CarrierInterface
                             "quantity" => $childQty,
                             'price' => $price,
                             'weight' => (int)$childItem->getWeight(),
-                            'is_spo' => 0,
+                            'is_spo' => false,
                             'is_own_courier' => $ownCourier
                         ];
                     }
@@ -251,10 +246,9 @@ class TransShipping extends AbstractCarrier implements CarrierInterface
                 $product = $itemsTrue->getProduct();
                 $ownCourier = $product->getData('own_courier');
                 if ($ownCourier) {
-                    $this->freshOrder = true;
-                    $ownCourier = 1;
+                    $ownCourier = true;
                 } else {
-                    $ownCourier = 0;
+                    $ownCourier = false;
                 }
                 $sku = $itemsTrue->getSku();
                 $price = ((int)$itemsTrue->getPrice() != 0) ? (int)$itemsTrue->getPrice() : (int)$itemsTrue->getProduct()->getPrice();
@@ -267,7 +261,7 @@ class TransShipping extends AbstractCarrier implements CarrierInterface
                         "quantity" => (int)$itemsTrue->getQty(),
                         'price' => $price,
                         'weight' => (int)$itemsTrue->getWeight(),
-                        'is_spo' => 0,
+                        'is_spo' => false,
                         'is_own_courier' => $ownCourier
                     ];
                 }

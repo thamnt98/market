@@ -8,14 +8,14 @@
 <routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
     <route method="POST" url="/V1/transcustomer">
-        <service class="SM\Customer\Api\TransCustomerRepositoryInterface" method="transSave"/>
+        <service class="SM\Customer\Api\TransCustomerRepositoryInterface" method="createCustomer"/>
         <resources>
             <resource ref="anonymous"/>
         </resources>
     </route>
 
     <route url="/V1/transcustomer/me" method="PUT" soapOperation="saveSelf">
-        <service class="SM\Customer\Api\TransCustomerRepositoryInterface" method="transSave"/>
+        <service class="SM\Customer\Api\TransCustomerRepositoryInterface" method="updateCustomer"/>
         <resources>
             <resource ref="self"/>
         </resources>

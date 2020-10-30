@@ -95,13 +95,16 @@ class Product implements \SM\MobileApi\Api\ProductInterface
      */
     public function getDetailsBySKU($sku, $customerId)
     {
-        /* @var \SM\MobileApi\Api\Data\Product\ProductInterface $result */
-        $result = $this->productFactory->create();
         //Using customer id for calculate distance between customer and store
         $this->_registry->register('customer_id', $customerId);
+
+        /* @var \SM\MobileApi\Api\Data\Product\ProductInterface $result */
+        $result = $this->productFactory->create();
         $result->setProduct($this->catalogCategory->getProductV2BySKU($sku));
+
         //Using function to save last viewed product of customer
         $this->smartProductRepository->get($customerId, $sku);
+
         return $result;
     }
 

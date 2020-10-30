@@ -37,9 +37,10 @@ interface ParentOrderRepositoryInterface
 
     /**
      * @param int $orderId
+     * @param int $customerId
      * @return \SM\Sales\Api\Data\ParentOrderDataInterface
      */
-    public function getById($orderId);
+    public function getById($customerId, $orderId);
 
     /**
      * @param int $customerId

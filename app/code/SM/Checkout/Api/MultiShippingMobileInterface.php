@@ -82,9 +82,10 @@ interface MultiShippingMobileInterface
 
     /**
      * @param string $paymentMethod
+     * @param int $term
      * @param int $customerId
      * @param int $cartId
      * @return \SM\Checkout\Api\Data\Checkout\CheckoutDataInterface
      */
-    public function saveMobilePayment($paymentMethod, $customerId, $cartId);
+    public function saveMobilePayment($paymentMethod, $term = null, $customerId, $cartId);
 }

@@ -28,8 +28,6 @@ class SendOmsPrepareItemDataAfter implements ObserverInterface
     public function execute(Observer $observer)
     {
         $itemData = $observer->getData('itemData');
-        if ($this->configurableStock->checkIsConfigurableStockSku($itemData['sku'])) {
-            $item['sku_basic'] = $this->configurableStock->getBaseSku($itemData['sku']);
-        }
+        $itemData['sku_basic'] = $this->configurableStock->getSkuBasic($itemData['sku']);
     }
 }

@@ -3,14 +3,15 @@
 namespace SM\Sales\Block\Order\Physical;
 
 use Exception;
+use Magento\Customer\Model\Session;
 use Magento\Framework\Pricing\Helper\Data;
+use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\View\Element\Template;
-use SM\Sales\Api\Data\ParentOrderDataInterface;
 use SM\Sales\Block\AbstractDetail;
-use SM\Sales\Model\InvoiceRepository;
-use SM\Sales\Model\OrderItemRepository;
+use SM\Sales\Model\DigitalOrderRepository;
 use SM\Sales\Model\ParentOrderRepository;
+use SM\Sales\Model\SubOrderRepository;
 
 /**
  * Class Physical
@@ -19,6 +20,26 @@ use SM\Sales\Model\ParentOrderRepository;
 class Detail extends AbstractDetail
 {
     /**
+     * @var Session
+     */
+    protected $session;
+
+    public function __construct(
+        ParentOrderRepository $parentOrderRepository,
+        DigitalOrderRepository $digitalOrderRepository,
+        SubOrderRepository $subOrderRepository,
+        Template\Context $context,
+        Data $priceHelper,
+        TimezoneInterface $timezone,
+        DateTime $dateTime,
+        Session $customerSession,
+        array $data = []
+    ) {
+        $this->session = $customerSession;
+        parent::__construct($parentOrderRepository, $digitalOrderRepository, $subOrderRepository, $context, $priceHelper, $timezone, $dateTime, $data);
+    }
+
+    /**
      * @return Template|void
      */
     protected function _prepareLayout()
@@ -26,7 +47,8 @@ class Detail extends AbstractDetail
         $orderId = $this->getRequest()->getParam("id", 0);
         if ($orderId) {
             try {
-                $this->setParentOrder($this->parentOrderRepository->getById($orderId));
+                $customerId = $this->session->getCustomerId();
+                $this->setParentOrder($this->parentOrderRepository->getById($customerId, $orderId));
                 return;
             } catch (Exception $e) {
                 $this->setParentOrder(0);

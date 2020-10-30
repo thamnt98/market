@@ -24,8 +24,8 @@
                     "components": {
                         "installation<?= $block->getData('item_id') ?>": {
                             "component"     : "SM_Installation/js/form",
-                            "itemId"        : <?= $block->getData('item_id') ?? 0 ?>,
-                            "productId"     : <?= $block->getProduct() ? $block->getProduct()->getId() : 0 ?>,
+                            "itemId"        : "<?= $block->getData('item_id') ?? '' ?>",
+                            "productId"     : "<?= $block->getProduct() ? $block->getProduct()->getId() : '' ?>",
                             "title"         : "<?= $block->escapeHtml($block->getTitle()) ?>",
                             "tooltip"       : "<?= $block->escapeHtml($block->getTooltip()) ?>",
                             "defaultNote"   : "<?= $default['defaultNote'] ?? '' ?>",

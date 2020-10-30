@@ -32,6 +32,7 @@ use SM\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFacto
 use SM\Sales\Model\ResourceModel\Order\Item\Collection as OrderItemCollection;
 use SM\Sales\Model\ResourceModel\Order\Item\CollectionFactory as OrderItemCollectionFactory;
 use SM\Sales\Model\Data\HandleOrderStatusHistory;
+use Magento\Customer\Api\Data\CustomerInterface;
 
 /**
  * Class ParentOrderRepository
@@ -126,6 +127,8 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
      */
     protected $storeManager;
 
+    protected $tokenUserContext;
+
     /**
      * ParentOrderRepository constructor.
      * @param ParentOrder $parentOrder
@@ -137,6 +140,7 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
      * @param Emulation $appEmulation
      * @param Image $imageHelper
      * @param StoreManagerInterface $storeManager
+     * @param \Magento\Webapi\Model\Authorization\TokenUserContext $tokenUserContext
      */
     public function __construct(
         ParentOrder $parentOrder,
@@ -147,7 +151,8 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
         OrderDataInterfaceFactory $orderDataFactory,
         Emulation $appEmulation,
         Image $imageHelper,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        \Magento\Webapi\Model\Authorization\TokenUserContext $tokenUserContext
     ) {
         $this->storeManager = $storeManager;
         $this->appEmulation = $appEmulation;
@@ -158,6 +163,7 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->searchResultsFactory = $searchResultsFactory;
         $this->orderItemCollectionFactory = $orderItemCollectionFactory;
+        $this->tokenUserContext = $tokenUserContext;
     }
 
     /**
@@ -201,20 +207,23 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
 
     /**
      * @param int $orderId
+     * @param int $customerId
      * @return ParentOrderDataInterface
      * @throws NoSuchEntityException
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getById($orderId)
+    public function getById($customerId, $orderId)
     {
         /** @var OrderCollection $orderCollection */
         $subOrderCollection = $this->orderCollectionFactory
             ->create()
             ->selectSub()
             ->addFieldToFilter([
+                "main_table.customer_id",
                 "main_table.parent_order",
                 "main_table.entity_id"
             ], [
+                ["eq" => $customerId],
                 ["eq" => $orderId],
                 ["eq" => $orderId]
             ]);
@@ -223,8 +232,13 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
         $parentOrder = $this->orderCollectionFactory
             ->create()
             ->selectParent()
+            ->addFieldToFilter(OrderInterface::CUSTOMER_ID, $customerId)
             ->addFieldToFilter(OrderInterface::ENTITY_ID, $orderId)
             ->getFirstItem();
+
+        if (!empty($subOrderCollection->getSize()) && empty($parentOrder->getData())) {
+            return null;
+        }
 
         $hasInvoice = (bool) $parentOrder->getReferenceInvoiceNumber();
         $result = $this->subOrder->handleSubOrders($subOrderCollection, $cancelType, $hasInvoice);
@@ -238,8 +252,10 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
         if (!empty($cancelType) && $orderData->getStatus() == ParentOrderRepositoryInterface::STATUS_ORDER_CANCELED) {
             $this->setCancelMessage($cancelType, $orderData);
         }
-        $transactionId = $orderData->getPaymentInfo()->getTransactionId();
-        $orderData->setTransactionId($transactionId ? $transactionId : null);
+        if ($orderData->getPaymentInfo()) {
+            $transactionId = $orderData->getPaymentInfo()->getTransactionId();
+            $orderData->setTransactionId($transactionId ? $transactionId : null);
+        }
 
         return $orderData;
     }
