@@ -82,7 +82,7 @@ class IntegrationOrderRepository implements IntegrationOrderRepositoryInterface 
 		try {
 			if (!$integrationOrderInterface->getShipmentDate()) {
 				$date = new \DateTime();
-				$integrationOrderInterface->setShipmentDate($date->format('Y-m-d H:i:s'););
+				$integrationOrderInterface->setShipmentDate($date->format('Y-m-d H:i:s'));
 			}
 			$this->integrationOrderResourceModel->save($integrationOrderInterface);
 		} catch (Exception $e) {
