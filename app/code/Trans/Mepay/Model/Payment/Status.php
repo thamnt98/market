@@ -126,16 +126,20 @@ class Status
 
       $transactionData = $this->transactionHelper->getAuthorizeByTxnId($inquiry->getId())->getFirstItem();
       if ($transactionData->getId()) {
+        $this->logger->log('== {{authorize_operation}} ==');
         $this->authorize->handle($transaction, $inquiry, $token); 
       }
       switch(strtolower($transaction->getStatus())){
         case self::CAPTURE : 
+          $this->logger->log('== {{capture_operation}} ==');
           $this->capture->handle($transaction, $inquiry, $token);
           break;
         case self::PAID : 
+        $this->logger->log('== {{paid_operation}} ==');
           $this->paid->handle($transaction, $inquiry, $token);
           break;
         case self::FAILED:
+          $this->logger->log('== {{failed_operation}} ==');
           $this->failed->handle($transaction, $inquiry, $token);
           break;
       }

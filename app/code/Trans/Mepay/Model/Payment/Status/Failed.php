@@ -119,10 +119,13 @@ class Failed
         //$this->quoteRepo->save($quote);
 
     } catch (InputException $e) {
+      $this->logger->log($e->getMessage());
       throw $e;
     } catch (NoSuchEntityException $e) {
+      $this->logger->log($e->getMessage());
       throw $e;
     } catch (\Exception $e) {
+      $this->logger->log($e->getMessage());
       throw $e;
     }
   }

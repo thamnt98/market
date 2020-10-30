@@ -14,17 +14,21 @@ namespace Trans\Mepay\Logger\Write\Model;
 
 use Magento\Framework\Serialize\Serializer\Json;
 use Trans\Mepay\Helper\Response\Payment\Inquiry;
+use Trans\Mepay\Helper\Response\Payment\Transaction;
 
 class Webhook
 {
   protected $inquiry;
   protected $json;
+  protected $transaction;
   public function __construct(
     Json $json,
-    Inquiry $inquiry
+    Inquiry $inquiry,
+    Transaction $transaction
   ) {
     $this->json = $json;
     $this->inquiry = $inquiry;
+    $this->transaction = $transaction;
   }
 
   public function logNotif($logger, $type, $transaction, $inquiry, $token)
@@ -33,7 +37,7 @@ class Webhook
     $logger->debug('Payment Type: '.$type);
     if ($transaction) {
       $logger->debug('Transaction =========');
-      $logger->debug($this->json->serialize($transaction));
+      $logger->debug($this->json->serialize($this->transaction->convertToArray($transaction)));
     }
     if ($inquiry){
       $logger->debug('inquiry =========');

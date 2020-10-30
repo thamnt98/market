@@ -108,10 +108,13 @@ class Authorize
         $this->transactionHelper->addTransactionData($transaction->getId(), $inquiryTransaction, $transaction);
 
     } catch (InputException $e) {
+      $this->logger->log($e->getMessage());
       throw $e;
     } catch (NoSuchEntityException $e) {
+      $this->logger->log($e->getMessage());
       throw $e;
     } catch (\Exception $e) {
+      $this->logger->log($e->getMessage());
       throw $e;
     }
   }

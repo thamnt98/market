@@ -72,4 +72,30 @@ class Transaction
     }
     return $status;
   }
+
+  public function convertToArray($transaction) {
+    $arrayInquiry = $this->convertToArrayTransaction($transaction);
+    return $arrayInquiry;
+  }
+
+  public function convertToArrayTransaction($transaction)
+  {
+    $result = [];
+    foreach ($transaction->getData() as $key => $value) {
+      if ($key == TransactionInterface::STATUS_DATA) {
+        $value = $this->convertToArrayStatusData();
+      }
+      $result[$key] = $value;
+    }
+    return $result;
+  }
+
+  public function convertToArrayStatusData($statusData)
+  {
+    $result = [];
+    foreach ($statusData as $key => $value) {
+      $result[$key] = $value;
+    }
+    return $result;
+  }
 }

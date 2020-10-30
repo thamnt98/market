@@ -82,9 +82,10 @@ class Capture
         //init related data
         $transactionData = $this->transactionHelper->getAuthorizeByTxnId($transaction->getId())->getFirstItem();
         $orderId = $transactionData->getOrderId();
+        $this->logger->log('== {{order_id:'.$orderId.'}} ==');
         $order = $this->transactionHelper->getOrder($orderId);
         $payment = $order->getPayment();
-
+        $this->logger->log('== {{payment_id:'.$payment->getId().'}} ==');
         //update customer token
         if ($token) {
           $customerId = $order->getCustomerId();
@@ -92,6 +93,7 @@ class Capture
         }
 
         //close authorize transaction
+        $this->logger->log('== {{txnid:'.$transactionData->getTransactionId().':close}} ==');
         $transactionObj = $this->transactionHelper->getTransaction($transactionData->getTransactionId());
         $transactionObj->close();
 
@@ -99,6 +101,7 @@ class Capture
         $transactionCapture = $this->transactionHelper->buildCaptureTransaction($payment, $order, $transaction);
 
         //update payment
+        $this->logger->log('== {{txnid:'.$transactionCapture->getTransactionId().':capture}} ==');
         $payment->setLastTransactionId($transaction->getId());
         //$payment->addTransactionCommentsToOrder($transactionCapture, $message);
         $payment->setAdditionalInformation([Transaction::RAW_DETAILS => $transaction->getData()]);
@@ -111,10 +114,13 @@ class Capture
         $this->transactionHelper->addTransactionData($transaction->getId(), $inquiryTransaction, $transaction);
 
     } catch (InputException $e) {
+      $this->logger->log($e->getMessage());
       throw $e;
     } catch (NoSuchEntityException $e) {
+      $this->logger->log($e->getMessage());
       throw $e;
     } catch (\Exception $e) {
+      $this->logger->log($e->getMessage());
       throw $e;
     }
   }
