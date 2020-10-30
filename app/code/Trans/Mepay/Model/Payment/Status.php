@@ -121,24 +121,26 @@ class Status
    */
   public function update($transaction, $inquiry, $token = null)
   {
-    $this->transactionHelper->addTransactionData($inquiry->getId(), $inquiry, $transaction);
+    if ($transaction) {
+      $this->transactionHelper->addTransactionData($inquiry->getId(), $inquiry, $transaction);
 
-    $transactionData = $this->transactionHelper->getAuthorizeByTxnId($inquiry->getId())->getFirstItem();
-    if ($transactionData->getId()) {
-      $this->authorize->handle($transaction, $inquiry, $token); 
-    }
-    switch(strtolower($transaction->getStatus())){
-      case self::CAPTURE : 
-        $this->capture->handle($transaction, $inquiry, $token);
-        break;
-      case self::PAID : 
-        $this->paid->handle($transaction, $inquiry, $token);
-        break;
-      case self::FAILED:
-        $this->failed->handle($transaction, $inquiry, $token);
-        break;
-    }
+      $transactionData = $this->transactionHelper->getAuthorizeByTxnId($inquiry->getId())->getFirstItem();
+      if ($transactionData->getId()) {
+        $this->authorize->handle($transaction, $inquiry, $token); 
+      }
+      switch(strtolower($transaction->getStatus())){
+        case self::CAPTURE : 
+          $this->capture->handle($transaction, $inquiry, $token);
+          break;
+        case self::PAID : 
+          $this->paid->handle($transaction, $inquiry, $token);
+          break;
+        case self::FAILED:
+          $this->failed->handle($transaction, $inquiry, $token);
+          break;
+      }
 
+    }
   }
 
   /**

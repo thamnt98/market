@@ -12,16 +12,12 @@
  */
 namespace Trans\Mepay\Helper\Response\Payment;
 
+use Magento\Framework\App\ObjectManager;
 use Trans\Mepay\Api\Data\InquiryInterface;
-use Trans\Mepay\Api\Data\InquiryInterfaceFactory;
 use Trans\Mepay\Api\Data\InquiryCustomerInterface;
-use Trans\Mepay\Api\Data\InquiryCustomerInterfaceFactory;
 use Trans\Mepay\Api\Data\InquiryMerchantInterface;
-use Trans\Mepay\Api\Data\InquiryMerchantInterfaceFactory;
 use Trans\Mepay\Api\Data\InquiryOrderInterface;
-use Trans\Mepay\Api\Data\InquiryOrderInterfaceFactory;
 use Trans\Mepay\Api\Data\InquiryOrderItemsInterface;
-use Trans\Mepay\Api\Data\InquiryOrderItemsInterfaceFactory;
 
 class Inquiry
 {
@@ -30,10 +26,6 @@ class Inquiry
    */
   protected $inquiry;
 
-  /**
-   * @var InquiryInterfaceFactory
-   */
-  protected $inquiryFactory;
 
   /**
    * @var InquiryCustomerInterface
@@ -41,19 +33,10 @@ class Inquiry
   protected $customer;
 
   /**
-   * @var InquiryCustomerInterfaceFactory
-   */
-  protected $customerFactory;
-
-  /**
    * @var InquiryMerchantInterface
    */
   protected $merchant;
 
-  /**
-   * @var InquiryMerchantInterfaceFactory
-   */
-  protected $merchantFactory;
 
   /**
    * @var InquiryOrderInterface
@@ -61,27 +44,18 @@ class Inquiry
   protected $order;
 
   /**
-   * @var InquiryOrderInterfaceFactory
+   * @var ObjectManager
    */
-  protected $orderFactory;
+  protected $objectManager;
 
   /**
-   * @var InquiryOrderItemsInterfaceFactory
+   * Constructor
+   * @param  ObjectManager $objectManager
    */
-  protected $itemFactory;
-
   public function __constructor(
-    InquiryInterfaceFactory $inquiryFactory,
-    InquiryCustomerInterfaceFactory $customerFactory,
-    InquiryMerchantInterfaceFactory $merchantFactory,
-    InquiryOrderInterfaceFactory $orderFactory,
-    InquiryOrderItemsInterfaceFactory $itemFactory
+    ObjectManager $objectManager
   ){ 
-    $this->inquiryFactory = $inquiryFactory;
-    $this->customerFactory = $customerFactory;
-    $this->merchantFactory = $merchantFactory;
-    $this->orderFactory = $orderFactory;
-    $this->itemFactory = $itemFactory;
+    $this->objectManager = $objectManager;
    }
 
   /**
@@ -194,18 +168,20 @@ class Inquiry
    */
   public function convertToObject($inputInquiry)
   {
-    $inquiry = $this->inquiryFactory->create();
-    foreach ($inputInquiry as $key => $value) {
-      if($key == InquiryInterface::MERCHANT) {
-        $value = $this->convertToObjectMerchant($value);
-      } elseif ($key == InquiryInterface::CUSTOMER) {
-        $value = $this->convertToObjectCustomer($value);
-      } elseif ($key == InquiryInterface::ORDER) {
-        $value = $this->convertToObjectOrder($value);
-      }
-      $inquiry->setData($key, $value);
+    if ($this->objectManager) {
+        $inquiry = $this->objectManager->create('Trans\Mepay\Api\Data\InquiryInterface');
+        foreach ($inputInquiry as $key => $value) {
+          if($key == InquiryInterface::MERCHANT) {
+            $value = $this->convertToObjectMerchant($value);
+          } elseif ($key == InquiryInterface::CUSTOMER) {
+            $value = $this->convertToObjectCustomer($value);
+          } elseif ($key == InquiryInterface::ORDER) {
+            $value = $this->convertToObjectOrder($value);
+          }
+          $inquiry->setData($key, $value);
+        }
+        return $inquiry;
     }
-    return $inquiry;
   }
 
   /**
@@ -215,7 +191,7 @@ class Inquiry
    */
   public function convertToObjectMerchant($inputMerchant)
   {
-    $merchant = $this->merchantFactory->create();
+    $merchant = $this->objectManager->create('Trans\Mepay\Api\Data\InquiryMerchantInterface');
     foreach ($inputMerchant as $key => $value) {
       $merchant->setData($key, $value);
     }
@@ -229,7 +205,7 @@ class Inquiry
    */
   public function convertToObjectCustomer($inputCustomer)
   {
-    $customer = $this->customerFactory->create();
+    $customer = $this->objectManager->create('Trans\Mepay\Api\Data\InquiryCustomerInterface');
     foreach ($inputCustomer as $key => $value) {
       $customer->setData($key, $value);
     }
@@ -243,9 +219,9 @@ class Inquiry
    */
   public function convertToObjectOrder($inputOrder)
   {
-    $order = $this->orderFactory->create();
+      $order = $this->objectManager->create('Trans\Mepay\Api\Data\InquiryOrderInterface');
     foreach ($inputOrder as $key => $value) {
-      if ($key == nquiryOrderInterface::ITEMS) {
+      if ($key == InquiryOrderInterface::ITEMS) {
         $value = $this->convertToObjectOrderItems($value);
       }
       $order->setData($key, $value);
@@ -261,7 +237,7 @@ class Inquiry
   {
     $result = [];
     foreach ($inputItems as $key => $value) {
-      $item = $this->itemFactory->create();
+      $item = $this->objectManager->create('Trans\Mepay\Api\Data\InquiryOrderItemsInterface');
       foreach ($value as $index => $data) {
         $item->setData($key, $value);
       }

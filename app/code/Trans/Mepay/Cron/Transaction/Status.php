@@ -102,17 +102,23 @@ class Status
   public function execute()
   {
     $cron = $this->cronRepo->get(CronStatus::CONFIG_PULL_STATUS);
-    $collection = $this->getCollectionData($cron);
-    if ($collection->getSize()) {
-      $coll = $collection->getFirstItem();
-      if ($inquiry = $coll->getTransMepayInquiry()) {
-        $inquiry = $this->json->unserialize($inquiry);
-        $response = $this->sendData($inquiry);
-        $this->update($inquiry, $response);
-        return $this->cronRepo->save($cron->setConfigOffset($offset + 1));
-      }
+    if ($cron->getId()) {
+       $collection = $this->getCollectionData($cron);
+        if ($collection->getSize()) {
+          $coll = $collection->getFirstItem();
+          if ($inquiry = $coll->getTransMepayInquiry()) {
+            $offset = $cron->getConfigOffset();
+            $inquiry = $this->json->unserialize($inquiry);
+            $response = $this->sendData($inquiry);
+            $this->update($inquiry, $response);
+            $offset = (int)$offset + 1;
+            $cron->setConfigOffset($offset);
+            return $this->cronRepo->save($cron);
+          }
+        }
+        $cron->setConfigOffset(0);
+         return $this->cronRepo->save($cron);
     }
-     return $this->cronRepo->save($cron->setConfigOffset(0));
   }
 
   /**
