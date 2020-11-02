@@ -23,6 +23,7 @@ use Magento\Sales\Api\OrderPaymentRepositoryInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Api\Data\OrderInterfaceFactory;
 use Magento\Framework\Serialize\Serializer\Json;
+use Magento\Framework\Api\SortOrderBuilder;
 use Trans\Mepay\Helper\Response\Response as ResponseHelper;
 use Trans\Mepay\Helper\Response\Payment\Inquiry as InquiryResponseHelper;
 use Trans\Mepay\Logger\LoggerWrite;
@@ -85,6 +86,11 @@ class Transaction extends AbstractHelper
   protected $logger;
 
   /**
+   * @var SortOrderBuilder
+   */
+  protected $sortOrderBuilder;
+
+  /**
    * Constructor
    * @param Context                        $context
    * @param SearchCriteriaBuilder          $searchBuilder
@@ -104,6 +110,7 @@ class Transaction extends AbstractHelper
     ResponseHelper $responseHelper,
     InquiryResponseHelper $inquiryResponseHelper,
     Json $json,
+    SortOrderBuilder $sortOrderBuilder,
     LoggerWrite $logger
   ) {
     $this->searchBuilder = $searchBuilder;
@@ -114,6 +121,7 @@ class Transaction extends AbstractHelper
     $this->responseHelper = $responseHelper;
     $this->inquiryResponseHelper = $inquiryResponseHelper;
     $this->json = $json;
+    $this->sortOrderBuilder = $sortOrderBuilder;
     $this->logger = $logger;
     parent::__construct($context);
   }
@@ -188,6 +196,15 @@ class Transaction extends AbstractHelper
     ]);
     return $this->transactionRepo->getList($searchCriteria);
 
+  }
+
+  public function getLastOrderTransaction($orderId)
+  {
+    $sortOrder = $this->sortOrderBuilder->setField(TransactionInterface::TRANSACTION_ID)->setDirection('DESC')->create();
+    $searchCriteria = $this->getSearchCriteria([
+      TransactionInterface::ORDER_ID => $orderId
+    ])->setSortOrders([$sortOrder]);
+    return $this->transactionRepo->getList($searchCriteria)->getFirstItem();
   }
 
   /**
