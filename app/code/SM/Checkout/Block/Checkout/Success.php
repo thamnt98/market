@@ -159,8 +159,8 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
         $this->timeZone                    = $timezone;
         $this->cityRepository              = $cityRepository;
         $this->districtRepository          = $districtRepository;
-        $this->paymentHelper = $paymentHelper;
-        $this->orderCollectionFactory = $orderCollectionFactory;
+        $this->paymentHelper               = $paymentHelper;
+        $this->orderCollectionFactory      = $orderCollectionFactory;
     }
 
     public function getGrandTotal()
@@ -249,7 +249,7 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
         $sprintOrder = $this->getSprintOrder();
 
         if ($sprintOrder->getId()) {
-            return $this->timeZone->date($sprintOrder->getExpireDate())->format('d F Y h:i A');
+            return date('d F Y h:i A', strtotime($sprintOrder->getExpireDate()));
         }
         return '';
     }
@@ -272,7 +272,7 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
 
     public function getTimeLeft()
     {
-        return $this->getExpireTime() - $this->date->gmtTimestamp()-$this->date->getGmtOffset();
+        return $this->getExpireTime() - $this->date->gmtTimestamp() - $this->date->getGmtOffset();
     }
 
     public function getOrderStatus()
@@ -308,7 +308,7 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
 
     public function getLogoPayment()
     {
-        return $this->paymentHelper->getLogoPayment($this->getPaymentMethod(), true)??null;
+        return $this->paymentHelper->getLogoPayment($this->getPaymentMethod(), true) ?? null;
     }
 
     public function getWebsiteBanking()
@@ -345,13 +345,13 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
         if (empty($this->pickupAtStore)) {
             $this->getPickupAtStore();
         }
-        return  $this->pickupAtStore->getData($data)??'';
+        return $this->pickupAtStore->getData($data) ?? '';
     }
 
     public function getPickupAtStore($order)
     {
-        $storePickupCode = $order->getStorePickUp();
-        $this->pickupAtStore= $this->sourceRepository->get($storePickupCode);
+        $storePickupCode     = $order->getStorePickUp();
+        $this->pickupAtStore = $this->sourceRepository->get($storePickupCode);
         return $this->pickupAtStore;
     }
 
@@ -383,7 +383,7 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
         if (empty($address)) {
             return '';
         }
-        return  'Deliver to: ' . $address->getAddressTag() . ' - ' . implode($address->getStreet(), ' ') . ', ' . $this->getCityName($address->getCity()) . ', ' . $this->getDistrictName($address->getDistrict()) . ' ' . $address->getPostcode();
+        return 'Deliver to: ' . $address->getAddressTag() . ' - ' . implode($address->getStreet(), ' ') . ', ' . $this->getCityName($address->getCity()) . ', ' . $this->getDistrictName($address->getDistrict()) . ' ' . $address->getPostcode();
     }
 
     public function getSecret()
@@ -418,7 +418,7 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
     public function getProductImageUrl($product)
     {
         return $this->imageHelper->init($product, 'product_thumbnail_image')->setImageFile($product->getFile())
-                                                                            ->resize('74', '74')->getUrl();
+            ->resize('74', '74')->getUrl();
     }
     /**
      * get rule id applied for GTM
@@ -474,7 +474,7 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
 
     public function getTimeDisplayConfirmPage()
     {
-        return ((int)$this->paymentHelper->getTimeDisplayConfirmPage())*1000;
+        return ((int) $this->paymentHelper->getTimeDisplayConfirmPage()) * 1000;
     }
 
     public function getParentOrder()
@@ -499,7 +499,7 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
         if (empty($address)) {
             return '';
         }
-        return  'Deliver to: ' . $address->getAddressTag() . ' - ' . implode($address->getStreet(), ' ') . ', ' . $this->getCityName($address->getCity()) . ', ' . $this->getDistrictName($address->getDistrict()) . ' ' . $address->getPostcode();
+        return 'Deliver to: ' . $address->getAddressTag() . ' - ' . implode($address->getStreet(), ' ') . ', ' . $this->getCityName($address->getCity()) . ', ' . $this->getDistrictName($address->getDistrict()) . ' ' . $address->getPostcode();
     }
 
     public function isRendermap()
