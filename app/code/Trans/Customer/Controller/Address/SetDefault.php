@@ -99,7 +99,7 @@ class SetDefault extends \Magento\Framework\App\Action\Action implements HttpPos
 
                 $customer = $this->customerSession->getCustomer();
                 $this->customerHelper->updateDistrictAndOmniStoreForCustomer($customer, $address->getDistrict(), $address->getCity());
-                $this->messageManager->addSuccessMessage(__('You saved the address.'));
+//                $this->messageManager->addSuccessMessage(__('You saved the address.'));
             } catch (\Exception $e) {
                 $this->messageManager->addErrorMessage($e->getMessage());
             }

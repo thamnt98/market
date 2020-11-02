@@ -311,19 +311,11 @@ class OmsIntegration implements OmsIntegrationInterface
 
             /*smart osc start remove code*/
             /*$allocationRuleDataByQuoteId = $this->orderAllocationRepo->loadDataByQuoteId($dataOrder['quote_id']);
-<<<<<<< HEAD
-                                                                                                                                $warehouse                   = $allocationRuleDataByQuoteId->getSpoDetail();
-                                                                                                                                $orderOriginId               = $allocationRuleDataByQuoteId->getOarOriginOrderId();
-                                                                                                                                $isSpo                       = $allocationRuleDataByQuoteId->getIsSpo();
-                                                                                                                                $isOwnCourier                = $allocationRuleDataByQuoteId->getIsOwnCourier();
-                                                                                                                                $warehouseSource             = $allocationRuleDataByQuoteId->getWarehouseSource();
-=======
                                                                                                                 $warehouse                   = $allocationRuleDataByQuoteId->getSpoDetail();
                                                                                                                 $orderOriginId               = $allocationRuleDataByQuoteId->getOarOriginOrderId();
                                                                                                                 $isSpo                       = $allocationRuleDataByQuoteId->getIsSpo();
                                                                                                                 $isOwnCourier                = $allocationRuleDataByQuoteId->getIsOwnCourier();
                                                                                                                 $warehouseSource             = $allocationRuleDataByQuoteId->getWarehouseSource();
->>>>>>> e09cbc640070f58be686591329ec5c56fba1a491
             */
             /*smart osc end remove code*/
 

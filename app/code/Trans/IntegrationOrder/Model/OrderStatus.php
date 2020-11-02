@@ -237,7 +237,7 @@ class OrderStatus implements OrderStatusInterface
     }
 
     /**
-     * Get Data Status with subaction
+     * Get Data Status with sub_action
      *
      * @param string $orderId
      * @param int $status
