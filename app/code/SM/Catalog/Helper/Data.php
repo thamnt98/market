@@ -76,7 +76,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Review\Model\ReviewFactory $reviewFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         BundleHelper $bundleHelper,
-        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
+        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
+        \Magento\Bundle\Api\ProductOptionRepositoryInterface $productOptionRepo
     ) {
         parent::__construct($context);
         $this->productCollFact = $productCollFact;
@@ -87,6 +88,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->storeManager = $storeManager;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->bundleHelper = $bundleHelper;
+        $this->productOptionRepo = $productOptionRepo;
     }
 
     /**
@@ -121,7 +123,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         return false;
     }
-
 
     /**
      * @param \Magento\Catalog\Model\Product $product
@@ -185,7 +186,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             return null;
         }
 
-        return round(
+        return ceil(
             ($product->getPrice() - $product->getFinalPrice()) * 100 / $product->getPrice()
         );
     }
@@ -202,10 +203,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             is_null($sumSpecialPriceMin) ||
             $sumPriceMin <= $sumSpecialPriceMin
         ) {
-            return NULL;
+            return null;
         }
 
-        return round(
+        return ceil(
             ($sumPriceMin - $sumSpecialPriceMin) * 100 / $sumPriceMin
         );
     }
@@ -275,8 +276,10 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getDiscountBundle($product)
     {
-        return $this->getDiscountBundleMin($this->bundleHelper->getMinAmount($product, true),
-            $this->bundleHelper->getMinAmount($product, true, true));
+        return $this->getDiscountBundleMin(
+            $this->bundleHelper->getMinAmount($product, true),
+            $this->bundleHelper->getMinAmount($product, true, true)
+        );
     }
 
     /**
@@ -302,16 +305,35 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getSumPriceMinBundle($product)
     {
-        /** @var \Magento\Catalog\Model\Product[] $children */
-        $childrenIds = $product->getTypeInstance()->getChildrenIds($product->getId(), false);
-        /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection $coll */
-        $coll = $this->productCollFact->create();
-        $coll->addFieldToSelect('type_id');
-        $coll->addFieldToSelect('price');
-        $coll->addFieldToSelect('special_price');
-        $coll->addFieldToFilter('entity_id', $childrenIds);
-
-        return $this->getSumMinPriceChildrenBundle($coll->getItems(), true);
+        $selectionCollection = $product->getTypeInstance(true)
+            ->getSelectionsCollection(
+                $product->getTypeInstance(true)->getOptionsIds($product),
+                $product
+            );
+        $optionList = [];
+        foreach ($selectionCollection as $selection) {
+            $optionList[$selection->getOptionId()][] = $selection;
+        }
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/xxx.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+        $sumMinPrice = $sumMinPriceRegular = 0;
+        foreach ($optionList as $option) {
+            $sumMinPriceOption = $sumMinPriceRegularOption = 0;
+            foreach ($option as $item) {
+                $logger->info($item->getId() . ': ' . $item->getFinalPrice() . ': ' . $item->getPrice());
+                if ($item->getTypeId() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
+                    $item = $this->getMinConfigurable($item);
+                }
+                if ($sumMinPriceOption == 0 || $sumMinPriceOption > floatval($item->getFinalPrice())) {
+                    $sumMinPriceOption = floatval($item->getFinalPrice());
+                    $sumMinPriceRegularOption = floatval($item->getPrice());
+                }
+            }
+            $sumMinPrice += $sumMinPriceOption;
+            $sumMinPriceRegular += $sumMinPriceRegularOption;
+        }
+        return ['special' => $sumMinPrice, 'regular' => $sumMinPriceRegular];
     }
 
     /**
@@ -356,29 +378,38 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected function getSumMinPriceChildrenBundle($children, $require = false)
     {
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/abc.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+        $logger->info(count($children));
+        $require = false;
         if (empty($children)) {
-            return NULL;
+            return null;
         } else {
             $sumMinPrice = 0;
             $sumMinPriceRegular = 0;
-            $minProduct = NULL;
-            $minPrice = NULL;
+            $minProduct = null;
+            $minPrice = null;
             foreach ($children as $item) {
                 if ($item->getTypeId() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
                     $item = $this->getMinConfigurable($item);
                 }
-
                 if ($require) {
                     $sumMinPrice = $sumMinPrice + floatval($item->getFinalPrice());
                     $sumMinPriceRegular = $sumMinPriceRegular + floatval($item->getPrice());
                 } else {
+                    if ($sumMinPrice == 0) {
+                        $sumMinPrice = floatval($item->getFinalPrice());
+                    }
+                    if ($sumMinPriceRegular == 0) {
+                        $sumMinPriceRegular = floatval($item->getPrice());
+                    }
                     if ($sumMinPrice > floatval($item->getFinalPrice())) {
                         $sumMinPrice = floatval($item->getFinalPrice());
                         $sumMinPriceRegular = floatval($item->getPrice());
                     }
                 }
             }
-
             return ['special' => $sumMinPrice, 'regular' => $sumMinPriceRegular];
         }
     }
@@ -390,11 +421,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected function getSumMinFinalPriceChildrenBundle($children)
     {
         if (empty($children)) {
-            return NULL;
+            return null;
         } else {
             $sumMinPrice = 0;
-            $minProduct = NULL;
-            $minPrice = NULL;
+            $minProduct = null;
+            $minPrice = null;
 
             foreach ($children as $item) {
                 if ($item->getTypeId() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
@@ -468,7 +499,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     public function convertDescription($description)
     {
         $countDescription = strlen($description);
-        $valueAccept = NULL;
+        $valueAccept = null;
         if ($countDescription > 1000) {
             $valueAccept = substr($description, 0, 1000);
 

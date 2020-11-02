@@ -268,12 +268,15 @@ class Search extends \Magento\CatalogSearch\Block\Result
      * Get Product Collection
      *
      * @return \Magento\Catalog\Model\ResourceModel\Product\Collection
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function _getProductCollection()
     {
         if (!$this->_collection) {
             $this->_collection = $this->_getSearchLayer()->getProductCollection();
+            //Remove product is tobacco
+            $this->_collection->addAttributeToFilter([
+                ["attribute" => "is_tobacco", "null" => true],
+                ["attribute" => "is_tobacco", "eq" => 0]]);
         }
 
         return $this->_collection;

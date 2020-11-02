@@ -115,11 +115,15 @@ class Onepage extends \Magento\Checkout\Block\Onepage
         $listPostCode = [];
         if ($this->helperConfig->isActiveFulfillmentStore()) {
             foreach ($customerAddressData as $addressId => $address) {
-                if (isset($address['postcode']) && $address['postcode'] != '') {
+                if (isset($address['postcode']) && $address['postcode'] != '' && $address['postcode'] != '*****') {
                     $listPostCode[] = $address['postcode'];
                 }
             }
-            $listPostCodeSupportShipping = $this->checkShippingPostCode($listPostCode);
+            if (empty($listPostCode)) {
+                $listPostCodeSupportShipping = [];
+            } else {
+                $listPostCodeSupportShipping = $this->checkShippingPostCode($listPostCode);
+            }
             foreach ($customerAddressData as $addressId => $address) {
                 $cityName = $this->getCityName($address['city']);
                 $customerAddressData[$addressId]['custom_attributes']['city'] = ['attribute_code' => 'city', 'value' => $cityName];
@@ -250,15 +254,19 @@ class Onepage extends \Magento\Checkout\Block\Onepage
      */
     protected function checkShippingPostCode($listPostCode)
     {
-        $table = $this->readAdapter->getTableName('omni_shipping_postcode');
-        $select = $this->readAdapter->select()->from(
-            [$table],
-            ['post_code']
-        )
-        ->where(
-            'post_code IN (' . implode(',', $listPostCode) . ')'
-        );
-        return $this->readAdapter->fetchCol($select);
+        try {
+            $table = $this->readAdapter->getTableName('omni_shipping_postcode');
+            $select = $this->readAdapter->select()->from(
+                [$table],
+                ['post_code']
+            )
+                ->where(
+                    'post_code IN (' . implode(',', $listPostCode) . ')'
+                );
+            return $this->readAdapter->fetchCol($select);
+        } catch (\Exception $e) {
+            return [];
+        }
     }
 
     protected function getToolTip()

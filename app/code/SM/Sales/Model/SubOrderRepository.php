@@ -184,8 +184,7 @@ class SubOrderRepository implements SubOrderRepositoryInterface
                     /** @var Order $parentOrderModel */
                     $parentOrderModel = $this->getParentOrder($subOrder->getParentOrder(), $subOrder->getId());
                     if ($parentOrderModel->getReferenceInvoiceNumber()) {
-                        $invoiceLink = $this->urlInterface->getUrl('sales/invoice/view') . 'id/' . $subOrder->getParentOrder();
-                        $subOrder->setInvoiceLink($invoiceLink);
+                        $subOrder->setInvoiceLink($this->subOrder->getInvoiceLink($subOrder->getParentOrder()));
                     }
                     $subOrderResults[] = $subOrder;
                 }

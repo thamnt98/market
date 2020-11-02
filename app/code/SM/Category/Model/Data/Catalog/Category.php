@@ -2,8 +2,6 @@
 
 namespace SM\Category\Model\Data\Catalog;
 
-use SM\Category\Api\Data\Catalog\CategoryInterface;
-
 /**
  * Class for storing Category information
  */
@@ -17,16 +15,6 @@ class Category extends \Magento\Framework\Model\AbstractExtensibleModel implemen
     public function setEntityId($entityId)
     {
         return $this->setData(self::ENTITY_ID, $entityId);
-    }
-
-    public function getEntityTypeId()
-    {
-        return $this->getData(self::ENTITY_TYPE_ID);
-    }
-
-    public function setEntityTypeId($entityTypeId)
-    {
-        return $this->setData(self::ENTITY_TYPE_ID, $entityTypeId);
     }
 
     public function getAttributeSetId()
@@ -99,16 +87,6 @@ class Category extends \Magento\Framework\Model\AbstractExtensibleModel implemen
         return $this->setData(self::LEVEL, $level);
     }
 
-    public function getChildrenCount()
-    {
-        return $this->getData(self::CHILDREN_COUNT);
-    }
-
-    public function setChildrenCount($childrenCount)
-    {
-        return $this->setData(self::CHILDREN_COUNT, $childrenCount);
-    }
-
     public function getIsActive()
     {
         return $this->getData(self::IS_ACTIVE);
@@ -149,16 +127,6 @@ class Category extends \Magento\Framework\Model\AbstractExtensibleModel implemen
         return $this->setData(self::IMAGE, $image);
     }
 
-    public function getThumbnail()
-    {
-        return $this->getData(self::THUMBNAIL);
-    }
-
-    public function setThumbnail($thumbnail)
-    {
-        return $this->setData(self::THUMBNAIL, $thumbnail);
-    }
-
     public function getIsAnchor()
     {
         return $this->getData(self::IS_ANCHOR);
@@ -177,26 +145,6 @@ class Category extends \Magento\Framework\Model\AbstractExtensibleModel implemen
     public function setColor($color)
     {
         return $this->setData(self::COLOR, $color);
-    }
-
-    public function getChildren()
-    {
-        return $this->getData(self::CHILDREN);
-    }
-
-    public function setChildren($children)
-    {
-        return $this->setData(self::CHILDREN, $children);
-    }
-
-    public function getProducts()
-    {
-        return $this->getData(self::PRODUCTS);
-    }
-
-    public function setProducts($products)
-    {
-        return $this->setData(self::PRODUCTS, $products);
     }
 
     /**

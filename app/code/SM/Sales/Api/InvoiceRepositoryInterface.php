@@ -10,8 +10,9 @@ namespace SM\Sales\Api;
 interface InvoiceRepositoryInterface
 {
     /**
+     * @param int $customerId
      * @param int $orderId
-     * @return \SM\Sales\Api\Data\Invoice\InvoiceInterface
+     * @return string
      */
-    public function getById($orderId);
+    public function getById(int $customerId, int $orderId);
 }

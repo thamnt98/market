@@ -31,11 +31,18 @@
             color: @c-tsm-blue;
             text-align: center;
             position: absolute;
-            width: 50px;
+            width: 60px;
             top:@indent__base;
             right: 0;
             .apl-ArrowIcon {
                 .lib-font-size(45);
+                display: block;
+                margin-bottom: @indent__xs;
+            }
+            .icon-direction{
+                width: 56px;
+                height: 56px;
+                background: url(../images/icon-direction.png) no-repeat;
                 display: block;
                 margin-bottom: @indent__xs;
             }
@@ -138,14 +145,16 @@
         }
         .number-time{
             font-weight: bold;
-            margin-right: 5px;
+            width: 86px;
+            overflow: hidden;
+
         }
         .text-time{
             font-weight: 500;
         }
         .two-dots{
             color: @c-tsm-grey35;
-            margin: 0px 5px;
+            margin: 0px 10px;
         }
     }
 
@@ -228,6 +237,7 @@
         }
         .account-number{
             margin-bottom: 50px;
+            text-align: center;
             .coppy-number{
                 margin-right: 60px;
             }
@@ -237,7 +247,9 @@
             margin-bottom: 50px;
         }
         .logo-bank{
-            margin: 50px 0;
+            margin: 50px auto;
+            text-align: center;
+
         }
         .check-payment-col{
             margin-bottom: 50px;
@@ -539,6 +551,13 @@
 // @screen__m = 767
 .media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m){
     #timer{
+        #hours,
+        #minutes,
+        #seconds{
+            justify-content:center;
+            flex-wrap: wrap;
+            position: relative;
+        }
         .number-time{
             font-size: 50px;
 
@@ -549,6 +568,10 @@
         }
         .two-dots{
             font-size: 26px;
+            position: absolute;
+            z-index: 1;
+            right: 0;
+            margin: 0 !important;
         }
     }
     .order-info {

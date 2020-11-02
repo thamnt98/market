@@ -128,7 +128,11 @@ $shoppingListHelper = $this->helper('SM\ShoppingList\Helper\Data');
                                                                 <input type="hidden" name="qty_type" value="1"/>
                                                                 <button type="submit"
                                                                         title="<?= $block->escapeHtmlAttr(__('Decrease qty')) ?>"
-                                                                        class="action decrease-qty">
+                                                                        class="action decrease-qty"
+                                                                        <?php if ($dataGTM) : ?>
+                                                                            data-gtm-product='<?= $dataGTM ?>'
+                                                                            data-position="<?= $iterator - 1 ?>"
+                                                                        <?php endif; ?>>
                                                                     <span><?= __('-') ?></span>
                                                                 </button>
                                                                 <label for="item_qty" class="label-item-qty">
@@ -432,6 +436,28 @@ $shoppingListHelper = $this->helper('SM\ShoppingList\Helper\Data');
                         }
                     });
                     eventCreate['.action.increase-qty']++;
+                });
+
+                async.async('.action.decrease-qty', function () {
+                    if (!eventCreate['.action.decrease-qty']) {
+                        eventCreate['.action.decrease-qty'] = 0;
+                    }
+
+                    let current = $($('.action.decrease-qty')[eventCreate['.action.decrease-qty']]);
+                    $(current).click(function (e) {
+                        let data = $(this).attr("data-gtm-product");
+
+                        if (data) {
+                            try {
+                                data = JSON.parse(data);
+                                data['position'] = $(this).attr("data-position");
+                                gtm.push("removeFromCart", data);
+                            } catch (e) {
+
+                            }
+                        }
+                    });
+                    eventCreate['.action.decrease-qty']++;
                 });
             }
         });

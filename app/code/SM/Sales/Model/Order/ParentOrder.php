@@ -143,8 +143,7 @@ class ParentOrder
             ->setConvertDate($this->convertDate($parentOrder->getCreatedAt()));
 
         if ($parentOrder->getReferenceInvoiceNumber()) {
-            $invoiceLink = $this->getUrl('sales/invoice/view', ['id' => $parentOrder->getId()]);
-            $parentOrderData->setInvoiceLink($invoiceLink);
+            $parentOrderData->setInvoiceLink(current($subOrders)->getInvoiceLink());
         }
 
         $this->voucherDetailProcess($parentOrderData, $parentOrder);

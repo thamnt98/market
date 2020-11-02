@@ -23,6 +23,7 @@ use Magento\Framework\View\LayoutFactory;
 use Magento\Review\Model\RatingFactory as RatingFactory;
 use SM\Catalog\Helper\Data as CatalogHelper;
 use Zend_Json_Encoder;
+use Magento\Catalog\Api\ProductRepositoryInterface;
 
 /**
  * Catalog Products List widget block
@@ -73,7 +74,13 @@ class ProductsList extends WidgetProductListDefault
     private $catalogHelper;
 
     /**
+     * @var ProductRepositoryInterface
+     */
+    protected $productRepository;
+
+    /**
      * ProductsList constructor.
+     * @param ProductRepositoryInterface $productRepository
      * @param CatalogHelper $catalogHelper
      * @param \Magento\Catalog\Block\Product\Context $context
      * @param \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory
@@ -90,6 +97,7 @@ class ProductsList extends WidgetProductListDefault
      * @param EncoderInterface|null $urlEncoder
      */
     public function __construct(
+        ProductRepositoryInterface $productRepository,
         CatalogHelper $catalogHelper,
         \Magento\Catalog\Block\Product\Context $context,
         \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory,
@@ -105,6 +113,7 @@ class ProductsList extends WidgetProductListDefault
         LayoutFactory $layoutFactory = null,
         EncoderInterface $urlEncoder = null
     ) {
+        $this->productRepository = $productRepository;
         $this->itemInfo = $itemInfo;
         $this->rating = $rating;
         parent::__construct(
@@ -218,7 +227,7 @@ class ProductsList extends WidgetProductListDefault
 
     /**
      * @param $product
-     * @return string
+     * @return \Magento\Catalog\Model\Product|null
      */
 
     public function getGTMMinProduct($product)
@@ -336,6 +345,7 @@ class ProductsList extends WidgetProductListDefault
     /**
      * @param $productBase
      * @return string
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getGtm($productBase)
     {
@@ -346,6 +356,7 @@ class ProductsList extends WidgetProductListDefault
         if (!$product) {
             $product = $productBase;
         }
+        $product = $this->productRepository->getById($product->getId());
         $priceGTM = $this->getPriceGTM($product);
         $initPrice = $this->getGTMInitialProductPrice($product);
         $price = $priceGTM['sale_price'] != 'Not in sale' ? $priceGTM['sale_price'] : $initPrice;

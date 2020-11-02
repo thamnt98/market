@@ -10,6 +10,7 @@
 
 namespace SM\Sales\Block\Invoice;
 
+use Magento\Customer\Model\SessionFactory;
 use Magento\Framework\Filesystem\DirectoryList;
 use Magento\Framework\View\Element\Template;
 use Mpdf\Mpdf;
@@ -25,27 +26,37 @@ class Wrapper extends Template
      * @var InvoiceRepository
      */
     protected $invoiceRepository;
+
     /**
      * @var DirectoryList
      */
     private $directoryList;
 
     /**
+     * @var SessionFactory
+     */
+    private $sessionFactory;
+
+    /**
      * Wrapper constructor.
      * @param Template\Context $context
      * @param InvoiceRepository $invoiceRepository
      * @param DirectoryList $directoryList
+     * @param SessionFactory $customerSession
      * @param array $data
      */
     public function __construct(
         Template\Context $context,
         InvoiceRepository $invoiceRepository,
         DirectoryList $directoryList,
+        SessionFactory $customerSession,
         array $data = []
     ) {
-        $this->invoiceRepository = $invoiceRepository;
+
         parent::__construct($context, $data);
         $this->directoryList = $directoryList;
+        $this->sessionFactory = $customerSession;
+        $this->invoiceRepository = $invoiceRepository;
     }
 
     /**
@@ -78,10 +89,13 @@ class Wrapper extends Template
      */
     public function getInvoice()
     {
+        $session = $this->sessionFactory->create();
+        $customerId = $session->getCustomerId() ?? $session->getCustomerTokenId();
+
         $parentOrder = $this->getRequest()->getParam("id", 0);
-        if ($parentOrder) {
+        if ($parentOrder && $customerId) {
             try {
-                return $this->invoiceRepository->getById($parentOrder);
+                return $this->invoiceRepository->getDataInvoice($customerId, $parentOrder);
             } catch (\Exception $e) {
                 return 0;
             }

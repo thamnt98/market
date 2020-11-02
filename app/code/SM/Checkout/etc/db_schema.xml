@@ -13,7 +13,7 @@
         <column xsi:type="int" name="location" nullable="true" comment="Split Store Code"/>
         <column xsi:type="varchar" name="item_rate" nullable="true" length="255" comment="Item Rate"/>
         <column xsi:type="varchar" name="address_tag" nullable="true" length="255" comment="Address Tag"/>
-        <column xsi:type="varchar" name="oar_data" nullable="true" length="255" comment="Oar Response"/>
+        <column xsi:type="text" name="oar_data" nullable="true" comment="Oar Response"/>
     </table>
     <table name="sales_order">
         <column xsi:type="varchar" name="store_pick_up" nullable="true" length="255" comment="store_pick_up"/>
@@ -27,7 +27,7 @@
         <column xsi:type="varchar" name="reference_payment_number" nullable="true" length="255" comment="Reference Payment Number"/>
         <column xsi:type="varchar" name="reference_invoice_number" nullable="true" length="255" comment="Reference Invoice Number"/>
         <column xsi:type="varchar" name="split_store_code" nullable="true" length="255" comment="split_store_code"/>
-        <column xsi:type="varchar" name="oar_data" nullable="true" length="255" comment="Oar Response"/>
+        <column xsi:type="text" name="oar_data" nullable="true" comment="Oar Response"/>
     </table>
     <table name="sales_order_grid">
         <column xsi:type="varchar" name="store_pick_up" nullable="true" length="255" comment="store_pick_up"/>

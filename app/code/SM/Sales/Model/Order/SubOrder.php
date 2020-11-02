@@ -21,6 +21,7 @@ use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
+use Magento\Framework\Webapi\Request;
 use Magento\Inventory\Model\ResourceModel\Source\Collection as SourceCollection;
 use Magento\Inventory\Model\ResourceModel\Source\CollectionFactory as SourceCollectionFactory;
 use Magento\InventoryApi\Api\Data\SourceInterface;
@@ -165,6 +166,11 @@ class SubOrder
     protected $fresh;
 
     /**
+     * @var string
+     */
+    private $currentCustomerToken;
+
+    /**
      * SubOrder constructor.
      * @param ItemOptionDataInterfaceFactory $itemOptionDataFactory
      * @param Emulation $appEmulation
@@ -209,7 +215,8 @@ class SubOrder
         \SM\Sales\Model\Data\HandleOrderStatusHistory $history,
         DataObjectFactory $dataObjectFactory,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
-        \SM\FreshProductApi\Helper\Fresh $fresh
+        \SM\FreshProductApi\Helper\Fresh $fresh,
+        Request $request
     ) {
         $this->dataObjectFactory = $dataObjectFactory;
         $this->fresh = $fresh;
@@ -233,6 +240,7 @@ class SubOrder
         $this->urlInterface = $urlInterface;
         $this->history = $history;
         $this->productRepository = $productRepository;
+        $this->request = $request;
     }
 
     /**
@@ -275,9 +283,9 @@ class SubOrder
                         ->getSelectionsCollection($productTypeInstance->getOptionsIds($product), $product)
                         ->getItems();
 
-                    $selectOption = $this->getSelectedProduct($productOption,$options);
+                    $selectOption = $this->getSelectedProduct($productOption, $options);
 
-                    if(isset($selectOption[$option['option_id']])) {
+                    if (isset($selectOption[$option['option_id']])) {
                         $itemOptionData->setOptionSelection($selectOption[$option['option_id']]);
                     }
                     $key++;
@@ -296,7 +304,7 @@ class SubOrder
     public function formatBundleOptions($values, $key)
     {
         foreach ($values as &$value) {
-            $value["title"] =  __("Bundle ") . $key;
+            $value["title"] = __("Bundle ") . $key;
         }
 
         return $values;
@@ -307,15 +315,15 @@ class SubOrder
      * @param $option
      * @return array
      */
-    public function getSelectedProduct($productOption,$option)
+    public function getSelectedProduct($productOption, $option)
     {
         $optionSelected = [];
         $selectOption = [];
         $infoBuyRequest = $option['info_buyRequest'];
         $bundleOption = $infoBuyRequest['bundle_option'];
-        foreach ($productOption as $optionId =>$productOpt) {
+        foreach ($productOption as $optionId => $productOpt) {
             foreach ($bundleOption as $opt) {
-                if(is_array($opt)) {
+                if (is_array($opt)) {
                     if (in_array($productOpt->getSelectionId(), $opt)) {
                         $optionSelected[] = $productOpt;
                         if ($productOpt->getTypeId() == Configurable::TYPE_CODE) {
@@ -344,7 +352,7 @@ class SubOrder
                             $selectOption[$productOpt->getData("option_id")] = $productOpt->getData("name");
                         }
                     }
-                }else{
+                } else {
                     if ($productOpt->getSelectionId() == $opt) {
                         $optionSelected[] = $productOpt;
                         if ($productOpt->getTypeId() == Configurable::TYPE_CODE) {
@@ -451,8 +459,7 @@ class SubOrder
                 ->setStoreInfo($this->getStoreInfo($subOrder, $sourceInformation));
 
             if ($hasInvoice) {
-                $invoiceLink = $this->urlInterface->getUrl('sales/invoice/view') . 'id/' . $subOrder->getParentOrder();
-                $subOrderData->setInvoiceLink($invoiceLink);
+                $subOrderData->setInvoiceLink($this->getInvoiceLink($subOrder->getParentOrder()));
             }
 
             if (!$subOrder->getIsVirtual()) {
@@ -506,11 +513,11 @@ class SubOrder
             if ($street) {
                 $street = explode(PHP_EOL, $street);
                 if (isset($street[0])) {
-                    $address =  $street[0];
+                    $address = $street[0];
                 }
 
                 if (isset($street[1])) {
-                    $addressDetails =  $street[1];
+                    $addressDetails = $street[1];
                 }
             }
 
@@ -540,7 +547,8 @@ class SubOrder
      * @param Order $subOrderModel
      * @return string
      */
-    public function getFullName($subOrderModel) {
+    public function getFullName($subOrderModel)
+    {
         $name = '';
         $name .= $subOrderModel->getData("firstname");
         if ($subOrderModel->getData("middlename")) {
@@ -551,9 +559,9 @@ class SubOrder
     }
 
     /**
-    * @param Order $subOrderModel
-    * @param SubOrderDataInterface $subOrderData
-    */
+     * @param Order $subOrderModel
+     * @param SubOrderDataInterface $subOrderData
+     */
     private function setItemsData($subOrderModel, $subOrderData)
     {
         $items = [];
@@ -600,7 +608,7 @@ class SubOrder
             $totalPrice += $orderItem->getBasePrice() * (int)$orderItem->getQtyOrdered();
         }
 
-        if($subOrderModel->getData("parent_order") && $subOrderModel->getSubtotal() <= 0){
+        if ($subOrderModel->getData("parent_order") && $subOrderModel->getSubtotal() <= 0) {
             $subOrderData->setSubtotal($totalPrice);
         }
 
@@ -699,5 +707,47 @@ class SubOrder
     public function isStorePickUp($order)
     {
         return $order->getShippingMethod() == "store_pickup_store_pickup";
+    }
+
+    /**
+     * @return string|void
+     */
+    public function getCurrentCustomerToken()
+    {
+        if (empty($this->currentCustomerToken)) {
+            $authorizationHeaderValue = $this->request->getHeader('Authorization');
+            if (!$authorizationHeaderValue) {
+                return;
+            }
+
+            $headerPieces = explode(" ", $authorizationHeaderValue);
+            if (count($headerPieces) !== 2) {
+                return;
+            }
+
+            $tokenType = strtolower($headerPieces[0]);
+            if ($tokenType !== 'bearer') {
+                return;
+            }
+            $this->currentCustomerToken = $headerPieces[1] ?? '';
+        }
+
+        return $this->currentCustomerToken;
+    }
+
+    /**
+     * @param $orderId
+     * @return string|null
+     */
+    public function getInvoiceLink($orderId)
+    {
+        if ($token = $this->getCurrentCustomerToken()) {
+            return $this->urlInterface->getUrl(
+                'sales/invoice/mobileview',
+                array('id' => $orderId, 'token' => $token)
+            );
+        }
+
+        return null;
     }
 }

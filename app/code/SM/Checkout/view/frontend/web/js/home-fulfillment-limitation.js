@@ -43,7 +43,7 @@ define(
                 });
                 customerData.get('fulfillment').subscribe(function (newValue) {
                     var customer = customerData.get('customer');
-                    if (newValue.show && typeof customer().firstname !== "undefined" && customer().firstname) {
+                    if (!newValue.show && typeof customer().firstname !== "undefined" && customer().firstname) {
                         console.log('fulfillment change');
                         self.showPopup()
                     }

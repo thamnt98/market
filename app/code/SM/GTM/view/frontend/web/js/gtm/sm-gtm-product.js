@@ -152,6 +152,48 @@ define([
                         }
                     }
                         break;
+                    case "removeFromCart": {
+                        if (data['price'] !== "Not available") {
+                            window.dataLayer.push({
+                                'event': "removeFromCart",
+                                'uniqueUserID': dataLayerSourceObjects.customer.uniqueUserID,
+                                'userID': dataLayerSourceObjects.customer.userID,
+                                'customerID': dataLayerSourceObjects.customer.customerID,
+                                'customerType': dataLayerSourceObjects.customer.customerType,
+                                'loyalty': dataLayerSourceObjects.customer.loyalty,
+                                'customerStatus': dataLayerSourceObjects.customer.customerStatus,
+                                'loginType': dataLayerSourceObjects.customer.loginType,
+                                'timestamp': moment().format('DD\/MM\/YYYY HH:mm:ss'),
+                                'product_size': data['product_size'],
+                                'product_volume': data['product_volume'],
+                                'product_weight': data['product_weight'],
+                                'product_bundle': data['productBundle'],
+                                'salePrice': data['salePrice'],
+                                'discountRate': data['discountRate'],
+                                'rating': data['rating'],
+                                'initialPrice': data['initialPrice'],
+                                'email': dataLayerSourceObjects.quote.email,
+                                'basket_id': dataLayerSourceObjects.customer.basketID,
+                                'basket_value': dataLayerSourceObjects.quote.cart_total = Math.ceil(dataLayerSourceObjects.quote.cart_total) + Math.ceil(data['price']),
+                                'basket_quantity': dataLayerSourceObjects.quote.product_quantity = dataLayerSourceObjects.quote.product_quantity + 1,
+                                'ecommerce': {
+                                    'currencyCode': dataLayerSourceObjects.store.currency,
+                                    'remove': {
+                                        'products': [{
+                                            'name': data['name'],
+                                            'id': data['id'],
+                                            'price': data['price'],
+                                            'brand': data['brand'],
+                                            'category': data['category'],
+                                            'variant': data['variant'],
+                                            'quantity': 1
+                                        }]
+                                    }
+                                }
+                            });
+                        }
+                    }
+                        break;
                     case "see_all_category_page": {
                         window.dataLayer.push({
                             'event': "see_all_category_page",

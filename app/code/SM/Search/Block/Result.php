@@ -129,22 +129,13 @@ class Result extends ResultBase
      */
     public function prepareRecommendationListOnNoResult(): ?int
     {
-        $recommendCategoryId = $this->config->getSuggestCategoryIdOnNoResult();
-        if ($recommendCategoryId) {
-            try {
-                $category = $this->categoryRepository->get($recommendCategoryId, $this->_storeManager->getStore()->getId());/** @var \Amasty\Shopby\Model\ResourceModel\Fulltext\Collection $collection */
+        /** @var \Amasty\Shopby\Model\ResourceModel\Fulltext\Collection $collection */
+        $collection = $this->_getProductCollection();
+        $collection->clear();
+        $collection->resetSearchEngineResult();
+        $collection->setQueryText('');
+        $collection->load();
 
-                $collection = $this->_getProductCollection();
-                $collection->clear();
-                $collection->resetSearchEngineResult();
-                $collection->setQueryText('');
-                $collection->addCategoryFilter($category);
-                $collection->load();
-
-                return $collection->getSize();
-            } catch (NoSuchEntityException $exception) {
-                return null;
-            }
-        }
+        return $collection->getSize();
     }
 }

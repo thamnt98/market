@@ -48,12 +48,18 @@ class MiniForm extends Template
         return $this->categoryRepository->getCategoriesInSearchForm();
     }
 
-    /**
-     * @param array $categoryData
-     * @return bool
-     */
-    public function isSelectedCategory(array $categoryData): bool
+    public function getSelectedCategory()
     {
-        return $categoryData['entity_id'] == $this->getRequest()->getParam(self::CATEGORY_FIELD_NAME);
+        if ($this->getRequest()->getFullActionName() === 'catalogsearch_result_index' &&
+            $this->getRequest()->getParam('cat')
+        ) {
+            foreach ($this->getCategories() as $category) {
+                if (isset($category['entity_id'])
+                    && $category['entity_id'] == $this->getRequest()->getParam('cat')
+                ) {
+                    return $category;
+                }
+            }
+        }
     }
 }

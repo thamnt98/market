@@ -184,6 +184,7 @@ class ContactUs extends \Magento\Framework\View\Element\Template
         try {
             return $this->topicCollectionFactory
                 ->addStoreFilter()
+                ->addVisibilityFilter()
                 ->addFieldToFilter(TopicInterface::LEVEL, 1);
         } catch (LocalizedException $e) {
         }

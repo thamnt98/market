@@ -28,11 +28,6 @@ interface CategoryInterface
     public function getMostPopularProduct($category_id);
 
     /**
-     * @return mixed[]
-     */
-    public function getFavoriteBrands();
-
-    /**
      * Get category gallery and color
      * @param int $category_id
      * @return \SM\Category\Api\Data\Catalog\CategoryMetaDataInterface

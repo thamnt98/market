@@ -102,7 +102,10 @@ class Invoice extends \Magento\Sales\Model\Order\Pdf\Invoice
             $invoiceList[] = $invoice;
         }
 
-        $invoice = $this->invoiceRepository->getById($invoiceList[0]->getOrder()->getData('entity_id'));
+        $invoice = $this->invoiceRepository->getDataInvoice(
+            $invoiceList[0]->getOrder()->getData('customer_id'),
+            $invoiceList[0]->getOrder()->getData('entity_id')
+        );
 
         $html = $this->getHTML($invoice);
 
