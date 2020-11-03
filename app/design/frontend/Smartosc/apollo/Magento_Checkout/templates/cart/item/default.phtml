@@ -20,7 +20,7 @@ $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
 ?>
 <tbody class="cart item">
 <tr class="item-info">
-    <td class="col select-item">
+    <td class="col select-item demo">
         <div class="checkbox-custom">
             <input type="checkbox" id="itemid-<?= $_item->getId() ?>" class="item-checked" data-gtm-product-id="<?= $block->escapeHtml($product->getId()) ?>" name="<?= $_item->getId() ?>" <?php if($_item->getIsActive()){ echo 'checked=true';}?> />
             <label for="recent"><?= $block->escapeHtml('') ?></label>
@@ -72,6 +72,15 @@ $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
                     <?php endforeach; ?>
                 </dl>
             <?php endif; ?>
+
+            <?php /** @var $freshBlock \SM\FreshProduct\Block\Product\View */ ?>
+            <?php $freshBlock = $block->getLayout()->getBlock('checkout.item.price.fresh') ?>
+
+            <?php if ($freshBlock) : ?>
+                <?= $freshBlock->setProduct($_item->getProduct())->toHtml() ?>
+            <?php endif; ?>
+
+
             <?php /** @var $installationBlock \SM\Installation\Block\Form */ ?>
             <?php $installationBlock = $block->getLayout()->getBlock('product.info.form.installation') ?>
 
@@ -147,12 +156,6 @@ $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
             <?= $block->getRowTotalHtml($_item) ?>
         <?php endif; ?>
 
-        <?php /** @var $freshBlock \SM\FreshProduct\Block\Product\View */ ?>
-        <?php $freshBlock = $block->getLayout()->getBlock('checkout.item.price.fresh') ?>
-
-        <?php if ($freshBlock) : ?>
-            <?= $freshBlock->setProduct($_item->getProduct())->toHtml() ?>
-        <?php endif; ?>
 
 
     </td>

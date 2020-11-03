@@ -330,4 +330,31 @@ class TopicRepository implements TopicRepositoryInterface
             ScopeInterface::SCOPE_STORE
         );
     }
+
+    /**
+     * Get Topics Category Contact us
+     *
+     * @return Data\TopicInterface[]
+     */
+    public function getListCategory()
+    {
+        $data = [
+            "id"          => 0,
+            "name"        => "General",
+            "status"      => 1,
+            "description" => "",
+            "url_key"     => "",
+            "path"        =>  "",
+            "level"       => 1,
+            "position"    => 0,
+            "parent_id"   => 1,
+            "created_at"  => "",
+            "image"       => "",
+            "image_url"   => "",
+            "type"        => "normal"
+        ];
+        $topics = $this->getParentTopics();
+        array_unshift($topics, $data);
+        return $topics;
+    }
 }

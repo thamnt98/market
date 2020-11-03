@@ -8,5 +8,8 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Customer:etc/sections.xsd">
     <action name="customer/trans/createAccount"/>
-    <action name="customer/trans/LoginAjax"/>
+    <action name="customer/trans/LoginAjax">
+        <section name="checkout-data"/>
+        <section name="cart"/>
+    </action>
 </config>

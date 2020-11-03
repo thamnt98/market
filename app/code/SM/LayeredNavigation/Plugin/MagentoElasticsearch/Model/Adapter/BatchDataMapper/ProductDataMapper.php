@@ -24,6 +24,9 @@ class ProductDataMapper
     const DISCOUNT_PERCENT_FIELD_NAME = 'discount_percent';
     const DISCOUNT_PERCENT_PREFIX     = 'discount_percent_';
 
+    const XML_GROUP_PREFIX  = 'trans_catalog/product/group_name_prefix';
+    const XML_BUNDLE_PREFIX = 'trans_catalog/product/bundle_name_prefix';
+
     /**
      * @var \Magento\Framework\DB\Adapter\AdapterInterface
      */
@@ -33,6 +36,11 @@ class ProductDataMapper
      * @var \Magento\CatalogSearch\Model\Indexer\Fulltext\Action\DataProvider
      */
     protected $dataProvider;
+
+    /**
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
+     */
+    protected $scopeConfig;
 
     /**
      * @var int
@@ -85,18 +93,31 @@ class ProductDataMapper
     protected $bundleOptions = [];
 
     /**
+     * @var string
+     */
+    protected $bundleNamePrefix;
+
+    /**
+     * @var string
+     */
+    protected $groupNamePrefix;
+
+    /**
      * ProductDataMapper constructor.
      *
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface                $scopeConfig
      * @param \Magento\CatalogSearch\Model\Indexer\Fulltext\Action\DataProvider $dataProvider
      * @param \Magento\Framework\App\ResourceConnection                         $resource
      */
     public function __construct(
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\CatalogSearch\Model\Indexer\Fulltext\Action\DataProvider $dataProvider,
         \Magento\Framework\App\ResourceConnection $resource
     ) {
         $this->connection = $resource->getConnection();
         $this->dataProvider = $dataProvider;
         $this->construct();
+        $this->scopeConfig = $scopeConfig;
     }
 
     protected function construct()
@@ -156,11 +177,12 @@ class ProductDataMapper
             $this->convertData($productId);
         }
 
+
         return $this->result;
     }
 
     /**
-     * @param int   $productId
+     * @param int $productId
      */
     protected function convertData($productId)
     {
@@ -169,6 +191,13 @@ class ProductDataMapper
         }
 
         $type = $this->productRawData[$productId]['type_id'];
+
+        if ($type === \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE && $this->bundleNamePrefix) {
+            $this->result[$productId]['name'][] = $this->groupNamePrefix;
+        } elseif ($type === \Magento\Bundle\Model\Product\Type::TYPE_CODE && $this->bundleNamePrefix) {
+            $this->result[$productId]['name'][] = $this->bundleNamePrefix;
+        }
+
         foreach ($this->basePriceAttributes as $attrCode) {
             $locationCode = (int)str_replace(CustomerPrice::PREFIX_OMNI_NORMAL_PRICE, '', $attrCode);
 
@@ -219,15 +248,20 @@ class ProductDataMapper
      */
     protected function updateConfigGroup($productId, $code)
     {
-        if (empty($this->result[$productId]) || empty($this->parentProduct[$productId])) {
+        if (empty($this->result[$productId])) {
             return;
         }
 
         $baseAttr = CustomerPrice::PREFIX_OMNI_NORMAL_PRICE . $code;
         $specialAttr = CustomerPrice::PREFIX_OMNI_FINAL_PRICE . $code;
-        $minPrice = $this->getMinChildrenPrice($this->parentProduct[$productId], $baseAttr, $specialAttr);
-        $this->result[$productId][$baseAttr] = $minPrice['price'] ?? 0;
-        $this->result[$productId][$specialAttr] = $minPrice['special'] ?? 0;
+        if (empty($this->parentProduct[$productId])) {
+            $this->result[$productId][$baseAttr] = 0;
+            $this->result[$productId][$specialAttr] = 0;
+        } else {
+            $minPrice = $this->getMinChildrenPrice($this->parentProduct[$productId], $code);
+            $this->result[$productId][$baseAttr] = $minPrice['price'] ?? 0;
+            $this->result[$productId][$specialAttr] = $minPrice['special'] ?? 0;
+        }
     }
 
     /**
@@ -248,7 +282,7 @@ class ProductDataMapper
 
         foreach ($this->bundleOptions[$productId] as $optionId => $optionProduct) {
             $minOption = $this->getMinChildrenPrice(array_keys($optionProduct), $code);
-            $qty = $optionProduct[$minOption['productId']] ?? 1;
+            $qty = (int)($optionProduct[$minOption['productId']] ?? 1);
             $minPrice['price'] += ($minOption['price'] ?? 0) * $qty;
             $minPrice['special'] += ($minOption['special'] ?? 0) * $qty;
         }
@@ -366,8 +400,21 @@ class ProductDataMapper
         $price = (float)($this->productRawData[$productId][$priceCode] ?? 0);
 
         if (!$price) {
-            $rawCode = $isSpecial ? 'special_price' : 'price';
-            $price = (float)($this->productRawData[$productId][$rawCode] ?? 0);
+            if ($isSpecial) {
+                $basePriceCode = str_replace(
+                    CustomerPrice::PREFIX_OMNI_FINAL_PRICE,
+                    CustomerPrice::PREFIX_OMNI_NORMAL_PRICE,
+                    $priceCode
+                );
+
+                $price = (float)($this->productRawData[$productId][$basePriceCode] ?? 0);
+
+                if (!$price) {
+                    $price = (float)($this->productRawData[$productId]['special_price'] ?? 0);
+                }
+            } else {
+                $price = (float)($this->productRawData[$productId]['price'] ?? 0);
+            }
         }
 
         return $price;
@@ -448,6 +495,7 @@ class ProductDataMapper
      */
     protected function prepareProductData($productIds)
     {
+        $this->prepareNamePrefix();
         $this->prepareChildren($productIds);
         $select = $this->connection->select();
         $select->from(
@@ -555,12 +603,8 @@ class ProductDataMapper
         $priceAttrs['price'] = $this->priceAttrId;
         $priceAttrs['special_price'] = $this->specialAttrId;
 
-        foreach ($this->result as $item) {
-            if (isset($item['store_id'])) {
-                $stores[] = (int)$item['store_id'];
-                break;
-            }
-        }
+        $lastProduct = end($this->result);
+        $stores[] = (int)$lastProduct['store_id'] ?? 0;
 
         $defaultSelect = $this->connection->select()
             ->from(
@@ -606,5 +650,22 @@ class ProductDataMapper
         $select->columns([
             '(' . $statusSelect->__toString() . ') AS status',
         ]);
+    }
+
+    protected function prepareNamePrefix()
+    {
+        $lastProduct = end($this->result);
+        $store = (int)$lastProduct['store_id'] ?? 0;
+
+        $this->bundleNamePrefix = $this->scopeConfig->getValue(
+            self::XML_BUNDLE_PREFIX,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $store
+        );
+        $this->groupNamePrefix = $this->scopeConfig->getValue(
+            self::XML_GROUP_PREFIX,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $store
+        );
     }
 }

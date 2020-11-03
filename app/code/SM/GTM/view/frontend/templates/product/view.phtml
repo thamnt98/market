@@ -23,6 +23,18 @@ if ($GTMViewModel) {
                     $this.find('[data-gtm-event="product_view"]').each(function () {
                         var $that =  $(this);
                         $that.attr('data-gtm-position', position);
+
+                        let data_product_pdp = $that.attr('data-gtm-product');
+                        if (data_product_pdp) {
+                            try {
+                                data_product_pdp = JSON.parse(data_product_pdp);
+                                data_product_pdp['list'] = $that.attr('data-gtm-list');
+                                data_product_pdp['position'] = $that.attr('data-gtm-position');
+                                gtm.push('product_view', data_product_pdp);
+                            } catch (e) {
+
+                            }
+                        }
                     });
                     position++;
                 });
@@ -208,24 +220,6 @@ if ($GTMViewModel) {
                     eventCreate['[data-gtm-event="product_click"]']++;
                 });
 
-                async.async('[data-gtm-event="product_view"]', function () {
-                    if (!eventCreate['[data-gtm-event="product_view"]']) {
-                        eventCreate['[data-gtm-event="product_view"]'] = 0;
-                    }
-                    let current = $($('[data-gtm-event="product_view"]')[eventCreate['[data-gtm-event="product_view"]']]);
-                    let data_product_pdp = $(current).attr('data-gtm-product');
-                    if (data_product_pdp) {
-                        try {
-                            data_product_pdp = JSON.parse(data_product_pdp);
-                            data_product_pdp['list'] = $(current).attr('data-gtm-list');
-                            data_product_pdp['position'] = $(current).attr('data-gtm-position');
-                            gtm.push('product_view', data_product_pdp);
-                        } catch (e) {
-
-                        }
-                    }
-                    eventCreate['[data-gtm-event="product_view"]']++;
-                });
 
                 async.async('[data-gtm-message="success"]', function () {
                     //Todo Remove Debug

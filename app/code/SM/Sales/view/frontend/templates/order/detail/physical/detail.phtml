@@ -192,7 +192,7 @@ if ($parentOrder) {
                                                 <?php if ($item->getProductType() == \SM\Sales\Model\ParentOrderRepository::OPTION_TYPE_CONFIGURABLE): ?>
                                                     <?php foreach ($item->getOptions() as $key => $option): ?>
                                                         <?php $char = $key != 0 ? ', ' : ''; ?>
-                                                        <p><?= $char . $block->escapeHtml($option->getOptionValue()) ?></p>
+                                                        <span><?= $char . $block->escapeHtml($option->getOptionValue()) ?></span>
                                                     <?php endforeach; ?>
                                                 <?php endif; ?>
                                                 <?php $qty = (int)$item->getQuantity(); ?>

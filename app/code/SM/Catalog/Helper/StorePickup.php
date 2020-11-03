@@ -13,15 +13,15 @@
 
 namespace SM\Catalog\Helper;
 
-use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\InventoryApi\Api\SourceItemRepositoryInterface;
-use Magento\InventoryApi\Api\Data\SourceItemInterface;
-use Magento\InventoryApi\Api\SourceRepositoryInterface;
-use Magento\InventoryApi\Api\Data\SourceInterface;
-use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Catalog\Api\ProductRepositoryInterface;
+use Magento\Customer\Model\Session as CustomerSession;
+use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Registry;
+use Magento\InventoryApi\Api\Data\SourceInterface;
+use Magento\InventoryApi\Api\Data\SourceItemInterface;
+use Magento\InventoryApi\Api\SourceItemRepositoryInterface;
+use Magento\InventoryApi\Api\SourceRepositoryInterface;
 
 /**
  * Class StorePickup
@@ -175,9 +175,10 @@ class StorePickup
 
         try {
             $customer = $this->customerSession->getCustomer()->getDefaultBillingAddress();
+            //Mobile API don't have session, so when mobile call api get product detail, we store customer id in registry and use in here!
             if (!$customer) {
-                $customerId = $this->customerSession->getCustomerId();
-                $customer = $this->customerFactory->create()->load($customerId)->getDefaultBillingAddress();
+                $customerId = $this->registry->registry('customer_id');
+                $customer   = $this->customerFactory->create()->load($customerId)->getDefaultBillingAddress();
             }
 
             if ($customer) {
@@ -251,7 +252,6 @@ class StorePickup
                 if (empty($resultSourceCode)) {
                     $hasSourceAval = false;
                 }
-
             }
         }
 
@@ -308,7 +308,6 @@ class StorePickup
                 if (empty($resultSourceCode)) {
                     $hasSourceAval = false;
                 }
-
             }
         }
 
@@ -444,7 +443,6 @@ class StorePickup
                         (float)$latLongMainAddress['long'],
                         (float)$source['latitude'],
                         (float)$source['longitude']
-
                     );
 
                     $kmDistance = round(($kmDistance * 100 / 100), 2);

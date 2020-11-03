@@ -249,7 +249,10 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
         $sprintOrder = $this->getSprintOrder();
 
         if ($sprintOrder->getId()) {
-            return $this->timeZone->date($sprintOrder->getExpireDate())->format('d F Y h:i A');
+            /**
+             * fix VA payment expire time information by CTCD
+             */
+            return date('d F Y h:i A', strtotime($sprintOrder->getExpireDate()));
         }
         return '';
     }

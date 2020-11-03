@@ -2,19 +2,14 @@
 
 namespace SM\Category\Model\Catalog;
 
-use Magento\Checkout\Exception;
 use Magento\Store\Model\ScopeInterface;
+use SM\Category\Api\Data\Catalog\CategoryMetaDataInterface;
 use SM\HeroBanner\Model\Banner;
 use SM\MobileApi\Api\Data\Product\ListInterface;
-use SM\Category\Api\Data\Catalog\CategoryMetaDataInterface;
 
 class Tree
 {
-    const IMAGE_TYPE = 'thumbnail';
-
     const GET_ALL_ACTIVE = true;
-
-    const MAX_TREE_DEPTH = 2;
 
     protected $_categoryHelper;
 
@@ -104,6 +99,13 @@ class Tree
         $this->categoryMetaData             = $categoryMetaData;
     }
 
+    /**
+     * Get C0 Category
+     * @return \SM\Category\Model\Data\Catalog\CategoryTree
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Zend_Db_Select_Exception
+     */
     public function getTree()
     {
         $parentId   = $this->storeManager->getStore()->getRootCategoryId();
@@ -124,25 +126,11 @@ class Tree
         return $result;
     }
 
-    public function getParentCategories()
-    {
-        $parentId   = $this->storeManager->getStore()->getRootCategoryId();
-        $categories = [];
-        $result = $this->categoryTreeFactory->create();
-
-        $rootCategory = $this->categoryFactory->create()->load($parentId);
-        if (! $rootCategory->getId()) {
-            $result->setCategories($categories);
-
-            return $result;
-        }
-
-        $categories = $this->_getActiveCategories($rootCategory->getId(), 1, false);
-        $result->setCategories($categories);
-
-        return $result;
-    }
-
+    /**
+     * @param $categoryId
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
     public function getSubCategoryById($categoryId)
     {
         $category           = $this->categoryFactory->create();
@@ -166,7 +154,6 @@ class Tree
             $subCateInfo->setEntityId($cat->getId());
             $subCateInfo->setName($cat->getName());
             $subCateInfo->setAttributeSetId($cat->getAttributeSetId());
-            $subCateInfo->setEntityTypeId($cat->getEntityTypeId());
             $subCateInfo->setParentId($cat->getParentId());
             $subCateInfo->setCreatedAt($cat->getCreatedAt());
             $subCateInfo->setUpdatedAt($cat->getUpdatedAt());
@@ -174,7 +161,6 @@ class Tree
             $subCateInfo->setPath($cat->getPath());
             $subCateInfo->setLevel($cat->getLevel());
             $subCateInfo->setImage($cat->getImageUrl());
-            $subCateInfo->setThumbnail($this->_getThumbnailFromProduct($cat));
             $subCateInfo->setIsActive($cat->getIsActive());
             $subCateInfo->setIsAnchor($cat->getIsAnchor());
             $subCateInfo->setCategoryId($cat->getId());
@@ -183,10 +169,17 @@ class Tree
             $subCateInfo->setIsTobacco($cat->getData(ListInterface::IS_TOBACCO));
             $data[] = $subCateInfo;
         }
+
         return $data;
     }
 
-    public function getCategoryMetaData($categoryId){
+    /**
+     * @param $categoryId
+     * @return CategoryMetaDataInterface|null
+     * @throws \Magento\Framework\Webapi\Exception
+     */
+    public function getCategoryMetaData($categoryId)
+    {
         try {
             $category = $this->categoryFactory->create()->load($categoryId);
             if ($category->getId()) {
@@ -201,14 +194,14 @@ class Tree
             } else {
                 return null;
             }
-        }catch (\Exception $e){
-            throw new \Magento\Framework\Webapi\Exception(__($e->getMessage()),426,404);
+        } catch (\Exception $e) {
+            throw new \Magento\Framework\Webapi\Exception(__($e->getMessage()), 0, 404);
         }
     }
 
     /**
      * @param $categoryId
-     * @return \SM\MobileApi\Api\Data\Product\ListInterface|array
+     * @return ListInterface|array
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getMostPopular($categoryId)
@@ -233,11 +226,6 @@ class Tree
         return $this->productInterface->getList($mostPopularCategoryId, $limit = 10, $p = 1);
     }
 
-    public function getFavoriteBrand()
-    {
-        return $this->_getGalleryCategory();
-    }
-
     /**
      * @param $category
      * @return \SM\Category\Model\Data\Catalog\CategoryColor
@@ -253,13 +241,14 @@ class Tree
         return $categoryColorObject;
     }
 
-    protected function _getActiveCategories($parentId, $indexLevel = 1, $includingProducts = true)
+    /**
+     * @param $parentId
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Zend_Db_Select_Exception
+     */
+    protected function _getActiveCategories($parentId)
     {
-        $maxTreeDepth = $this->request->getParam('max_tree_depth', null);
-        if (! $maxTreeDepth) {
-            $maxTreeDepth = self::MAX_TREE_DEPTH;
-        }
-
         $category   = $this->categoryFactory->create();
         $categories = $category->getCategories($parentId, 1, false, true, false);
         $categories->addAttributeToSelect('*');
@@ -282,7 +271,6 @@ class Tree
         $categories->load();
 
         $data  = [];
-        $index = 0;
         foreach ($categories as $cat) {
             /* @var  $cateInfo \SM\Category\Api\Data\Catalog\CategoryInterface*/
             /* @var $cat \Magento\Catalog\Api\Data\CategoryTreeInterface */
@@ -290,7 +278,6 @@ class Tree
             $cateInfo->setEntityId($cat->getId());
             $cateInfo->setName($cat->getName());
             $cateInfo->setAttributeSetId($cat->getAttributeSetId());
-            $cateInfo->setEntityTypeId($cat->getEntityTypeId());
             $cateInfo->setParentId($cat->getParentId());
             $cateInfo->setCreatedAt($cat->getCreatedAt());
             $cateInfo->setUpdatedAt($cat->getUpdatedAt());
@@ -298,7 +285,6 @@ class Tree
             $cateInfo->setPath($cat->getPath());
             $cateInfo->setLevel($cat->getLevel());
             $cateInfo->setImage($cat->getImageUrl());
-            $cateInfo->setThumbnail($this->_getThumbnailFromProduct($cat));
             $cateInfo->setIsActive($cat->getIsActive());
             $cateInfo->setIsAnchor($cat->getIsAnchor());
             $cateInfo->setCategoryId($cat->getId());
@@ -306,87 +292,11 @@ class Tree
             $cateInfo->setIsDigital($this->getIsDigital($cat));
             $cateInfo->setIsAlcohol($cat->getData("is_alcohol"));
             $cateInfo->setIsTobacco($cat->getData("is_tobacco"));
-
             $cateInfo->setIsFresh($cat->getData(\SM\Category\Api\Data\Catalog\CategoryInterface::IS_FRESH) ?? false);
-            if ($includingProducts) {
-                $products = $this->_getProductsFromCategory($cat);
-                $cateInfo->setProducts($products);
-            } else {
-                $cateInfo->setProducts(null);
-            }
-
-            $data[ $index ] = $cateInfo;
-            $index ++;
+            $data[] = $cateInfo;
         }
 
         return $data;
-    }
-
-    protected function _getThumbnailFromProduct(\Magento\Catalog\Model\Category $category)
-    {
-        $_imageWidth  = 400;
-        $_imageHeight = 400;
-
-        $imageUrl = '';
-
-        /** @var  \Magento\Catalog\Model\ResourceModel\Product\Collection $productCollection */
-        $productCollection = $category->getProductCollection();
-        $productCollection->addAttributeToSelect('*');
-        $productCollection->addAttributeToFilter('status', [ 'in' => $this->productStatus->getVisibleStatusIds() ]);
-        $productCollection->addAttributeToFilter('visibility', [ 'in' => $this->productVisibility->getVisibleInSiteIds() ]);
-        $productCollection->getSelect()->limit(3);
-        $productCollection->load();
-        if (! $productCollection->getSize()) {
-            return $imageUrl;
-        }
-
-        /** @var \Magento\Catalog\Model\Product\Interceptor $product */
-        foreach ($productCollection as $product) {
-            if (! $product->getData(self::IMAGE_TYPE)) {
-                continue;
-            }
-            $_helper  = $this->imageHelper->init($product, '');
-            $imageUrl = $_helper->setImageFile($product->getData(self::IMAGE_TYPE))->resize($_imageWidth, $_imageHeight)->getUrl();
-            if ($imageUrl) {
-                break;
-            }
-        }
-
-        return $imageUrl;
-    }
-
-    protected function _getProductsFromCategory(\Magento\Catalog\Model\Category $category)
-    {
-        if ($category) {
-            $productCollection = $category->getProductCollection();
-            $productCollection->addAttributeToSelect('*');
-            $productCollection->addAttributeToFilter('status', [ 'in' => $this->productStatus->getVisibleStatusIds() ]);
-            $productCollection->addAttributeToFilter('visibility', [ 'in' => $this->productVisibility->getVisibleInSiteIds() ]);
-            $productCollection->load();
-
-            if ($productCollection) {
-                return $this->mProductHelper->convertProductCollectionToResponseV2($productCollection);
-            } else {
-                return null;
-            }
-        } else {
-            return null;
-        }
-    }
-
-    protected function _getGalleryCategory()
-    {
-        //TODO: Remove hard data
-        return [
-            'https://images.livemint.com/rf/Image-621x414/LiveMint/Period2/2017/10/31/Photos/Processed/fruits-kFLF--621x414@LiveMint.jpg',
-            'https://pbs.twimg.com/profile_images/996599426796797952/7vcDjxzu_400x400.jpg',
-            'https://media.gettyimages.com/photos/assortment-of-fruits-picture-id173255460',
-            'https://www.unlockfood.ca/EatRightOntario/media/Website-images-resized/How-to-store-fruit-to-keep-it-fresh-resized.jpg',
-            'https://cached.imagescaler.hbpl.co.uk/resize/scaleWidth/815/cached.offlinehbpl.hbpl.co.uk/news/OMC/Pepsilogo02-201310210104514411-20180524105721574.jpg',
-            'https://www.interbrand.com/assets/00000001313.png',
-            'https://www.interbrand.com/assets/00000001551.png',
-            'https://ih1.redbubble.net/image.1102551917.4147/flat,750x,075,f-pad,750x1000,f8f8f8.jpg',
-        ];
     }
 
     /**

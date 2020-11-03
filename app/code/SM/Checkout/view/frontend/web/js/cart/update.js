@@ -98,7 +98,7 @@ define([
             actions: {
                 confirm: function () {
                     //Remove selected items GTM
-                    gtmCollectData.collectData();
+                    gtmCollectData.removeItemSelected();
 
                     const form = $("form[name='remove_selected_item']");
                     form.children('input[name="remove_ids"]').val(removeIds);
@@ -184,8 +184,6 @@ define([
     });
 
     cartContainer.on("click", ".increase-qty", function () {
-        //Increase quantity GTM
-        gtmCollectData.collectData('addToCart');
 
         let itemId = $(this).attr('itemId');
         let itemStockQty = $(this).attr('itemstock');
@@ -193,6 +191,10 @@ define([
         let form = $("#form-validate");
         let elementId = $('a#add-cart-item-' + itemId);
         let downElementId = $('a#subtract-cart-item-' + itemId);
+
+        //Increase quantity GTM
+        let productId = $(this).parents().eq(4).find('[data-gtm-event="removeFromCart"]').attr('data-gtm-product-id');
+        gtmCollectData.collectData('addToCart', productId, itemQty.val());
 
         if (elementId.is('[readonly]')) {
             return this;
@@ -255,14 +257,16 @@ define([
     });
 
     cartContainer.on("click", ".decrease-qty", function () {
-        //Decrease quantity GTM
-        gtmCollectData.collectData('removeFromCart');
 
         let itemId = $(this).attr('itemId');
         let itemQty = $('#cart-qty-'+ itemId);
         let elementId = $('a#subtract-cart-item-' + itemId);
         let plusElementId = $('a#add-cart-item-' + itemId);
         let form = $("#form-validate");
+
+        //Decrease quantity GTM
+        let productId = $(this).parents().eq(4).find('[data-gtm-event="removeFromCart"]').attr('data-gtm-product-id');
+        gtmCollectData.collectData('removeFromCart', productId, itemQty.val());
 
         if (elementId.is('[readonly]')) {
             return this;

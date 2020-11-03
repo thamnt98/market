@@ -3,6 +3,7 @@
 namespace SM\GTM\Block\Product;
 
 use Magento\Catalog\Api\CategoryRepositoryInterface;
+use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Block\Product\Context;
 use Magento\Catalog\Block\Product\ListProduct as ListProductBase;
 use Magento\Catalog\Model\Layer\Resolver;
@@ -24,7 +25,13 @@ class ListProduct extends ListProductBase
     private $catalogHelper;
 
     /**
+     * @var ProductRepositoryInterface
+     */
+    protected $productRepository;
+
+    /**
      * ListProduct constructor.
+     * @param ProductRepositoryInterface $productRepository
      * @param CatalogHelper $catalogHelper
      * @param RatingFactory $rating
      * @param Context $context
@@ -35,6 +42,7 @@ class ListProduct extends ListProductBase
      * @param array $data
      */
     public function __construct(
+        ProductRepositoryInterface $productRepository,
         CatalogHelper $catalogHelper,
         RatingFactory $rating,
         Context $context,
@@ -44,6 +52,7 @@ class ListProduct extends ListProductBase
         Data $urlHelper,
         array $data = []
     ) {
+        $this->productRepository = $productRepository;
         $this->rating = $rating;
         parent::__construct($context, $postDataHelper, $layerResolver, $categoryRepository, $urlHelper, $data);
         $this->catalogHelper = $catalogHelper;
@@ -228,6 +237,7 @@ class ListProduct extends ListProductBase
     /**
      * @param $productBase
      * @return string
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getGtm($productBase)
     {
@@ -238,6 +248,7 @@ class ListProduct extends ListProductBase
         if (!$product) {
             $product = $productBase;
         }
+        $product = $this->productRepository->getById($product->getId());
         $priceGTM = $this->getPriceGTM($product);
         $initPrice = $this->getGTMInitialProductPrice($product);
         $price = $priceGTM['sale_price'] != 'Not in sale' ? $priceGTM['sale_price'] : $initPrice;

@@ -15,6 +15,7 @@ declare(strict_types=1);
 namespace SM\Theme\Block\Product\Widget;
 
 use Magento\Catalog\Api\Data\ProductInterface;
+use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\CatalogEvent\Model\Event as SaleEvent;
 use Magento\Framework\Exception\NoSuchEntityException;
@@ -69,6 +70,11 @@ class SurpriseDeals extends \Magento\CatalogWidget\Block\Product\ProductsList
     private $storeManager;
 
     /**
+     * @var ProductRepositoryInterface
+     */
+    protected $productRepository;
+
+    /**
      * SurpriseDeals constructor.
      * @param CatalogHelper $catalogHelper
      * @param RatingFactory $rating
@@ -91,6 +97,7 @@ class SurpriseDeals extends \Magento\CatalogWidget\Block\Product\ProductsList
      * @param Iteminfo $itemInfo
      */
     public function __construct(
+        ProductRepositoryInterface $productRepository,
         CatalogHelper $catalogHelper,
         RatingFactory $rating,
         \Magento\CatalogInventory\Model\Stock\StockItemRepository $stockItemRepository,
@@ -111,6 +118,7 @@ class SurpriseDeals extends \Magento\CatalogWidget\Block\Product\ProductsList
         EncoderInterface $urlEncoder = null,
         Iteminfo $itemInfo
     ) {
+        $this->productRepository = $productRepository;
         $this->rating = $rating;
         $this->_stockItemRepository = $stockItemRepository;
         $this->itemInfo = $itemInfo;
@@ -374,6 +382,7 @@ class SurpriseDeals extends \Magento\CatalogWidget\Block\Product\ProductsList
         if (!$product) {
             $product = $productBase;
         }
+        $product = $this->productRepository->getById($product->getId());
         $priceGTM = $this->getPriceGTM($product);
         $initPrice = $this->getGTMInitialProductPrice($product);
         $price = $priceGTM['sale_price'] != 'Not in sale' ? $priceGTM['sale_price'] : $initPrice;

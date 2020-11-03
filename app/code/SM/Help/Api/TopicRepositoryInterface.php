@@ -83,4 +83,11 @@ interface TopicRepositoryInterface
      * @return \SM\Help\Api\Data\QuestionInterface[]
      */
     public function getChildQuestions($topicId);
+
+    /**
+     * Get Topics Category Contact us
+     *
+     * @return \SM\Help\Api\Data\TopicInterface[]
+     */
+    public function getListCategory();
 }

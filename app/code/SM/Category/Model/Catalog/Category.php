@@ -487,6 +487,10 @@ class Category extends \Magento\Catalog\Block\Product\ListProduct
             }
         }
         $collection = $layer->getProductCollection();
+        //Remove product is tobacco
+        $collection->addAttributeToFilter([
+            ["attribute" => "is_tobacco", "null" => true],
+            ["attribute" => "is_tobacco", "eq" => 0]]);
         $this->productCollectionStockCondition->apply($collection);
 
         $this->prepareSortableFieldsByCategory($layer->getCurrentCategory());

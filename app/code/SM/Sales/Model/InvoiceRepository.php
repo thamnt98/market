@@ -4,7 +4,10 @@ namespace SM\Sales\Model;
 
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Filesystem\DirectoryList;
 use Magento\Framework\Stdlib\DateTime\DateTime;
+use Magento\Framework\View\Element\BlockFactory;
+use Magento\Framework\View\Result\PageFactory;
 use Magento\InventoryApi\Api\Data\SourceInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\ResourceModel\Order\Invoice\CollectionFactory as InvoiceCollectionFactory;
@@ -85,6 +88,26 @@ class InvoiceRepository implements \SM\Sales\Api\InvoiceRepositoryInterface
     protected $deliveryDataFactory;
 
     /**
+     * @var BlockFactory
+     */
+    protected $blockFactory;
+
+    /**
+     * @var \Magento\Framework\Controller\ResultFactory
+     */
+    protected $resultFactory;
+
+    /**
+     * @var PageFactory
+     */
+    protected $resultPageFactory;
+
+    /**
+     * @var DirectoryList
+     */
+    private $directoryList;
+
+    /**
      *
      * @param DateTime $date
      * @param InvoiceCollectionFactory $invoiceCollectionFactory
@@ -96,6 +119,8 @@ class InvoiceRepository implements \SM\Sales\Api\InvoiceRepositoryInterface
      * @param OrderCollectionFactory $orderCollectionFactory
      * @param ParentOrder $parentOrder
      * @param SubOrder $subOrder
+     * @param BlockFactory $blockFactory
+     * @param PageFactory $resultPageFactory
      * @param DeliveryAddressDataInterfaceFactory $deliveryDataFactory
      */
 
@@ -110,6 +135,9 @@ class InvoiceRepository implements \SM\Sales\Api\InvoiceRepositoryInterface
         OrderCollectionFactory $orderCollectionFactory,
         ParentOrder $parentOrder,
         SubOrder $subOrder,
+        BlockFactory $blockFactory,
+        PageFactory $resultPageFactory,
+        DirectoryList $directoryList,
         DeliveryAddressDataInterfaceFactory $deliveryDataFactory
     ) {
         $this->deliveryDataFactory = $deliveryDataFactory;
@@ -123,16 +151,34 @@ class InvoiceRepository implements \SM\Sales\Api\InvoiceRepositoryInterface
         $this->invoiceDataFactory = $invoiceDataFactory;
         $this->dataObjectHelper = $dataObjectHelper;
         $this->date = $date;
+        $this->blockFactory = $blockFactory;
+        $this->resultPageFactory = $resultPageFactory;
+        $this->directoryList = $directoryList;
     }
 
     /**
      * @param int $orderId
-     * @return InvoiceInterface
+     * @param int $customerId
+     * @return string
+     * @throws NoSuchEntityException
+     * @throws \Mpdf\MpdfException
      */
-    public function getById($orderId)
+    public function getById($customerId, $orderId)
     {
-        $mainOrder = $this->getMainOrder($orderId);
-        $subOrderCollection = $this->getSubOrderCollection($orderId);
+        $data = $this->getDataInvoice($customerId, $orderId);
+        return $this->getHTML($data);
+    }
+
+    /**
+     * @param int $orderId
+     * @param int $customerId
+     * @return InvoiceInterface
+     * @throws NoSuchEntityException
+     */
+    public function getDataInvoice($customerId, $orderId)
+    {
+        $mainOrder = $this->getMainOrder($customerId, $orderId);
+        $subOrderCollection = $this->getSubOrderCollection($customerId, $orderId);
 
         $orderIds = $this->getOrderIds($subOrderCollection);
         $orderItemCollection = $this->getOrderItemCollection($orderIds);
@@ -161,10 +207,11 @@ class InvoiceRepository implements \SM\Sales\Api\InvoiceRepositoryInterface
 
     /**
      * @param int $mainOrderId
+     * @param int $customerId
      * @return Order
      * @throws NoSuchEntityException
      */
-    private function getMainOrder($mainOrderId)
+    protected function getMainOrder($customerId, $mainOrderId)
     {
         /** @var Order $mainOrder */
         $mainOrder = $this->orderCollectionFactory->create()
@@ -194,6 +241,7 @@ class InvoiceRepository implements \SM\Sales\Api\InvoiceRepositoryInterface
                     "service_fee"
                 ]
             )
+            ->addFieldToFilter("main_table.customer_id", $customerId)
             ->addFieldToFilter("main_table.entity_id", $mainOrderId)
             ->getFirstItem();
 
@@ -205,16 +253,18 @@ class InvoiceRepository implements \SM\Sales\Api\InvoiceRepositoryInterface
     }
 
     /**
+     * @param int $customerId
      * @param int $mainOrderId
      * @return OrderCollection
      */
-    private function getSubOrderCollection($mainOrderId)
+    protected function getSubOrderCollection($customerId, $mainOrderId)
     {
         /** @var OrderCollection $orderCollection */
         $orderCollection = $this->orderCollectionFactory->create();
         $orderCollection
             ->selectSub()
             ->addFieldToSelect("discount_amount")
+            ->addFieldToFilter("customer_id", $customerId)
             ->addFieldToFilter("parent_order", $mainOrderId);
         return $orderCollection;
     }
@@ -390,5 +440,31 @@ class InvoiceRepository implements \SM\Sales\Api\InvoiceRepositoryInterface
         $deliveryData->setAddressName($subOrderModel->getData("address_tag"));
         $deliveryData->setTelephone($subOrderModel->getData("telephone"));
         return $deliveryData;
+    }
+
+    /**
+     * @param \SM\Sales\Api\Data\Invoice\InvoiceInterface $invoice
+     * @return string
+     */
+    protected function getHTML($invoice)
+    {
+        $rootPath  =  $this->directoryList->getRoot();
+        $filepath = $rootPath . '/app/code/SM/Sales/view/frontend/web/css/invoice.css';
+        $styleContent = file_get_contents($filepath);
+        $style ='<style> ' . $styleContent . ' </style>';
+        /** @var \SM\Sales\Block\Invoice\Content $contentBlock */
+        $contentBlock = $this->blockFactory->createBlock("SM\Sales\Block\Invoice\Content");
+        $contentBlock->setTemplate("SM_Sales::invoice/content.phtml");
+        $contentBlock->setInvoice($invoice);
+        return $this->setPageInvoice($contentBlock->toHtml(), $style);
+    }
+
+    public function setPageInvoice($content, $style)
+    {
+        return '<html><head>'
+            . $style
+            . '</head><body>'
+            . $content
+            . '</body></html>';
     }
 }

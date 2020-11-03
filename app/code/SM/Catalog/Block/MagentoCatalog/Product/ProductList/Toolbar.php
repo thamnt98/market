@@ -107,11 +107,21 @@ class Toolbar extends \Magento\Catalog\Block\Product\ProductList\Toolbar
             $dir = $customDir[$requestOrder];
             $this->helper->{$method}($collection, $dir);
         } else {
-            if ($this->getCurrentOrder()) {
-                $this->_collection->addAttributeToSort(
-                    $this->getCurrentOrder(),
-                    $this->getCurrentDirection()
-                );
+            if ($currentOrder = $this->getCurrentOrder()) {
+                if ($currentOrder === 'relevance') {
+                    try {
+                        $searchTbl = $this->_collection->getSelect()->getPart('from')['search_result'] ?? null;
+                        if ($searchTbl) {
+                            $this->_collection->getSelect()->order('search_result.score DESC');
+                        }
+                    } catch (\Exception $e) {
+                    }
+                } else {
+                    $this->_collection->addAttributeToSort(
+                        $currentOrder,
+                        $this->getCurrentDirection()
+                    );
+                }
             }
         }
 

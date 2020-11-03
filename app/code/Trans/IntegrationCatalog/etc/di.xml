@@ -74,6 +74,10 @@
             <argument name="commands" xsi:type="array">
                  <item name="Trans_IntegrationCatalog_Console_Pim_Save_ConfigurableProductImage" xsi:type="object">Trans\IntegrationCatalog\Console\Pim\Save\ConfigurableProductImage</item>
             </argument>
+            <!-- synch configurable product data -->
+            <argument name="commands" xsi:type="array">
+                 <item name="Trans_IntegrationCatalog_Console_Pim_Save_ConfigurableProduct" xsi:type="object">Trans\IntegrationCatalog\Console\Pim\Save\ConfigurableProduct</item>
+            </argument>
         </arguments>
     </type>
 

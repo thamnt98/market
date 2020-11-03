@@ -422,6 +422,10 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
             //set flag to magento not validate quote, address.. after save so prevent error "Invalid state change requested"
             $customer->setData('ignore_validation_flag', true);
             $customerDataObject = $this->customerRepositoryInterface->save($customer, $passwordHash);
+            if ($customer->getId()) {
+                $customerDataObject = $this->customerRepositoryInterface->getById($customer->getId());
+            }
+
 
             //Add Incomplete address
             if (!$customer->getId()) {

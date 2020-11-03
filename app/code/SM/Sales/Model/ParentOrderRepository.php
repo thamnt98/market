@@ -151,8 +151,7 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
         OrderDataInterfaceFactory $orderDataFactory,
         Emulation $appEmulation,
         Image $imageHelper,
-        StoreManagerInterface $storeManager,
-        \Magento\Webapi\Model\Authorization\TokenUserContext $tokenUserContext
+        StoreManagerInterface $storeManager
     ) {
         $this->storeManager = $storeManager;
         $this->appEmulation = $appEmulation;
@@ -163,7 +162,6 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->searchResultsFactory = $searchResultsFactory;
         $this->orderItemCollectionFactory = $orderItemCollectionFactory;
-        $this->tokenUserContext = $tokenUserContext;
     }
 
     /**

@@ -288,6 +288,28 @@ $category = $block->getLayer()->getCurrentCategory();
                 });
                 eventCreate['.action.increase-qty']++;
             });
+
+            async.async('.action.decrease-qty', function () {
+                if (!eventCreate['.action.decrease-qty']) {
+                    eventCreate['.action.decrease-qty'] = 0;
+                }
+
+                let current = $($('.action.decrease-qty')[eventCreate['.action.decrease-qty']]);
+                $(current).click(function (e) {
+                    let data = $(this).parents().eq(3).attr("data-gtm-product");
+
+                    if (data) {
+                        try {
+                            data = JSON.parse(data);
+                            data['position'] = $(this).parents().eq(3).attr("data-position");
+                            gtm.push("removeFromCart", data);
+                        } catch (e) {
+
+                        }
+                    }
+                });
+                eventCreate['.action.decrease-qty']++;
+            });
         }
     });
 </script>

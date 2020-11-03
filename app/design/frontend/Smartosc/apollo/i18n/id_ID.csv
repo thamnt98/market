@@ -17208,7 +17208,6 @@ Free installation included,Termasuk pemasangan gratis
 Note,Catatan
 Remove Installation,Hapus Instalasi
 Remove item,Hapus item
-Are you sure you want to remove free installation? Your note will be automatically removed.,Anda yakin ingin menghapus pemasangan gratis? Catatan Anda akan terhapus secara otomatis.
 "Due to stock availability, some items have to be sent at different times in separate orders.","Karena ketersediaan stok, beberapa produk harus dikirim pada waktu dan order berbeda."
 Order #1 (## items),Order #1 (## produk)
 Select Delivery Method,Pilih Metode Pengiriman
@@ -18043,3 +18042,6 @@ Thank you for reviewing,Terima kasih telah mengulas
 "Your notification settings have been saved.","Pengaturan notifikasi Anda telah disimpan."
 "(%1 item)","(%1 produk)"
 "(%1 items)","(%1 produk)"
+"Are you sure you want to remove free installation?","Anda yakin ingin menghapus pemasangan gratis?"
+"Your note will be automatically removed.","Catatan Anda akan terhapus secara otomatis."
+"Add free installation to this product.","Tambahkan pemasangan gratis untuk produk ini."

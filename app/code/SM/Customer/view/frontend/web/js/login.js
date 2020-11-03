@@ -14,11 +14,12 @@ define(
         'Magento_Ui/js/modal/modal',
         'ForgotPassword',
         'gtmSha256',
+        'Magento_Customer/js/customer-data',
         'mage/translate',
         'mage/validation',
-        'mage/mage'
+        'mage/mage',
     ],
-    function ($, modal, ForgotPassword, sha256) {
+    function ($, modal, ForgotPassword, sha256, customerData) {
         'use strict';
 
         var downloadTimer,
@@ -534,6 +535,8 @@ define(
                                             'phone_number': sha256(phone_number)
                                         });
                                     }
+                                } else {
+                                    console.log("Debug! Can't login by wrong step.");
                                 }
                             } else {
                                 if (step == 3) {
@@ -545,13 +548,22 @@ define(
                                 tabLoginModal.find('.fieldInputText ').removeClass('fieldInputError');
                                 $(document).trigger('customer:login');
                                 caseCustomerOnEco = false;
-                                if (window.location.href === result.redirectUrl) {
-                                    window.location.reload();
+                                customerData.invalidate(['customer']);
+
+                                if (result.redirectUrl) {
+                                    if (window.location.href === result.redirectUrl) {
+                                        location.reload();
+                                    } else {
+                                        window.location.href = result.redirectUrl;
+                                    }
                                 } else {
-                                    window.location.href = result.redirectUrl;
+                                    window.location.href = BASE_URL;
                                 }
                             }
                         },
+                        error: function (xhr, status, error) {
+                            console.log(error);
+                        }
                     });
                 },
 

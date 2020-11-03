@@ -59,6 +59,10 @@
         }
     }
     .payment-detail-order-list {
+        td{
+            border-top: 2px solid #e5e5e5 !important;
+        }
+
         .wrap-order-summary {
             h3 {
                 .lib-font-size(16)!important;
@@ -81,6 +85,8 @@
             div.item {
                 border-top:0;
                 padding:0 0 @indent__base;
+                display: flex;
+                justify-content: space-between;
                 .item-info {
                     width: 60%;
                     .product-item-name {

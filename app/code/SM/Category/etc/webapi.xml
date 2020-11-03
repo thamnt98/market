@@ -31,13 +31,6 @@
         </resources>
     </route>
 
-    <route url="/V1/category/getFavoriteBrands" method="GET">
-        <service class="SM\Category\Api\CategoryInterface" method="getFavoriteBrands"/>
-        <resources>
-            <resource ref="anonymous"/>
-        </resources>
-    </route>
-
     <route url="/V1/category/getCategoryMetaData" method="GET">
         <service class="SM\Category\Api\CategoryInterface" method="getCategoryMetaData"/>
         <resources>

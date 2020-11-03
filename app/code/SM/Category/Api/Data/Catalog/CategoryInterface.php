@@ -16,17 +16,11 @@ interface CategoryInterface extends \Magento\Framework\Api\ExtensibleDataInterfa
     const PATH = "path";
     const POSITION = "position";
     const LEVEL = "level";
-    const CHILDREN_COUNT = "children_count";
     const IS_ACTIVE = "is_active";
     const NAME = "name";
     const IMAGE = "image";
-    const GALLERY = "galley";
     const IS_ANCHOR = "is_anchor";
-    const THUMBNAIL = "thumbnail";
     const CATEGORY_ID = "category_id";
-    const CHILDREN = "children";
-    const MAIN_COLOR = "main_color";
-    const SUB_COLOR = "sub_color";
     const COLOR = "color";
 
     const PRODUCTS = "products";
@@ -50,22 +44,6 @@ interface CategoryInterface extends \Magento\Framework\Api\ExtensibleDataInterfa
      * @return $this
      */
     public function setEntityId($entityId);
-
-    /**
-     * Get entity_type_id
-     *
-     * @return integer
-     */
-    public function getEntityTypeId();
-
-    /**
-     * Set entity_type_id
-     *
-     * @param int $entityTypeId
-     *
-     * @return $this
-     */
-    public function setEntityTypeId($entityTypeId);
 
     /**
      * Get attribute_set_id
@@ -180,22 +158,6 @@ interface CategoryInterface extends \Magento\Framework\Api\ExtensibleDataInterfa
     public function setLevel($level);
 
     /**
-     * Get Children count
-     *
-     * @return integer
-     */
-    public function getChildrenCount();
-
-    /**
-     * Set Children count
-     *
-     * @param int $childrenCount
-     *
-     * @return $this
-     */
-    public function setChildrenCount($childrenCount);
-
-    /**
      * Is Active
      *
      * @return boolean
@@ -258,22 +220,6 @@ interface CategoryInterface extends \Magento\Framework\Api\ExtensibleDataInterfa
      * @return $this
      */
     public function setImage($image);
-
-    /**
-     * Get Thumbnail
-     *
-     * @return string
-     */
-    public function getThumbnail();
-
-    /**
-     * Set Thumbnail
-     *
-     * @param string $thumbnail
-     *
-     * @return $this
-     */
-    public function setThumbnail($thumbnail);
 
     /**
      * Is anchor
@@ -355,34 +301,4 @@ interface CategoryInterface extends \Magento\Framework\Api\ExtensibleDataInterfa
      * @return $this
      */
     public function setIsFresh($value);
-
-    /**
-     * Get Children
-     *
-     * @return \SM\Category\Api\Data\Catalog\CategoryInterface[]
-     */
-    public function getChildren();
-
-    /**
-     * Set Children
-     *
-     * @param \SM\Category\Api\Data\Catalog\CategoryInterface[] $children
-     *
-     * @return $this
-     */
-    public function setChildren($children);
-
-    /**
-     * Get product collection
-     *
-     * @return \SM\MobileApi\Api\Data\Product\ListItemInterface[]
-     */
-    public function getProducts();
-
-    /**
-     * @param \SM\MobileApi\Api\Data\Product\ListItemInterface[] $data
-     *
-     * @return $this
-     */
-    public function setProducts($data);
 }
