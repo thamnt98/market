@@ -13,6 +13,7 @@
 namespace Trans\MepayTransmart\Controller\Payment;
 
 use Trans\Mepay\Controller\Payment\Callbacks;
+use Magento\Framework\Controller\ResultFactory;
 
 class TransmartCallbacks extends Callbacks
 {
