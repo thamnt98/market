@@ -33,7 +33,7 @@ class TransmartCallbacks extends Callbacks
       $order = $this->transaction->getOrder($orderId);
       if ($this->checkOrderCreated($order)) {
         $resultRedirect->setPath(
-          'transcheckout/index/success?orderid=' . $orderId
+          'transcheckout/index/success'
         );
         return $resultRedirect;
       } else {
