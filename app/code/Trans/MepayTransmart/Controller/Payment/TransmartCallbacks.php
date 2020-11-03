@@ -10,7 +10,7 @@
  * Copyright © 2020 PT CT Corp Digital. All rights reserved.
  * http://www.ctcorpora.com
  */
-namespace rans\MepayTransmart\Controller\Payment;
+namespace Trans\MepayTransmart\Controller\Payment;
 
 use Trans\Mepay\Controller\Payment\Callbacks;
 
