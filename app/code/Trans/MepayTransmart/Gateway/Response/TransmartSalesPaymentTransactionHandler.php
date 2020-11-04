@@ -86,7 +86,6 @@ class TransmartSalesPaymentTransactionHandler extends SalesPaymentTransactionHan
       //$resp = $this->getDummyResponse();
       if (isset($resp[Response::RESPONSE_ID]) && $resp[Response::RESPONSE_ID]) {
         $this->savePayment($orderPayment, $resp);
-        $this->updateStatusToOms($orderPayment);
       }
       $orderPayment->setAdditionalInformation([PaymentTransaction::RAW_DETAILS => $resp]);
     }

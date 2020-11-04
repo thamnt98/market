@@ -99,11 +99,11 @@ class Order extends DataObject implements InquiryOrderInterface
   {
     $result = [];
     foreach ($input as $key => $value) {
-      $item = $this->inquiryOrderItemsFactory->create();
-      foreach ($value as $index => $data) {
-        $item->setData($index, $data);
-      }
-      $result[] = $item;
+      // $item = $this->inquiryOrderItemsFactory->create();
+      // foreach ($value as $index => $data) {
+      //   $item->setData($index, $data);
+      // }
+      // $result[] = $item;
     }
     return $result;
   }

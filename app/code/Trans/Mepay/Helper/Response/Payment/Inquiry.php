@@ -152,11 +152,11 @@ class Inquiry
   {
     $result = [];
     foreach ($items as $key => $value) {
-      $sub = [];
-      foreach ($value as $index => $item) {
-        $sub[$index] = $item;
-      }
-      $result[] = $sub;
+      // $sub = [];
+      // foreach ($value as $index => $item) {
+      //   $sub[$index] = $item;
+      // }
+      // $result[] = $sub;
     }
     return $result;
   }
