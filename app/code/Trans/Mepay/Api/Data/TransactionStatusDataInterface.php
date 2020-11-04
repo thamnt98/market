@@ -51,6 +51,21 @@ interface TransactionStatusDataInterface
    */
   const CARD_NETWROK = 'cardNetwork';
 
+  /**
+   * @var  string
+   */
+  const QR_CODE = 'qrCode';
+
+  /**
+   * @var  string
+   */
+  const EXPIRE_TIME = 'expireTime';
+
+  /**
+   * @var  string
+   */
+  const VA_NUMBER = 'vaNumber';
+
 /**
    * Get message
    * @return string
@@ -128,4 +143,41 @@ interface TransactionStatusDataInterface
    * @return  void
    */
   public function setCardNetwork($data);
+
+  /**
+   * Get Qr Code
+   * @return string
+   */
+  public function getQrCode();
+
+  /**
+   * Set Qr Code
+   * @param  string $data
+   * @return  void
+   */
+  public function setQrCode($data);
+
+  /**
+   * Get expire time
+   * @return string
+   */
+  public function getExpireTime();
+
+  /**
+   * Set expire time
+   * @param string $data
+   */
+  public function setExpireTime($data);
+
+  /**
+   * Get expire time
+   * @return string
+   */
+  public function getVaNumber();
+
+  /**
+   * Set expire time
+   * @param string $data
+   */
+  public function setVaNumber($data);
 }

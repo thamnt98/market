@@ -14,6 +14,7 @@ namespace Trans\Mepay\Model;
 
 use Magento\Framework\DataObject;
 use Trans\Mepay\Api\WebhookInterface;
+use Magento\Framework\Event\ManagerInterface as EventManager;
 use Trans\Mepay\Api\Data\InquiryInterfaceFactory;
 use Trans\Mepay\Api\Data\InquiryInterface;
 use Trans\Mepay\Api\Data\TransactionInterfaceFactory;
@@ -25,6 +26,8 @@ use Trans\Mepay\Logger\LoggerWrite;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Webapi\Request;
 use Trans\Mepay\Helper\Response\Payment\Inquiry as InquiryResponseHelper;
+use Trans\Mepay\Helper\Payment\Transaction as TransactionHelper;
+use Trans\Sprint\Helper\Config;
 
 class Webhook extends DataObject implements WebhookInterface
 {
@@ -88,6 +91,10 @@ class Webhook extends DataObject implements WebhookInterface
    */
   protected $inquiryResponseHelper;
 
+  protected $transactionHelper;
+
+  protected $eventManager;
+
   /**
    * Constructor
    * @param InquiryInterfaceFactory     $inquiryFactory
@@ -109,7 +116,9 @@ class Webhook extends DataObject implements WebhookInterface
     LoggerWrite $logger,
     Json $json,
     Request $request,
-    InquiryResponseHelper $inquiryResponseHelper
+    InquiryResponseHelper $inquiryResponseHelper,
+    TransactionHelper $transactionHelper,
+    EventManager $eventManager
   ) {
     $this->inquiry = $inquiryFactory->create();
     $this->transaction = $transactionFactory->create();
@@ -120,6 +129,8 @@ class Webhook extends DataObject implements WebhookInterface
     $this->json = $json;
     $this->request = $request;
     $this->inquiryResponseHelper = $inquiryResponseHelper;
+    $this->transactionHelper = $transactionHelper;
+    $this->eventManager = $eventManager;
   }
 
     /**
@@ -174,6 +185,24 @@ class Webhook extends DataObject implements WebhookInterface
     $status = $this->_validate($type);
     return $this->buildResponse($type, $status);
   }
+
+   /**
+     * Event pre dispatch for hit status to OMS
+     * @param string $orderId
+     * @param string $status
+     */
+    protected function updateStatusToOms($inquiry)
+    {
+        $collTxn = $this->transactionHelper->getTxnByTxnId($inquiry->getId())->getFirstItem();
+        $order = $this->transactionHelper->getOrder($collTxn->getOrderId());
+        $this->eventManager->dispatch(
+            'update_payment_oms',
+            [
+                'reference_number' => $order->getReferenceNumber(),
+                'payment_status' => Config::OMS_SUCCESS_PAYMENT_OPRDER,
+            ]
+        );
+    }
 
   /**
    * @inheritdoc
@@ -264,6 +293,7 @@ class Webhook extends DataObject implements WebhookInterface
   protected function _validate($type)
   {
     $id = $this->inquiry->getId();
+    $this->updateStatusToOms($this->inquiry);
     $status = $this->statusFactory->create();
     if ($id && $status->isExist($id)) {
       if ($type == ResponseInterface::PAYMENT_VALIDATE_TYPE) {

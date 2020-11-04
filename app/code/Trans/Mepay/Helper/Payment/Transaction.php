@@ -244,7 +244,6 @@ class Transaction extends AbstractHelper
    */
   public function buildCaptureTransaction($payment, $order, $transaction)
   {
-   // var_dump($transaction->getId());die();
     return $this->transactionRepo->save(
       $this->transactionBuilder->setPayment($payment)
       ->setOrder($order)

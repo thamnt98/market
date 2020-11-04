@@ -118,4 +118,51 @@ class StatusData extends DataObject implements TransactionStatusDataInterface
     $this->setData(TransactionStatusDataInterface::CARD_NETWORK, $data);
   }
 
+  /**
+   * @inheritdoc
+   */
+  public function getQrCode()
+  {
+    return $this->_getData(TransactionStatusDataInterface::QR_CODE);
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function setQrCode($data)
+  {
+    $this->setData(TransactionStatusDataInterface::QR_CODE, $data);
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getExpireTime()
+  {
+    return $this->_getData(TransactionStatusDataInterface::EXPIRE_TIME); 
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function setExpireTime($data)
+  {
+    $this->setData(TransactionStatusDataInterface::EXPIRE_TIME, $data);
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getVaNumber()
+  {
+    return $this->_getData(TransactionStatusDataInterface::VA_NUMBER); 
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function setVaNumber($data)
+  {
+    $this->setData(TransactionStatusDataInterface::VA_NUMBER, $data);
+  }
 }

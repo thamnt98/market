@@ -24,6 +24,11 @@ interface InquiryOrderInterface
   const ITEMS = 'items';
 
   /**
+   * @var  string
+   */
+  const DISABLE_PROMO = 'disablePromo';
+
+  /**
    * Get id
    * @return string
    */
@@ -48,4 +53,17 @@ interface InquiryOrderInterface
    * @return  void
    */
   public function setItems($data);
+
+  /**
+   * Get Disable promo
+   * @return boolean
+   */
+  public function getDisablePromo();
+
+  /**
+   * Set Disable promo
+   * @param boolean
+   * @return  void
+   */
+  public function setDisablePromo($data);
 }

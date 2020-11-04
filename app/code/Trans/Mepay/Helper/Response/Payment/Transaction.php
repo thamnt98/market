@@ -83,7 +83,7 @@ class Transaction
     $result = [];
     foreach ($transaction->getData() as $key => $value) {
       if ($key == TransactionInterface::STATUS_DATA) {
-        $value = $this->convertToArrayStatusData();
+        $value = $this->convertToArrayStatusData($value);
       }
       $result[$key] = $value;
     }

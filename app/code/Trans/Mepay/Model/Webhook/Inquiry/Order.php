@@ -66,6 +66,22 @@ class Order extends DataObject implements InquiryOrderInterface
   }
 
   /**
+   * @inheritdoc
+   */
+  public function getDisablePromo()
+  {
+    return $this->_getData(InquiryOrderInterface::DISABLE_PROMO);
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function setDisablePromo($data)
+  {
+    $this->setData(InquiryOrderInterface::DISABLE_PROMO, $data);
+  }
+
+  /**
    * Validate
    * @return boolean
    */

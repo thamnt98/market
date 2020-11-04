@@ -17,9 +17,14 @@ use Magento\Payment\Gateway\Http\TransferFactoryInterface;
 use Trans\Mepay\Model\Config\Config;
 use Trans\Mepay\Logger\Logger;
 
-class TransferFactory extends AbstractTransfer implements TransferFactoryInterface
+class GetFactory extends AbstractTransfer implements TransferFactoryInterface
 {
-    /**
+  /**
+   * @var  string
+   */
+    const URI_SECTION = 'uri_section';
+
+      /**
      * @var TransferBuilder
      */
     private $transferBuilder;
@@ -43,14 +48,12 @@ class TransferFactory extends AbstractTransfer implements TransferFactoryInterfa
      * @param array $body
      * @return \Magento\Payment\Gateway\Http\TransferInterface
      */
-    public function create(array $body)
+    public function create(array $body = [])
     {
+        $section = $body[self::URI_SECTION];
         return $this->transferBuilder
-          ->setUri($this->getUri())
-          ->setHeaders($this->getPostHeaders())
-          ->setMethod($this->getPostMethod())
-          ->setBody($body)
-          ->setClientConfig(['isRaw' => true])
+          ->setUri($this->config->getStatusPullUrl($section))
+          ->setMethod($this->getGetMethod())
           ->build();
     }
 

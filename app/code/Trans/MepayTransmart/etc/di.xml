@@ -15,4 +15,5 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
   <preference for="Trans\Mepay\Gateway\Request\OrderDataBuilder" type="Trans\MepayTransmart\Gateway\Request\TransmartOrderDataBuilder" />
   <preference for="Trans\Mepay\Controller\Payment\Callbacks" type="Trans\MepayTransmart\Controller\Payment\TransmartCallbacks" />
+  <preference for="Trans\Mepay\Gateway\Response\SalesPaymentTransactionHandler" type="Trans\MepayTransmart\Gateway\Response\TransmartSalesPaymentTransactionHandler" />
 </config>

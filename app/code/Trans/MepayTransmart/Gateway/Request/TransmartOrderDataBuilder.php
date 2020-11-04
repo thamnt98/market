@@ -17,6 +17,7 @@ use Magento\Payment\Gateway\Helper\SubjectReader;
 use Trans\Mepay\Logger\Logger;
 use Trans\Mepay\Gateway\Request\OrderDataBuilder;
 use Trans\Sprint\Model\ResourceModel\SprintResponse;
+use Trans\Mepay\Helper\Payment\Transaction as TransactionHelper;
 
 class TransmartOrderDataBuilder extends OrderDataBuilder
 {
@@ -36,6 +37,11 @@ class TransmartOrderDataBuilder extends OrderDataBuilder
   private $sprintResource;
 
   /**
+   * @var TransactionHelper
+   */
+  private $transactionHelper;
+
+  /**
    * Constructor
    * @param SubjectReader  $subjectReader
    * @param SprintResponse $sprintResource
@@ -44,11 +50,13 @@ class TransmartOrderDataBuilder extends OrderDataBuilder
   public function __construct(
     SubjectReader $subjectReader,
     SprintResponse $sprintResource,
-    Logger $logger
+    Logger $logger,
+    TransactionHelper $transactionHelper
   ) {
       $this->subjectReader = $subjectReader;
       $this->sprintResource = $sprintResource;
       $this->logger = $logger;
+      $this->transactionHelper = $transactionHelper;
       parent::__construct($subjectReader, $logger);
   }
 
@@ -63,11 +71,9 @@ class TransmartOrderDataBuilder extends OrderDataBuilder
     $items = $this->getOrderItems($order);
 
     //buid order id
-    $orderIncrementId = $order->getOrderIncrementId();
-    $refNumber = $this->sprintResource->getReferenceNumber($orderIncrementId);
     return [
       self::ORDER =>[
-        self::ID => ($refNumber)? $refNumber : $orderIncrementId,
+        self::ID => $order->getOrderIncrementId(),
         self::ITEMS => $items
       ]
     ];
