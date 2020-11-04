@@ -365,12 +365,14 @@ class SendOMS
         $isSpo = isset($oarData['is_spo']) ? (int) $oarData['is_spo'] : 0;
         $isOwnCourier = isset($oarData['is_own_courier']) ? (int) $oarData['is_own_courier'] : 0;
         $warehouseSource = isset($oarData['warehouse_source']) ? (string) $oarData['warehouse_source'] : '';
+        $warehouseCode = (isset($oarData['warehouse']) && isset($oarData['warehouse']['store_code'])) ? (string) $oarData['warehouse']['store_code'] : '';
         $interface->setOrderOriginId($orderOriginId);
         $interface->setSpoDetail($spoDetail);
         $interface->setIsSpo($isSpo);
         $interface->setIsOwnCourier($isOwnCourier);
         $interface->setWarehouseSource($warehouseSource);
         $interface->setCodeName($codeName);
+        $interface->setWarehouseCode($warehouseCode);
 
         $createAt = $order->getCreatedAt();
         $time = $this->timezone->date($order->getCreatedAt())->format('H:i:s');

@@ -290,7 +290,11 @@ switch ($type) {
                                                                         <input type="hidden" name="qty_type" value="1"/>
                                                                         <button type="submit"
                                                                                 title="<?= $block->escapeHtmlAttr(__('Decrease qty')) ?>"
-                                                                                class="action decrease-qty">
+                                                                                class="action decrease-qty"
+                                                                                <?php if ($data) : ?>
+                                                                                    data-gtm-product="<?= $block->escapeHtml($data); ?>"
+                                                                                    data-gtm-position="<?= $position ?>"
+                                                                                <?php endif; ?>>
                                                                             <span><?= __('-') ?></span>
                                                                         </button>
                                                                         <label for="item_qty" class="label-item-qty">

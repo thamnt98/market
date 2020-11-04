@@ -274,7 +274,6 @@ class Search implements SearchProductInterface
 
         $this->searchCriterial->setFilterGroups([$this->filterGroup]);
         $this->searchCriterial->setRequestName('quick_search_container');
-        $this->searchCriterial->setPageSize(5);
 
         /** @var \Magento\Framework\Api\Search\SearchResult $result */
         $result            = $this->search->suggest($this->searchCriterial);
