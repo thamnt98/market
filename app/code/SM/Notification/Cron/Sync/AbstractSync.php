@@ -33,13 +33,22 @@ abstract class AbstractSync
     protected $logger;
 
     /**
+     * @var \Magento\Framework\Filesystem\Directory\WriteInterface
+     */
+    protected $directory;
+
+    /**
      * AbstractSync constructor.
      *
+     * @param \Magento\Framework\Filesystem                      $filesystem
      * @param \Magento\Framework\App\ResourceConnection          $resourceConnection
      * @param \Magento\Framework\MessageQueue\PublisherInterface $publisher
      * @param \Magento\Framework\Logger\Monolog                  $logger
+     *
+     * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function __construct(
+        \Magento\Framework\Filesystem $filesystem,
         \Magento\Framework\App\ResourceConnection $resourceConnection,
         \Magento\Framework\MessageQueue\PublisherInterface $publisher,
         \Magento\Framework\Logger\Monolog $logger
@@ -47,10 +56,40 @@ abstract class AbstractSync
         $this->connection = $resourceConnection->getConnection();
         $this->publisher = $publisher;
         $this->logger = $logger;
+        $this->directory = $filesystem->getDirectoryWrite(\Magento\Framework\App\Filesystem\DirectoryList::VAR_DIR);
     }
 
+    /**
+     * @param int[] $ids
+     */
+    abstract protected function updateStatus($ids);
+
+    /**
+     * @return string
+     */
+    abstract protected function getQueueTopic();
+
+    /**
+     * @return string
+     */
+    abstract protected function getLockFileName();
+
+    /**
+     * @param array $data
+     *
+     * @return object
+     */
+    abstract protected function generateObject($data);
+
+    /**
+     * Cron execution function.
+     */
     public function execute()
     {
+        if ($this->isLocked()) {
+            return;
+        }
+
         $records = $this->getRecords();
         $this->updateStatus(array_keys($records));
         foreach ($records as $id => $record) {
@@ -67,6 +106,8 @@ abstract class AbstractSync
 
             $this->syncRecord($record);
         }
+
+        $this->unlock();
     }
 
     /**
@@ -129,19 +170,32 @@ abstract class AbstractSync
     }
 
     /**
-     * @param int[] $ids
-     */
-    abstract protected function updateStatus($ids);
-
-    /**
-     * @return string
-     */
-    abstract protected function getQueueTopic();
-
-    /**
-     * @param array $data
+     * Check cron is locked.
      *
-     * @return object
+     * @return bool
      */
-    abstract protected function generateObject($data);
+    protected function isLocked()
+    {
+        if ($this->directory->isFile($this->getLockFileName())) {
+            return true;
+        } else {
+            $this->directory->openFile($this->getLockFileName());
+
+            return false;
+        }
+    }
+
+    /**
+     * Unlock cron
+     */
+    protected function unlock()
+    {
+        try {
+            $this->directory->delete($this->getLockFileName());
+        } catch (\Exception $e) {
+            $this->logger->error(
+                "Consumer Sync Failed ('{$this->getQueueTopic()}'):\n\tCan not DELETE lock. " . $e->getMessage()
+            );
+        }
+    }
 }

@@ -97,14 +97,14 @@ if ($parentOrder) {
                             <?php if ($isPickUp): ?>
                                 <?php if ($subOrder->getStoreInfo()): ?>
                                     <?php
-                                    /** @var \SM\MobileApi\Api\Data\Catalog\Product\StoreInfoInterface $storeInfo */
-                                    $storeInfo = $subOrder->getStoreInfo();
-                                    $preparedStreet = $block->prepareStreet($storeInfo->getStreet()); ?>
+                                        /** @var \SM\MobileApi\Api\Data\Catalog\Product\StoreInfoInterface $storeInfo */
+                                        $storeInfo = $subOrder->getStoreInfo();
+                                        $storeAddress = $block->getStoreAddress($storeInfo);
+                                    ?>
                                     <span
                                         class="delivery-address"><?= $block->escapeHtml(__('Store Information')) ?></span>
                                     <h4><?= $block->escapeHtml($storeInfo->getName()) ?></h4>
-                                    <p><?= $block->escapeHtml($preparedStreet["street"]) ?></p>
-                                    <p><?= $block->escapeHtml($preparedStreet["last"]) ?></p>
+                                    <p><?= $block->escapeHtml($storeAddress) ?></p>
                                     <p><?= $block->escapeHtml($block->pickUpTimeDateFormat($storeInfo->getPickUpDate()) . ", " . $storeInfo->getPickUpTime()) ?></p>
                                 <?php endif; ?>
                             <?php else: ?>

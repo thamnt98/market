@@ -35,18 +35,20 @@
         <job name="sm_notification_abandoned_cart" instance="SM\Notification\Cron\AbandonedCart" method="execute">
             <config_path>sm_notification/generate/abandoned_cart</config_path>
         </job>
-        <job name="sm_notification_abandoned_cart_repeat" instance="SM\Notification\Cron\AbandonedCartRepeat" method="execute">
+        <job name="sm_notification_abandoned_cart_repeat"
+             instance="SM\Notification\Cron\AbandonedCartRepeat" method="execute">
             <config_path>sm_notification/generate/abandoned_cart_repeat</config_path>
         </job>
 
         <!-- Generate message V.A payment expiring soon -->
         <job name="sm_notification_payment_va_expiring_soon"
              instance="SM\Notification\Cron\VaPaymentExpiringSoon" method="execute">
-            <schedule>* * * * *</schedule>
+            <config_path>sm_notification/generate/payment_expiring_soon_time_cron</config_path>
         </job>
 
         <!-- Generate message remind pickup -->
-        <job name="sm_notification_remind_pickup" instance="SM\Notification\Cron\Order\RemindPickup" method="execute">
+        <job name="sm_notification_remind_pickup"
+             instance="SM\Notification\Cron\Order\RemindPickup" method="execute">
             <config_path>sm_notification/sync/remind_pickup</config_path>
         </job>
     </group>

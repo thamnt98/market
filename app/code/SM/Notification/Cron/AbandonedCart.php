@@ -27,6 +27,7 @@ class AbandonedCart extends AbstractGenerate
     /**
      * AbandonedCartOneHour constructor.
      *
+     * @param \Magento\Framework\Filesystem                     $filesystem
      * @param \Magento\Store\Model\App\Emulation                $emulation
      * @param \Magento\Catalog\Api\ProductRepositoryInterface   $productRepository
      * @param \SM\Notification\Helper\CustomerSetting           $settingHelper
@@ -34,8 +35,11 @@ class AbandonedCart extends AbstractGenerate
      * @param \SM\Notification\Model\ResourceModel\Notification $notificationResource
      * @param \Magento\Framework\App\ResourceConnection         $resourceConnection
      * @param \Magento\Framework\Logger\Monolog|null            $logger
+     *
+     * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function __construct(
+        \Magento\Framework\Filesystem $filesystem,
         \Magento\Store\Model\App\Emulation $emulation,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
         \SM\Notification\Helper\CustomerSetting $settingHelper,
@@ -45,6 +49,7 @@ class AbandonedCart extends AbstractGenerate
         \Magento\Framework\Logger\Monolog $logger = null
     ) {
         parent::__construct(
+            $filesystem,
             $emulation,
             $settingHelper,
             $notificationFactory,
@@ -58,7 +63,7 @@ class AbandonedCart extends AbstractGenerate
     /**
      * Cron run main function.
      */
-    public function execute()
+    public function process()
     {
         foreach ($this->getAbandonedCart() as $item) {
             if (empty($item['customer_id']) || empty($item['product_id']) || empty($item['entity_id'])) {
@@ -198,5 +203,13 @@ class AbandonedCart extends AbstractGenerate
         )->limit(50);
 
         return $this->connection->fetchAssoc($select);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getLockFileName()
+    {
+        return 'sm_notification_abandoned_cart.lock';
     }
 }

@@ -262,6 +262,7 @@ define(
             $.ajax({
                 type: "GET",
                 url: BASE_URL + 'reports/ajax/latestViewedProduct',
+                cache: false,
                 success: function (response) {
                     if (response) {
                         mod.latestViewedContent.html(response);

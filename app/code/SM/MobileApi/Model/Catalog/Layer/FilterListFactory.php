@@ -20,8 +20,7 @@ class FilterListFactory
     public function __construct(
         \Magento\Framework\Module\Manager $moduleManager,
         \Magento\Framework\ObjectManagerInterface $objectManager
-    )
-    {
+    ) {
         $this->moduleManager = $moduleManager;
         $this->objectManager = $objectManager;
     }
@@ -33,7 +32,7 @@ class FilterListFactory
      * @param bool $isSearch
      * @return \Magento\Catalog\Model\Layer\FilterList
      */
-    public function create(array $data = array(), $isSearch = false)
+    public function create(array $data = [], $isSearch = false)
     {
         if ($isSearch) {
             $data['filterableAttributes'] = $this->objectManager->create(
@@ -51,7 +50,7 @@ class FilterListFactory
                 'attribute' => 'Amasty\Shopby\Model\Layer\Filter\Attribute',
                 'price' => 'Amasty\Shopby\Model\Layer\Filter\Price',
                 'decimal' => 'Amasty\Shopby\Model\Layer\Filter\Decimal',
-//                'category' => 'Amasty\Shopby\Model\Layer\Filter\Category',
+                'category' => 'Amasty\Shopby\Model\Layer\Filter\Category',
             ];
         } else {
             $instanceName = 'Magento\Catalog\Model\Layer\FilterList';

@@ -125,7 +125,7 @@ define([
                                 'product_size': data['product_size'],
                                 'product_volume': data['product_volume'],
                                 'product_weight': data['product_weight'],
-                                'product_bundle': data['productBundle'],
+                                'product_type': data['type'],
                                 'salePrice': data['salePrice'],
                                 'discountRate': data['discountRate'],
                                 'rating': data['rating'],
@@ -167,7 +167,7 @@ define([
                                 'product_size': data['product_size'],
                                 'product_volume': data['product_volume'],
                                 'product_weight': data['product_weight'],
-                                'product_bundle': data['productBundle'],
+                                'product_type': data['type'],
                                 'salePrice': data['salePrice'],
                                 'discountRate': data['discountRate'],
                                 'rating': data['rating'],
@@ -477,7 +477,7 @@ define([
                     }
                         break;
                     case "addToCartPDP": {
-                        if (data['price'] !== "Not available") {
+                        $.each(data,function (key, value) {
                             window.dataLayer.push({
                                 'event': "addToCart",
                                 'uniqueUserID': dataLayerSourceObjects.customer.uniqueUserID,
@@ -490,31 +490,31 @@ define([
                                 'store_name': dataLayerSourceObjects.customer.storeName,
                                 'store_ID': dataLayerSourceObjects.customer.storeID,
                                 'timestamp': moment().format('DD\/MM\/YYYY HH:mm:ss'),
-                                'product_size': data['product_size'],
-                                'product_volume': data['product_volume'],
-                                'product_weight': data['product_weight'],
-                                'product_type': data['type'],
-                                'product_rating': data['rating'],
-                                'salePrice': data['salePrice'],
-                                'discountRate': data['discountRate'],
-                                'initialPrice': data['initialPrice'],
+                                'product_size': value['product_size'],
+                                'product_volume': value['product_volume'],
+                                'product_weight': value['product_weight'],
+                                'product_type': value['type'],
+                                'product_rating': value['rating'],
+                                'salePrice': value['salePrice'],
+                                'discountRate': value['discountRate'],
+                                'initialPrice': value['initialPrice'],
                                 'promo_ends_time' : dataLayerSourceObjects.promoTime ?? 'Not available',
                                 'ecommerce': {
                                     'currencyCode': dataLayerSourceObjects.store.currency,
                                     'add': {
                                         'products': [{
-                                            'name': data['name'],
-                                            'id': data['id'],
-                                            'price': data['price'],
-                                            'brand': data['brand'],
-                                            'category': data['category'],
-                                            'variant': data['variant'],
-                                            'quantity':  data['quantity']
+                                            'name': value['name'],
+                                            'id': value['id'],
+                                            'price': value['price'],
+                                            'brand': value['brand'],
+                                            'category': value['category'],
+                                            'variant': value['variant'],
+                                            'quantity':  value['quantity']
                                         }]
                                     }
                                 }
                             });
-                        }
+                        });
                     }
                         break;
                     case "add_to_shopping_list": {
@@ -598,7 +598,7 @@ define([
                             'product_size': data['product_size'],
                             'product_volume': data['product_volume'],
                             'product_weight': data['product_weight'],
-                            'product_bundle': data['productBundle'],
+                            'product_type': data['type'],
                             'product_price': data['price']
                         });
                     }

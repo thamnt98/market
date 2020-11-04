@@ -432,7 +432,7 @@ class ProductDataMapper
         $basePrice = (float)$basePrice;
         $promoPrice = (float)$promoPrice;
         if (!empty($promoPrice) && !empty($basePrice) && $basePrice > $promoPrice) {
-            $result = ceil(($basePrice - $promoPrice) / $basePrice * 10) * 10;
+            $result = ceil(($basePrice - $promoPrice) * 100 / $basePrice);
         }
 
         return $result;

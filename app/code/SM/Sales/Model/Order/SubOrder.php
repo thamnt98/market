@@ -631,8 +631,8 @@ class SubOrder
             $storeInfo->setStreet($source->getStreet());
             $storeInfo->setPostcode($source->getPostcode());
             $storeInfo->setRegion($source->getRegion());
-            $storeInfo->setPickUpTime($order->getTime());
-            $storeInfo->setPickUpDate($order->getDate());
+            $storeInfo->setPickUpTime($order->getStorePickUpDelivery());
+            $storeInfo->setPickUpDate($order->getStorePickUpTime());
             return $storeInfo;
         }
 

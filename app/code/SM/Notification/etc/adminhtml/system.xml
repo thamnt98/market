@@ -96,10 +96,18 @@
                     <label>Payment</label>
                     <field id="payment_expiring_soon_time" translate="label" type="text" sortOrder="0" canRestore="1"
                            showInDefault="1" showInWebsite="0" showInStore="0">
-                        <label>Virtual Account Expiring Soon Time (minute)</label>
+                        <label>VA Expiring Soon Time (minute)</label>
                         <config_path>sm_notification/generate/payment_expiring_soon_time</config_path>
                         <validate>validate-zero-or-greater</validate>
                         <comment><![CDATA[The value of 0 then turn off.]]>
+                        </comment>
+                    </field>
+                    <field id="payment_expiring_soon_time_cron" translate="label" type="text" sortOrder="10"
+                           canRestore="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>VA Expiring Soon (Cron)</label>
+                        <config_path>sm_notification/generate/payment_expiring_soon_time_cron</config_path>
+                        <comment>
+                            <![CDATA[Time auto sync.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
                         </comment>
                     </field>
                 </group>

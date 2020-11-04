@@ -239,8 +239,8 @@ class OmsIntegration implements OmsIntegrationInterface
                 $orderItemSave = $this->orderItemRepo->save($modelItem);
 
                 $paidPrice += $items['paid_price'];
-                $subTotal   = $items['quantity'] * $items['sell_price'];
-                $promoValue = $subTotal - ($items['paid_price'] * $items['quantity']);
+                $subTotal = $items['quantity'] * $items['sell_price'];
+                // $promoValue = $subTotal - ($items['paid_price'] * $items['quantity']);
             }
             foreach ($dataOrder['billing'] as $billing) {
                 $dataBilling['street'] = $billing['street'];
@@ -283,7 +283,8 @@ class OmsIntegration implements OmsIntegrationInterface
             $receiverName  = $dataOrder['receiver_name'];
             $receiverPhone = $dataOrder['receiver_phone'];
 
-            $promoType = $dataOrder['promotion_type'];
+            $promoType  = $dataOrder['promotion_type']; // rule id;
+            $promoValue = $dataOrder['promotion_value']; // promotion value
 
             $billingAddr  = $billing['street'];
             $shippingAddr = $shipping['street'];
@@ -311,11 +312,12 @@ class OmsIntegration implements OmsIntegrationInterface
 
             /*smart osc start remove code*/
             /*$allocationRuleDataByQuoteId = $this->orderAllocationRepo->loadDataByQuoteId($dataOrder['quote_id']);
-                                                                                                                $warehouse                   = $allocationRuleDataByQuoteId->getSpoDetail();
-                                                                                                                $orderOriginId               = $allocationRuleDataByQuoteId->getOarOriginOrderId();
-                                                                                                                $isSpo                       = $allocationRuleDataByQuoteId->getIsSpo();
-                                                                                                                $isOwnCourier                = $allocationRuleDataByQuoteId->getIsOwnCourier();
-                                                                                                                $warehouseSource             = $allocationRuleDataByQuoteId->getWarehouseSource();
+
+                                                                                                                                $warehouse                   = $allocationRuleDataByQuoteId->getSpoDetail();
+                                                                                                                                $orderOriginId               = $allocationRuleDataByQuoteId->getOarOriginOrderId();
+                                                                                                                                $isSpo                       = $allocationRuleDataByQuoteId->getIsSpo();
+                                                                                                                                $isOwnCourier                = $allocationRuleDataByQuoteId->getIsOwnCourier();
+                                                                                                                                $warehouseSource             = $allocationRuleDataByQuoteId->getWarehouseSource();
             */
             /*smart osc end remove code*/
 

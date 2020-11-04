@@ -203,7 +203,7 @@ class Search implements SearchProductInterface
      * {@inheritdoc}
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function searchV2($customerId, $keyword, $p = 1, $limit = 12, $cat = null)
+    public function searchV2($customerId, $keyword, $p = 1, $limit = 12)
     {
         //Set prams for query factory
         $this->request->setParams([QueryFactory::QUERY_VAR_NAME => $keyword]);

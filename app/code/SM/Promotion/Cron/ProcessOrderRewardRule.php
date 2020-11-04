@@ -37,6 +37,7 @@ class ProcessOrderRewardRule extends \SM\Notification\Cron\AbstractGenerate
     /**
      * ProcessOrderRewardRule constructor.
      *
+     * @param \Magento\Framework\Filesystem                                    $filesystem
      * @param \Magento\SalesRule\Api\Data\CouponGenerationSpecInterfaceFactory $generationSpecFactory
      * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory       $collectionFactory
      * @param \Magento\SalesRule\Model\ResourceModel\Rule\CollectionFactory    $ruleCollectionFactory
@@ -47,8 +48,11 @@ class ProcessOrderRewardRule extends \SM\Notification\Cron\AbstractGenerate
      * @param \SM\Notification\Model\ResourceModel\Notification                $notificationResource
      * @param \Magento\Framework\App\ResourceConnection                        $resourceConnection
      * @param \Magento\Framework\Logger\Monolog|null                           $logger
+     *
+     * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function __construct(
+        \Magento\Framework\Filesystem $filesystem,
         \Magento\SalesRule\Api\Data\CouponGenerationSpecInterfaceFactory $generationSpecFactory,
         \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $collectionFactory,
         \Magento\SalesRule\Model\ResourceModel\Rule\CollectionFactory $ruleCollectionFactory,
@@ -61,6 +65,7 @@ class ProcessOrderRewardRule extends \SM\Notification\Cron\AbstractGenerate
         \Magento\Framework\Logger\Monolog $logger
     ) {
         parent::__construct(
+            $filesystem,
             $emulation,
             $settingHelper,
             $notificationFactory,
@@ -74,7 +79,7 @@ class ProcessOrderRewardRule extends \SM\Notification\Cron\AbstractGenerate
         $this->couponManagementService = $couponManagementService;
     }
 
-    public function execute()
+    public function process()
     {
         try {
             $orderSkip = [];
@@ -230,5 +235,13 @@ class ProcessOrderRewardRule extends \SM\Notification\Cron\AbstractGenerate
         } catch (\Exception $e) {
             $this->logger->error($e);
         }
+    }
+
+    /**
+     * @return string
+     */
+    protected function getLockFileName()
+    {
+        return 'sm_notification_order_reward_rule.lock';
     }
 }

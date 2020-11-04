@@ -28,6 +28,7 @@
                 <abandoned_cart_repeat_time>3</abandoned_cart_repeat_time>
                 <abandoned_cart_repeat>*/10 * * * *</abandoned_cart_repeat>
                 <payment_expiring_soon_time>5</payment_expiring_soon_time>
+                <payment_expiring_soon_time_cron>* * * * *</payment_expiring_soon_time_cron>
                 <remind_pickup_cron>0 * * * *</remind_pickup_cron>
                 <remind_pickup>5</remind_pickup>
                 <remind_pickup_expired>2</remind_pickup_expired>

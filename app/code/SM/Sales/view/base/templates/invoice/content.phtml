@@ -153,12 +153,11 @@ $invoice = $block->getInvoice();
                     <?php
                     /** @var \SM\MobileApi\Api\Data\Catalog\Product\StoreInfoInterface $storeInfo */
                     $storeInfo = $subInvoice->getStoreInfo();
-                    $preparedStreet = $block->prepareStreet($storeInfo->getStreet());
+                    $storeAddress = $block->getStoreAddress($storeInfo);
                     ?>
                     <span><?= $block->escapeHtml(__('Pick up in Store')) ?></span>
                     <h3><?= $block->escapeHtml($storeInfo->getName()) ?></h3>
-                    <p><?= $block->escapeHtml($preparedStreet["street"]) ?></p>
-                    <p><?= $block->escapeHtml($preparedStreet["last"]) ?></p>
+                    <p><?= $block->escapeHtml($storeAddress) ?></p>
                 <?php endif;?>
                 <?php if ($subInvoice->getDeliveryAddress()):?>
                     <?php
