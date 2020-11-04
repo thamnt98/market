@@ -1,17 +1,15 @@
 <?php
 
-
 namespace SM\CustomPrice\Model\Session;
-
 
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Api\GroupManagementInterface;
 use Magento\Customer\Model\AccountConfirmation;
-use  \Magento\Customer\Model\Url;
+use Magento\Customer\Model\Config\Share;
 use Magento\Customer\Model\CustomerFactory;
 use Magento\Customer\Model\ResourceModel\Customer as ResourceCustomer;
 use Magento\Customer\Model\Session;
-use Magento\Customer\Model\Config\Share;
+use Magento\Customer\Model\Url;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\State;
 use SM\CustomPrice\Model\ResourceModel\District;
@@ -26,18 +24,13 @@ class Customer extends Session
      * @var State
      */
     protected $state;
-    /**
-     * @var \Magento\Webapi\Model\Authorization\TokenUserContext
-     */
-    protected $tokenUserContext;
 
     /**
-     * @var \Magento\Eav\Model\Config
+     * @var \SM\MobileApi\Model\Authorization\TokenUserContext
      */
-    protected $eavConfig;
+    protected $smartTokenUserContext;
 
     public function __construct(
-        \Magento\Eav\Model\Config $eavConfig,
         \Magento\Framework\App\Request\Http $request,
         \Magento\Framework\Session\SidResolverInterface $sidResolver,
         \Magento\Framework\Session\Config\ConfigInterface $sessionConfig,
@@ -61,37 +54,60 @@ class Customer extends Session
         \Magento\Framework\App\Response\Http $response,
         District $district,
         State $state,
-        \Magento\Webapi\Model\Authorization\TokenUserContext $tokenUserContext,
+        \SM\MobileApi\Model\Authorization\TokenUserContext $smartTokenUserContext,
         AccountConfirmation $accountConfirmation = null
     ) {
-        parent::__construct($request, $sidResolver, $sessionConfig, $saveHandler, $validator, $storage, $cookieManager,
-            $cookieMetadataFactory, $appState, $configShare, $coreUrl, $customerUrl, $customerResource,
-            $customerFactory, $urlFactory, $session, $eventManager, $httpContext, $customerRepository, $groupManagement,
-            $response, $accountConfirmation);
+        parent::__construct(
+            $request,
+            $sidResolver,
+            $sessionConfig,
+            $saveHandler,
+            $validator,
+            $storage,
+            $cookieManager,
+            $cookieMetadataFactory,
+            $appState,
+            $configShare,
+            $coreUrl,
+            $customerUrl,
+            $customerResource,
+            $customerFactory,
+            $urlFactory,
+            $session,
+            $eventManager,
+            $httpContext,
+            $customerRepository,
+            $groupManagement,
+            $response,
+            $accountConfirmation
+        );
 
-        $this->district           = $district;
-        $this->state              = $state;
-        $this->tokenUserContext   = $tokenUserContext;
-        $this->customerRepository = $customerRepository;
-        $this->eavConfig = $eavConfig;
+        $this->district              = $district;
+        $this->state                 = $state;
+        $this->customerRepository    = $customerRepository;
+        $this->smartTokenUserContext = $smartTokenUserContext;
     }
 
     /**
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getOmniFinalPriceAttributeCode()
     {
         $omni_store_id = $this->getOmniStoreId();
-        return \SM\CustomPrice\Model\Customer::PREFIX_OMNI_FINAL_PRICE. $omni_store_id;
+        return \SM\CustomPrice\Model\Customer::PREFIX_OMNI_FINAL_PRICE . $omni_store_id;
     }
 
     /**
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getOmniNormalPriceAttributeCode()
     {
         $omni_store_id = $this->getOmniStoreId();
-        return \SM\CustomPrice\Model\Customer::PREFIX_OMNI_NORMAL_PRICE. $omni_store_id;
+        return \SM\CustomPrice\Model\Customer::PREFIX_OMNI_NORMAL_PRICE . $omni_store_id;
     }
 
     /**
@@ -105,25 +121,17 @@ class Customer extends Session
             return null;
         }
         if ($this->isLoggedInByAPI()) {
-            $customerId = $this->tokenUserContext->getUserId();
+            $customerId = $this->smartTokenUserContext->getUserId();
             $customer   = $this->customerRepository->getById($customerId);
             if (!empty($customer)) {
                 $omni_store_id = $customer->getCustomAttribute(\SM\CustomPrice\Model\Customer::OMNI_STORE_ID);
             }
         } else {
             $omni_store_id = $this->getCustomerData()->getCustomAttribute(\SM\CustomPrice\Model\Customer::OMNI_STORE_ID);
-
         }
-
         if (!empty($omni_store_id)) {
-            $basePriceCode = \SM\CustomPrice\Model\Customer::PREFIX_OMNI_NORMAL_PRICE . $omni_store_id->getValue();
-            $basePriceAttr = $this->eavConfig->getAttribute(\Magento\Catalog\Model\Product::ENTITY, $basePriceCode);
-
-            if ($basePriceAttr && $basePriceAttr->getId()) {
-                return $omni_store_id->getValue();
-            }
+            return $omni_store_id->getValue();
         }
-
         return $this->getDefaultOmniStoreCode();
     }
 
@@ -135,7 +143,7 @@ class Customer extends Session
 
     public function isLoggedInByAPI()
     {
-        if ($this->state->getAreaCode() == Area::AREA_WEBAPI_REST && (bool)$this->tokenUserContext->getUserId()) {
+        if ($this->state->getAreaCode() == Area::AREA_WEBAPI_REST && (bool)$this->smartTokenUserContext->getUserId()) {
             return true;
         }
     }
