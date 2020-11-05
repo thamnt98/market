@@ -1,5 +1,126 @@
 <?php
 return [
+    'scopes' => [
+        'websites' => [
+            'admin' => [
+                'website_id' => '0',
+                'code' => 'admin',
+                'name' => 'Admin',
+                'sort_order' => '0',
+                'default_group_id' => '0',
+                'is_default' => '0'
+            ],
+            'base' => [
+                'website_id' => '1',
+                'code' => 'base',
+                'name' => 'Main Website',
+                'sort_order' => '0',
+                'default_group_id' => '1',
+                'is_default' => '1'
+            ]
+        ],
+        'groups' => [
+            [
+                'group_id' => '0',
+                'website_id' => '0',
+                'name' => 'Default',
+                'root_category_id' => '0',
+                'default_store_id' => '0',
+                'code' => 'default'
+            ],
+            [
+                'group_id' => '1',
+                'website_id' => '1',
+                'name' => 'Main Website Store',
+                'root_category_id' => '2',
+                'default_store_id' => '4',
+                'code' => 'main_website_store'
+            ]
+        ],
+        'stores' => [
+            'admin' => [
+                'store_id' => '0',
+                'code' => 'admin',
+                'website_id' => '0',
+                'group_id' => '0',
+                'name' => 'Admin',
+                'sort_order' => '0',
+                'is_active' => '1'
+            ],
+            'en_US' => [
+                'store_id' => '4',
+                'code' => 'en_US',
+                'website_id' => '1',
+                'group_id' => '1',
+                'name' => 'English',
+                'sort_order' => '0',
+                'is_active' => '1'
+            ],
+            'id_ID' => [
+                'store_id' => '7',
+                'code' => 'id_ID',
+                'website_id' => '1',
+                'group_id' => '1',
+                'name' => 'Indonesia Bahasa',
+                'sort_order' => '2',
+                'is_active' => '1'
+            ]
+        ]
+    ],
+    'system' => [
+        'default' => [
+            'general' => [
+                'locale' => [
+                    'code' => 'en_US'
+                ]
+            ],
+            'dev' => [
+                'static' => [
+                    'sign' => '1'
+                ],
+                'front_end_development_workflow' => [
+                    'type' => 'server_side_compilation'
+                ],
+                'template' => [
+                    'minify_html' => '0',
+                    'allow_symlink' => '0'
+                ],
+                'js' => [
+                    'merge_files' => '0',
+                    'minify_files' => '0',
+                    'minify_exclude' => [
+                        'tiny_mce' => '/tiny_mce/',
+                        'cardinal_commerce' => '/v1/songbird',
+                        'authorizenet_acceptjs' => '\\.authorize\\.net/v1/Accept'
+                    ],
+                    'move_script_to_bottom' => '0',
+                    'session_storage_logging' => '0',
+                    'translate_strategy' => 'dictionary',
+                    'enable_js_bundling' => '1'
+                ],
+                'css' => [
+                    'minify_files' => '0',
+                    'minify_exclude' => [
+                        'tiny_mce' => '/tiny_mce/'
+                    ],
+                    'use_css_critical_path' => '0',
+                    'merge_css_files' => '1'
+                ]
+            ]
+        ],
+        'stores' => [
+            'id_ID' => [
+                'general' => [
+                    'locale' => [
+                        'code' => 'id_ID'
+                    ]
+                ]
+            ]
+        ],
+        'websites' => [
+
+        ]
+    ],
     'modules' => [
         'Magento_AdminAnalytics' => 1,
         'Magento_Store' => 1,
@@ -322,7 +443,6 @@ return [
         'Magento_WishlistAnalytics' => 1,
         'Magento_WishlistGraphQl' => 1,
         'Magento_Worldpay' => 1,
-        'ADM_QuickDevBar' => 1,
         'Amasty_BannersLite' => 1,
         'Amasty_Base' => 1,
         'Amasty_Conditions' => 1,
@@ -429,6 +549,8 @@ return [
         'Trans_IntegrationOrder' => 1,
         'Trans_LocationCoverage' => 1,
         'Trans_MasterPayment' => 1,
+        'Trans_Mepay' => 1,
+        'Trans_MepayTransmart' => 1,
         'SM_Inventory' => 1,
         'Vertex_Tax' => 1,
         'Vertex_AddressValidation' => 1,
@@ -437,5 +559,12 @@ return [
         'Ves_Setup' => 1,
         'SM_Bundle' => 1,
         'Yotpo_Yotpo' => 1
+    ],
+    'admin_user' => [
+        'locale' => [
+            'code' => [
+                'en_US'
+            ]
+        ]
     ]
 ];
