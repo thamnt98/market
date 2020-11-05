@@ -82,10 +82,6 @@ class IntegrationOrderRepository implements IntegrationOrderRepositoryInterface
     public function save(IntegrationOrderInterface $integrationOrderInterface)
     {
         try {
-            if (!$integrationOrderInterface->getShipmentDate()) {
-                $date = new \DateTime();
-                $integrationOrderInterface->setShipmentDate($date->format('Y-m-d H:i:s'));
-            }
             $this->integrationOrderResourceModel->save($integrationOrderInterface);
         } catch (Exception $e) {
             $this->messageManager

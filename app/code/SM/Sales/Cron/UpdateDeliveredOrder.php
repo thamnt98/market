@@ -2,6 +2,7 @@
 
 namespace SM\Sales\Cron;
 
+use Magento\Framework\App\ResourceConnection;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderStatusHistoryInterface;
 use Magento\Sales\Model\Order\Status\History as StatusHistory;
@@ -33,19 +34,27 @@ class UpdateDeliveredOrder
     private $orderResourceModel;
 
     /**
+     * @var ResourceConnection
+     */
+    protected $resourceConnection;
+
+    /**
      * UpdateDeliveredOrder constructor.
      * @param OrderCollectionFactory $orderCollectionFactory
      * @param StatusHistoryCollectionFactory $statusHistoryCollectionFactory
      * @param Order $orderResourceModel
+     * @param ResourceConnection $resourceConnection
      */
     public function __construct(
         OrderCollectionFactory $orderCollectionFactory,
         StatusHistoryCollectionFactory $statusHistoryCollectionFactory,
-        Order $orderResourceModel
+        Order $orderResourceModel,
+        ResourceConnection $resourceConnection
     ) {
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->statusHistoryCollectionFactory = $statusHistoryCollectionFactory;
         $this->orderResourceModel = $orderResourceModel;
+        $this->resourceConnection = $resourceConnection;
     }
 
     /**
@@ -94,15 +103,15 @@ class UpdateDeliveredOrder
          */
         $orderCollection = $this->orderCollectionFactory->create();
         $orderCollection->addFieldToFilter(
-                OrderInterface::ENTITY_ID,
-                ["in" => $orderIds]
-            )->addFieldToFilter(
-                OrderInterface::STATE,
-                ["neq" => ParentOrderRepositoryInterface::STATUS_COMPLETE]
-            )->addFieldToFilter(
-                OrderInterface::STATUS,
-                ["neq" => ParentOrderRepositoryInterface::STATUS_COMPLETE]
-            )->setPage(1, 100);
+            OrderInterface::ENTITY_ID,
+            ["in" => $orderIds]
+        )->addFieldToFilter(
+            OrderInterface::STATE,
+            ["neq" => ParentOrderRepositoryInterface::STATUS_COMPLETE]
+        )->addFieldToFilter(
+            OrderInterface::STATUS,
+            ["neq" => ParentOrderRepositoryInterface::STATUS_COMPLETE]
+        )->setPage(1, 100);
 
         foreach ($orderCollection as $order) {
             $order->setState(ParentOrderRepositoryInterface::STATUS_COMPLETE)
@@ -113,6 +122,33 @@ class UpdateDeliveredOrder
             } catch (\Exception $e) {
                 continue;
             }
+        }
+
+        //If order status,state is set to closed because order don't have invoice, so we force magento set order to complete by sql raw
+        //This is workaround solution.
+        //https://jira.smartosc.com/browse/APO-5557
+        $resource      = $this->resourceConnection;
+        $connection    = $this->resourceConnection->getConnection(ResourceConnection::DEFAULT_CONNECTION);
+        $saleOrder     = $resource->getTableName('sales_order');
+        $saleOrderGrid = $resource->getTableName('sales_order_grid');
+
+        try {
+            $where = ['entity_id IN (?)' => $orderIds];
+            $connection->beginTransaction();
+            //Update sale_order
+            $connection->update($saleOrder, [
+                'state'  => ParentOrderRepositoryInterface::STATUS_COMPLETE,
+                'status' => ParentOrderRepositoryInterface::STATUS_COMPLETE
+            ], $where);
+
+            //Update sale_order_grid
+            $connection->update($saleOrderGrid, [
+                'status' => ParentOrderRepositoryInterface::STATUS_COMPLETE
+            ], $where);
+
+            $connection->commit();
+        } catch (\Exception $e) {
+            $connection->rollBack();
         }
     }
 }

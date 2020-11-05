@@ -349,7 +349,7 @@ class IntegrationProductAttribute implements IntegrationProductAttributeInterfac
 			foreach ($datas as $data) {
 				try {
 					$pimDataAttribute[$i] = $this->curl->jsonToArray($data->getDataValue());
-					
+
 					// $pimAttrCode[$i] = str_replace(" ","_",strtolower($this->validation->validateArray(IntegrationProductAttributeInterface::PIM_LABEL, $pimDataAttribute[$i])));
 					$pimAttrCode[$i] = $pimDataAttribute[$i]['code'] ? $this->generateAttrCodeByString($pimDataAttribute[$i]['code']) : $this->generateAttrCodeByString($pimDataAttribute[$i]['name']);
 					$this->logger->info("Data Value = " . $data->getDataValue());
@@ -385,7 +385,7 @@ class IntegrationProductAttribute implements IntegrationProductAttributeInterfac
 
 						$pimAttrType[$i]    = $this->validation->validateArray(IntegrationProductAttributeInterface::PIM_ATTRIBUTE_TYPE, $pimDataAttribute[$i]);
 						$attrTypeData[$i] = $this->integrationAttributeRepository->getAttributeTypeMap($pimAttrType[$i]);
-						
+
 						// Insert Data by Id attribute
 						$queryAttribute[$i] = $this->productAttributeFactory->create();
 
@@ -418,7 +418,11 @@ class IntegrationProductAttribute implements IntegrationProductAttributeInterfac
 						$queryAttribute[$i]->setDefaultFrontendLabel(ucwords($pimLabelName[$i]));
 
 						$queryAttribute[$i]->setBackendType($attrTypeData[$i][IntegrationProductAttributeTypeInterface::BACKEND_CODE]);
-											
+						
+						if($attrTypeData[$i][IntegrationProductAttributeTypeInterface::PIM_TYPE_CODE] === 'yes_no') {
+							$queryAttribute[$i]->setSourceModel('Magento\Eav\Model\Entity\Attribute\Source\Boolean');
+						}
+
 						$queryAttribute[$i]->setIsUnique(IntegrationProductAttributeInterface::IS_UNIQUE);
 						
 						if (!empty($pimAttrOption[$i])) {

@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace SM\Checkout\Model;
 
-use Magento\Catalog\Model\Product;
+use Magento\Framework\Webapi\Exception as HttpException;
 use SM\Checkout\Api\Data\Checkout\CheckoutDataInterface;
 use SM\DigitalProduct\Api\Data\DigitalInterface;
 use SM\GTM\Model\BasketFactory;
@@ -405,9 +405,15 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
             $this->registry->unregister("remove_cart_item");
         }
         $quote = $this->quoteRepository->getActive($cartId);
+
+        if (empty($quote->getItemsV2())) {
+            throw new HttpException(__('Your cart is empty. Pls add more item!'), 0, HttpException::HTTP_NOT_FOUND);
+        }
+
         if ($quote->getIsVirtual()) {
             return $this->handleCheckoutDigital($cartId, $customerId);
         }
+
         $customer = $this->customerFactory->create()->load($customerId);
         $quote = $this->quoteRepository->get($cartId);
         $checkoutSession = $this->multiShipping;

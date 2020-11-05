@@ -39,6 +39,38 @@ class Brands extends \Magento\Framework\Model\AbstractModel implements BrandInte
 	/**
 	 * @inheritdoc
 	 */
+	public function getPimId()
+	{
+		return $this->getData(BrandInterface::PIM_ID);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function setPimId($pimId)
+	{
+		return $this->setData(BrandInterface::PIM_ID, $pimId);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getCode()
+	{
+		return $this->getData(BrandInterface::PIM_CODE);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function setCode($code)
+	{
+		return $this->setData(BrandInterface::PIM_CODE, $code);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
 	public function getTitle() {
 		return $this->getData(BrandInterface::TITLE);
 	}

@@ -75,4 +75,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->eavAttribute->getIdByCode('catalog_product', $code);
     }
+
+    /**
+     * @return string
+     */
+    public function getBrandAttributeCode()
+    {
+        return $this->scopeConfig->getValue(
+            'amshopby_brand/general/attribute_code',
+            ScopeInterface::SCOPE_STORE
+        );
+    }
 }
