@@ -47,10 +47,55 @@ class Status
    */
   const CANCEL = 'cancel';
 
-    /**
+  /**
    * @var  string
    */
   const FAILED = 'failed';
+
+  /**
+   * @var  string
+   */
+  const SUBMITTED = 'submitted';
+
+  /**
+   * @var  string
+   */
+  const DECLINED = 'declined';
+
+  /**
+   * @var  string
+   */
+  const PENDING = 'pending';
+
+  /**
+   * @var  string
+   */
+  const VALIDATED = 'validated';
+
+  /**
+   * @var  string
+   */
+  const PROCESSING = 'processing';
+
+  /**
+   * @var  string
+   */
+  const AUTHORIZED = 'authorized';
+
+  /**
+   * @var  string
+   */
+  const CAPTURED = 'captured';
+
+  /**
+   * @var  string
+   */
+  const AUTHORIZATION = 'authorization';
+
+  /**
+   * @var  string
+   */
+  const VOID = 'void';
 
   /**
    * @var Config
@@ -129,19 +174,15 @@ class Status
         $this->logger->log('== {{authorize_operation}} ==');
         $this->authorize->handle($transaction, $inquiry, $token); 
       }
-      switch(strtolower($transaction->getStatus())){
-        case self::CAPTURE : 
+
+      if ($this->isCapture($transaction->getStatus())) {
           $this->logger->log('== {{capture_operation}} ==');
           $this->capture->handle($transaction, $inquiry, $token);
-          break;
-        case self::PAID : 
-        $this->logger->log('== {{paid_operation}} ==');
-          $this->paid->handle($transaction, $inquiry, $token);
-          break;
-        case self::FAILED:
+      }
+
+      if ($this->isFailed($transaction->getStatus())) {
           $this->logger->log('== {{failed_operation}} ==');
           $this->failed->handle($transaction, $inquiry, $token);
-          break;
       }
 
     }
@@ -156,6 +197,65 @@ class Status
   {
     $collection = $this->transactionHelper->getTxnByTxnId($txnId);
     if($collection->getSize())
+      return true;
+    return false;
+  }
+
+  /**
+   * Is status authorize
+   * @param  string  $status 
+   * @return boolean         
+   */
+  public function isAuthorize($status)
+  {
+    $status = strtolower($status);
+    $mapAuthorize = [
+      self::AUTHORIZATION,
+      self::AUTHORIZED,
+      self::AUTHORIZE,
+      self::SUBMITTED,
+      self::PENDING,
+      self::VALIDATED,
+      self::PROCESSING
+    ];
+    if(in_array($status, $mapAuthorize))
+      return true;
+    return false;
+  }
+
+  /**
+   * Is status capture
+   * @param  string  $status 
+   * @return boolean         
+   */
+  public function isCapture($status)
+  {
+    $status = strtolower($status);
+    $mapCapture = [
+      self::CAPTURED,
+      self::CAPTURE,
+      self::PAID
+    ];
+    if(in_array($status, $mapCapture))
+      return true;
+    return false;
+  }
+
+  /**
+   * Is status failed
+   * @param  string  $status 
+   * @return boolean         
+   */
+  public function isFailed($status)
+  {
+    $status = strtolower($status);
+    $mapFailed = [
+      self::FAILED,
+      self::DECLINED,
+      self::CANCEL,
+      self::VOID
+    ];
+    if(in_array($status, $mapFailed))
       return true;
     return false;
   }

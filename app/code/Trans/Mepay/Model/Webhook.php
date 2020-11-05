@@ -293,9 +293,9 @@ class Webhook extends DataObject implements WebhookInterface
   protected function _validate($type)
   {
     $id = $this->inquiry->getId();
-    $this->updateStatusToOms($this->inquiry);
     $status = $this->statusFactory->create();
     if ($id && $status->isExist($id)) {
+      $this->updateStatusToOms($this->inquiry);
       if ($type == ResponseInterface::PAYMENT_VALIDATE_TYPE) {
         return ResponseInterface::STATUS_OK;
       }

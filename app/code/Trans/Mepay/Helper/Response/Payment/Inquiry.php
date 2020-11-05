@@ -150,15 +150,20 @@ class Inquiry
    */
   public function convertToArrayOrderItems($items)
   {
-    $result = [];
+    $result = [];$isList=false;
     foreach ($items as $key => $value) {
-      // $sub = [];
-      // foreach ($value as $index => $item) {
-      //   $sub[$index] = $item;
-      // }
-      // $result[] = $sub;
+      try {
+       $sub = [];
+       foreach ($value as $index => $item) {
+         $sub[$index] = $item;
+       }
+       $result[] = $sub;
+      } catch (\Exception $e) {
+        $result[$key] = $value;
+        $isList=true;
+      }
     }
-    return $result;
+    return ($isList)? [$result] : $result;
   }
 
   /**
