@@ -21,10 +21,9 @@ interface SearchProductInterface
      * @param string $keyword
      * @param int $p
      * @param int $limit
-     * @param int $cat
      * @return \SM\MobileApi\Api\Data\Product\ListInterface
      */
-    public function searchV2(int $customerId, string $keyword, int $p = 1, int $limit = 12, $cat = null);
+    public function searchV2(int $customerId, string $keyword, int $p = 1, int $limit = 12);
 
     /**
      * @param int $customerId

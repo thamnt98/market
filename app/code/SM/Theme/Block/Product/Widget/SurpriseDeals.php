@@ -393,6 +393,7 @@ class SurpriseDeals extends \Magento\CatalogWidget\Block\Product\ProductsList
             "salePrice" => $initPrice - $price,
             "discountRate" => $priceGTM['discount_rate'],
             "rating" => $this->getGTMProductRating($productBase),
+            "type" => $this->getGTMProductType($productBase),
             "initialPrice" => $initPrice,
             "productBundle" => $this->getGTMProductType($productBase) === "bundle" ? "Yes" : "No",
             "list" => $this->getData('title') ?? "Not available",

@@ -78,6 +78,10 @@
             <argument name="commands" xsi:type="array">
                  <item name="Trans_IntegrationCatalog_Console_Pim_Save_ConfigurableProduct" xsi:type="object">Trans\IntegrationCatalog\Console\Pim\Save\ConfigurableProduct</item>
             </argument>
+            <!-- synch simple product data -->
+            <argument name="commands" xsi:type="array">
+                 <item name="Trans_IntegrationCatalog_Console_Pim_Save_Product" xsi:type="object">Trans\IntegrationCatalog\Console\Pim\Save\Product</item>
+            </argument>
         </arguments>
     </type>
 

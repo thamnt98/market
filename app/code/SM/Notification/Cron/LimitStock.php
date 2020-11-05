@@ -32,6 +32,7 @@ class LimitStock extends AbstractGenerate
     /**
      * LimitStock constructor.
      *
+     * @param \Magento\Framework\Filesystem                     $filesystem
      * @param \Magento\Catalog\Model\ProductRepository          $productRepository
      * @param \Magento\Store\Model\App\Emulation                $emulation
      * @param \SM\Notification\Helper\CustomerSetting           $settingHelper
@@ -39,8 +40,11 @@ class LimitStock extends AbstractGenerate
      * @param \SM\Notification\Model\ResourceModel\Notification $notificationResource
      * @param \Magento\Framework\App\ResourceConnection         $resourceConnection
      * @param \Magento\Framework\Logger\Monolog|null            $logger
+     *
+     * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function __construct(
+        \Magento\Framework\Filesystem $filesystem,
         \Magento\Catalog\Model\ProductRepository $productRepository,
         \Magento\Store\Model\App\Emulation $emulation,
         \SM\Notification\Helper\CustomerSetting $settingHelper,
@@ -50,6 +54,7 @@ class LimitStock extends AbstractGenerate
         \Magento\Framework\Logger\Monolog $logger
     ) {
         parent::__construct(
+            $filesystem,
             $emulation,
             $settingHelper,
             $notificationFactory,
@@ -71,7 +76,7 @@ class LimitStock extends AbstractGenerate
         $this->labelId = $this->getLimitStockLabel();
     }
 
-    public function execute()
+    public function process()
     {
         $items = $this->getActiveItems();
         foreach ($items as $item) {
@@ -210,5 +215,13 @@ class LimitStock extends AbstractGenerate
             ->limit(1);
 
         return (int)$this->connection->fetchOne($select);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getLockFileName()
+    {
+        return 'sm_notification_limit_stock.lock';
     }
 }

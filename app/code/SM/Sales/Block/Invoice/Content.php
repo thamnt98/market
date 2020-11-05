@@ -118,6 +118,21 @@ class Content extends Template
         ];
     }
 
+    public function getStoreAddress($storeInfo)
+    {
+        $storeAddress = $storeInfo->getStreet();
+        if ($storeInfo->getCity() != '') {
+            $storeAddress .= ', ' . $storeInfo->getCity();
+        }
+        if ($storeInfo->getRegion() != '') {
+            $storeAddress .= ', ' . $storeInfo->getRegion();
+            if ($storeInfo->getPostcode() != '') {
+                $storeAddress .= ' ' . $storeInfo->getPostcode();
+            }
+        }
+        return $storeAddress;
+    }
+
     public function pickUpTimeDateFormat($date)
     {
         return $this->timezone->date($date)->format('d F Y');

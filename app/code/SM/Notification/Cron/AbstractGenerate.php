@@ -48,16 +48,25 @@ abstract class AbstractGenerate
     protected $emulation;
 
     /**
+     * @var \Magento\Framework\Filesystem\Directory\WriteInterface
+     */
+    protected $directory;
+
+    /**
      * constructor.
      *
+     * @param \Magento\Framework\Filesystem                     $filesystem
      * @param \Magento\Store\Model\App\Emulation                $emulation
      * @param \SM\Notification\Helper\CustomerSetting           $settingHelper
      * @param \SM\Notification\Model\NotificationFactory        $notificationFactory
      * @param \SM\Notification\Model\ResourceModel\Notification $notificationResource
      * @param \Magento\Framework\App\ResourceConnection         $resourceConnection
      * @param \Magento\Framework\Logger\Monolog|null            $logger
+     *
+     * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function __construct(
+        \Magento\Framework\Filesystem $filesystem,
         \Magento\Store\Model\App\Emulation $emulation,
         \SM\Notification\Helper\CustomerSetting $settingHelper,
         \SM\Notification\Model\NotificationFactory $notificationFactory,
@@ -70,13 +79,56 @@ abstract class AbstractGenerate
         $this->connection = $resourceConnection->getConnection();
         $this->settingHelper = $settingHelper;
         $this->logger = $logger;
-        $this->construct();
         $this->emulation = $emulation;
+        $this->directory = $filesystem->getDirectoryWrite(\Magento\Framework\App\Filesystem\DirectoryList::VAR_DIR);
+
+        $this->construct();
+
     }
 
     protected function construct()
     {
     }
 
-    abstract public function execute();
+    abstract protected function process();
+    abstract protected function getLockFileName();
+
+    public function execute()
+    {
+        if (!$this->isLocked()) {
+            $this->process();
+            $this->unlock();
+        }
+    }
+
+
+    /**
+     * Check cron is locked.
+     *
+     * @return bool
+     */
+    protected function isLocked()
+    {
+        if ($this->directory->isFile($this->getLockFileName())) {
+            return true;
+        } else {
+            $this->directory->openFile($this->getLockFileName());
+
+            return false;
+        }
+    }
+
+    /**
+     * Unlock cron
+     */
+    protected function unlock()
+    {
+        try {
+            $this->directory->delete($this->getLockFileName());
+        } catch (\Exception $e) {
+            $this->logger->error(
+                "Can not DELETE lock({$this->getLockFileName()}). " . $e->getMessage()
+            );
+        }
+    }
 }

@@ -60,4 +60,12 @@ class AbandonedCartRepeat extends AbandonedCart
 
         return $this->connection->fetchAssoc($select);
     }
+
+    /**
+     * @return string
+     */
+    protected function getLockFileName()
+    {
+        return 'sm_notification_abandoned_cart_repeat.lock';
+    }
 }

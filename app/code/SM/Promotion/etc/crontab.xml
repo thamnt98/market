@@ -8,7 +8,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
     <group id="promotion">
-        <job name="promotion_process_reward_rule" instance="SM\Promotion\Cron\ProcessOrderRewardRule" method="execute">
+        <job name="promotion_process_reward_rule" instance="SM\Promotion\Cron\ProcessOrderRewardRule" method="process">
             <schedule>*/5 * * * *</schedule>
         </job>
     </group>

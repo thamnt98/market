@@ -8,7 +8,7 @@ if ($GTMViewModel) {
 ?>
 <?php if ($data): ?>
     <script type="text/javascript" defer>
-        require(['jquery', "gtmProduct", 'Magento_Ui/js/lib/view/utils/async', 'jquery/jquery-storageapi', 'mage/translate', 'domReady!'], function ($, gtm, async) {
+        require(['jquery', "gtmProduct", 'mage/url', 'Magento_Ui/js/lib/view/utils/async', 'jquery/jquery-storageapi', 'mage/translate', 'domReady!'], function ($, gtm, urlBuilder, async) {
             $(window).load(function () {
                 window.eventCreate = window.eventCreate || {};
                 let data = <?= $data ?>;
@@ -133,8 +133,73 @@ if ($GTMViewModel) {
                     //Todo Remove Debug
                     console.log($('[data-gtm-message="success"]').text());
                     if ($('[data-gtm-message="success"]').text().includes($.mage.__(data['name']))) {
-                        data['quantity'] = $('input[name="qty"]').val();
-                        gtm.push('addToCartPDP', data);
+                        let productIds = [];
+                        if (data['type'] === 'bundle') {
+                            $('#product-options-wrapper').find('a').each(function () {
+                                if ($(this).hasClass('active')) {
+                                    let IDs = {
+                                        'productId' : $(this).find('.option-data').attr('childid'),
+                                        'productQty' : $('input[name="qty"]').val(),
+                                        'delivery_option' : 'Not available'
+                                    };
+                                    productIds.push(IDs);
+                                }
+                            });
+                        } else if (data['type'] === 'group') {
+                            $('#super-product-table').find('input[title="Qty"]').each(function () {
+                                let IDs = {
+                                    'productId' : $(this).attr('data-item-id'),
+                                    'productQty' : $(this).val(),
+                                    'delivery_option' : 'Not available'
+                                };
+                                productIds.push(IDs);
+                            });
+                        } else {
+                            let IDs = {
+                                'productId' : <?= $product->getId() ?>,
+                                'productQty' : $('input[name="qty"]').val(),
+                                'delivery_option' : 'Not available'
+                            };
+                            productIds.push(IDs);
+                        }
+
+                        console.log(productIds);
+
+                        let IDs = {
+                            'productsInfo' : productIds
+                        };
+                       $.ajax({
+                           type: 'POST',
+                           url: urlBuilder.build('sm_gtm/gtm/product'),
+                           data: IDs,
+                           dataType: "json",
+                           async: true,
+                           success: function (result) {
+                               if (result) {
+                                   var dataProducts = [];
+                                   $.each(result, function(key, value){
+                                       try {
+                                           let product = JSON.parse(value);
+
+                                           if (data['type'] === 'bundle') {
+                                               product['type'] = 'bundle';
+                                           }
+
+                                           if (data['type'] === 'group') {
+                                               product['type'] = 'group';
+                                           }
+                                           dataProducts.push(product);
+                                       } catch (e) {
+
+                                       }
+                                   });
+                                   gtm.push('addToCartPDP',dataProducts);
+                               }
+                           },
+                           error: function () {
+
+                           }
+                       });
                     }
                 });
 
@@ -271,6 +336,28 @@ if ($GTMViewModel) {
                         }
                     });
                     eventCreate['.action.increase-qty']++;
+                });
+
+                async.async('.action.decrease-qty', function () {
+                    if (!eventCreate['.action.decrease-qty']) {
+                        eventCreate['.action.decrease-qty'] = 0;
+                    }
+
+                    let current = $($('.action.decrease-qty')[eventCreate['.action.decrease-qty']]);
+                    $(current).click(function (e) {
+                        let data = $(this).attr("data-gtm-product");
+
+                        if (data) {
+                            try {
+                                data = JSON.parse(data);
+                                data['position'] = $(this).attr("data-position");
+                                gtm.push("removeFromCart", data);
+                            } catch (e) {
+
+                            }
+                        }
+                    });
+                    eventCreate['.action.decrease-qty']++;
                 });
             });
         });

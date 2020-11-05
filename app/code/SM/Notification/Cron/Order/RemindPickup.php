@@ -30,6 +30,7 @@ class RemindPickup extends AbstractGenerate
     /**
      * RemindPickup constructor.
      *
+     * @param \Magento\Framework\Filesystem                     $filesystem
      * @param \SM\Sales\Helper\Data                             $orderHelper
      * @param \Magento\Store\Model\App\Emulation                $emulation
      * @param \SM\Notification\Helper\CustomerSetting           $settingHelper
@@ -37,8 +38,11 @@ class RemindPickup extends AbstractGenerate
      * @param \SM\Notification\Model\ResourceModel\Notification $notificationResource
      * @param \Magento\Framework\App\ResourceConnection         $resourceConnection
      * @param \Magento\Framework\Logger\Monolog|null            $logger
+     *
+     * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function __construct(
+        \Magento\Framework\Filesystem $filesystem,
         \SM\Sales\Helper\Data $orderHelper,
         \Magento\Store\Model\App\Emulation $emulation,
         \SM\Notification\Helper\CustomerSetting $settingHelper,
@@ -48,6 +52,7 @@ class RemindPickup extends AbstractGenerate
         \Magento\Framework\Logger\Monolog $logger
     ) {
         parent::__construct(
+            $filesystem,
             $emulation,
             $settingHelper,
             $notificationFactory,
@@ -59,7 +64,7 @@ class RemindPickup extends AbstractGenerate
         $this->orderHelper = $orderHelper;
     }
 
-    public function execute()
+    public function process()
     {
         $this->create(self::EVENT_NAME_AFTER_READY);
         $this->create(self::EVENT_NAME_BEFORE_LIMIT);
@@ -244,5 +249,13 @@ class RemindPickup extends AbstractGenerate
         ]);
 
         return $select;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getLockFileName()
+    {
+        return 'sm_notification_remind_pickup.lock';
     }
 }

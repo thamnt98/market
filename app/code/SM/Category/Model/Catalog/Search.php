@@ -105,11 +105,23 @@ class Search extends \Magento\CatalogSearch\Block\Result
             $items         = [];
 
             foreach ($filter->getItems() as $item) {
-                $filterItemInfo = $this->productFilterItemFactory->create();
-                $filterItemInfo->setValue($item->getValue());
-                $filterItemInfo->setLabel($item->getLabel());
-                $filterItemInfo->setCount($item->getCount());
-                $items[] = $filterItemInfo;
+                if (is_array($item)) {
+                    foreach ($item as $value) {
+                        $filterItemInfo = $this->productFilterItemFactory->create();
+                        $filterItemInfo->setValue($value->getValue());
+                        $filterItemInfo->setLabel($value->getLabel());
+                        $filterItemInfo->setCount($value->getCount());
+                        $items[] = $filterItemInfo;
+                    }
+                }
+
+                if (!is_array($item)) {
+                    $filterItemInfo = $this->productFilterItemFactory->create();
+                    $filterItemInfo->setValue($item->getValue());
+                    $filterItemInfo->setLabel($item->getLabel());
+                    $filterItemInfo->setCount($item->getCount());
+                    $items[] = $filterItemInfo;
+                }
             }
 
             if ($filter->hasAttributeModel()) {

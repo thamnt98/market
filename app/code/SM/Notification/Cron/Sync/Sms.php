@@ -25,18 +25,22 @@ class Sms extends AbstractSync
     /**
      * Email constructor.
      *
+     * @param \Magento\Framework\Filesystem                       $filesystem
      * @param \SM\Notification\Api\Data\Queue\SmsInterfaceFactory $objectFactory
      * @param \Magento\Framework\App\ResourceConnection           $resourceConnection
      * @param \Magento\Framework\MessageQueue\PublisherInterface  $publisher
      * @param \Magento\Framework\Logger\Monolog                   $logger
+     *
+     * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function __construct(
+        \Magento\Framework\Filesystem $filesystem,
         \SM\Notification\Api\Data\Queue\SmsInterfaceFactory $objectFactory,
         \Magento\Framework\App\ResourceConnection $resourceConnection,
         \Magento\Framework\MessageQueue\PublisherInterface $publisher,
         \Magento\Framework\Logger\Monolog $logger
     ) {
-        parent::__construct($resourceConnection, $publisher, $logger);
+        parent::__construct($filesystem, $resourceConnection, $publisher, $logger);
         $this->objectFactory = $objectFactory;
     }
 
@@ -91,5 +95,13 @@ class Sms extends AbstractSync
         );
 
         return $select;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getLockFileName()
+    {
+        return 'sm_notification_sync_sms.lock';
     }
 }

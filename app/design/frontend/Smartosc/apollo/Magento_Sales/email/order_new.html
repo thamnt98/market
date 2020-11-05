@@ -54,7 +54,7 @@
                 shopping at Transmart.
                 We have received your
                 order with %payment_method_title payment. Please
-                make your payment before " payment_method_title=$additional_data.payment_method_title}}
+                complete your payment using %payment_method_title before " payment_method_title=$additional_data.payment_method_title}}
                 {{trans '<span class="no-link">%created_at</span>' created_at=$created_at_formatted |raw}}.
             </p>
             <p>
@@ -67,6 +67,10 @@
 
             <p>
                 {{trans "Reference Number: %order_increment" order_increment=$additional_data.order_increment}}
+            </p>
+
+            <p>
+                {{trans "Total: %order_total" order_total=$additional_data.order_total}}
             </p>
 
             <p>
@@ -89,7 +93,6 @@
             </h3>
         </td>
     </tr>
-    {{/if}}
     <tr>
         <td class="total-column">
             <p class="column-heading">
@@ -100,6 +103,7 @@
             </p>
         </td>
     </tr>
+    {{/if}}
     </tbody>
 </table>
 <!--End Message Email 2-->

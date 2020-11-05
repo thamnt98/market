@@ -177,4 +177,9 @@ class Category extends \Amasty\Shopby\Model\Layer\Filter\Category
 
         return $isAllowed;
     }
+
+    public function getName()
+    {
+        return __('Shop by Category');
+    }
 }

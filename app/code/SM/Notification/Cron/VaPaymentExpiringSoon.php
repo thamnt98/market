@@ -37,6 +37,7 @@ class VaPaymentExpiringSoon extends AbstractGenerate
     /**
      * VaPaymentExpiringSoon constructor.
      *
+     * @param \Magento\Framework\Filesystem                                      $filesystem
      * @param \SM\Sales\Helper\Data                                              $orderHelper
      * @param \Trans\Sprint\Model\ResourceModel\SprintResponse\CollectionFactory $sprintResponseCollFact
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface               $timezone
@@ -46,8 +47,11 @@ class VaPaymentExpiringSoon extends AbstractGenerate
      * @param \SM\Notification\Model\ResourceModel\Notification                  $notificationResource
      * @param \Magento\Framework\App\ResourceConnection                          $resourceConnection
      * @param \Magento\Framework\Logger\Monolog|null                             $logger
+     *
+     * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function __construct(
+        \Magento\Framework\Filesystem $filesystem,
         \SM\Sales\Helper\Data $orderHelper,
         \Trans\Sprint\Model\ResourceModel\SprintResponse\CollectionFactory $sprintResponseCollFact,
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
@@ -59,6 +63,7 @@ class VaPaymentExpiringSoon extends AbstractGenerate
         \Magento\Framework\Logger\Monolog $logger
     ) {
         parent::__construct(
+            $filesystem,
             $emulation,
             $settingHelper,
             $notificationFactory,
@@ -71,7 +76,7 @@ class VaPaymentExpiringSoon extends AbstractGenerate
         $this->orderHelper = $orderHelper;
     }
 
-    public function execute()
+    public function process()
     {
         /** @var \Trans\Sprint\Model\SprintResponse $item */
         foreach ($this->getCollection() as $item) {
@@ -208,5 +213,13 @@ class VaPaymentExpiringSoon extends AbstractGenerate
             )->group('main_table.id');
 
         return $coll;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getLockFileName()
+    {
+        return 'sm_notification_va_expiring.lock';
     }
 }

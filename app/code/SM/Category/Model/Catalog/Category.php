@@ -8,7 +8,6 @@ namespace SM\Category\Model\Catalog;
  */
 class Category extends \Magento\Catalog\Block\Product\ListProduct
 {
-    protected $excludeAttr = [];
     protected $_toolbar;
     protected $productToolbar;
     protected $productToolbarOrder;
@@ -17,9 +16,6 @@ class Category extends \Magento\Catalog\Block\Product\ListProduct
     protected $productMediaFactory;
     protected $productModel;
     protected $mProductHelper;
-    protected $mConfigurableHelper;
-    protected $mBundleHelper;
-    protected $mGroupedHelper;
     protected $_filterList;
     protected $productFilterFactory;
     protected $productFilterItemFactory;
@@ -228,11 +224,24 @@ class Category extends \Magento\Catalog\Block\Product\ListProduct
             $filterInfo = $this->productFilterFactory->create();
             $items      = [];
             foreach ($filter->getItems() as $item) {
-                $filterItemInfo = $this->productFilterItemFactory->create();
-                $filterItemInfo->setValue($item->getValue());
-                $filterItemInfo->setLabel($item->getLabel());
-                $filterItemInfo->setCount($item->getCount());
-                $items[] = $filterItemInfo;
+                if (is_array($item)) {
+                    foreach ($item as $value) {
+                        $filterItemInfo = $this->productFilterItemFactory->create();
+                        $filterItemInfo->setValue($value->getValue());
+                        $filterItemInfo->setLabel($value->getLabel());
+                        $filterItemInfo->setCount($value->getCount());
+                        $items[] = $filterItemInfo;
+                    }
+
+                }
+
+                if (!is_array($item)) {
+                    $filterItemInfo = $this->productFilterItemFactory->create();
+                    $filterItemInfo->setValue($item->getValue());
+                    $filterItemInfo->setLabel($item->getLabel());
+                    $filterItemInfo->setCount($item->getCount());
+                    $items[] = $filterItemInfo;
+                }
             }
 
             if ($filter->hasAttributeModel()) {

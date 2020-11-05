@@ -137,7 +137,7 @@ class CartItemPersister
             throw new CouldNotSaveException(__("The quote couldn't be saved."));
         }
         $itemId = $item->getId();
-        foreach ($quote->getAllItems() as $quoteItem) {
+        foreach ($quote->getItemsV2() as $quoteItem) {
             /** @var \Magento\Quote\Model\Quote\Item $quoteItem */
             if ($itemId == $quoteItem->getId()) {
                 $item = $this->cartItemOptionProcessor->addProductOptions($productType, $quoteItem);
