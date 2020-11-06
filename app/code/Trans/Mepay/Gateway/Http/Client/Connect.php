@@ -111,7 +111,6 @@ class Connect implements ClientInterface
       $client->setUri($transferObject->getUri());
 
       try {
-
           $response = $client->request();
           $result = $this->converter ? $this->converter->convert($response->getBody()) : [$response->getBody()];
           $log['response'] = $result;
@@ -133,4 +132,5 @@ class Connect implements ClientInterface
 
       return $result;
   }
+
 }

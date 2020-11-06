@@ -27,7 +27,6 @@ use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Webapi\Request;
 use Trans\Mepay\Helper\Response\Payment\Inquiry as InquiryResponseHelper;
 use Trans\Mepay\Helper\Payment\Transaction as TransactionHelper;
-use Trans\Sprint\Helper\Config;
 
 class Webhook extends DataObject implements WebhookInterface
 {
@@ -186,24 +185,6 @@ class Webhook extends DataObject implements WebhookInterface
     return $this->buildResponse($type, $status);
   }
 
-   /**
-     * Event pre dispatch for hit status to OMS
-     * @param string $orderId
-     * @param string $status
-     */
-    protected function updateStatusToOms($inquiry)
-    {
-        $collTxn = $this->transactionHelper->getTxnByTxnId($inquiry->getId())->getFirstItem();
-        $order = $this->transactionHelper->getOrder($collTxn->getOrderId());
-        $this->eventManager->dispatch(
-            'update_payment_oms',
-            [
-                'reference_number' => $order->getReferenceNumber(),
-                'payment_status' => Config::OMS_SUCCESS_PAYMENT_OPRDER,
-            ]
-        );
-    }
-
   /**
    * @inheritdoc
    */
@@ -295,7 +276,6 @@ class Webhook extends DataObject implements WebhookInterface
     $id = $this->inquiry->getId();
     $status = $this->statusFactory->create();
     if ($id && $status->isExist($id)) {
-      $this->updateStatusToOms($this->inquiry);
       if ($type == ResponseInterface::PAYMENT_VALIDATE_TYPE) {
         return ResponseInterface::STATUS_OK;
       }

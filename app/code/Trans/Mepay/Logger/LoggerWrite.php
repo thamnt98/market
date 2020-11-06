@@ -44,8 +44,8 @@ class LoggerWrite
       switch ($methodName) {
         case 'placeRequest': $this->loggerGatewayHttpClientConnect->logPlaceRequest(
           $this->logger, 
-          $this->json->serialize($param['log']['request']), 
-          $param['log']['response'][0],
+          (isset($param['log']['request']))? $this->json->serialize($param['log']['request']): '["no-request"]', 
+          (isset($param['log']['response'][0]))? $param['log']['response'][0] : '["no-response"]',
           $param['client']
         );
           break;

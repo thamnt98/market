@@ -40,7 +40,7 @@
                 <model>TransMepayCcFacade</model>
                 <group>trans_mepay</group>
                 <payment_code>trans_mepay_cc</payment_code>
-                <order_status>processing</order_status>
+                <order_status>pending_payment</order_status>
                 <allowspecific>1</allowspecific>
                 <payment_action>authorize</payment_action>
                 <is_gateway>1</is_gateway>
@@ -56,7 +56,7 @@
                 <model>TransMepayVaFacade</model>
                 <group>trans_mepay</group>
                 <payment_code>trans_mepay_va</payment_code>
-                <order_status>processing</order_status>
+                <order_status>pending_payment</order_status>
                 <allowspecific>1</allowspecific>
                 <payment_action>authorize</payment_action>
                 <is_gateway>1</is_gateway>
@@ -72,7 +72,7 @@
                 <model>TransMepayQrisFacade</model>
                 <group>trans_mepay</group>
                 <payment_code>trans_mepay_qris</payment_code>
-                <order_status>processing</order_status>
+                <order_status>pending_payment</order_status>
                 <allowspecific>1</allowspecific>
                 <payment_action>authorize</payment_action>
                 <is_gateway>1</is_gateway>

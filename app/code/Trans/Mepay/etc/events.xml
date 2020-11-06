@@ -16,4 +16,7 @@
     <event name="custom_quote_proces">
         <observer name="TransMepayObserverMagentoCheckoutModelSession" instance="Trans\Mepay\Observer\Magento\Checkout\Model\Session" />
     </event>
+    <event name="sales_order_place_after">
+        <observer name="TransMepayObserverMagentoSalesModelOrder" instance="Trans\Mepay\Observer\Magento\Sales\Model\Order" />
+    </event>
 </config>
