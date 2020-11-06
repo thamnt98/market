@@ -411,7 +411,7 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
             ->setError($dataHandle['error'])
             ->setIsSplitOrder($dataHandle['split'])
             ->setStockMessage($message)
-            ->setShowEachItems($this->multiShippingHandle->isShowEachItems($checkoutSession->getQuote()->getAllShippingAddresses()));
+            ->setShowEachItems($this->multiShippingHandle->isShowEachItems($checkoutSession->getQuote()->getAllShippingAddresses(), $itemsValidMethod, true));
     }
 
     /**

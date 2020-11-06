@@ -89,4 +89,13 @@
     </type>
     <!-- integration_channel_method grid -->
     <!-- end admin grid -->
+
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <!-- clean integration table console-->
+            <argument name="commands" xsi:type="array">
+                 <item name="Trans_Integration_Console_Clean_Table" xsi:type="object">Trans\Integration\Console\IntegrationTableCleaner</item>
+            </argument>
+        </arguments>
+    </type>
 </config>

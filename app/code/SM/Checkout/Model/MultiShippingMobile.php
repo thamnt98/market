@@ -720,7 +720,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
             CheckoutDataInterface::BASKET_ID => $this->getBasketId($customerId),
             CheckoutDataInterface::BASKET_VALUE => $quote->getGrandTotal(),
             CheckoutDataInterface::BASKET_QTY => $quote->getItemsQty(),
-            CheckoutDataInterface::SHOW_EACH_ITEMS => $this->multiShippingHandle->isShowEachItems($quote->getAllShippingAddresses())
+            CheckoutDataInterface::SHOW_EACH_ITEMS => $this->multiShippingHandle->isShowEachItems($quote->getAllShippingAddresses(), $items)
         ];
 
         return $this->getCheckoutData($data);
@@ -914,7 +914,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
             CheckoutDataInterface::BASKET_ID => $this->getBasketId($customerId),
             CheckoutDataInterface::BASKET_VALUE => $quote->getGrandTotal(),
             CheckoutDataInterface::BASKET_QTY => $quote->getItemsQty(),
-            CheckoutDataInterface::SHOW_EACH_ITEMS => $this->multiShippingHandle->isShowEachItems($quote->getAllShippingAddresses())
+            CheckoutDataInterface::SHOW_EACH_ITEMS => $this->multiShippingHandle->isShowEachItems($quote->getAllShippingAddresses(), $quoteItems)
         ];
         return $this->getCheckoutData($data);
     }
@@ -1356,7 +1356,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
                 CheckoutDataInterface::BASKET_ID => $this->getBasketId($customerId),
                 CheckoutDataInterface::BASKET_VALUE => $quote->getGrandTotal(),
                 CheckoutDataInterface::BASKET_QTY => $quote->getItemsQty(),
-                CheckoutDataInterface::SHOW_EACH_ITEMS => $this->multiShippingHandle->isShowEachItems($quote->getAllShippingAddresses())
+                CheckoutDataInterface::SHOW_EACH_ITEMS => $this->multiShippingHandle->isShowEachItems($quote->getAllShippingAddresses(), $requestItems)
             ];
             $response = $this->getCheckoutData($data);
         }
@@ -1423,7 +1423,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
             CheckoutDataInterface::BASKET_ID => $this->getBasketId($customerId),
             CheckoutDataInterface::BASKET_VALUE => $quote->getGrandTotal(),
             CheckoutDataInterface::BASKET_QTY => $quote->getItemsQty(),
-            CheckoutDataInterface::SHOW_EACH_ITEMS => $this->multiShippingHandle->isShowEachItems($quote->getAllShippingAddresses())
+            CheckoutDataInterface::SHOW_EACH_ITEMS => false
         ];
         return $this->getCheckoutData($data);
     }

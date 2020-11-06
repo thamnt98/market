@@ -896,10 +896,15 @@ class MultiShippingHandle
 
     /**
      * @param $allShippingAddress
+     * @param $itemsValidMethod
+     * @param false $web
      * @return bool
      */
-    public function isShowEachItems($allShippingAddress)
+    public function isShowEachItems($allShippingAddress, $itemsValidMethod, $web = false)
     {
+        if (count($allShippingAddress) == 1) {
+            return false;
+        }
         $showEachItems = false;
         $shippingListFromQuoteAddress = [];
         foreach ($allShippingAddress as $_address) {
@@ -919,6 +924,41 @@ class MultiShippingHandle
         }
         if (count($shippingListFromQuoteAddress) > 1) {
             $showEachItems = true;
+        } else {
+            $validMethodCode = 0;
+            $i = 0;
+            if ($web) {
+                foreach ($itemsValidMethod as $item) {
+                    $i++;
+                    if ($i == 1) {
+                        $validMethodCode = count($item->getValidMethod());
+                    } else {
+                        if ($validMethodCode != count($item->getValidMethod())) {
+                            $showEachItems = true;
+                            break;
+                        }
+                    }
+                }
+            } else {
+                foreach ($itemsValidMethod as $item) {
+                    $i++;
+                    $validMethod = 0;
+                    foreach ($item->getShippingMethod() as $method) {
+                        if ($method->getValue() != self::NOT_AVAILABLE && !$method->getDisabled()) {
+                            $validMethod++;
+                        }
+                    }
+                    if ($i == 1) {
+                        $validMethodCode = $validMethod;
+                    } else {
+                        if ($validMethodCode != $validMethod) {
+                            $showEachItems = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
         }
         return $showEachItems;
     }
