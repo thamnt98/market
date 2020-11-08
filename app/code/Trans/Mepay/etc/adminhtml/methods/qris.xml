@@ -29,12 +29,17 @@
           <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
           <config_path>payment/trans_mepay_qris/order_status</config_path>
       </field>
-      <field id="allowspecific" translate="label" type="allowspecific" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+      <field id="order_state" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+          <label>New Order State</label>
+          <source_model>Magento\Sales\Model\Config\Source\Order\Status</source_model>
+          <config_path>payment/trans_mepay_qris/order_state</config_path>
+      </field>
+      <field id="allowspecific" translate="label" type="allowspecific" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Payment from Applicable Countries</label>
           <config_path>payment/trans_mepay_qris/allowspecific</config_path>
           <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
       </field>
-      <field id="specificcountry" translate="label" type="multiselect" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+      <field id="specificcountry" translate="label" type="multiselect" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
           <label>Payment from Specific Countries</label>
           <config_path>payment/trans_mepay_qris/specificcountry</config_path>
           <source_model>Magento\Directory\Model\Config\Source\Country</source_model>

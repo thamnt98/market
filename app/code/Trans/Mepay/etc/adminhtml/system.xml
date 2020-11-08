@@ -58,27 +58,32 @@
                     <label>Inquiry Url</label>
                     <config_path>payment/trans_mepay/inquiry_url</config_path>
                 </field>
-                <field id="status_pull_format" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="is_authcapture" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Is Authcapture</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/trans_mepay/is_authcapture</config_path>
+                </field>
+                <field id="status_pull_format" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Status Pull Format</label>
                     <config_path>payment/trans_mepay/status_pull_format</config_path>
                 </field>
-                <field id="status_pull_dynamic" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="status_pull_dynamic" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Status Pull Format Dynamic Value</label>
                     <config_path>payment/trans_mepay/status_pull_dynamic</config_path>
                 </field>
-                <field id="status_capture_init_url" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="status_capture_init_url" translate="label" type="text" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Status Pull Format</label>
                     <config_path>payment/trans_mepay/status_capture_init_url</config_path>
                 </field>
-                <field id="status_capture_init" translate="label" type="text" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="status_capture_init" translate="label" type="text" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Status Pull Format Dynamic Value</label>
                     <config_path>payment/trans_mepay/status_capture_init</config_path>
                 </field>
-                <field id="content_type" translate="label" type="text" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+                <field id="content_type" translate="label" type="text" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Content Type</label>
                     <config_path>payment/trans_mepay/content_type</config_path>
                 </field>
-                <field id="debug" translate="label" type="select" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="0">
+                <field id="debug" translate="label" type="select" sortOrder="150" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Debug</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                     <config_path>payment/trans_mepay/debug</config_path>

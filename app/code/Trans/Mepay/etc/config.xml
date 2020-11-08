@@ -26,6 +26,7 @@
                 <prod_base_url>https://api.dev.megapay.app</prod_base_url>
                 <merchant_reference_url>https://magento.com/checkout/onepage/success</merchant_reference_url>
                 <inquiry_url>/inquiries</inquiry_url>
+                <is_authcapture>1</is_authcapture>
                 <status_pull_format>/inquiries/{{inquiry_id}}/transactions/</status_pull_format>
                 <status_pull_dynamic>{{inquiry_id}}</status_pull_dynamic>
                 <status_capture_init_url>/inquiry/{{inquiry_id}}/payments/{{transaction_id}}/capture</status_capture_init_url>
@@ -41,6 +42,7 @@
                 <group>trans_mepay</group>
                 <payment_code>trans_mepay_cc</payment_code>
                 <order_status>pending_payment</order_status>
+                <order_state>new</order_state>
                 <allowspecific>1</allowspecific>
                 <payment_action>authorize</payment_action>
                 <is_gateway>1</is_gateway>
@@ -57,6 +59,7 @@
                 <group>trans_mepay</group>
                 <payment_code>trans_mepay_va</payment_code>
                 <order_status>pending_payment</order_status>
+                <order_state>new</order_state>
                 <allowspecific>1</allowspecific>
                 <payment_action>authorize</payment_action>
                 <is_gateway>1</is_gateway>
@@ -73,6 +76,7 @@
                 <group>trans_mepay</group>
                 <payment_code>trans_mepay_qris</payment_code>
                 <order_status>pending_payment</order_status>
+                <order_state>new</order_state>
                 <allowspecific>1</allowspecific>
                 <payment_action>authorize</payment_action>
                 <is_gateway>1</is_gateway>

@@ -185,6 +185,8 @@ class Status
           $this->failed->handle($transaction, $inquiry, $token);
       }
 
+      $this->saveAuthenticateCode($transaction);
+
     }
   }
 
@@ -258,6 +260,20 @@ class Status
     if(in_array($status, $mapFailed))
       return true;
     return false;
+  }
+
+  /**
+   * Save authenticate code
+   * @param  $txn
+   * @return void
+   */
+  public function saveAuthenticateCode($txn)
+  {
+    if ($txn->getAuthenticationCode()) {
+      $savedTxn = $this->transactionHelper->getTxnByTxnId($txn->getId());
+      $savedTxn->setTransMepayAuthenticateCode($txn->getAuthenticationCode());
+      $this->transactionHelper->saveTransaction($savedTxn);
+    }
   }
 
 }

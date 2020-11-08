@@ -18,7 +18,7 @@ use Trans\Mepay\Gateway\Http\AbstractTransfer;
 use Trans\Mepay\Model\Config\Config;
 use Trans\Mepay\Logger\Logger;
 
-class GetTransactionStatus extends AbstractTransfer implements TransferFactoryInterface
+class PostCaptureTransactionStatus extends AbstractTransfer
 {
     /**
      * @var TransferBuilder

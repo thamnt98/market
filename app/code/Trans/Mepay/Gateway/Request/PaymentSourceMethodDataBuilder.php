@@ -15,6 +15,7 @@ namespace Trans\Mepay\Gateway\Request;
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
 use Trans\Mepay\Model\Config\Source\Provider;
+use Trans\Mepay\Model\Config\Config;
 use Trans\Mepay\Logger\Logger;
 
 class PaymentSourceMethodDataBuilder implements BuilderInterface
@@ -42,6 +43,11 @@ class PaymentSourceMethodDataBuilder implements BuilderInterface
   private $code;
 
   /**
+   * @var Config
+   */
+  private $config;
+
+  /**
    * @var Logger
    */
   private $logger;
@@ -56,11 +62,13 @@ class PaymentSourceMethodDataBuilder implements BuilderInterface
   public function __construct(
     SubjectReader $subjectReader,
     Provider $provider,
+    Config $config,
     Logger $logger,
     string $code = ''
   ) {
       $this->subjectReader = $subjectReader;
       $this->provider = $provider;
+      $this->config = $config;
       $this->code = $code;
       $this->logger = $logger;
   }
@@ -83,10 +91,12 @@ class PaymentSourceMethodDataBuilder implements BuilderInterface
   public function getPaymentSourceMethod($source)
   {
     $method = '';
-    // switch($source) {
-    //   case $this->provider::MEGA_CC : $method = self::AUTH_CAPTURE;
-    //     break;
-    // }
+    if ((int) $this->config->getIsAuthCapture()) {
+      switch($source) {
+        case $this->provider::MEGA_CC : $method = self::AUTH_CAPTURE;
+        break;
+      }
+    }
     return $method;
   }
 }

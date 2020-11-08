@@ -15,24 +15,57 @@ namespace Trans\Mepay\Observer\Magento\Sales\Model;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Trans\Mepay\Helper\Payment\Transaction as TransactionHelper;
+use Trans\Mepay\Model\Config\Config;
 
 class Order implements ObserverInterface
 {
+  /**
+   * @var 
+   */
+  const ORDER = 'order';
+
+  /**
+   * @var 
+   */
   protected $transactionHelper;
+
+  /**
+   * @var 
+   */
   protected $orderRepo;
+
+  /**
+   * @var 
+   */
+  protected $config;
+
+  /**
+   * Constructor
+   * @param TransactionHelper        $transactionHelper 
+   * @param OrderRepositoryInterface $orderRepo         
+   * @param Config                   $config            
+   */
   public function __construct(
     TransactionHelper $transactionHelper,
-    OrderRepositoryInterface $orderRepo
+    OrderRepositoryInterface $orderRepo,
+    Config $config
   ) {
     $this->transactionHelper = $transactionHelper;
     $this->orderRepo = $orderRepo;
+    $this->config = $config;
   }
 
+  /**
+   * Execute
+   * @param  \Magento\Framework\Event\Observer $observer 
+   * @return void
+   */
   public function execute(\Magento\Framework\Event\Observer $observer)
   {
-    $order= $observer->getData('order');
-    $order->setState('new');
-    $order->setStatus('pending_payment');
+    $order= $observer->getData(self::ORDER);
+    $payment = $order->getPayment();
+    $order->setState($this->config->getOrderState($payment->getMethod()));
+    $order->setStatus($this->config->getOrderStatus($payment->getMethod()));
     $this->orderRepo->save($order);
   }
 }

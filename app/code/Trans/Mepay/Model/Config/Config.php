@@ -69,6 +69,11 @@
    const PAYMENT_TRANS_MEPAY_INQUIRY_URL = 'payment/trans_mepay/inquiry_url';
 
    /**
+    * @var string
+    */
+   const PAYMENT_TRANS_MEPAY_IS_AUTHCAPTURE = 'payment/trans_mepay/is_authcapture';
+
+   /**
     * @var  string
     */
    const PAYMENT_TRANS_MEPAY_STATUS_PULL_FORMAT = 'payment/trans_mepay/status_pull_format';
@@ -111,6 +116,11 @@
    /**
     * @var string
     */
+   const PAYMENT_TRANS_MEPAY_CC_ORDER_STATE = 'payment/trans_mepay_cc/order_state';
+
+   /**
+    * @var string
+    */
    const PAYMENT_TRANS_MEPAY_VA_ACTIVE = 'payment/trans_mepay_va/active';
 
    /**
@@ -126,6 +136,11 @@
    /**
     * @var string
     */
+   const PAYMENT_TRANS_MEPAY_VA_ORDER_STATE = 'payment/trans_mepay_va/order_state';
+
+   /**
+    * @var string
+    */
    const PAYMENT_TRANS_MEPAY_QRIS_ACTIVE = 'payment/trans_mepay_qris/active';
 
    /**
@@ -137,6 +152,11 @@
     * @var string
     */
    const PAYMENT_TRANS_MEPAY_QRIS_ORDER_STATUS = 'payment/trans_mepay_qris/order_status';
+
+   /**
+    * @var string
+    */
+   const PAYMENT_TRANS_MEPAY_QRIS_ORDER_STATE = 'payment/trans_mepay_qris/order_state';
 
    /**
     * @var string
@@ -269,6 +289,15 @@
     }
 
     /**
+     * Get Is Auth Capture
+     * @return string
+     */
+    public function getIsAuthCapture()
+    {
+      return $this->getValue(self::PAYMENT_TRANS_MEPAY_IS_AUTHCAPTURE);
+    }
+
+    /**
      * Get status pull format
      * @return string
      */
@@ -358,6 +387,25 @@
           break;
       }
       return $status;
+    }
+
+    /**
+     * Get order state
+     * @param  string $paymentCode
+     * @return string
+     */
+    public function getOrderState($paymentCode)
+    {
+      $state = '';
+      switch($paymentCode) {
+        case Cc::CODE_CC : $state = $this->getValue(self::PAYMENT_TRANS_MEPAY_CC_ORDER_STATE);
+          break;
+        case Va::CODE_VA : $state = $this->getValue(self::PAYMENT_TRANS_MEPAY_VA_ORDER_STATE);
+          break;
+        case Qris::CODE_QRIS : $state = $this->getValue(self::PAYMENT_TRANS_MEPAY_QRIS_ORDER_STATE);
+          break;
+      }
+      return $state;
     }
 
     /**
