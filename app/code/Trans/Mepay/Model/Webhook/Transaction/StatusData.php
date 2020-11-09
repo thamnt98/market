@@ -103,7 +103,7 @@ class StatusData extends DataObject implements TransactionStatusDataInterface
    * Get card network
    * @return string
    */
-  public function getCardNetwrork()
+  public function getCardNetwork()
   {
     return $this->_getData(TransactionStatusDataInterface::CARD_NETWORK);
   }

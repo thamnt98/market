@@ -136,7 +136,7 @@ interface TransactionStatusDataInterface
    * Get card network
    * @return string
    */
-  public function getCardNetwrork();
+  public function getCardNetwork();
 
   /**
    * Set card network
