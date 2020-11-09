@@ -13,23 +13,46 @@
 namespace Trans\MepayTransmart\Observer\Trans\IntegrationOrder\Model;
 
 use Trans\Mepay\Helper\Gateway\Http\Client\ConnectAuthCapture;
+use Trans\Mepay\Model\Config\Config;
 
 class OrderStatus 
 {
+  /**
+   * @var ConnectAuthCapture
+   */
   protected $clientHelper;
 
+  /**
+   * @var Config
+   */
+  protected $config;
+
+  /**
+   * Constructor
+   * @param ConnectAuthCapture $clientHelper
+   * @param Config             $config
+   */
   public function __construct(
-    ConnectAuthCapture $clientHelper
+    ConnectAuthCapture $clientHelper,
+    Config $config
   ) {
     $this->clientHelper = $clientHelper;
+    $this->config = $config;
   }
 
+  /**
+   * Execute
+   * @param  \Magento\Framework\Event\Observer $observer
+   * @return void
+   */
   public function execute(\Magento\Framework\Event\Observer $observer)
   {
-    $orderId = $observer->getData('order_id');
-    $newAmount = $observer->getData('new_amount');
-    $this->clientHelper->setNewAmount($newAmount);
-    $this->clientHelper->setTxnByOrderId($orderId);
-    $this->clientHelper->send();
+    if ((int) $this->config->getIsAuthCapture()) {
+      $orderId = $observer->getData('order_id');
+      $newAmount = $observer->getData('new_amount');
+      $this->clientHelper->setNewAmount($newAmount);
+      $this->clientHelper->setTxnByOrderId($orderId);
+      $this->clientHelper->send();
+    }
   }
 }
