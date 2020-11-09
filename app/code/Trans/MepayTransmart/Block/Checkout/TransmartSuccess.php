@@ -133,8 +133,10 @@ class TransmartSuccess extends Success
     {
       $txn = $this->transactionHelper->getLastOrderTransaction($this->order->getId());
       $txnData = $txn->getData();
-      if (isset($txnData['txn_type']) && $txnData['txn_type'] == 'capture') {
-        return true;
+      if (isset($txnData['txn_type'])) {
+        if ($txnData['txn_type'] == 'authorization' && $txnData['txn_type'] == 'capture') {
+          return true;
+        }
       }
       return false;
     }
