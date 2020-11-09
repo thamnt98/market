@@ -18,7 +18,7 @@
  use Trans\Mepay\Model\Config\Provider\Mepay;
  use Trans\Mepay\Model\Config\Provider\Cc;
  use Trans\Mepay\Model\Config\Provider\Va;
- use Trans\Mepay\Model\Config\Provide\Qris;
+ use Trans\Mepay\Model\Config\Provider\Qris;
  use Trans\Mepay\Logger\Logger;
 
  class Config
