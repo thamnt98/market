@@ -15,10 +15,10 @@
  use Magento\Framework\App\Config\ScopeConfigInterface;
  use Magento\Store\Model\ScopeInterface;
  use Trans\Mepay\Model\Config\Source\Environment;
- use Provider\Mepay;
- use Provider\Cc;
- use Provider\Va;
- use Provide\Qris;
+ use Trans\Mepay\Model\Config\Provider\Mepay;
+ use Trans\Mepay\Model\Config\Provider\Cc;
+ use Trans\Mepay\Model\Config\Provider\Va;
+ use Trans\Mepay\Model\Config\Provide\Qris;
  use Trans\Mepay\Logger\Logger;
 
  class Config

@@ -26,7 +26,7 @@
                 <prod_base_url>https://api.dev.megapay.app</prod_base_url>
                 <merchant_reference_url>https://magento.com/checkout/onepage/success</merchant_reference_url>
                 <inquiry_url>/inquiries</inquiry_url>
-                <is_authcapture>1</is_authcapture>
+                <is_authcapture>0</is_authcapture>
                 <status_pull_format>/inquiries/{{inquiry_id}}/transactions/</status_pull_format>
                 <status_pull_dynamic>{{inquiry_id}}</status_pull_dynamic>
                 <status_capture_init_url>/inquiry/{{inquiry_id}}/payments/{{transaction_id}}/capture</status_capture_init_url>

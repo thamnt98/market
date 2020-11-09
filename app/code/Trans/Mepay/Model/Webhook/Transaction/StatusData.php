@@ -165,4 +165,21 @@ class StatusData extends DataObject implements TransactionStatusDataInterface
   {
     $this->setData(TransactionStatusDataInterface::VA_NUMBER, $data);
   }
+
+  /**
+   * @inheritdoc
+   */
+  public function getProcessingCode()
+  {
+    return $this->_getData(TransactionStatusDataInterface::PROCESSING_CODE); 
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function setProcessingCode($data) {
+    $this->setData(TransactionStatusDataInterface::PROCESSING_CODE, $data);
+  }
+
+
 }

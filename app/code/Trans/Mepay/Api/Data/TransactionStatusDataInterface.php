@@ -66,6 +66,7 @@ interface TransactionStatusDataInterface
    */
   const VA_NUMBER = 'vaNumber';
 
+
 /**
    * Get message
    * @return string
@@ -180,4 +181,16 @@ interface TransactionStatusDataInterface
    * @param string $data
    */
   public function setVaNumber($data);
+
+  /**
+   * Get processing code
+   * @return string
+   */
+  public function getProcessingCode();
+
+  /**
+   * Set processing code
+   * @param string $data
+   */
+  public function setProcessingCode($data);
 }
