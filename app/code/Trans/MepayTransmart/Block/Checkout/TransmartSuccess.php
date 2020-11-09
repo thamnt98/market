@@ -28,8 +28,34 @@ use Magento\Sales\Model\ResourceModel\Order\CollectionFactory;
 class TransmartSuccess extends Success
 {
 
+  /**
+   * @var \Trans\Mepay\Helper\Payment\Transaction
+   */
   protected $transactionHelper;
 
+  /**
+   * Constructor
+   * @param Context                              $context                     
+   * @param Session                              $checkoutSession             
+   * @param OrderConfig                          $orderConfig                 
+   * @param HttpContext                          $httpContext                 
+   * @param SprintResponseRepositoryInterface    $sprintResponseRepository    
+   * @param SprintPaymentFlagRepositoryInterface $sprintPaymentFlagRepository 
+   * @param Config                               $config                      
+   * @param SprintHelper                         $paymentLogo                 
+   * @param SprintHelperData                     $sprintHelperData            
+   * @param PriceHelperData                      $priceHelper                 
+   * @param DateTime                             $date                        
+   * @param TimezoneInterface                    $timezone                    
+   * @param SourceRepositoryInterface            $sourceRepository            
+   * @param CheckoutConfigHelper                 $checkoutConfigHelper        
+   * @param Image                                $image                       
+   * @param CityRepository                       $cityRepository              
+   * @param DistrictRepository                   $districtRepository          
+   * @param Payment                              $paymentHelper               
+   * @param CollectionFactory                    $orderCollectionFactory      
+   * @param array                                $data                        
+   */
   public function __construct (
     Context $context,
     Session $checkoutSession,
@@ -52,8 +78,8 @@ class TransmartSuccess extends Success
     CollectionFactory $orderCollectionFactory,
     array $data = []
   ) {
-      $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-      $this->transactionHelper = $objectManager->create('Trans\Mepay\Helper\Payment\Transaction');
+    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+    $this->transactionHelper = $objectManager->create('Trans\Mepay\Helper\Payment\Transaction');
     parent::__construct(
       $context,
       $checkoutSession,
@@ -78,6 +104,10 @@ class TransmartSuccess extends Success
     );
   }
 
+  /**
+   * Is payment success
+   * @return boolean
+   */
   public function isSucceed()
     {
         $paymentMethod = $this->getPaymentMethod();
@@ -95,10 +125,14 @@ class TransmartSuccess extends Success
         return $this->paymentHelper->isCredit($paymentMethod) || $this->paymentHelper->isInstallment($paymentMethod) || ($this->paymentHelper->isVirtualAccount($paymentMethod) && $this->isPaid());
     }
 
+    /**
+     * Is order has capture
+     * @return boolean
+     */
     public function checkOrderIsCaptured()
     {
       $txn = $this->transactionHelper->getLastOrderTransaction($this->order->getId());
-      $txtnData = $txn->getData();
+      $txnData = $txn->getData();
       if (isset($txnData['txn_type']) && $txnData['txn_type'] == 'capture') {
         return true;
       }
