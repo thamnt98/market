@@ -18,6 +18,7 @@
         <module name="Trans_Mepay"/>
         <module name="Trans_Sprint"/>
         <module name="Trans_IntegrationOrder"/>
+        <module name="SM_Checkout" />
       </sequence>
     </module>
 </config>

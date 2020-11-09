@@ -17,4 +17,5 @@
   <preference for="Trans\Mepay\Controller\Payment\Callbacks" type="Trans\MepayTransmart\Controller\Payment\TransmartCallbacks" />
   <preference for="Trans\Mepay\Model\Payment\Status\Capture" type="Trans\MepayTransmart\Model\Payment\Status\TransmartCapture" />
   <preference for="Trans\Mepay\Model\Payment\Status\Failed" type="Trans\MepayTransmart\Model\Payment\Status\TransmartFailed" />
+  <preference for="SM\Checkout\Block\Checkout\Success" type="Trans\MepayTransmart\Block\Checkout\TransmartSuccess" />
 </config>
