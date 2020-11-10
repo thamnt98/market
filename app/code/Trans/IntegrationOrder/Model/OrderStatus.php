@@ -530,38 +530,6 @@ class OrderStatus implements OrderStatusInterface {
 			}
 			/* End CC Bank Mega Auth Capture*/
 
-			/* Start Non CC*/
-			if ($paymentMethod === 'sprint_bca_va' || 'sprint_permata_va') {
-
-				/* update quantity adjusment */
-				$url            = $this->orderConfig->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
-				$headers        = $this->getHeader();
-				$dataAdjustment = array(
-					'reference_number' => $reffId,
-					'status' => 3,
-					'amount_adjustment' => $matrixAdjusmentAmount,
-
-				);
-				$dataJson = json_encode($dataAdjustment);
-				$this->loggerOrder->info($dataJson);
-
-				$this->curl->setOption(CURLOPT_RETURNTRANSFER, true);
-				$this->curl->setOption(CURLOPT_CUSTOMREQUEST, 'PATCH');
-				$this->curl->setHeaders($headers);
-				$this->curl->post($url, $dataJson);
-				$responseOrder = $this->curl->getBody();
-				$this->loggerOrder->info('$headers : ' . json_encode($headers));
-				$this->loggerOrder->info('$responseOrder : ' . $responseOrder);
-				$objOrder = json_decode($response);
-				$this->loggerOrder->info('Body: ' . $dataJson . '. Response: ' . $responseOrder);
-				$json_string = stripcslashes($responseOrder);
-				if ($objOrder->code == 200) {
-					return json_decode($responseOrder, true);
-				}
-			}
-
-			/* End Non CC*/
-
 			if ($paymentMethod === 'sprint_mega_cc' || 'sprint_allbankfull_cc' || 'sprint_mega_debit') {
 				if ($itemData['quantity'] > $itemData['quantity_allocated']) {
 					$this->helperData->sprintLog()->info('===== Capture Process ===== Start');
@@ -679,6 +647,36 @@ class OrderStatus implements OrderStatusInterface {
 					}
 				}
 			}
+			/* Start Non CC*/
+			if ($paymentMethod === 'sprint_bca_va' || 'sprint_permata_va') {
+
+				/* update quantity adjusment */
+				$url            = $this->orderConfig->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
+				$headers        = $this->getHeader();
+				$dataAdjustment = array(
+					'reference_number' => $reffId,
+					'status' => 3,
+					'amount_adjustment' => $matrixAdjusmentAmount,
+
+				);
+				$dataJson = json_encode($dataAdjustment);
+				$this->loggerOrder->info($dataJson);
+
+				$this->curl->setOption(CURLOPT_RETURNTRANSFER, true);
+				$this->curl->setOption(CURLOPT_CUSTOMREQUEST, 'PATCH');
+				$this->curl->setHeaders($headers);
+				$this->curl->post($url, $dataJson);
+				$responseOrder = $this->curl->getBody();
+				$this->loggerOrder->info('$headers : ' . json_encode($headers));
+				$this->loggerOrder->info('$responseOrder : ' . $responseOrder);
+				$objOrder = json_decode($response);
+				$this->loggerOrder->info('Body: ' . $dataJson . '. Response: ' . $responseOrder);
+				$json_string = stripcslashes($responseOrder);
+				if ($objOrder->code == 200) {
+					return json_decode($responseOrder, true);
+				}
+			}
+			/* End Non CC*/
 		}
 
 		/* =================== END CAPTURE REFUND =======================*/
