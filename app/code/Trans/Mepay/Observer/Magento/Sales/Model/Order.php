@@ -14,6 +14,8 @@ namespace Trans\Mepay\Observer\Magento\Sales\Model;
 
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Api\Data\OrderStatusHistoryInterfaceFactory;
+use Magento\Sales\Api\OrderStatusHistoryRepositoryInterface;
 use Trans\Mepay\Helper\Payment\Transaction as TransactionHelper;
 use Trans\Mepay\Model\Config\Config;
 
@@ -39,6 +41,10 @@ class Order implements ObserverInterface
    */
   protected $config;
 
+  protected $statusHistory;
+
+  protected $statusHistoryRepo;
+
   /**
    * Constructor
    * @param TransactionHelper        $transactionHelper 
@@ -48,9 +54,13 @@ class Order implements ObserverInterface
   public function __construct(
     TransactionHelper $transactionHelper,
     OrderRepositoryInterface $orderRepo,
+    OrderStatusHistoryInterfaceFactory $statusHistory,
+    OrderStatusHistoryRepositoryInterface $statusHistoryRepo,
     Config $config
   ) {
     $this->transactionHelper = $transactionHelper;
+    $this->statusHistory = $statusHistory;
+    $this->statusHistoryRepo = $statusHistoryRepo;
     $this->orderRepo = $orderRepo;
     $this->config = $config;
   }
@@ -62,10 +72,16 @@ class Order implements ObserverInterface
    */
   public function execute(\Magento\Framework\Event\Observer $observer)
   {
+    //set order state & status
     $order= $observer->getData(self::ORDER);
     $payment = $order->getPayment();
     $order->setState($this->config->getOrderState($payment->getMethod()));
     $order->setStatus($this->config->getOrderStatus($payment->getMethod()));
     $this->orderRepo->save($order);
+    //set order history status
+    $statusHistory = $this->statusHistory->create();
+    $statusHistory->setParentId($order->getId());
+    $statusHistory->setStatus($this->config->getOrderStatus($payment->getMethod()));
+    $this->statusHistoryRepo->save($statusHistory);
   }
 }
