@@ -378,6 +378,7 @@ class OrderStatus implements OrderStatusInterface {
 		}
 		$orderItem    = [];
 		$allocatedQty = 0;
+		$qtyOrdered   = 0;
 		foreach ($orderItems as $itemData) {
 			$item['sku']                = $itemData['sku'];
 			$item['quantity']           = $itemData['quantity'];
@@ -385,6 +386,7 @@ class OrderStatus implements OrderStatusInterface {
 			$item['item_status']        = $itemData['item_status'];
 
 			$allocatedQty += $itemData['quantity_allocated'];
+			$qtyOrdered += $itemData['quantity'];
 
 			$orderItem[] = $item;
 		}
@@ -420,7 +422,7 @@ class OrderStatus implements OrderStatusInterface {
 				$itemOrder->setQtyAllocated($item['quantity_allocated']);
 				$itemOrder->setItemStatus($item['item_status']);
 			}
-			// if ($itemOrder->getQty() != $item['quantity']) {
+			// if ($itemOrder->getQty() != $qtyOrdered) {
 			// 	throw new \Magento\Framework\Webapi\Exception(__('Invalid quantity order. Please checking again.'), 400);
 			// }
 			if ($item['quantity_allocated'] > $itemOrder->getQty()) {
@@ -518,10 +520,13 @@ class OrderStatus implements OrderStatusInterface {
 		if ($status == 2 && $action == 2 && $subAction == 7) {
 			/* Start CC Bank Mega Auth Capture*/
 			if ($paymentMethod === 'trans_mepay_cc') {
+				$paidPriceOrder = 0;
+				$qtyOrder       = 0;
+				$qtyAllocated   = 0;
 				foreach ($loadItemByOrderId as $itemOrder) {
-					$paidPriceOrder        = $itemOrder->getPaidPrice();
-					$qtyOrder              = $itemOrder->getQty();
-					$qtyAllocated          = $itemOrder->getQtyAllocated();
+					$paidPriceOrder += $itemOrder->getPaidPrice();
+					$qtyOrder += $itemOrder->getQty();
+					$qtyAllocated += $allocatedQty;
 					$matrixAdjusmentAmount = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 				}
 				$this->eventManager->dispatch(
@@ -611,10 +616,13 @@ class OrderStatus implements OrderStatusInterface {
 						/**
 						 * prepare data array refund send to PG
 						 */
+						$paidPriceOrder = 0;
+						$qtyOrder       = 0;
+						$qtyAllocated   = 0;
 						foreach ($loadItemByOrderId as $itemOrder) {
-							$paidPriceOrder        = $itemOrder->getPaidPrice();
-							$qtyOrder              = $itemOrder->getQty();
-							$qtyAllocated          = $itemOrder->getQtyAllocated();
+							$paidPriceOrder += $itemOrder->getPaidPrice();
+							$qtyOrder += $itemOrder->getQty();
+							$qtyAllocated += $allocatedQty;
 							$matrixAdjusmentAmount = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 						}
 						$refTrxNumber = RefundInterface::PREFIX_REFUND . $this->helperData->genRefNumber() . $orderId;
