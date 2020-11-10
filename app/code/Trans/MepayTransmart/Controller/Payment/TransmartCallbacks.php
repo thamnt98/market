@@ -32,6 +32,10 @@ class TransmartCallbacks extends Callbacks
       $orderId = $this->getOrderId();
       $order = $this->transaction->getOrder($orderId);
       if ($this->checkOrderCreated($order)) {
+        $txn = $this->transaction->getLastOrderTransaction($orderId);
+        if ($txn['txn_type'] == 'authorization') {
+          return $resultRedirect->setPath(''); 
+        }
         $this->checkoutSession->setIsSucceed(1);
         $resultRedirect->setPath(
           'transcheckout/index/success'
