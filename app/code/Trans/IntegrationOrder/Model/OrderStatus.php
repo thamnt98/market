@@ -520,11 +520,10 @@ class OrderStatus implements OrderStatusInterface {
 			if ($paymentMethod === 'trans_mepay_cc') {
 				$paidPriceOrder = 0;
 				$qtyOrder       = 0;
-				$qtyAllocated   = 0;
 				foreach ($loadItemByOrderId as $itemOrder) {
 					$paidPriceOrder += $itemOrder->getPaidPrice();
 					$qtyOrder += $itemOrder->getQty();
-					$qtyAllocated += $allocatedQty;
+					$qtyAllocated          = $allocatedQty;
 					$matrixAdjusmentAmount = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 				}
 				$this->eventManager->dispatch(
@@ -542,11 +541,10 @@ class OrderStatus implements OrderStatusInterface {
 			if ($paymentMethod === 'sprint_bca_va' || 'sprint_permata_va') {
 				$paidPriceOrder = 0;
 				$qtyOrder       = 0;
-				$qtyAllocated   = 0;
 				foreach ($loadItemByOrderId as $itemOrder) {
 					$paidPriceOrder += $itemOrder->getPaidPrice();
 					$qtyOrder += $itemOrder->getQty();
-					$qtyAllocated += $allocatedQty;
+					$qtyAllocated          = $allocatedQty;
 					$matrixAdjusmentAmount = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 				}
 				/* update quantity adjusment */
@@ -616,11 +614,10 @@ class OrderStatus implements OrderStatusInterface {
 						 */
 						$paidPriceOrder = 0;
 						$qtyOrder       = 0;
-						$qtyAllocated   = 0;
 						foreach ($loadItemByOrderId as $itemOrder) {
 							$paidPriceOrder += $itemOrder->getPaidPrice();
 							$qtyOrder += $itemOrder->getQty();
-							$qtyAllocated += $allocatedQty;
+							$qtyAllocated          = $allocatedQty;
 							$matrixAdjusmentAmount = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 						}
 						$refTrxNumber = RefundInterface::PREFIX_REFUND . $this->helperData->genRefNumber() . $orderId;
