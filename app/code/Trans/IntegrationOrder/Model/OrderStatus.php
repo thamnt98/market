@@ -416,9 +416,9 @@ class OrderStatus implements OrderStatusInterface {
 				$itemOrder->setQtyAllocated($item['quantity_allocated']);
 				$itemOrder->setItemStatus($item['item_status']);
 			}
-			// if ($itemOrder->getQty() != $item['quantity']) {
-			// 	throw new \Magento\Framework\Webapi\Exception(__('Invalid quantity order. Please checking again.'), 400);
-			// }
+			if ($itemOrder->getQty() != $item['quantity']) {
+				throw new \Magento\Framework\Webapi\Exception(__('Invalid quantity order. Please checking again.'), 400);
+			}
 			if ($item['quantity_allocated'] > $itemOrder->getQty()) {
 				throw new \Magento\Framework\Webapi\Exception(__('Quantity allocated is greater than quantity order. Please checking again.'), 400);
 			}
@@ -500,12 +500,13 @@ class OrderStatus implements OrderStatusInterface {
 		/**
 		 * preparing data for refund PG
 		 */
-		$paymentMethod = $loadDataOrder->getPayment()->getMethod();
-		$channelId     = $this->configPg->getPaymentChannelId($paymentMethod);
-		$serviceCode   = $this->configPg->getPaymentChannelRefundServicecode($paymentMethod);
-		$reffId        = $idsOrder->getReferenceNumber();
-		$trxAmount     = (int) $loadDataOrder->getGrandTotal();
-		$url           = $this->configPg->getApiBaseUrl($paymentMethod) . '/' . Config::REFUND_POST_URL;
+		$paymentMethod     = $loadDataOrder->getPayment()->getMethod();
+		$channelId         = $this->configPg->getPaymentChannelId($paymentMethod);
+		$serviceCode       = $this->configPg->getPaymentChannelRefundServicecode($paymentMethod);
+		$reffId            = $idsOrder->getReferenceNumber();
+		$trxAmount         = (int) $loadDataOrder->getGrandTotal();
+		$url               = $this->configPg->getApiBaseUrl($paymentMethod) . '/' . Config::REFUND_POST_URL;
+		$loadItemByOrderId = $this->statusRepo->loadByOrderId($orderId);
 
 		/**
 		 * trigger capture - refund by payment method
@@ -513,7 +514,7 @@ class OrderStatus implements OrderStatusInterface {
 		if ($status == 2 && $action == 2 && $subAction == 7) {
 			/* Start CC Bank Mega Auth Capture*/
 			if ($paymentMethod === 'trans_mepay_cc') {
-				foreach ($orderItems as $item) {
+				foreach ($loadItemByOrderId as $itemOrder) {
 					$paidPriceOrder        = $itemOrder->getPaidPrice();
 					$qtyOrder              = $itemOrder->getQty();
 					$qtyAllocated          = $itemOrder->getQtyAllocated();
@@ -532,26 +533,21 @@ class OrderStatus implements OrderStatusInterface {
 
 			/* Start Non CC*/
 			if ($paymentMethod === 'sprint_bca_va' || 'sprint_permata_va') {
-				$paidPriceOrder        = 0;
-				$qtyOrder              = 0;
-				$qtyAllocated          = 0;
-				$matrixAdjusmentAmount = 0;
-				foreach ($orderItems as $item) {
-					$paidPriceOrder += $itemOrder->getPaidPrice();
-					$qtyOrder += $itemOrder->getQty();
-					$qtyAllocated += $itemOrder->getQtyAllocated();
-					$matrixAdjusmentAmount += ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
-
-					/* update quantity adjusment */
-					$url            = $this->orderConfig->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
-					$headers        = $this->getHeader();
-					$dataAdjustment = array(
-						'reference_number' => $reffId,
-						'status' => 3,
-						'amount_adjustment' => $matrixAdjusmentAmount,
-
-					);
+				foreach ($loadItemByOrderId as $itemOrder) {
+					$paidPriceOrder        = $itemOrder->getPaidPrice();
+					$qtyOrder              = $itemOrder->getQty();
+					$qtyAllocated          = $itemOrder->getQtyAllocated();
+					$matrixAdjusmentAmount = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 				}
+				/* update quantity adjusment */
+				$url            = $this->orderConfig->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
+				$headers        = $this->getHeader();
+				$dataAdjustment = array(
+					'reference_number' => $reffId,
+					'status' => 3,
+					'amount_adjustment' => $matrixAdjusmentAmount,
+
+				);
 				$dataJson = json_encode($dataAdjustment);
 				$this->loggerOrder->info($dataJson);
 
@@ -608,7 +604,7 @@ class OrderStatus implements OrderStatusInterface {
 						/**
 						 * prepare data array refund send to PG
 						 */
-						foreach ($orderItems as $item) {
+						foreach ($loadItemByOrderId as $itemOrder) {
 							$paidPriceOrder        = $itemOrder->getPaidPrice();
 							$qtyOrder              = $itemOrder->getQty();
 							$qtyAllocated          = $itemOrder->getQtyAllocated();
