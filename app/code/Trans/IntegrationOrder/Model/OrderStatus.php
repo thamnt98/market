@@ -376,13 +376,17 @@ class OrderStatus implements OrderStatusInterface {
 		if (!$idsOrder->getOrderId()) {
 			throw new \Magento\Framework\Webapi\Exception(__('Order ID doesn\'t exist, please make sure again.'));
 		}
-		$orderItem = [];
+		$orderItem    = [];
+		$allocatedQty = 0;
 		foreach ($orderItems as $itemData) {
 			$item['sku']                = $itemData['sku'];
 			$item['quantity']           = $itemData['quantity'];
 			$item['quantity_allocated'] = $itemData['quantity_allocated'];
 			$item['item_status']        = $itemData['item_status'];
-			$orderItem[]                = $item;
+
+			$allocatedQty += $itemData['quantity_allocated'];
+
+			$orderItem[] = $item;
 		}
 		$request = array(
 			'order_id' => $orderId,
@@ -539,7 +543,7 @@ class OrderStatus implements OrderStatusInterface {
 				foreach ($loadItemByOrderId as $itemOrder) {
 					$paidPriceOrder += $itemOrder->getPaidPrice();
 					$qtyOrder += $itemOrder->getQty();
-					$qtyAllocated += $itemData['quantity_allocated'];
+					$qtyAllocated += $allocatedQty;
 					$matrixAdjusmentAmount = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 				}
 				/* update quantity adjusment */
