@@ -557,7 +557,7 @@ class OrderStatus implements OrderStatusInterface {
 				$responseOrder = $this->curl->getBody();
 				$this->loggerOrder->info('$headers : ' . json_encode($headers));
 				$this->loggerOrder->info('$responseOrder : ' . $responseOrder);
-				$objOrder = json_decode($response);
+				$objOrder = json_decode($responseOrder);
 				$this->loggerOrder->info('Body: ' . $dataJson . '. Response: ' . $responseOrder);
 				$json_string = stripcslashes($responseOrder);
 				if ($objOrder->code == 200) {
@@ -652,7 +652,7 @@ class OrderStatus implements OrderStatusInterface {
 						$responseOrder = $this->curl->getBody();
 						$this->loggerOrder->info('$headers : ' . json_encode($headers));
 						$this->loggerOrder->info('$responseOrder : ' . $responseOrder);
-						$objOrder = json_decode($response);
+						$objOrder = json_decode($responseOrder);
 						$this->loggerOrder->info('Body: ' . $dataJson . '. Response: ' . $responseOrder);
 						$json_string = stripcslashes($responseOrder);
 						if ($objOrder->code == 200) {
