@@ -378,7 +378,6 @@ class OrderStatus implements OrderStatusInterface {
 		}
 		$orderItem    = [];
 		$allocatedQty = 0;
-		$qtyOrdered   = 0;
 		foreach ($orderItems as $itemData) {
 			$item['sku']                = $itemData['sku'];
 			$item['quantity']           = $itemData['quantity'];
@@ -386,7 +385,6 @@ class OrderStatus implements OrderStatusInterface {
 			$item['item_status']        = $itemData['item_status'];
 
 			$allocatedQty += $itemData['quantity_allocated'];
-			$qtyOrdered += $itemData['quantity'];
 
 			$orderItem[] = $item;
 		}
