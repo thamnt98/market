@@ -1,0 +1,28 @@
+<div class="wrapper-payment " data-block="success">
+  <div class="success-payment">
+      <p class="status-payment"><?= $block->escapeHtml(__('Payment Pending!')) ?></p>
+      <p class="text-label-body"><?= $block->getCreatedAt() ?></p>
+  </div>
+  <div class="total-payment">
+        <label class="text-label-body"><?= $block->escapeHtml(__('Total Payment')) ?></label>
+        <p class="text-body"><?= $block->getGrandTotal() ?></p>
+    </div>
+
+    <div class="total-payment payment-method">
+        <label class="text-label-body"><?= $block->escapeHtml(__('Payment Method')) ?></label>
+        <div class="virtual-account">
+            <?php
+            if (!empty($block->getLogoPayment())) :
+                ?>
+                <img src='<?= $block->getLogoPayment() ?>' alt=""  height="40"/>
+            <?php
+            else:
+                ?>
+                <span class="text-label-body"><?= $block->getTitlePaymentMethod() ?></span>
+
+            <?php
+            endif;
+            ?>
+        </div>
+    </div>
+</div>

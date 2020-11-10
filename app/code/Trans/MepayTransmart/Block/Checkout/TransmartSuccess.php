@@ -34,6 +34,11 @@ class TransmartSuccess extends Success
   protected $transactionHelper;
 
   /**
+   * @var \Trans\Mepay\Model\Payment\Status
+   */
+  protected $statusCheck;
+
+  /**
    * Constructor
    * @param Context                              $context                     
    * @param Session                              $checkoutSession             
@@ -80,6 +85,7 @@ class TransmartSuccess extends Success
   ) {
     $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
     $this->transactionHelper = $objectManager->create('Trans\Mepay\Helper\Payment\Transaction');
+    $this->statusCheck = $objectManager->create('Trans\Mepay\Model\Payment\Status');
     parent::__construct(
       $context,
       $checkoutSession,
@@ -113,28 +119,41 @@ class TransmartSuccess extends Success
         $paymentMethod = $this->getPaymentMethod();
 
         if ($paymentMethod == 'trans_mepay_va') {
-          return $this->checkOrderIsCaptured();
+          return $this->isCaptured();
         }
         if ($paymentMethod == 'trans_mepay_cc') {
-          return $this->checkOrderIsCaptured();
+          return $this->isCaptured();
         }
         if ($paymentMethod == 'trans_mepay_qris') {
-          return $this->checkOrderIsCaptured();
+          return $this->isCaptured();
         }
 
         return $this->paymentHelper->isCredit($paymentMethod) || $this->paymentHelper->isInstallment($paymentMethod) || ($this->paymentHelper->isVirtualAccount($paymentMethod) && $this->isPaid());
+    }
+
+    public function isPending()
+    {
+      $txn = $this->transactionHelper->getLastOrderTransaction($this->order->getId());
+      $txnData = $txn->getData();
+      if (isset($txnData['txn_type'])) {
+        if ($this->statusCheck->isAuthorize($txnData['txn_type'])) {
+          return true;
+        }
+      }
+      return false;
+
     }
 
     /**
      * Is order has capture
      * @return boolean
      */
-    public function checkOrderIsCaptured()
+    public function isCaptured()
     {
       $txn = $this->transactionHelper->getLastOrderTransaction($this->order->getId());
       $txnData = $txn->getData();
       if (isset($txnData['txn_type'])) {
-        if ($txnData['txn_type'] == 'authorization' || $txnData['txn_type'] == 'capture') {
+        if ($this->statusCheck->isCapture($txnData['txn_type'])) {
           return true;
         }
       }
