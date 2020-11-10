@@ -179,4 +179,9 @@
         <plugin name="SM_Checkout::CollectTotalServiceFee"
                 type="SM\Checkout\Plugin\TransSprint\Model\Total\ServiceFee" />
     </type>
+
+    <type name="Trans\Sprint\Api\PaymentNotifyInterface">
+        <plugin name="SM_Checkout::SprintPaymentSendEmail"
+                type="SM\Checkout\Plugin\TransSprint\Model\PaymentSendEmail" />
+    </type>
 </config>

@@ -92,11 +92,10 @@ define(
                 mod.container.find('.confirmation span').removeClass('disable-forcus');
                 mod.container.find('#password-strength-meter').removeClass('disable-forcus');
             });
-
             var urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('recovery')) {
+            if (urlParams.has('recoverytoken')) {
                 mod.container.modal('openModal').on('modalclosed', function() {
-                    $('#tab-login').modal('openModal').show();
+                    $('.sign-link a').trigger('click');
                 });
             }
         };

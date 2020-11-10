@@ -154,7 +154,11 @@ class ReviewSaveAfter implements ObserverInterface
             $data = [
                 'value' => $sum,
             ];
-            $this->connection->update($tableName, $data, "`row_id`='{$rowId}'");
+            $this->connection->update(
+                $tableName,
+                $data,
+                "`row_id`='{$rowId}' AND `attribute_id`='{$ratingAttributeId}' AND `store_id`='{$store}'"
+            );
         }
     }
 

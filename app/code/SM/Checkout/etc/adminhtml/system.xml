@@ -182,6 +182,66 @@
 
                 </group>
             </group>
+            <group id="email" translate="label" type="text" sortOrder="999"
+                   showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Email Template</label>
+                <group id="payment_success_physical" translate="label" sortOrder="0" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Payment Success</label>
+                    <field id="template" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1"
+                           showInStore="1" canRestore="1">
+                        <label>Email Template</label>
+                        <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    </field>
+                    <field id="sender" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0"
+                           showInStore="0" canRestore="1">
+                        <label>Sender</label>
+                        <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                    </field>
+                </group>
+                <group id="payment_expired" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Payment Fail Expired</label>
+                    <field id="template" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1"
+                           showInStore="1" canRestore="1">
+                        <label>Email Template</label>
+                        <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    </field>
+                    <field id="sender" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0"
+                           showInStore="0" canRestore="1">
+                        <label>Sender</label>
+                        <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                    </field>
+                </group>
+                <group id="payment_bank_reject" translate="label" sortOrder="20" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Reject By Bank</label>
+                    <field id="template" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1"
+                           showInStore="1" canRestore="1">
+                        <label>Email Template</label>
+                        <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    </field>
+                    <field id="sender" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0"
+                           showInStore="0" canRestore="1">
+                        <label>Sender</label>
+                        <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                    </field>
+                </group>
+                <group id="payment_system_failed" translate="label" sortOrder="30" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>System Failed</label>
+                    <field id="template" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1"
+                           showInStore="1" canRestore="1">
+                        <label>Email Template</label>
+                        <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    </field>
+                    <field id="sender" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0"
+                           showInStore="0" canRestore="1">
+                        <label>Sender</label>
+                        <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                    </field>
+                </group>
+            </group>
         </section>
         <section id="sm_checkout" translate="label" sortOrder="100" showInDefault="1" showInWebsite="0"
                  showInStore="0">

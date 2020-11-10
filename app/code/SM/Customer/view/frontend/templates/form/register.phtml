@@ -226,16 +226,15 @@ if (!$block->isLoggedIn()) :?>
                     }
                 };
                 modal(options, registerContainer);
-
-                $('body').on('click', '#create-account', function() {
+                var registerModal = registerContainer.modal('openModal').show().closest('.modal-popup').addClass('modal-popup-signin')
+                validateEmail.create(registerModal);
+                validatePhone.create(registerModal);
+                fillOutCityDistrict.create(registerModal);
+                suggestPassword.create(registerModal);
+                $('#create-account').click(function (){
                     $('#tab-login').modal('closeModal');
-                    var registerModal = registerContainer.modal('openModal').show().closest('.modal-popup').addClass('modal-popup-signin');
-                    validateEmail.create(registerModal);
-                    validatePhone.create(registerModal);
-                    fillOutCityDistrict.create(registerModal);
-                    suggestPassword.create(registerModal);
+                    registerContainer.modal('openModal').show();
                 });
-
                 registerContainer.find('input').change(function () {
                     $.validator.validateSingleElement($(this));
                     let errorEmail = registerContainer.find('.mage-error[id="email-error"]');

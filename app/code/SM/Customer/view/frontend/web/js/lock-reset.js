@@ -52,7 +52,8 @@ define(
 
                         $(self.options.tabLockResetSelector).modal('openModal').on('modalclosed', function() {
                             if (self.options.login == 'false') {
-                                $('#tab-login').modal('openModal').show();
+                                //$('#tab-login').modal('openModal').show();
+                                $('.sign-link a').trigger('click');
                             }
                         }).show();
                         window.history.replaceState(null, null, window.location.pathname);

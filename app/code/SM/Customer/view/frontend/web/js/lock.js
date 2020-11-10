@@ -40,7 +40,7 @@ define(
                         };
 
                     modal(options, $(self.options.tabLockSelector));
-                    $(self.options.tabLockSelector).on('modalclosed', function() {
+                    $(self.options.tabLockSelector).modal('openModal').on('modalclosed', function() {
                         if (!$(this).hasClass('next-open')) {
                             $('#tab-login').modal('openModal').show();
                             $(this).removeClass('next-open');

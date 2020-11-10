@@ -73,7 +73,6 @@ define(
 
             mod.submit.addClass('disabled');
             mod.initInputEvent();
-
             mod.submit.on('click', function() {
                 mod.sendValidateRequest(mod.combine.val());
                 return false;
@@ -112,7 +111,7 @@ define(
                         $(this).val('');
                     }
 
-                    if (mod.currentCountDown.text() == 0 && !mod.submit.hasClass('disabled')) {
+                    if (!mod.submit.hasClass('disabled')) {
                         mod.submit.addClass('disabled');
 
                         return false;
@@ -147,11 +146,14 @@ define(
                     if (value.length === 1 && $.isNumeric(value)) {
                         let next = inputParent.find('input[name=' + $(this).data('next') + ']'),
                             errorField = $('.form-verification input.otp-input.mage-error'),
-                            emptyField = $(inputs).filter(function () {
-                                return $(this).val() == "";
-                            });
-
-                        if (errorField.length < 1 && emptyField.length < 1) {
+                            emptyField = false;
+                        mod.inputs.each(function () {
+                            if ($(this).val() == '') {
+                                emptyField = true;
+                                return false;
+                            }
+                        });
+                        if (errorField.length < 1 && !emptyField) {
                             mod.submit.removeClass('disabled');
                         } else if (!mod.submit.hasClass('disabled')) {
                             mod.submit.addClass('disabled');
@@ -160,7 +162,7 @@ define(
                         $(this).removeClass('mage-error');
                         if (next.length && $(this).data('next')) {
                             next.select();
-                        } else if (inputParent.data('autosubmit') && errorField.length < 1 && emptyField.length < 1) {
+                        } else if (inputParent.data('autosubmit') && errorField.length < 1 && !emptyField) {
                             $(this).parents('form').submit();
                         }
                     } else if (!mod.submit.hasClass('disabled')) {

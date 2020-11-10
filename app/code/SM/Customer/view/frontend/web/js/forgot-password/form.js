@@ -39,7 +39,7 @@ define(
 
         mod.initEvents = function () {
             ModalCreator.create(mod.container, 'modal-popup-forgot-password modal-popup-signin');
-
+            mod.openPopup();
             mod.input.on('change', function () {
                 mod.errorLabel.hide();
                 mod.input.removeClass('mage-error');
@@ -92,6 +92,9 @@ define(
                 else {
                     mod.submit.removeClass('disabled');
                 }
+            });
+            $('#action-forgot-password').click(function () {
+                mod.openPopup();
             });
         };
 
