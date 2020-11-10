@@ -386,7 +386,7 @@ class Config extends \Magento\Framework\App\Helper\AbstractHelper {
 			break;
 		}
 
-		if ($channel === 'credit_card' || $paymentMethod == 'sprint_bcafullpayment_cc' || $paymentMethod == 'sprint_allbankfull_cc' || $paymentMethod == 'sprint_mega_cc' || $paymentMethod == 'sprint_allbank_debit' || $paymentMethod == 'sprint_mega_debit' || $paymentMethod == 'sprint_bca_va' || $paymentMethod == 'sprint_permata_va') {
+		if ($channel === 'credit_card' || $paymentMethod == 'sprint_bcafullpayment_cc' || $paymentMethod == 'sprint_allbankfull_cc' || $paymentMethod == 'sprint_mega_cc' || $paymentMethod == 'sprint_allbank_debit' || $paymentMethod == 'sprint_mega_debit') {
 			switch ($this->isProduction()) {
 			case true:
 				$base = self::CC_PRODUCTION_BASE_URL;
