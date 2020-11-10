@@ -76,6 +76,11 @@ class Webhook extends DataObject implements WebhookInterface
   protected $logger;
 
   /**
+   * @var array
+   */
+  protected $invalidToken = ['undefined'];
+
+  /**
    * @var \Json
    */
   protected $json;
@@ -190,6 +195,9 @@ class Webhook extends DataObject implements WebhookInterface
    */
   public function received($type, $transaction, $inquiry, $token = null)
   {
+    if (in_array(strtolower($token), $this->invalidToken)) {
+      $token = null;
+    }
     $this->init($inquiry, $transaction);
     $status = $this->_validate($type);
     $this->updateTransaction($status, $transaction, $inquiry, $token);
