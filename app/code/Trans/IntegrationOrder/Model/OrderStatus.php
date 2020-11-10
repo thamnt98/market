@@ -533,10 +533,13 @@ class OrderStatus implements OrderStatusInterface {
 
 			/* Start Non CC*/
 			if ($paymentMethod === 'sprint_bca_va' || 'sprint_permata_va') {
+				$paidPriceOrder = 0;
+				$qtyOrder       = 0;
+				$qtyAllocated   = 0;
 				foreach ($loadItemByOrderId as $itemOrder) {
-					$paidPriceOrder        = $itemOrder->getPaidPrice();
-					$qtyOrder              = $itemOrder->getQty();
-					$qtyAllocated          = $itemOrder->getQtyAllocated();
+					$paidPriceOrder += $itemOrder->getPaidPrice();
+					$qtyOrder += $itemOrder->getQty();
+					$qtyAllocated += $itemOrder->getQtyAllocated();
 					$matrixAdjusmentAmount = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 				}
 				/* update quantity adjusment */
