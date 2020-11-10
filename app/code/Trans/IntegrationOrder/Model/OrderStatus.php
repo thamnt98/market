@@ -537,16 +537,17 @@ class OrderStatus implements OrderStatusInterface {
 					$qtyOrder              = $itemOrder->getQty();
 					$qtyAllocated          = $itemOrder->getQtyAllocated();
 					$matrixAdjusmentAmount = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
-				}
-				/* update quantity adjusment */
-				$url            = $this->orderConfig->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
-				$headers        = $this->getHeader();
-				$dataAdjustment = array(
-					'reference_number' => $reffId,
-					'status' => 3,
-					'amount_adjustment' => $matrixAdjusmentAmount,
 
-				);
+					/* update quantity adjusment */
+					$url            = $this->orderConfig->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
+					$headers        = $this->getHeader();
+					$dataAdjustment = array(
+						'reference_number' => $reffId,
+						'status' => 3,
+						'amount_adjustment' => $matrixAdjusmentAmount,
+
+					);
+				}
 				$dataJson = json_encode($dataAdjustment);
 				$this->loggerOrder->info($dataJson);
 

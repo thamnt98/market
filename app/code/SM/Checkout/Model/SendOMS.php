@@ -361,7 +361,9 @@ class SendOMS {
 		$isSpo           = isset($oarData['is_spo']) ? (int) $oarData['is_spo'] : 0;
 		$isOwnCourier    = isset($oarData['is_own_courier']) ? (int) $oarData['is_own_courier'] : 0;
 		$warehouseSource = isset($oarData['warehouse_source']) ? (string) $oarData['warehouse_source'] : '';
-		$warehouseCode   = (isset($oarData['warehouse_code']) && isset($oarData['warehouse_code']['store_code'])) ? (string) $oarData['warehouse_code']['store_code'] : '';
+		// $warehouseCode   = (isset($oarData['warehouse_code']) && isset($oarData['warehouse_code']['store_code'])) ? (string) $oarData['warehouse_code']['store_code'] : '';
+		//
+		$warehouseCode = isset($oarData['warehouse_code']) ? (string) $oarData['warehouse_code'] : '';
 		$interface->setOrderOriginId($orderOriginId);
 		$interface->setSpoDetail($spoDetail);
 		$interface->setIsSpo($isSpo);
