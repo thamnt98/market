@@ -532,11 +532,15 @@ class OrderStatus implements OrderStatusInterface {
 
 			/* Start Non CC*/
 			if ($paymentMethod === 'sprint_bca_va' || 'sprint_permata_va') {
+				$paidPriceOrder        = 0;
+				$qtyOrder              = 0;
+				$qtyAllocated          = 0;
+				$matrixAdjusmentAmount = 0;
 				foreach ($orderItems as $item) {
-					$paidPriceOrder        = $itemOrder->getPaidPrice();
-					$qtyOrder              = $itemOrder->getQty();
-					$qtyAllocated          = $itemOrder->getQtyAllocated();
-					$matrixAdjusmentAmount = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
+					$paidPriceOrder += $itemOrder->getPaidPrice();
+					$qtyOrder += $itemOrder->getQty();
+					$qtyAllocated += $itemOrder->getQtyAllocated();
+					$matrixAdjusmentAmount += ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 
 					/* update quantity adjusment */
 					$url            = $this->orderConfig->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
