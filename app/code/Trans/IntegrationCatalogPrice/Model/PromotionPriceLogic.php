@@ -797,7 +797,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             // if promo id not exist
             $checkIntPromoId = $this->checkIntegrationPromoByPromoId($dataPass['promotion_id']);
 
-            if (!$checkIntPromoId) {
+            // if (!$checkIntPromoId) {
                 // add dataPass array for name and desc
                 $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - spend x amount, get item (pick only one item from multiple reward item) ('.$dataPass['sku'].')';
                 $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - spend x amount, get item (pick only one item from multiple reward item) ('.$dataPass['sku'].')';
@@ -849,7 +849,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                         $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
                     }
                 }
-            }
+            // }
             // --------------
         } catch (\Exception $e) {
             $this->logger->error("error saved promo type 7 --->".print_r($dataPass['sku'], true));
@@ -949,7 +949,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                         // save to sales rule
                         foreach ($dataPass['sliding_disc_type_info'] as $row) {
                             //sliding discount type info child
-                            $sliding_child_arr = explode(",", $row);
+                            $sliding_child_arr = explode("-", $row);
                             $dataPass['sliding_child'] = $sliding_child_arr;
                             $dataPass['sliding_child_sequence'] = $arr;
                             $dataPass['discount_amount'] = $dataPass['sliding_child'][2];
@@ -970,7 +970,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                         // save to sales rule
                         foreach ($dataPass['sliding_disc_type_info'] as $row) {
                             //sliding discount type info child
-                            $sliding_child_arr = explode(",", $row);
+                            $sliding_child_arr = explode("-", $row);
                             $dataPass['sliding_child'] = $sliding_child_arr;
                             $dataPass['sliding_child_sequence'] = $arr;
                             $dataPass['discount_amount'] = $dataPass['sliding_child'][2];
@@ -991,7 +991,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                         // save to sales rule
                         foreach ($dataPass['sliding_disc_type_info'] as $row) {
                             //sliding discount type info child
-                            $sliding_child_arr = explode(",", $row);
+                            $sliding_child_arr = explode("-", $row);
                             $dataPass['sliding_child'] = $sliding_child_arr;
                             $dataPass['sliding_child_sequence'] = $arr;
                             $dataPass['discount_amount'] = $dataPass['sliding_child'][2];
@@ -1028,7 +1028,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             // if promo id not exist
             $checkIntPromoId = $this->checkIntegrationPromoByPromoId($dataPass['promotion_id']);
 
-            if (!$checkIntPromoId) {
+            // if (!$checkIntPromoId) {
                 $dataPass['discount_step'] = 3;
                 $dataPass['simple_free_shipping'] = 0;
                 $dataPass['item_type'] = $dataPass['item_type'];
@@ -1189,7 +1189,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                         }
                         break;
                 }
-            }
+            // }
             // --------------
         } catch (\Exception $e) {
             $this->logger->error("error saved promo type 5 --->".print_r($dataPass['sku'], true));
