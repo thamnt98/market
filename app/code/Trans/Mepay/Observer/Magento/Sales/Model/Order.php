@@ -78,6 +78,10 @@ class Order implements ObserverInterface
     $order->setState($this->config->getOrderState($payment->getMethod()));
     $order->setStatus($this->config->getOrderStatus($payment->getMethod()));
     $this->orderRepo->save($order);
+  }
+
+  public function setOrderStatusAfterPayment($order)
+  {
     //set order history status
     $statusHistory = $this->statusHistory->create();
     $statusHistory->setParentId($order->getId());
