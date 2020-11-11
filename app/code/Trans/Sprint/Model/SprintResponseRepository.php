@@ -164,7 +164,7 @@ class SprintResponseRepository implements SprintResponseRepositoryInterface {
 			/** @var \Trans\Sprint\Model\ResourceModel\SprintResponse\CollectionFactory|\Magento\Framework\Model\AbstractModel $customOrderItem */
 			$data = $this->sprintResCollection->create($quoteId, null, $storeId)->addFieldToSelect('*')->setOrder('id', 'ASC')->setPageSize(1)->load()->getFirstItem();
 
-			$this->logger->info('$data->getId() = ' . $data->getId());
+			$this->logger->info('$data->getData() = ' . json_encode($data->getData()));
 			if (!$data->getId()) {
 				$this->logger->info('$data empty');
 				$this->logger->info('Get sprint response by quote id. --END--');
