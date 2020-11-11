@@ -27,6 +27,7 @@
                 <abandoned_cart_time>1</abandoned_cart_time>
                 <abandoned_cart_repeat_time>3</abandoned_cart_repeat_time>
                 <abandoned_cart_repeat>*/10 * * * *</abandoned_cart_repeat>
+                <va_payment>sprint_bca_va</va_payment>
                 <payment_expiring_soon_time>5</payment_expiring_soon_time>
                 <payment_expiring_soon_time_cron>* * * * *</payment_expiring_soon_time_cron>
                 <remind_pickup_cron>0 * * * *</remind_pickup_cron>

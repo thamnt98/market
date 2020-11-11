@@ -71,7 +71,7 @@ class Address extends \Magento\Quote\Model\Quote\Address
         $request->setCustomerAddressId($this->getData('customer_address_id'));
         $request->setPreShippingMethod($this->getData('pre_shipping_method'));
         $request->setQuote($this->getQuote());
-
+        $request->setQuoteAddressId($this->getId());
         $result = $this->_rateCollector->create()->collectRates($request)->getResult();
 
         $found = false;

@@ -399,7 +399,7 @@
                 </group>
                 <!-- Credit Card Section End -->
             </group>
-            <!-- payment-groups -->
+            <!-- payment-group -->
         </section>
         <section id="installment_set" translate="label" type="text" sortOrder="300" showInDefault="1" showInWebsite="1" showInStore="1">
             <label>Sprint Setting</label>

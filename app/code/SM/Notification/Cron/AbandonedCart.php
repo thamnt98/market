@@ -72,12 +72,17 @@ class AbandonedCart extends AbstractGenerate
 
             try {
                 if ($this->createNotification($item)) {
+                    $event = self::EVENT_NAME;
+                    $this->connection->delete(
+                        \SM\Notification\Model\ResourceModel\TriggerEvent::TABLE_NAME,
+                        "event_id = '{$item['entity_id']}' AND event_type = 'quote' AND event_name = '{$event}'"
+                    );
                     $this->connection->insert(
                         \SM\Notification\Model\ResourceModel\TriggerEvent::TABLE_NAME,
                         [
                             'event_id'   => $item['entity_id'],
                             'event_type' => 'quote',
-                            'event_name' => self::EVENT_NAME,
+                            'event_name' => $event,
                         ]
                     );
                 }
@@ -166,7 +171,7 @@ class AbandonedCart extends AbstractGenerate
             []
         )->joinLeft(
             ['n' => \SM\Notification\Model\ResourceModel\TriggerEvent::TABLE_NAME],
-            'q.entity_id = n.event_id',
+            "q.entity_id = n.event_id AND n.event_name = '" . self::EVENT_NAME . "'",
             []
         )->where(
             'q.is_active = ?',
@@ -174,9 +179,8 @@ class AbandonedCart extends AbstractGenerate
         )->where(
             'q.customer_id IS NOT NULL'
         )->where(
-            'n.id IS NULL OR n.event_name <> ? ' .
-            'OR (n.event_name = ? AND n.created_at < (' . $selectLatestDate->__toString() . '))',
-            self::EVENT_NAME
+            'n.id IS NULL ' .
+            'OR (n.created_at < (' . $selectLatestDate->__toString() . '))'
         )->where(
             'current_timestamp() >= DATE_ADD((' . $selectLatestDate->__toString() . '), INTERVAL ' . $time . ' hour)'
         )->group('q.customer_id');

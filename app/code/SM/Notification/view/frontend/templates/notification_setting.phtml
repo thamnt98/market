@@ -30,6 +30,9 @@
                     </div>
                     <div class="block-item-content">
                         <?php foreach ($row['child'] as $name => $child) : ?>
+                            <?php if ($name == 'Subscription') : ?>
+                                <?php continue; ?>
+                            <?php endif; ?>
                             <div class="item">
                                 <div class="content <?= $class != 'container-two-col' ? 'col-1' : '' ?>">
                                     <p><?= $name ?></p>

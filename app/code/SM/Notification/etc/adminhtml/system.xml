@@ -94,15 +94,20 @@
                 <group id="payment_group" translate="label" type="text" sortOrder="20"
                        showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment</label>
-                    <field id="payment_expiring_soon_time" translate="label" type="text" sortOrder="0" canRestore="1"
+                    <field id="va_payment" translate="label" type="multiselect" sortOrder="0"
+                           canRestore="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>VA Payment</label>
+                        <source_model>SM\Notification\Model\Source\Config\PaymentMethod</source_model>
+                        <config_path>sm_notification/generate/va_payment</config_path>
+                    </field>
+                    <field id="payment_expiring_soon_time" translate="label" type="text" sortOrder="10" canRestore="1"
                            showInDefault="1" showInWebsite="0" showInStore="0">
                         <label>VA Expiring Soon Time (minute)</label>
                         <config_path>sm_notification/generate/payment_expiring_soon_time</config_path>
                         <validate>validate-zero-or-greater</validate>
-                        <comment><![CDATA[The value of 0 then turn off.]]>
-                        </comment>
+                        <comment><![CDATA[The value of 0 then turn off.]]></comment>
                     </field>
-                    <field id="payment_expiring_soon_time_cron" translate="label" type="text" sortOrder="10"
+                    <field id="payment_expiring_soon_time_cron" translate="label" type="text" sortOrder="20"
                            canRestore="1" showInDefault="1" showInWebsite="0" showInStore="0">
                         <label>VA Expiring Soon (Cron)</label>
                         <config_path>sm_notification/generate/payment_expiring_soon_time_cron</config_path>

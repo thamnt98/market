@@ -34,7 +34,7 @@ class AbandonedCartRepeat extends AbandonedCart
             []
         )->joinInner(
             ['n' => \SM\Notification\Model\ResourceModel\TriggerEvent::TABLE_NAME],
-            'q.entity_id = n.event_id',
+            'q.entity_id = n.event_id AND event_name = \'' . self::EVENT_NAME . '\'',
             []
         )->where(
             'q.is_active = ?',

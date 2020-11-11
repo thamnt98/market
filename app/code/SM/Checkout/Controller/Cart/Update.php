@@ -120,7 +120,7 @@ class Update extends \Magento\Checkout\Controller\Cart implements HttpPostAction
             $this->getQuote()->setTotalsCollectedFlag(false)->collectTotals();
             $this->quoteRepository->save($this->getQuote());
             $this->messageManager->getMessages(true);
-            $response['message'] = $this->messageManager->addSuccessMessage(__('Updated items successfully!'));
+            $response['message'] = '';
         } catch (\Exception $e) {
             $response['message'] = $this->messageManager->addErrorMessage($e->getMessage());
             $response['status'] = __('Error');

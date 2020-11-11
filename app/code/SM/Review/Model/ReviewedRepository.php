@@ -188,8 +188,8 @@ class ReviewedRepository implements ReviewedRepositoryInterface
 
         /** @var ReviewCollection $reviewCollection */
         $reviewCollection = $this->reviewCollectionFactory->create();
-        $reviewCollection->addRateVotes();
         $reviewCollection->addFieldToFilter("detail.customer_id", ["eq" => $customerId]);
+        $reviewCollection->addRateVotes();
         $reviewCollection = $this->filterCollectionByCriteria($searchCriteria, $reviewCollection);
         $reviewCollection = $this->sortCollection($searchCriteria, $reviewCollection);
         $productIdsAndOrderIds = $this->prepareProductIdsAndOrderIds($reviewCollection);

@@ -304,7 +304,8 @@ class TransShipping extends AbstractCarrier implements CarrierInterface
                 "items" => $resetItems,
                 "total_weight" => (int)$request->getPackageWeight(),
                 "total_price" => (int)$totalPrice,
-                "total_qty" => (int)$request->getPackageQty()
+                "total_qty" => (int)$request->getPackageQty(),
+                "quote_address_id" => $quote->getId() . '-' . $request->getQuoteAddressId()
             ]
         ];
     }

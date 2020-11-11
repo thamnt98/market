@@ -480,12 +480,20 @@ class ProductDataMapper
      */
     protected function isSalable($productId)
     {
-        return isset($this->productRawData[$productId]['status'])
-            && $this->productRawData[$productId]['status'] == ProductStatus::STATUS_ENABLED
-            && (
-                !empty($this->productRawData[$productId]['source']) ||
-                !empty($this->parentProduct[$productId])
-            );
+        if (!empty($this->parentProduct[$productId])) {
+            foreach ($this->parentProduct[$productId] as $child) {
+                if ($this->isSalable($child)) {
+                    return true;
+                }
+            }
+        } else {
+            return isset($this->productRawData[$productId]['status'])
+                && $this->productRawData[$productId]['status'] == ProductStatus::STATUS_ENABLED
+                && (
+                    !empty($this->productRawData[$productId]['source']) ||
+                    !empty($this->parentProduct[$productId])
+                );
+        }
     }
 
     /**
@@ -503,7 +511,7 @@ class ProductDataMapper
             ['entity_id', 'type_id']
         )->joinLeft(
             ['i' => 'inventory_source_item'],
-            'p.sku = i.sku and i.status = 1',
+            "p.sku = i.sku and i.status = 1 and i.source_code <> 'default'",
             'count(i.source_item_id) as source'
         )->where(
             'entity_id IN (?)',

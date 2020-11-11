@@ -235,9 +235,9 @@ class Split
     {
         //Bypass OAR because it is painful to get data from it
         $isTestMode = $this->scopeConfig->getValue('sm_checkout/checkout_oar/oar_active');
-        if ($isTestMode) {
+        /*if ($isTestMode) {
             return $this->byPassOar($data);
-        }
+        }*/
         return $this->sendOAR($data);
     }
 
@@ -493,23 +493,31 @@ class Split
         $response = [];
         $url = $this->configHelper->getOmsBaseUrl() . $this->configHelper->getOmsOarApi();
         $header = $this->getHeader();
+        $flagLog = 'Quote ID and Quote Address ID:';
+        if (isset($data[0]['quote_address_id'])) {
+            $flagLog .=  ' ' . $data[0]['quote_address_id'];
+            unset($data[0]['quote_address_id']);
+        }
         $dataJson = $this->serializer->serialize($data);
+        $dataJsonLog = $dataJson;
         for ($x = 0; $x <= 2; $x++) {
             try {
-                $response = $this->curlHelper->post($url, $header, $dataJson);
-                $response = $this->serializer->unserialize($response);
+                $responseOAR = $this->curlHelper->post($url, $header, $dataJson);
+                $response = $this->serializer->unserialize($responseOAR);
                 $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/oar-response-success.log');
                 $logger = new \Zend\Log\Logger();
                 $logger->addWriter($writer);
-                $logger->info($dataJson);
-                $logger->info(print_r($response, true));
+                $logger->info($flagLog);
+                $logger->info($dataJsonLog);
+                $logger->info($responseOAR);
                 break;
             } catch (\Exception $e) {
                 $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/oar-response-error.log');
                 $logger = new \Zend\Log\Logger();
                 $logger->addWriter($writer);
+                $logger->info($flagLog);
                 $logger->info($e->getMessage());
-                $logger->info($dataJson);
+                $logger->info($dataJsonLog);
                 $response['error'] = $e->getMessage();
             }
         }

@@ -67,10 +67,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $store = $this->storeManager->getStore()->getBaseUrl();
         $img = str_replace($store, '', $image);
-        $absolutePath = $this->filesystem->getDirectoryRead(\Magento\Framework\App\Filesystem\DirectoryList::PUB)
-                ->getAbsolutePath() . $img;
+        if (strpos($img, \Magento\Framework\App\Filesystem\DirectoryList::PUB) !== false) {
+            $absolutePath = $this->filesystem->getDirectoryRead(\Magento\Framework\App\Filesystem\DirectoryList::ROOT)
+                    ->getAbsolutePath() . $img;
+        } else {
+            $absolutePath = $this->filesystem->getDirectoryRead(\Magento\Framework\App\Filesystem\DirectoryList::PUB)
+                    ->getAbsolutePath() . $img;
+        }
         if (!file_exists($absolutePath)) {
-            return false;
+            return $image;
         }
         $resizePath = self::PATH . $width . '/';
         $imageResized = $this->filesystem->getDirectoryRead(\Magento\Framework\App\Filesystem\DirectoryList::PUB)
@@ -85,7 +90,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $imageResize->keepAspectRatio(true);
             $imageResize->resize($width, $height);
             //destination folder
-            $destination = $imageResized ;
+            $destination = $imageResized;
             //save image
             $imageResize->save($destination);
         }

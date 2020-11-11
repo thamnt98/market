@@ -298,6 +298,7 @@ if ($parentOrder) {
                             \SM\Sales\Model\ParentOrderRepository::STATUS_IN_DELIVERY,
                             \SM\Sales\Model\ParentOrderRepository::PICK_UP_BY_CUSTOMER,
                             \SM\Sales\Model\ParentOrderRepository::STATUS_DELIVERED,
+                            \SM\Sales\Model\ParentOrderRepository::STATUS_COMPLETE
                         ]
                     ?>
                     <?php if (in_array($parentOrder->getStatus(), $statusesToShow)): ?>

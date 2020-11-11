@@ -52,7 +52,7 @@
                             <?php /** @var $product \Magento\Catalog\Model\Product */?>
                             <img src="<?php echo $block->getImage($product, 70, 70)?>"/>
                         <?php endforeach; ?>
-                        <input name="order_increment_id" hidden value="<?=  $order->getIncrementId() ?>" />
+                        <input name="order_increment_id" hidden value="<?=  $order->getSubOrderId() ?>" />
                         <input name="order_id" hidden value="<?= $order->getId() ?>" />
                         <input name="product_ids" hidden value="<?= $productIds ?>" />
                     </div>

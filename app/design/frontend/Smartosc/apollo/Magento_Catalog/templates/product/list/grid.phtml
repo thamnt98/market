@@ -27,7 +27,7 @@ $category = $block->getLayer()->getCurrentCategory();
             }
             ?>
             <?php // Product Image?>
-            <a href="<?= $block->escapeUrl($_product->getProductUrl()) ?>"
+            <a href="<?= $block->escapeHtmlAttr($_product->getProductUrl(), false) ?>"
                class="product photo product-item-photo"
                <?php if ($dataGTM) : ?>
                data-gtm-product="<?= $dataGTM ?>"
@@ -54,7 +54,7 @@ $category = $block->getLayer()->getCurrentCategory();
                        data-gtm-product="<?= $dataGTM ?>"
                        data-position="<?= $position ?>"
                        <?php endif; ?>
-                       href="<?= $block->escapeUrl($_product->getProductUrl()) ?>">
+                       href="<?= $block->escapeHtmlAttr($_product->getProductUrl(), false) ?>">
                         <?= /* @noEscape */
                         $_helper->productAttribute($_product, $_product->getName(), 'name') ?>
                     </a>

@@ -44,6 +44,7 @@ class MegaDebit extends \Magento\Payment\Model\Method\AbstractMethod
         if (!$this->_scopeConfig->getValue('payment/' . $this->_code . '/' . Config::PAYMENT_CHANNEL_ID, \Magento\Store\Model\ScopeInterface::SCOPE_STORE)) {
             return false;
         }
+
         return parent::isAvailable($quote);
     }
 }

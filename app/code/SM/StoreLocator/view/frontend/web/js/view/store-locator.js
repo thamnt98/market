@@ -40,12 +40,8 @@ define([
             var self = this;
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function (position) {
-                    let coords = {
-                        lat: position.coords.latitude,
-                        long: position.coords.longitude
-                    };
-                    currentLongitude.val(coords.long);
-                    currentLatitude.val(coords.lat);
+                    currentLongitude = position.coords.latitude;
+                    currentLatitude = position.coords.longitude;
                 })
             } else {
                 alert("Geolocation is not supported by this browser.");

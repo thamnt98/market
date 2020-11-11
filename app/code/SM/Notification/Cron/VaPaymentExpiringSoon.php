@@ -79,15 +79,20 @@ class VaPaymentExpiringSoon extends AbstractGenerate
     public function process()
     {
         /** @var \Trans\Sprint\Model\SprintResponse $item */
-        foreach ($this->getCollection() as $item) {
+        foreach ($this->getRecords() as $item) {
             try {
                 if ($this->createNotification($item)) {
+                    $event = self::EVENT_NAME;
+                    $this->connection->delete(
+                        \SM\Notification\Model\ResourceModel\TriggerEvent::TABLE_NAME,
+                        "event_id = '{$item->getData('order_id')}' AND event_type = 'order' AND event_name = '{$event}'"
+                    );
                     $this->connection->insert(
                         \SM\Notification\Model\ResourceModel\TriggerEvent::TABLE_NAME,
                         [
-                            'event_id'   => $item->getQuoteId(),
-                            'event_type' => 'quote',
-                            'event_name' => self::EVENT_NAME
+                            'event_id'   => $item->getData('order_id'),
+                            'event_type' => 'order',
+                            'event_name' => $event
                         ]
                     );
                 } else {
@@ -161,10 +166,15 @@ class VaPaymentExpiringSoon extends AbstractGenerate
     /**
      * @return \Trans\Sprint\Model\ResourceModel\SprintResponse\Collection|array
      */
-    protected function getCollection()
+    protected function getRecords()
     {
-        $allowMethods = ['sprint_bca_va', 'sprint_permata_va'];
+        $allowMethods = $this->settingHelper->getConfigValue('sm_notification/generate/va_payment');
 
+        if (empty($allowMethods)) {
+            return [];
+        }
+
+        $allowMethods = explode(',', $allowMethods);
         $stepTime = (int) $this->settingHelper->getConfigValue('sm_notification/generate/payment_expiring_soon_time');
         if ($stepTime < 1) {
             return [];
@@ -176,6 +186,10 @@ class VaPaymentExpiringSoon extends AbstractGenerate
         $date = $this->timezone->date($date);
         $expired = $date->format('Y-m-d H:i:s');
 
+        $sprintIdsSelect = $this->connection->select()
+            ->from('sprint_response', ['MAX(id)'])
+            ->group('quote_id');
+
         $coll = $this->sprintResponseCollFact->create();
         $coll->addFieldToFilter('expire_date', ['lteq' => $expired])
             ->addFieldToFilter('expire_date', ['gteq' => $current])
@@ -184,35 +198,37 @@ class VaPaymentExpiringSoon extends AbstractGenerate
             ->addFieldToFilter('payment_method', ['in' => $allowMethods]);
         $coll->getSelect()
             ->joinInner(
-                ['q' => 'quote'],
-                'main_table.quote_id = q.entity_id',
-                []
-            )
-            ->joinInner(
                 ['s' => 'store'],
                 'main_table.store_id = s.store_id',
                 ['store_code' => 's.code']
             )->joinInner(
                 ['o' => 'sales_order'],
-                'o.quote_id = q.entity_id',
+                "o.reference_number = main_table.transaction_no AND o.status = 'pending_payment'",
                 [
-                    'increment_id' => 'MAX(o.increment_id)',
-                    'order_id'     => 'MAX(o.entity_id)',
+                    'increment_id' => 'o.increment_id',
+                    'order_id'     => 'o.entity_id',
                     'customer_id'  => 'o.customer_id',
                 ]
             )->joinLeft(
                 ['n' => \SM\Notification\Model\ResourceModel\TriggerEvent::TABLE_NAME],
-                'q.entity_id = n.event_id',
+                "o.entity_id = n.event_id AND n.event_name = '" . self::EVENT_NAME . "'",
                 []
             )->where(
-                'n.event_id IS NULL OR n.event_name <> ?',
-                self::EVENT_NAME
+                'n.event_id IS NULL'
             )->where(
                 'o.is_parent = ?',
                 1
-            )->group('main_table.id');
+            )->where(
+                'main_table.id IN (' . $sprintIdsSelect->__toString() . ')'
+            );
 
-        return $coll;
+        try {
+            return $coll->getItems();
+        } catch (\Exception $e) {
+            $this->logger->error("Notification Payment Expiring Soon create failed: \n\t" . $e->getMessage());
+
+            return [];
+        }
     }
 
     /**
