@@ -49,7 +49,7 @@ interface TransactionStatusDataInterface
   /**
    * @var  string
    */
-  const CARD_NETWROK = 'cardNetwork';
+  const CARD_NETWORK = 'cardNetwork';
 
   /**
    * @var  string
