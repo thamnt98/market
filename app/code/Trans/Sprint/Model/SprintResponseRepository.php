@@ -155,25 +155,21 @@ class SprintResponseRepository implements SprintResponseRepositoryInterface {
 	 * @throws \Magento\Framework\Exception\LocalizedException
 	 */
 	public function getByQuoteId($quoteId, $storeId = null) {
-		$this->logger->info('Get sprint response by quote id. --START--');
-		$this->logger->info('$quoteId = ' . $quoteId);
 		if (!isset($this->instances[$quoteId])) {
 			if (!$storeId) {
 				$storeId = $this->storeManager->getStore()->getId();
 			}
 			/** @var \Trans\Sprint\Model\ResourceModel\SprintResponse\CollectionFactory|\Magento\Framework\Model\AbstractModel $customOrderItem */
-			$data = $this->sprintResCollection->create($quoteId, null, $storeId)->addFieldToSelect('*')->setOrder('id', 'ASC')->setPageSize(1)->load()->getFirstItem();
-
-			$this->logger->info('$data->getData() = ' . json_encode($data->getData()));
-			if (!$data->getId()) {
-				$this->logger->info('$data empty');
-				$this->logger->info('Get sprint response by quote id. --END--');
+			$data = $this->sprintResCollection->create($quoteId, null, $storeId)
+			->setPageSize(1);
+			if (!$data->getSize()) {
 				throw new NoSuchEntityException(__('Requested Item doesn\'t exist'));
 			}
 
+			$data = $data->getFirstItem();
+			
 			$this->instances[$quoteId] = $data;
 		}
-		$this->logger->info('Get sprint response by quote id. --END--');
 
 		return $this->instances[$quoteId];
 	}
