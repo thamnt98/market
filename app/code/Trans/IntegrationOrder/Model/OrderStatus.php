@@ -523,8 +523,8 @@ class OrderStatus implements OrderStatusInterface {
 				$qtyOrder       = 0;
 				foreach ($loadItemByOrderId as $itemOrder) {
 					$paidPriceOrder = $itemOrder->getPaidPrice();
-					$qtyOrder = $itemOrder->getQty();
-					$qtyAllocated = $allocatedQty;
+					$qtyOrder       = $itemOrder->getQty();
+					$qtyAllocated   = $allocatedQty;
 					// $matrixAdjusmentAmount = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 					$amount = $amount + (($paidPriceOrder * $qtyOrder) - ($paidPriceOrder * $qtyAllocated));
 
@@ -543,10 +543,10 @@ class OrderStatus implements OrderStatusInterface {
 				//$qtyOrder       = 0;
 				foreach ($loadItemByOrderId as $itemOrder) {
 					$paidPriceOrder = $itemOrder->getPaidPrice();
-					$qtyOrder = $itemOrder->getQty();
-					$qtyAllocated = $allocatedQty;
+					$qtyOrder       = $itemOrder->getQty();
+					$qtyAllocated   = $allocatedQty;
 					// $matrixAdjusmentAmount = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
-					$amount = ($paidPriceOrder / $qtyOrder) - ($paidPriceOrder * $qtyAllocated));
+					$amount = ($paidPriceOrder / $qtyOrder) - ($paidPriceOrder * $qtyAllocated);
 
 					$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
 				}
