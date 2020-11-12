@@ -95,12 +95,11 @@ interface PromotionPriceRepositoryInterface
     /**
      * Load Integration Product by promo id and store code
      *
-     * @param mixed $promotionid
-     * @param mixed $storecode
+     * @param mixed $data
      * @return mixed
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function loadDataPromoByPromoIdStoreCode($promotionid, $storecode);
+    public function loadDataPromoByPromoIdStoreCode($data);
 
     /**
      * Load Integration Product by Store attr code.
