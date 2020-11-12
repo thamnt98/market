@@ -71,7 +71,7 @@ class SalesPaymentTransactionHandler implements HandlerInterface
     $orderPayment = $paymentDO->getPayment();
     if ($orderPayment instanceof Payment) {
       $resp = $this->response->unserialize($response);
-      //$resp = $this->getDummyResponse();
+      $resp = $this->getDummyResponse();
       if (isset($resp[Response::RESPONSE_ID]) && $resp[Response::RESPONSE_ID]) {
         $this->savePayment($orderPayment, $resp);
       }

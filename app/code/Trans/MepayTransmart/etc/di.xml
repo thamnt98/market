@@ -18,4 +18,5 @@
   <preference for="Trans\Mepay\Model\Payment\Status\Capture" type="Trans\MepayTransmart\Model\Payment\Status\TransmartCapture" />
   <preference for="Trans\Mepay\Model\Payment\Status\Failed" type="Trans\MepayTransmart\Model\Payment\Status\TransmartFailed" />
   <preference for="SM\Checkout\Block\Checkout\Success" type="Trans\MepayTransmart\Block\Checkout\TransmartSuccess" />
+  <preference for="Trans\Mepay\Plugin\Magento\Checkout\Model\PaymentInformationManagement" type="Trans\MepayTransmart\Plugin\Magento\Checkout\Model\TransmartPaymentInformationManagement" />
 </config>
