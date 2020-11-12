@@ -90,6 +90,8 @@ class TransmartFailed extends Failed
          */
         $this->sendOrderToOms($order);
 
+        $this->updateChildOrderStatus($order);
+
 
     } catch (InputException $e) {
       $this->logger->log($e->getMessage());
@@ -117,6 +119,24 @@ class TransmartFailed extends Failed
         'payment_status' => SprintConfig::OMS_CANCEL_PAYMENT_ORDER,
       ]
     );
+  }
+
+  public function updateChildOrderStatus($order)
+  {
+    $referenceNumber = $order->getReferenceNumber();
+    $this->logger->log($referenceNumber);
+    $collection = $order->getCollection()->addFieldToFilter('reference_number',['eq'=>$referenceNumber]);
+      if ($collection->getSize()) {
+        foreach ($collection as $key => $value) {
+          if ($value->getEntityId() !== $order->getId()) {
+              $subOrder = $this->transactionHelper->getOrder($value->getEntityId());
+              $subOrder->setState(Order::STATE_CANCELED);
+              $subOrder->setStatus(Order::STATE_CANCELED);
+              $subOrder->cancel();
+              $this->transactionHelper->saveOrder($subOrder);
+          }
+        }
+     }
   }
 
 }
