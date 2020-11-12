@@ -573,7 +573,7 @@ class OrderStatus implements OrderStatusInterface {
 				$this->loggerOrder->info('Body: ' . $dataJson . '. Response: ' . $responseOrder);
 				$json_string = stripcslashes($responseOrder);
 				if ($objOrder->code == 200) {
-					return $result
+					return $result;
 				}
 			}
 			/* End Non CC*/
