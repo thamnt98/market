@@ -415,8 +415,8 @@ class OrderStatus implements OrderStatusInterface {
 
 		$itemOrders = $this->statusRepo->loadByOrderId($request['order_id']);
 		foreach ($itemOrders as $itemOrder) {
-			foreach ($request['order_items'] as $allocatedItems) {
-				if ($itemOrder->getSKU() === $allocatedItems['sku']) {
+			if ($itemOrder->getSKU() === $itemData['sku']) {
+				foreach ($request['order_items'] as $allocatedItems) {
 					$itemOrder->setQtyAllocated($allocatedItems['quantity_allocated']);
 					$itemOrder->setItemStatus($allocatedItems['item_status']);
 				}
