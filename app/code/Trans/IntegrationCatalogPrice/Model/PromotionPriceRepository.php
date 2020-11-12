@@ -165,11 +165,17 @@ class PromotionPriceRepository implements PromotionPriceRepositoryInterface
                 'Parameter item_type are empty !'
             ));
         }
+        if (empty($data['store_code'])) {
+            throw new StateException(__(
+                'Parameter store_code are empty !'
+            ));
+        }
         $collection = $this->interface->create()->getCollection();
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_PROMOTION_TYPE, $data['promotion_type']);
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_DISCOUNT_TYPE, $data['discount_type']);
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_MIX_MATCH_CODE, $data['mix_and_match_code']);
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_ITEM_TYPE, $data['item_type']);
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_STORECODE, $data['store_code']);
 
         $getLastCollection =null;
         if ($collection->getSize()) {
@@ -230,6 +236,32 @@ class PromotionPriceRepository implements PromotionPriceRepositoryInterface
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_PROMOTION_ID, $data);
 
         $getLastCollection =null;
+        if ($collection->getSize()) {
+            $getLastCollection = $collection->getFirstItem();
+        }
+        return $getLastCollection;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function loadDataPromoByPromoIdStoreCode($promotionid, $storecode)
+    {
+        if (empty($promotionid)) {
+            throw new StateException(__(
+                'Parameter promotion id are empty !'
+            ));
+        }
+        if (empty($storecode)) {
+            throw new StateException(__(
+                'Parameter store code are empty !'
+            ));
+        }
+        $collection = $this->interface->create()->getCollection();
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_PROMOTION_ID, $promotionid);
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_STORECODE, $storecode);
+
+        $getLastCollection = null;
         if ($collection->getSize()) {
             $getLastCollection = $collection->getFirstItem();
         }
