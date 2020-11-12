@@ -376,15 +376,14 @@ class OrderStatus implements OrderStatusInterface {
 		if (!$idsOrder->getOrderId()) {
 			throw new \Magento\Framework\Webapi\Exception(__('Order ID doesn\'t exist, please make sure again.'));
 		}
-		$orderItem    = [];
-		$allocatedQty = 0;
+		$orderItem = [];
 		foreach ($orderItems as $itemData) {
 			$item['sku']                = $itemData['sku'];
 			$item['quantity']           = $itemData['quantity'];
 			$item['quantity_allocated'] = $itemData['quantity_allocated'];
 			$item['item_status']        = $itemData['item_status'];
 
-			$allocatedQty += $itemData['quantity_allocated'];
+			$allocatedQty = $itemData['quantity_allocated'];
 
 			$orderItem[] = $item;
 		}
@@ -414,11 +413,14 @@ class OrderStatus implements OrderStatusInterface {
 			throw new \Magento\Framework\Webapi\Exception(__('Please re-check status, action and subaction sequence before submit'), 400);
 		}
 
-		$itemOrders = $this->statusRepo->loadByOrderId($request['order_id']);
-		foreach ($itemOrders as $itemOrder) {
-			if ($itemOrder->getSKU() === $item['sku']) {
-				$itemOrder->setQtyAllocated($item['quantity_allocated']);
-				$itemOrder->setItemStatus($item['item_status']);
+		foreach ($request['order_items'] as $allocatedItems) {
+			$itemOrders = $this->statusRepo->loadByOrderId($orderId);
+			foreach ($itemOrders as $itemOrder) {
+				if ($itemOrder->getSKU() === $allocatedItems['sku']) {
+					$itemOrder->setQtyAllocated($allocatedItems['quantity_allocated']);
+					$itemOrder->setItemStatus($allocatedItems['item_status']);
+				}
+				$itemOrderSave = $this->statusRepo->saveItem($itemOrder);
 			}
 			// if ($itemOrder->getQty() != $qtyOrdered) {
 			//  throw new \Magento\Framework\Webapi\Exception(__('Invalid quantity order. Please checking again.'), 400);
@@ -427,7 +429,6 @@ class OrderStatus implements OrderStatusInterface {
 				throw new \Magento\Framework\Webapi\Exception(__('Quantity allocated is greater than quantity order. Please checking again.'), 400);
 			}
 		}
-		$itemOrderSave = $this->statusRepo->saveItem($itemOrder);
 
 		$configStatus               = $this->orderConfig;
 		$loadDataOrder              = $this->statusRepo->loadDataByRefOrderId($orderId);
@@ -515,16 +516,16 @@ class OrderStatus implements OrderStatusInterface {
 		/**
 		 * trigger capture - refund by payment method
 		 */
-		$amount = 0;
+		$matrixAdjusmentAmount = 0;
 		if ($status == 2 && $action == 2 && $subAction == 7) {
 			/* Start CC Bank Mega Auth Capture*/
 			if ($paymentMethod === 'trans_mepay_cc') {
 				$paidPriceOrder = 0;
 				$qtyOrder       = 0;
 				foreach ($loadItemByOrderId as $itemOrder) {
-					$paidPriceOrder += $itemOrder->getPaidPrice();
-					$qtyOrder += $itemOrder->getQty();
-					$qtyAllocated = $allocatedQty;
+					$paidPriceOrder = $itemOrder->getPaidPrice();
+					$qtyOrder       = $itemOrder->getQty();
+					$qtyAllocated   = $allocatedQty;
 					// $matrixAdjusmentAmount = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 					$amount = $amount + (($paidPriceOrder * $qtyOrder) - ($paidPriceOrder * $qtyAllocated));
 
@@ -538,21 +539,17 @@ class OrderStatus implements OrderStatusInterface {
 						'new_amount' => $trxAmount - $matrixAdjusmentAmount,
 					]
 				);
-			}
-			/* End CC Bank Mega Auth Capture*/
-
-			/* Start Non CC*/
-			if ($paymentMethod === 'sprint_bca_va' || 'sprint_permata_va') {
-				$paidPriceOrder = 0;
-				$qtyOrder       = 0;
+			} elseif ($paymentMethod === 'sprint_bca_va' || 'sprint_permata_va') {
+				//$paidPriceOrder = 0;
+				//$qtyOrder       = 0;
 				foreach ($loadItemByOrderId as $itemOrder) {
-					$paidPriceOrder += $itemOrder->getPaidPrice();
-					$qtyOrder += $itemOrder->getQty();
-					$qtyAllocated = $allocatedQty;
+					$paidPriceOrder = $itemOrder->getPaidPrice();
+					$qtyOrder       = $itemOrder->getQty();
+					$qtyAllocated   = $itemOrder->getQtyAllocated();
 					// $matrixAdjusmentAmount = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
-					$amount = $amount + (($paidPriceOrder * $qtyOrder) - ($paidPriceOrder * $qtyAllocated));
+					$amount = ($paidPriceOrder / $qtyOrder) - ($paidPriceOrder * $qtyAllocated);
 
-					$matrixAdjusmentAmount = $amount;
+					$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
 				}
 				/* update quantity adjusment */
 				$url            = $this->orderConfig->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
@@ -577,12 +574,12 @@ class OrderStatus implements OrderStatusInterface {
 				$this->loggerOrder->info('Body: ' . $dataJson . '. Response: ' . $responseOrder);
 				$json_string = stripcslashes($responseOrder);
 				if ($objOrder->code == 200) {
-					return json_decode($responseOrder, true);
+					return $result;
 				}
 			}
 			/* End Non CC*/
 
-			if ($paymentMethod === 'sprint_mega_cc' || 'sprint_allbankfull_cc' || 'sprint_mega_debit') {
+			elseif ($paymentMethod === 'sprint_mega_cc' || 'sprint_allbankfull_cc' || 'sprint_mega_debit') {
 				if ($itemData['quantity'] > $itemData['quantity_allocated']) {
 					$this->helperData->sprintLog()->info('===== Capture Process ===== Start');
 
@@ -717,7 +714,6 @@ class OrderStatus implements OrderStatusInterface {
 		}
 
 		/* =================== END CAPTURE REFUND =======================*/
-
 		return $result;
 	}
 

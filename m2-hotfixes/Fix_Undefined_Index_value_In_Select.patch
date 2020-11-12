@@ -1,0 +1,20 @@
+--- a/vendor/magento/module-backend/Block/Widget/Grid/Column/Filter/Select.php	2020-10-12 16:08:06.183682302 +0700
++++ b/vendor/magento/module-backend/Block/Widget/Grid/Column/Filter/Select.php	2020-10-12 16:14:22.057216813 +0700
+@@ -66,11 +66,14 @@
+     public function getHtml()
+     {
+         $html = '<select name="' . $this->_getHtmlName() . '" id="' . $this->_getHtmlId() . '"' . $this->getUiId(
+-            'filter',
+-            $this->_getHtmlName()
+-        ) . 'class="no-changes admin__control-select">';
++                'filter',
++                $this->_getHtmlName()
++            ) . 'class="no-changes admin__control-select">';
+         $value = $this->getValue();
+         foreach ($this->_getOptions() as $option) {
++            if (!array_key_exists('value', $option)) {
++                continue;
++            }
+             if (is_array($option['value'])) {
+                 $html .= '<optgroup label="' . $this->escapeHtml($option['label']) . '">';
+                 foreach ($option['value'] as $subOption) {
