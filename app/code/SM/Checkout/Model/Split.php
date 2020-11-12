@@ -235,9 +235,9 @@ class Split
     {
         //Bypass OAR because it is painful to get data from it
         $isTestMode = $this->scopeConfig->getValue('sm_checkout/checkout_oar/oar_active');
-        /*if ($isTestMode) {
+        if ($isTestMode) {
             return $this->byPassOar($data);
-        }*/
+        }
         return $this->sendOAR($data);
     }
 

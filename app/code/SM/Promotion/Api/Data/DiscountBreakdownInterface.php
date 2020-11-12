@@ -19,6 +19,8 @@ interface DiscountBreakdownInterface extends \Amasty\Rules\Api\Data\DiscountBrea
 {
     const KEY_COUPON_CODE = 'coupon_code';
     const KEY_RULE_ID     = 'id';
+    const SHIPPING_DISCOUNT = 'shipping_discount';
+    const ITEMS_DISCOUNT = 'items_discount';
 
     /**
      * @return int
@@ -43,4 +45,28 @@ interface DiscountBreakdownInterface extends \Amasty\Rules\Api\Data\DiscountBrea
      * @return self
      */
     public function setCode($code);
+
+    /**
+     * @return float
+     */
+    public function getShippingDiscount();
+
+    /**
+     * @param float $amount
+     *
+     * @return self
+     */
+    public function setShippingDiscount($amount);
+
+    /**
+     * @return float
+     */
+    public function getItemsDiscount();
+
+    /**
+     * @param float $amount
+     *
+     * @return self
+     */
+    public function setItemsDiscount($amount);
 }

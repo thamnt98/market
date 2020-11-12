@@ -101,17 +101,9 @@ class CustomerDeviceRepository implements \SM\Customer\Api\CustomerDeviceReposit
      */
     public function save(\SM\Customer\Api\Data\CustomerDeviceInterface $device)
     {
-        /** @var ResourceModel\CustomerDevice\Collection $coll */
-        $coll = $this->collectionFactory->create();
+        $this->removeDuplicateToken($device->getToken(), $device->getDeviceId());
         /** @var CustomerDevice $model */
-        $model = $coll->addFieldToFilter('customer_id', $device->getCustomerId())
-            ->addFieldToFilter('device_id', $device->getDeviceId())
-            ->getFirstItem();
-
-        if (!$model || !$model->getId()) {
-            $model = $this->modelFactory->create();
-        }
-
+        $model = $this->modelFactory->create();
         $model->setData('customer_id', $device->getCustomerId())
             ->setData('device_id', $device->getDeviceId())
             ->setData('type', $device->getType())
@@ -242,5 +234,20 @@ class CustomerDeviceRepository implements \SM\Customer\Api\CustomerDeviceReposit
         );
 
         return $result;
+    }
+
+    /**
+     * @param string $token
+     * @param string $deviceId
+     */
+    protected function removeDuplicateToken($token, $deviceId)
+    {
+        /** @var ResourceModel\CustomerDevice\Collection $coll */
+        $coll = $this->collectionFactory->create();
+        $conn = $coll->getConnection();
+        $conn->delete(
+            ResourceModel\CustomerDevice::TABLE_NAME,
+            "token = '{$token}' OR device_id = '{$deviceId}'"
+        );
     }
 }

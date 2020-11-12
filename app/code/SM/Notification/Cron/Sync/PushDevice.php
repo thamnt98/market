@@ -89,7 +89,7 @@ class PushDevice extends AbstractSync
         $select = parent::prepareSelect();
 
         $select->joinInner(
-            ['type' => \SM\Notification\Model\ResourceModel\Push::TABLE_NAME],
+            ['type' => ResourceModel::TABLE_NAME],
             'main_table.message_id = type.message_id',
             ['content', 'title']
         )->where(

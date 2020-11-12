@@ -17203,7 +17203,6 @@ How to Use:,Cara Menggunakan:
 Add,Tambah
 Applied,Digunakan
 You Saved,Anda menghemat
-Free installation included,Termasuk pemasangan gratis
 "We know installation can be tricky sometimes, let us help you. It's free of charge!",Memasang produk tidak lagi sulit karena kami akan membantu Anda. Bebas biaya!
 Note,Catatan
 Remove Installation,Hapus Instalasi
@@ -17218,7 +17217,7 @@ Subtotal Delivery Fee,Subtotal Ongkos Kirim
 Address,Alamat
 "Unfortunately, some products are allocated in limited stock in your area. We have adjusted the quantity for you.","Sayangnya, beberapa produk dialokasikan terbatas di area Anda. Kami telah menyesuaikan jumlahnya di bawah ini."
 Quantity has been adjusted,Jumlah telah disesuaikan
-Please update your address using the edit button.,Perbarui alamat Anda dengan tombol ubah.
+"Please update your address using the %1 button.","Perbarui alamat Anda dengan tombol %1."
 "To ensure we send your orders correctly, please complete your address.","Agar kami dapat mengirimkan order Anda dengan akurat, mohon lengkapi alamat Anda."
 Payment,Pembayaran
 Select Payment Method,Pilih Metode Pembayaran
@@ -18045,3 +18044,7 @@ Thank you for reviewing,Terima kasih telah mengulas
 "Are you sure you want to remove free installation?","Anda yakin ingin menghapus pemasangan gratis?"
 "Your note will be automatically removed.","Catatan Anda akan terhapus secara otomatis."
 "Add free installation to this product.","Tambahkan pemasangan gratis untuk produk ini."
+"Free installation included","Termasuk pemasangan gratis"
+"Free installation included","Termasuk pemasangan gratis"
+"edit","ubah"
+"Not Available Method","Metode Tidak Tersedia"

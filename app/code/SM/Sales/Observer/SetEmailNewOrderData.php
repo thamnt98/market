@@ -74,7 +74,7 @@ class SetEmailNewOrderData implements ObserverInterface
         $additionalData = [
             "order_increment" => $order->getReferenceNumber(),
             "order_total" => $this->getPrice($order->getGrandTotal()),
-            "virtual_account_number" => $this->getPayCode($order->getQuoteId()),
+            "virtual_account_number" => $this->getPaycode($order->getQuoteId()),
             "payment_method_title" => $paymentMethodTitle,
             "order_url" => $orderUrl,
             "is_va" => $this->verifyPayment($paymentMethod, "va"),

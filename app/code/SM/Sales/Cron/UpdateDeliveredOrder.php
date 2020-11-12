@@ -2,12 +2,12 @@
 
 namespace SM\Sales\Cron;
 
-use Magento\Framework\App\ResourceConnection;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Api\Data\OrderStatusHistoryInterface;
 use Magento\Sales\Model\Order\Status\History as StatusHistory;
 use Magento\Sales\Model\ResourceModel\Order;
 use SM\Sales\Api\ParentOrderRepositoryInterface;
+use SM\Sales\Model\Order\Updater as OrderUpdater;
 use SM\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
 use SM\Sales\Model\ResourceModel\Order\StatusHistory\Collection as StatusHistoryCollection;
 use SM\Sales\Model\ResourceModel\Order\StatusHistory\CollectionFactory as StatusHistoryCollectionFactory;
@@ -34,27 +34,27 @@ class UpdateDeliveredOrder
     private $orderResourceModel;
 
     /**
-     * @var ResourceConnection
+     * @var OrderUpdater
      */
-    protected $resourceConnection;
+    protected $orderUpdater;
 
     /**
      * UpdateDeliveredOrder constructor.
      * @param OrderCollectionFactory $orderCollectionFactory
      * @param StatusHistoryCollectionFactory $statusHistoryCollectionFactory
      * @param Order $orderResourceModel
-     * @param ResourceConnection $resourceConnection
+     * @param OrderUpdater $updater
      */
     public function __construct(
         OrderCollectionFactory $orderCollectionFactory,
         StatusHistoryCollectionFactory $statusHistoryCollectionFactory,
         Order $orderResourceModel,
-        ResourceConnection $resourceConnection
+        OrderUpdater $updater
     ) {
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->statusHistoryCollectionFactory = $statusHistoryCollectionFactory;
         $this->orderResourceModel = $orderResourceModel;
-        $this->resourceConnection = $resourceConnection;
+        $this->orderUpdater = $updater;
     }
 
     /**
@@ -114,41 +114,7 @@ class UpdateDeliveredOrder
         )->setPage(1, 100);
 
         foreach ($orderCollection as $order) {
-            $order->setState(ParentOrderRepositoryInterface::STATUS_COMPLETE)
-                ->setStatus(ParentOrderRepositoryInterface::STATUS_COMPLETE)
-                ->addCommentToStatusHistory("Order has been Successfully Completed");
-            try {
-                $this->orderResourceModel->save($order);
-            } catch (\Exception $e) {
-                continue;
-            }
-        }
-
-        //If order status,state is set to closed because order don't have invoice, so we force magento set order to complete by sql raw
-        //This is workaround solution.
-        //https://jira.smartosc.com/browse/APO-5557
-        $resource      = $this->resourceConnection;
-        $connection    = $this->resourceConnection->getConnection(ResourceConnection::DEFAULT_CONNECTION);
-        $saleOrder     = $resource->getTableName('sales_order');
-        $saleOrderGrid = $resource->getTableName('sales_order_grid');
-
-        try {
-            $where = ['entity_id IN (?)' => $orderIds];
-            $connection->beginTransaction();
-            //Update sale_order
-            $connection->update($saleOrder, [
-                'state'  => ParentOrderRepositoryInterface::STATUS_COMPLETE,
-                'status' => ParentOrderRepositoryInterface::STATUS_COMPLETE
-            ], $where);
-
-            //Update sale_order_grid
-            $connection->update($saleOrderGrid, [
-                'status' => ParentOrderRepositoryInterface::STATUS_COMPLETE
-            ], $where);
-
-            $connection->commit();
-        } catch (\Exception $e) {
-            $connection->rollBack();
+            $this->orderUpdater->updateStatusOrder($order);
         }
     }
 }

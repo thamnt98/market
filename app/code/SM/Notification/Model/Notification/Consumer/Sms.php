@@ -59,6 +59,8 @@ class Sms extends AbstractConsumer
 
     protected function reSyncUpdate($id)
     {
+        // todo turn off re-sync : call push noti response code != 200 but response data success
+        return;
         $this->connection->update(
             \SM\Notification\Model\ResourceModel\CustomerMessage::TABLE_NAME,
             ['sms_status' => \SM\Notification\Model\Notification::SYNC_PENDING],

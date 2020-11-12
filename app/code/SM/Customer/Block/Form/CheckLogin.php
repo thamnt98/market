@@ -35,4 +35,15 @@ class CheckLogin extends \Magento\Framework\View\Element\Template
     {
         return $this->httpContext->getValue(Context::CONTEXT_AUTH);
     }
+
+    protected function _prepareLayout()
+    {
+        if ($this->isLoggedIn()) {
+            $this->pageConfig->addBodyClass('login');
+        } else {
+            $this->pageConfig->addBodyClass('logout');
+        }
+
+        return parent::_prepareLayout();
+    }
 }

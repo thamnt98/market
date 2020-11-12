@@ -67,23 +67,6 @@ class PreviewOrder extends \Magento\Framework\Api\AbstractExtensibleObject imple
     /**
      * {@inheritdoc}
      */
-    public function setFreeShipping($freeShipping)
-    {
-        return $this->setData(self::FREE_SHIPPING, $freeShipping);
-    }
-
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFreeShipping()
-    {
-        return $this->_get(self::FREE_SHIPPING);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function setShippingFee($shippingFee)
     {
         return $this->setData(self::SHIPPING_FEE, $shippingFee);

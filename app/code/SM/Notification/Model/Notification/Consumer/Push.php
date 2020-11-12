@@ -116,7 +116,7 @@ class Push extends AbstractConsumer
             $result[] = $device->getToken();
         }
 
-        return $result;
+        return array_unique($result);
     }
 
     /**
@@ -124,6 +124,8 @@ class Push extends AbstractConsumer
      */
     protected function reSyncUpdate($id)
     {
+        // todo turn off re-sync : call push noti response code != 200 but response data success
+        return;
         $this->connection->update(
             \SM\Notification\Model\ResourceModel\CustomerMessage::TABLE_NAME,
             ['push_status' => \SM\Notification\Model\Notification::SYNC_PENDING],

@@ -25,8 +25,9 @@ interface OrderItemRepositoryInterface
 
     /**
      * @param int $cartId
+     * @param int $customerId
      * @param int $parentOrderId
      * @return \SM\Sales\Api\Data\ResultDataInterface
      */
-    public function reorderAll($cartId, $parentOrderId);
+    public function reorderAll($cartId, $customerId, $parentOrderId);
 }

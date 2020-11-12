@@ -39,6 +39,10 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
             $this->truncateTable($setup);
         }
 
+        if (version_compare($context->getVersion(), '1.0.3', '<')) {
+            $this->truncateTable($setup);
+        }
+
         $setup->endSetup();
     }
 
@@ -70,6 +74,11 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
         }
 
         $table = $setup->getTable(\SM\Notification\Model\ResourceModel\Notification::TABLE_NAME);
+        if ($setup->tableExists($table)) {
+            $setup->getConnection()->truncateTable($table);
+        }
+
+        $table = $setup->getTable(\SM\Customer\Model\ResourceModel\CustomerDevice::TABLE_NAME);
         if ($setup->tableExists($table)) {
             $setup->getConnection()->truncateTable($table);
         }

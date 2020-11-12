@@ -130,6 +130,7 @@
             }
 
             .wrapper-option-config {
+                cursor: pointer;
                 border: solid 1px @c-tsm-grey16;
                 .lib-css(border-radius, @border-radius-13);
                 .lib-css(font-family, @font-family-SF-UI-Display-Semibold);
@@ -146,6 +147,11 @@
                     border-width: 2px;
                 }
 
+                &.disabled{
+                    pointer-events: none;
+                    opacity: 0.8;
+                    background: #dfdfdf;
+                }
                 .swatch-option {
                     width: 17px;
                     height: 17px;

@@ -34,6 +34,7 @@ class SubmitReorderAll extends AbstractReorder
             $result = $this->orderItemRepository
                 ->reorderAll(
                     $this->checkoutSession->getQuoteId(),
+                    $this->currentCustomer->getCustomerId(),
                     $parentOrderId
                 );
 
