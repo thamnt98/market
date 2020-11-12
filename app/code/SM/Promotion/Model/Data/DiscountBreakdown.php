@@ -57,4 +57,44 @@ class DiscountBreakdown extends \Amasty\Rules\Model\DiscountBreakdownLine implem
 
         return $this;
     }
+
+    /**
+     * @return float
+     */
+    public function getShippingDiscount()
+    {
+        return $this->_get(self::SHIPPING_DISCOUNT);
+    }
+
+    /**
+     * @param float $amount
+     *
+     * @return self
+     */
+    public function setShippingDiscount($amount)
+    {
+        $this->setData(self::SHIPPING_DISCOUNT, $amount);
+
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getItemsDiscount()
+    {
+        return $this->_get(self::ITEMS_DISCOUNT);
+    }
+
+    /**
+     * @param float $amount
+     *
+     * @return self
+     */
+    public function setItemsDiscount($amount)
+    {
+        $this->setData(self::ITEMS_DISCOUNT, $amount);
+
+        return $this;
+    }
 }

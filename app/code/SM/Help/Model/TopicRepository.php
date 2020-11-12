@@ -354,7 +354,7 @@ class TopicRepository implements TopicRepositoryInterface
             "type"        => "normal"
         ];
         $topics = $this->getParentTopics();
-        array_push($topics, $data);
+        array_unshift($topics, $data);
         return $topics;
     }
 }

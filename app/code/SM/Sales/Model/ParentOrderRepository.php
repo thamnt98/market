@@ -222,7 +222,6 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
                 "main_table.entity_id"
             ], [
                 ["eq" => $customerId],
-                ["eq" => $orderId],
                 ["eq" => $orderId]
             ]);
 
@@ -234,7 +233,7 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
             ->addFieldToFilter(OrderInterface::ENTITY_ID, $orderId)
             ->getFirstItem();
 
-        if (!empty($subOrderCollection->getSize()) && empty($parentOrder->getData())) {
+        if (empty($subOrderCollection->getSize()) && empty($parentOrder->getData())) {
             return null;
         }
 

@@ -20,8 +20,9 @@ define([
     'SM_Checkout/js/view/split',
     'SM_Checkout/js/action/find-store',
     'SM_Checkout/js/view/cart-items/set-shipping-type',
-    'SM_Checkout/js/view/cart-items/init-shipping-type'
-], function ($, ko, Component, storage, urlManager, fullScreenLoader, getTotalsAction, globalVar, customerData, placeOrder,$t,messageList,pickup, split, findStoreAction, setShippingType, initShippingType) {
+    'SM_Checkout/js/view/cart-items/init-shipping-type',
+    'Trans_Mepay/js/view/payment/method-renderer/trans_mepay'
+], function ($, ko, Component, storage, urlManager, fullScreenLoader, getTotalsAction, globalVar, customerData, placeOrder,$t,messageList,pickup, split, findStoreAction, setShippingType, initShippingType, transMepay) {
     'use strict';
 
     return Component.extend({
@@ -143,6 +144,22 @@ define([
 
         },
         placeOrder:function () {
+            // **** BANK MEGA payment ****
+            var obj = this.getPaymentMethods();
+
+            if (obj['method'] == 'trans_mepay_cc' || obj['method'] == 'trans_mepay_va' || obj['method'] == 'trans_mepay_qris') {
+                return $.when(placeOrder(this.getPaymentMethods(), '')).done(
+                    function () {
+
+                        var redirectUrl = urlManager.build('transmepay/payment/redirect');
+                        $('[data-href="payment-error"]').text('').addClass('hidden');
+                        window.location.replace(redirectUrl);
+                        
+                    }
+                );
+            }
+            // **** end BANK MEGA payment ****
+            
             return $.when(placeOrder(this.getPaymentMethods(), '')).done(
                 function () {
 

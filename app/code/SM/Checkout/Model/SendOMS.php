@@ -319,8 +319,6 @@ class SendOMS
         $interface->setOrderId($order->getReferenceOrderId());
         $interface->setQuoteId($order->getQuoteId());
         $interface->setAddressId($shippingData->getId());
-        $interface->setPromotionType($order->getAppliedRuleIds());
-        $interface->setPromotionValue((int)$order->getDiscountAmount());
         $interface->setOrderItems($items);
         $interface->setBilling($billingData);
         $interface->setShipping($shipping);
@@ -342,11 +340,9 @@ class SendOMS
         } else {
             $sourceOrder = 3;
         }
-        $shippingFee = (int)$order->getShippingInclTax();
         $interface->setOrderType($orderType);
         $interface->setOrderSource($sourceOrder);
         $interface->setCourier($logisticType);
-        $interface->setShippingFee($shippingFee);
 
         $oarData = $order->getOarData();
         try {
@@ -425,6 +421,12 @@ class SendOMS
             $timeslot = $date . ' ' . $timeFrom;
         }
         $interface->setTimeSlot($timeslot);
+        /*calculate discount*/
+        $shippingFee = (int)$order->getShippingInclTax();
+        $discount = (int)$order->getDiscountAmount();
+        $interface->setShippingFee($shippingFee);
+        $interface->setPromotionValue($discount);
+        $interface->setPromotionType($order->getAppliedRuleIds());
         return $interface;
     }
 

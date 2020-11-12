@@ -10,9 +10,9 @@
 
 namespace SM\Sales\Model\Order;
 
-use Magento\Catalog\Api\Data\ProductOptionInterface;
 use Magento\Catalog\Api\Data\ProductOptionInterfaceFactory;
 use Magento\Catalog\Helper\Image;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 use Magento\Framework\Api\DataObjectHelper;
 use Magento\Framework\App\Area;
 use Magento\Framework\DataObject;
@@ -20,7 +20,6 @@ use Magento\Framework\DataObjectFactory;
 use Magento\Framework\Exception\AlreadyExistsException;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\Webapi\Request;
 use Magento\Inventory\Model\ResourceModel\Source\Collection as SourceCollection;
 use Magento\Inventory\Model\ResourceModel\Source\CollectionFactory as SourceCollectionFactory;
@@ -33,7 +32,6 @@ use Magento\Sales\Model\Order\Item;
 use Magento\Sales\Model\OrderRepository;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\StoreManagerInterface;
-use SM\DigitalProduct\Api\Data\Order\DigitalProductInterface;
 use SM\DigitalProduct\Api\Data\Order\DigitalProductInterfaceFactory;
 use SM\Installation\Api\Data\InstallationServiceInterface;
 use SM\Installation\Api\Data\InstallationServiceInterfaceFactory;
@@ -48,10 +46,8 @@ use SM\Sales\Api\Data\SubOrderDataInterface;
 use SM\Sales\Api\Data\SubOrderDataInterfaceFactory;
 use SM\Sales\Api\ParentOrderRepositoryInterface;
 use SM\Sales\Helper\StatusState;
-use SM\Sales\Model\Data\StatusHistoryData;
 use SM\Sales\Model\ParentOrderRepository;
 use SM\Sales\Model\ResourceModel\Order\Collection as OrderCollection;
-use Magento\ConfigurableProduct\Model\Product\Type\Configurable;
 
 /**
  * Class SubOrder
@@ -159,7 +155,6 @@ class SubOrder
      */
     protected $dataObjectFactory;
 
-
     /**
      * @var \SM\FreshProductApi\Helper\Fresh
      */
@@ -169,6 +164,11 @@ class SubOrder
      * @var string
      */
     private $currentCustomerToken;
+
+    /**
+     * @var \SM\Sales\Model\Order\Updater
+     */
+    protected $orderUpdater;
 
     /**
      * SubOrder constructor.
@@ -190,8 +190,12 @@ class SubOrder
      * @param StoreInfoFactory $storeInfoFactory
      * @param SourceCollectionFactory $sourceCollectionFactory
      * @param \Magento\Framework\UrlInterface $urlInterface
-     * @param \Magento\Framework\Stdlib\DateTime\DateTime $dateTime
+     * @param \SM\Sales\Model\Data\HandleOrderStatusHistory $history
+     * @param DataObjectFactory $dataObjectFactory
+     * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
      * @param \SM\FreshProductApi\Helper\Fresh $fresh
+     * @param Request $request
+     * @param \SM\Sales\Model\Order\Updater $updater
      */
     public function __construct(
         ItemOptionDataInterfaceFactory $itemOptionDataFactory,
@@ -216,7 +220,8 @@ class SubOrder
         DataObjectFactory $dataObjectFactory,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
         \SM\FreshProductApi\Helper\Fresh $fresh,
-        Request $request
+        Request $request,
+        Updater $updater
     ) {
         $this->dataObjectFactory = $dataObjectFactory;
         $this->fresh = $fresh;
@@ -241,6 +246,7 @@ class SubOrder
         $this->history = $history;
         $this->productRepository = $productRepository;
         $this->request = $request;
+        $this->orderUpdater = $updater;
     }
 
     /**
@@ -331,7 +337,6 @@ class SubOrder
                                 $supperAttributes = $infoBuyRequest['super_attribute'];
                                 $attrOpt = 0;
                                 foreach ($bundleOption as $k => $v) {
-
                                     if (in_array($productOpt->getSelectionId(), $v)) {
                                         $attrOpt = $k;
                                     }
@@ -347,7 +352,6 @@ class SubOrder
                                     }
                                 }
                             }
-
                         } else {
                             $selectOption[$productOpt->getData("option_id")] = $productOpt->getData("name");
                         }
@@ -360,7 +364,6 @@ class SubOrder
                                 $supperAttributes = $infoBuyRequest['super_attribute'];
                                 $attrOpt = 0;
                                 foreach ($bundleOption as $k => $v) {
-
                                     if ($productOpt->getSelectionId() == $v) {
                                         $attrOpt = $k;
                                     }
@@ -376,7 +379,6 @@ class SubOrder
                                     }
                                 }
                             }
-
                         } else {
                             $selectOption[$productOpt->getData("option_id")] = $productOpt->getData("name");
                         }
@@ -413,11 +415,10 @@ class SubOrder
     {
         $order = $this->orderRepository->get($subOrderId);
         if ($order->getStatus() == ParentOrderRepositoryInterface::STATUS_DELIVERED) {
-            $order
-                ->setStatus(ParentOrderRepositoryInterface::STATUS_COMPLETE)
-                ->setState($this->stateHelper->getState(ParentOrderRepositoryInterface::STATUS_COMPLETE))
-                ->addCommentToStatusHistory("Order has been Successfully Completed");
-            $this->orderRepository->save($order);
+        $orderStatus = $order->getStatus();
+        if ($orderStatus == ParentOrderRepositoryInterface::STATUS_DELIVERED
+            || $orderStatus == ParentOrderRepositoryInterface::PICK_UP_BY_CUSTOMER) {
+            $this->orderUpdater->updateStatusOrder($order);
         } else {
             throw new \Exception(__('The order isn\'t delivered.'));
         }
@@ -622,7 +623,6 @@ class SubOrder
      */
     public function getStoreInfo($order, $inventorySource)
     {
-
         if ($this->isStorePickUp($order) && isset($inventorySource[$order->getStorePickUp()])) {
             $source = $inventorySource[$order->getStorePickUp()];
             $storeInfo = $this->storeInfoFactory->create();
@@ -744,7 +744,7 @@ class SubOrder
         if ($token = $this->getCurrentCustomerToken()) {
             return $this->urlInterface->getUrl(
                 'sales/invoice/mobileview',
-                array('id' => $orderId, 'token' => $token)
+                ['id' => $orderId, 'token' => $token]
             );
         }
 

@@ -82,14 +82,7 @@ define([
          * @returns {*}
          */
         getTitle: function (itemId) {
-            let result = 'Installation included',
-                fee = itemId ? this.getDataByItem(itemId).data['installation_fee'] : this.data['installation_fee'];
-
-            if (parseFloat(fee) === 0) {
-                result = 'Free ' + result.toLowerCase();
-            }
-
-            return $t(result);
+            return $t('Free installation included');
         },
 
         getNote: function (itemId) {

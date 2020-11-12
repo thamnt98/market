@@ -49,6 +49,7 @@
         </resources>
         <data>
             <parameter name="cartId" force="true">%cart_id%</parameter>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
         </data>
     </route>
 

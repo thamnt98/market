@@ -802,7 +802,6 @@ class MultiShippingHandle
             $date = $time = "";
             $previewOrder = $this->previewOrderInterfaceFactory->create();
             $shippingMethod = $address->getShippingMethod();
-            $previewOrder->setFreeShipping(false);
             $previewOrder->setShippingFeeNotDiscount(0);
             if ($shippingMethod == \SM\Checkout\Model\MultiShippingHandle::STORE_PICK_UP) {
                 $title = __('Pick Up in Store');
@@ -821,16 +820,17 @@ class MultiShippingHandle
                     $time = $address->getTime();
                 }
                 if ($address->getFreeShipping() == 1) {
-                    $previewOrder->setFreeShipping(true);
                     $previewOrder->setShippingFeeNotDiscount($address->getShippingDiscountAmount());
+                    $previewOrder->setShippingFee($address->getShippingInclTax());
                 } else {
+                    $shippingFee = (int)$address->getShippingInclTax() - (int)$address->getShippingDiscountAmount();
                     $previewOrder->setShippingFeeNotDiscount($address->getShippingInclTax());
+                    $previewOrder->setShippingFee($shippingFee);
                 }
             }
             $previewOrder->setTitle($title);
             $previewOrder->setShippingMethod($shippingMethod);
             $previewOrder->setShippingMethodTitle($shippingMethodTitle);
-            $previewOrder->setShippingFee($address->getShippingInclTax());
             $previewOrder->setAddressId($addressId);
             if (!$web && $date != '') {
                 $date = date('d M Y', strtotime($date));

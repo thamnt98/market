@@ -38,17 +38,6 @@ interface PreviewOrderInterface
     public function getShippingMethodTitle();
 
     /**
-     * @param bool $freeShipping
-     * @return $this
-     */
-    public function setFreeShipping($freeShipping);
-
-    /**
-     * @return bool
-     */
-    public function getFreeShipping();
-
-    /**
      * @param float $shippingFee
      * @return $this
      */

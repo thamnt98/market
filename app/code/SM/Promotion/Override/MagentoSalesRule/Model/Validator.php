@@ -91,6 +91,10 @@ class Validator extends \Magento\SalesRule\Model\Validator
 
     public function processShippingAmount(\Magento\Quote\Model\Quote\Address $address)
     {
+        if ($isMain = $this->checkoutSession->getMainOrder()) {
+            $this->checkoutSession->unsMainOrder();
+        }
+
         $shippingAmount = $address->getShippingAmount();
         $baseShippingAmount = $address->getBaseShippingAmount();
         $quote = $address->getQuote();
@@ -101,6 +105,9 @@ class Validator extends \Magento\SalesRule\Model\Validator
         if ($this->addressIsFreeShip($address) || empty($rules)) {
             $address->setShippingDiscountAmount(0);
             $address->setBaseShippingDiscountAmount(0);
+            if ($isMain) {
+                $this->checkoutSession->setMainOrder(true);
+            }
 
             return $this;
         }
@@ -185,6 +192,9 @@ class Validator extends \Magento\SalesRule\Model\Validator
             )
         );
         $quote->setAppliedRuleIds($this->validatorUtility->mergeIds($quote->getAppliedRuleIds(), $appliedRuleIds));
+        if ($isMain) {
+            $this->checkoutSession->setMainOrder(true);
+        }
 
         return $this;
     }

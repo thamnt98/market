@@ -43,7 +43,7 @@ define([
 
             $.each(this.rules(), function (key, rule) {
                 if (rule.code) {
-                    voucherTotal += parseFloat(rule['rule_amount']);
+                    voucherTotal += parseFloat(rule['items_discount']);
                 } else {
                     customRules.push(rule);
                 }

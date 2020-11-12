@@ -73,7 +73,7 @@ define([
             if (!this.isCalculated()) {
                 return this.notCalculatedMessage;
             }
-            price =  this.totals()['shipping_amount'];
+            price =  this.totals()['shipping_amount'] - this.totals()['shipping_discount_amount'];
 
             return this.getFormattedPrice(price);
         },
@@ -90,6 +90,10 @@ define([
                 price = parseFloat(extData['free_shipping_discount']) + parseFloat(this.totals()['shipping_amount']);
 
                 return this.getFormattedPrice(price);
+            }
+
+            if (parseFloat(this.totals()['shipping_discount_amount']) > 0) {
+                return this.getFormattedPrice(this.totals()['shipping_amount']);
             }
 
             return '';
@@ -153,6 +157,13 @@ define([
 
         showSubtotalDeliveryFee: function () {
             return !globalVar.isStepPayment();
+        },
+
+        isDiscountShipping: function (shipping_fee, shipping_fee_not_discount) {
+            if (parseFloat(shipping_fee) < parseFloat(shipping_fee_not_discount)) {
+                return true;
+            }
+            return false;
         }
     });
 });

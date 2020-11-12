@@ -14,7 +14,7 @@ define([
     'use strict';
     return {
         shippingMethodList: ko.observableArray([
-            {label: $.mage.__('Not Availiable Method'), value: 'transshipping_transshipping0'},
+            {label: $.mage.__('Not Available Method'), value: 'transshipping_transshipping0'},
             {label: $.mage.__('Regular (2-7 days)'), value: 'transshipping_transshipping1'},
             {label: $.mage.__('Same day (3 hours)'), value: 'transshipping_transshipping2'},
             {label: $.mage.__('Scheduling'), value: 'transshipping_transshipping3'},
