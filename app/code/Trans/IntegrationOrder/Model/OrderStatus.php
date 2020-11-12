@@ -415,15 +415,17 @@ class OrderStatus implements OrderStatusInterface {
 
 		$itemOrders = $this->statusRepo->loadByOrderId($request['order_id']);
 		foreach ($itemOrders as $itemOrder) {
-			if ($itemOrder->getSKU() === $item['sku']) {
-				$itemOrder->setQtyAllocated($item['quantity_allocated']);
-				$itemOrder->setItemStatus($item['item_status']);
-			}
-			// if ($itemOrder->getQty() != $qtyOrdered) {
-			//  throw new \Magento\Framework\Webapi\Exception(__('Invalid quantity order. Please checking again.'), 400);
-			// }
-			if ($item['quantity_allocated'] > $itemOrder->getQty()) {
-				throw new \Magento\Framework\Webapi\Exception(__('Quantity allocated is greater than quantity order. Please checking again.'), 400);
+			foreach ($request['order_items'] as $allocatedItems) {
+				if ($itemOrder->getSKU() === $allocatedItems['sku']) {
+					$itemOrder->setQtyAllocated($allocatedItems['quantity_allocated']);
+					$itemOrder->setItemStatus($allocatedItems['item_status']);
+				}
+				// if ($itemOrder->getQty() != $qtyOrdered) {
+				//  throw new \Magento\Framework\Webapi\Exception(__('Invalid quantity order. Please checking again.'), 400);
+				// }
+				if ($item['quantity_allocated'] > $itemOrder->getQty()) {
+					throw new \Magento\Framework\Webapi\Exception(__('Quantity allocated is greater than quantity order. Please checking again.'), 400);
+				}
 			}
 		}
 		$itemOrderSave = $this->statusRepo->saveItem($itemOrder);
