@@ -162,7 +162,10 @@ class SprintResponseRepository implements SprintResponseRepositoryInterface {
 				$storeId = $this->storeManager->getStore()->getId();
 			}
 			/** @var \Trans\Sprint\Model\ResourceModel\SprintResponse\CollectionFactory|\Magento\Framework\Model\AbstractModel $customOrderItem */
-			$data = $this->sprintResCollection->create($quoteId, null, $storeId)->addFieldToSelect('*')->setOrder('id', 'ASC')->setPageSize(1)->load()->getFirstItem();
+			//$data = $this->sprintResCollection->create($quoteId, null, $storeId)->addFieldToSelect('*')->setOrder('id', 'ASC')->setPageSize(1)->load()->getFirstItem();
+/** @var \Trans\Sprint\Api\Data\SprintResponseInterface|\Magento\Framework\Model\AbstractModel $sprintResponse */
+			$data = $this->sprintResInterface->create();
+			$this->resource->load($data, $quoteId, 'quote_id');
 
 			$this->logger->info('$data->getData() = ' . json_encode($data->getData()));
 			if (!$data->getId()) {
