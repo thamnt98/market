@@ -551,7 +551,7 @@ class OrderStatus implements OrderStatusInterface {
 					$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
 				}
 				/* update quantity adjusment */
-				$url            = $this->configHelper->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
+				$url            = $this->orderConfig->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
 				$headers        = $this->getHeader();
 				$dataAdjustment = array(
 					'reference_number' => $reffId,
@@ -661,7 +661,7 @@ class OrderStatus implements OrderStatusInterface {
 						$objRf      = json_decode($responseRf);
 
 						/* update quantity adjusment */
-						$url            = $this->configHelper->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
+						$url            = $this->orderConfig->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
 						$headers        = $this->getHeader();
 						$dataAdjustment = array(
 							'reference_number' => $reffId,
