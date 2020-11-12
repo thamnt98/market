@@ -713,7 +713,6 @@ class OrderStatus implements OrderStatusInterface {
 		}
 
 		/* =================== END CAPTURE REFUND =======================*/
-
 		return $result;
 	}
 
