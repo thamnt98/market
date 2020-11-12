@@ -110,6 +110,10 @@ class Capture
         $invoice = $this->invoice->create($order, $transaction);
         $this->invoice->send($invoice);
 
+        //update order status
+        $order->setState('in_process');
+        $order->setStatus('in_process');
+        $this->transactionHelper->saveOrder($order);
         //save detail information
         $this->transactionHelper->addTransactionData($transaction->getId(), $inquiryTransaction, $transaction);
 
