@@ -141,6 +141,10 @@ class TransmartCapture extends Capture
           if ($value->getEntityId() !== $order->getId()) {
             $query = "INSERT INTO ".$table." (parent_id, status, entity_name) VALUES ('".$value->getEntityId()."','in_process','order')";
             $connection->query($query);
+            $subOrder = $this->transactionHelper->getOrder($value->getEntityId());
+            $subOrder->setState('in_process');
+            $subOrder->setStatus('in_process');
+            $this->transactionHelper->saveOrder($subOrder);
           }
         }
     }
