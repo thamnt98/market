@@ -538,11 +538,7 @@ class OrderStatus implements OrderStatusInterface {
 						'new_amount' => $trxAmount - $matrixAdjusmentAmount,
 					]
 				);
-			}
-			/* End CC Bank Mega Auth Capture*/
-
-			/* Start Non CC*/
-			if ($paymentMethod === 'sprint_bca_va' || 'sprint_permata_va') {
+			} elseif ($paymentMethod === 'sprint_bca_va' || 'sprint_permata_va') {
 				$paidPriceOrder = 0;
 				$qtyOrder       = 0;
 				foreach ($loadItemByOrderId as $itemOrder) {
@@ -555,7 +551,7 @@ class OrderStatus implements OrderStatusInterface {
 					$matrixAdjusmentAmount = $amount;
 				}
 				/* update quantity adjusment */
-				$url            = $this->orderConfig->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
+				$url            = 'https://oms-prd-api.transmart.co.id' . $this->orderConfig->getOmsPaymentStatusApi();
 				$headers        = $this->getHeader();
 				$dataAdjustment = array(
 					'reference_number' => $reffId,
@@ -577,12 +573,12 @@ class OrderStatus implements OrderStatusInterface {
 				$this->loggerOrder->info('Body: ' . $dataJson . '. Response: ' . $responseOrder);
 				$json_string = stripcslashes($responseOrder);
 				if ($objOrder->code == 200) {
-					return json_decode($responseOrder, true);
+					return $result
 				}
 			}
 			/* End Non CC*/
 
-			if ($paymentMethod === 'sprint_mega_cc' || 'sprint_allbankfull_cc' || 'sprint_mega_debit') {
+			elseif ($paymentMethod === 'sprint_mega_cc' || 'sprint_allbankfull_cc' || 'sprint_mega_debit') {
 				if ($itemData['quantity'] > $itemData['quantity_allocated']) {
 					$this->helperData->sprintLog()->info('===== Capture Process ===== Start');
 
@@ -665,7 +661,7 @@ class OrderStatus implements OrderStatusInterface {
 						$objRf      = json_decode($responseRf);
 
 						/* update quantity adjusment */
-						$url            = $this->orderConfig->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
+						$url            = 'https://oms-prd-api.transmart.co.id' . $this->orderConfig->getOmsPaymentStatusApi();
 						$headers        = $this->getHeader();
 						$dataAdjustment = array(
 							'reference_number' => $reffId,
