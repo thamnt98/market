@@ -420,15 +420,15 @@ class OrderStatus implements OrderStatusInterface {
 					$itemOrder->setQtyAllocated($allocatedItems['quantity_allocated']);
 					$itemOrder->setItemStatus($allocatedItems['item_status']);
 				}
-				// if ($itemOrder->getQty() != $qtyOrdered) {
-				//  throw new \Magento\Framework\Webapi\Exception(__('Invalid quantity order. Please checking again.'), 400);
-				// }
-				if ($item['quantity_allocated'] > $itemOrder->getQty()) {
-					throw new \Magento\Framework\Webapi\Exception(__('Quantity allocated is greater than quantity order. Please checking again.'), 400);
-				}
 			}
+			// if ($itemOrder->getQty() != $qtyOrdered) {
+			//  throw new \Magento\Framework\Webapi\Exception(__('Invalid quantity order. Please checking again.'), 400);
+			// }
+			if ($item['quantity_allocated'] > $itemOrder->getQty()) {
+				throw new \Magento\Framework\Webapi\Exception(__('Quantity allocated is greater than quantity order. Please checking again.'), 400);
+			}
+			$itemOrderSave = $this->statusRepo->saveItem($itemOrder);
 		}
-		$itemOrderSave = $this->statusRepo->saveItem($itemOrder);
 
 		$configStatus               = $this->orderConfig;
 		$loadDataOrder              = $this->statusRepo->loadDataByRefOrderId($orderId);
