@@ -515,15 +515,15 @@ class OrderStatus implements OrderStatusInterface {
 		/**
 		 * trigger capture - refund by payment method
 		 */
-		$amount = 0;
+		$matrixAdjusmentAmount = 0;
 		if ($status == 2 && $action == 2 && $subAction == 7) {
 			/* Start CC Bank Mega Auth Capture*/
 			if ($paymentMethod === 'trans_mepay_cc') {
 				$paidPriceOrder = 0;
 				$qtyOrder       = 0;
 				foreach ($loadItemByOrderId as $itemOrder) {
-					$paidPriceOrder += $itemOrder->getPaidPrice();
-					$qtyOrder += $itemOrder->getQty();
+					$paidPriceOrder = $itemOrder->getPaidPrice();
+					$qtyOrder = $itemOrder->getQty();
 					$qtyAllocated = $allocatedQty;
 					// $matrixAdjusmentAmount = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 					$amount = $amount + (($paidPriceOrder * $qtyOrder) - ($paidPriceOrder * $qtyAllocated));
@@ -539,19 +539,19 @@ class OrderStatus implements OrderStatusInterface {
 					]
 				);
 			} elseif ($paymentMethod === 'sprint_bca_va' || 'sprint_permata_va') {
-				$paidPriceOrder = 0;
-				$qtyOrder       = 0;
+				//$paidPriceOrder = 0;
+				//$qtyOrder       = 0;
 				foreach ($loadItemByOrderId as $itemOrder) {
-					$paidPriceOrder += $itemOrder->getPaidPrice();
-					$qtyOrder += $itemOrder->getQty();
+					$paidPriceOrder = $itemOrder->getPaidPrice();
+					$qtyOrder = $itemOrder->getQty();
 					$qtyAllocated = $allocatedQty;
 					// $matrixAdjusmentAmount = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
-					$amount = $amount + (($paidPriceOrder * $qtyOrder) - ($paidPriceOrder * $qtyAllocated));
+					$amount = ($paidPriceOrder / $qtyOrder) - ($paidPriceOrder * $qtyAllocated));
 
-					$matrixAdjusmentAmount = $amount;
+					$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
 				}
 				/* update quantity adjusment */
-				$url            = 'https://oms-prd-api.transmart.co.id' . $this->orderConfig->getOmsPaymentStatusApi();
+				$url            = $this->configHelper->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
 				$headers        = $this->getHeader();
 				$dataAdjustment = array(
 					'reference_number' => $reffId,
@@ -661,7 +661,7 @@ class OrderStatus implements OrderStatusInterface {
 						$objRf      = json_decode($responseRf);
 
 						/* update quantity adjusment */
-						$url            = 'https://oms-prd-api.transmart.co.id' . $this->orderConfig->getOmsPaymentStatusApi();
+						$url            = $this->configHelper->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
 						$headers        = $this->getHeader();
 						$dataAdjustment = array(
 							'reference_number' => $reffId,
