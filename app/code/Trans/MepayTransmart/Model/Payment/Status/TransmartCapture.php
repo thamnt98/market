@@ -87,7 +87,10 @@ class TransmartCapture extends Capture
         //create invoice
         $invoice = $this->invoice->create($order, $transaction);
         $this->invoice->send($invoice);
-
+        $order->setState('in_process');
+        $order->setStatus('in_process');
+        $this->transactionHelper->saveOrder($order);
+        $this->updateChildStatusHistory($order);
         //save detail information
         $this->transactionHelper->addTransactionData($transaction->getId(), $inquiryTransaction, $transaction);
 
@@ -122,5 +125,24 @@ class TransmartCapture extends Capture
         'payment_status' => SprintConfig::OMS_SUCCESS_PAYMENT_OPRDER,
       ]
     );
+  }
+
+  public function updateChildStatusHistory($order)
+  {
+    $referenceNumber = $order->getReferenceNumber();
+    $this->logger->log($referenceNumber);
+    $collection = $order->getCollection()->addFieldToFilter('reference_number',['eq'=>$referenceNumber]);
+    if ($collection->getSize()) {
+        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $resourceCon = $objectManager->create('Magento\Framework\App\ResourceConnection');
+        $connection = $resourceCon->getConnection();
+        $table = $connection->getTableName('sales_order_status_history');
+        foreach ($collection as $key => $value) {
+          if ($value->getEntityId() !== $order->getId()) {
+            $query = "INSERT INTO ".$table." (parent_id, status, entity_name) VALUES ('".$value->getEntityId()."','in_process','order')";
+            $connection->query($query);
+          }
+        }
+    }
   }
 }
