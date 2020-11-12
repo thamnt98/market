@@ -413,10 +413,10 @@ class OrderStatus implements OrderStatusInterface {
 			throw new \Magento\Framework\Webapi\Exception(__('Please re-check status, action and subaction sequence before submit'), 400);
 		}
 
-		$itemOrders = $this->statusRepo->loadByOrderId($request['order_id']);
-		foreach ($itemOrders as $itemOrder) {
-			if ($itemOrder->getSKU() === $itemData['sku']) {
-				foreach ($request['order_items'] as $allocatedItems) {
+		foreach ($request['order_items'] as $allocatedItems) {
+			$itemOrders = $this->statusRepo->loadByOrderId($orderId);
+			foreach ($itemOrders as $itemOrder) {
+				if ($itemOrder->getSKU() === $allocatedItems['sku']) {
 					$itemOrder->setQtyAllocated($allocatedItems['quantity_allocated']);
 					$itemOrder->setItemStatus($allocatedItems['item_status']);
 				}
