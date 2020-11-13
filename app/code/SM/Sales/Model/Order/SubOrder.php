@@ -414,7 +414,6 @@ class SubOrder
     public function updateStatusComplete($subOrderId)
     {
         $order = $this->orderRepository->get($subOrderId);
-        if ($order->getStatus() == ParentOrderRepositoryInterface::STATUS_DELIVERED) {
         $orderStatus = $order->getStatus();
         if ($orderStatus == ParentOrderRepositoryInterface::STATUS_DELIVERED
             || $orderStatus == ParentOrderRepositoryInterface::PICK_UP_BY_CUSTOMER) {
