@@ -551,7 +551,7 @@ class OrderStatus implements OrderStatusInterface {
 				$dataAdjustment = array(
 					'reference_number' => $reffId,
 					'status' => 3,
-					'amount_adjustment' => $matrixAdjusmentAmount,
+					'amount_adjustment' => ceil($matrixAdjusmentAmount),
 
 				);
 				$dataJson = json_encode($dataAdjustment);
@@ -662,7 +662,7 @@ class OrderStatus implements OrderStatusInterface {
 						$dataAdjustment = array(
 							'reference_number' => $reffId,
 							'status' => 3,
-							'amount_adjustment' => $matrixAdjusmentAmount,
+							'amount_adjustment' => ceil($matrixAdjusmentAmount),
 
 						);
 						$dataJson = json_encode($dataAdjustment);
