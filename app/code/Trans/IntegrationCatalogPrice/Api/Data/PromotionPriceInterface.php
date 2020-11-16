@@ -46,6 +46,7 @@ interface PromotionPriceInterface
     const PIM_PROMO_SELLING_PRICE   = 'promo_selling_price';
     const PIM_PERCENT_DISC          = 'percent_disc';
     const PIM_AMOUNT_OFF            = 'amount_off';
+    const PIM_POINT_PER_UNIT        = 'point_per_unit';
 
     /**
      * get id
@@ -361,4 +362,19 @@ interface PromotionPriceInterface
      * @return void
      */
     public function setRowId($id);
+
+    /**
+     * get point_per_unit
+     *
+     * @return int
+     */
+    public function getPointPerUnit();
+
+    /**
+     * Set point_per_unit
+     *
+     * @param int $point
+     * @return void
+     */
+    public function setPointPerUnit($point);
 }
