@@ -34,6 +34,9 @@ class Onepage
     protected $notFulFillMessage;
     protected $currentItemsListId = [];
     protected $isAddressEachItem = false;
+    protected $fulFill = true;
+    protected $storePickUpItemsEnable = [];
+
     /**
      * @var \Magento\Framework\Api\SearchCriteriaBuilder
      */
@@ -247,6 +250,7 @@ class Onepage
         $data['voucher_list'] = $this->getVoucherList();
         $data['symbol'] = $this->currency->getCurrency()->getCurrencySymbol();
         $data['sortSource'] = $this->getSortSource();
+        $data['isFullFill'] = $this->fulFill;
         $data['notFulFillMessage'] = $this->notFulFillMessage;
         $data['latlng'] = ['lat' => $this->defaultLat, 'lng' => $this->defaultLng];
         $data['address_complete'] = $this->isAddressComplete();
@@ -421,7 +425,6 @@ class Onepage
      */
     protected function getSortSource()
     {
-        $fulFill = true;
         $skuList = [];
         $quote = $this->checkoutSession->getQuote();
         $child = [];
@@ -433,13 +436,9 @@ class Onepage
         }
         foreach ($quote->getAllVisibleItems() as $item) {
             $product = $item->getProduct();
-            if ($product->getData('is_spo') || $product->getData('own_courier')) {
-                $this->hasSpecialProduct = true;
-            }
-
             $isWarehouse = $product->getIsWarehouse();
             if ($isWarehouse == 1) {
-                $fulFill = false;
+                $this->fulFill = false;
                 continue;
             }
             $notFulFillType = 1;
@@ -450,9 +449,6 @@ class Onepage
             $this->notFulFillMessage = __('Sorry, pick-up method is not applicable for this order. Shop conveniently with our delivery.');
         } else {
             $this->notFulFillMessage = __('Sorry, some items are not available for pick-up. We have more delivery options for you, try them out!');
-        }
-        if (!$fulFill) {
-            return [];
         }
         $defaultShipping = $this->getCustomer()->getDefaultShippingAddress();
         $this->defaultLat = $defaultShipping->getCustomAttribute('latitude') ? $defaultShipping->getCustomAttribute('latitude')->getValue() : 0;
@@ -574,6 +570,7 @@ class Onepage
     protected function getItemPreSelect($quoteAddress, $allCustomerAddresses)
     {
         $items = [];
+        $shippingMethod = $quoteAddress->getShippingMethod();
         foreach ($quoteAddress->getAllVisibleItems() as $item) {
             if (!isset($this->currentQuoteItems[$item->getQuoteItemId()]) || $this->currentQuoteItems[$item->getQuoteItemId()]->getQty() != $item->getQty()) {
                 $this->cartUpdate = true;
@@ -584,13 +581,6 @@ class Onepage
             if (!in_array($customerAddressId, $allCustomerAddresses)) {
                 $customerAddressId = $this->getDefaultShippingAddressId();
             }
-            $shippingMethod = $quoteAddress->getShippingMethod();
-            /*if ($shippingMethod == \SM\Checkout\Model\MultiShippingHandle::DC) {
-                $shippingMethod = \SM\Checkout\Model\MultiShippingHandle::DEFAULT_METHOD;
-            }
-            if ($shippingMethod == \SM\Checkout\Model\MultiShippingHandle::TRANS_COURIER) {
-                $shippingMethod = \SM\Checkout\Model\MultiShippingHandle::SAME_DAY;
-            }*/
             if ($shippingMethod == \SM\Checkout\Model\MultiShippingHandle::STORE_PICK_UP) {
                 $type = '1';
             } else {

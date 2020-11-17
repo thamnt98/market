@@ -185,6 +185,8 @@ class Onepage extends \Magento\Checkout\Block\Onepage
                             $quoteData['fresh_tooltip'] = $this->getToolTip();
                         }
                     }
+                    $imageData[$key]['is_warehouse'] = (bool)$item['product']['is_warehouse'];
+
                 }
             }
         }

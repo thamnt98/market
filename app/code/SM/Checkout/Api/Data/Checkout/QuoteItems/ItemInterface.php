@@ -234,4 +234,15 @@ interface ItemInterface
      * @return \SM\FreshProductApi\Api\Data\FreshProductInterface
      */
     public function getFreshProduct();
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function setDisableStorePickUp($value);
+
+    /**
+     * @return bool
+     */
+    public function getDisableStorePickUp();
 }

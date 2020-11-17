@@ -47,18 +47,21 @@
                     <div class="help-order-list">
                         <div class="txt-title-order-list"><?= $block->escapeHtml(__('Which order has the products with problems? Please choose one from the list below.'))?></div>
                         <?php if ($_orders->getItems()): ?>
-                            <?php foreach ($_orders->getItems() as $order): ?>
-                                <?php /** @var SM\Sales\Model\Data\SubOrderData $order */?>
+                            <?php foreach ($_orders->getItems() as $order):?>
+                                <?php /** @var SM\Sales\Model\Data\SubOrderData $order */
+                                    if($order->getStatus() == 'order_canceled' || $order->getStatus() == 'canceled') $classOrder="color-red";
+                                    else $classOrder="color-blue";
+                                ?>
                                 <div id="<?= $order->getId() ?>" class="order-track-box">
                                     <div class="order-track-head">
                                         <div class="gr-date-total">
                                             <span class="date-track"><?= $block->escapeHtml($block->getFormatDate($order->getCreatedAt())) ?></span>
                                             <span class="or-track-total"><?= $block->escapeHtml(__('Order ID ')) ?>
-                                                <span class="color-red"><?= $block->escapeHtml('#'.$order->getSubOrderId()) ?></span>
+                                                <span class="color-black"><?= $block->escapeHtml('#'.$order->getSubOrderId()) ?></span>
                                         </span>
                                         </div>
-                                        <div class="gr-status"><span class="or-track-status"><?= $block->escapeHtml(__('Status:')) ?><span
-                                                    class="color-blue"><?= $block->escapeHtml($order->getStatusLabel()) ?></span>
+                                        <div class="gr-status"><span class="or-track-status"><?= $block->escapeHtml(__('Status:')) ?>
+                                                <span class="<?= $block->escapeHtml($classOrder) ?>"><?= $block->escapeHtml($order->getStatusLabel()) ?></span>
                                         </span>
                                         </div>
                                     </div>

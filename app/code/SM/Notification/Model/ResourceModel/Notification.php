@@ -211,26 +211,7 @@ class Notification extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      */
     public function saveCustomerMessage(\Magento\Framework\Model\AbstractModel $object)
     {
-        if ($object->getData('admin_type') != $object->getOrigData('admin_type')) {
-            switch ($object->getData('admin_type')) {
-                case CustomerTypeOptions::TYPE_ALL:
-                    $customerIds = $this->getAllCustomerIds();
-                    break;
-                case CustomerTypeOptions::TYPE_CUSTOMER_SEGMENT:
-                    $customerIds = $this->getCustomerIdBySegment($object->getData('segment_ids'));
-                    break;
-                default:
-                    $customerIds = $object->getData('customer_ids');
-            }
-        } elseif ($object->getData('customer_ids')) {
-            $customerIds = $object->getData('customer_ids');
-        }
-
-        if (!empty($customerIds)) {
-            if (!is_array($customerIds)) {
-                $customerIds = explode(',', $customerIds);
-            }
-
+        if ($customerIds = $this->getCustomerIds($object)) {
             $this->getConnection()
                 ->delete(
                     CustomerMessage::TABLE_NAME,
@@ -321,6 +302,41 @@ class Notification extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
         $select = $this->getConnection()->select();
         $select->from(['customer_entity'], 'entity_id')
             ->where('is_active = ? ', 1);
+
+        return $this->getConnection()->fetchCol($select);
+    }
+
+    /**
+     * @param \Magento\Framework\Model\AbstractModel $object
+     *
+     * @return array
+     */
+    protected function getCustomerIds(\Magento\Framework\Model\AbstractModel $object)
+    {
+        if ($object->getData('admin_type') != $object->getOrigData('admin_type')) {
+            switch ($object->getData('admin_type')) {
+                case CustomerTypeOptions::TYPE_ALL:
+                    $customerIds = $this->getAllCustomerIds();
+                    break;
+                case CustomerTypeOptions::TYPE_CUSTOMER_SEGMENT:
+                    $customerIds = $this->getCustomerIdBySegment($object->getData('segment_ids'));
+                    break;
+                default:
+                    $customerIds = $object->getData('customer_ids');
+            }
+        } elseif ($object->getData('customer_ids')) {
+            $customerIds = $object->getData('customer_ids');
+        } else {
+            return [];
+        }
+
+        if (is_array($customerIds)) {
+            $customerIds = implode(',', $customerIds);
+        }
+
+        $select = $this->getConnection()->select();
+        $select->from(['customer_entity'], 'entity_id')
+            ->where("entity_id IN ({$customerIds})");
 
         return $this->getConnection()->fetchCol($select);
     }

@@ -32,6 +32,10 @@ class Config
             unset($options['position']);
         }
 
+        if (isset($options['name'])) {
+            $options['name'] = __('A to Z');
+        }
+
         return array_merge(\SM\Catalog\Helper\ProductList\Toolbar::getAdditionalOptions(), $options);
     }
 }

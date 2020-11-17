@@ -750,15 +750,11 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
                 $product = $item->getProduct();
                 $isWarehouse = $product->getIsWarehouse();
                 if ($isWarehouse == 1) {
-                    $fulFill = false;
-                    break;
+                    continue;
                 }
                 $sku = (isset($child[$item->getItemId()])) ? $child[$item->getItemId()] : $item->getSku();
                 $skuList[$sku] = $item->getQty();
             }
-        }
-        if (!$fulFill) {
-            return $response;
         }
         $sourceList = $this->msiFullFill->getMsiFullFill($skuList);
         if (empty($sourceList)) {

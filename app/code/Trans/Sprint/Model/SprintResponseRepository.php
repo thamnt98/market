@@ -99,10 +99,6 @@ class SprintResponseRepository implements SprintResponseRepositoryInterface {
 		$this->sprintResInterface   = $sprintResInterface;
 		$this->dataObjectHelper     = $dataObjectHelper;
 		$this->storeManager         = $storeManager;
-
-		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/sprint_model.log');
-        $logger = new \Zend\Log\Logger();
-        $this->logger = $logger->addWriter($writer);
 	}
 
 	/**

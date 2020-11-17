@@ -55,7 +55,8 @@
                 We have received your
                 order with %payment_method_title payment. Please
                 complete your payment using %payment_method_title before " payment_method_title=$additional_data.payment_method_title}}
-                {{trans '<span class="no-link">%created_at</span>' created_at=$created_at_formatted |raw}}.
+                {{trans '%expire_time,' expire_time=$additional_data.expire_time }}
+                {{trans '%expire_time_string' expire_time_string=$additional_data.expire_time_string }}.
             </p>
             <p>
                 {{trans "Reference Number: %order_increment" order_increment=$additional_data.order_increment}}
