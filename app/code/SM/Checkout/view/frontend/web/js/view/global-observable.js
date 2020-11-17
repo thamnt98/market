@@ -21,7 +21,8 @@ define([
             paymentSelected = ko.observable(false),
             showPaymentDetails = ko.observable(false),
             disableGoPaymentButton = ko.observable(false),
-            splitOrder = ko.observable(false);
+            splitOrder = ko.observable(false),
+            showOrderSummary = ko.observable(false);
         getPaymentInformation();
     } else {
         var isStepShipping = ko.observable(true),
@@ -30,7 +31,8 @@ define([
             paymentSelected = ko.observable(false),
             showPaymentDetails = ko.observable(false),
             disableGoPaymentButton = ko.observable(false),
-            splitOrder = ko.observable(false);
+            splitOrder = ko.observable(false),
+            showOrderSummary = ko.observable(false);
     }
     return {
         isStepShipping: isStepShipping,
@@ -39,7 +41,8 @@ define([
         paymentSelected: paymentSelected,
         showPaymentDetails: showPaymentDetails,
         disableGoPaymentButton: disableGoPaymentButton,
-        splitOrder: splitOrder
+        splitOrder: splitOrder,
+        showOrderSummary: showOrderSummary
     };
 });
 
