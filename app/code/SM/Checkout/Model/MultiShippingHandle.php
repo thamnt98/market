@@ -246,11 +246,13 @@ class MultiShippingHandle
         $quoteItemIdSku = [];
         $order = [];
         $addressIds = [];
+        $quote = $checkoutSession->getQuote();
         /** @var \Magento\Quote\Model\Quote\Item[] $allItems */
-        $allItems = $checkoutSession->getQuote()->getAllItems();
+        $allItems = $quote->getAllItems();
         $storePickupOrder = [];
         $child = [];
         $listMethod = $this->split->getListMethodName();
+        $quoteId = $quote->getId();
         foreach ($allItems as $item) {
             if ($item->getParentItemId() && $item->getParentItemId() != null) {
                 $child[$item->getParentItemId()][] = $item;
@@ -324,6 +326,7 @@ class MultiShippingHandle
                     $totalPrice = 0;
                     $itemsData = [];
                     $orderToSendOar = [];
+                    $orderToSendOar['quote_address_id'] = $quoteId;
                     $orderToSendOar['order_id'] = $customerId;
                     $orderToSendOar['merchant_code'] = $merchantCode;
                     $orderToSendOar['destination'] = $addressData[$addressId];

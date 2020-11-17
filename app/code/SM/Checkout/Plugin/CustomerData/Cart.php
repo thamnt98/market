@@ -62,7 +62,7 @@ class Cart extends \Magento\Checkout\CustomerData\Cart
         $itemCount = 0;
         $itemQty = 0;
         foreach ($quote->getItemsCollection() as $item) {
-            if ($item->getIsVirtual()) {
+            if ($item->getIsVirtual() || $item->getParentItemId()) {
                 continue;
             }
             $itemCount ++;

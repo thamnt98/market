@@ -33,13 +33,20 @@ class Tax
     protected $customerUses;
 
     /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $checkoutSession;
+
+    /**
      * ShippingDiscount constructor.
      *
+     * @param \Magento\Checkout\Model\Session                               $checkoutSession
      * @param \SM\Promotion\Model\Rule\Validator\CustomerUses               $customerUses
      * @param \Amasty\Rules\Model\DiscountRegistry                          $discountRegistry
      * @param \Magento\SalesRule\Model\ResourceModel\Rule\CollectionFactory $ruleCollFact
      */
     public function __construct(
+        \Magento\Checkout\Model\Session $checkoutSession,
         \SM\Promotion\Model\Rule\Validator\CustomerUses $customerUses,
         \Amasty\Rules\Model\DiscountRegistry $discountRegistry,
         \Magento\SalesRule\Model\ResourceModel\Rule\CollectionFactory $ruleCollFact
@@ -47,6 +54,7 @@ class Tax
         $this->ruleCollFact = $ruleCollFact;
         $this->discountRegistry = $discountRegistry;
         $this->customerUses = $customerUses;
+        $this->checkoutSession = $checkoutSession;
     }
 
     /**
@@ -67,6 +75,9 @@ class Tax
     ) {
         /** @var \Magento\Quote\Model\Quote\Address $address */
         $address = $shippingAssignment->getShipping()->getAddress();
+        if ($isMain = $this->checkoutSession->getMainOrder()) {
+            $this->checkoutSession->unsMainOrder();
+        }
 
         if (!$quote->isVirtual() &&
             $address->getAddressType() === 'shipping' &&
@@ -122,6 +133,10 @@ class Tax
             }
 
             $address->setFreeShipping($addressFreeShip);
+        }
+
+        if ($isMain) {
+            $this->checkoutSession->setMainOrder(true);
         }
 
         return $result;

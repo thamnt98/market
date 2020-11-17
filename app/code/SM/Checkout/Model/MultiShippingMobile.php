@@ -557,7 +557,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
             $model->setVoucherId('');
         }
         $quoteItemModel->setGtmData($model);
-
+        $quoteItemModel->setDisableStorePickUp((bool)$product->getIsWarehouse());
         return $quoteItemModel;
     }
 
@@ -1046,6 +1046,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
                 $quoteItemModel->setQty($quoteItem->getQty());
                 $quoteItemModel->setThumbnail($this->getImageUrl($product, $storeId));
                 $quoteItemModel->setRowTotal($quoteItem->getRowTotal());
+                $quoteItemModel->setDisableStorePickUp((bool)$product->getIsWarehouse());
                 $product = $this->productRepository->getById($product->getId());
                 $model = $this->gtmCart->create();
                 $data = $this->productGtm->getGtm($product);
@@ -1143,6 +1144,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
                 ) {
                     $quoteItemModel->setMessage(__('Quantity has been adjusted.'));
                 }
+
                 $quoteItemData[$quoteItemId] = $quoteItemModel;
             }
         }
@@ -1252,16 +1254,11 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
                 $product = $item->getProduct();
                 $isWarehouse = $product->getIsWarehouse();
                 if ($isWarehouse == 1) {
-                    $fulFill = false;
-                    break;
+                    continue;
                 }
                 $sku = (isset($child[$item->getItemId()])) ? $child[$item->getItemId()] : $item->getSku();
                 $skuList[$sku] = $item->getQty();
             }
-        }
-        if (!$fulFill) {
-            $interface->setCurrentStoreFulFill(false);
-            return $interface;
         }
         $sourceList = $this->msiFullFill->getMsiFullFill($skuList);
         if (empty($sourceList)) {

@@ -94,9 +94,21 @@ class TotalsCollector extends \Magento\Quote\Model\Quote\TotalsCollector
                 if ($key === 'main') { // Main Address (Quote shipping address)
                     $this->checkoutSession->setMainOrder(true);
                     $addressTotal = $this->collectAddressTotals($quote, $address);
+
+                    if ($this->checkoutSession->getMainAddress()) {
+                        $this->checkoutSession->unsMainAddress();
+                    }
+
                     $this->checkoutSession->unsMainOrder();
                 } else { // Other shipping address
                     $this->collectAddressTotals($quote, $address);
+                    if ($address->getId()
+                        && isset($addresses['main'])
+                        && $address->getId() == $addresses['main']->getId()
+                    ) {
+                        $this->checkoutSession->setMainAddress(clone $address);
+                    }
+
                     continue;
                 }
             } else {

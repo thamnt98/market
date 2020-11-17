@@ -91,8 +91,35 @@ class Validator extends \Magento\SalesRule\Model\Validator
 
     public function processShippingAmount(\Magento\Quote\Model\Quote\Address $address)
     {
-        if ($isMain = $this->checkoutSession->getMainOrder()) {
-            $this->checkoutSession->unsMainOrder();
+        if ($this->checkoutSession->getMainOrder() && $this->checkoutSession->getMainAddress()) {
+            /** @var \Magento\Quote\Model\Quote\Address $mainAddress */
+            $mainAddress = $this->checkoutSession->getMainAddress();
+            if ($mainAddress->getShippingDiscountAmount()) {
+                $address->setAppliedRuleIds($mainAddress->getAppliedRuleIds());
+                $address->setShippingDiscountAmount($mainAddress->getShippingDiscountAmount());
+                $address->setBaseShippingDiscountAmount($mainAddress->getBaseShippingDiscountAmount());
+                $address->setData(
+                    \SM\Promotion\Model\Data\Rule::SHIPPING_RULE_IDS_FIELD,
+                    $this->validatorUtility->mergeIds(
+                        $address->getData(\SM\Promotion\Model\Data\Rule::SHIPPING_RULE_IDS_FIELD),
+                        $mainAddress->getAppliedRuleIds()
+                    )
+                );
+                $address->getQuote()->setData(
+                    \SM\Promotion\Model\Data\Rule::SHIPPING_RULE_IDS_FIELD,
+                    $this->validatorUtility->mergeIds(
+                        $address->getQuote()->getData(\SM\Promotion\Model\Data\Rule::SHIPPING_RULE_IDS_FIELD),
+                        $mainAddress->getAppliedRuleIds()
+                    )
+                )->setAppliedRuleIds(
+                    $this->validatorUtility->mergeIds(
+                        $address->getQuote()->getAppliedRuleIds(),
+                        $mainAddress->getAppliedRuleIds()
+                    )
+                );
+            }
+
+            return $this;
         }
 
         $shippingAmount = $address->getShippingAmount();
@@ -105,9 +132,6 @@ class Validator extends \Magento\SalesRule\Model\Validator
         if ($this->addressIsFreeShip($address) || empty($rules)) {
             $address->setShippingDiscountAmount(0);
             $address->setBaseShippingDiscountAmount(0);
-            if ($isMain) {
-                $this->checkoutSession->setMainOrder(true);
-            }
 
             return $this;
         }
@@ -192,9 +216,6 @@ class Validator extends \Magento\SalesRule\Model\Validator
             )
         );
         $quote->setAppliedRuleIds($this->validatorUtility->mergeIds($quote->getAppliedRuleIds(), $appliedRuleIds));
-        if ($isMain) {
-            $this->checkoutSession->setMainOrder(true);
-        }
 
         return $this;
     }

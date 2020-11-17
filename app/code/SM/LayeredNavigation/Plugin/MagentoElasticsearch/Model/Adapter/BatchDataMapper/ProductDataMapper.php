@@ -348,6 +348,7 @@ class ProductDataMapper
         $realPrice = $realSpecial = $minProductId = 0;
         $baseAttr = CustomerPrice::PREFIX_OMNI_NORMAL_PRICE . $code;
         $specialAttr = CustomerPrice::PREFIX_OMNI_FINAL_PRICE . $code;
+        $isFirst = true;
         foreach ($productIds as $childrenId) {
             if (!$this->isSalable($childrenId)) {
                 continue;
@@ -371,14 +372,15 @@ class ProductDataMapper
                 $special = $price;
             }
 
-            if ($realSpecial && $special && $realSpecial > $special) {
+            if ($isFirst) {
                 $realPrice = $price;
                 $realSpecial = $special;
                 $minProductId = $childrenId;
+                $isFirst = false;
                 continue;
             }
 
-            if ($price !== 0 && ($realPrice === 0 || $realPrice > $price)) {
+            if ($realSpecial && $special && $realSpecial > $special) {
                 $realPrice = $price;
                 $realSpecial = $special;
                 $minProductId = $childrenId;

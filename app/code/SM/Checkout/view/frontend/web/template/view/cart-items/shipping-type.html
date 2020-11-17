@@ -46,6 +46,7 @@
     <!-- /ko -->
     <!-- /ko -->
     <!-- ko if: storePickUpPerItem -->
+    <!-- ko if: showStorePickUp($parents[1].item_id) -->
     <div class="store-pickup-per-item">
         <p class="store-pickup-label" data-bind="i18n: 'Pick Up in Store'"></p>
         <div class="store-pickup-block">
@@ -59,6 +60,7 @@
             <!-- /ko -->
         </div>
     </div>
+    <!-- /ko -->
     <!-- /ko -->
 </div>
 <!-- /ko -->

@@ -13,8 +13,6 @@ declare(strict_types=1);
 
 namespace SM\Catalog\Plugin\Model\Config\Source;
 
-use SM\Catalog\Plugin\Model\Config;
-
 class ListSort
 {
     /**
@@ -31,7 +29,11 @@ class ListSort
         $newOptions = \SM\Catalog\Helper\ProductList\Toolbar::getAdditionalOptions();
         $columns = array_keys($newOptions);
         foreach ($options as $key => $option) {
-            if (in_array($option['value'], $columns) || $option['value'] == 'price') {
+            if (empty($option['value'])) {
+                continue;
+            } elseif ($option['value'] === 'name') {
+                $options[$key]['label'] = __('A to Z');
+            } elseif (in_array($option['value'], $columns) || $option['value'] == 'price') {
                 unset($options[$key]);
             }
         }

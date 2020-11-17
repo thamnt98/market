@@ -527,7 +527,9 @@
                     }
                 }
                 &:extend(.abs-text-vouchers all);
-
+                h2{
+                    font-size: 4rem;
+                }
                 .voucher-discount-amount {
                     .lib-font-size(30);
                     display: block;
@@ -626,6 +628,7 @@
                     .item-voucher-detail {
                         padding: @indent__xs 65px @indent__s @indent__s;
                         position: relative;
+                        min-height: 35px;
                         &:before {
                             content:"";
                             background: url(~'@{font-path-base}/border-wavy.png') repeat-x left top;
@@ -1282,6 +1285,8 @@
             img {
                 height: 200px;
                 display: block;
+                object-fit: cover;
+                width: 100%;
             }
             &:extend(.abs-text-vouchers all);
             .img-voucher-ct {
