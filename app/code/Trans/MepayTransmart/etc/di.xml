@@ -13,6 +13,7 @@
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+  <!-- preference -->
   <preference for="Trans\Mepay\Gateway\Request\OrderDataBuilder" type="Trans\MepayTransmart\Gateway\Request\TransmartOrderDataBuilder" />
   <preference for="Trans\Mepay\Controller\Payment\Callbacks" type="Trans\MepayTransmart\Controller\Payment\TransmartCallbacks" />
   <preference for="Trans\Mepay\Model\Payment\Status\Capture" type="Trans\MepayTransmart\Model\Payment\Status\TransmartCapture" />
@@ -20,4 +21,10 @@
   <preference for="SM\Checkout\Block\Checkout\Success" type="Trans\MepayTransmart\Block\Checkout\TransmartSuccess" />
   <preference for="Trans\Mepay\Plugin\Magento\Checkout\Model\PaymentInformationManagement" type="Trans\MepayTransmart\Plugin\Magento\Checkout\Model\TransmartPaymentInformationManagement" />
   <preference for="SM\Checkout\Model\MultiShipping" type="Trans\MepayTransmart\Model\TransmartMultishipping" />
+  <preference for="SM\Sales\Model\Order\ParentOrder" type="Trans\MepayTransmart\Model\Order\TransmartParentOrder" />
+
+    <!-- plugin -->
+    <type name="SM\Sales\Model\InvoiceRepository">
+      <plugin name="TransMepayTransmartPluginSMSalesModelTransmartInvoiceRepository" type="Trans\MepayTransmart\Plugin\SM\Sales\Model\TransmartInvoiceRepository" />
+    </type>
 </config>

@@ -69,4 +69,36 @@ class Data extends AbstractHelper
   {
     return in_array($method, self::BANK_MEGA_PAYMENT_METHOD);
   }
+
+  /**
+   * Get order repo
+   * @return \Magento\Sales\Api\OrderRepositoryInterface
+   */
+  public static function getOrderRepo()
+  {
+    return self::getClassInstance('Magento\Sales\Api\OrderRepositoryInterface');
+  }
+
+  /**
+   * Get order by id
+   * @param  int $orderId
+   * @return \Magento\Sales\Api\Data\OrderInterface
+   */
+  public static function getOrderById($orderId)
+  {
+    $repo = self::getOrderRepo();
+    return $repo->get($orderId);
+  }
+
+  /**
+   * Get payment method by order id
+   * @param  int $orderId
+   * @return string
+   */
+  public static function getPaymentMethodByOrderId($orderId)
+  {
+    $order = self::getOrderById($orderId);
+    return $order->getPayment()->getMethod();
+  }
+
 }

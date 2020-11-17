@@ -22,6 +22,7 @@ use Trans\Mepay\Model\Invoice;
 use Trans\Mepay\Logger\LoggerWrite;
 use Trans\Mepay\Model\Payment\Status\Capture;
 use Trans\Sprint\Helper\Config as SprintConfig;
+use Trans\Mepay\Helper\Data;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 
 class TransmartCapture extends Capture
@@ -85,12 +86,7 @@ class TransmartCapture extends Capture
         $payment->setAdditionalInformation([Transaction::RAW_DETAILS => $transaction->getData()]);
 
         //create invoice
-        $invoice = $this->invoice->create($order, $transaction);
-        $this->invoice->send($invoice);
-        $order->setState('in_process');
-        $order->setStatus('in_process');
-        $this->transactionHelper->saveOrder($order);
-        $this->updateChildStatusHistory($order);
+        $this->createOrderInvoiceParentAndChild($order, $transaction);
         //save detail information
         $this->transactionHelper->addTransactionData($transaction->getId(), $inquiryTransaction, $transaction);
 
@@ -127,26 +123,26 @@ class TransmartCapture extends Capture
     );
   }
 
-  public function updateChildStatusHistory($order)
+  public function updateChildStatusHistory($connection, $orderId)
   {
-    $referenceNumber = $order->getReferenceNumber();
-    $this->logger->log($referenceNumber);
-    $collection = $order->getCollection()->addFieldToFilter('reference_number',['eq'=>$referenceNumber]);
-    if ($collection->getSize()) {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $resourceCon = $objectManager->create('Magento\Framework\App\ResourceConnection');
-        $connection = $resourceCon->getConnection();
-        $table = $connection->getTableName('sales_order_status_history');
-        foreach ($collection as $key => $value) {
-          if ($value->getEntityId() !== $order->getId()) {
-            $query = "INSERT INTO ".$table." (parent_id, status, entity_name) VALUES ('".$value->getEntityId()."','in_process','order')";
-            $connection->query($query);
-            $subOrder = $this->transactionHelper->getOrder($value->getEntityId());
-            $subOrder->setState('in_process');
-            $subOrder->setStatus('in_process');
-            $this->transactionHelper->saveOrder($subOrder);
-          }
-        }
-    }
+    $table = $connection->getTableName('sales_order_status_history');
+    $query = "INSERT INTO ".$table." (parent_id, status, entity_name) VALUES ('".$orderId."','in_process','order')";
+    $connection->query($query);
+  }
+
+  public function createOrderInvoiceParentAndChild($initOrder, $transaction)
+  {
+      $referenceNumber = $initOrder->getReferenceNumber();
+      $collection = $initOrder->getCollection()->addFieldToFilter('reference_number',['eq'=>$referenceNumber]);
+      $connection = Data::getConnection();
+      foreach ($collection as $key => $value) {
+        $order = $this->transactionHelper->getOrder($value->getEntityId());
+        $invoice = $this->invoice->create($order, $transaction);
+        $this->invoice->send($invoice);
+        $order->setState('in_process');
+        $order->setStatus('in_process');
+        $this->transactionHelper->saveOrder($order);
+        $this->updateChildStatusHistory($connection, $order->getId());
+      }
   }
 }
