@@ -159,9 +159,9 @@ class PromotionPrice extends \Magento\Framework\Model\AbstractModel implements P
         return $this->_getData(PromotionPriceInterface::PIM_ID);
     }
 
-   /**
-     * @inheritdoc
-     */
+    /**
+      * @inheritdoc
+      */
     public function setPimId($pimid)
     {
         $this->setData(PromotionPriceInterface::PIM_ID, $pimid);
@@ -237,7 +237,7 @@ class PromotionPrice extends \Magento\Framework\Model\AbstractModel implements P
     public function getMixMatchCode()
     {
         return $this->_getData(PromotionPriceInterface::PIM_MIX_MATCH_CODE);
-    }   
+    }
 
     /**
      * @inheritdoc
@@ -357,5 +357,21 @@ class PromotionPrice extends \Magento\Framework\Model\AbstractModel implements P
     public function setAmountOff($amount)
     {
         $this->setData(PromotionPriceInterface::PIM_AMOUNT_OFF, $amount);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPointPerUnit()
+    {
+        return $this->_getData(PromotionPriceInterface::PIM_POINT_PER_UNIT);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setPointPerUnit($point)
+    {
+        $this->setData(PromotionPriceInterface::PIM_POINT_PER_UNIT, $point);
     }
 }
