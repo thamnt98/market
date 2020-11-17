@@ -48,6 +48,9 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), '1.7.0', '<')) {
             $this->addOnlinePriceTable($setup);
         }
+        if (version_compare($context->getVersion(), '1.8.0', '<')) {
+            $this->updateTableCatalogPricePromotionColumnTwo($setup);
+        }
     }
 
     /**
@@ -509,6 +512,31 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 ->setOption('charset', 'utf8');
             $setup->getConnection()->createTable($table);
         }
+    }
+
+    /**
+     * Update integration catalog promotion price point_per_unit
+     */
+    protected function updateTableCatalogPricePromotionColumnTwo($setup){
+        $tableName = $setup->getTable(PromotionPriceInterface::TABLE_NAME);
+        // Check if the table already exists
+        if ($setup->getConnection()->isTableExists($tableName) != true) {
+            throw new StateException(__(
+                'Table '. $tableName." is not exist!"
+            ));
+        }  
+
+        // Add Column
+        $setup->getConnection()->addColumn(
+            $setup->getTable($tableName),
+            PromotionPriceInterface::PIM_POINT_PER_UNIT,
+            [
+                'type' => Table::TYPE_TEXT,
+                'nullable' => true,
+                'comment' =>  ucfirst(str_replace('_',' ',PromotionPriceInterface::PIM_POINT_PER_UNIT)),
+                'after' => PromotionPriceInterface::PIM_AMOUNT_OFF,
+            ]
+        );
     }
     
 }
