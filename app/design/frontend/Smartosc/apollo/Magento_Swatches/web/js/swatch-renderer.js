@@ -753,6 +753,7 @@ define([
             }
 
             if ($this.hasClass('disabled')) {
+                $this.parent().addClass('disabled');
                 return;
             }
             $this.parent().parent().find('.active').removeClass('active');
