@@ -279,28 +279,17 @@ class Transaction extends AbstractHelper
    * @param $transaction
    * @return  boolean
    */
-  public function addTransactionData($txnId, $inquiry, $transaction)
+  public function addTransactionData($id, $inquiry, $transaction)
   {
     try {
 
-      $searchCriteria = $this->getSearchCriteria([
-        TransactionInterface::TXN_ID => $txnId
-      ]);
-
-      $collection = $this->transactionRepo->getList($searchCriteria);
-      if ($collection->getSize()) {
-        foreach ($collection as $key => $value) {
-          $id = $value->getTransactionId();
-          $inquiryData = $this->inquiryResponseHelper->convertToArray($inquiry);
-          $transactionData = $transaction->getData();
-          $txn = $this->getTransaction($id);
-          if ($txn->getId()) {
-            $txn->setTransMepayInquiry($this->json->serialize($inquiryData));
-            $txn->setTransMepayTransaction($this->json->serialize($transactionData));
-            $this->transactionRepo->save($txn);
-          }
-        }
-      }
+      $inquiryData = $this->inquiryResponseHelper->convertToArray($inquiry);
+      $transactionData = $transaction->getData();
+      $txn = $this->getTransaction($id);
+      $txn->setTransMepayInquiry($this->json->serialize($inquiryData));
+      $txn->setTransMepayTransaction($this->json->serialize($transactionData));
+      $this->transactionRepo->save($txn);
+          
     } catch (\Exception $e) {
       $this->logger->log($e->getMessage());
       throw $e;

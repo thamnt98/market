@@ -167,12 +167,14 @@ class Status
   public function update($transaction, $inquiry, $token = null)
   {
     if ($transaction) {
-      $this->transactionHelper->addTransactionData($inquiry->getId(), $inquiry, $transaction);
+      //$this->transactionHelper->addTransactionData($inquiry->getId(), $inquiry, $transaction);
 
-      $transactionData = $this->transactionHelper->getAuthorizeByTxnId($inquiry->getId())->getFirstItem();
-      if ($transactionData->getId()) {
-        $this->logger->log('== {{authorize_operation}} ==');
-        $this->authorize->handle($transaction, $inquiry, $token); 
+      $transactionDatas = $this->transactionHelper->getAuthorizeByTxnId($inquiry->getId());
+      foreach ($transactionDatas as $key => $value) {
+        if ($value->getTransactionId()) {
+            $this->logger->log('== {{authorize_operation}} ==');
+            $this->authorize->handle($value->getTransactionId(), $transaction, $inquiry, $token); 
+         }
       }
 
       if ($this->isCapture($transaction->getStatus())) {
@@ -186,6 +188,7 @@ class Status
       }
 
       $this->saveAuthenticateCode($transaction);
+
 
     }
   }

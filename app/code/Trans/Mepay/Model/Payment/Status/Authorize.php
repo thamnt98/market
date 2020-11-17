@@ -75,11 +75,11 @@ class Authorize
    * @param  \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\Collection $inquiryTransaction
    * @return void
    */
-  public function handle($transaction, $inquiryTransaction, $token = null)
+  public function handle($id, $transaction, $inquiryTransaction, $token = null)
   {
     try {
         //init related data
-        $transactionData = $this->transactionHelper->getAuthorizeByTxnId($inquiryTransaction->getId())->getFirstItem();
+        $transactionData = $this->transactionHelper->getTransaction($id);
         $orderId = $transactionData->getOrderId();
         $order = $this->transactionHelper->getOrder($orderId);
         $payment = $order->getPayment();
@@ -91,10 +91,9 @@ class Authorize
         }
 
         //close authorize transaction
-        $transactionObj = $this->transactionHelper->getTransaction($transactionData->getTransactionId());
-        $transactionObj->close();
+        $transactionData->close();
 
-        //create capture transaction
+        //change from inquiry authorize into transaction authorize
         $transactionAuth = $this->transactionHelper->buildAuthorizeTransaction($payment, $order, $transaction);
         $transactionAuth->setIsClosed(0);
         $this->transactionHelper->saveTransaction($transactionAuth);
@@ -102,10 +101,10 @@ class Authorize
         //update payment
         $payment->setLastTransactionId($transaction->getId());
         //$payment->addTransactionCommentsToOrder($transactionCapture, $message);
-        $payment->setAdditionalInformation([Transaction::RAW_DETAILS => $transaction->getData()]);
+        //$payment->setAdditionalInformation([Transaction::RAW_DETAILS => $transaction->getData()]);
 
         //save detail information
-        $this->transactionHelper->addTransactionData($transaction->getId(), $inquiryTransaction, $transaction);
+        $this->transactionHelper->addTransactionData($transactionAuth->getTransactionId(), $inquiryTransaction, $transaction);
 
     } catch (InputException $e) {
       $this->logger->log($e->getMessage());

@@ -80,42 +80,47 @@ class Capture
     try {
 
         //init related data
-        $transactionData = $this->transactionHelper->getAuthorizeByTxnId($transaction->getId())->getFirstItem();
-        $orderId = $transactionData->getOrderId();
-        $this->logger->log('== {{order_id:'.$orderId.'}} ==');
-        $order = $this->transactionHelper->getOrder($orderId);
-        $payment = $order->getPayment();
-        $this->logger->log('== {{payment_id:'.$payment->getId().'}} ==');
-        //update customer token
-        if ($token) {
-          $customerId = $order->getCustomerId();
-          $this->customerHelper->setCustomerToken($customerId, $token);
+        $transactionData = $this->transactionHelper->getTxnByTxnId($transaction->getId());
+        foreach ($transactionData as $key => $value) {
+          if ($value->getTxnType() == \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH) {
+              $orderId = $value->getOrderId();
+              $this->logger->log('== {{order_id:'.$orderId.'}} ==');
+              $order = $this->transactionHelper->getOrder($orderId);
+              $payment = $order->getPayment();
+              $this->logger->log('== {{payment_id:'.$payment->getId().'}} ==');
+              //update customer token
+              if ($token) {
+                $customerId = $order->getCustomerId();
+                $this->customerHelper->setCustomerToken($customerId, $token);
+              }
+
+              //close authorize transaction
+              $this->logger->log('== {{txnid:'.$value->getTransactionId().':close}} ==');
+              $transactionObj = $this->transactionHelper->getTransaction($value->getTransactionId());
+              $transactionObj->close();
+
+              //create capture transaction
+              $transactionCapture = $this->transactionHelper->buildCaptureTransaction($payment, $order, $transaction);
+
+              //update payment
+              $this->logger->log('== {{txnid:'.$transactionCapture->getTransactionId().':capture}} ==');
+              $payment->setLastTransactionId($transaction->getId());
+              //$payment->addTransactionCommentsToOrder($transactionCapture, $message);
+              //$payment->setAdditionalInformation([Transaction::RAW_DETAILS => $transaction->getData()]);
+
+              //create invoice
+              $invoice = $this->invoice->create($order, $transaction);
+              $this->invoice->send($invoice);
+
+              //update order status
+              $order->setState('in_process');
+              $order->setStatus('in_process');
+              $this->transactionHelper->saveOrder($order);
+              //save detail information
+              $this->transactionHelper->addTransactionData($transactionCapture->getTransactionId(), $inquiryTransaction, $transaction);
+
+          }
         }
-
-        //close authorize transaction
-        $this->logger->log('== {{txnid:'.$transactionData->getTransactionId().':close}} ==');
-        $transactionObj = $this->transactionHelper->getTransaction($transactionData->getTransactionId());
-        $transactionObj->close();
-
-        //create capture transaction
-        $transactionCapture = $this->transactionHelper->buildCaptureTransaction($payment, $order, $transaction);
-
-        //update payment
-        $this->logger->log('== {{txnid:'.$transactionCapture->getTransactionId().':capture}} ==');
-        $payment->setLastTransactionId($transaction->getId());
-        //$payment->addTransactionCommentsToOrder($transactionCapture, $message);
-        $payment->setAdditionalInformation([Transaction::RAW_DETAILS => $transaction->getData()]);
-
-        //create invoice
-        $invoice = $this->invoice->create($order, $transaction);
-        $this->invoice->send($invoice);
-
-        //update order status
-        $order->setState('in_process');
-        $order->setStatus('in_process');
-        $this->transactionHelper->saveOrder($order);
-        //save detail information
-        $this->transactionHelper->addTransactionData($transaction->getId(), $inquiryTransaction, $transaction);
 
     } catch (InputException $e) {
       $this->logger->log($e->getMessage());

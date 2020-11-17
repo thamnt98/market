@@ -60,38 +60,37 @@ class TransmartFailed extends Failed
     try {
 
         //init related data
-        $transactionData = $this->transactionHelper->getAuthorizeByTxnId($transaction->getId())->getFirstItem();
-        $orderId = $transactionData->getOrderId();
-        $order = $this->transactionHelper->getOrder($orderId);
+        $transactionData = $this->transactionHelper->getTxnByTxnId($transaction->getId());
+        foreach ($transactionData as $key => $value) {
+          $orderId = $value->getOrderId();
+          $order = $this->transactionHelper->getOrder($orderId);
 
-        //update customer token
-        if ($token) {
-          $customerId = $order->getCustomerId();
-          $this->customerHelper->setCustomerToken($customerId, $token);
+          //update customer token
+          if ($token) {
+            $customerId = $order->getCustomerId();
+            $this->customerHelper->setCustomerToken($customerId, $token);
+          }
+
+          //change status to void and close transaction
+          $transactionObj = $this->transactionHelper->getTransaction($value->getTransactionId());
+          $transactionObj->setTxnType(\Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID);
+          $transactionObj->close();
+          $this->transactionHelper->saveTransaction($transactionObj);
+
+          //save detail information
+          $this->transactionHelper->addTransactionData($transactionObj->getTransactionId(), $inquiryTransaction, $transaction);
+
+          //cancel order
+          $order->setState(Order::STATE_CANCELED);
+          $order->setStatus(Order::STATE_CANCELED);
+          $order->cancel();
+          $this->transactionHelper->saveOrder($order);
+
+          /**
+           * send order to oms
+           */
+          $this->sendOrderToOms($order);
         }
-
-        //change status to void and close transaction
-        $transactionObj = $this->transactionHelper->getTransaction($transactionData->getTransactionId());
-        $transactionObj->setTxnType(\Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID);
-        //$transactionObj->close();
-        $this->transactionHelper->saveTransaction($transactionObj);
-
-        //save detail information
-        $this->transactionHelper->addTransactionData($transaction->getId(), $inquiryTransaction, $transaction);
-
-        //cancel order
-        $order->setState(Order::STATE_CANCELED);
-        $order->setStatus(Order::STATE_CANCELED);
-        $order->cancel();
-        $this->transactionHelper->saveOrder($order);
-
-        /**
-         * send order to oms
-         */
-        $this->sendOrderToOms($order);
-
-        $this->updateChildOrderStatus($order);
-
 
     } catch (InputException $e) {
       $this->logger->log($e->getMessage());
@@ -119,24 +118,6 @@ class TransmartFailed extends Failed
         'payment_status' => SprintConfig::OMS_CANCEL_PAYMENT_ORDER,
       ]
     );
-  }
-
-  public function updateChildOrderStatus($order)
-  {
-    $referenceNumber = $order->getReferenceNumber();
-    $this->logger->log($referenceNumber);
-    $collection = $order->getCollection()->addFieldToFilter('reference_number',['eq'=>$referenceNumber]);
-      if ($collection->getSize()) {
-        foreach ($collection as $key => $value) {
-          if ($value->getEntityId() !== $order->getId()) {
-              $subOrder = $this->transactionHelper->getOrder($value->getEntityId());
-              $subOrder->setState(Order::STATE_CANCELED);
-              $subOrder->setStatus(Order::STATE_CANCELED);
-              $subOrder->cancel();
-              $this->transactionHelper->saveOrder($subOrder);
-          }
-        }
-     }
   }
 
 }

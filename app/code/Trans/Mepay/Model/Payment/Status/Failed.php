@@ -89,34 +89,37 @@ class Failed
     try {
 
         //init related data
-        $transactionData = $this->transactionHelper->getAuthorizeByTxnId($transaction->getId())->getFirstItem();
-        $orderId = $transactionData->getOrderId();
-        $order = $this->transactionHelper->getOrder($orderId);
+        $transactionData = $this->transactionHelper->getTxnByTxnId($transaction->getId());
+        foreach ($transactionData as $key => $value) {
+            $orderId = $value->getOrderId();
+            $order = $this->transactionHelper->getOrder($orderId);
 
-        //update customer token
-        if ($token) {
-          $customerId = $order->getCustomerId();
-          $this->customerHelper->setCustomerToken($customerId, $token);
+            //update customer token
+            if ($token) {
+              $customerId = $order->getCustomerId();
+              $this->customerHelper->setCustomerToken($customerId, $token);
+            }
+
+            //change status to void and close transaction
+            $transactionObj = $this->transactionHelper->getTransaction($value->getTransactionId());
+            $transactionObj->setTxnType(\Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID);
+            //$transactionObj->close();
+            $this->transactionHelper->saveTransaction($transactionObj);
+
+            //save detail information
+            $this->transactionHelper->addTransactionData($transactionObj->getTransactionId(), $inquiryTransaction, $transaction);
+
+            //cancel order
+            $order->setState(Order::STATE_CANCELED);
+            $order->setStatus(Order::STATE_CANCELED);
+            $order->cancel();
+            $this->transactionHelper->saveOrder($order);
+            //restore cart
+            //$quote = $this->quoteRepo->get($order->getQuoteId());
+            //$quote->setIsActive(1)->setReservedOrderId(null);
+            //$this->quoteRepo->save($quote);
         }
 
-        //change status to void and close transaction
-        $transactionObj = $this->transactionHelper->getTransaction($transactionData->getTransactionId());
-        $transactionObj->setTxnType(\Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID);
-        //$transactionObj->close();
-        $this->transactionHelper->saveTransaction($transactionObj);
-
-        //save detail information
-        $this->transactionHelper->addTransactionData($transaction->getId(), $inquiryTransaction, $transaction);
-
-        //cancel order
-        $order->setState(Order::STATE_CANCELED);
-        $order->setStatus(Order::STATE_CANCELED);
-        $order->cancel();
-        $this->transactionHelper->saveOrder($order);
-        //restore cart
-        //$quote = $this->quoteRepo->get($order->getQuoteId());
-        //$quote->setIsActive(1)->setReservedOrderId(null);
-        //$this->quoteRepo->save($quote);
 
     } catch (InputException $e) {
       $this->logger->log($e->getMessage());

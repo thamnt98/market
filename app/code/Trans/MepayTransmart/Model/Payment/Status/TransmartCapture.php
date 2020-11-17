@@ -57,43 +57,45 @@ class TransmartCapture extends Capture
   public function handle($transaction, $inquiryTransaction, $token = null)
   {
     try {
-
         //init related data
-        $transactionData = $this->transactionHelper->getAuthorizeByTxnId($transaction->getId())->getFirstItem();
-        $orderId = $transactionData->getOrderId();
-        $this->logger->log('== {{order_id:'.$orderId.'}} ==');
-        $order = $this->transactionHelper->getOrder($orderId);
-        $payment = $order->getPayment();
-        $this->logger->log('== {{payment_id:'.$payment->getId().'}} ==');
-        //update customer token
-        if ($token) {
-          $customerId = $order->getCustomerId();
-          $this->customerHelper->setCustomerToken($customerId, $token);
+        $transactionData = $this->transactionHelper->getTxnByTxnId($transaction->getId());
+        foreach ($transactionData as $key => $value) {
+            $orderId = $value->getOrderId();
+            $this->logger->log('== {{order_id:'.$orderId.'}} ==');
+            $order = $this->transactionHelper->getOrder($orderId);
+            $payment = $order->getPayment();
+            $this->logger->log('== {{payment_id:'.$payment->getId().'}} ==');
+            //update customer token
+            if ($token) {
+              $customerId = $order->getCustomerId();
+              $this->customerHelper->setCustomerToken($customerId, $token);
+            }
+
+            //close authorize transaction
+            $this->logger->log('== {{txnid:'.$value->getTransactionId().':close}} ==');
+            $transactionObj = $this->transactionHelper->getTransaction($value->getTransactionId());
+            $transactionObj->close();
+
+            //create capture transaction
+            $transactionCapture = $this->transactionHelper->buildCaptureTransaction($payment, $order, $transaction);
+
+            //update payment
+            $this->logger->log('== {{txnid:'.$transactionCapture->getTransactionId().':capture}} ==');
+            $payment->setLastTransactionId($transaction->getId());
+            //$payment->addTransactionCommentsToOrder($transactionCapture, $message);
+            //$payment->setAdditionalInformation([Transaction::RAW_DETAILS => $transaction->getData()]);
+
+            //create invoice
+            $this->createOrderInvoiceParentAndChild($order, $transaction);
+            //save detail information
+            $this->transactionHelper->addTransactionData($transactionCapture->getTransactionId(), $inquiryTransaction, $transaction);
+
+            /**
+             * Send order to oms
+             */
+            $this->sendOrderToOms($order);
+
         }
-
-        //close authorize transaction
-        $this->logger->log('== {{txnid:'.$transactionData->getTransactionId().':close}} ==');
-        $transactionObj = $this->transactionHelper->getTransaction($transactionData->getTransactionId());
-        $transactionObj->close();
-
-        //create capture transaction
-        $transactionCapture = $this->transactionHelper->buildCaptureTransaction($payment, $order, $transaction);
-
-        //update payment
-        $this->logger->log('== {{txnid:'.$transactionCapture->getTransactionId().':capture}} ==');
-        $payment->setLastTransactionId($transaction->getId());
-        //$payment->addTransactionCommentsToOrder($transactionCapture, $message);
-        $payment->setAdditionalInformation([Transaction::RAW_DETAILS => $transaction->getData()]);
-
-        //create invoice
-        $this->createOrderInvoiceParentAndChild($order, $transaction);
-        //save detail information
-        $this->transactionHelper->addTransactionData($transaction->getId(), $inquiryTransaction, $transaction);
-
-        /**
-         * Send order to oms
-         */
-        $this->sendOrderToOms($order);
 
     } catch (InputException $e) {
       $this->logger->log($e->getMessage());
@@ -132,17 +134,13 @@ class TransmartCapture extends Capture
 
   public function createOrderInvoiceParentAndChild($initOrder, $transaction)
   {
-      $referenceNumber = $initOrder->getReferenceNumber();
-      $collection = $initOrder->getCollection()->addFieldToFilter('reference_number',['eq'=>$referenceNumber]);
       $connection = Data::getConnection();
-      foreach ($collection as $key => $value) {
-        $order = $this->transactionHelper->getOrder($value->getEntityId());
-        $invoice = $this->invoice->create($order, $transaction);
-        $this->invoice->send($invoice);
-        $order->setState('in_process');
-        $order->setStatus('in_process');
-        $this->transactionHelper->saveOrder($order);
-        $this->updateChildStatusHistory($connection, $order->getId());
-      }
+      $invoice = $this->invoice->create($initOrder, $transaction);
+      $this->invoice->send($invoice);
+      $initOrder->setState('in_process');
+      $initOrder->setStatus('in_process');
+      $this->transactionHelper->saveOrder($initOrder);
+      $this->updateChildStatusHistory($connection, $initOrder->getId());
+
   }
 }

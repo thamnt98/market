@@ -75,7 +75,7 @@ class Paid
    * @param  \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\Collection $inquiryTransaction
    * @return void
    */
-  public function handle($transaction, $inquiryTransaction, $token = null)
+  public function handle($id, $transaction, $inquiryTransaction, $token = null)
   {
     try {
 
