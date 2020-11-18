@@ -54,11 +54,28 @@ class CustomerRepositoryInterface
             $customerData->setCustomAttribute(Config::IS_VERIFIED_EMAIL_ATTRIBUTE_CODE, 0);
         }
 
+        $customerChecker = $this->dataChecker->createCustomerChecker($customerData);
+
         $savedCustomerData = $proceed($customerData, $passwordHash);
 
-        if ($isRequireVerifiedEmail) {
-            $this->emailSender->sendVerifyEmail($savedCustomerData);
-            $this->emailSender->sendRegistrationSuccessEmail($savedCustomerData);
+        if ($savedCustomerData->getCustomAttribute(Config::IS_VERIFIED_EMAIL_ATTRIBUTE_CODE)->getValue() == 0) {
+            if ($customerChecker[DataChecker::IS_CHANGE_EMAIL]) {
+                $this->emailSender->sendChangeEmail($savedCustomerData);
+            } else {
+                $this->emailSender->sendVerifyEmail($savedCustomerData);
+            }
+        }
+
+        if ($customerChecker[DataChecker::IS_CHANGE_EMAIL]) {
+            $this->emailSender->sendChangeEmail($savedCustomerData);
+        }
+
+        if ($customerChecker[DataChecker::IS_CHANGE_TELEPHONE]) {
+            $this->emailSender->sendChangeTelephoneEmail($savedCustomerData);
+        }
+
+        if ($customerChecker[DataChecker::IS_CHANGE_PERSONAL_INFO]) {
+            $this->emailSender->sendChangePersonalInformation($savedCustomerData);
         }
 
         return $savedCustomerData;

@@ -16,6 +16,7 @@ class Config extends AbstractHelper
     const MODULE_NAME = 'SM_Customer';
     const EMAIL_ATTRIBUTE_CODE = 'email';
     const PHONE_ATTRIBUTE_CODE = 'telephone';
+    const MARITAL_STATUS = 'marital_status';
     const TOKEN_FIELD_NAME = 'token';
     const IS_VERIFIED_EMAIL_ATTRIBUTE_CODE = 'is_verified_email';
     const IS_DISABLED_DATE_OF_BIRTH = 'is_disabled_dob';
