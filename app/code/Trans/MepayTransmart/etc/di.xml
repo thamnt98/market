@@ -22,9 +22,13 @@
   <preference for="Trans\Mepay\Plugin\Magento\Checkout\Model\PaymentInformationManagement" type="Trans\MepayTransmart\Plugin\Magento\Checkout\Model\TransmartPaymentInformationManagement" />
   <preference for="SM\Checkout\Model\MultiShipping" type="Trans\MepayTransmart\Model\TransmartMultishipping" />
   <preference for="SM\Sales\Model\Order\ParentOrder" type="Trans\MepayTransmart\Model\Order\TransmartParentOrder" />
+  <preference for="SM\Checkout\Helper\OrderReferenceNumber" type="Trans\MepayTransmart\Helper\TransmartOrderReferenceNumber" />
 
     <!-- plugin -->
     <type name="SM\Sales\Model\InvoiceRepository">
       <plugin name="TransMepayTransmartPluginSMSalesModelTransmartInvoiceRepository" type="Trans\MepayTransmart\Plugin\SM\Sales\Model\TransmartInvoiceRepository" />
+    </type>
+    <type name="Trans\Mepay\Gateway\Request\OrderDataBuilder">
+      <plugin name="TransMepayTransmartPluginTransMepayGatewayRequestTransmartOrderDataBuilder" type="Trans\MepayTransmart\Plugin\Trans\Mepay\Gateway\Request\TransmartOrderDataBuilder" />
     </type>
 </config>
