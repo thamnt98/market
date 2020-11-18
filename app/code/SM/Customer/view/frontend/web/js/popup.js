@@ -25,12 +25,20 @@ define(
             optForm = false;
 
         mod.init = function () {
-            $('.sign-link a').click(function(event){
+            $('.sign-link a, .authorization-link a').click(function(event){
                 event.preventDefault();
                 if (loginForm) {
                     $('#tab-login').modal('openModal');
                 } else {
                     mod.callAjax('login-form');
+                }
+            });
+            $('.register-link').click(function(event){
+                event.preventDefault();
+                if (registerForm) {
+                    $('#register').modal('openModal');
+                } else {
+                    mod.callAjax('register-form');
                 }
             });
             var urlParams = new URLSearchParams(window.location.search);
@@ -42,7 +50,7 @@ define(
                 mod.callAjax('lock-reset-form');
             } else {
                 // show login popup
-                $('.sign-link a').trigger('click');
+                //$('.sign-link a').trigger('click');
             }
         };
 
@@ -60,9 +68,7 @@ define(
                         loginForm = true;
                         $('#create-account').click(function (){
                             $('#tab-login').modal('closeModal');
-                            if (!registerForm) {
-                                mod.callAjax('register-form');
-                            }
+                            $('.register-link').trigger('click');
                         });
                         $('#action-forgot-password').click(function () {
                             if (!forgotPassForm) {

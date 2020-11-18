@@ -126,14 +126,12 @@ define(
                             title: '',
                             buttons: [],
                             modalClass: 'modal-popup-signin',
-                            clickableOverlay: false,
-                            keyEventHandlers: {
-                                escapeKey: function () {
-                                    return;
-                                }
-                            }
+                            clickableOverlay: false
                     };
                     modal(options, $(self.options.tabLoginSelector));
+                    $(self.options.tabLoginSelector + '.signin-header [selector=action-back]').click(function (){
+                        $(self.options.tabLoginSelector).modal('closeModal');
+                    });
                     /*var urlParams = new URLSearchParams(window.location.search);
                     if (!urlParams.has('recovery') && !urlParams.has('recoverytoken')) {
                         tabLoginModal = $(self.options.tabLoginSelector).modal('openModal').show();
@@ -148,10 +146,6 @@ define(
                                 tabLoginModal.find('#user-not-exist').text('').hide();
                             }
                         })
-                    });
-                    $('body').on('click', '#register #login', function () {
-                        $('#register').modal('closeModal');
-                        $(self.options.tabLoginSelector).modal('openModal').show();
                     });
                 },
 
