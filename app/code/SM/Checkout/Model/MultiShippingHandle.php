@@ -418,7 +418,7 @@ class MultiShippingHandle
                         $orderToSendOar['items'] = $resetItems;
                         $splitOrder[$i][$addressId]['oar'] = $this->split->getOarResponse([$orderToSendOar]);
                     }
-                    if (isset($splitOrder[$i][$addressId]['oar']['error'])) {
+                    if (!is_array($splitOrder[$i][$addressId]['oar']) || isset($splitOrder[$i][$addressId]['oar']['error']) || !isset($splitOrder[$i][$addressId]['oar']['content'])) {
                         unset($splitOrder[$i]);
                         foreach ($itemsData as $quoteItemId) {
                             $errorOar[$quoteItemId] = [];

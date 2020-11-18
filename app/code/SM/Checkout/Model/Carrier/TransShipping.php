@@ -164,7 +164,7 @@ class TransShipping extends AbstractCarrier implements CarrierInterface
             return false;
         }
         $response = $this->split->getOarResponse($data);
-        if (isset($response['error'])) {
+        if (!is_array($response) || isset($response['error']) || !isset($response['content'])) {
             return false;
         }
         foreach ($response['content'] as $data) {
