@@ -295,7 +295,6 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
         return $customerToSave;
     }
 
-
     /**
      * @return String[][]
      */
@@ -420,7 +419,6 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
             if ($customer->getId()) {
                 $customerDataObject = $this->customerRepositoryInterface->getById($customer->getId());
             }
-
 
             //Add Incomplete address
             if (!$customer->getId()) {
@@ -637,13 +635,13 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
      * @throws LocalizedException
      */
     private function telephoneIsVerified($telephone)
-    {return true;
+    {
         $telephone = preg_replace("/^(^\+628|^628|^08|^8)/", '08', $telephone);
         if (!$this->customerResourceModel->checkTelephoneIsVerified($telephone)) {
             $this->throwException();
         }
 
-       return true;
+        return true;
     }
 
     /**

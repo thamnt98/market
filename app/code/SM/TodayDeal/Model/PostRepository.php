@@ -279,7 +279,6 @@ class PostRepository implements PostRepositoryInterface
             $popularCategory = $this->categoryRepository->get($popularCategoryId);
             $popularProducts = $popularCategory->getProductCollection()
                 ->addAttributeToSelect('*')
-                ->setPageSize(5)
                 ->getItems();
             /** @var \Magento\Catalog\Model\Product $product */
             foreach ($popularProducts as &$product) {

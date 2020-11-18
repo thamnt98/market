@@ -330,14 +330,12 @@ class TransCustomerProfile implements \SM\Customer\Api\TransCustomerProfileInter
             $result->setStatus(true);
             $result->setMessage(__('Your password change successfully'));
             $result->setLocationAppears(self::POP_UP);
-            return $result;
         } catch (NoSuchEntityException $emailOrPasswordException) {
             throw new \Magento\Framework\Webapi\Exception(__($emailOrPasswordException->getMessage()), 401, 401);
         } catch (InputException $inputException) {
             $result->setStatus(false);
             $result->setMessage($inputException->getMessage());
             $result->setLocationAppears(self::NEW_PASSWORD);
-            return $result;
         } catch (UserLockedException $userLockedException) {
             $result->setStatus(false);
             $result->setMessage(__('Your account is locked'));
@@ -346,8 +344,9 @@ class TransCustomerProfile implements \SM\Customer\Api\TransCustomerProfileInter
             $result->setStatus(false);
             $result->setMessage(__('This is not your current password'));
             $result->setLocationAppears(self::CURRENT_PASSWORD);
-            return $result;
         }
+
+        return $result;
     }
 
     /**
