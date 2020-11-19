@@ -25,6 +25,7 @@ use Magento\Sales\Model\Order;
 use Trans\Mepay\Model\Payment\Status\Failed;
 use Trans\Sprint\Helper\Config as SprintConfig;
 use Magento\Framework\Event\ManagerInterface as EventManager;
+use Magento\Sales\Api\OrderManagementInterface;
 
 class TransmartFailed extends Failed
 {
@@ -43,10 +44,11 @@ class TransmartFailed extends Failed
     Invoice $invoice,
     LoggerWrite $logger,
     CartRepositoryInterface $quoteRepo,
-    EventManager $eventManager
+    EventManager $eventManager,
+    OrderManagementInterface $orderManagementInterface
   ) {
     $this->eventManager = $eventManager;
-    parent::__construct($config, $transactionHelper, $customerHelper, $invoice, $logger, $quoteRepo);
+    parent::__construct($config, $transactionHelper, $customerHelper, $invoice, $logger, $quoteRepo, $orderManagementInterface);
   }
 
     /**
@@ -81,10 +83,11 @@ class TransmartFailed extends Failed
           $this->transactionHelper->addTransactionData($transactionObj->getTransactionId(), $inquiryTransaction, $transaction);
 
           //cancel order
-          $order->setState(Order::STATE_CANCELED);
-          $order->setStatus(Order::STATE_CANCELED);
-          $order->cancel();
-          $this->transactionHelper->saveOrder($order);
+          // $order->setState(Order::STATE_CANCELED);
+          // $order->setStatus(Order::STATE_CANCELED);
+          // $order->cancel();
+          // $this->transactionHelper->saveOrder($order);
+          $this->orderManagement->cancel($order->getId());
 
           /**
            * send order to oms

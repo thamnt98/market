@@ -15,13 +15,14 @@ namespace Trans\Mepay\Model\Payment\Status;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Model\Order\Payment\Transaction;
+use Magento\Quote\Api\CartRepositoryInterface;
+use Magento\Sales\Model\Order;
+use Magento\Sales\Api\OrderManagementInterface;
 use Trans\Mepay\Model\Config\Config;
 use Trans\Mepay\Helper\Payment\Transaction as TransactionHelper;
 use Trans\Mepay\Helper\Customer\Customer as CustomerHelper;
 use Trans\Mepay\Model\Invoice;
 use Trans\Mepay\Logger\LoggerWrite;
-use Magento\Quote\Api\CartRepositoryInterface;
-use Magento\Sales\Model\Order;
 
 class Failed
 {
@@ -51,16 +52,24 @@ class Failed
   protected $logger;
 
   /**
-   * @var 
+   * @var CartRepositoryInterface
    */
   protected $quoteRepo;
 
   /**
-   * Constructor
-   * @param Config            $config
+   * @var OrderManagementInterface
+   */
+  protected $orderManagement;
+
+  /**
+   * Constructor method
+   * @param Config $config
    * @param TransactionHelper $transactionHelper
-   * @param Invoice           $invoice
-   * @param LoggerWrite       $logger
+   * @param CustomerHelper $customerHelper
+   * @param Invoice $invoice
+   * @param LoggerWrite $logger
+   * @param CartRepositoryInterface $quoteRepo
+   * @param OrderManagementInterface $orderManagement
    */
   public function __construct(
     Config $config,
@@ -68,7 +77,8 @@ class Failed
     CustomerHelper $customerHelper,
     Invoice $invoice,
     LoggerWrite $logger,
-    CartRepositoryInterface $quoteRepo
+    CartRepositoryInterface $quoteRepo,
+    OrderManagementInterface $orderManagement
   ) {
     $this->config = $config;
     $this->transactionHelper = $transactionHelper;
@@ -76,6 +86,7 @@ class Failed
     $this->invoice = $invoice;
     $this->logger = $logger;
     $this->quoteRepo = $quoteRepo;
+    $this->orderManagement = $orderManagement;
   }
 
   /**
@@ -110,14 +121,11 @@ class Failed
             $this->transactionHelper->addTransactionData($transactionObj->getTransactionId(), $inquiryTransaction, $transaction);
 
             //cancel order
-            $order->setState(Order::STATE_CANCELED);
-            $order->setStatus(Order::STATE_CANCELED);
-            $order->cancel();
-            $this->transactionHelper->saveOrder($order);
-            //restore cart
-            //$quote = $this->quoteRepo->get($order->getQuoteId());
-            //$quote->setIsActive(1)->setReservedOrderId(null);
-            //$this->quoteRepo->save($quote);
+            //$order->setState(Order::STATE_CANCELED);
+            //$order->setStatus(Order::STATE_CANCELED);
+            //$order->cancel();
+            $this->orderManagement->cancel($order->getId());
+
         }
 
 
