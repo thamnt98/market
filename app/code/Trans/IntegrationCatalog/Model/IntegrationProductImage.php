@@ -243,7 +243,7 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 		}
 
 		$jobId = $jobs->getFirstItem()->getId();
-		// $this->updateJobData($jobId, IntegrationJobInterface::STATUS_PROGRESS_CATEGORY);
+		$this->updateJobData($jobId, IntegrationJobInterface::STATUS_PROGRESS_CATEGORY);
 
 		$productIds = [];
 		$product = [];
