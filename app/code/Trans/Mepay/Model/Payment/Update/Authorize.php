@@ -16,8 +16,15 @@ use Trans\Mepay\Helper\Payment\Transaction;
 
 class Authorize
 {
+  /**
+   * @var Transaction
+   */
   protected $transaction;
 
+  /**
+   * Constructor method
+   * @param Transaction $transaction
+   */
   public function __construct(
     Transaction $transaction
   ) {

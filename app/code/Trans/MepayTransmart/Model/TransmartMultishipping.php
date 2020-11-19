@@ -1,4 +1,15 @@
 <?php 
+/**
+ * @category Trans
+ * @package  Trans_MepayTransmart
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Anan Fauzi <anan.fauzi@transdigital.co.id>
+ *
+ * Copyright © 2020 PT CT Corp Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
 namespace Trans\MepayTransmart\Model;
 
 use SM\Checkout\Model\MultiShipping;
@@ -15,6 +26,9 @@ class TransmartMultishipping extends MultiShipping
      */
     private $basketFactory;
 
+    /** 
+     * @inheritdoc
+     */
     public function __construct(
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Checkout\Model\Session $checkoutSession,
@@ -178,6 +192,14 @@ class TransmartMultishipping extends MultiShipping
         return $response;
     }
 
+    /**
+     * Process bank mega payment
+     * @param $cartId
+     * @param $response
+     * @param $mainOrder
+     * @param $quote
+     * @return $response
+     */
     public function processByBankMegaPayment($cartId, $response, $mainOrder, $quote)
     {
         $suborderIds = $this->orderCollectionFactory->create()->addAttributeToSelect('entity_id')
@@ -193,29 +215,7 @@ class TransmartMultishipping extends MultiShipping
             ->setMessage($txnRaws['referenceId'] ?? '')
             ->setRedirectUrl($txnRaws['urls']['checkout'] ?? '');
 
-        // if ($this->paymentHelper->isVirtualAccount($paymentMethod) && !empty($pg['account_number'])) {
-        //     $bank = $this->bankInterfaceFactory->create()
-        //         ->setLogo($this->paymentHelper->getLogoPayment($paymentMethod, true))
-        //         ->setTitle($mainOrder->getPayment()->getMethodInstance()->getTitle())
-        //         ->setMinimumAmount($this->paymentHelper->getMinimumAmountVA());
-        //     $expiredTime = $pg['expired_time'] ?? null;
-        //     if (!empty($expiredTime)) {
-        //         $utc = strtotime($expiredTime) - $this->dateTime->getGmtOffset();
-        //         $expiredTime = date('Y-m-d H:i:s', $utc);
-        //     }
-        //     $payment->setAccountNumber($pg['account_number'] ?? '')
-        //         ->setExpiredTime($expiredTime)
-        //         ->setHowToPayObjects($this->paymentHelper->getBlockHowToPay($paymentMethod, true))
-        //         ->setReferenceNumber($pg['reference_number'])
-        //         ->setTotalAmount($pg['total_amount'])
-        //         ->setRelateUrl($this->paymentHelper->getWebsiteBanking($paymentMethod))
-        //         ->setBank($bank);
-        // }
-
         $error = false;
-        // if (!empty($pg['insertStatus']) && $pg['insertStatus'] != '00') {
-        //     $error = true;
-        // }
         $response->setError($error)
             ->setPayment($payment);
 

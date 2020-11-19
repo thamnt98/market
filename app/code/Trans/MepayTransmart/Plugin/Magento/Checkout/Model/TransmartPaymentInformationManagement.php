@@ -1,10 +1,27 @@
 <?php 
+/**
+ * @category Trans
+ * @package  Trans_MepayTransmart
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Anan Fauzi <anan.fauzi@transdigital.co.id>
+ *
+ * Copyright © 2020 PT CT Corp Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
 namespace Trans\MepayTransmart\Plugin\Magento\Checkout\Model;
 
 use Trans\Mepay\Plugin\Magento\Checkout\Model\PaymentInformationManagement;
 
 class TransmartPaymentInformationManagement extends PaymentInformationManagement
 {
+  /**
+   * After Save Payment Information And Place Order
+   * @param  \Magento\Checkout\Model\PaymentInformationManagement $subject
+   * @param  $result
+   * @return int
+   */
   public function afterSavePaymentInformationAndPlaceOrder(
     \Magento\Checkout\Model\PaymentInformationManagement $subject,
     $result

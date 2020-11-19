@@ -22,34 +22,42 @@ use Trans\Mepay\Model\Config\Config;
 class Order implements ObserverInterface
 {
   /**
-   * @var 
+   * @var string
    */
   const ORDER = 'order';
 
   /**
-   * @var 
+   * @var TransactionHelper
    */
   protected $transactionHelper;
 
   /**
-   * @var 
+   * @var OrderRepositoryInterface
    */
   protected $orderRepo;
 
   /**
-   * @var 
+   * @var Config
    */
   protected $config;
 
+  /**
+   * @var OrderStatusHistoryInterfaceFactory
+   */
   protected $statusHistory;
 
+  /**
+   * @var OrderStatusHistoryRepositoryInterface
+   */
   protected $statusHistoryRepo;
 
   /**
-   * Constructor
-   * @param TransactionHelper        $transactionHelper 
-   * @param OrderRepositoryInterface $orderRepo         
-   * @param Config                   $config            
+   * Constructor method
+   * @param TransactionHelper $transactionHelper
+   * @param OrderRepositoryInterface $orderRepo
+   * @param OrderStatusHistoryInterfaceFactory $statusHistory
+   * @param OrderStatusHistoryRepositoryInterface $statusHistoryRepo
+   * @param Config $config 
    */
   public function __construct(
     TransactionHelper $transactionHelper,
@@ -80,6 +88,10 @@ class Order implements ObserverInterface
     $this->orderRepo->save($order);
   }
 
+  /**
+   * Set order status after payment
+   * @param \Magento\Sales\Api\Data\OrderInterface $order
+   */
   public function setOrderStatusAfterPayment($order)
   {
     //set order history status

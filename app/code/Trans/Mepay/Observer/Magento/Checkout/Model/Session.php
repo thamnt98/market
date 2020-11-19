@@ -17,11 +17,25 @@ use Trans\Mepay\Helper\Payment\Transaction as TransactionHelper;
 
 class Session implements ObserverInterface
 {
+  /**
+   * @var TransactionHelper
+   */
   protected $transactionHelper;
+
+  /**
+   * Constructor method
+   * @param TransactionHelper $transactionHelper
+   */
   public function __construct(TransactionHelper $transactionHelper)
   {
     $this->transactionHelper = $transactionHelper;
   }
+
+  /**
+   * Execute
+   * @param  \Magento\Framework\Event\Observer $observer
+   * @return void
+   */
   public function execute(\Magento\Framework\Event\Observer $observer)
   {
     if ($this->isNeedRestore($session->getLastRealOrderId())) {
@@ -32,6 +46,11 @@ class Session implements ObserverInterface
     
   }
 
+  /**
+   * Is need restore quote
+   * @param int $orderId
+   * @return boolean
+   */
   public function isNeedRestore($orderId)
   {
     $collection = $this->transactionHelper->getVoidTransaction($orderId);
@@ -40,6 +59,11 @@ class Session implements ObserverInterface
     return false;
   }
 
+  /**
+   * Close void transaction
+   * @param int $orderId
+   * @return void
+   */
   public function closeVoidTransaction($orderId)
   {
     $collection = $this->transactionHelper->getVoidTransaction($orderId);

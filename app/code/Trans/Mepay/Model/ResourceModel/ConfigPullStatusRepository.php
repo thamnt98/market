@@ -22,11 +22,26 @@ use Trans\Mepay\Api\ConfigPullStatusRepositoryInterface;
 
 class ConfigPullStatusRepository implements ConfigPullStatusRepositoryInterface
 {
+  /**
+   * string
+   */
   const NOT_FOUND_MSG = 'Requested Object doesn\'t exist';
+
+  /**
+   * @var ConfigPullStatus
+   */
   protected $resource;
 
+  /**
+   * @var ConfigPullStatusInterfaceFactory
+   */
   protected $modelFactory;
 
+  /**
+   * Constructor
+   * @param ResourceModel $resource
+   * @param ModelFactory $modelFactory
+   */
   public function __construct(
     ResourceModel $resource,
     ModelFactory $modelFactory
@@ -34,6 +49,7 @@ class ConfigPullStatusRepository implements ConfigPullStatusRepositoryInterface
     $this->resource = $resource;
     $this->modelFactory = $modelFactory;
   }
+
   /**
    * @inheritdoc
    */

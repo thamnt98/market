@@ -16,6 +16,12 @@ use Trans\Mepay\Helper\Data;
 
 class PaymentInformationManagement
 {
+  /**
+   * After savePaymentInformationPlaceOrder
+   * @param  \Magento\Checkout\Model\PaymentInformationManagement $subject
+   * @param  int $result
+   * @return int
+   */
   public function afterSavePaymentInformationAndPlaceOrder(
     \Magento\Checkout\Model\PaymentInformationManagement $subject,
     $result

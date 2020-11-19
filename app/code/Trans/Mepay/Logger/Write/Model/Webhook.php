@@ -18,9 +18,27 @@ use Trans\Mepay\Helper\Response\Payment\Transaction;
 
 class Webhook
 {
+  /**
+   * @var [type]
+   */
   protected $inquiry;
+
+  /**
+   * @var [type]
+   */
   protected $json;
+
+  /**
+   * @var [type]
+   */
   protected $transaction;
+
+  /**
+   * Constructor method
+   * @param Json $json
+   * @param Inquiry $inquiry
+   * @param Transaction $transaction
+   */
   public function __construct(
     Json $json,
     Inquiry $inquiry,
@@ -31,6 +49,15 @@ class Webhook
     $this->transaction = $transaction;
   }
 
+  /**
+   * Logging input notification
+   * @param \Trans\Mepay\Logger\LoggerWrite $logger
+   * @param string $type
+   * @param \Magento\Framework\DataObject $transaction
+   * @param \Magento\Framework\DataObject $inquiry
+   * @param string $token
+   * @return void
+   */
   public function logNotif($logger, $type, $transaction, $inquiry, $token)
   {
     $logger->debug('================= Webhook Input Logger start ===============');
@@ -48,6 +75,14 @@ class Webhook
     $logger->debug('================= Webhook Input Logger end ===============');
   }
 
+  /**
+   * Logging for response notification
+   * @param \Trans\Mepay\Logger\LoggerWrite $logger
+   * @param string $type
+   * @param string $status
+   * @param \Magento\Framework\DataObject  $response
+   * @return void
+   */
   public function logResponse($logger, $type, $status, $response)
   {
     $logger->debug('================= Webhook Response Logger start ===============');

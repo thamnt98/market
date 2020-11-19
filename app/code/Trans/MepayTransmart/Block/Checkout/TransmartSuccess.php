@@ -1,4 +1,15 @@
 <?php 
+/**
+ * @category Trans
+ * @package  Trans_MepayTransmart
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Anan Fauzi <anan.fauzi@transdigital.co.id>
+ *
+ * Copyright © 2020 PT CT Corp Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
 namespace Trans\MepayTransmart\Block\Checkout;
 
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
@@ -40,26 +51,26 @@ class TransmartSuccess extends Success
 
   /**
    * Constructor
-   * @param Context                              $context                     
-   * @param Session                              $checkoutSession             
-   * @param OrderConfig                          $orderConfig                 
-   * @param HttpContext                          $httpContext                 
-   * @param SprintResponseRepositoryInterface    $sprintResponseRepository    
-   * @param SprintPaymentFlagRepositoryInterface $sprintPaymentFlagRepository 
-   * @param Config                               $config                      
-   * @param SprintHelper                         $paymentLogo                 
-   * @param SprintHelperData                     $sprintHelperData            
-   * @param PriceHelperData                      $priceHelper                 
-   * @param DateTime                             $date                        
-   * @param TimezoneInterface                    $timezone                    
-   * @param SourceRepositoryInterface            $sourceRepository            
-   * @param CheckoutConfigHelper                 $checkoutConfigHelper        
-   * @param Image                                $image                       
-   * @param CityRepository                       $cityRepository              
-   * @param DistrictRepository                   $districtRepository          
-   * @param Payment                              $paymentHelper               
-   * @param CollectionFactory                    $orderCollectionFactory      
-   * @param array                                $data                        
+   * @param Context $context
+   * @param Session $checkoutSession
+   * @param OrderConfig $orderConfig
+   * @param HttpContext $httpContext
+   * @param SprintResponseRepositoryInterface $sprintResponseRepository
+   * @param SprintPaymentFlagRepositoryInterface $sprintPaymentFlagRepository
+   * @param Config $config
+   * @param SprintHelper  $paymentLogo
+   * @param SprintHelperData $sprintHelperData
+   * @param PriceHelperData priceHelper
+   * @param DateTime  $date
+   * @param TimezoneInterface $timezone
+   * @param SourceRepositoryInterface $sourceRepository
+   * @param CheckoutConfigHelper $checkoutConfigHelper
+   * @param Image $image
+   * @param CityRepository $cityRepository
+   * @param DistrictRepository $districtRepository
+   * @param Payment $paymentHelper
+   * @param CollectionFactory $orderCollectionFactory
+   * @param array $data
    */
   public function __construct (
     Context $context,

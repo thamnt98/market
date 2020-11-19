@@ -1,7 +1,7 @@
 <?php
 /**
  * @category Trans
- * @package  Trans_Mepay
+ * @package  Trans_MepayTransmart
  * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *
  *
@@ -125,6 +125,12 @@ class TransmartCapture extends Capture
     );
   }
 
+  /**
+   * Update child sales order status history
+   * @param $connection
+   * @param $orderId
+   * @return void
+   */
   public function updateChildStatusHistory($connection, $orderId)
   {
     $table = $connection->getTableName('sales_order_status_history');

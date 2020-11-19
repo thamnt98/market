@@ -19,11 +19,39 @@ use Trans\Mepay\Model\Config\Config;
 
 class LoggerWrite
 {
+  /**
+   * @var Json
+   */
   protected $json;
+
+  /**
+   * @var Logger
+   */
   protected $logger;
+
+  /**
+   * @var Config
+   */
   protected $config;
+
+  /**
+   * @var Connect
+   */
   protected $loggerGatewayHttpClientConnect;
+
+  /**
+   * @var Webhook
+   */
   protected $loggerModelWebhook;
+
+  /**
+   * Constructor method
+   * @param Json json
+   * @param Logger $logger
+   * @param Config $config
+   * @param Connect $loggerGatewayHttpClientConnect
+   * @param Webhook $loggerModelWebhook
+   */
   public function __construct(
     Json $json,
     Logger $logger,
@@ -38,6 +66,12 @@ class LoggerWrite
     $this->loggerModelWebhook = $loggerModelWebhook;
   }
 
+  /**
+   * Logging for class \Trans\Mepay\Gateway\Http\Client\Connect
+   * @param  string $methodName
+   * @param  array  $param
+   * @return void
+   */
   public function loggingGatewayHttpClientConnect($methodName, $param = [])
   {
     if ($this->config->isDebug()) {
@@ -55,6 +89,12 @@ class LoggerWrite
     }
   }
 
+  /**
+   * Logging for class \Trans\Mepay\Model\Webhook
+   * @param  string $methodName
+   * @param  array  $param
+   * @return void
+   */
   public function loggingModelWebhook($methodName, $param = [])
   {
     if ($this->config->isDebug()) {
@@ -68,6 +108,11 @@ class LoggerWrite
     }
   }
 
+  /**
+   * Logging for general puposes
+   * @param  string $message
+   * @return void
+   */
   public function log(string $message)
   {
     $this->logger->debug('===== Common Log ====');
