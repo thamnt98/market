@@ -84,8 +84,7 @@ class ProductImage {
 	 * @return void
 	 */
 	public function execute() {
-		var_dump('start : ' . date('H:i:s'));
-        $class = str_replace(IntegrationCheckUpdatesInterface::CRON_DIRECTORY,"",get_class($this));
+		$class = str_replace(IntegrationCheckUpdatesInterface::CRON_DIRECTORY,"",get_class($this));
 		try {
 			$this->logger->info("=>".$class." Get Channel Data");
 			$channel = $this->commonRepository->prepareChannel('product-image');

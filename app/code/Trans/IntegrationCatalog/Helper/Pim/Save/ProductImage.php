@@ -220,6 +220,7 @@ class ProductImage extends AbstractHelper
     $catalogData = $this->integrationCatalogDataFactory->create();
     $collection = $catalogData->getCollection();
     $collection->addFieldToFilter('data_value', ['like'=>'%"id":"'.$pimId.'"%']);
+    $collection->setPageSize(1);
     return $collection->getFirstItem();
   }
 
