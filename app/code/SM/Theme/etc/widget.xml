@@ -15,7 +15,7 @@
             <parameter name="title" xsi:type="text" visible="true">
                 <label translate="true">Title</label>
             </parameter>
-            <parameter name="template" xsi:type="select" required="true" visible="false">
+            <parameter name="template" xsi:type="select" required="true" visible="true">
                 <label translate="true">Template</label>
                 <options>
                     <option name="default" value="SM_Theme::category/widget/selected-categories.phtml" selected="true">
@@ -46,7 +46,7 @@
             <parameter name="title" xsi:type="text" visible="true">
                 <label translate="true">Title</label>
             </parameter>
-            <parameter name="template" xsi:type="select" required="true" visible="false">
+            <parameter name="template" xsi:type="select" required="true" visible="true">
                 <label translate="true">Template</label>
                 <options>
                     <option name="default" value="SM_Theme::order/widget/reorder-quickly.phtml" selected="true">
@@ -73,7 +73,7 @@
             <parameter name="title" xsi:type="text" visible="true">
                 <label translate="true">Title</label>
             </parameter>
-            <parameter name="template" xsi:type="select" required="true" visible="false">
+            <parameter name="template" xsi:type="select" required="true" visible="true">
                 <label translate="true">Template</label>
                 <options>
                     <option name="default" value="SM_Theme::product/widget/surprise-deals.phtml" selected="true">
@@ -121,7 +121,7 @@
             <parameter name="title" xsi:type="text" visible="true">
                 <label translate="true">Title</label>
             </parameter>
-            <parameter name="template" xsi:type="select" required="true" visible="false">
+            <parameter name="template" xsi:type="select" required="true" visible="true">
                 <label translate="true">Template</label>
                 <options>
                     <option name="default" value="SM_Theme::product/widget/trans-carousel.phtml" selected="true">
@@ -152,7 +152,7 @@
             <parameter name="title" xsi:type="text" visible="true">
                 <label translate="true">Title</label>
             </parameter>
-            <parameter name="template" xsi:type="select" required="true" visible="false">
+            <parameter name="template" xsi:type="select" required="true" visible="true">
                 <label translate="true">Template</label>
                 <options>
                     <option name="default" value="SM_Theme::landing/sub-categories.phtml" selected="true">

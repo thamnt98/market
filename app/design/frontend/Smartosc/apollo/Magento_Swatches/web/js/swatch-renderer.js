@@ -753,7 +753,6 @@ define([
             }
 
             if ($this.hasClass('disabled')) {
-                $this.parent().addClass('disabled');
                 return;
             }
             $this.parent().parent().find('.active').removeClass('active');
@@ -869,6 +868,7 @@ define([
          */
         _Rewind: function (controls) {
             controls.find('div[option-id], option[option-id]').removeClass('disabled').removeAttr('disabled');
+            controls.find('div[option-id], option[option-id]').parent().removeClass('disabled');
             controls.find('div[option-empty], option[option-empty]')
                 .attr('disabled', true)
                 .addClass('disabled')
@@ -915,6 +915,7 @@ define([
 
                     if (_.intersection(products, $widget.optionsMap[id][option].products).length <= 0) {
                         $element.attr('disabled', true).addClass('disabled');
+                        $element.parent().addClass('disabled');
                     }
                 });
             });

@@ -11,6 +11,10 @@ use SM\Customer\Helper\Config;
 
 class Checker
 {
+    const IS_CHANGE_EMAIL = 'isChangeEmail';
+    const IS_CHANGE_TELEPHONE = 'isChangeTelephone';
+    const IS_CHANGE_PERSONAL_INFO = 'isChangePersonalInformation';
+
     /**
      * @var CustomerRepositoryInterface
      */
@@ -82,5 +86,66 @@ class Checker
     public function isUsingEmail(): bool
     {
         return $this->lastUsernameChecked == Config::EMAIL_ATTRIBUTE_CODE;
+    }
+
+    /**
+     * @param CustomerInterface $customerData
+     * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws LocalizedException
+     */
+    public function createCustomerChecker($customerData)
+    {
+        $customerId      = $customerData->getId();
+        $customerChecker = $this->initCustomerCheckerArray();
+
+        if (!isset($customerId)) {
+            return $customerChecker;
+        }
+
+        $previousCustomerData = $this->repository->getById($customerId);
+
+        //Verify customer change email
+        if ($previousCustomerData->getEmail() !== $customerData->getEmail()) {
+            $customerChecker[self::IS_CHANGE_EMAIL] = true;
+        }
+
+        //Verify customer change telephone
+        $previousTelephone = $previousCustomerData->getCustomAttribute(Config::PHONE_ATTRIBUTE_CODE)->getValue();
+        $currentTelephone  = $customerData->getCustomAttribute(Config::PHONE_ATTRIBUTE_CODE)->getValue();
+        if ($previousTelephone !== $currentTelephone) {
+            $customerChecker[self::IS_CHANGE_TELEPHONE] = true;
+        }
+
+        //Verify customer change personal information
+        $previousMaritalStatus = $previousCustomerData->getCustomAttribute(Config::MARITAL_STATUS) ?
+            $previousCustomerData->getCustomAttribute(Config::MARITAL_STATUS)->getValue() : null;
+        $currentMaritalStatus  = $customerData->getCustomAttribute(Config::MARITAL_STATUS) ?
+            $customerData->getCustomAttribute(Config::MARITAL_STATUS)->getValue() : null;
+
+        if ($previousCustomerData->getDob() != $customerData->getDob()
+            || $previousCustomerData->getGender() != $customerData->getGender()
+            || $previousCustomerData->getFirstname() != $customerData->getFirstname()
+            || $previousCustomerData->getLastname() != $customerData->getLastname()
+            || $previousMaritalStatus != $currentMaritalStatus
+        ) {
+            $customerChecker[self::IS_CHANGE_PERSONAL_INFO] = true;
+        }
+
+        return $customerChecker;
+    }
+
+    /**
+     * @return array
+     */
+    protected function initCustomerCheckerArray()
+    {
+        $customerChecker = [];
+
+        $customerChecker[self::IS_CHANGE_EMAIL] = false;
+        $customerChecker[self::IS_CHANGE_PERSONAL_INFO] = false;
+        $customerChecker[self::IS_CHANGE_TELEPHONE] = false;
+
+        return $customerChecker;
     }
 }

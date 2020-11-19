@@ -869,19 +869,23 @@ define([
                 }
                 processing = false;
                 firstOrderSelectAddressList = false;
-                var split = response.show_each_items;
+                var split = response.show_each_items,
+                    showOrderSummary = response.is_split_order;
                 setShippingRates.refreshTotal().done(function (res) {
                     globalVar.splitOrder(split);
+                    globalVar.showOrderSummary(showOrderSummary);
                     if (updateShippingMethod) {
                         mod.getShippingMethod();
                     }
                 }).error(function (res) {
                     globalVar.splitOrder(split);
+                    globalVar.showOrderSummary(showOrderSummary);
                     if (updateShippingMethod) {
                         mod.getShippingMethod();
                     }
                 }).always(function () {
                     globalVar.splitOrder(split);
+                    globalVar.showOrderSummary(showOrderSummary);
                     if (updateShippingMethod) {
                         mod.getShippingMethod();
                     }
@@ -918,7 +922,7 @@ define([
         return {
             'store_date_time': {'date': (pickup.storePickUpDate() == '') ? '': pickup.storePickUpDate() + ' ' + time, 'time': pickup.storePickUpTime()},
             'delivery_date_time': addressListDateTime,
-            'is_split_order': globalVar.splitOrder()
+            'is_split_order': globalVar.showOrderSummary()
         };
     };
 

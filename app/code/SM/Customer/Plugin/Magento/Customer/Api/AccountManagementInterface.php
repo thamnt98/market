@@ -16,6 +16,7 @@ use SM\Customer\Helper\Config;
 use SM\Customer\Helper\Customer;
 use SM\Customer\Model\Customer\Data\Checker as DataChecker;
 use SM\Customer\Model\ValidateHash;
+use SM\Customer\Model\Email\Sender as EmailSender;
 
 class AccountManagementInterface
 {
@@ -51,6 +52,8 @@ class AccountManagementInterface
      */
     protected $validateHash;
 
+    protected $emailSender;
+
     /**
      * AccountManagementInterface constructor.
      * @param DataChecker $dataChecker
@@ -60,6 +63,7 @@ class AccountManagementInterface
      * @param GetCustomerByToken $getByToken
      * @param CustomerRegistry $customerRegistry
      * @param ValidateHash $validateHash
+     * @param EmailSender $emailSender
      */
     public function __construct(
         DataChecker $dataChecker,
@@ -68,7 +72,8 @@ class AccountManagementInterface
         Customer $customerHelper,
         GetCustomerByToken $getByToken,
         CustomerRegistry $customerRegistry,
-        ValidateHash $validateHash
+        ValidateHash $validateHash,
+        EmailSender $emailSender
     ) {
         $this->validateHash = $validateHash;
         $this->customerRegistry = $customerRegistry;
@@ -77,6 +82,7 @@ class AccountManagementInterface
         $this->dataChecker = $dataChecker;
         $this->transCustomerRepository = $transCustomerRepository;
         $this->customerRepositoryInterface = $customerRepositoryInterface;
+        $this->emailSender = $emailSender;
     }
 
     /**
@@ -153,7 +159,6 @@ class AccountManagementInterface
      * @return mixed
      * @throws InputException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Magento\Framework\Exception\State\ExpiredException
      * @throws \Exception
      */
     public function aroundChangePasswordById(
@@ -169,9 +174,11 @@ class AccountManagementInterface
                 $this->customerRegistry->retrieveSecureData($customerId),
                 $newPassword
             );
-            $result = $proceed($customerId, $currentPassword, $newPassword);
+            $result       = $proceed($customerId, $currentPassword, $newPassword);
+            $customerData = $this->customerRepositoryInterface->getById($customerId);
             if ($result == true) {
                 $this->customerHelper->logout($customerId);
+                $this->emailSender->sendChangePassWord($customerData);
             }
             return $result;
         } catch (InputException $e) {

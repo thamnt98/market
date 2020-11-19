@@ -42,8 +42,8 @@
         </arguments>
     </virtualType>
     <type name="\Magento\InventorySalesApi\Api\PlaceReservationsForSalesEventInterface">
-        <plugin name="sm_place_reservations_for_sale" type="\SM\Inventory\Plugin\Api\PlaceReservationsForSalesEvent"
-                sortOrder="50"/>
+        <plugin name="sm_place_reservations_for_sale"
+                type="\SM\Inventory\Plugin\Api\PlaceReservationsForSalesEvent" sortOrder="50" disabled="true"/>
     </type>
     <type name="\SM\Checkout\Model\Split">
         <plugin name="sm_configurable_stock" type="\SM\Inventory\Plugin\Model\Checkout\Split" sortOrder="50"/>
