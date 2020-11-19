@@ -45,28 +45,4 @@ interface DiscountBreakdownInterface extends \Amasty\Rules\Api\Data\DiscountBrea
      * @return self
      */
     public function setCode($code);
-
-    /**
-     * @return float
-     */
-    public function getShippingDiscount();
-
-    /**
-     * @param float $amount
-     *
-     * @return self
-     */
-    public function setShippingDiscount($amount);
-
-    /**
-     * @return float
-     */
-    public function getItemsDiscount();
-
-    /**
-     * @param float $amount
-     *
-     * @return self
-     */
-    public function setItemsDiscount($amount);
 }

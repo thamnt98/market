@@ -122,15 +122,11 @@ class DiscountRegistry extends \Amasty\Rules\Model\DiscountRegistry
                 if (!$rule->getId()) {
                     continue;
                 }
-                $shippingDiscount = 0;
                 $ruleAmount = array_sum($ruleItemsAmount);
                 /** @var \SM\Promotion\Api\Data\DiscountBreakdownInterface $breakdownLine */
                 $breakdownLine = $this->breakdownLineFactory->create();
                 if (isset($shippingDiscountDataForBreakdown[$rule->getId()])) {
                     $ruleAmount += $shippingDiscountDataForBreakdown[$rule->getId()];
-                    if ($shippingDiscountDataForBreakdown[$rule->getId()]) {
-                        $shippingDiscount = abs($shippingDiscountDataForBreakdown[$rule->getId()]);
-                    }
                 }
 
                 if ($ruleAmount > 0) {
@@ -138,8 +134,6 @@ class DiscountRegistry extends \Amasty\Rules\Model\DiscountRegistry
                     $breakdownLine->setId($rule->getId());
                     $breakdownLine->setCode($rule->getCouponCode());
                     $breakdownLine->setRuleAmount(abs($ruleAmount));
-                    $breakdownLine->setShippingDiscount($shippingDiscount);
-                    $breakdownLine->setItemsDiscount(abs($ruleAmount) - $shippingDiscount);
                     $totalAmount[$ruleId] = $breakdownLine;
                 }
             }

@@ -203,13 +203,6 @@ define([
                 return '(' + weight + ' ' + 'gram)';
             }
             return '';
-        },
-
-        isDiscountShipping: function (shipping_fee, shipping_fee_not_discount) {
-            if (parseFloat(shipping_fee) < parseFloat(shipping_fee_not_discount)) {
-                return true;
-            }
-            return false;
         }
     });
 });
