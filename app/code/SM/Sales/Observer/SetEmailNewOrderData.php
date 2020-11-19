@@ -89,7 +89,7 @@ class SetEmailNewOrderData implements ObserverInterface
             "is_cc" => $this->verifyPayment($paymentMethod, "cc"),
             "is_store_pick_up" => $order->getShippingMethod() == "store_pickup_store_pickup",
             "delivery_method" => $this->getDeliveryMethod($order->getShippingMethod(), $order->getShippingDescription()),
-            "expire_time" => $this->getExpireTime($order->getQuoteId()),
+            "expire_time" => date("l", $this->getExpireTime($order->getQuoteId())),
             "expire_time_string" => $this->getExpireTimeString($order->getQuoteId())
         ];
 
