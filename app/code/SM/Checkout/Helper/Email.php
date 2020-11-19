@@ -5,16 +5,13 @@ namespace SM\Checkout\Helper;
 class Email extends \Magento\Framework\App\Helper\AbstractHelper
 {
     const XML_EMAIL_PREFIX = 'sm_payment/email';
+    const EMAIL_TEMPLATE   = '/template';
+    const EMAIL_SENDER     = '/sender';
 
-    const EMAIL_TEMPLATE_SYSTEM_FAILED                           = 'payment_system_failed_template';
-    const EMAIL_TEMPLATE_BANK_REJECT                             = 'payment_bank_reject_template';
-    const EMAIL_TEMPLATE_EXPIRED                                 = 'payment_expired_template';
-    const EMAIL_TEMPLATE_PAYMENT_SUCCESS_PHYSICAL                = 'payment_success_physical_template';
-
-    const EMAIL_SENDER_SYSTEM_FAILED                           = 'payment_system_failed_sender';
-    const EMAIL_SENDER_BANK_REJECT                             = 'payment_bank_reject_sender';
-    const EMAIL_SENDER_EXPIRED                                 = 'payment_expired_sender';
-    const EMAIL_SENDER_PAYMENT_SUCCESS_PHYSICAL                = 'payment_success_physical_sender';
+    const EMAIL_TEMPLATE_SYSTEM_FAILED                         = 'payment_system_failed';
+    const EMAIL_TEMPLATE_BANK_REJECT                           = 'payment_bank_reject';
+    const EMAIL_TEMPLATE_EXPIRED                               = 'payment_expired';
+    const EMAIL_TEMPLATE_PAYMENT_SUCCESS_PHYSICAL              = 'payment_success_physical';
 
     /**
      * @param $store
@@ -23,7 +20,7 @@ class Email extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getSystemFailedTemplateId($store = null)
     {
-        return $this->getConfigEmailTemplateID(self::EMAIL_TEMPLATE_SYSTEM_FAILED, $store);
+        return $this->getConfigEmailTemplateID(self::EMAIL_TEMPLATE_SYSTEM_FAILED . self::EMAIL_TEMPLATE, $store);
     }
 
     /**
@@ -33,7 +30,7 @@ class Email extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getBankRejectTemplateId($store = null)
     {
-        return $this->getConfigEmailTemplateID(self::EMAIL_TEMPLATE_BANK_REJECT, $store);
+        return $this->getConfigEmailTemplateID(self::EMAIL_TEMPLATE_BANK_REJECT . self::EMAIL_TEMPLATE, $store);
     }
 
     /**
@@ -43,7 +40,7 @@ class Email extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getExpiredTemplateId($store = null)
     {
-        return $this->getConfigEmailTemplateID(self::EMAIL_TEMPLATE_EXPIRED, $store);
+        return $this->getConfigEmailTemplateID(self::EMAIL_TEMPLATE_EXPIRED . self::EMAIL_TEMPLATE, $store);
     }
 
     /**
@@ -53,7 +50,7 @@ class Email extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getPaymentSuccessPhysicalTemplateId($store = null)
     {
-        return $this->getConfigEmailTemplateID(self::EMAIL_TEMPLATE_PAYMENT_SUCCESS_PHYSICAL, $store);
+        return $this->getConfigEmailTemplateID(self::EMAIL_TEMPLATE_PAYMENT_SUCCESS_PHYSICAL . self::EMAIL_TEMPLATE, $store);
     }
 
     /**
@@ -63,7 +60,7 @@ class Email extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getSystemFailedSender($store = null)
     {
-        return $this->getConfigEmailTemplateID(self::EMAIL_SENDER_SYSTEM_FAILED, $store);
+        return $this->getConfigEmailTemplateID(self::EMAIL_TEMPLATE_SYSTEM_FAILED . self::EMAIL_SENDER, $store);
     }
 
     /**
@@ -73,7 +70,7 @@ class Email extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getBankRejectSender($store = null)
     {
-        return $this->getConfigEmailTemplateID(self::EMAIL_SENDER_BANK_REJECT, $store);
+        return $this->getConfigEmailTemplateID(self::EMAIL_TEMPLATE_BANK_REJECT . self::EMAIL_SENDER, $store);
     }
 
     /**
@@ -83,7 +80,7 @@ class Email extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getExpiredSender($store = null)
     {
-        return $this->getConfigEmailTemplateID(self::EMAIL_SENDER_EXPIRED, $store);
+        return $this->getConfigEmailTemplateID(self::EMAIL_TEMPLATE_EXPIRED . self::EMAIL_SENDER, $store);
     }
 
     /**
@@ -93,7 +90,7 @@ class Email extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getPaymentSuccessPhysicalSender($store = null)
     {
-        return $this->getConfigEmailTemplateID(self::EMAIL_SENDER_PAYMENT_SUCCESS_PHYSICAL, $store);
+        return $this->getConfigEmailTemplateID(self::EMAIL_TEMPLATE_PAYMENT_SUCCESS_PHYSICAL . self::EMAIL_SENDER, $store);
     }
 
     /**

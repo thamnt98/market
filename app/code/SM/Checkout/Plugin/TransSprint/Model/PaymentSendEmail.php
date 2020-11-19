@@ -3,6 +3,9 @@
 namespace SM\Checkout\Plugin\TransSprint\Model;
 
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Pricing\Helper\Data as PriceHelper;
+use Magento\Sales\Model\Order;
+use Magento\Sales\Model\Order\Address\Renderer;
 use SM\Email\Model\Email\Sender as EmailSender;
 use Trans\Sprint\Helper\Config;
 
@@ -29,6 +32,16 @@ class PaymentSendEmail
     protected $emailSender;
 
     /**
+     * @var Renderer
+     */
+    protected $addressRenderer;
+
+    /**
+     * @var PriceHelper
+     */
+    protected $priceHelper;
+
+    /**
      * @var \SM\Checkout\Helper\Email
      */
     protected $emailHelper;
@@ -38,15 +51,21 @@ class PaymentSendEmail
      *
      * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
      * @param EmailSender $emailSender
+     * @param Renderer $addressRenderer
+     * @param PriceHelper $priceHelper
      * @param \SM\Checkout\Helper\Email $emailHelper
      * @param \Magento\Framework\Logger\Monolog|null $logger
      */
     public function __construct(
         \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
         EmailSender $emailSender,
+        Renderer $addressRenderer,
+        PriceHelper $priceHelper,
         \SM\Checkout\Helper\Email $emailHelper,
         \Magento\Framework\Logger\Monolog $logger = null
     ) {
+        $this->priceHelper = $priceHelper;
+        $this->addressRenderer = $addressRenderer;
         $this->emailHelper = $emailHelper;
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->logger = $logger;
@@ -145,8 +164,8 @@ class PaymentSendEmail
      */
     protected function sendMailParam($order, $templateId, $sender, $templateVars = [])
     {
-        $email = $order->getCustomer()->getEmail();
-        $name = $order->getCustomer()->getName();
+        $email = $order->getCustomerEmail();
+        $name = $order->getCustomerName();
         $this->emailSender->send(
             $templateId,
             $sender,
@@ -164,14 +183,18 @@ class PaymentSendEmail
      */
     protected function createSuccess($order)
     {
-        $templateId = $this->emailHelper->getConfigEmailTemplateID($this->emailHelper->getPaymentSuccessPhysicalTemplateId());
+        $templateId = $this->emailHelper->getPaymentSuccessPhysicalTemplateId();
         if (!$templateId) {
-            throw new LocalizedException(__('Change Telephone Notification Template does not exist'));
+            throw new LocalizedException(__('Template does not exist'));
         }
 
-        $sender = $this->emailHelper->getConfigEmailTemplateID($this->emailHelper->getPaymentSuccessPhysicalSender());
+        $sender = $this->emailHelper->getPaymentSuccessPhysicalSender();
+
         $templateVars = [
-            'order' => $order
+            "order" => $order,
+            "order_total" => $this->getPrice($order->getGrandTotal()),
+            "delivery_method" => $this->getDeliveryMethod($order->getShippingMethod(), $order->getShippingDescription()),
+            "formattedShippingAddress" => $this->getFormattedShippingAddress($order)
         ];
 
         $this->sendMailParam($order, $templateId, $sender, $templateVars);
@@ -185,12 +208,12 @@ class PaymentSendEmail
      */
     protected function createExpired($order)
     {
-        $templateId = $this->emailHelper->getConfigEmailTemplateID($this->emailHelper->getExpiredTemplateId());
+        $templateId = $this->emailHelper->getExpiredTemplateId();
         if (!$templateId) {
-            throw new LocalizedException(__('Change Telephone Notification Template does not exist'));
+            throw new LocalizedException(__('Template does not exist'));
         }
 
-        $sender = $this->emailHelper->getConfigEmailTemplateID($this->emailHelper->getExpiredSender());
+        $sender = $this->emailHelper->getExpiredSender();
         $templateVars = [
             'order' => $order
         ];
@@ -206,12 +229,12 @@ class PaymentSendEmail
      */
     protected function createBankReject($order)
     {
-        $templateId = $this->emailHelper->getConfigEmailTemplateID($this->emailHelper->getBankRejectTemplateId());
+        $templateId = $this->emailHelper->getBankRejectTemplateId();
         if (!$templateId) {
-            throw new LocalizedException(__('Change Telephone Notification Template does not exist'));
+            throw new LocalizedException(__('Template does not exist'));
         }
 
-        $sender = $this->emailHelper->getConfigEmailTemplateID($this->emailHelper->getBankRejectSender());
+        $sender = $this->emailHelper->getBankRejectSender();
         $templateVars = [
             'order' => $order
         ];
@@ -227,17 +250,59 @@ class PaymentSendEmail
      */
     protected function createSystemFailed($order)
     {
-        $templateId = $this->emailHelper->getConfigEmailTemplateID($this->emailHelper->getSystemFailedTemplateId());
+        $templateId = $this->emailHelper->getSystemFailedTemplateId();
         if (!$templateId) {
-            throw new LocalizedException(__('Change Telephone Notification Template does not exist'));
+            throw new LocalizedException(__('Template does not exist'));
         }
 
-        $sender = $this->emailHelper->getConfigEmailTemplateID($this->emailHelper->getSystemFailedSender());
+        $sender = $this->emailHelper->getSystemFailedSender();
         $templateVars = [
             'order' => $order
         ];
 
         $this->sendMailParam($order, $templateId, $sender, $templateVars);
         return true;
+    }
+
+    /**
+     * @param string $shippingMethod
+     * @param string $shippingDescription
+     * @return \Magento\Framework\Phrase|mixed|string
+     */
+    private function getDeliveryMethod($shippingMethod, $shippingDescription)
+    {
+        if ($shippingMethod == "store_pickup_store_pickup") {
+            return __("Pick Up in Store");
+        } else {
+            $shippingDescription = explode(" - ", $shippingDescription);
+            if (isset($shippingDescription[1])) {
+                return $shippingDescription[1];
+            }
+        }
+        return __("Not available");
+    }
+
+    /**
+     * Render shipping address into html.
+     *
+     * @param Order $order
+     * @return string|null
+     */
+    protected function getFormattedShippingAddress($order)
+    {
+        return $order->getIsVirtual()
+            ? null
+            : $this->addressRenderer->format($order->getShippingAddress(), 'html');
+    }
+
+    /**
+     * Get currency symbol for current locale and currency code
+     *
+     * @param $price
+     * @return string
+     */
+    public function getPrice($price)
+    {
+        return $this->priceHelper->currency($price, true, false);
     }
 }

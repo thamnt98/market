@@ -3,14 +3,14 @@
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
     <template id="sm_payment_email_payment_expired_template"
               label="SM Payment Payment Expired"
-              area="frontend" file="payment_expired.html" type="html" module="SM_Checkout"/>
+              area="frontend" file="payment_expired.html" type="html" module="SM_Notification"/>
     <template id="sm_payment_email_payment_system_failed_template"
               label="SM Payment System Failed"
-              area="frontend" file="payment_system_failed.html" type="html" module="SM_Checkout"/>
+              area="frontend" file="payment_system_failed.html" type="html" module="SM_Notification"/>
     <template id="sm_payment_email_payment_bank_reject_template"
               label="SM Payment Bank Reject"
-              area="frontend" file="payment_bank_reject.html" type="html" module="SM_Checkout"/>
+              area="frontend" file="payment_bank_reject.html" type="html" module="SM_Notification"/>
     <template id="sm_payment_email_payment_success_physical_template"
               label="SM Payment Success Physical"
-              area="frontend" file="payment_success.html" type="html" module="SM_Checkout"/>
+              area="frontend" file="payment_success.html" type="html" module="SM_Notification"/>
 </config>
