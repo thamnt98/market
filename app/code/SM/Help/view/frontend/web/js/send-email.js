@@ -145,13 +145,32 @@ define(
 
         let helpReturnRefund = $(".help-return-refund");
         let selectYes = $('.return-refund-select-yes'),
-            selectNo  = $('.return-refund-select-no');
+            selectNo  = $('.return-refund-select-no'),
+            productSelected = $('#selected-product'),
+            btnSelectProduct = $("#button-select-product");
 
         $('ul[data-role="sorter"]').find('li').each(function () {
             $(this).on('click',function () {
                 $('.action.toggle.category').find('span').text($(this).text());
                 $('input[name="category"]').val($(this).attr("data-value"));
                 let value = $(this).attr("data-value");
+
+                if(productSelected.is(":visible")){
+                    productSelected.hide();
+                    btnSelectProduct.show()
+                }
+
+                if ( $('#yes').is(':checked') && value === returnRefundId) {
+                    selectYes.show();
+                    selectNo.show();
+                } else if ($('#yes').is(':checked') && value === myOrderId) {
+                    selectNo.show();
+                    selectYes.hide();
+                } else {
+                    selectNo.show();
+                    selectYes.hide();
+                }
+
                 if (value === returnRefundId) {
                     helpReturnRefund.show();
                     helpTextarea.attr('placeholder',$.mage.__('Example: This product came in the wrong size (100 ml). It\'s supposed to be 500 ml.'));

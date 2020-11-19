@@ -810,8 +810,8 @@ class MultiShippingHandle
                 $title = __('Pick Up in Store');
                 $shippingMethodTitle = __("Store Pick Up");
                 $addressId = 0;
-                $date = $address->getDate();
-                $time = $address->getTime();
+                $date = $address->getStorePickUpTime();
+                $time = $address->getStorePickUpDelivery();
             } else {
                 $title = __('Delivery Address');
                 $listMethod = $this->split->getListMethodName();
@@ -835,7 +835,7 @@ class MultiShippingHandle
             $previewOrder->setShippingMethod($shippingMethod);
             $previewOrder->setShippingMethodTitle($shippingMethodTitle);
             $previewOrder->setAddressId($addressId);
-            if (!$web && $date != '') {
+            if ($date != '') {
                 $date = date('d M Y', strtotime($date));
             }
             $previewOrder->setDate($date);

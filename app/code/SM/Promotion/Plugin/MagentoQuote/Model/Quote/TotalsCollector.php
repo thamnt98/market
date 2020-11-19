@@ -33,8 +33,14 @@ class TotalsCollector extends \Amasty\Promo\Plugin\Quote\Model\Quote\TotalsColle
     protected $promoCartHelper;
 
     /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $checkoutSession;
+
+    /**
      * TotalsCollector constructor.
      *
+     * @param \Magento\Checkout\Model\Session                    $checkoutSesssion
      * @param \Amasty\Promo\Helper\Cart                          $promoCartHelper
      * @param \Amasty\Promo\Helper\Item                          $promoItemHelper
      * @param \Amasty\Promo\Model\Registry                       $promoRegistry
@@ -45,6 +51,7 @@ class TotalsCollector extends \Amasty\Promo\Plugin\Quote\Model\Quote\TotalsColle
      * @param \Amasty\Promo\Model\Storage                        $storage
      */
     public function __construct(
+        \Magento\Checkout\Model\Session $checkoutSesssion,
         \Amasty\Promo\Helper\Cart $promoCartHelper,
         \Amasty\Promo\Helper\Item $promoItemHelper,
         \Amasty\Promo\Model\Registry $promoRegistry,
@@ -68,6 +75,7 @@ class TotalsCollector extends \Amasty\Promo\Plugin\Quote\Model\Quote\TotalsColle
             $productRepository,
             $storage
         );
+        $this->checkoutSession = $checkoutSesssion;
     }
 
     /**
@@ -86,9 +94,14 @@ class TotalsCollector extends \Amasty\Promo\Plugin\Quote\Model\Quote\TotalsColle
     ) {
         $this->recollectTotals = false;
 
-        /*if ($address->getAllItems()) {
+        if ($address->getAllItems() &&
+            (
+                !$quote->isMultipleShippingAddresses() ||
+                ($quote->isMultipleShippingAddresses() && $this->checkoutSession->getMainOrder())
+            )
+        ) {
             $this->promoItemRegistry->resetQtyAllowed();
-        }*/
+        }
 
         $totals = $proceed($quote, $address);
 

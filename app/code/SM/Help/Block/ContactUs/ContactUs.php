@@ -25,6 +25,7 @@ use Magento\Store\Model\ScopeInterface;
 use SM\Help\Api\Data\TopicInterface;
 use SM\Help\Model\ResourceModel\Topic\Collection;
 use SM\Help\Model\ResourceModel\Topic\CollectionFactory as TopicCollectionFactory;
+use SM\Sales\Model\ParentOrderRepository;
 use SM\StoreLocator\Model\Store\ResourceModel\Location\CollectionFactory as StoreCollectionFactory;
 use SM\Theme\Helper\Data;
 use SM\Sales\Api\SubOrderRepositoryInterface;
@@ -228,7 +229,7 @@ class ContactUs extends \Magento\Framework\View\Element\Template
             $to = date("Y-m-d h:i:s"); // current date
             $from = strtotime('-90 days', strtotime($to));
             $from = date('Y-m-d h:i:s', $from); // 24 hours before
-            $sortOrder = $this->sortOrderBuilder->setField('created_at')->setDirection('DESC')->create();
+            $sortOrder = $this->sortOrderBuilder->setField(ParentOrderRepository::SORT_LATEST)->setDirection('DESC')->create();
 
             $customerId = $this->customerSession->getCustomerId();
             $searchCriteria = $this->searchCriteriaBuilder
@@ -246,18 +247,15 @@ class ContactUs extends \Magento\Framework\View\Element\Template
     }
 
     /**
-     * @param $product
-     * @param $width
-     * @param $height
+     * @param $image
+     * @param null $width
+     * @param null $height
      * @return bool|string
      * @throws Exception
      */
-    public function getImageResize($product, $width = null, $height = null)
+    public function getImageResize($image, $width = null, $height = null)
     {
-        return $this->image->init($product, 'cart_page_product_thumbnail')
-            ->setImageFile($product->getImage())
-            ->resize($width, $height)
-            ->getUrl();
+        return $this->imageHelper->getImageResize($image, $width, $height);
     }
 
     /**

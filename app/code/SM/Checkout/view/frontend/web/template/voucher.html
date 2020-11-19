@@ -15,7 +15,7 @@
                 <div class="til-code">
                     <span class="tile-voucher" data-bind="html: voucher.code"></span>
                     <!-- ko if : voucher.amount && voucher.amount != 0 -->
-                    <span class="code-voucher" data-bind="text: $parent.getFormattedPrice(voucher.amount)"></span>
+                    <span class="code-voucher" data-bind="text: $parent.getFormattedPrice(voucher.amount * -1)"></span>
                     <!-- /ko -->
                 </div>
                 <div class="apply-remove">

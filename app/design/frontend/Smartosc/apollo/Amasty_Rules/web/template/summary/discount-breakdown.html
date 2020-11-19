@@ -6,10 +6,10 @@
     </th>
     <td class="amount">
         <!-- ko if: rule.rule_amount && rule.rule_amount != 0 && !$parent.isDigital() -->
-        <span class="rule-amount" data-bind="text: $parent.getFormattedPrice(rule.rule_amount)"></span>
+        <span class="rule-amount" data-bind="text: $parent.getFormattedPrice(rule.rule_amount * -1)"></span>
         <!-- /ko -->
         <!-- ko if: $parent.isDigital() -->
-        <span class="rule-amount" data-bind="text: $parent.getAmountRule(rule.rule_amount)"></span>
+        <span class="rule-amount" data-bind="text: $parent.getAmountRule(rule.rule_amount * -1)"></span>
         <!-- /ko -->
     </td>
 </tr>

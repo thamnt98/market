@@ -227,9 +227,9 @@ class Split {
 	public function getOarResponse($data) {
 		//Bypass OAR because it is painful to get data from it
 		$isTestMode = $this->scopeConfig->getValue('sm_checkout/checkout_oar/oar_active');
-		/*if ($isTestMode) {
-			            return $this->byPassOar($data);
-		*/
+		if ($isTestMode) {
+			return $this->byPassOar($data);
+		}
 		return $this->sendOAR($data);
 	}
 
@@ -491,22 +491,26 @@ class Split {
 		for ($x = 0; $x <= 2; $x++) {
 			try {
 				$responseOAR = $this->curlHelper->post($url, $header, $dataJson);
-				$response    = $this->serializer->unserialize($responseOAR);
-				$writer      = new \Zend\Log\Writer\Stream(BP . '/var/log/oar-response-success.log');
-				$logger      = new \Zend\Log\Logger();
-				$logger->addWriter($writer);
-				$logger->info($flagLog);
-				$logger->info($dataJsonLog);
-				$logger->info($responseOAR);
+				$response    = $responseOAR;
+				if (is_string($responseOAR)) {
+					$response = $this->serializer->unserialize($responseOAR);
+				}
+				$this->writeSuccessLog($flagLog, $dataJsonLog, $responseOAR);
 				break;
 			} catch (\Exception $e) {
-				$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/oar-response-error.log');
-				$logger = new \Zend\Log\Logger();
-				$logger->addWriter($writer);
-				$logger->info($flagLog);
-				$logger->info($e->getMessage());
-				$logger->info($dataJsonLog);
-				$response['error'] = $e->getMessage();
+				$result = $this->handleException($e);
+				if ($result['status'] == 'success') {
+					if (is_string($result['response'])) {
+						$response = $this->serializer->unserialize($result['response']);
+					} else {
+						$response = $result['response'];
+					}
+					$this->writeSuccessLog($flagLog, $dataJsonLog, $result['response']);
+					break;
+				} else {
+					$this->writeErrorLog($flagLog, $dataJsonLog, $e);
+					$response['error'] = $e->getMessage();
+				}
 			}
 		}
 		return $response;
@@ -554,29 +558,42 @@ class Split {
 		return $result;
 	}
 
-	// /**
-	//  * @param $flagLog
-	//  * @param $dataJsonLog
-	//  * @param $responseOAR
-	//  */
-	// protected function writeSuccessLog($flagLog, $dataJsonLog, $responseOAR)
-	// {
-	//     $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/oar-response-success.log');
-	//     $logger = new \Zend\Log\Logger();
-	//     $logger->addWriter($writer);
-	//     $logger->info($flagLog . '. Request: ' . $dataJsonLog . '. Response: ' . $responseOAR);
-	// }
+	/**
+	 * @param $flagLog
+	 * @param $dataJsonLog
+	 * @param $responseOAR
+	 */
+	protected function writeSuccessLog($flagLog, $dataJsonLog, $responseOAR) {
+		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/oar-response-success.log');
+		$logger = new \Zend\Log\Logger();
+		$logger->addWriter($writer);
+		if (is_array($responseOAR)) {
+			try {
+				$responseOAR = $this->serializer->serialize($responseOAR);
+			} catch (\Exception $e) {
+				$responseOAR = 'can not serialize';
+			}
+		}
+		$logger->info($flagLog . '. Request: ' . $dataJsonLog . '. Response: ' . $responseOAR);
+	}
 
-	// /**
-	//  * @param $flagLog
-	//  * @param $dataJsonLog
-	//  * @param $e
-	//  */
-	// protected function writeErrorLog($flagLog, $dataJsonLog, $e)
-	// {
-	//     $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/oar-response-error.log');
-	//     $logger = new \Zend\Log\Logger();
-	//     $logger->addWriter($writer);
-	//     $logger->info($flagLog . '. Request: ' . $dataJsonLog . '. Error: ' . $e->getMessage());
-	// }
+	/**
+	 * @param $flagLog
+	 * @param $dataJsonLog
+	 * @param $e
+	 */
+	protected function writeErrorLog($flagLog, $dataJsonLog, $e) {
+		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/oar-response-error.log');
+		$logger = new \Zend\Log\Logger();
+		$logger->addWriter($writer);
+		$response = $e->getMessage();
+		if (is_array($response)) {
+			try {
+				$response = $this->serializer->serialize($response);
+			} catch (\Exception $exception) {
+				$response = 'can not serialize';
+			}
+		}
+		$logger->info($flagLog . '. Request: ' . $dataJsonLog . '. Error: ' . $response);
+	}
 }
