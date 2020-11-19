@@ -73,15 +73,18 @@ class ProductImage {
 		$this->productImage     = $productImage;
 		$this->jobInterface		= $jobInterface;
 
+		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_image.log');
+        $logger = new \Zend\Log\Logger();
+        $this->logger = $logger->addWriter($writer);
 	}
 
-	/**
+	/**.
 	 * Write to system.log
 	 *
 	 * @return void
 	 */
 	public function execute() {
-
+		var_dump('start : ' . date('H:i:s'));
         $class = str_replace(IntegrationCheckUpdatesInterface::CRON_DIRECTORY,"",get_class($this));
 		try {
 			$this->logger->info("=>".$class." Get Channel Data");
@@ -96,14 +99,15 @@ class ProductImage {
 			$this->logger->info("=".$class." Prepare Data");
 			$data = $this->productImage->prepareData($channel);//status 1, on integration catalog product
 
-			$this->logger->info("=".$class." Validate Product Data");
-			$productImgBySku = $this->productImage->validateProductImage($data);//build array
+			// $this->logger->info("=".$class." Validate Product Data");
+			// $productImgBySku = $this->productImage->validateProductImage($data);//build array
 
 			$this->logger->info("=".$class." Save Product Data");
-			$result = $this->productImage->saveProductImage($channel['jobs'],$productImgBySku);
+			// $result = $this->productImage->saveProductImage($channel['jobs'],$productImgBySku);
+			$result = $this->productImage->saveProductImage($channel['jobs'],$data);
 
 		} catch (\Exception $ex) {
-			$this->logger->error("<=".$class." ".$ex->getMessage());
+			$this->logger->info("<=".$class." ".$ex->getMessage());
 			return false;
 		}
 		$this->logger->info("<=".$class );
