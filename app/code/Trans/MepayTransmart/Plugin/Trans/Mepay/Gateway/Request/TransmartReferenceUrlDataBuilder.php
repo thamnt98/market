@@ -1,7 +1,7 @@
-<?php
+<?php 
 /**
  * @category Trans
- * @package  Trans_Mepay
+ * @package  Trans_MepayTransmart
  * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *
  *
@@ -10,7 +10,7 @@
  * Copyright © 2020 PT CT Corp Digital. All rights reserved.
  * http://www.ctcorpora.com
  */
-namespace Trans\Mepay\Gateway\Request;
+namespace Trans\MepayTransmart\Plugin\Trans\Mepay\Gateway\Request;
 
 use Magento\Payment\Gateway\Request\BuilderInterface;
 use Magento\Payment\Gateway\Helper\SubjectReader;
@@ -18,11 +18,9 @@ use Magento\Checkout\Model\Session;
 use Trans\Mepay\Model\Config\Config;
 use Trans\Mepay\Logger\Logger;
 
-class ReferenceUrlDataBuilder implements BuilderInterface
+
+class TransmartReferenceUrlDataBuilder 
 {
-
-  const REFERENCE_URL = 'referenceUrl';
-
   /**
    * @var SubjectReader
    */
@@ -62,19 +60,20 @@ class ReferenceUrlDataBuilder implements BuilderInterface
   }
 
   /**
-   * @inheritdoc
-   */
-  public function build(array $buildSubject)
-  {
-    return [self::REFERENCE_URL => $this->config->getMerchantReferenceUrl()];
-  }
-
-  /**
-   * Get reference url
+   * After build plugin
+   * @param  \Trans\Mepay\Gateway\Request\ReferenceUrlDataBuilder $subject
+   * @param  array $result
+   * @param  array $buildSubject
    * @return array
    */
-  public function getReferenceUrl()
+  public function afterBuild(\Trans\Mepay\Gateway\Request\ReferenceUrlDataBuilder $subject, $result, $buildSubject)
   {
-   return [self::REFERENCE_URL => $this->config->getMerchantReferenceUrl()]; 
+    if ($this->session->getArea() == \SM\Checkout\Helper\OrderReferenceNumber::AREA_APP)
+    {
+      $paymentDO = $this->subjectReader->readPayment($buildSubject);
+      $order = $paymentDO->getOrder();
+      $result[$subject::REFERENCE_URL] = $result[$subject::REFERENCE_URL].'?increment_id='.$order->getOrderIncrementId();
+    }
+    return $result;
   }
 }

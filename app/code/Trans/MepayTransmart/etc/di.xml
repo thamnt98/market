@@ -34,4 +34,7 @@
     <type name="SM\Checkout\Controller\Index\Success">
       <plugin name="TransMepayTransmartPluginSMCheckoutControllerIndexTransmartSuccess" type="Trans\MepayTransmart\Plugin\SM\Checkout\Controller\Index\TransmartSuccess" />
     </type>
+    <type name="Trans\Mepay\Gateway\Request\ReferenceUrlDataBuilder">
+      <plugin name="TransMepayTransmartPluginTransMepayGatewayRequestTransmartReferenceUrlDataBuilder" type="Trans\MepayTransmart\Plugin\Trans\Mepay\Gateway\Request\TransmartReferenceUrlDataBuilder" />
+    </type>
 </config>

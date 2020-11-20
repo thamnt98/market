@@ -27,6 +27,11 @@ class TransmartCallbacks extends Callbacks
    */
   public function execute()
   {
+    $incrementId = $this->getRequest()->getParam('increment_id');
+    if (!empty($incrementId)) {
+      return $this->calbacksMobile();
+    }
+
     $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
     if ($this->checkoutSession->getLastRealOrderId()) {
       $orderId = $this->getOrderId();
@@ -34,28 +39,53 @@ class TransmartCallbacks extends Callbacks
       if ($this->checkOrderCreated($order)) {
         $txn = $this->transaction->getLastOrderTransaction($orderId);
         if ($txn['txn_type'] == 'authorization') {
-
-          if ($this->checkoutSession->getArea() == \SM\Checkout\Helper\OrderReferenceNumber::AREA_APP)
-            return $resultRedirect->setPath('?fromtransmepay=1');
-
           return $resultRedirect->setPath(''); 
-
         }
 
         $this->checkoutSession->setIsSucceed(1);
-        if ($this->checkoutSession->getArea() == \SM\Checkout\Helper\OrderReferenceNumber::AREA_APP) {
+        $resultRedirect->setPath(
+          'transcheckout/index/success'
+        );
 
-          $resultRedirect->setPath(
-            'transcheckout/index/success?orderid='.$orderId.'&fromtransmepay=1'
-          );
+        return $resultRedirect;
 
-        } else {
+      } else {
 
-          $resultRedirect->setPath(
-            'transcheckout/index/success'
-          );
+        $this->checkoutSession->restoreQuote();
+        $this->messageManager->addError( __(self::PAYMENT_FAILED_MESSAGES));
+        $resultRedirect->setPath('checkout/cart/index');
 
+        return $resultRedirect;
+
+      }
+    }
+
+    $resultRedirect->setPath('checkout/cart/index');
+
+    return $resultRedirect;
+  }
+
+  /**
+   * Callbacks from mobile
+   */
+  public function calbacksMobile()
+  {
+
+    $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
+    if ($this->checkoutSession->getLastRealOrderId()) {
+      $orderId = $this->getOrderId();
+      $order = $this->transaction->getOrder($orderId);
+      if ($this->checkOrderCreated($order)) {
+        $txn = $this->transaction->getLastOrderTransaction($orderId);
+
+        if ($txn['txn_type'] == 'authorization') {
+            return $resultRedirect->setPath('?fromtransmepay=1');
         }
+
+        $this->checkoutSession->setIsSucceed(1);
+        $resultRedirect->setPath(
+            'transcheckout/index/success?orderid='.$orderId.'&fromtransmepay=1'
+        );
 
         return $resultRedirect;
 
@@ -64,29 +94,19 @@ class TransmartCallbacks extends Callbacks
         $this->checkoutSession->restoreQuote();
         $this->messageManager->addError( __(self::PAYMENT_FAILED_MESSAGES));
 
-        if ($this->checkoutSession->getArea() == \SM\Checkout\Helper\OrderReferenceNumber::AREA_APP) {
-
-          $resultRedirect->setPath(
-            'checkout/cart/index?fromtransmepay=1'
-          );
-
-        } else {
-
-          $resultRedirect->setPath('checkout/cart/index');
-
-        }
+        $resultRedirect->setPath(
+          'checkout/cart/index?fromtransmepay=1'
+        );
 
         return $resultRedirect;
 
       }
     }
 
-
-    if ($this->checkoutSession->getArea() == \SM\Checkout\Helper\OrderReferenceNumber::AREA_APP)
-      $resultRedirect->setPath('checkout/cart/index?fromtransmepay=1');
-    else 
-      $resultRedirect->setPath('checkout/cart/index');
+    $resultRedirect->setPath('checkout/cart/index?fromtransmepay=1');
 
     return $resultRedirect;
   }
+
+
 }
