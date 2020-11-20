@@ -31,4 +31,7 @@
     <type name="Trans\Mepay\Gateway\Request\OrderDataBuilder">
       <plugin name="TransMepayTransmartPluginTransMepayGatewayRequestTransmartOrderDataBuilder" type="Trans\MepayTransmart\Plugin\Trans\Mepay\Gateway\Request\TransmartOrderDataBuilder" />
     </type>
+    <type name="SM\Checkout\Controller\Index\Success">
+      <plugin name="TransMepayTransmartPluginSMCheckoutControllerIndexTransmartSuccess" type="Trans\MepayTransmart\Plugin\SM\Checkout\Controller\Index\TransmartSuccess" />
+    </type>
 </config>
