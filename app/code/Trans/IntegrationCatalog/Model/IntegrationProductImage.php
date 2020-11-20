@@ -323,11 +323,6 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 						$this->saveStatusMessage($dataArray['id'], null, IntegrationDataValueInterface::STATUS_DATA_SUCCESS);
 					}
 
-					try {
-						$this->reindexByProductsIds($productIds, ['catalog_product_attribute', 'catalogsearch_fulltext']);
-					} catch (\Exception $e) {
-						$this->logger->info('reindex fail ' . date('d-M-Y H:i:s'));	
-					}
 
 					$this->logger->info('end loop row ' . $index . ' ' . date('d-M-Y H:i:s'));
 					$this->logger->info('-----------------------------------------------------');
@@ -341,6 +336,13 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 				}
 			}
 			
+			try {
+				if(!empty($productIds)) {
+					$this->reindexByProductsIds($productIds, ['catalog_product_attribute', 'catalogsearch_fulltext']);
+				}
+			} catch (\Exception $e) {
+				$this->logger->info('reindex fail ' . date('d-M-Y H:i:s'));	
+			}
 			$this->logger->info('end loop ' . date('d-M-Y H:i:s'));
 
 		} catch (\Exception $exception) {
