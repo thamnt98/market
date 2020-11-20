@@ -588,14 +588,18 @@ class MultiShippingHandle
                         $childSku = $childItem->getSku();
                         $itemFromOAR = $splitOrderWithSku[$childSku];
                         $shippingList = $itemFromOAR['shipping_list'];
-                        if (count($shippingList) == 1 && isset($shippingList[self::DC])) {
+                        if (count($shippingList) == 1 && in_array(self::DC, $shippingList)) {
                             // is_spo
                             $this->hasSpo = true;
-                            $itemData['shipping_method'] = self::DC;
-                        } elseif (count($shippingList) <= 2 && isset($shippingList[self::TRANS_COURIER])) {
+                            if ($itemAddToQuoteAddress['shipping_method'] == self::DEFAULT_METHOD) {
+                                $itemAddToQuoteAddress['shipping_method'] = self::DC;
+                            }
+                        } elseif (count($shippingList) <= 2 && in_array(self::TRANS_COURIER, $shippingList)) {
                             // own_courier
                             $this->hasFresh = true;
-                            $itemData['shipping_method'] = self::TRANS_COURIER;
+                            if ($itemAddToQuoteAddress['shipping_method'] == self::SAME_DAY) {
+                                $itemAddToQuoteAddress['shipping_method'] = self::TRANS_COURIER;
+                            }
                         } elseif (count($shippingList) == 1 && in_array(self::SAME_DAY, $shippingList)) {
                             $this->hasFresh = true;
                         } else {
@@ -810,8 +814,8 @@ class MultiShippingHandle
                 $title = __('Pick Up in Store');
                 $shippingMethodTitle = __("Store Pick Up");
                 $addressId = 0;
-                $date = $address->getDate();
-                $time = $address->getTime();
+                $date = $address->getStorePickUpTime();
+                $time = $address->getStorePickUpDelivery();
             } else {
                 $title = __('Delivery Address');
                 $listMethod = $this->split->getListMethodName();
@@ -835,7 +839,7 @@ class MultiShippingHandle
             $previewOrder->setShippingMethod($shippingMethod);
             $previewOrder->setShippingMethodTitle($shippingMethodTitle);
             $previewOrder->setAddressId($addressId);
-            if (!$web && $date != '') {
+            if ($date != '') {
                 $date = date('d M Y', strtotime($date));
             }
             $previewOrder->setDate($date);

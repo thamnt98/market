@@ -92,7 +92,7 @@ class Update extends \Magento\Checkout\Controller\Cart implements HttpPostAction
                     $checked = self::ITEM_IS_ACTIVE;
                 }
 
-                $this->updateItemActive($checked);
+                $this->updateAll((int) $checked);
             }
             /**
              * remove items
@@ -105,7 +105,7 @@ class Update extends \Magento\Checkout\Controller\Cart implements HttpPostAction
                 foreach ($removeIds as $id) {
                     $this->getQuote()->removeItem($id);
                 }
-                $this->getQuote()->setTotalsCollectedFlag(false)->collectTotals();
+                $this->getQuote()->setData('totals_collected_flag', false);
                 $this->quoteRepository->save($this->getQuote());
                 $this->messageManager->addSuccessMessage(__('Deleted items successfully!'));
 
@@ -113,16 +113,16 @@ class Update extends \Magento\Checkout\Controller\Cart implements HttpPostAction
             }
 
             if (isset($data['itemId'])) {
-                $itemPost = explode('=', $data['itemId']);
-                $this->updateItemActiveById($itemPost[1], $itemPost[0]);
+                $this->updateItem($data['itemId']);
             }
 
-            $this->getQuote()->setTotalsCollectedFlag(false)->collectTotals();
+            $this->getQuote()->setData('totals_collected_flag', false);
             $this->quoteRepository->save($this->getQuote());
             $this->messageManager->getMessages(true);
             $response['message'] = '';
         } catch (\Exception $e) {
-            $response['message'] = $this->messageManager->addErrorMessage($e->getMessage());
+            $this->messageManager->addErrorMessage($e->getMessage());
+            $response['message'] = $e->getMessage();
             $response['status'] = __('Error');
         }
         $this->_actionFlag->set('', self::FLAG_NO_POST_DISPATCH, true);
@@ -130,31 +130,27 @@ class Update extends \Magento\Checkout\Controller\Cart implements HttpPostAction
     }
 
     /**
-     * @param $checked
-     * @param $id
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Exception
+     * @param string $data
      */
-    protected function updateItemActiveById($checked, $id)
+    protected function updateItem($data)
     {
-        $quoteItem = $this->getQuote()->getItemById($id);
-        if ($quoteItem) {
-            $quoteItem->setIsActive($checked);
-            $this->cartItemRepository->save($quoteItem);
+        [$itemId, $isActive] = explode('=', $data);
+        if ($item = $this->getQuote()->getItemById($itemId)) {
+            $isActive = (int) $isActive;
+            $item->setData('is_active', $isActive);
+            foreach ($item->getChildren() as $child) {
+                $child->setData('is_active', $isActive);
+            }
         }
     }
 
     /**
      * @param $checked
      */
-    protected function updateItemActive($checked)
+    protected function updateAll($checked)
     {
         foreach ($this->getQuote()->getItemsCollection() as $item) {
-            if ($item->getIsActive() != $checked) {
-                $item->setIsActive($checked);
-                $item->save();
-            }
+            $item->setData('is_active', $checked);
         }
     }
 

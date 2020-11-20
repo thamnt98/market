@@ -52,7 +52,7 @@
                                         </tr>
                                         <tr>
                                             <td class="description">
-                                                {{"%total", total=$order.getGrandTotal()}}
+                                                {{trans "%total" total=$order_total}}
                                             </td>
                                         </tr>
                                         </tbody>
@@ -72,7 +72,7 @@
                                         </tr>
                                         <tr>
                                             <td class="description">
-                                                {{"%payment_method", payment_method=$order.getPayment().getMethod()}}
+                                                {{trans "%payment_method" payment_method=$order.getPayment().getMethodInstance().getTitle()}}
                                             </td>
                                         </tr>
                                         </tbody>
@@ -119,7 +119,7 @@
                                         <tr>
                                             <td class="description">
                                                 <p>
-                                                    {{"%status", status=$order.getStatus()}}
+                                                    {{trans "%status" status=$order.getStatusLabel()}}
                                                 </p>
                                             </td>
                                         </tr>
@@ -141,7 +141,7 @@
                                         <tr>
                                             <td class="description">
                                                 <p>
-                                                    {{"%payment_time", payment_time=$order.getCreatedAt()}}
+                                                    {{trans "%payment_time" payment_time=$order.getCreatedAt()}}
                                                 </p>
                                             </td>
                                         </tr>
@@ -163,7 +163,7 @@
                                         <tr>
                                             <td class="description">
                                                 <p>
-                                                    {{var additional_data.delivery_method}}
+                                                    {{trans "%delivery_method" delivery_method=$delivery_method}}
                                                 </p>
                                                 {{if shipping_msg}}
                                                 <p>{{var shipping_msg}}</p>

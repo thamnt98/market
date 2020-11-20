@@ -11,12 +11,13 @@
 
 namespace SM\Help\Block\ContactUs;
 
+use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Helper\Image;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Pricing\Helper\Data as PriceHelper;
 use Magento\Framework\View\Element\Template;
 use Magento\Sales\Api\OrderRepositoryInterface;
-use Magento\Catalog\Api\ProductRepositoryInterface;
+use SM\Sales\Api\ParentOrderRepositoryInterface;
 
 class OrderProduct extends Template
 {
@@ -29,6 +30,11 @@ class OrderProduct extends Template
      * @var OrderRepositoryInterface
      */
     protected $orderRepository;
+
+    /**
+     * @var ParentOrderRepositoryInterface
+     */
+    protected $parentOrderRepository;
 
     /**
      * @var SearchCriteriaBuilder
@@ -50,6 +56,7 @@ class OrderProduct extends Template
      * @param ProductRepositoryInterface $productRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param OrderRepositoryInterface $orderRepository
+     * @param ParentOrderRepositoryInterface $parentOrderRepository
      * @param Template\Context $context
      * @param Image $imageHelper
      * @param array $data
@@ -59,6 +66,7 @@ class OrderProduct extends Template
         ProductRepositoryInterface $productRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         OrderRepositoryInterface $orderRepository,
+        ParentOrderRepositoryInterface $parentOrderRepository,
         Template\Context $context,
         Image $imageHelper,
         array $data = []
@@ -66,6 +74,7 @@ class OrderProduct extends Template
         $this->productRepository     = $productRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->orderRepository       = $orderRepository;
+        $this->parentOrderRepository = $parentOrderRepository;
         $this->imageHelper           = $imageHelper;
         $this->priceHelper           = $priceHelper;
         parent::__construct($context, $data);
@@ -95,7 +104,7 @@ class OrderProduct extends Template
         try {
             $productIds = $product['data']['productIDs'];
             if (isset($productIds)) {
-                $productId = array();
+                $productId = [];
                 foreach ($productIds as $key => $value) {
                     array_push($productId, $value);
                 }
@@ -135,13 +144,15 @@ class OrderProduct extends Template
     }
 
     /**
-     * @param $orderId
-     * @return \Magento\Sales\Api\Data\OrderInterface
+     * @param $order
+     * @return \SM\Sales\Api\Data\ParentOrderDataInterface
      */
-    public function getParentOrder($orderId)
+    public function getParentOrder($order)
     {
-        $order = $this->orderRepository->get($orderId);
+        $customerId = $order->getCustomerId();
+        $order = $this->orderRepository->get($order->getId());
         $parentId = $order->getData('parent_order');
-        return $this->orderRepository->get($parentId);
+        $orderId = $this->orderRepository->get($parentId)->getEntityId();
+        return $this->parentOrderRepository->getById($customerId, $orderId);
     }
 }
