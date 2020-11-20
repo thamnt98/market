@@ -337,7 +337,9 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 			}
 			
 			try {
-				$this->reindexByProductsIds($productIds, ['catalog_product_attribute', 'catalogsearch_fulltext']);
+				if(!empty($productIds)) {
+					$this->reindexByProductsIds($productIds, ['catalog_product_attribute', 'catalogsearch_fulltext']);
+				}
 			} catch (\Exception $e) {
 				$this->logger->info('reindex fail ' . date('d-M-Y H:i:s'));	
 			}
