@@ -2,9 +2,6 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <!-- add condition calculate & get item selected -->
-    <type name="Magento\Quote\Model\Quote">
-        <plugin name="trans_model_quote_plugin" type="SM\Checkout\Plugin\Quote\Model\Quote"/>
-    </type>
     <type name="Magento\Quote\Model\Quote\Item\CartItemPersister">
         <plugin name="sm_checkout_quote_item_persister" type="SM\Checkout\Plugin\Quote\Model\Item\CartItemPersister"
                 sortOrder="99"/>

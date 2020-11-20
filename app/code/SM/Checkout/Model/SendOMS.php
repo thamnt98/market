@@ -381,13 +381,13 @@ class SendOMS
         $time = $this->timezone->date($createAt)->format('H:i:s');
         $date = $this->timezone->date($createAt)->format('Y-m-d');
         $timeslot = '';
-        if ($logisticType == 1 || $logisticType == 4) {
+        if ($logisticType == 1 || $logisticType == 4 || $logisticType == 5) {
             if (strtotime($time) > strtotime('13:30:00')) {
                 $date = date('Y-m-d', strtotime("+1 day", strtotime($date)));
             }
             $time = '17:00:00';
             $timeslot = $date . ' ' . $time;
-        } elseif ($logisticType == 2) {
+        } elseif ($logisticType == 2 || $logisticType == 6) {
             if (strtotime($time) < strtotime('08:00:00')) {
                 $time = '09:00:00';
             } elseif (strtotime($time) <= strtotime('15:30:00')) {

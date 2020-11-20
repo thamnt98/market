@@ -28,7 +28,7 @@ use SM\Checkout\Model\Cart\Item\Data\OptionListFactory;
 use SM\FreshProductApi\Helper\Fresh;
 use SM\MobileApi\Model\Quote\Item\Stock;
 
-class Quote extends \SM\Checkout\Plugin\Quote\Model\Quote
+class Quote
 {
     const PRODUCT_IMAGE_PATH = 'catalog/product';
 
@@ -144,8 +144,6 @@ class Quote extends \SM\Checkout\Plugin\Quote\Model\Quote
      */
 
     public function __construct(
-        \SM\Checkout\Helper\DigitalProduct $digitalHelper,
-        \Magento\Framework\App\Request\Http $request,
         CartItemExtensionInterfaceFactory $cartItemExFactory,
         CartItemDataInterfaceFactory $cartItemDataFactory,
         InstallationInterfaceFactory $installationFactory,
@@ -166,7 +164,6 @@ class Quote extends \SM\Checkout\Plugin\Quote\Model\Quote
         \SM\MobileApi\Api\Data\GTM\GTMCartInterfaceFactory $gtmCart,
         Fresh $fresh
     ) {
-        parent::__construct($request, $digitalHelper);
         $this->cartItemExFactory = $cartItemExFactory;
         $this->cartItemDataFactory = $cartItemDataFactory;
         $this->installationFactory = $installationFactory;
@@ -457,5 +454,17 @@ class Quote extends \SM\Checkout\Plugin\Quote\Model\Quote
     private function setItem($item)
     {
         $this->item = $item;
+    }
+
+    /**
+     * @param $item
+     * @return bool
+     */
+    protected function itemIsActive($item)
+    {
+        if (!$item->isDeleted() && $item->getIsActive()) {
+            return true;
+        }
+        return false;
     }
 }
