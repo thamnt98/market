@@ -404,11 +404,11 @@ class SendOMS {
 				$date = date('Y-m-d', strtotime("+1 day", strtotime($date)));
 			}
 			$timeslot = $date . ' ' . $time;
-		} elseif ($logisticType == 2) {
+		} elseif ($logisticType == 2 || $logisticType == 3) {
 			if (strtotime($time) < strtotime('08:00:00')) {
 				$time = '09:00:00';
 			} elseif (strtotime($time) <= strtotime('15:30:00')) {
-				$time = date('H:i:s', strtotime("+2 hour", strtotime($time)));
+				$time = date('H:i:s', strtotime("+3 hour", strtotime($time)));
 			} else {
 				$time = '09:00:00';
 				$date = date('Y-m-d', strtotime("+1 day", strtotime($date)));
