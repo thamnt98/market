@@ -80,6 +80,24 @@ class Data extends AbstractHelper
   }
 
   /**
+   * Get order object
+   * @return \Magento\Sales\Api\Data\OrderInterface
+   */
+  public static function getOrderInterface()
+  {
+    return self::getClassInstance('Magento\Sales\Api\Data\OrderInterface');
+  }
+
+  /**
+   * Get order collection object
+   * @return \Magento\Sales\Model\ResourceModel\Order\Collection
+   */
+  public static function getOrderCollection()
+  {
+    return self::getOrderInterface()->getCollection();
+  }
+
+  /**
    * Get order by id
    * @param  int $orderId
    * @return \Magento\Sales\Api\Data\OrderInterface
@@ -99,6 +117,42 @@ class Data extends AbstractHelper
   {
     $order = self::getOrderById($orderId);
     return $order->getPayment()->getMethod();
+  }
+
+  /**
+   * Get customer session
+   * @return \Magento\Customer\Model\Session
+   */
+  public static function getCustomerSession()
+  {
+    return self::getClassInstance('Magento\Customer\Model\Session');
+  }
+
+  /**
+   * Get customer repo
+   * @return \Magento\Customer\Api\CustomerRepositoryInterface
+   */
+  public static function getCustomerRepo()
+  {
+    return self::getClassInstance('Magento\Customer\Api\CustomerRepositoryInterface');
+  }
+
+  /**
+   * Get Customer
+   * @return \Magento\Customer\Api\Data\CustomerInterface
+   */
+  public static function getCustomer()
+  {
+    return self::getCustomerSession()->getCustomer();
+  }
+
+  /**
+   * Get Customer id
+   * @return int
+   */
+  public static function getCustomerId()
+  {
+    return self::getCustomer()->getId();
   }
 
 }

@@ -37,4 +37,7 @@
     <type name="Trans\Mepay\Gateway\Request\ReferenceUrlDataBuilder">
       <plugin name="TransMepayTransmartPluginTransMepayGatewayRequestTransmartReferenceUrlDataBuilder" type="Trans\MepayTransmart\Plugin\Trans\Mepay\Gateway\Request\TransmartReferenceUrlDataBuilder" />
     </type>
+    <type name="Trans\Mepay\Gateway\Http\Client\Connect">
+      <plugin name="TransMepayTransmartPluginTransMepayGatewayHttpClientTransmartConnect" type="Trans\MepayTransmart\Plugin\Trans\Mepay\Gateway\Http\Client\TransmartConnect" />
+    </type>
 </config>
