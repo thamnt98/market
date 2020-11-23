@@ -507,6 +507,14 @@ class Split
                 if (is_string($responseOAR)) {
                     $response = $this->serializer->unserialize($responseOAR);
                 }
+                // check timing get OAR
+                 $dateBegin = new DateTime();
+                 $this->logger->info('$Date Begin OAR : ' . $dateBegin->getTimestamp());
+                 sleep(5);
+                 $dateEnd = new DateTime();
+                 $this->logger->info('$Date End OAR : ' . $dateEnd->getTimestamp()
+                 $diff = $dateEnd->getTimestamp() - $dateBegin->getTimestamp();
+                 $this->logger->info('$Date Different OAR : ' . $diff);
                 $this->writeSuccessLog($flagLog, $dataJsonLog, $responseOAR);
                 break;
             } catch (\Exception $e) {
