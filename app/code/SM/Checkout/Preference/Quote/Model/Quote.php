@@ -161,4 +161,61 @@ class Quote extends \Magento\Quote\Model\Quote
         }
         return $items;
     }
+
+    /**
+     * Retrieve quote item by product id
+     *
+     * @param   \Magento\Catalog\Model\Product $product
+     * @return  \Magento\Quote\Model\Quote\Item|bool
+     */
+    public function getItemByProduct($product)
+    {
+        foreach (parent::getAllItems() as $item) {
+            if ($item->representProduct($product)) {
+                return $item;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @override
+     * @return \Magento\Quote\Model\Quote\Item[]
+     */
+    public function getAllItems()
+    {
+        $items = [];
+        foreach ($this->getItemsCollection() as $item) {
+            if (!$item->getId() || $item->getIsActive() === null) {
+                $item->setIsActive(1);
+            }
+
+            if (!$item->isDeleted() && $item->getIsActive()) {
+                $items[] = $item;
+            }
+        }
+
+        return $items;
+    }
+
+    /**
+     * @override
+     * @return \Magento\Quote\Model\Quote\Item[]
+     */
+    public function getAllVisibleItems()
+    {
+        $items = [];
+
+        foreach ($this->getItemsCollection() as $item) {
+            if (!$item->getId() || $item->getIsActive() === null) {
+                $item->setIsActive(1);
+            }
+
+            if (!$item->isDeleted() && $item->getIsActive() && !$item->getParentItemId() && !$item->getParentItem()) {
+                $items[] = $item;
+            }
+        }
+
+        return $items;
+    }
 }
