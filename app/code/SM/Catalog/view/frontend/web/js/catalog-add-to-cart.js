@@ -13,44 +13,47 @@ define([
     'use strict';
     const $productList =  $('#amasty-shopby-product-list');
     // Start Customize
-    $productList.on('click', '.action.increase-qty',function () {
-        var $this = $(this),
-            updateContainer = $this.parent('.update-cart-qty'),
-            qty = updateContainer.find("[name='item_qty']").stop().val();
+    if ($('.sign-link a').length > 0) {
+        $productList.on('click', '.action.increase-qty',function () {
+            var $this = $(this),
+                updateContainer = $this.parent('.update-cart-qty'),
+                qty = updateContainer.find("[name='item_qty']").stop().val();
 
-        updateContainer.find("[name='qty_type']").stop().val('1');
-        if (qty >= 99) {
-            $this.attr("disabled", true);
-        }
-        if (qty >= 98) {
-            $this.css("background", "grey");
-            $this.css("background-color", "grey");
-        }
-    });
+            updateContainer.find("[name='qty_type']").stop().val('1');
+            if (qty >= 99) {
+                $this.attr("disabled", true);
+            }
+            if (qty >= 98) {
+                $this.css("background", "grey");
+                $this.css("background-color", "grey");
+            }
+        });
 
-    $productList.on('click', '.action.decrease-qty', function () {
-        var $this = $(this),
-            updateContainer = $this.parent('.update-cart-qty'),
-            qty = updateContainer.find("[name='item_qty']").stop().val(),
+        $productList.on('click', '.action.decrease-qty', function () {
+            var $this = $(this),
+                updateContainer = $this.parent('.update-cart-qty'),
+                qty = updateContainer.find("[name='item_qty']").stop().val(),
+                addToCarForm = $this.parents("[data-role='tocart-form']");
+
+            updateContainer.find("[name='qty_type']").stop().val('0');
             addToCarForm = $this.parents("[data-role='tocart-form']");
 
-        updateContainer.find("[name='qty_type']").stop().val('0');
-        addToCarForm = $this.parents("[data-role='tocart-form']");
+            if (qty <=0 ) {
+                $this.attr('disabled', 'disabled');
+                $this.css("background", "grey");
+            }
+            if (qty <= 1) {
+                updateContainer.hide();
+                addToCarForm.children('.action.tocart').show();
+            }
+            if (qty >= 1 && qty <= 99) {
+                $this.closest('.update-cart-qty').find('.action.increase-qty').css("background", "#f7b500");
+                $this.closest('.update-cart-qty').find('.action.increase-qty').css("background-color", "#f7b500");
+                $this.closest('.update-cart-qty').find('.action.increase-qty').prop('disabled',false);
+            }
+        });
+    }
 
-        if (qty <=0 ) {
-            $this.attr('disabled', 'disabled');
-            $this.css("background", "grey");
-        }
-        if (qty <= 1) {
-            updateContainer.hide();
-            addToCarForm.children('.action.tocart').show();
-        }
-        if (qty >= 1 && qty <= 99) {
-            $this.closest('.update-cart-qty').find('.action.increase-qty').css("background", "#f7b500");
-            $this.closest('.update-cart-qty').find('.action.increase-qty').css("background-color", "#f7b500");
-            $this.closest('.update-cart-qty').find('.action.increase-qty').prop('disabled',false);
-        }
-    });
     // End Customize
 
     $.widget('mage.catalogAddToCartAdvanced', {
@@ -90,7 +93,11 @@ define([
             this.element.data('catalog-addtocart-initialized', 1);
             this.element.on('submit', function (e) {
                 e.preventDefault();
-                self.submitForm($(this));
+                if ($('.sign-link a').length == 0) {
+                    self.submitForm($(this));
+                } else {
+                    $('.sign-link a').trigger('click');
+                }
             });
         },
 

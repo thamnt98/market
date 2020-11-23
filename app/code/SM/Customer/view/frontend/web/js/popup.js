@@ -25,13 +25,15 @@ define(
             optForm = false;
 
         mod.init = function () {
-            $('.sign-link a, .authorization-link a').click(function(event){
+            $('.sign-link a, .authorization-link a, a.showcart').click(function(event){
                 event.preventDefault();
+                $('.modals-overlay').remove();
                 if (loginForm) {
                     $('#tab-login').modal('openModal');
                 } else {
                     mod.callAjax('login-form');
                 }
+                $('body').addClass('_has-modal');
             });
             $('.register-link').click(function(event){
                 event.preventDefault();
@@ -41,6 +43,14 @@ define(
                     mod.callAjax('register-form');
                 }
             });
+            if ($('.sign-link a').length > 0) {
+                $('.page-footer a').click(function (event) {
+                    if($(this).attr('href').indexOf('contactus') != -1){
+                        event.preventDefault();
+                        $('.sign-link a').trigger('click');
+                    }
+                });
+            }
             var urlParams = new URLSearchParams(window.location.search);
             console.log(urlParams.has('recovery'));
             if (urlParams.has('recovery') && recoveryForm === false) {
@@ -48,9 +58,9 @@ define(
                 mod.callAjax('recovery-form');
             } else if (urlParams.has('recoverytoken')) {
                 mod.callAjax('lock-reset-form');
-            } else {
+            } else if (window.location.href.indexOf('checkout/cart') != -1) {
                 // show login popup
-                //$('.sign-link a').trigger('click');
+                $('.sign-link a').trigger('click');
             }
         };
 
