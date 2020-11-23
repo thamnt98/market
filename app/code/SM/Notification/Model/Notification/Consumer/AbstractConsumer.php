@@ -18,6 +18,7 @@ namespace SM\Notification\Model\Notification\Consumer;
 define('DS', DIRECTORY_SEPARATOR);
 
 use Monolog\Logger;
+use SM\Notification\Model\Notification;
 
 abstract class AbstractConsumer
 {
@@ -52,8 +53,14 @@ abstract class AbstractConsumer
     protected $customerSetting = [];
 
     /**
+     * @var \Magento\Customer\Model\ResourceModel\Online\Grid\CollectionFactory
+     */
+    protected $customerOnlineCollFact;
+
+    /**
      * AbstractConsumer constructor.
      *
+     * @param \Magento\Customer\Model\ResourceModel\Online\Grid\CollectionFactory $customerOnlineCollFact
      * @param \SM\Notification\Helper\CustomerSetting                             $settingHelper
      * @param \Magento\Framework\App\ResourceConnection                           $resourceConnection
      * @param \Magento\Customer\Api\CustomerRepositoryInterface                   $customerRepository
@@ -61,6 +68,7 @@ abstract class AbstractConsumer
      * @param \Magento\Framework\Logger\Monolog                                   $logger
      */
     public function __construct(
+        \Magento\Customer\Model\ResourceModel\Online\Grid\CollectionFactory $customerOnlineCollFact,
         \SM\Notification\Helper\CustomerSetting $settingHelper,
         \Magento\Framework\App\ResourceConnection $resourceConnection,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
@@ -72,6 +80,7 @@ abstract class AbstractConsumer
         $this->customerRepository = $customerRepository;
         $this->logger = $logger;
         $this->settingHelper = $settingHelper;
+        $this->customerOnlineCollFact = $customerOnlineCollFact;
     }
 
     /**
@@ -140,7 +149,31 @@ abstract class AbstractConsumer
     {
         $setting = $this->getCustomerSetting($customerId);
         $settingCode = $this->settingHelper->generateSettingCode($event, $type);
+        if ($event === Notification::EVENT_ORDER_STATUS) {
+            $offlineCode = $this->settingHelper->generateSettingCode(
+                Notification::EVENT_ORDER_STATUS_SIGN_OUT,
+                $type
+            );
+
+            if (!in_array($offlineCode, $setting) && !$this->checkCustomerOnline($customerId)) {
+                return false;
+            }
+        }
 
         return in_array($settingCode, $setting);
+    }
+
+    /**
+     * @param $customerId
+     *
+     * @return int
+     */
+    protected function checkCustomerOnline($customerId)
+    {
+        /** @var \Magento\Customer\Model\ResourceModel\Online\Grid\Collection $coll */
+        $coll = $this->customerOnlineCollFact->create();
+        $coll->getSelect()->where('main_table.customer_id = ?', $customerId);
+
+        return $coll->count();
     }
 }

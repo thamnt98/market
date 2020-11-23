@@ -149,8 +149,8 @@ class PaymentNotify
     protected function createNotification($order)
     {
         switch ($this->paymentStatusCode) {
-            case Config::PAYMENT_FLAG_DECLINED_04: // Payment Expired
-                return $this->createExpired($order);
+//            case Config::PAYMENT_FLAG_DECLINED_04: // Payment Expired
+//                return $this->createExpired($order); // Payment not call when expired --> move to cron.
             case Config::PAYMENT_FLAG_DECLINED_05: // Payment Reject by Bank
                 return $this->createBankReject($order);
             case Config::PAYMENT_FLAG_DECLINED_01: // Payment System Failed
@@ -207,6 +207,7 @@ class PaymentNotify
         $notification = $this->notificationFactory->create();
         $notification->setTitle($title)
             ->setEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
+            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
             ->setCustomerIds([$order->getCustomerId()])
             ->setRedirectId($order->getData('parent_order') ? $order->getData('parent_order') : $order->getId())
             ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_ORDER_DETAIL)
@@ -247,6 +248,7 @@ class PaymentNotify
         $notification = $this->notificationFactory->create();
         $notification->setTitle($title)
             ->setEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
+            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
             ->setCustomerIds([$order->getCustomerId()])
             ->setRedirectId($order->getData('parent_order') ? $order->getData('parent_order') : $order->getId())
             ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_ORDER_DETAIL)
@@ -307,6 +309,7 @@ class PaymentNotify
         $notification = $this->notificationFactory->create();
         $notification->setTitle($title)
             ->setEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
+            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
             ->setCustomerIds([$order->getCustomerId()])
             ->setRedirectId($order->getData('parent_order') ? $order->getData('parent_order') : $order->getId())
             ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_ORDER_DETAIL)
@@ -415,6 +418,7 @@ class PaymentNotify
         $notification = $this->notificationFactory->create();
         $notification->setTitle($title)
             ->setEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
+            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
             ->setCustomerIds([$order->getCustomerId()])
             ->setRedirectId($order->getData('parent_order') ? $order->getData('parent_order') : $order->getId())
             ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_ORDER_DETAIL)

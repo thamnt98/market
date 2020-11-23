@@ -45,6 +45,11 @@
              instance="SM\Notification\Cron\VaPaymentExpiringSoon" method="execute">
             <config_path>sm_notification/generate/payment_expiring_soon_time_cron</config_path>
         </job>
+        <!-- Generate message V.A payment expired -->
+        <job name="sm_notification_payment_va_expired"
+             instance="SM\Notification\Cron\VaPaymentExpired" method="execute">
+            <config_path>sm_notification/generate/payment_expired</config_path>
+        </job>
 
         <!-- Generate message remind pickup -->
         <job name="sm_notification_remind_pickup"

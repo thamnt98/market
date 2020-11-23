@@ -96,7 +96,12 @@ abstract class AbstractGenerate
     public function execute()
     {
         if (!$this->isLocked()) {
-            $this->process();
+            try {
+                $this->process();
+            } catch (\Exception $e) {
+                $this->logger->error($e->getFile() . "\n" . $e->getLine() . "\n" .$e->getMessage());
+            }
+
             $this->unlock();
         }
     }

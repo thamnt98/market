@@ -21,7 +21,7 @@
                                 </span>
                                 <div class="noti-item-content">
                                     <span class="noti-status">
-                                        <span><?= $block->convertEventType($item->getData('event')) ?></span>
+                                        <span><?= $block->convertEventType($item->getData('sub_event') ? $item->getData('sub_event') : $item->getData('event')) ?></span>
                                         <span class="noti-date"><?= $block->convertDate($item->getData('created_at')) ?></span>
                                     </span>
                                     <h4><?= $block->convertOrderContent($block->getTitle($item)) ?></h4>

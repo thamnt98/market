@@ -22,6 +22,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
     const CHECK_ZERO_TOTAL = 'zero_total';
 
     protected $supportShippingData;
+    protected $disablePickUp = false;
 
     /**
      * @var bool
@@ -558,6 +559,9 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         }
         $quoteItemModel->setGtmData($model);
         $quoteItemModel->setDisableStorePickUp((bool)$product->getIsWarehouse());
+        if ((bool)$product->getIsWarehouse()) {
+            $this->disablePickUp = true;
+        }
         return $quoteItemModel;
     }
 
@@ -677,9 +681,11 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         $isAddressComplete,
         $isErrorCheckout,
         $voucher,
+        $disablePickUp,
         $customerId,
         $cartId
     ) {
+        $this->disablePickUp = $disablePickUp;
         $customer = $this->customerFactory->create()->load($customerId);
         $quote = $this->quoteRepository->get($cartId);
         $checkoutSession = $this->multiShipping;
@@ -720,7 +726,8 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
             CheckoutDataInterface::BASKET_ID => $this->getBasketId($customerId),
             CheckoutDataInterface::BASKET_VALUE => $quote->getGrandTotal(),
             CheckoutDataInterface::BASKET_QTY => $quote->getItemsQty(),
-            CheckoutDataInterface::SHOW_EACH_ITEMS => $this->multiShippingHandle->isShowEachItems($quote->getAllShippingAddresses(), $items)
+            CheckoutDataInterface::SHOW_EACH_ITEMS => $this->multiShippingHandle->isShowEachItems($quote->getAllShippingAddresses(), $items),
+            CheckoutDataInterface::DISABLE_PICK_UP => $this->disablePickUp
         ];
 
         return $this->getCheckoutData($data);
@@ -914,7 +921,8 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
             CheckoutDataInterface::BASKET_ID => $this->getBasketId($customerId),
             CheckoutDataInterface::BASKET_VALUE => $quote->getGrandTotal(),
             CheckoutDataInterface::BASKET_QTY => $quote->getItemsQty(),
-            CheckoutDataInterface::SHOW_EACH_ITEMS => $this->multiShippingHandle->isShowEachItems($quote->getAllShippingAddresses(), $quoteItems)
+            CheckoutDataInterface::SHOW_EACH_ITEMS => $this->multiShippingHandle->isShowEachItems($quote->getAllShippingAddresses(), $quoteItems),
+            CheckoutDataInterface::DISABLE_PICK_UP => $this->disablePickUp
         ];
         return $this->getCheckoutData($data);
     }
@@ -1047,6 +1055,9 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
                 $quoteItemModel->setThumbnail($this->getImageUrl($product, $storeId));
                 $quoteItemModel->setRowTotal($quoteItem->getRowTotal());
                 $quoteItemModel->setDisableStorePickUp((bool)$product->getIsWarehouse());
+                if ((bool)$product->getIsWarehouse()) {
+                    $this->disablePickUp = true;
+                }
                 $product = $this->productRepository->getById($product->getId());
                 $model = $this->gtmCart->create();
                 $data = $this->productGtm->getGtm($product);
@@ -1240,7 +1251,6 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         $skuList = [];
         $quote = $this->quoteRepository->get($cartId);
         $child = [];
-        $fulFill = true;
         $destinationLatLng = $this->msiFullFill->addLatLngInterface($lat, $lng);
         $currentStore = $this->msiFullFill->getDistanceBetweenCurrentStoreAndAddressMobile($currentStoreCode, $destinationLatLng);
         $interface->setCurrentStore($currentStore);
@@ -1274,8 +1284,9 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
     /**
      * {@inheritdoc}
      */
-    public function applyVoucher($shippingAddress, $items, $additionalInfo, $isStoreFulFill, $isSplitOrder, $isAddressComplete, $isErrorCheckout, $voucher, $currencySymbol, $digitalCheckout, $digitalDetail, $customerId, $cartId)
+    public function applyVoucher($shippingAddress, $items, $additionalInfo, $isStoreFulFill, $isSplitOrder, $isAddressComplete, $isErrorCheckout, $voucher, $currencySymbol, $digitalCheckout, $digitalDetail, $disablePickUp, $customerId, $cartId)
     {
+        $this->disablePickUp = $disablePickUp;
         $requestItems = $items;
         $response = false;
         $customer = $this->customerFactory->create()->load($customerId);
@@ -1353,7 +1364,8 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
                 CheckoutDataInterface::BASKET_ID => $this->getBasketId($customerId),
                 CheckoutDataInterface::BASKET_VALUE => $quote->getGrandTotal(),
                 CheckoutDataInterface::BASKET_QTY => $quote->getItemsQty(),
-                CheckoutDataInterface::SHOW_EACH_ITEMS => $this->multiShippingHandle->isShowEachItems($quote->getAllShippingAddresses(), $requestItems)
+                CheckoutDataInterface::SHOW_EACH_ITEMS => $this->multiShippingHandle->isShowEachItems($quote->getAllShippingAddresses(), $requestItems),
+                CheckoutDataInterface::DISABLE_PICK_UP => $this->disablePickUp
             ];
             $response = $this->getCheckoutData($data);
         }
@@ -1420,7 +1432,8 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
             CheckoutDataInterface::BASKET_ID => $this->getBasketId($customerId),
             CheckoutDataInterface::BASKET_VALUE => $quote->getGrandTotal(),
             CheckoutDataInterface::BASKET_QTY => $quote->getItemsQty(),
-            CheckoutDataInterface::SHOW_EACH_ITEMS => false
+            CheckoutDataInterface::SHOW_EACH_ITEMS => false,
+            CheckoutDataInterface::DISABLE_PICK_UP => $this->disablePickUp
         ];
         return $this->getCheckoutData($data);
     }
@@ -1582,7 +1595,8 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
             CheckoutDataInterface::CURRENCY_SYMBOL => $this->getCurrencySymbol(),
             CheckoutDataInterface::DIGITAL_CHECKOUT => true,
             CheckoutDataInterface::DIGITAL_DETAIL => $this->getDigitalDetail($quote),
-            CheckoutDataInterface::SHOW_EACH_ITEMS => false
+            CheckoutDataInterface::SHOW_EACH_ITEMS => false,
+            CheckoutDataInterface::DISABLE_PICK_UP => $this->disablePickUp
         ];
 
         return $this->getCheckoutData($data);

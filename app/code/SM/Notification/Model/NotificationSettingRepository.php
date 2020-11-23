@@ -174,8 +174,14 @@ class NotificationSettingRepository implements NotificationSettingRepositoryInte
         $notificationData = [];
         try {
             foreach ($defaultValue as $key => $item) {
-                if ($data->getId() != null && $data->getId() == $item['entity_id']) {
+                if (isset($notificationData[$item['entity_id']])) {
+                    continue;
+                } elseif ($data->getId() != null && $data->getId() == $item['entity_id']) {
                     $notificationData[$item['entity_id']] = (string)$data->getValue();
+                    $duplicate = $this->getDuplicateCode($item['code'], $item['message_type'], $item['entity_id']);
+                    foreach ($duplicate as $id) {
+                        $notificationData[$id] = $notificationData[$item['entity_id']];
+                    }
                 } else {
                     $notificationData[$item['entity_id']] = $item['default_value'];
                 }
@@ -204,11 +210,18 @@ class NotificationSettingRepository implements NotificationSettingRepositoryInte
         $notificationData = [];
         try {
             foreach ($defaultValue as $item) {
-                if (isset($data[$item['entity_id']])) {
+                if (isset($notificationData[$item['entity_id']])) {
+                    continue;
+                } elseif (isset($data[$item['entity_id']])) {
                     if ($data[$item['entity_id']] === 'on') {
                         $notificationData[$item['entity_id']] = '1';
                     } else {
                         $notificationData[$item['entity_id']] = '0';
+                    }
+
+                    $duplicate = $this->getDuplicateCode($item['code'], $item['message_type'], $item['entity_id']);
+                    foreach ($duplicate as $id) {
+                        $notificationData[$id] = $notificationData[$item['entity_id']];
                     }
                 } else {
                     if ($item['parent_code'] != '') {
@@ -229,5 +242,23 @@ class NotificationSettingRepository implements NotificationSettingRepositoryInte
         } catch (\Exception $e) {
             return false;
         }
+    }
+
+    /**
+     * @param $code
+     * @param $messageType
+     * @param $excludeId
+     *
+     * @return array
+     */
+    protected function getDuplicateCode($code, $messageType, $excludeId)
+    {
+        /** @var \SM\Notification\Model\ResourceModel\NotificationSetting\Collection $coll */
+        $coll = $this->notificationSettingCollectionFactory->create();
+        $coll->addFieldToFilter('code', $code)
+            ->addFieldToFilter('message_type', $messageType)
+            ->addFieldToFilter('entity_id', ['neq' => $excludeId]);
+
+        return $coll->getAllIds();
     }
 }

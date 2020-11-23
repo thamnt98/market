@@ -356,4 +356,20 @@ class CheckoutData extends AbstractExtensibleObject implements CheckoutDataInter
     {
         return $this->setData(self::SHOW_EACH_ITEMS, $value);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getDisablePickUp()
+    {
+        return $this->_get(self::DISABLE_PICK_UP);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setDisablePickUp($value)
+    {
+        return $this->setData(self::DISABLE_PICK_UP, $value);
+    }
 }
