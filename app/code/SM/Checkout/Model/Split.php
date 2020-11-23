@@ -490,19 +490,11 @@ class Split {
 		$dataJsonLog = $dataJson;
 		for ($x = 0; $x <= 2; $x++) {
 			try {
-				$dateBegin   = new DateTime();
-				$format      = 'Y-m-d H:i:s';
-				$begin       = $dateBegin->getTimestamp();
 				$responseOAR = $this->curlHelper->post($url, $header, $dataJson);
 				$response    = $responseOAR;
 				if (is_string($responseOAR)) {
 					$response = $this->serializer->unserialize($responseOAR);
 				}
-				$dateEnd = new DateTime();
-				$end     = $dateEnd->getTimestamp();
-
-				$diff = $end - $begin;
-				$this->writeSuccessLog('Begin OAR: ' . $dateBegin->format($format), 'End OAR: ' . $dateEnd->format($format), 'Diff OAR: ' . $diff);
 				$this->writeSuccessLog($flagLog, $dataJsonLog, $responseOAR);
 				break;
 			} catch (\Exception $e) {
