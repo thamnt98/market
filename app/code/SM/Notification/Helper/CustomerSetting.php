@@ -50,7 +50,7 @@ class CustomerSetting extends \Magento\Framework\App\Helper\AbstractHelper
         foreach ($settings as $setting) {
             if ((bool)$setting['default_value']) {
                 $result[] = $this->generateSettingCode(
-                    $setting['event_type'] ?? '',
+                    $setting['code'] ?? '',
                     $setting['message_type'] ?? ''
                 );
             }

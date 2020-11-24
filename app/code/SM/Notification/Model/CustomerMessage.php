@@ -90,7 +90,7 @@ class CustomerMessage extends \Magento\Framework\Model\AbstractModel
             $params = json_decode($params, true);
         }
 
-        $data['event_label'] = $this->helper->getEventTitle($this->getData('event'));
+        $data['event_label'] = $this->helper->getEventTitle($this->getData('sub_event') ?? $this->getData('event'));
         $data['title'] = __($data['title'] ?? '', $params['title'] ?? [])->__toString();
         $data['content'] = __($data['content'] ?? '', $params['content'] ?? [])->__toString();
         $data['image'] = $this->helper->getNotificationImageUrl($data['image'] ?? '');

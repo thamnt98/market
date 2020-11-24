@@ -31,15 +31,7 @@ class UpgradeData implements \Magento\Framework\Setup\UpgradeDataInterface
     {
         $setup->startSetup();
 
-        if (version_compare($context->getVersion(), '1.0.1', '<')) {
-            $this->truncateTable($setup);
-        }
-
-        if (version_compare($context->getVersion(), '1.0.2', '<')) {
-            $this->truncateTable($setup);
-        }
-
-        if (version_compare($context->getVersion(), '1.0.3', '<')) {
+        if (version_compare($context->getVersion(), '1.0.4', '<')) {
             $this->truncateTable($setup);
         }
 

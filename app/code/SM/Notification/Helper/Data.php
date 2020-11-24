@@ -72,8 +72,14 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     protected $helpRepository;
 
     /**
+     * @var \SM\Notification\Model\Source\EventType
+     */
+    protected $eventTypeOptions;
+
+    /**
      * Data constructor.
      *
+     * @param \SM\Notification\Model\Source\EventType    $eventTypeOptions
      * @param \SM\Help\Model\Url                         $helpUrl
      * @param \SM\Help\Model\TopicRepository             $helpRepository
      * @param \Amasty\ShopbyBrand\Helper\Data            $brandHelper
@@ -84,6 +90,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Framework\App\Helper\Context      $context
      */
     public function __construct(
+        \SM\Notification\Model\Source\EventType $eventTypeOptions,
         \SM\Help\Model\Url $helpUrl,
         \SM\Help\Model\TopicRepository $helpRepository,
         \Amasty\ShopbyBrand\Helper\Data $brandHelper,
@@ -101,6 +108,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $this->brandHelper = $brandHelper;
         $this->helpUrl = $helpUrl;
         $this->helpRepository = $helpRepository;
+        $this->eventTypeOptions = $eventTypeOptions;
     }
 
     /**
@@ -199,13 +207,26 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getEventTitle($event)
     {
-        foreach ($this->getEventConfig() as $item) {
-            if (isset($item['event_type']) &&
-                $item['event_type'] === $event
-            ) {
-                return $item['name'] ?? $event;
+        $options = $this->eventTypeOptions->getTreeEvent();
+        foreach ($options as $groups) {
+            if (empty($groups['value'])) {
+                continue;
+            }
+
+            foreach ($groups['value'] as $option) {
+                if (!empty($option['value']) && $option['value'] === $event) {
+                    return $option['label'] ?? '';
+                }
             }
         }
+
+        foreach ($options as $key => $option) {
+            if ($key === $event) {
+                return $option['label'] ?? '';
+            }
+        }
+
+        return '';
     }
 
     /**

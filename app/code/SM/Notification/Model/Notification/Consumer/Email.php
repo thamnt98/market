@@ -33,31 +33,34 @@ class Email extends AbstractConsumer
 
     /**
      * Email constructor.
-     *
-     * @param \Magento\Sales\Model\OrderRepository                                $orderRepository
-     * @param \SM\Notification\Helper\Generate\Email                              $helper
-     * @param \SM\Notification\Helper\CustomerSetting                             $settingHelper
-     * @param \Magento\Framework\App\ResourceConnection                           $resourceConnection
-     * @param \Magento\Customer\Api\CustomerRepositoryInterface                   $customerRepository
+     * @param \Magento\Customer\Model\ResourceModel\Online\Grid\CollectionFactory $customerOnlineCollFact
+     * @param \SM\Notification\Helper\CustomerSetting $settingHelper
+     * @param \Magento\Framework\App\ResourceConnection $resourceConnection
+     * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
      * @param \Trans\IntegrationNotification\Api\IntegrationNotificationInterface $integrationNotification
-     * @param \Magento\Framework\Logger\Monolog|null                              $logger
+     * @param \SM\Notification\Helper\Generate\Email $helper
+     * @param \Magento\Sales\Model\OrderRepository $orderRepository
+     * @param \Magento\Framework\Logger\Monolog $logger
      */
     public function __construct(
-        \Magento\Sales\Model\OrderRepository $orderRepository,
-        \SM\Notification\Helper\Generate\Email $helper,
+        \Magento\Customer\Model\ResourceModel\Online\Grid\CollectionFactory $customerOnlineCollFact,
         \SM\Notification\Helper\CustomerSetting $settingHelper,
         \Magento\Framework\App\ResourceConnection $resourceConnection,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
         \Trans\IntegrationNotification\Api\IntegrationNotificationInterface $integrationNotification,
-        \Magento\Framework\Logger\Monolog $logger = null
+        \SM\Notification\Helper\Generate\Email $helper,
+        \Magento\Sales\Model\OrderRepository $orderRepository,
+        \Magento\Framework\Logger\Monolog $logger
     ) {
         parent::__construct(
+            $customerOnlineCollFact,
             $settingHelper,
             $resourceConnection,
             $customerRepository,
             $integrationNotification,
             $logger
         );
+
         $this->helper = $helper;
         $this->orderRepository = $orderRepository;
     }

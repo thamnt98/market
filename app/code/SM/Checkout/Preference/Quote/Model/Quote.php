@@ -218,4 +218,69 @@ class Quote extends \Magento\Quote\Model\Quote
 
         return $items;
     }
+
+    /**
+     * @param int $itemId
+     * @param \Magento\Framework\DataObject $buyRequest
+     * @param null $params
+     * @return bool|\Magento\Quote\Model\Quote\Item|string|null
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function updateItem($itemId, $buyRequest, $params = null)
+    {
+        $item = $this->getItemById($itemId);
+        if (!$item) {
+            throw new \Magento\Framework\Exception\LocalizedException(
+                __('This is the wrong quote item id to update configuration.')
+            );
+        }
+        $productId = $item->getProduct()->getId();
+
+        //We need to create new clear product instance with same $productId
+        //to set new option values from $buyRequest
+        $product = clone $this->productRepository->getById($productId, false, $this->getStore()->getId());
+
+        if (!$params) {
+            $params = new \Magento\Framework\DataObject();
+        } elseif (is_array($params)) {
+            $params = new \Magento\Framework\DataObject($params);
+        }
+        $params->setCurrentConfig($item->getBuyRequest());
+        $buyRequest = $this->_catalogProduct->addParamsToBuyRequest($buyRequest, $params);
+        $buyRequest->setId($itemId);
+        $buyRequest->setResetCount(true);
+        $resultItem = $this->addProduct($product, $buyRequest);
+
+        if (is_string($resultItem)) {
+            throw new \Magento\Framework\Exception\LocalizedException(__($resultItem));
+        }
+
+        if ($resultItem->getParentItem()) {
+            $resultItem = $resultItem->getParentItem();
+        }
+
+        if ($resultItem->getId() != $itemId) {
+            /**
+             * Product configuration didn't stick to original quote item
+             * It either has same configuration as some other quote item's product or completely new configuration
+             */
+            $this->removeItem($itemId);
+            $items = $this->getAllItems();
+            foreach ($items as $item) {
+                if ($item->getProductId() == $productId && $item->getId() != $resultItem->getId()) {
+                    if ($resultItem->compare($item)) {
+                        // Product configuration is same as in other quote item
+                        $resultItem->setQty($resultItem->getQty() + $item->getQty());
+                        $this->removeItem($item->getId());
+                        break;
+                    }
+                }
+            }
+        } else {
+            $resultItem->setQty($buyRequest->getQty());
+        }
+
+        return $resultItem;
+    }
 }

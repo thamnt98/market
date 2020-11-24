@@ -29,6 +29,7 @@ interface CheckoutDataInterface
     const BASKET_VALUE = 'basket_value';
     const TERM_AND_CONDITION = "term_and_condition";
     const SHOW_EACH_ITEMS = "show_each_items";
+    const DISABLE_PICK_UP = "disable_pick_up";
 
     /**
      * @param \Magento\Customer\Api\Data\AddressInterface[] $data
@@ -273,4 +274,15 @@ interface CheckoutDataInterface
      * @return $this
      */
     public function setShowEachItems($value);
+
+    /**
+     * @return bool
+     */
+    public function getDisablePickUp();
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function setDisablePickUp($value);
 }

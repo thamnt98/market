@@ -116,6 +116,7 @@ class AbandonedCart extends AbstractGenerate
             ->setContent($message)
             ->setPushContent($message)
             ->setEvent(\SM\Notification\Model\Notification::EVENT_UPDATE)
+            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_PROMO_AND_EVENT)
             ->setCustomerIds([$rowData['customer_id']])
             ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_CART);
 

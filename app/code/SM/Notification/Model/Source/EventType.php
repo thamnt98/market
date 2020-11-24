@@ -14,39 +14,58 @@ class EventType implements \Magento\Framework\Data\OptionSourceInterface
      */
     public function toOptionArray()
     {
+        return array_values($this->getTreeEvent());
+    }
+
+    /**
+     * @return array[]
+     */
+    public function getTreeEvent()
+    {
         return [
-            [
-                'label' => __('Order Status'),
-                'value' => Notification::EVENT_ORDER_STATUS,
-            ],
-            [
+            Notification::EVENT_UPDATE => [
                 'label' => __('Transmart Updates'),
-                'value' => Notification::EVENT_UPDATE,
+                'value' => [
+                    [
+                        'label' => __('Promo & Event'),
+                        'value' => Notification::EVENT_PROMO_AND_EVENT,
+                    ],
+                    [
+                        'label' => __('Information'),
+                        'value' => Notification::EVENT_INFO,
+                    ],
+                ],
             ],
-            [
+            Notification::EVENT_ORDER_STATUS => [
+                'label' => __('Order'),
+                'value' => [
+                    [
+                        'label' => __('Order Status'),
+                        'value' => Notification::EVENT_ORDER_STATUS,
+                    ]
+                ],
+            ],
+            Notification::EVENT_SERVICE => [
                 'label' => __('Services'),
-                'value' => Notification::EVENT_SERVICE,
-            ],
-            [
-                'label' => __('Chat Recap'),
-                'value' => Notification::EVENT_CHAT_RECAP,
-            ],
-            [
-                'label' => __('My Appointment'),
-                'value' => Notification::EVENT_MY_APPOINTMENT,
-            ],
-            [
-                'label' => __('Promotion'),
-                'value' => Notification::EVENT_PROMO,
-            ],
-            [
-                'label' => __('Subscription'),
-                'value' => Notification::EVENT_SUBSCRIPTION,
-            ],
-            [
-                'label' => __('Unknown Device'),
-                'value' => Notification::EVENT_UNKNOWN_DEVICE,
-            ],
+                'value' => [
+                    [
+                        'label' => __('Subscription'),
+                        'value' => Notification::EVENT_SUBSCRIPTION,
+                    ],
+                    [
+                        'label' => __('Reorder Quickly'),
+                        'value' => Notification::EVENT_REORDER,
+                    ],
+                    [
+                        'label' => __('Chat Recap'),
+                        'value' => Notification::EVENT_CHAT_RECAP,
+                    ],
+                    [
+                        'label' => __('Unknown Device'),
+                        'value' => Notification::EVENT_UNKNOWN_DEVICE,
+                    ],
+                ]
+            ]
         ];
     }
 }

@@ -77,6 +77,7 @@ class EventProductInShoppingListOnSale implements ObserverInterface
                 ->setPushContent(__("Let's get it! Only in limited time and stock."))
                 ->setCustomerIds($listCustomer)
                 ->setEvent(Notification::EVENT_UPDATE)
+                ->setSubEvent(\SM\Notification\Model\Notification::EVENT_PROMO_AND_EVENT)
                 ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_PDP)
                 ->setRedirectId($product->getSku())
                 ->setParams($params);

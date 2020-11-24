@@ -156,7 +156,7 @@ abstract class AbstractSync
             ->joinInner(
                 ['message' => \SM\Notification\Model\ResourceModel\Notification::TABLE_NAME],
                 'main_table.message_id = message.id',
-                ['event']
+                ['event' => 'sub_event']
             )->where(
                 'message.start_date IS NULL OR message.start_date <= NOW()'
             )->where(
