@@ -233,22 +233,22 @@ class IntegrationStock implements IntegrationStockInterface {
 					else {
 						$this->saveStatusMessage($data, IntegrationStockInterface::MSG_NO_STORE, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
 
-						$this->logger->error("start - store not found");
-						$this->logger->error("sku: " . $productSku);
-						$this->logger->error("store_code: " . $locationCode);
-						$this->logger->error("quantity: " . $quantity);
-						$this->logger->error("query: " . $query);
-						$this->logger->error("end - store not found");
+						$this->logger->info("start - store not found");
+						$this->logger->info("sku: " . $productSku);
+						$this->logger->info("store_code: " . $locationCode);
+						$this->logger->info("quantity: " . $quantity);
+						$this->logger->info("query: " . $query);
+						$this->logger->info("end - store not found");
 					}
 
 				}
 				else {
 					$this->saveStatusMessage($data, IntegrationStockInterface::MSG_DATA_STOCK_NULL, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
 
-					$this->logger->error("start - sku and store not provided");
-					$this->logger->error("quantity: " . $quantity);
-					$this->logger->error("query: " . $query);
-					$this->logger->error("end - sku and store not provided");
+					$this->logger->info("start - sku and store not provided");
+					$this->logger->info("quantity: " . $quantity);
+					$this->logger->info("query: " . $query);
+					$this->logger->info("end - sku and store not provided");
                 }
             }
             
@@ -263,19 +263,19 @@ class IntegrationStock implements IntegrationStockInterface {
 					$dataJobs->setHit($tryHit);
 					$dataJobs->setStatus(IntegrationJobInterface::STATUS_PROGRESS_FAIL);
 
-					$this->logger->error("start - job exceed maximum hit to save the data");
-					$this->logger->error("job_id: " . $jobId);
-					$this->logger->error("max_try_hit: " . IntegrationStockInterface::MAX_TRY_HIT);
-					$this->logger->error("end - job exceed maximum hit to save the data");
+					$this->logger->info("start - job exceed maximum hit to save the data");
+					$this->logger->info("job_id: " . $jobId);
+					$this->logger->info("max_try_hit: " . IntegrationStockInterface::MAX_TRY_HIT);
+					$this->logger->info("end - job exceed maximum hit to save the data");
 				}
 				else {
 					$dataJobs->setHit($tryHit);
 					$dataJobs->setStatus(IntegrationJobInterface::STATUS_READY);
 
-					$this->logger->error("start - job retried to hit to save the data");
-					$this->logger->error("job_id: " . $jobId);
-					$this->logger->error("hit: " . $tryHit);
-					$this->logger->error("end - job retried to hit to save the data");
+					$this->logger->info("start - job retried to hit to save the data");
+					$this->logger->info("job_id: " . $jobId);
+					$this->logger->info("hit: " . $tryHit);
+					$this->logger->info("end - job retried to hit to save the data");
 				}
 
 				$this->integrationJobRepositoryInterface->save($dataJobs);
