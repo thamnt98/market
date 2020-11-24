@@ -243,6 +243,6 @@ class Search implements SearchInterface
             return [];
         }
 
-        return $this->smProductInterface->getList($category_id, $limit, $p);
+        return $this->smProductInterface->getList($category_id, $limit, $p, false);
     }
 }

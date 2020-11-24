@@ -201,8 +201,16 @@ class VaPaymentExpired extends AbstractGenerate
         );
 
         if ($isPush) {
-            $notification->setPushTitle(__($title))
-                ->setPushContent(__($content, $params['content']));
+            $this->emulation->startEnvironmentEmulation(
+                $order->getStoreId(),
+                \Magento\Framework\App\Area::AREA_FRONTEND,
+                true
+            );
+
+            $notification->setPushTitle(__($title)->__toString())
+                ->setPushContent(__($content, $params['content'])->__toString());
+
+            $this->emulation->stopEnvironmentEmulation();
         }
 
         if ($isSendMail) {

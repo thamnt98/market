@@ -4,6 +4,7 @@ namespace SM\Sales\Model\Order;
 
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\OrderFactory;
 use Magento\Sales\Model\ResourceModel\Order as OrderResource;
@@ -51,6 +52,18 @@ class Updater
     protected $resourceConnection;
 
     /**
+     * @var DateTime
+     */
+    protected $dateTime;
+
+    /**
+     * Identifier for history item
+     *
+     * @var string
+     */
+    protected $entityType = 'order';
+
+    /**
      * OrderPlugin constructor.
      * @param OrderCollectionFactory $orderCollectionFactory
      * @param OrderFactory $orderFactory
@@ -58,6 +71,7 @@ class Updater
      * @param StatusState $stateHelper
      * @param LoggerInterface $logger
      * @param ResourceConnection $resourceConnection
+     * @param DateTime $dateTime
      */
     public function __construct(
         OrderCollectionFactory $orderCollectionFactory,
@@ -65,7 +79,8 @@ class Updater
         OrderResource $orderResource,
         StatusState $stateHelper,
         LoggerInterface $logger,
-        ResourceConnection $resourceConnection
+        ResourceConnection $resourceConnection,
+        DateTime $dateTime
     ) {
         $this->stateHelper = $stateHelper;
         $this->orderResource = $orderResource;
@@ -73,6 +88,7 @@ class Updater
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->logger = $logger;
         $this->resourceConnection = $resourceConnection;
+        $this->dateTime = $dateTime;
     }
 
     /**
@@ -91,6 +107,7 @@ class Updater
         try {
             $where = ['entity_id = ?' => $order->getEntityId()];
             $connection->beginTransaction();
+
             //Update sale_order
             $connection->update($saleOrder, [
                 'state'  => ParentOrderRepositoryInterface::STATUS_COMPLETE,
@@ -102,19 +119,26 @@ class Updater
                 'status' => ParentOrderRepositoryInterface::STATUS_COMPLETE
             ], $where);
 
-            //Update sales_order_status_history
-            $condition =  ['parent_id = ?' => $order->getEntityId()];
-            $connection->update($saleOrderStatusHistory, [
-                'comment' => 'Order has been Successfully Completed'
-            ], $condition);
+            //Insert data to sales_order_status_history table
+            $currentTime = $this->dateTime->gmtDate();
+            $comment     = __('Order has been Successfully Completed');
+            $data =  [
+                'parent_id'            => $order->getEntityId(),
+                'is_customer_notified' => $order->getCustomerNoteNotify(),
+                'is_visible_on_front'  => 0,
+                'comment'              => $comment,
+                'status'               => $order->getStatus(),
+                'created_at'           => $currentTime,
+                'entity_name'          => $this->entityType
+            ];
 
+            $connection->insert($saleOrderStatusHistory, $data);
             $connection->commit();
             $this->updateParentOrderStatus($order);
         } catch (\Exception $exception) {
             $connection->rollBack();
             $this->logger->critical('Can\'t update order status', ['exception' => $exception]);
         }
-
     }
 
     /**

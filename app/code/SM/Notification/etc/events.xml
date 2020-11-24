@@ -18,4 +18,8 @@
         <observer name="SM_Notification::QuoteItemSaveAfter"
                   instance="SM\Notification\Observer\QuoteItemSaveBefore" />
     </event>
+    <event name="customer_device_save_after">
+        <observer name="SM_Notification::CustomerDeviceSaveAfter"
+                  instance="SM\Notification\Observer\DeviceSaveAfter" />
+    </event>
 </config>

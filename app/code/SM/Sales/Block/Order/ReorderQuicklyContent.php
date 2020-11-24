@@ -120,6 +120,6 @@ class ReorderQuicklyContent extends Template
      */
     public function timeFormat($time)
     {
-        return $this->timezone->date($time)->format('d F Y');
+        return $this->timezone->date(strtotime($time))->format('d F Y');
     }
 }

@@ -24,13 +24,6 @@
         </resources>
     </route>
 
-    <route url="/V1/homepage/getSurpriseDeal" method="GET">
-        <service class="SM\MobileApi\Api\HomeInterface" method="getSurpriseDeal"/>
-        <resources>
-            <resource ref="self"/>
-        </resources>
-    </route>
-
     <!-- Product -->
     <route url="/V1/product/getProductById" method="GET">
         <service class="SM\MobileApi\Api\ProductInterface" method="getDetails"/>

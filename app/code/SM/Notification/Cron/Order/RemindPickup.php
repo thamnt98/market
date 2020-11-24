@@ -147,8 +147,8 @@ class RemindPickup extends AbstractGenerate
             \Magento\Framework\App\Area::AREA_FRONTEND
         );
 
-        $notification->setPushTitle(__($title, $params['title']))
-            ->setPushContent(__($message, $params['content']));
+        $notification->setPushTitle(__($title, $params['title'])->__toString())
+            ->setPushContent(__($message, $params['content'])->__toString());
 
         $this->emulation->stopEnvironmentEmulation(); // End Emulation
 

@@ -127,8 +127,8 @@ class AbandonedCart extends AbstractGenerate
                 \Magento\Framework\App\Area::AREA_FRONTEND
             );
 
-            $notification->setPushTitle(__($title))
-                ->setPushContent(__($message));
+            $notification->setPushTitle(__($title)->__toString())
+                ->setPushContent(__($message)->__toString());
 
             $this->emulation->stopEnvironmentEmulation(); // End Emulation
         }

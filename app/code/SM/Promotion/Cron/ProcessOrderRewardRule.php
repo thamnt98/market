@@ -212,23 +212,60 @@ class ProcessOrderRewardRule extends \SM\Notification\Cron\AbstractGenerate
                 $order->getCustomerName()
             ]
         ];
+        $title = '%1, we have a voucher for you';
+        $content = 'Check this one out and shop now!';
+
         /** @var \SM\Notification\Model\Notification $notification */
         $notification = $this->notificationFactory->create();
-        $notification->setTitle('%1, we have a voucher for you')
+        $notification->setTitle($title)
             ->setEvent(\SM\Notification\Model\Notification::EVENT_UPDATE)
             ->setSubEvent(\SM\Notification\Model\Notification::EVENT_PROMO_AND_EVENT)
             ->setCustomerIds([$order->getCustomerId()])
-            ->setContent('Check this one out and shop now!')
+            ->setContent($content)
             ->setParams($params);
 
+        $setting = $this->settingHelper->getCustomerSetting($order->getCustomerId());
+        $isSendMail = in_array(
+            $this->settingHelper->generateSettingCode(
+                \SM\Notification\Model\Notification::EVENT_PROMO_AND_EVENT,
+                'email'
+            ),
+            $setting
+        );
+        $isPush = in_array(
+            $this->settingHelper->generateSettingCode(
+                \SM\Notification\Model\Notification::EVENT_PROMO_AND_EVENT,
+                'push'
+            ),
+            $setting
+        );
+        $isSms = in_array(
+            $this->settingHelper->generateSettingCode(
+                \SM\Notification\Model\Notification::EVENT_PROMO_AND_EVENT,
+                'sms'
+            ),
+            $setting
+        );
         // Emulation store view
         $this->emulation->startEnvironmentEmulation(
             $order->getStoreId(),
             \Magento\Framework\App\Area::AREA_FRONTEND
         );
-        $notification->setPushTitle(__('%1, we have a voucher for you', $params))
-            ->setPushContent('Check this one out and shop now!')
-            ->setSms($order->getCustomerName() . ', we have a voucher for you\r\nFind it on My Voucher!');
+        if ($isPush) {
+            $notification->setPushTitle(__($title, $params)->__toString())
+                ->setPushContent(__($content)->__toString());
+        }
+
+        if ($isSendMail) {
+            // send mail
+        }
+
+        if ($isSms) {
+            $notification->setSms(
+                __('%1, we have a voucher for you\r\nFind it on My Voucher!', $order->getCustomerName())->__toString()
+            );
+        }
+
         $this->emulation->stopEnvironmentEmulation(); // End Emulation
 
         try {

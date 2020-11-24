@@ -66,10 +66,6 @@ class CustomerRepositoryInterface
             }
         }
 
-        if ($customerChecker[DataChecker::IS_CHANGE_EMAIL]) {
-            $this->emailSender->sendChangeEmail($savedCustomerData);
-        }
-
         if ($customerChecker[DataChecker::IS_CHANGE_TELEPHONE]) {
             $this->emailSender->sendChangeTelephoneEmail($savedCustomerData);
         }

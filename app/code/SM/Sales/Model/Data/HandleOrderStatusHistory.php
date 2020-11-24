@@ -435,7 +435,7 @@ class HandleOrderStatusHistory
      */
     private function formatDate($date)
     {
-        return $this->timezone->date($date)->format('d M Y, h:i A');
+        return $this->timezone->date(strtotime($date))->format('d M Y, h:i A');
     }
 
     /**

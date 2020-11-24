@@ -223,7 +223,7 @@ class Tree
             break;
         }
 
-        return $this->productInterface->getList($mostPopularCategoryId, $limit = 10, $p = 1);
+        return $this->productInterface->getList($mostPopularCategoryId, $limit = 10, $p = 1, false);
     }
 
     /**
