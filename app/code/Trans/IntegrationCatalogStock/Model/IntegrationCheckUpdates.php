@@ -526,6 +526,7 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
 
         $total  = $data['count'];
 
+        //default status of integration_catalogstock_job is STATUS_WAITING == 1
         $result[IntegrationJobInterface::TOTAL_DATA] = $total;
         $result[IntegrationJobInterface::METHOD_ID] = $method->getId();
         $result[IntegrationJobInterface::LIMIT] = (!empty($method->getLimits()))?$method->getLimits():IntegrationChannelMethodInterface::VAL_LIMIT;
