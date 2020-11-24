@@ -38,6 +38,11 @@ class Update extends \Magento\Checkout\Controller\Cart implements HttpPostAction
     private $cartItemRepository;
 
     /**
+     * @var \Magento\Framework\App\Request\DataPersistorInterface
+     */
+    protected $dataPersistor;
+
+    /**
      * Update constructor.
      * @param Context $context
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
@@ -48,6 +53,7 @@ class Update extends \Magento\Checkout\Controller\Cart implements HttpPostAction
      * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
      * @param \Magento\Quote\Api\CartItemRepositoryInterface $cartItemRepository
      * @param CustomerCart $cart
+     * @param \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -58,11 +64,13 @@ class Update extends \Magento\Checkout\Controller\Cart implements HttpPostAction
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Quote\Api\CartItemRepositoryInterface $cartItemRepository,
-        CustomerCart $cart
+        CustomerCart $cart,
+        \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor
     ) {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->quoteRepository = $quoteRepository;
         $this->cartItemRepository = $cartItemRepository;
+        $this->dataPersistor = $dataPersistor;
         parent::__construct(
             $context,
             $scopeConfig,
@@ -81,7 +89,8 @@ class Update extends \Magento\Checkout\Controller\Cart implements HttpPostAction
         $data = $this->getRequest()->getParams();
         $resultJson = $this->resultJsonFactory->create();
         $response = [
-            'status' => 'success'
+            'status' => 'success',
+            'reload' => 'false'
         ];
 
         try {
@@ -93,6 +102,10 @@ class Update extends \Magento\Checkout\Controller\Cart implements HttpPostAction
                 }
 
                 $this->updateAll((int) $checked);
+                $isUpdateOmniCode = $this->dataPersistor->get('update_omni_code');
+                if ($isUpdateOmniCode && $checked == self::ITEM_IS_ACTIVE) {
+                    $this->updateResponse();
+                }
             }
             /**
              * remove items
@@ -135,11 +148,16 @@ class Update extends \Magento\Checkout\Controller\Cart implements HttpPostAction
     protected function updateItem($data)
     {
         [$itemId, $isActive] = explode('=', $data);
+        $isUpdateOmniCode = $this->dataPersistor->get('update_omni_code');
         if ($item = $this->getQuote()->getItemById($itemId)) {
             $isActive = (int) $isActive;
             $item->setData('is_active', $isActive);
             foreach ($item->getChildren() as $child) {
                 $child->setData('is_active', $isActive);
+
+                if ($isUpdateOmniCode && $isActive == true) {
+                    $this->updateResponse();
+                }
             }
         }
     }
@@ -168,5 +186,12 @@ class Update extends \Magento\Checkout\Controller\Cart implements HttpPostAction
     protected function setQuote($quote)
     {
         $this->quote = $quote;
+    }
+
+    protected function updateResponse()
+    {
+        $response['reload'] = true;
+        $response['reload_message'] = __('The prices in your cart have been update based on your delivery address');
+        $this->dataPersistor->clear('update_omni_code');
     }
 }

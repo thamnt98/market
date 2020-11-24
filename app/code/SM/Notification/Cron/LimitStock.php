@@ -146,8 +146,8 @@ class LimitStock extends AbstractGenerate
                 \Magento\Framework\App\Area::AREA_FRONTEND
             );
 
-            $notification->setPushTitle(__($title, $params['title']))
-                ->setPushContent(__($message));
+            $notification->setPushTitle(__($title, $params['title'])->__toString())
+                ->setPushContent(__($message)->__toString());
 
             $this->emulation->stopEnvironmentEmulation(); // End Emulation
         }

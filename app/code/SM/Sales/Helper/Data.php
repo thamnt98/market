@@ -57,7 +57,7 @@ class Data extends AbstractHelper
      */
     public function timeFormat($time)
     {
-        return $this->timezone->date($time)->format('d M Y | H:i A');
+        return $this->timezone->date(strtotime($time))->format('d M Y | H:i A');
     }
 
     /**

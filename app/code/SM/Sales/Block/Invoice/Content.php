@@ -135,6 +135,6 @@ class Content extends Template
 
     public function pickUpTimeDateFormat($date)
     {
-        return $this->timezone->date($date)->format('d F Y');
+        return $this->timezone->date(strtotime($date))->format('d F Y');
     }
 }

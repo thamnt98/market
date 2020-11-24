@@ -17,6 +17,13 @@ namespace SM\Customer\Model;
 
 class CustomerDevice extends \Magento\Framework\Model\AbstractModel
 {
+    const NEW_DEVICE_KEY = 'is_new_device';
+
+    const DESKTOP_TYPE = 'desktop';
+
+    protected $_eventPrefix = 'customer_device';
+    protected $_eventObject = 'device';
+
     /**
      * Initialize resource model
      */

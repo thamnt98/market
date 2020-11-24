@@ -1,6 +1,5 @@
 <?php
 
-
 namespace SM\CustomPrice\Observer\Customer;
 
 use Magento\Customer\Model\Address;
@@ -10,7 +9,7 @@ class UpdateAddress implements \Magento\Framework\Event\ObserverInterface
 {
 
     /**
-     * @var \SM\CustomPrice\Model\Customer
+     * @var Customer
      */
     protected $customer;
     /**
@@ -19,10 +18,9 @@ class UpdateAddress implements \Magento\Framework\Event\ObserverInterface
     protected $customerHelper;
 
     public function __construct(
-        \SM\CustomPrice\Model\Customer $customer,
+        Customer $customer,
         \SM\CustomPrice\Helper\Customer $customerHelper
-    )
-    {
+    ) {
         $this->customer = $customer;
         $this->customerHelper = $customerHelper;
     }
@@ -32,27 +30,27 @@ class UpdateAddress implements \Magento\Framework\Event\ObserverInterface
      *
      * @param \Magento\Framework\Event\Observer $observer
      * @return void
+     * @throws \Exception
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         /** @var $customerAddress Address */
         $customerAddress = $observer->getCustomerAddress();
-        /** @var \SM\CustomPrice\Model\Customer $customer */
+        /** @var Customer $customer */
         $customer      = $customerAddress->getCustomer();
         $customerModel = $this->customer->load($customer->getId());
         $newDistrict   = $customerAddress->getDistrict();
         $oldDistrict   = $customerAddress->getOrigData('district');
-        $newCity   = $customerAddress->getCity();
-            /*
-            * if already billing address -> check it is main address
-            * and if it is new account
-            */
+        $newCity       = $customerAddress->getCity();
+        /*
+        * if already billing address -> check it is main address
+        * and if it is new account
+        */
         if (($customer->getDefaultBillingAddress() instanceof \Magento\Customer\Model\Address\AbstractAddress
              && $customer->getDefaultBillingAddress()->getId() == $customerAddress->getId()
-             &&$newDistrict!=$oldDistrict)
+             && $newDistrict != $oldDistrict)
             || !$customerModel->getDataModel()->getCustomAttribute(Customer::OMNI_STORE_ID)) {
             $this->customerHelper->updateDistrictAndOmniStoreForCustomer($customerModel, $newDistrict, $newCity);
         }
-
     }
 }

@@ -68,6 +68,10 @@ define([
                     recollect(true);
                     updateLabelSubtotalSelected();
                 }
+
+                if (response.reload === true) {
+                   reloadPageAfterChangeAddress(response);
+                }
             },
             error : function () {
                 /**
@@ -175,6 +179,10 @@ define([
                     } else if (itemValue == 1) {
                         current.attr('checked','true');
                     }
+                }
+
+                if (response.reload === true) {
+                    reloadPageAfterChangeAddress(response);
                 }
             },
             error : function () {
@@ -341,5 +349,26 @@ define([
         } else {
             $('.totals .sub >  .mark').html('Subtotal <span class="totals-count-items">' + $.mage.__("(%1 items)").replace('%1', i) + '</span>');
         }
+    }
+
+    function reloadPageAfterChangeAddress(response) {
+        let customerMessages = customerData.get('messages')() || {},
+            messages = customerMessages.messages || [];
+
+        messages.push({
+            text: response.reload_message,
+            type: 'success'
+        });
+
+        customerMessages.messages = messages;
+        customerData.set('messages', customerMessages);
+
+        // The mini cart reloading
+        customerData.reload(['cart'], true);
+
+        //Wait 3 second then reload page
+        setTimeout(function () {
+            window.location.reload();
+        }, 3000);
     }
 });

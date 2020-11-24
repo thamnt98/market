@@ -15,8 +15,6 @@
 
 namespace SM\Customer\Model\Data;
 
-use SM\Customer\Api\Data\CustomerDeviceInterface;
-
 class CustomerDevice extends \Magento\Framework\DataObject implements \SM\Customer\Api\Data\CustomerDeviceInterface
 {
     /**

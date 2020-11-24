@@ -101,7 +101,6 @@ class CustomerDeviceRepository implements \SM\Customer\Api\CustomerDeviceReposit
      */
     public function save(\SM\Customer\Api\Data\CustomerDeviceInterface $device)
     {
-        $this->removeDuplicateToken($device->getToken(), $device->getDeviceId());
         /** @var CustomerDevice $model */
         $model = $this->modelFactory->create();
         $model->setData('customer_id', $device->getCustomerId())
@@ -234,20 +233,5 @@ class CustomerDeviceRepository implements \SM\Customer\Api\CustomerDeviceReposit
         );
 
         return $result;
-    }
-
-    /**
-     * @param string $token
-     * @param string $deviceId
-     */
-    protected function removeDuplicateToken($token, $deviceId)
-    {
-        /** @var ResourceModel\CustomerDevice\Collection $coll */
-        $coll = $this->collectionFactory->create();
-        $conn = $coll->getConnection();
-        $conn->delete(
-            ResourceModel\CustomerDevice::TABLE_NAME,
-            "token = '{$token}' OR device_id = '{$deviceId}'"
-        );
     }
 }

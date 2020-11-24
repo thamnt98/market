@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_Customer
+ *
+ * Date: November, 23 2020
+ * Time: 3:52 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="customer_login">
+        <observer name="SM_Customer::CustomerLogin"
+                  instance="SM\Customer\Observer\CustomerLogin" />
+    </event>
+</config>

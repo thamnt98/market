@@ -528,9 +528,6 @@ class Multishipping extends \Magento\Framework\DataObject
      */
     protected function _addShippingItem($quoteItemId, $data)
     {
-        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/test.log');
-        $logger = new \Zend\Log\Logger();
-        $logger->addWriter($writer);
         $qty = isset($data['qty']) ? (int)$data['qty'] : 1;
         //$qty       = $qty > 0 ? $qty : 1;
         $addressId = isset($data['address']) ? $data['address'] : false;
@@ -560,19 +557,18 @@ class Multishipping extends \Magento\Framework\DataObject
                     if (!isset($data['split_store_code'])) {
                         $data['split_store_code'] = 0;
                     }
-                    if (!($quoteAddress = $this->getShippingAddressByCustomerAddressId($address->getId(), $data['shipping_method'], $data['split_store_code']))
+                    if (!($quoteAddress = $this->getShippingAddressByCustomerAddressId($address->getId(), $data['shipping_method'], $data['oar_order_id']))
                     ) {
-                        //$logger->info($quoteItemId);
                         $quoteAddress = $this->_addressFactory->create()->importCustomerAddressData($address);
                         if ($data['shipping_method'] == 'store_pickup_store_pickup') {
                             $quoteAddress->setStorePickUp($data['store_pickup']);
                         } else {
                             $quoteAddress->setStorePickUp(null);
                         }
-                        $quoteAddress->setPreShippingMethod($data['shipping_method'])->setSplitStoreCode($data['split_store_code']);
+                        $quoteAddress->setPreShippingMethod($data['shipping_method'])->setSplitStoreCode($data['split_store_code'])->setOarOrderId($data['oar_order_id']);
                         $this->getQuote()->setIsMultiShipping(true)->addShippingAddress($quoteAddress);
                     }
-                    $quoteAddress = $this->getShippingAddressByCustomerAddressId($address->getId(), $data['shipping_method'], $data['split_store_code']);
+                    $quoteAddress = $this->getShippingAddressByCustomerAddressId($address->getId(), $data['shipping_method'], $data['oar_order_id']);
                 } else {
                     if (!($quoteAddress = $this->getQuote()->getShippingAddressByCustomerAddressId($address->getId()))
                     ) {
@@ -607,10 +603,10 @@ class Multishipping extends \Magento\Framework\DataObject
      *
      * @param $addressId
      * @param $shippingMethod
-     * @param $splitStoreCode
+     * @param $oarOrderId
      * @return bool|Address
      */
-    public function getShippingAddressByCustomerAddressId($addressId, $shippingMethod, $splitStoreCode)
+    public function getShippingAddressByCustomerAddressId($addressId, $shippingMethod, $oarOrderId)
     {
         /** @var \Magento\Quote\Model\Quote\Address $address */
         foreach ($this->getQuote()->getAddressesCollection() as $address) {
@@ -618,7 +614,7 @@ class Multishipping extends \Magento\Framework\DataObject
                 $address->getAddressType() == Address::TYPE_SHIPPING &&
                 $address->getCustomerAddressId() == $addressId &&
                 (!$address->getPreShippingMethod() || $address->getPreShippingMethod() == $shippingMethod)
-                && $address->getSplitStoreCode() == $splitStoreCode
+                && $address->getOarOrderId() == $oarOrderId
             ) {
                 return $address;
             }
