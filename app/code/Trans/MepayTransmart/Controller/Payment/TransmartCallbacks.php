@@ -14,6 +14,7 @@ namespace Trans\MepayTransmart\Controller\Payment;
 
 use Trans\Mepay\Controller\Payment\Callbacks;
 use Magento\Framework\Controller\ResultFactory;
+use Trans\Mepay\Helper\Data;
 
 class TransmartCallbacks extends Callbacks
 {
@@ -29,7 +30,7 @@ class TransmartCallbacks extends Callbacks
   {
     $incrementId = $this->getRequest()->getParam('increment_id');
     if (!empty($incrementId)) {
-      return $this->calbacksMobile();
+      return $this->calbacksMobile($incrementId);
     }
 
     $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
@@ -68,45 +69,45 @@ class TransmartCallbacks extends Callbacks
   /**
    * Callbacks from mobile
    */
-  public function calbacksMobile()
+  public function calbacksMobile($incrementId)
   {
 
     $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
-    if ($this->checkoutSession->getLastRealOrderId()) {
-      $orderId = $this->getOrderId();
-      $order = $this->transaction->getOrder($orderId);
-      if ($this->checkOrderCreated($order)) {
-        $txn = $this->transaction->getLastOrderTransaction($orderId);
+    $order = $this->transaction->getOrderByIncrementId($incrementId);
+    if ($orderId = $order->getId()) {
 
+      if ($this->checkOrderCreated($order)) {
+
+        $txn = $this->transaction->getLastOrderTransaction($orderId);
         if ($txn['txn_type'] == 'authorization') {
             return $resultRedirect->setPath('?fromtransmepay=1');
         }
 
-        $this->checkoutSession->setIsSucceed(1);
-        $resultRedirect->setPath(
-            'transcheckout/index/success?orderid='.$orderId.'&fromtransmepay=1'
-        );
-
-        return $resultRedirect;
-
       } else {
 
-        $this->checkoutSession->restoreQuote();
-        $this->messageManager->addError( __(self::PAYMENT_FAILED_MESSAGES));
-
-        $resultRedirect->setPath(
-          'checkout/cart/index?fromtransmepay=1'
-        );
-
-        return $resultRedirect;
+        $this->restoreQuoteMobile($order->getQuoteId());
 
       }
+
+      $resultRedirect->setPath(
+          'transcheckout/index/success?orderid='.$orderId
+      );
+
+      return $resultRedirect;
+
     }
 
-    $resultRedirect->setPath('checkout/cart/index?fromtransmepay=1');
+    $resultRedirect->setPath('checkout/cart/index');
 
     return $resultRedirect;
   }
 
+  public function restoreQuoteMobile($quoteId)
+  {
+    $quoteRepo = Data::getQuoteRepo();
+    $quote = $quoteRepo->get($quoteId);
+    $quote->setIsActive(1)->setReservedOrderId(null);
+    $quoteRepo->save($quote);
+  }
 
 }

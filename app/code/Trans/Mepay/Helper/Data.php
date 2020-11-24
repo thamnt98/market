@@ -155,4 +155,13 @@ class Data extends AbstractHelper
     return self::getCustomer()->getId();
   }
 
+  /**
+   * Get quote repo
+   * @return \Magento\Quote\Api\CartRepositoryInterface
+   */
+  public static function getQuoteRepo()
+  {
+    return self::getClassInstance('Magento\Quote\Api\CartRepositoryInterface');
+  }
+
 }
