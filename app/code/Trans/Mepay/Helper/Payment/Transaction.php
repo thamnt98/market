@@ -26,6 +26,8 @@ use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Api\SortOrderBuilder;
 use Trans\Mepay\Helper\Response\Response as ResponseHelper;
 use Trans\Mepay\Helper\Response\Payment\Inquiry as InquiryResponseHelper;
+use Trans\Mepay\Helper\Response\Payment\Transaction as TransactionResponseHelper;
+use Trans\Mepay\Api\Data\TransactionInterface as MepayTransactionInterface;
 use Trans\Mepay\Logger\LoggerWrite;
 
 class Transaction extends AbstractHelper
@@ -39,6 +41,11 @@ class Transaction extends AbstractHelper
    * @var string
    */
   const CHECKOUT_URL = 'checkout';
+
+  /**
+   * @var string
+   */
+  const TRANSACTION = 'transaction';
 
   /**
    * @var SearchCriteriaBuilder
@@ -75,6 +82,8 @@ class Transaction extends AbstractHelper
    */
   protected $inquiryResponseHelper;
 
+  protected $transactionResponseHelper;
+
   /**
    * Json
    */
@@ -109,6 +118,7 @@ class Transaction extends AbstractHelper
     TransactionBuilder $transactionBuilder,
     ResponseHelper $responseHelper,
     InquiryResponseHelper $inquiryResponseHelper,
+    TransactionResponseHelper $transactionResponseHelper,
     Json $json,
     SortOrderBuilder $sortOrderBuilder,
     LoggerWrite $logger
@@ -120,6 +130,7 @@ class Transaction extends AbstractHelper
     $this->transactionBuilder = $transactionBuilder;
     $this->responseHelper = $responseHelper;
     $this->inquiryResponseHelper = $inquiryResponseHelper;
+    $this->transactionResponseHelper = $transactionResponseHelper;
     $this->json = $json;
     $this->sortOrderBuilder = $sortOrderBuilder;
     $this->logger = $logger;
@@ -284,7 +295,7 @@ class Transaction extends AbstractHelper
     try {
 
       $inquiryData = $this->inquiryResponseHelper->convertToArray($inquiry);
-      $transactionData = $transaction->getData();
+      $transactionData = $this->convertArray(self::TRANSACTION, $transaction->getData());
       $txn = $this->getTransaction($id);
       $txn->setTransMepayInquiry($this->json->serialize($inquiryData));
       $txn->setTransMepayTransaction($this->json->serialize($transactionData));
@@ -294,6 +305,27 @@ class Transaction extends AbstractHelper
       $this->logger->log($e->getMessage());
       throw $e;
     }
+  }
+
+  /**
+   * Convert to Array
+   * @param  string $mode 
+   * @param  array $data 
+   * @return array
+   */
+  public function convertArray($mode, $data)
+  {
+    if ($mode == self::TRANSACTION)
+    {
+      foreach ($data as $key => $value) {
+        if ($key == MepayTransactionInterface::STATUS_DATA)
+        {
+           $value = $value->getData();
+           $data[$key] = $value;
+        }
+      }
+    }
+    return $data;
   }
 
   /**
