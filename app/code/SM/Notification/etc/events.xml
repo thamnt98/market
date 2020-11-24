@@ -2,10 +2,10 @@
 
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
-    <event name="catalog_product_save_after">
-        <observer name="SMNotificationObserverEventProductInShoppingListOnSale"
-                  instance="SM\Notification\Observer\EventProductInShoppingListOnSale" />
-    </event>
+<!--    <event name="catalog_product_save_after">-->
+<!--        <observer name="SMNotificationObserverEventProductInShoppingListOnSale"-->
+<!--                  instance="SM\Notification\Observer\EventProductInShoppingListOnSale" />-->
+<!--    </event>-->
     <event name="catalog_product_save_before">
         <observer name="SMNotificationObserverEventProductBackToStock"
                   instance="SM\Notification\Observer\EventProductBackToStock" />

@@ -1100,9 +1100,7 @@
             .pagebuilder-column{
                 width: auto !important;
                 flex-direction: row !important;
-
-                &:nth-child(2){
-                    &:after,&:before{
+                    &:after{
                         content: '';
                         width:1px;
                         height: 22px;
@@ -1111,6 +1109,11 @@
                         background: @color-border-navbar;
                     }
 
+
+            }
+            > *:last-child{
+                &:after{
+                    display: none;
                 }
             }
         }

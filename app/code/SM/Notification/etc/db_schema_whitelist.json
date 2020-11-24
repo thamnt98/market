@@ -151,7 +151,8 @@
             "content": true,
             "image": true,
             "params": true,
-            "admin_type": true
+            "admin_type": true,
+            "sub_event": true
         },
         "constraint": {
             "PRIMARY": true

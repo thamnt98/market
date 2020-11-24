@@ -64,6 +64,7 @@ class EventProductBackToStock implements ObserverInterface
                 $notification = $this->notificationFactory->create();
                 $notification->setTitle('%1 is back in stock')
                     ->setEvent(Notification::EVENT_UPDATE)
+                    ->setSubEvent(\SM\Notification\Model\Notification::EVENT_INFO)
                     ->setCustomerIds($listCustomer)
                     ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_PDP)
                     ->setRedirectId($product->getSku())

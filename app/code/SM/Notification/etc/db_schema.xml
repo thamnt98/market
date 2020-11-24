@@ -5,7 +5,8 @@
     <table name="sm_notification_msg" resource="default" engine="innodb" comment="SmartOSC Notification Message">
         <column xsi:type="int" name="id" padding="10" unsigned="true" nullable="false" identity="true" comment="ID"/>
         <column xsi:type="tinyint" name="admin_type" nullable="true" comment="Customer Type Create on Admin"/>
-        <column xsi:type="varchar" name="event" length="25" nullable="false" comment="Event Type"/>
+        <column xsi:type="varchar" name="event" length="50" nullable="false" comment="Event Type"/>
+        <column xsi:type="varchar" name="sub_event" length="50" nullable="false" comment="Sub Event Type"/>
         <column xsi:type="varchar" name="title" length="255" nullable="true" comment="Title"/>
         <column xsi:type="text" name="content" nullable="true" comment="Content"/>
         <column xsi:type="varchar" name="image" nullable="true" length="255" comment="Image"/>

@@ -98,6 +98,11 @@ class IntegrationStock implements IntegrationStockInterface {
      */
     private $sourceInterfaceFactory;
 
+    /**
+     * @var Magento\Framework\App\ResourceConnection
+     */
+    protected $resourceConnection;
+
 	/**
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param SourceItemsSaveInterface $sourceItemSave
@@ -110,6 +115,7 @@ class IntegrationStock implements IntegrationStockInterface {
 	 * @param Validation $validation
 	 * @param SourceItem $sourceItemHelper
      * @param SourceInterfaceFactory $sourceInterfaceFactory
+     * @param Magento\Framework\App\ResourceConnection $resourceConnection
      */
 	public function __construct
 	(	
@@ -124,7 +130,8 @@ class IntegrationStock implements IntegrationStockInterface {
 		Curl $curl,
 		Validation $validation,
 		SourceItem $sourceItemHelper,
-        SourceInterfaceFactory $sourceInterfaceFactory
+        SourceInterfaceFactory $sourceInterfaceFactory,
+        \Magento\Framework\App\ResourceConnection $resourceConnection
 	) {	
 
         $this->sourceItem 							   = $sourceItem;
@@ -139,6 +146,11 @@ class IntegrationStock implements IntegrationStockInterface {
 		$this->integrationJobRepositoryInterface       = $integrationJobRepositoryInterface;
         $this->sourceInterfaceFactory 				   = $sourceInterfaceFactory; 
 		$this->integrationAssignSources 			   = $integrationAssignSources;
+		$this->resourceConnection = $resourceConnection;
+
+		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_stock.log');
+        $logger = new \Zend\Log\Logger();
+        $this->logger = $logger->addWriter($writer);
 	}
 
 	/**
@@ -163,7 +175,7 @@ class IntegrationStock implements IntegrationStockInterface {
 		$tryHit   = ($hitCount == NULL)? 0 : (int)$hitCount;
 		$tryHit++;
 
-		$dataJobs->setStatus(IntegrationJobInterface::STATUS_PROGRESS_SYNC);
+		$dataJobs->setStatus(IntegrationJobInterface::STATUS_PROGRESS_CATEGORY);
 		$this->integrationJobRepositoryInterface->save($dataJobs);
 
 		try {
@@ -187,13 +199,32 @@ class IntegrationStock implements IntegrationStockInterface {
 				if ($productSku!=NULL && $locationCode!=NULL){
 
 					if ($checkSource!=NULL){
-						$sourceItem = $this->sourceItem->create();
-		                $sourceItem->setSku($productSku);
-		                $sourceItem->setSourceCode($locationCode);
-		                $sourceItem->setQuantity($quantity);
-		                $sourceItem->setStatus(IntegrationStockInterface::IMS_STATUS);
-		                $items = array($sourceItem);
-		            	$this->sourceItemSave->execute($items);
+						// $sourceItem = $this->sourceItem->create();
+		    //             $sourceItem->setSku($productSku);
+		    //             $sourceItem->setSourceCode($locationCode);
+		    //             $sourceItem->setQuantity($quantity);
+		    //             $sourceItem->setStatus(IntegrationStockInterface::IMS_STATUS);
+		    //             $items = array($sourceItem);
+		    //         	$this->sourceItemSave->execute($items);
+						// raw query set stock
+						// check if sku and store exist on table inventory_source_item
+						$connection = $this->resourceConnection->getConnection();
+			        	// $table is table name
+				        $tableName = $connection->getTableName('inventory_source_item');
+
+						$sql = "Select source_item_id, sku, source_code FROM " . $tableName ." where sku = '".$productSku."' AND source_code = '".$locationCode."' limit 1";
+						$checkSource = $connection->fetchRow($sql);
+						
+						if (!$checkSource) {
+							//Insert Data into table
+							$query = "Insert Into " . $tableName . " (source_code, sku, quantity, status) Values ('".$locationCode."','".$productSku."','".$quantity."','".IntegrationStockInterface::IMS_STATUS."')";
+						}
+						else {
+							$query = "Update " . $tableName . " Set quantity = '".$quantity."' where source_item_id = '".$checkSource['source_item_id']."'";
+						}
+
+				        $connection->query($query);
+
 						$this->saveStatusMessage($data, $messageValue, IntegrationDataValueInterface::STATUS_DATA_SUCCESS);
 					} else {
 						$this->saveStatusMessage($data, IntegrationStockInterface::MSG_NO_STORE, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);	
@@ -203,7 +234,7 @@ class IntegrationStock implements IntegrationStockInterface {
 					$this->saveStatusMessage($data, IntegrationStockInterface::MSG_DATA_STOCK_NULL, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
                 }
             }
-
+            
 	        $this->sourceItemHelper->stockItemReindex();
 
 		} catch (\Exception $exception) {
@@ -238,15 +269,26 @@ class IntegrationStock implements IntegrationStockInterface {
      */
 	public function addNewSource($locationCode) {
 		try {
-			$inventorySource = $this->sourceInterfaceFactory->create();
-	        $inventorySource->setSourceCode($locationCode);
-			$inventorySource->setName($locationCode);
-			$inventorySource->setEnabled(1);
-			$inventorySource->setCountryId('ID');
-			$inventorySource->setPostcode('00000');
-			$inventorySource->setUseDefaultCarrierConfig(1);
-		    $this->sourceRepository->save($inventorySource);
-		    $this->integrationAssignSources->assignSource($locationCode);//assign source to stock
+			// $inventorySource = $this->sourceInterfaceFactory->create();
+	  //       $inventorySource->setSourceCode($locationCode);
+			// $inventorySource->setName($locationCode);
+			// $inventorySource->setEnabled(1);
+			// $inventorySource->setCountryId('ID');
+			// $inventorySource->setPostcode('00000');
+			// $inventorySource->setUseDefaultCarrierConfig(1);
+		 //    $this->sourceRepository->save($inventorySource);
+		 //    $this->integrationAssignSources->assignSource($locationCode);//assign source to stock
+
+		    // raw sql
+		    $connection = $this->resourceConnection->getConnection();
+        	// $table is table name
+	        $tableName = $connection->getTableName('inventory_source');
+	        
+	        //Insert Data into table
+			$query = "Insert Into " . $tableName . " (source_code, name, enabled, country_id, postcode, use_default_carrier_config) Values ('".$locationCode."','".$locationCode."','1','ID', '00000', '1')";
+
+	        $connection->query($query);
+	        
 		} catch (\Exception $exception) {
 			throw new CouldNotSaveException(__(
 				$exception->getMessage()
@@ -260,16 +302,25 @@ class IntegrationStock implements IntegrationStockInterface {
      * @return mixed
      */
 	protected function checkSourceExist($locationCode) {
-		$sourceData 	= $this->sourceRepository->getList();		
-		$checkSource 	= NULL;
+		// $sourceData 	= $this->sourceRepository->getList();		
+		// $checkSource 	= NULL;
 
-    	if ($sourceData->getTotalCount()) {
-        	foreach ($sourceData->getItems() as $sourceDatas) {
-        		if($sourceDatas['source_code'] == $locationCode){
-	        		$checkSource = $sourceDatas['source_code'];
-	        	} 
-	        }
-        }
+  //   	if ($sourceData->getTotalCount()) {
+  //       	foreach ($sourceData->getItems() as $sourceDatas) {
+  //       		if($sourceDatas['source_code'] == $locationCode){
+	 //        		$checkSource = $sourceDatas['source_code'];
+	 //        	} 
+	 //        }
+  //       }
+
+		// raw query check source exist
+		$checkSource = NULL;
+
+		$connection = $this->resourceConnection->getConnection();
+        // $table is table name
+	    $tableName = $connection->getTableName('inventory_source');
+		$sql = "Select source_code FROM " . $tableName ." where source_code = '".$locationCode."' limit 1";
+		$checkSource = $connection->fetchOne($sql);
 
         return $checkSource;
 	}

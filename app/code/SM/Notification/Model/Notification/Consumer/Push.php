@@ -31,31 +31,34 @@ class Push extends AbstractConsumer
 
     /**
      * Push constructor.
-     *
-     * @param \SM\Notification\Helper\CustomerSetting                             $settingHelper
-     * @param \Magento\Framework\App\ResourceConnection                           $resourceConnection
-     * @param \Magento\Framework\Api\SearchCriteriaBuilder                        $searchCriteriaBuilder
-     * @param \SM\Customer\Model\CustomerDeviceRepository                         $customerDeviceRepository
-     * @param \Magento\Customer\Api\CustomerRepositoryInterface                   $customerRepository
+     * @param \Magento\Customer\Model\ResourceModel\Online\Grid\CollectionFactory $customerOnlineCollFact
+     * @param \SM\Notification\Helper\CustomerSetting $settingHelper
+     * @param \Magento\Framework\App\ResourceConnection $resourceConnection
+     * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
      * @param \Trans\IntegrationNotification\Api\IntegrationNotificationInterface $integrationNotification
-     * @param \Magento\Framework\Logger\Monolog|null                              $logger
+     * @param \SM\Customer\Model\CustomerDeviceRepository $customerDeviceRepository
+     * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param \Magento\Framework\Logger\Monolog $logger
      */
     public function __construct(
+        \Magento\Customer\Model\ResourceModel\Online\Grid\CollectionFactory $customerOnlineCollFact,
         \SM\Notification\Helper\CustomerSetting $settingHelper,
         \Magento\Framework\App\ResourceConnection $resourceConnection,
-        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
-        \SM\Customer\Model\CustomerDeviceRepository $customerDeviceRepository,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
         \Trans\IntegrationNotification\Api\IntegrationNotificationInterface $integrationNotification,
-        \Magento\Framework\Logger\Monolog $logger = null
+        \SM\Customer\Model\CustomerDeviceRepository $customerDeviceRepository,
+        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
+        \Magento\Framework\Logger\Monolog $logger
     ) {
         parent::__construct(
+            $customerOnlineCollFact,
             $settingHelper,
             $resourceConnection,
             $customerRepository,
             $integrationNotification,
             $logger
         );
+
         $this->customerDeviceRepository = $customerDeviceRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
     }

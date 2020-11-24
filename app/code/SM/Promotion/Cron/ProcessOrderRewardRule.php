@@ -215,7 +215,8 @@ class ProcessOrderRewardRule extends \SM\Notification\Cron\AbstractGenerate
         /** @var \SM\Notification\Model\Notification $notification */
         $notification = $this->notificationFactory->create();
         $notification->setTitle('%1, we have a voucher for you')
-            ->setEvent(\SM\Notification\Model\Notification::EVENT_PROMO)
+            ->setEvent(\SM\Notification\Model\Notification::EVENT_UPDATE)
+            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_PROMO_AND_EVENT)
             ->setCustomerIds([$order->getCustomerId()])
             ->setContent('Check this one out and shop now!')
             ->setParams($params);

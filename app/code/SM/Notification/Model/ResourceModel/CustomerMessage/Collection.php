@@ -47,6 +47,7 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
                 'created_at',
                 'end_date',
                 'event',
+                'sub_event',
                 'image',
                 'params',
                 'redirect_id',

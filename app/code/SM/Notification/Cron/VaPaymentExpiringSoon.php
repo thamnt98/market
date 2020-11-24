@@ -142,6 +142,7 @@ class VaPaymentExpiringSoon extends AbstractGenerate
         $notification->setTitle($title)
             ->setContent($message)
             ->setEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
+            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
             ->setCustomerIds([$order->getCustomerId()])
             ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_ORDER_DETAIL)
             ->setRedirectId($order->getData('parent_order') ? $order->getData('parent_order') : $order->getEntityId())

@@ -180,6 +180,7 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
             ->setContent('Hope you love your shopping experience with Transmart.')
             ->setImage($this->helper->getMediaPathImage(Helper::XML_IMAGE_ORDER_STATUS_COMPLETED, $order->getStoreId()))
             ->setEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
+            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
             ->setPushTitle(__('Order ID/%1 has been completed!', [$order->getIncrementId()]))
             ->setPushContent(__('Hope you love your shopping experience with Transmart.'))
             ->setCustomerIds([$order->getCustomerId()])
@@ -213,6 +214,7 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
         $notify->setTitle('Order ID/%1 is on its way!')
             ->setContent('Check the delivery status in My Order page.')
             ->setEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
+            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
             ->setPushTitle(__('Order ID/%1 is on its way!', [$order->getIncrementId()]))
             ->setPushContent(__('Check the delivery status in My Order page.'))
             ->setCustomerIds([$order->getCustomerId()])
@@ -266,6 +268,7 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
         $notify = $this->notifyFactory->create();
         $notify->setTitle($title)
             ->setEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
+            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
             ->setPushTitle(__($title, $params['title']))
             ->setContent($content)
             ->setImage($this->helper->getMediaPathImage(Helper::XML_IMAGE_ORDER_STATUS_DELIVERED, $order->getStoreId()))
@@ -306,6 +309,7 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
         $notify->setTitle('%1, your order is ready to be picked up.')
             ->setContent('Please visit %1 to collect order ID/%2.')
             ->setEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
+            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
             ->setPushTitle(__('%1, your order is ready to be picked up.', [$order->getCustomerName()]))
             ->setPushContent(__(
                 'Please visit %1 to collect order ID/%2.',
@@ -365,6 +369,7 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
                 " We will refund your payment in nx24 hours"
             )
             ->setEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
+            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
             ->setPushTitle(__(
                 'Sorry, your %1 transaction has been cancelled.',
                 [$buyRequest[Digital::DIGITAL][DigitalProduct::SERVICE_TYPE] ?? '']

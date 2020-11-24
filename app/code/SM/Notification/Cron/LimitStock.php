@@ -133,6 +133,7 @@ class LimitStock extends AbstractGenerate
         $notification->setTitle($title)
             ->setContent($message)
             ->setEvent(\SM\Notification\Model\Notification::EVENT_UPDATE)
+            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_PROMO_AND_EVENT)
             ->setCustomerIds([$data['customer_id']])
             ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_PDP)
             ->setRedirectId($product->getSku())

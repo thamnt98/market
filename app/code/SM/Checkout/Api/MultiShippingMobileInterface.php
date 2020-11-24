@@ -51,11 +51,12 @@ interface MultiShippingMobileInterface
      * @param bool $isAddressComplete
      * @param bool $isErrorCheckout
      * @param \SM\Checkout\Api\Data\Checkout\Voucher\VoucherInterface[] $voucher
+     * @param bool $disablePickUp
      * @param int $customerId
      * @param int $cartId
      * @return \SM\Checkout\Api\Data\Checkout\CheckoutDataInterface
      */
-    public function previewOrder($shippingAddress, $items, $additionalInfo, $isStoreFulFill, $isSplitOrder, $isAddressComplete, $isErrorCheckout, $voucher, $customerId, $cartId);
+    public function previewOrder($shippingAddress, $items, $additionalInfo, $isStoreFulFill, $isSplitOrder, $isAddressComplete, $isErrorCheckout, $voucher, $disablePickUp, $customerId, $cartId);
 
     /**
      * @return \SM\Checkout\Api\Data\Checkout\ConfigInterface
@@ -74,11 +75,12 @@ interface MultiShippingMobileInterface
      * @param string $currencySymbol
      * @param bool $digitalCheckout
      * @param \SM\Checkout\Api\Data\CheckoutWeb\DigitalInterface[] $digitalDetail
+     * @param bool $disablePickUp
      * @param int $customerId
      * @param int $cartId
      * @return \SM\Checkout\Api\Data\Checkout\CheckoutDataInterface
      */
-    public function applyVoucher($shippingAddress, $items, $additionalInfo, $isStoreFulFill, $isSplitOrder, $isAddressComplete, $isErrorCheckout, $voucher, $currencySymbol, $digitalCheckout, $digitalDetail, $customerId, $cartId);
+    public function applyVoucher($shippingAddress, $items, $additionalInfo, $isStoreFulFill, $isSplitOrder, $isAddressComplete, $isErrorCheckout, $voucher, $currencySymbol, $digitalCheckout, $digitalDetail, $disablePickUp, $customerId, $cartId);
 
     /**
      * @param string $paymentMethod

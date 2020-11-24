@@ -120,6 +120,14 @@ class EventTypeCol extends Select
 
     private function getSourceOptions(): array
     {
-        return $this->eventTypeOptions->toOptionArray();
+        $result = [];
+        foreach ($this->eventTypeOptions->getTreeEvent() as $key => $item) {
+            $result[] = [
+                'label' => $item['label'],
+                'value' => $key,
+            ];
+        }
+
+        return $result;
     }
 }
