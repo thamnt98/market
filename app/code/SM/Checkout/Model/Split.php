@@ -481,6 +481,7 @@ class Split {
 		$response = [];
 		$url      = $this->configHelper->getOmsBaseUrl() . $this->configHelper->getOmsOarApi();
 		$header   = $this->getHeader();
+		$format   = 'Y-m-d H:i:s';
 		$flagLog  = 'Quote ID and Quote Address ID:';
 		if (isset($data[0]['quote_address_id'])) {
 			$flagLog .= ' ' . $data[0]['quote_address_id'];
@@ -490,11 +491,19 @@ class Split {
 		$dataJsonLog = $dataJson;
 		for ($x = 0; $x <= 2; $x++) {
 			try {
-				$responseOAR = $this->curlHelper->post($url, $header, $dataJson);
-				$response    = $responseOAR;
+				$dateBegin          = date_create();
+				$dateBeginTimestamp = date_timestamp_get($dateBegin);
+				$responseOAR        = $this->curlHelper->post($url, $header, $dataJson);
+				$response           = $responseOAR;
 				if (is_string($responseOAR)) {
 					$response = $this->serializer->unserialize($responseOAR);
 				}
+				$dateEnd          = date_create();
+				$dateEndTimestamp = date_timestamp_get($dateEnd);
+				$diff             = $dateEndTimestamp - $dateBeginTimestamp;
+				$begin            = date_format($dateBegin, $format);
+				$end              = date_format($dateEnd, $format);
+				$this->writeSuccessLog('Begin :' . $begin, 'End :' . $end, 'Diff :' . $diff);
 				$this->writeSuccessLog($flagLog, $dataJsonLog, $responseOAR);
 				break;
 			} catch (\Exception $e) {
