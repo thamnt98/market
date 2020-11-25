@@ -63,7 +63,7 @@ class Css extends Template
             if ($this->_helper->getPopupLogin()) {
                 $this->pageConfig->addPageAsset('Mageplaza_SocialLogin::css/style.css');
                 $this->pageConfig->addPageAsset('Mageplaza_Core::css/grid-mageplaza.css');
-                $this->pageConfig->addPageAsset('Mageplaza_Core::css/font-awesome.min.css');
+
                 $this->pageConfig->addPageAsset('Mageplaza_Core::css/magnific-popup.css');
             } elseif (in_array(
                 $this->_request->getFullActionName(),
@@ -71,7 +71,7 @@ class Css extends Template
             )
             ) {
                 $this->pageConfig->addPageAsset('Mageplaza_SocialLogin::css/style.css');
-                $this->pageConfig->addPageAsset('Mageplaza_Core::css/font-awesome.min.css');
+
             }
         }
 

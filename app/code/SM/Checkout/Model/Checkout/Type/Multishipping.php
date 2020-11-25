@@ -557,6 +557,11 @@ class Multishipping extends \Magento\Framework\DataObject
                     if (!isset($data['split_store_code'])) {
                         $data['split_store_code'] = 0;
                     }
+                    if (!isset($data['oar_data']) || !isset($data['oar_data']['order_id'])) {
+                        $data['oar_order_id'] = '0';
+                    } else {
+                        $data['oar_order_id'] = $data['oar_data']['order_id'];
+                    }
                     if (!($quoteAddress = $this->getShippingAddressByCustomerAddressId($address->getId(), $data['shipping_method'], $data['oar_order_id']))
                     ) {
                         $quoteAddress = $this->_addressFactory->create()->importCustomerAddressData($address);

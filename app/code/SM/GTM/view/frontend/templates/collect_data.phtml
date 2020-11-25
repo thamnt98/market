@@ -8,6 +8,50 @@
         dataLayerSourceObjects['page'] = <?php echo $block->getBreadcrumbs(); ?>;
 </script>
 
+<script type="text/javascript" async>
+    function categoriesClick(data) {
+        let data_category = data.getAttribute('data-gtm');
+        if (data_category) {
+            data_category = JSON.parse(data_category);
+            window.dataLayer.push({
+                'event': 'categories_click',
+                'uniqueUserID': dataLayerSourceObjects.customer.uniqueUserID,
+                'userID': dataLayerSourceObjects.customer.userID,
+                'customerID': dataLayerSourceObjects.customer.customerID,
+                'customerType': dataLayerSourceObjects.customer.customerType,
+                'loyalty': dataLayerSourceObjects.customer.loyalty,
+                'customerStatus': dataLayerSourceObjects.customer.customerStatus,
+                'loginType': dataLayerSourceObjects.customer.loginType,
+                'menu_category': data_category['menu_category'],
+                'store_name': dataLayerSourceObjects.customer.storeName,
+                'store_ID': dataLayerSourceObjects.customer.storeID
+            });
+        }
+    }
+
+    function navigationMenu(data) {
+        let data_category = data.getAttribute('data-gtm');
+        if (data_category) {
+            data_category = JSON.parse(data_category);
+            window.dataLayer.push({
+                'event': 'navigation_menu',
+                'uniqueUserID': dataLayerSourceObjects.customer.uniqueUserID,
+                'userID': dataLayerSourceObjects.customer.userID,
+                'customerID': dataLayerSourceObjects.customer.customerID,
+                'customerType': dataLayerSourceObjects.customer.customerType,
+                'loyalty': dataLayerSourceObjects.customer.loyalty,
+                'customerStatus': dataLayerSourceObjects.customer.customerStatus,
+                'loginType': dataLayerSourceObjects.customer.loginType,
+                'menu_category': data_category['menu_category'],
+                'menu_name': data_category['menu_name'],
+                'submenu_name': data_category['submenu_name'],
+                'store_name': dataLayerSourceObjects.customer.storeName,
+                'store_ID': dataLayerSourceObjects.customer.storeID
+            });
+        }
+    }
+</script>
+
 <script type="text/javascript" async >
     require([
             'jquery',

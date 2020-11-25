@@ -212,6 +212,7 @@ class MultiShippingHandle
     {
         $itemsFormat  = [];
         $requestItems = [];
+        $addressSelect = [];
         foreach ($items as $item) {
             $requestItems[$item->getItemId()] = $item;
             if ($item->getDisable()) {
@@ -226,8 +227,11 @@ class MultiShippingHandle
                 'time' => $additionalInfo->getTime(),
             ];
             $itemsFormat[$item->getItemId()] = $format;
+            if (!in_array($item->getShippingAddressId(), $addressSelect)) {
+                $addressSelect[] = $item->getShippingAddressId();
+            }
         }
-        return ['item_format' => $itemsFormat, 'item_request' => $requestItems];
+        return ['item_format' => $itemsFormat, 'item_request' => $requestItems, 'shipping_list' => $addressSelect];
     }
 
     /**
@@ -553,7 +557,6 @@ class MultiShippingHandle
                             'address' => $itemData['shipping_address'],
                             'shipping_method' => $itemData['shipping_method'],
                             'split_store_code' => $itemFromOAR['store'],
-                            'oar_order_id' => $itemFromOAR['oar_data']['order_id'],
                             'oar_data' => $itemFromOAR['oar_data'],
                         ];
                         if (!in_array($itemData['shipping_address'], $addressIdList)) {
@@ -571,7 +574,6 @@ class MultiShippingHandle
                     'qty' => (int) $itemData['qty'],
                     'address' => $itemData['shipping_address'],
                     'shipping_method' => $itemData['shipping_method'],
-                    'oar_order_id' => '',
                     'split_store_code' => 0,
                 ];
                 if (!in_array($itemData['shipping_address'], $addressIdList)) {
@@ -612,7 +614,6 @@ class MultiShippingHandle
                         if ($childItemTotalQty <= (int) $itemFromOAR['quantity_allocated']) {
                             $useQtyFromOar[$childSku]                  = $itemData['qty'];
                             $itemAddToQuoteAddress['split_store_code'] = $itemFromOAR['store'];
-                            $itemAddToQuoteAddress['oar_order_id'] = $itemFromOAR['oar_data']['order_id'];
                             $itemAddToQuoteAddress['oar_data']         = $itemFromOAR['oar_data'];
                         } elseif ((int) $itemFromOAR['quantity_allocated'] > 0) {
                             $qty = (int) $itemFromOAR['quantity_allocated'] / (int) $childItem->getQty();
@@ -625,7 +626,6 @@ class MultiShippingHandle
                             } else {
                                 $itemAddToQuoteAddress['qty']              = $qty;
                                 $itemAddToQuoteAddress['split_store_code'] = $itemFromOAR['store'];
-                                $itemAddToQuoteAddress['oar_order_id'] = $itemFromOAR['oar_data']['order_id'];
                                 $itemAddToQuoteAddress['oar_data']         = $itemFromOAR['oar_data'];
                             }
                         } else {
