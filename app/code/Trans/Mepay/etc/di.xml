@@ -44,8 +44,11 @@
   <preference for="Trans\Mepay\Api\ConfigPullStatusRepositoryInterface" type="Trans\Mepay\Model\ResourceModel\ConfigPullStatusRepository" />
   <preference for="Trans\Mepay\Api\Data\ConfigPullStatusInterface" type="Trans\Mepay\Model\ConfigPullStatus" />
 
-  <type name="Magento\Checkout\Model\PaymentInformationManagement">
+  <!--<type name="Magento\Checkout\Model\PaymentInformationManagement">
       <plugin name="TransMepayPluginMagentoCheckoutModelPaymentInformationManagement" type="Trans\Mepay\Plugin\Magento\Checkout\Model\PaymentInformationManagement" />
+  </type> -->
+  <type name="Magento\Quote\Model\QuoteManagement">
+      <plugin name="TransMepayPluginMagentoQuoteModelQuoteManagement" type="Trans\Mepay\Plugin\Magento\Quote\Model\QuoteManagement" />
   </type>
 
   <!-- General configuration -->

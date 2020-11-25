@@ -26,21 +26,6 @@ class PaymentInformationManagement
     \Magento\Checkout\Model\PaymentInformationManagement $subject,
     $result
   ){
-    $orderId = $result;
-
-    $orderRepo = Data::getClassInstance('Magento\Sales\Api\OrderRepositoryInterface');
-    $order = $orderRepo->get($orderId);
-    $payment = $order->getPayment();
-    $method = $payment->getMethod();
-
-    if (Data::isMegaMethod($method)) {
-        $connection = Data::getConnection();
-        $table = $connection->getTableName('sales_order_status_history');
-        $config = Data::getClassInstance('Trans\Mepay\Model\Config\Config');
-        $query = "UPDATE `" . $table . "` SET `status`= '".$config->getOrderStatus($method)."' WHERE parent_id = '".$orderId."' ";
-        $connection->query($query);
-    }
-
     return $result;
   }
 }

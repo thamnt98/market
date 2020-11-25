@@ -19,7 +19,8 @@
   <preference for="Trans\Mepay\Model\Payment\Status\Capture" type="Trans\MepayTransmart\Model\Payment\Status\TransmartCapture" />
   <preference for="Trans\Mepay\Model\Payment\Status\Failed" type="Trans\MepayTransmart\Model\Payment\Status\TransmartFailed" />
   <preference for="SM\Checkout\Block\Checkout\Success" type="Trans\MepayTransmart\Block\Checkout\TransmartSuccess" />
-  <preference for="Trans\Mepay\Plugin\Magento\Checkout\Model\PaymentInformationManagement" type="Trans\MepayTransmart\Plugin\Magento\Checkout\Model\TransmartPaymentInformationManagement" />
+  <!--<preference for="Trans\Mepay\Plugin\Magento\Checkout\Model\PaymentInformationManagement" type="Trans\MepayTransmart\Plugin\Magento\Checkout\Model\TransmartPaymentInformationManagement" /> -->
+  <preference for="Trans\Mepay\Plugin\Magento\Quote\Model\QuoteManagement" type="Trans\MepayTransmart\Plugin\Magento\Quote\Model\TransmartQuoteManagement" />
   <preference for="SM\Checkout\Model\MultiShipping" type="Trans\MepayTransmart\Model\TransmartMultishipping" />
   <preference for="SM\Sales\Model\Order\ParentOrder" type="Trans\MepayTransmart\Model\Order\TransmartParentOrder" />
   <preference for="SM\Checkout\Helper\OrderReferenceNumber" type="Trans\MepayTransmart\Helper\TransmartOrderReferenceNumber" />
