@@ -541,7 +541,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
 
                                     // promotype = 7
                                     case 7:
-                                            $this->promoType7Function($dataPass);
+                                            // $this->promoType7Function($dataPass);
                                         break;
 
                                     // promotype = 4
@@ -608,46 +608,46 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
 
         $datas = $jsonResponse['data'];
 
-        foreach ($datas as $row) {
-            $dataPass = $this->prepareDataPromoGlobal($row);
+        // foreach ($datas as $row) {
+        //     $dataPass = $this->prepareDataPromoGlobal($row);
 
-            switch ($dataPass['promotion_type']) {
-                // promotype = 1
-                case 1:
-                        $this->markdownFunction($dataPass);
-                    break;
+        //     switch ($dataPass['promotion_type']) {
+        //         // promotype = 1
+        //         case 1:
+        //                 $this->markdownFunction($dataPass);
+        //             break;
 
-                // promotype = 2
-                case 2:
-                        $this->promoType2Function($dataPass);
-                    break;
+        //         // promotype = 2
+        //         case 2:
+        //                 $this->promoType2Function($dataPass);
+        //             break;
 
-                // promotype = 8
-                case 8:
-                        $this->promoType8Function($dataPass);
-                    break;
+        //         // promotype = 8
+        //         case 8:
+        //                 $this->promoType8Function($dataPass);
+        //             break;
 
-                // promotype = 5
-                case 5:
-                        $this->promoType5Function($dataPass);
-                    break;
+        //         // promotype = 5
+        //         case 5:
+        //                 $this->promoType5Function($dataPass);
+        //             break;
 
-                // promotype = 7
-                case 7:
-                        $this->promoType7Function($dataPass);
-                    break;
+        //         // promotype = 7
+        //         case 7:
+        //                 $this->promoType7Function($dataPass);
+        //             break;
 
-                // promotype = 4
-                case 4:
-                        $this->promoType4Function($dataPass);
-                    break;
+        //         // promotype = 4
+        //         case 4:
+        //                 $this->promoType4Function($dataPass);
+        //             break;
 
-                default:
-                break;
-            }
+        //         default:
+        //         break;
+        //     }
 
-            $i++;
-        }
+        //     $i++;
+        // }
         return true;
     }
 
