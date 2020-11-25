@@ -6,7 +6,7 @@
 /** @var SM\Checkout\Block\Checkout\Success $block */
 ?>
 <?php if ($block->getTimeLeft() < 1) : ?>
-<div class="payment-expired-wrapper">
+<div class="payment-expired-wrapper wrapper-payment">
     <div class="header">
         <div class="payment-notify">
             <span><?= __('Your order has been cancelled. Please try again.') ?></span>
@@ -16,27 +16,30 @@
         </div>
     </div>
     <div class="content">
-        <h2 class="payment-status"><?= __('Payment Unsuccessful!') ?></h2>
-        <div class="date">
-            <label class="text-label-body"><?= '' ?></label>
+        <div class="total-payment">
+            <p class="payment-status"><?= __('Payment Unsuccessful!') ?></p>
+            <div class="date">
+                <label class="text-label-body"><?= '' ?></label>
+            </div>
         </div>
-        <div class="total">
+
+        <div class="total-payment">
             <label class="text-label-body"><?= $block->escapeHtml(__('Total Payment')) ?></label>
-            <div class="payment-price"><?= $block->getGrandTotal() ?></div>
+            <p class="payment-price"><?= $block->getGrandTotal() ?></p>
         </div>
-        <div class="payment-method">
+        <div class="payment-method invoice-number">
             <label class="text-label-body"><?= $block->escapeHtml(__('Payment Method')) ?></label>
             <div class="bank-logo">
                 <img src='<?= $block->getLogoPayment() ?>' alt="<?= $block->escapeHtmlAttr($block->getTitlePaymentMethod()) ?>" />
-                <span><?= $block->escapeHtml($block->getTitlePaymentMethod()) ?></span>
+                <p class="text-body"><?= $block->escapeHtml($block->getTitlePaymentMethod()) ?></p>
             </div>
         </div>
         <div class="invoice-number">
             <label class="text-label-body"><?= $block->escapeHtml(__(' Reference Number')) ?></label>
             <p class="text-body"><?= $block->getReferenceNumber() ?></p>
         </div>
-        <div class="additional-links">
-            <a class="order-detail-btn"
+        <div class="check-payment-col expired">
+            <a class="pagebuilder-button-secondary"
                href="<?= $block->escapeHtmlAttr($block->getUrl('sales/order/physical', ['id' => $block->getOrderId()])) ?>"
             >
                 <?= __('Check My Order') ?>
@@ -109,7 +112,7 @@
             </div>
         </div>
         <div class="check-payment-col">
-            <a class="btn-outline-secondary" href="javascript:void(0)" data-action="checkStatus">
+            <a class="pagebuilder-button-secondary" href="javascript:void(0)" data-action="checkStatus">
                 <?= __('Check Payment Status') ?>
             </a>
             <a class="action primary" href="<?= $block->escapeHtmlAttr($block->getUrl('')) ?>">

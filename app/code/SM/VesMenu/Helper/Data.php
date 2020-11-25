@@ -799,8 +799,10 @@ class Data extends \Ves\Megamenu\Helper\Data
             $attr .= " data-gtm-name='category'";
             if ($level == 1) {
                 $attr .= ' data-gtm-event="categories_click"';
+                $attr .= ' onclick="categoriesClick(this)"';
             } elseif ($level >= 0 || $level > 1) {
                 $attr .= ' data-gtm-event="navigation_menu"';
+                $attr .= ' onclick="navigationMenu(this)"';
             }
         }
 

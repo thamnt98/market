@@ -23,7 +23,8 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
 
     protected $supportShippingData;
     protected $disablePickUp = false;
-
+    protected $itemSelectShippingAddressId = [];
+    protected $errorCheckout = false;
     /**
      * @var bool
      */
@@ -458,6 +459,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         $skuList = $this->getCartSkuList($quote);
         $isStoreFulFill = (empty($this->msiFullFill->getMsiFullFill($skuList))) ? false : true;
         $addressSelectedId = [$defaultShippingAddressId];
+        $this->itemSelectShippingAddressId = $addressSelectedId;
         $addressesList = $this->getAddressSelectedList($customerId, $addressSelectedId);
 
         return $this->handleCheckoutData(
@@ -646,6 +648,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         $format = $this->multiShippingHandle->itemsFormat($items);
         $items = $format['item_format'];
         $this->requestItems = $format['item_request'];
+        $this->itemSelectShippingAddressId = $format['shipping_list'];
         $defaultShippingAddress = $customer->getDefaultShippingAddress();
         $isAddressComplete = ($defaultShippingAddress->getStreetFull() == 'N/A'
             && $defaultShippingAddress->getPostcode() == '*****') ? false : true;
@@ -860,9 +863,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         }
 
         if ($dataHandle['error'] || $this->cartEmpty) {
-            $checkoutError = true;
-        } else {
-            $checkoutError = false;
+            $this->errorCheckout = true;
         }
 
         $customerId = $customer->getId();
@@ -912,7 +913,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
             CheckoutDataInterface::IS_STORE_FULFILL => $isStoreFulFill,
             CheckoutDataInterface::IS_SPLIT_ORDER => $dataHandle['split'],
             CheckoutDataInterface::IS_ADDRESS_COMPLETE => $isAddressComplete,
-            CheckoutDataInterface::IS_ERROR_CHECKOUT => $checkoutError,
+            CheckoutDataInterface::IS_ERROR_CHECKOUT => $this->errorCheckout,
             CheckoutDataInterface::PAYMENT_METHODS => $paymentMethodsAvailable,
             CheckoutDataInterface::VOUCHER => $voucherData['voucher_data'],
             CheckoutDataInterface::CURRENCY_SYMBOL => $this->getCurrencySymbol(),
@@ -972,6 +973,9 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
                         $addressListSupport[] = $address->getId();
                     }
                 }
+            }
+            if (!empty(array_diff($this->itemSelectShippingAddressId, $addressListSupport))) {
+                $this->errorCheckout = true;
             }
             $this->supportShippingData->setAddressSupport(implode(",", $addressListSupport));
         }
