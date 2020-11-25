@@ -356,7 +356,7 @@ class IntegrationProductAttribute implements IntegrationProductAttributeInterfac
 					
 					$pimIsDeleted[$i] = $this->validation->validateArray(IntegrationProductAttributeInterface::PIM_DELETED, $pimDataAttribute[$i] );
 
-					$attributeId[$i]    = $this->checkAttributeIdExist($pimAttrCode[$i]);
+					$attributeId[$i] = $this->checkAttributeIdExist($pimAttrCode[$i]);
 					
 					if ($pimIsDeleted[$i] > 0) {
 						$this->logger->info("Deleting Attribute Code = " . $pimAttrCode[$i]);
@@ -451,34 +451,36 @@ class IntegrationProductAttribute implements IntegrationProductAttributeInterfac
 						try {
 							$this->productAttributeRepository->save($queryAttribute[$i]);
 						} catch (CouldNotSaveException $e) {
-							$this->logger->info("Error save Attribute Code = " . $pimAttrCode[$i] . ". Message = " . $e->getMessage());
+							$this->logger->info("CouldNotSaveException Error save Attribute Code = " . $pimAttrCode[$i] . ". Message = " . $e->getMessage());
 							$this->saveStatusMessage($data, $$e->getMessage(), IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);		
 							continue;
 						} catch (NoSuchEntityException $e) {
-							$this->logger->info("Error save Attribute Code = " . $pimAttrCode[$i] . ". Message = " . $e->getMessage());
+							$this->logger->info("NoSuchEntityException Error save Attribute Code = " . $pimAttrCode[$i] . ". Message = " . $e->getMessage());
 							$this->saveStatusMessage($data, $$e->getMessage(), IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);		
 							continue;
 						} catch (\Exception $e) {
-							$this->logger->info("Error save Attribute Code = " . $pimAttrCode[$i] . ". Message = " . $e->getMessage());
+							$this->logger->info("Exception Error save Attribute Code = " . $pimAttrCode[$i] . ". Message = " . $e->getMessage());
 							$this->saveStatusMessage($data, $$e->getMessage(), IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);		
 							continue;
 						}
 
-						//Set Attribute Option
-						if ($attrTypeData[$i][IntegrationProductAttributeTypeInterface::IS_SWATCH] == 1) {
-							if($pimAttrOption[$i]) {
-								foreach($pimAttrOption[$i] as $labelOption){
-									try {
-										$this->attributeOptionHelper->createOrGetId($pimAttrCode[$i], $labelOption);	
-									} catch (\Exception $e) {									
-										$this->logger->info("Error save Attribute Option = " . $labelOption . '. ' . $e->getMessage());
+						if (!$attributeId[$i]) {
+							//Set Attribute Option
+							if ($attrTypeData[$i][IntegrationProductAttributeTypeInterface::IS_SWATCH] == 1) {
+								if($pimAttrOption[$i]) {
+									foreach($pimAttrOption[$i] as $labelOption){
+										try {
+											$this->attributeOptionHelper->createOrGetId($pimAttrCode[$i], $labelOption);	
+										} catch (\Exception $e) {									
+											$this->logger->info("Error save Attribute Option = " . $labelOption . '. ' . $e->getMessage());
+										}
 									}
-								}
-							} else {
-								try {
-									$this->attributeOptionHelper->createOrGetId($pimAttrCode[$i], 'default');	
-								} catch (\Exception $e) {
-									$this->logger->info("Error save Attribute Option = " . 'default. ' . $e->getMessage());
+								} else {
+									try {
+										$this->attributeOptionHelper->createOrGetId($pimAttrCode[$i], 'default');	
+									} catch (\Exception $e) {
+										$this->logger->info("Error save Attribute Option = " . 'default. ' . $e->getMessage());
+									}
 								}
 							}
 						}
@@ -486,8 +488,10 @@ class IntegrationProductAttribute implements IntegrationProductAttributeInterfac
 						//Set Attribute to Attribute Set (Default)
 						$this->productAttributeManagement->assign($this->attrGroupGeneralInfoId, $this->attrGroupProductDetailId,$pimAttrCode[$i], IntegrationProductAttributeInterface::SORT_ORDER);
 						
-						if ($attrTypeData[$i][IntegrationProductAttributeTypeInterface::IS_SWATCH] == 1) {
-							$this->convertAttrToSwatches($pimAttrCode[$i]);
+						if (!$attributeId[$i]) {
+							if ($attrTypeData[$i][IntegrationProductAttributeTypeInterface::IS_SWATCH] == 1) {
+								$this->convertAttrToSwatches($pimAttrCode[$i]);
+							}
 						}
 						
 						$this->saveStatusMessage($data, $msgDataValue[$i], IntegrationDataValueInterface::STATUS_DATA_SUCCESS);		
@@ -495,13 +499,17 @@ class IntegrationProductAttribute implements IntegrationProductAttributeInterfac
 					
 					$i++;
 				} catch (\Exception $e) {
-					$this->saveStatusMessage($data, $$e->getMessage(), IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);		
-					$this->logger->info("Error save Attribute = " . $e->getMessage());
+					try {
+						$this->saveStatusMessage($data, $$e->getMessage(), IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);		
+					} catch (\Exception $exc) {
+						$this->logger->info('Error save status ' . $exc->getMessage());
+					}
+					$this->logger->info("Exception 2 Error save Attribute = " . $e->getMessage());
 					continue;
 				}
 			}
 		} catch (\Exception $exception) {
-			$this->logger->info("Error save Attribute Code = " . $pimAttrCode[$i] . ". Message = " . $exception->getMessage());
+			$this->logger->info("Exception 3 Error save Attribute Code = " . $pimAttrCode[$i] . ". Message = " . $exception->getMessage());
 			$this->updateJobData($jobId,IntegrationJobInterface::STATUS_PROGRES_UPDATE_FAIL);
 			throw new StateException(__($exception->getMessage()));
 		}
@@ -689,9 +697,11 @@ class IntegrationProductAttribute implements IntegrationProductAttributeInterfac
      * Save Status & Message Data Value
      */
 	public function saveStatusMessage($data, $message, $status) {
-		$data->setMessage($message);
-		$data->setStatus($status);
-		$this->integrationDataValueRepositoryInterface->save($data);
+		if($data instanceof \Trans\IntegrationEntity\Api\Data\IntegrationDataValueInterface) {
+			$data->setMessage($message);
+			$data->setStatus($status);
+			$this->integrationDataValueRepositoryInterface->save($data);
+		}
 	}
 
 	/**

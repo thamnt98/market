@@ -13,6 +13,23 @@
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <!-- Logger Start -->
+    <type name="Trans\IntegrationCatalogStock\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+
+    <type name="Trans\IntegrationCatalogStock\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">sprintlog</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="system" xsi:type="object">Trans\IntegrationCatalogStock\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </type>
+    <!-- Logger End -->
+
     <!-- DB Model-->
     <preference for="Trans\IntegrationCatalogStock\Api\IntegrationJobRepositoryInterface"
                 type="Trans\IntegrationCatalogStock\Model\IntegrationJobRepository" />

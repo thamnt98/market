@@ -19,7 +19,7 @@ use Trans\IntegrationCatalogStock\Api\IntegrationCheckUpdatesInterface;
 
 class Stock {
 	/**
-	 * @var \Trans\Integration\Logger\Logger
+	 * @var \Trans\IntegrationCatalogStock\Logger\Logger
 	 */
 	protected $logger;
 
@@ -44,7 +44,7 @@ class Stock {
 	protected $timezone;
 
 	public function __construct(
-		\Trans\Integration\Logger\Logger $logger
+		\Trans\IntegrationCatalogStock\Logger\Logger $logger
 		, IntegrationCommonInterface $commonRepository
 		, IntegrationGetUpdatesInterface $getUpdates
 		, IntegrationCheckUpdatesInterface $checkUpdates

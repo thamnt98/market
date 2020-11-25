@@ -28,6 +28,8 @@ interface IntegrationStockInterface {
 	const IMS_QUANTITY 	     = 'quantity';
 	const IMS_STATUS         = 1;
 
+	const MAX_TRY_HIT		 = 3;
+
 	/**
 	 * Save data
 	 *

@@ -24,7 +24,7 @@ use Trans\IntegrationCatalogStock\Api\Data\IntegrationInitialStockResponseInterf
 class IntegrationInitialStock implements IntegrationInitialStockInterface
 {
     /**
-     * @var \Trans\Integration\Logger\Logger
+     * @var \Trans\IntegrationCatalogStock\Logger\Logger
      */
     protected $logger;
 
@@ -50,7 +50,7 @@ class IntegrationInitialStock implements IntegrationInitialStockInterface
 
 
     public function __construct(
-        \Trans\Integration\Logger\Logger $logger
+        \Trans\IntegrationCatalogStock\Logger\Logger $logger
         ,IntegrationCommonInterface $commonRepository
         ,IntegrationCheckUpdatesInterface $checkUpdates
         ,IntegrationInitialStockResponseInterfaceFactory $response
