@@ -113,4 +113,40 @@ class TransmartSetEmailNewOrderData extends SetEmailNewOrderData
       $transaction = $data->getData();
       return isset($transaction['statusData']['vaNumber'])? $transaction['statusData']['vaNumber'] : '';
     }
+
+    /**
+     * @param string $paymentMethod
+     * @param string $methodCodeShort
+     * @return bool
+     */
+    private function verifyPayment($paymentMethod, $methodCodeShort)
+    {
+        $paymentMethodSplit = explode("_", $paymentMethod);
+
+        if (is_array($paymentMethodSplit)) {
+            $methodShort = $paymentMethodSplit[count($paymentMethodSplit) - 1];
+            if ($methodShort == $methodCodeShort) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @param string $shippingMethod
+     * @param string $shippingDescription
+     * @return \Magento\Framework\Phrase|mixed|string
+     */
+    private function getDeliveryMethod($shippingMethod, $shippingDescription)
+    {
+        if ($shippingMethod == "store_pickup_store_pickup") {
+            return __("Pick Up in Store");
+        } else {
+            $shippingDescription = explode(" - ", $shippingDescription);
+            if (isset($shippingDescription[1])) {
+                return $shippingDescription[1];
+            }
+        }
+        return __("Not available");
+    }
 }
