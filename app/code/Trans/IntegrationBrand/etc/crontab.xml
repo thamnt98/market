@@ -16,13 +16,13 @@
    
     <group id="pim_brand">
         <job name="integration_pim_check_brand" instance="Trans\IntegrationBrand\Cron\Pim\Check\Brand" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/5 * * * *</schedule>
         </job>
          <job name="integration_pim_get_brand" instance="Trans\IntegrationBrand\Cron\Pim\Get\Brand" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_save_brand" instance="Trans\IntegrationBrand\Cron\Pim\Save\Brand" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>* 2 * * *</schedule>
         </job>
     </group>
 </config>

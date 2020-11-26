@@ -79,7 +79,14 @@ class ProductImage {
             
             try {
                 $this->logger->info("=".$class." Check Complete Jobs");
-                $channel = $this->checkUpdates->checkCompleteJobs($channel);
+                // $this->logger->info(print_r($channel['jobs'],true));
+				$channel = $this->checkUpdates->checkCompleteJobs($channel);				
+				$this->logger->info($channel['jobs']->getBatchId());
+                $this->logger->info($channel['jobs']->getLimits());
+                $this->logger->info($channel['jobs']->getOFfset());
+                $this->logger->info($channel['jobs']->getTotalData());
+                // $this->logger->info("=".$class." Check channel data");
+                // $this->logger->info(print_r($channel['jobs'],true));
             } catch (\Exception $e) {
             }
 

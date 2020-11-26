@@ -15,25 +15,25 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
     <group id="pim_store_price">
         <job name="integration_pim_check_price" instance="Trans\IntegrationCatalogPrice\Cron\Pim\Check\Price" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_get_price" instance="Trans\IntegrationCatalogPrice\Cron\Pim\Get\Price" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/5 * * * *</schedule>
         </job>
-         <job name="integration_pim_save_Price" instance="Trans\IntegrationCatalogPrice\Cron\Pim\Save\Price" method="execute">
-            <schedule>* * * * *</schedule>
+         <job name="integration_pim_save_price" instance="Trans\IntegrationCatalogPrice\Cron\Pim\Save\Price" method="execute">
+            <schedule>* 3-5 * * *</schedule>
         </job>
     </group>
 
      <group id="pim_promotion_price">
         <job name="integration_pim_check_promotion_price" instance="Trans\IntegrationCatalogPrice\Cron\Pim\Check\PromotionPrice" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/5 * * * *</schedule>
         </job>
        <job name="integration_pim_get_promotion_price" instance="Trans\IntegrationCatalogPrice\Cron\Pim\Get\PromotionPrice" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/5 * * * *</schedule>
         </job>
-         <job name="integration_pim_save_promotion_Price" instance="Trans\IntegrationCatalogPrice\Cron\Pim\Save\PromotionPrice" method="execute">
-            <schedule>* * * * *</schedule>
+         <job name="integration_pim_save_promotion_price" instance="Trans\IntegrationCatalogPrice\Cron\Pim\Save\PromotionPrice" method="execute">
+            <schedule>* 6-8 * * *</schedule>
         </job> 
     </group>
      

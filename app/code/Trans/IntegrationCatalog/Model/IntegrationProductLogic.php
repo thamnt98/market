@@ -695,8 +695,9 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			}
 
 			// Save Product
+			$this->logger->info('Before save productRepositoryInterface '.date('Y-m-d H:i:s'));
 			$product = $this->productRepositoryInterface->save($product);
-
+			$this->logger->info('After save productRepositoryInterface '.date('Y-m-d H:i:s'));
 			if($visibility && isset($dataProduct['sku']) && $dataProduct['sku']) {
 				$this->integrationProductRepositoryInterface->changeProductVisibility($dataProduct['sku'], $visibility);
 			}

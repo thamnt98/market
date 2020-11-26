@@ -16,58 +16,58 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
     <group id="pim_product">
         <job name="integration_pim_check_product" instance="Trans\IntegrationCatalog\Cron\Pim\Check\Product" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_get_product" instance="Trans\IntegrationCatalog\Cron\Pim\Get\Product" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_save_product" instance="Trans\IntegrationCatalog\Cron\Pim\Save\Product" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>* 22 * * *</schedule>
         </job>
     </group>
 
     <group id="pim_product_image">
         <job name="integration_pim_check_product_image" instance="Trans\IntegrationCatalog\Cron\Pim\Check\ProductImage" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_get_product_image" instance="Trans\IntegrationCatalog\Cron\Pim\Get\ProductImage" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_save_product_image" instance="Trans\IntegrationCatalog\Cron\Pim\Save\ProductImage" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>* 0 * * *</schedule>
         </job>
     </group>
      <group id="pim_product_configurable">
         <job name="integration_product_configurable" instance="Trans\IntegrationCatalog\Cron\Pim\Save\ProductConfigurable" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>* 23 * * *</schedule>
         </job>
     </group>
     <group id="pim_product_association">
         <job name="integration_pim_check_product_association" instance="Trans\IntegrationCatalog\Cron\Pim\Check\ProductAssociation" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_get_product_association" instance="Trans\IntegrationCatalog\Cron\Pim\Get\ProductAssociation" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_save_product_association" instance="Trans\IntegrationCatalog\Cron\Pim\Save\ProductAssociation" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>* 1 * * *</schedule>
         </job>
     </group>
      <group id="pim_product_digital">
         <job name="integration_pim_check_product_digital" instance="Trans\IntegrationCatalog\Cron\Pim\Check\ProductDigital" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_get_product_digital" instance="Trans\IntegrationCatalog\Cron\Pim\Get\ProductDigital" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_save_product_digital" instance="Trans\IntegrationCatalog\Cron\Pim\Save\ProductDigital" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>* 22 * * *</schedule>
         </job>
     </group>
     <!-- @anan.fauzi <add synch configurable product cron -->
     <group id="synch_configurable_product">
        <job name="integration_pim_save_synch_configurable_product_image" instance="Trans\IntegrationCatalog\Cron\Pim\Save\ConfigurableProductImage" method="execute">
-           <schedule>* * * * *</schedule>
+           <schedule>* 1 * * *</schedule>
        </job>
    </group>
 </config>

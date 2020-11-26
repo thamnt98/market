@@ -16,7 +16,7 @@
     <group id="integration_table_cleaner">
         <!-- cron integration_table_cleaner. executed at 03.00 every day -->
         <job name="integration_table_cleaner" instance="Trans\Integration\Cron\IntegrationTableCleaner" method="execute">
-            <schedule>* * * * *</schedule> 
+            <schedule>* */6 * * *</schedule> 
         <!-- end cron integration_table_cleaner. -->
         </job>
     </group>
