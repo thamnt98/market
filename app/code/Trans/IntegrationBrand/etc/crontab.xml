@@ -22,7 +22,7 @@
             <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_save_brand" instance="Trans\IntegrationBrand\Cron\Pim\Save\Brand" method="execute">
-            <schedule>* 19 * * *</schedule>
+            <schedule>* 2 * * *</schedule>
         </job>
     </group>
 </config>

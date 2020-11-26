@@ -22,7 +22,7 @@
             <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_save_product" instance="Trans\IntegrationCatalog\Cron\Pim\Save\Product" method="execute">
-            <schedule>* 15 * * *</schedule>
+            <schedule>* 22 * * *</schedule>
         </job>
     </group>
 
@@ -34,12 +34,12 @@
             <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_save_product_image" instance="Trans\IntegrationCatalog\Cron\Pim\Save\ProductImage" method="execute">
-            <schedule>* 17 * * *</schedule>
+            <schedule>* 0 * * *</schedule>
         </job>
     </group>
      <group id="pim_product_configurable">
         <job name="integration_product_configurable" instance="Trans\IntegrationCatalog\Cron\Pim\Save\ProductConfigurable" method="execute">
-            <schedule>* 16 * * *</schedule>
+            <schedule>* 23 * * *</schedule>
         </job>
     </group>
     <group id="pim_product_association">
@@ -50,7 +50,7 @@
             <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_save_product_association" instance="Trans\IntegrationCatalog\Cron\Pim\Save\ProductAssociation" method="execute">
-            <schedule>* 18 * * *</schedule>
+            <schedule>* 1 * * *</schedule>
         </job>
     </group>
      <group id="pim_product_digital">
@@ -61,13 +61,13 @@
             <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_save_product_digital" instance="Trans\IntegrationCatalog\Cron\Pim\Save\ProductDigital" method="execute">
-            <schedule>* 15 * * *</schedule>
+            <schedule>* 22 * * *</schedule>
         </job>
     </group>
     <!-- @anan.fauzi <add synch configurable product cron -->
     <group id="synch_configurable_product">
        <job name="integration_pim_save_synch_configurable_product_image" instance="Trans\IntegrationCatalog\Cron\Pim\Save\ConfigurableProductImage" method="execute">
-           <schedule>* 18 * * *</schedule>
+           <schedule>* 1 * * *</schedule>
        </job>
    </group>
 </config>
