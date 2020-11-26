@@ -25,6 +25,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
     protected $disablePickUp = false;
     protected $itemSelectShippingAddressId = [];
     protected $errorCheckout = false;
+    protected $errorCheckoutByAddress = false;
     /**
      * @var bool
      */
@@ -773,10 +774,9 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         }
         foreach ($quote->getAllVisibleItems() as $item) {
             $product = $item->getProduct();
-            $isWarehouse = $product->getIsWarehouse();
-            if ($isWarehouse == 1) {
-                $skuList = [];
-                break;
+            $isWarehouse = (bool)$product->getIsWarehouse();
+            if ($isWarehouse) {
+                continue;
             }
             $sku = (isset($child[$item->getItemId()])) ? $child[$item->getItemId()] : $item->getSku();
             $skuList[$sku] = $item->getQty();
@@ -888,6 +888,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
             }
         }
         if ($rebuild) {
+            $this->errorCheckout = false;
             return $this->handleCheckoutData(
                 $cartId,
                 $items,
@@ -902,6 +903,9 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
                 $init = false,
                 $message
             );
+        }
+        if ($this->errorCheckoutByAddress) {
+            $this->errorCheckout = true;
         }
         $data = [
             CheckoutDataInterface::SHIPPING_ADDRESS => $addressesList,
@@ -975,7 +979,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
                 }
             }
             if (!empty(array_diff($this->itemSelectShippingAddressId, $addressListSupport))) {
-                $this->errorCheckout = true;
+                $this->errorCheckoutByAddress = true;
             }
             $this->supportShippingData->setAddressSupport(implode(",", $addressListSupport));
         }

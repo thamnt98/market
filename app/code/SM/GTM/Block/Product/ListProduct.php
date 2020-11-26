@@ -248,7 +248,6 @@ class ListProduct extends ListProductBase
         if (!$product) {
             $product = $productBase;
         }
-        $product = $this->productRepository->getById($product->getId());
         $priceGTM = $this->getPriceGTM($product);
         $initPrice = $this->getGTMInitialProductPrice($product);
         $price = $priceGTM['sale_price'] != 'Not in sale' ? $priceGTM['sale_price'] : $initPrice;

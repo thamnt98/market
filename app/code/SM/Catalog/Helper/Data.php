@@ -294,6 +294,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection $coll */
         $coll = $this->productCollFact->create();
         $coll->addFieldToFilter('entity_id', $childrenIds);
+        $coll->addFieldToSelect('price')
+             ->addFieldToSelect('final_price');
 
         return $this->getMinChildren($coll->getItems());
     }
@@ -354,15 +356,8 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
                     $item = $this->getMinConfigurable($item);
                 }
 
-                try {
-                    /** @var \Magento\Catalog\Model\Product $item */
-                    $item = $this->productRepository->getById($item->getId());
-                } catch (\Exception $e) {
-                    continue;
-                }
-
-                if (is_null($minProduct) || $minPrice > $item->getFinalPrice()) {
-                    $minPrice = $item->getFinalPrice();
+                if (is_null($minProduct) || $minPrice > (float)$item->getFinalPrice()) {
+                    $minPrice = (float)$item->getFinalPrice();
                     $minProduct = $item;
                 }
             }

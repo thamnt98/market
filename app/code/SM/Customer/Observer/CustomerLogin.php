@@ -15,8 +15,6 @@
 
 namespace SM\Customer\Observer;
 
-use SM\Customer\Model\CustomerDevice;
-
 class CustomerLogin implements \Magento\Framework\Event\ObserverInterface
 {
     /**

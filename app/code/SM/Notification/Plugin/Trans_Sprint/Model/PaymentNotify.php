@@ -40,9 +40,9 @@ class PaymentNotify
     protected $notificationResource;
 
     /**
-     * @var \SM\Notification\Helper\CustomerSetting
+     * @var \SM\Notification\Model\EventSetting
      */
-    protected $settingHelper;
+    protected $setting;
 
     /**
      * @var string
@@ -60,21 +60,22 @@ class PaymentNotify
     protected $logger;
 
     /**
-     * @var bool
-     */
-    protected $isSendMail;
-
-    /**
      * @var Helper
      */
     protected $helper;
 
     /**
+     * @var \Magento\Store\Model\App\Emulation
+     */
+    protected $emulation;
+
+    /**
      * PaymentNotify constructor.
      *
      * @param Helper                                                     $helper
+     * @param \Magento\Store\Model\App\Emulation                         $emulation
      * @param \SM\Notification\Helper\Generate\Email                     $emailHelper
-     * @param \SM\Notification\Helper\CustomerSetting                    $settingHelper
+     * @param \SM\Notification\Model\EventSetting                        $setting
      * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
      * @param \SM\Notification\Model\NotificationFactory                 $notificationFactory
      * @param \SM\Notification\Model\ResourceModel\Notification          $notificationResource
@@ -82,8 +83,9 @@ class PaymentNotify
      */
     public function __construct(
         Helper $helper,
+        \Magento\Store\Model\App\Emulation $emulation,
         \SM\Notification\Helper\Generate\Email $emailHelper,
-        \SM\Notification\Helper\CustomerSetting $settingHelper,
+        \SM\Notification\Model\EventSetting $setting,
         \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory,
         \SM\Notification\Model\NotificationFactory $notificationFactory,
         \SM\Notification\Model\ResourceModel\Notification $notificationResource,
@@ -92,12 +94,12 @@ class PaymentNotify
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->notificationFactory = $notificationFactory;
         $this->notificationResource = $notificationResource;
-        $this->settingHelper = $settingHelper;
+        $this->setting = $setting;
         $this->emailHelper = $emailHelper;
         $this->logger = $logger;
         $this->paymentStatusCode = null;
-        $this->isSendMail = false;
         $this->helper = $helper;
+        $this->emulation = $emulation;
     }
 
     public function afterProcessingNotify(
@@ -119,21 +121,16 @@ class PaymentNotify
         }
 
         try {
-            $setting = $this->settingHelper->getCustomerSetting($order->getCustomerId());
-            $this->isSendMail = in_array(
-                $this->settingHelper->generateSettingCode(
-                    \SM\Notification\Model\Notification::EVENT_ORDER_STATUS,
-                    'email'
-                ),
-                $setting
-            );
-
+            $this->setting->init($order->getCustomerId(), \SM\Notification\Model\Notification::EVENT_ORDER_STATUS);
             $this->createNotification($order);
             $this->logInfo('Generate `payment notification` Success', $postData);
         } catch (\Exception $e) {
             $this->logError(
                 "Generate `payment notification` error:\n\t" . $e->getMessage(),
-                ['order_id' => $order->getId(), 'post_data' => $postData]
+                [
+                    'data'  => ['order_id' => $order->getId(), 'post_data' => $postData],
+                    'trace' => $e->getTrace(),
+                ]
             );
         }
 
@@ -197,7 +194,7 @@ class PaymentNotify
     protected function createExpired($order)
     {
         $title = 'Sorry, your order has been cancelled.';
-        $content = 'Order ID/%1 has passed the payment due time.';
+        $content = 'Order %1 has passed the payment due time.';
         $params = [
             'content' => [
                 $order->getIncrementId(),
@@ -206,23 +203,14 @@ class PaymentNotify
         /** @var \SM\Notification\Model\Notification $notification */
         $notification = $this->notificationFactory->create();
         $notification->setTitle($title)
-            ->setEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
-            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
-            ->setCustomerIds([$order->getCustomerId()])
-            ->setRedirectId($order->getData('parent_order') ? $order->getData('parent_order') : $order->getId())
-            ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_ORDER_DETAIL)
             ->setContent($content)
-            ->setPushTitle(__($title))
-            ->setPushContent(__($content, $params['content']))
             ->setImage($this->helper->getMediaPathImage(Helper::XML_IMAGE_PAYMENT_FAILED, $order->getStoreId()))
             ->setParams($params);
-
-        if ($this->isSendMail) {
-            $notification->setEmailTemplate($this->emailHelper->getExpiredTemplateId($order->getStoreId()))
-                ->setEmailParams([
-                    EmailConsumer::EMAIL_PARAM_ORDER_KEY => $order->getId(),
-                ]);
-        }
+        $this->addNotificationAdditional(
+            $notification,
+            $order,
+            $this->emailHelper->getExpiredTemplateId($order->getStoreId())
+        );
 
         $this->notificationResource->save($notification);
 
@@ -238,32 +226,23 @@ class PaymentNotify
     protected function createBankReject($order)
     {
         $title = 'Sorry, your order is cancelled because the payment is rejected by your bank.';
-        $content = "Don't worry, you are not charged for order ID/%1";
+        $content = "Don't worry, you are not charged for order %1";
         $params = [
             'content' => [
                 $order->getIncrementId(),
             ],
         ];
-        /** @var \SM\Notification\Model\Notification $notification */
-        $notification = $this->notificationFactory->create();
+
+        $notification = $this->initNotification($order);
         $notification->setTitle($title)
-            ->setEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
-            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
-            ->setCustomerIds([$order->getCustomerId()])
-            ->setRedirectId($order->getData('parent_order') ? $order->getData('parent_order') : $order->getId())
-            ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_ORDER_DETAIL)
             ->setContent($content)
-            ->setPushTitle(__($title))
-            ->setPushContent(__($content, $params['content']))
             ->setImage($this->helper->getMediaPathImage(Helper::XML_IMAGE_PAYMENT_FAILED, $order->getStoreId()))
             ->setParams($params);
-
-        if ($this->isSendMail) {
-            $notification->setEmailTemplate($this->emailHelper->getBankRejectTemplateId($order->getStoreId()))
-                ->setEmailParams([
-                    EmailConsumer::EMAIL_PARAM_ORDER_KEY => $order->getId(),
-                ]);
-        }
+        $this->addNotificationAdditional(
+            $notification,
+            $order,
+            $this->emailHelper->getBankRejectTemplateId($order->getStoreId())
+        );
 
         $this->notificationResource->save($notification);
 
@@ -296,7 +275,7 @@ class PaymentNotify
             $email = $this->emailHelper->getPaymentSystemFailedDigitalTemplateId($order->getStoreId());
         } else {
             $title = 'Sorry, your order is cancelled due to payment system failure.';
-            $content = "Don't worry, you are not charged for order ID/%1";
+            $content = "Don't worry, you are not charged for order %1";
             $params = [
                 'content' => [
                     $order->getIncrementId(),
@@ -305,26 +284,12 @@ class PaymentNotify
             $email = $this->emailHelper->getSystemFailedTemplateId($order->getStoreId());
         }
 
-        /** @var \SM\Notification\Model\Notification $notification */
-        $notification = $this->notificationFactory->create();
+        $notification = $this->initNotification($order);
         $notification->setTitle($title)
-            ->setEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
-            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
-            ->setCustomerIds([$order->getCustomerId()])
-            ->setRedirectId($order->getData('parent_order') ? $order->getData('parent_order') : $order->getId())
-            ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_ORDER_DETAIL)
             ->setContent($content)
-            ->setPushTitle(__($title))
-            ->setPushContent(__($content, $params['content']))
             ->setImage($this->helper->getMediaPathImage(Helper::XML_IMAGE_PAYMENT_FAILED, $order->getStoreId()))
             ->setParams($params);
-
-        if ($this->isSendMail) {
-            $notification->setEmailTemplate($email)
-                ->setEmailParams([
-                    EmailConsumer::EMAIL_PARAM_ORDER_KEY => $order->getId(),
-                ]);
-        }
+        $this->addNotificationAdditional($notification, $order, $email);
 
         $this->notificationResource->save($notification);
 
@@ -339,13 +304,13 @@ class PaymentNotify
      */
     protected function createSuccess($order)
     {
-        $content = $title = '';
+        $content = $email = $title = '';
         $params = [];
 
         if (!$order->getIsVirtual()) {
             $email = $this->emailHelper->getPaymentSuccessPhysicalTemplateId($order->getStoreId());
             $title = 'Your payment is successful!';
-            $content = 'Order ID/%1 is now being processed. Check out the progress in My Order.';
+            $content = 'Order %1 is now being processed. Check out the progress in My Order.';
             $params = [
                 'content' => [
                     $order->getIncrementId(),
@@ -414,29 +379,67 @@ class PaymentNotify
             }
         }
 
+        $notification = $this->initNotification($order);
+        $notification->setTitle($title)
+            ->setContent($content)
+            ->setImage($this->helper->getMediaPathImage(Helper::XML_IMAGE_PAYMENT_SUCCESS, $order->getStoreId()))
+            ->setParams($params);
+        $this->addNotificationAdditional($notification, $order, $email);
+
+        $this->notificationResource->save($notification);
+
+        return $notification->getId();
+    }
+
+    /**
+     * @param \Magento\Sales\Model\Order $order
+     *
+     * @return \SM\Notification\Model\Notification
+     */
+    protected function initNotification($order)
+    {
         /** @var \SM\Notification\Model\Notification $notification */
         $notification = $this->notificationFactory->create();
-        $notification->setTitle($title)
-            ->setEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
+        $notification->setEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
             ->setSubEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
             ->setCustomerIds([$order->getCustomerId()])
             ->setRedirectId($order->getData('parent_order') ? $order->getData('parent_order') : $order->getId())
-            ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_ORDER_DETAIL)
-            ->setContent($content)
-            ->setPushTitle(__($title, $params['title'] ?? []))
-            ->setPushContent(__($content, $params['content'] ?? []))
-            ->setImage($this->helper->getMediaPathImage(Helper::XML_IMAGE_PAYMENT_SUCCESS, $order->getStoreId()))
-            ->setParams($params);
+            ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_ORDER_DETAIL);
 
-        if ($this->isSendMail && isset($email)) {
-            $notification->setEmailTemplate($email)
+        return $notification;
+    }
+
+    /**
+     * @param \SM\Notification\Model\Notification $notify
+     * @param \Magento\Sales\Model\Order          $order
+     * @param int|string|null                     $email
+     * @param string|null                         $sms
+     */
+    protected function addNotificationAdditional($notify, $order, $email = null, $sms = null)
+    {
+        $this->emulation->startEnvironmentEmulation(
+            $order->getStoreId(),
+            \Magento\Framework\App\Area::AREA_FRONTEND,
+            true
+        );
+
+        $params = $notify->getParams() ?: [];
+        if ($this->setting->isPush()) {
+            $notify->setPushTitle(__($notify->getTitle(), $params['title'] ?? [])->__toString())
+                ->setPushContent(__($notify->getContent(), $params['content'] ?? [])->__toString());
+        }
+
+        if ($this->setting->isEmail() && $email) {
+            $notify->setEmailTemplate($email)
                 ->setEmailParams([
                     EmailConsumer::EMAIL_PARAM_ORDER_KEY => $order->getId(),
                 ]);
         }
 
-        $this->notificationResource->save($notification);
+        if ($this->setting->isSms() && $sms) {
+            $notify->setSms(__($sms)->__toString());
+        }
 
-        return $notification->getId();
+        $this->emulation->stopEnvironmentEmulation();
     }
 }

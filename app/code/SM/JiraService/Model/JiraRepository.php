@@ -453,6 +453,33 @@ class JiraRepository implements \SM\JiraService\Api\JiraRepositoryInterface
                 break;
             }
         }
+        $isLastPage = $jiraCustomer['isLastPage'];
+        if ($isLastPage == false && $accountId == '') {
+            $accountId = $this->getCustomerList($jiraCustomer, $email);
+        }
+        return $accountId;
+    }
+
+    public function getCustomerList($jiraCustomer, $email)
+    {
+        $accountId = '';
+        $isLastPage = $jiraCustomer['isLastPage'];
+        if ($isLastPage == false && $accountId == '') {
+            $link = $jiraCustomer['_links'];
+            $this->curl->get($link['next']);
+            $response = $this->curl->getBody();
+            $response = json_decode($response, true);
+            $values = $response['values'];
+            foreach ($values as $customer) {
+                if ($customer['emailAddress'] == $email) {
+                    $accountId = $customer['accountId'];
+                    break;
+                }
+            }
+            if ($isLastPage == false && $accountId == '') {
+                $accountId = $this->getCustomerList($response, $email);
+            }
+        }
         return $accountId;
     }
 

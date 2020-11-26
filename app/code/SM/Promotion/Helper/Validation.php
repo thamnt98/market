@@ -85,11 +85,13 @@ class Validation extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * @param \Magento\SalesRule\Model\Rule $rule
+     * @param \Magento\SalesRule\Model\Rule         $rule
+     *
+     * @param \Magento\Customer\Model\Customer|null $customer
      *
      * @return bool
      */
-    public function validateCustomer($rule)
+    public function validateCustomer($rule, $customer = null)
     {
         $conditions = $rule->getConditions()->getConditions() ?? [];
 
@@ -108,9 +110,12 @@ class Validation extends \Magento\Framework\App\Helper\AbstractHelper
             return false;
         }
 
-        $customer = $this->customerSession->getCustomer();
-        $customer->setData('id', $this->customerSession->getCustomerId())
-            ->setData('entity_id', $this->customerSession->getCustomerId());
+        if (!$customer) {
+            $customer = $this->customerSession->getCustomer();
+            $customer->setData('id', $this->customerSession->getCustomerId())
+                ->setData('entity_id', $this->customerSession->getCustomerId());
+        }
+
         foreach ($conditions as $condition) {
             try {
                 if ($condition instanceof \Amasty\Conditions\Model\Rule\Condition\CustomerAttributes &&
@@ -216,12 +221,15 @@ class Validation extends \Magento\Framework\App\Helper\AbstractHelper
 
     /**
      * Validate product when call by api
+     *
      * @param $rule
      * @param $product
      * @param $customerId
+     *
      * @return bool
      */
-    public function validateApiProduct($rule, $product, $customerId){
+    public function validateApiProduct($rule, $product, $customerId)
+    {
         $conditions = $rule->getConditions()->getConditions();
         $actions = $rule->getActions()->getData('actions') ?? [];
         $productSetTypeRules = [
@@ -250,7 +258,7 @@ class Validation extends \Magento\Framework\App\Helper\AbstractHelper
             }
         }
 
-        if (!$this->validateApiCustomer($rule,$customerId)) {
+        if (!$this->validateApiCustomer($rule, $customerId)) {
             return false;
         }
 

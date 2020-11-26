@@ -35,4 +35,9 @@
         <observer name="sm_transcheckout_active_items"
                   instance="\SM\Checkout\Observer\ActiveItems" />
     </event>
+
+    <event name="trans_sprint_set_order_cancel_after">
+        <observer name="sm_trancheckout_payment_expire_send_email"
+                  instance="\SM\Checkout\Observer\PaymentExpireSendEmail" />
+    </event>
 </config>

@@ -14,6 +14,10 @@
         <observer name="SM_Notification::OrderSaveAfter"
                   instance="SM\Notification\Observer\Order\SaveAfter" />
     </event>
+    <event name="sm_sales_order_status_update">
+        <observer name="SM_Notification::OrderSaveAfter"
+                  instance="SM\Notification\Observer\Order\SaveAfter" />
+    </event>
     <event name="sales_quote_item_save_before">
         <observer name="SM_Notification::QuoteItemSaveAfter"
                   instance="SM\Notification\Observer\QuoteItemSaveBefore" />
@@ -21,5 +25,9 @@
     <event name="customer_device_save_after">
         <observer name="SM_Notification::CustomerDeviceSaveAfter"
                   instance="SM\Notification\Observer\DeviceSaveAfter" />
+    </event>
+    <event name="salesrule_rule_save_after">
+        <observer name="SM_Notification::RuleSaveAfter"
+                  instance="SM\Notification\Observer\RuleSaveAfter" />
     </event>
 </config>
