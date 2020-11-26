@@ -206,7 +206,7 @@ class TransmartParentOrder extends ParentOrder
     {
         if (!isset($this->howToPay[$method])) {
             try {
-                $howToPay = $this->paymentHelper->getBlockHowToPay($method, true);
+                $howToPay = (Data::isMegaMethod($method))? $this->paymentHelper->getBlockHowToPay('', true) : $this->paymentHelper->getBlockHowToPay($method, true);
             } catch (LocalizedException $e) {
                 $this->logger->critical($e->getMessage());
                 $howToPay = null;
