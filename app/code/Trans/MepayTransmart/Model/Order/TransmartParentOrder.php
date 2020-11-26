@@ -33,9 +33,13 @@ use Trans\Sprint\Api\SprintResponseRepositoryInterface;
 use Trans\Sprint\Model\SprintResponse;
 use SM\Sales\Model\Order\ParentOrder;
 use Trans\Mepay\Helper\Data;
+use Trans\Mepay\Helper\Payment\Transaction as TransactionHelper;
+use Magento\Framework\Serialize\Serializer\Json;
 
 class TransmartParentOrder extends ParentOrder
 {
+  protected $transactionHelper;
+  protected $json;
   /** 
    * @inheritdoc
    */
@@ -48,8 +52,12 @@ class TransmartParentOrder extends ParentOrder
     TimezoneInterface $timezone,
     UrlInterface $urlInterface,
     Payment $paymentHelper,
-    LoggerInterface $logger
+    LoggerInterface $logger,
+    TransactionHelper $transactionHelper,
+    Json $json
   ) {
+    $this->transactionHelper = $transactionHelper;
+    $this->json = $json;
     parent::__construct(
       $parentOrderDataFactory,
       $paymentInfoDataFactory,
@@ -148,10 +156,25 @@ class TransmartParentOrder extends ParentOrder
             if (is_array($paymentMethodSplit)) {
                 $methodShort = $paymentMethodSplit[count($paymentMethodSplit) - 1];
                 if ($methodShort == "va") {
+                  try {
                     $expireDate = '';
                     $virtualAccount = '';
+                    $paymentData = $this->transactionHelper->getLastOrderTransaction($payment->getParentId());
+                    if ($mepayTxnData = $paymentData->getTransMepayTransaction()) {
+                      $txnData = $this->json->unserialize($mepayTxnData);
+                      if (isset($txnData['statusData']) && $txnData['statusData']) {
+                        $expireDate = isset($txnData['statusData']['expireTime'])? $txnData['statusData']['expireTime'] : $expireDate;
+                        $virtualAccount = isset($txnData['statusData']['vaNumber'])? $txnData['statusData']['vaNumber'] : $virtualAccount;
+                      }
+                    }
+
+                  } catch (\Exception $e) {
+                    $this->logger->critical($e->getMessage());
+                  }
+                    $this->logger->critical($virtualAccount);
                     $data[PaymentInfoDataInterface::EXPIRE_DATE] = $expireDate;
                     $data[PaymentInfoDataInterface::VIRTUAL_ACCOUNT] = $virtualAccount;
+
                 }
 
                 if ($methodShort == "cc") {
@@ -169,8 +192,26 @@ class TransmartParentOrder extends ParentOrder
             PaymentInfoDataInterface::class
         );
 
-        //$paymentInfoData->setHowToPayObjects($this->getHowToPay($method));
+        $paymentInfoData->setHowToPayObjects($this->getHowToPay($method));
 
         return $paymentInfoData;
+    }
+
+    /**
+     * @param $method
+     * @return mixed|string|null
+     */
+    private function getHowToPay($method)
+    {
+        if (!isset($this->howToPay[$method])) {
+            try {
+                $howToPay = $this->paymentHelper->getBlockHowToPay($method, true);
+            } catch (LocalizedException $e) {
+                $this->logger->critical($e->getMessage());
+                $howToPay = null;
+            }
+            $this->howToPay[$method] = $howToPay;
+        }
+        return $this->howToPay[$method];
     }
 }
