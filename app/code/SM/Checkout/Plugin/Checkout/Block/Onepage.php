@@ -250,7 +250,7 @@ class Onepage
         $data['voucher_list'] = $this->getVoucherList();
         $data['symbol'] = $this->currency->getCurrency()->getCurrencySymbol();
         $data['sortSource'] = $this->getSortSource();
-        $data['isFullFill'] = $this->fulFill;
+        $data['fulFill'] = $this->fulFill;
         $data['notFulFillMessage'] = $this->notFulFillMessage;
         $data['latlng'] = ['lat' => $this->defaultLat, 'lng' => $this->defaultLng];
         $data['address_complete'] = $this->isAddressComplete();
@@ -436,8 +436,8 @@ class Onepage
         }
         foreach ($quote->getAllVisibleItems() as $item) {
             $product = $item->getProduct();
-            $isWarehouse = $product->getIsWarehouse();
-            if ($isWarehouse == 1) {
+            $isWarehouse = (bool)$product->getIsWarehouse();
+            if ($isWarehouse) {
                 $this->fulFill = false;
                 continue;
             }
@@ -445,9 +445,9 @@ class Onepage
             $sku = (isset($child[$item->getItemId()])) ? $child[$item->getItemId()] : $item->getSku();
             $skuList[$sku] = $item->getQty();
         }
-        if ($notFulFillType == 0) {
+        if (!$this->fulFill && $notFulFillType == 0) {
             $this->notFulFillMessage = __('Sorry, pick-up method is not applicable for this order. Shop conveniently with our delivery.');
-        } else {
+        } elseif (!$this->fulFill && $notFulFillType == 1) {
             $this->notFulFillMessage = __('Sorry, some items are not available for pick-up. We have more delivery options for you, try them out!');
         }
         $defaultShipping = $this->getCustomer()->getDefaultShippingAddress();

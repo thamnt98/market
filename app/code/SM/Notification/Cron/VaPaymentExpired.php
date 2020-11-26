@@ -48,7 +48,8 @@ class VaPaymentExpired extends AbstractGenerate
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface       $timezone
      * @param \Magento\Framework\Filesystem                              $filesystem
      * @param \Magento\Store\Model\App\Emulation                         $emulation
-     * @param \SM\Notification\Helper\CustomerSetting                    $settingHelper
+     * @param \SM\Notification\Model\EventSetting                        $eventSetting
+     * @param \SM\Notification\Helper\Config                             $configHelper
      * @param \SM\Notification\Model\NotificationFactory                 $notificationFactory
      * @param \SM\Notification\Model\ResourceModel\Notification          $notificationResource
      * @param \Magento\Framework\App\ResourceConnection                  $resourceConnection
@@ -63,7 +64,8 @@ class VaPaymentExpired extends AbstractGenerate
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
         \Magento\Framework\Filesystem $filesystem,
         \Magento\Store\Model\App\Emulation $emulation,
-        \SM\Notification\Helper\CustomerSetting $settingHelper,
+        \SM\Notification\Model\EventSetting $eventSetting,
+        \SM\Notification\Helper\Config $configHelper,
         \SM\Notification\Model\NotificationFactory $notificationFactory,
         \SM\Notification\Model\ResourceModel\Notification $notificationResource,
         \Magento\Framework\App\ResourceConnection $resourceConnection,
@@ -72,7 +74,8 @@ class VaPaymentExpired extends AbstractGenerate
         parent::__construct(
             $filesystem,
             $emulation,
-            $settingHelper,
+            $eventSetting,
+            $configHelper,
             $notificationFactory,
             $notificationResource,
             $resourceConnection,
@@ -98,7 +101,10 @@ class VaPaymentExpired extends AbstractGenerate
                     ]
                 );
             } catch (\Exception $e) {
-                $this->logger->error("Notification Payment Expired create failed: \n\t" . $e->getMessage());
+                $this->logger->error(
+                    "Notification Payment Expired create failed: \n\t" . $e->getMessage(),
+                    $e->getTrace()
+                );
             }
         }
     }
@@ -108,22 +114,18 @@ class VaPaymentExpired extends AbstractGenerate
      */
     protected function getOrders()
     {
-        $allowMethods = $this->settingHelper->getConfigValue('sm_notification/generate/va_payment');
+        $allowMethods = $this->configHelper->getVaPaymentList();
 
         if (empty($allowMethods)) {
             return [];
         }
 
-        $allowMethods = explode(',', $allowMethods);
         $date = $this->timezone->date(new \DateTime());
         $current = $date->format('Y-m-d H:i:s');
         $allowStatus = [
             'canceled',
             'closed',
-            $this->settingHelper->getConfigValue(
-                \Trans\Sprint\Helper\Config::GENERAL_NEW_ORDER_STATUS,
-                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
-            ) ?: 'pending',
+            $this->configHelper->getOrderPendingStatus() ?: 'pending',
         ];
 
         $coll = $this->orderCollFact->create();
@@ -155,7 +157,7 @@ class VaPaymentExpired extends AbstractGenerate
     protected function createNotify($order)
     {
         $title = 'Sorry, your order has been cancelled.';
-        $content = 'Order ID/%1 has passed the payment due time.';
+        $content = 'Order %1 has passed the payment due time.';
         $params = [
             'content' => [
                 $order->getIncrementId(),
@@ -177,30 +179,8 @@ class VaPaymentExpired extends AbstractGenerate
                 )
             )->setParams($params);
 
-        $setting = $this->settingHelper->getCustomerSetting($order->getCustomerId());
-        $isSendMail = in_array(
-            $this->settingHelper->generateSettingCode(
-                \SM\Notification\Model\Notification::EVENT_ORDER_STATUS,
-                'email'
-            ),
-            $setting
-        );
-        $isPush = in_array(
-            $this->settingHelper->generateSettingCode(
-                \SM\Notification\Model\Notification::EVENT_ORDER_STATUS,
-                'push'
-            ),
-            $setting
-        );
-        $isSms = in_array(
-            $this->settingHelper->generateSettingCode(
-                \SM\Notification\Model\Notification::EVENT_ORDER_STATUS,
-                'sms'
-            ),
-            $setting
-        );
-
-        if ($isPush) {
+        $this->eventSetting->init($order->getCustomerId(), \SM\Notification\Model\Notification::EVENT_ORDER_STATUS);
+        if ($this->eventSetting->isPush()) {
             $this->emulation->startEnvironmentEmulation(
                 $order->getStoreId(),
                 \Magento\Framework\App\Area::AREA_FRONTEND,
@@ -213,8 +193,8 @@ class VaPaymentExpired extends AbstractGenerate
             $this->emulation->stopEnvironmentEmulation();
         }
 
-        if ($isSendMail) {
-            // todo email
+        if ($this->eventSetting->isEmail()) {
+            // set email
 //            $notification->setEmailTemplate(
 //                $this->emailHelper->getExpiredTemplateId($order->getStoreId())
 //            )->setEmailParams([
@@ -222,9 +202,8 @@ class VaPaymentExpired extends AbstractGenerate
 //            ]);
         }
 
-        if ($isSms) {
-            // todo sms content
-//            $notification->setSms('');
+        if ($this->eventSetting->isSms()) {
+            // set sms
         }
 
         $this->notificationResource->save($notification);

@@ -51,7 +51,7 @@ namespace SM\Notification\Model;
  * @method Notification setCreatedAt($date)
  * @method string getCreatedAt()
  * @method Notification setParams($params)
- * @method int[]|string getParams()
+ * @method array|string getParams()
  * @method Notification setEmailParams($params)
  * @method int[]|string getEmailParams()
  * @method Notification setCustomerIds($ids)

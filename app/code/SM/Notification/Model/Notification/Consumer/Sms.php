@@ -52,7 +52,10 @@ class Sms extends AbstractConsumer
             $this->reSyncUpdate($request->getId());
             $this->logError(
                 "Consumer `SMS` Error:\n\t" . $e->getMessage() . "\n",
-                $request->getData()
+                [
+                    'data'  => $request->getData(),
+                    'trace' => $e->getTrace(),
+                ]
             );
         }
     }

@@ -37,6 +37,11 @@ class Updater
     protected $stateHelper;
 
     /**
+     * @var \Magento\Framework\Event\ManagerInterface
+     */
+    protected $eventManager;
+
+    /**
      * @var int
      */
     private $parentId;
@@ -65,15 +70,18 @@ class Updater
 
     /**
      * OrderPlugin constructor.
-     * @param OrderCollectionFactory $orderCollectionFactory
-     * @param OrderFactory $orderFactory
-     * @param OrderResource $orderResource
-     * @param StatusState $stateHelper
-     * @param LoggerInterface $logger
-     * @param ResourceConnection $resourceConnection
-     * @param DateTime $dateTime
+     *
+     * @param \Magento\Framework\Event\ManagerInterface $eventManager
+     * @param OrderCollectionFactory                    $orderCollectionFactory
+     * @param OrderFactory                              $orderFactory
+     * @param OrderResource                             $orderResource
+     * @param StatusState                               $stateHelper
+     * @param LoggerInterface                           $logger
+     * @param ResourceConnection                        $resourceConnection
+     * @param DateTime                                  $dateTime
      */
     public function __construct(
+        \Magento\Framework\Event\ManagerInterface $eventManager,
         OrderCollectionFactory $orderCollectionFactory,
         OrderFactory $orderFactory,
         OrderResource $orderResource,
@@ -89,6 +97,7 @@ class Updater
         $this->logger = $logger;
         $this->resourceConnection = $resourceConnection;
         $this->dateTime = $dateTime;
+        $this->eventManager = $eventManager;
     }
 
     /**
@@ -134,6 +143,10 @@ class Updater
 
             $connection->insert($saleOrderStatusHistory, $data);
             $connection->commit();
+            $this->eventManager->dispatch(
+                'sm_sales_order_status_update',
+                ['order' => $order]
+            );
             $this->updateParentOrderStatus($order);
         } catch (\Exception $exception) {
             $connection->rollBack();

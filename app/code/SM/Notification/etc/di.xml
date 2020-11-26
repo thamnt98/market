@@ -80,4 +80,8 @@
         <plugin name="SM_Notification::SprintPaymentNotify"
                 type="SM\Notification\Plugin\Trans_Sprint\Model\PaymentNotify" />
     </type>
+    <type name="\Magento\SalesRule\Model\ResourceModel\Coupon">
+        <plugin name="SM_Notification::CouponResourcePlugin"
+                type="SM\Notification\Plugin\Magento_SalesRule\Model\ResourceModel\Coupon" />
+    </type>
 </config>

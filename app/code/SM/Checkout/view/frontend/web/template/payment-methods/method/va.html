@@ -9,7 +9,7 @@
         </span>
         <div class="info-card">
             <h4 data-bind="i18n: 'Virtual Account'"></h4>
-            <p data-bind="i18n: 'BCA & Bank Mega'"></p>
+            <p data-bind="i18n: 'BCA, Bank Mega & Permata Bank'"></p>
             <!-- ko if: invalidMinimumAmount('virtual_account')==false -->
             <div class="select-bank hidden" data-href="payment-method-options" data-id="payment-method-va">
                 <div class="sortby-dropdown">
@@ -21,7 +21,7 @@
                     <ul class="dropdown">
                         <!-- ko foreach: { data: getListPaymentVirtualAccount(), as: 'payment'} -->
                         <li  data-bind="click: () => {$parent.setPaymentMethod(payment.method)}, class: 'item'">
-                            <img data-bind="attr:{src: $parent.getPaymentLogo(payment.method), height: 24, width:24,class:'icon-card'}"/><span
+                            <img data-bind="attr:{src: $parent.getPaymentLogo(payment.method), width:24,class:'icon-card'}"/><span
                                 data-bind="click:$parent.selectOption, text:payment.title,attr:{'data-id':payment.method}" data-href="option-selected-va"></span></li>
                         <!-- /ko -->
                     </ul>

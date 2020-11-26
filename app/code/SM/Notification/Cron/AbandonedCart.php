@@ -30,7 +30,8 @@ class AbandonedCart extends AbstractGenerate
      * @param \Magento\Framework\Filesystem                     $filesystem
      * @param \Magento\Store\Model\App\Emulation                $emulation
      * @param \Magento\Catalog\Api\ProductRepositoryInterface   $productRepository
-     * @param \SM\Notification\Helper\CustomerSetting           $settingHelper
+     * @param \SM\Notification\Model\EventSetting               $eventSetting
+     * @param \SM\Notification\Helper\Config                    $configHelper
      * @param \SM\Notification\Model\NotificationFactory        $notificationFactory
      * @param \SM\Notification\Model\ResourceModel\Notification $notificationResource
      * @param \Magento\Framework\App\ResourceConnection         $resourceConnection
@@ -42,7 +43,8 @@ class AbandonedCart extends AbstractGenerate
         \Magento\Framework\Filesystem $filesystem,
         \Magento\Store\Model\App\Emulation $emulation,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
-        \SM\Notification\Helper\CustomerSetting $settingHelper,
+        \SM\Notification\Model\EventSetting $eventSetting,
+        \SM\Notification\Helper\Config $configHelper,
         \SM\Notification\Model\NotificationFactory $notificationFactory,
         \SM\Notification\Model\ResourceModel\Notification $notificationResource,
         \Magento\Framework\App\ResourceConnection $resourceConnection,
@@ -51,7 +53,8 @@ class AbandonedCart extends AbstractGenerate
         parent::__construct(
             $filesystem,
             $emulation,
-            $settingHelper,
+            $eventSetting,
+            $configHelper,
             $notificationFactory,
             $notificationResource,
             $resourceConnection,
@@ -87,7 +90,10 @@ class AbandonedCart extends AbstractGenerate
                     );
                 }
             } catch (\Exception $e) {
-                $this->logger->error("Notification Abandoned_Cart_One_Hour create failed: \n\t" . $e->getMessage());
+                $this->logger->error(
+                    "Notification Abandoned_Cart_One_Hour create failed: \n\t" . $e->getMessage(),
+                    $e->getTrace()
+                );
             }
         }
     }
@@ -150,8 +156,7 @@ class AbandonedCart extends AbstractGenerate
      */
     protected function getAbandonedCart()
     {
-        $time = (int)$this->settingHelper->getConfigValue('sm_notification/generate/abandoned_cart_time');
-
+        $time = $this->configHelper->getAbandonedCartHour();
         $selectLatestDate =$this->connection->select();
         $selectLatestDate->from('quote_item', 'qty_updated_at')
             ->where('quote_id = q.entity_id')

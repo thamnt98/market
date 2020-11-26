@@ -18,7 +18,7 @@ namespace SM\VesMenu\Setup\Patch\Data;
 
 class GtmConfigCategoryClick implements \Magento\Framework\Setup\Patch\DataPatchInterface
 {
-    const VERSION = '0.0.1';
+    const VERSION = '0.0.2';
 
     /**
      * @var \Magento\Framework\Setup\ModuleDataSetupInterface
@@ -51,27 +51,27 @@ class GtmConfigCategoryClick implements \Magento\Framework\Setup\Patch\DataPatch
     {
         $this->setup->startSetup();
 
-        $handler = 'default';
-        $key = 'categories_click';
-        $trigger = [
-            'event'    => 'click',
-            'selector' => '[data-gtm-event="' . $key . '"]'
-        ];
-        $templateDate = [
-            'event'          => $key,
-            'uniqueUserID'   => '<%= customer.uniqueUserID; %>',
-            'userID'         => '<%= customer.userID; %>',
-            'customerID'     => '<%= customer.customerID; %>',
-            'customerType'   => '<%= customer.customerType; %>',
-            'loyalty'        => '<%= customer.loyalty; %>',
-            'customerStatus' => '<%= customer.customerStatus; %>',
-            'loginType'      => '<%= customer.loginType; %>',
-            'menu_category'  => '<%= category.menu_category; %>',
-            'store_name'     => '<%= customer.storeName; %>',
-            'store_ID'       => '<%= customer.storeID; %>'
-        ];
-
-        $this->gtmSetup->add($handler, $trigger, $key, $templateDate);
+//        $handler = 'default';
+//        $key = 'categories_click';
+//        $trigger = [
+//            'event'    => 'click',
+//            'selector' => '[data-gtm-event="' . $key . '"]'
+//        ];
+//        $templateDate = [
+//            'event'          => $key,
+//            'uniqueUserID'   => '<%= customer.uniqueUserID; %>',
+//            'userID'         => '<%= customer.userID; %>',
+//            'customerID'     => '<%= customer.customerID; %>',
+//            'customerType'   => '<%= customer.customerType; %>',
+//            'loyalty'        => '<%= customer.loyalty; %>',
+//            'customerStatus' => '<%= customer.customerStatus; %>',
+//            'loginType'      => '<%= customer.loginType; %>',
+//            'menu_category'  => '<%= category.menu_category; %>',
+//            'store_name'     => '<%= customer.storeName; %>',
+//            'store_ID'       => '<%= customer.storeID; %>'
+//        ];
+//
+//        $this->gtmSetup->add($handler, $trigger, $key, $templateDate);
 
         $this->setup->endSetup();
     }

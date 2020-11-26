@@ -25,11 +25,6 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
     const TRIGGER_EVENT_ORDER_COMPLETE        = 'order_complete';
 
     /**
-     * @var \SM\Notification\Helper\CustomerSetting
-     */
-    protected $settingHelper;
-
-    /**
      * @var \SM\Notification\Model\NotificationFactory
      */
     protected $notifyFactory;
@@ -60,36 +55,51 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
     protected $helper;
 
     /**
+     * @var \SM\Notification\Model\EventSetting
+     */
+    protected $setting;
+
+    /**
+     * @var \Magento\Store\Model\App\Emulation
+     */
+    protected $emulation;
+
+    /**
      * SaveAfter constructor.
      *
      * @param Helper                                            $helper
+     * @param \Magento\Store\Model\App\Emulation                $emulation
      * @param \SM\Sales\Helper\Data                             $orderHelper
+     * @param \SM\Notification\Model\EventSetting               $setting
      * @param \SM\Notification\Model\TriggerEventFactory        $triggerEventFactory
-     * @param \SM\Notification\Helper\CustomerSetting           $settingHelper
      * @param \SM\Notification\Model\NotificationFactory        $notifyFactory
      * @param \SM\Notification\Model\ResourceModel\Notification $notificationResource
      * @param \Magento\Framework\Logger\Monolog|null            $logger
      */
     public function __construct(
         Helper $helper,
+        \Magento\Store\Model\App\Emulation $emulation,
         \SM\Sales\Helper\Data $orderHelper,
+        \SM\Notification\Model\EventSetting $setting,
         \SM\Notification\Model\TriggerEventFactory $triggerEventFactory,
-        \SM\Notification\Helper\CustomerSetting $settingHelper,
         \SM\Notification\Model\NotificationFactory $notifyFactory,
         \SM\Notification\Model\ResourceModel\Notification $notificationResource,
         \Magento\Framework\Logger\Monolog $logger = null
     ) {
-        $this->settingHelper = $settingHelper;
         $this->notifyFactory = $notifyFactory;
         $this->logger = $logger;
         $this->triggerEventFactory = $triggerEventFactory;
         $this->orderHelper = $orderHelper;
         $this->notificationResource = $notificationResource;
         $this->helper = $helper;
+        $this->setting = $setting;
+        $this->emulation = $emulation;
     }
 
     /**
      * @param \Magento\Framework\Event\Observer $observer
+     *
+     * @return int
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
@@ -101,12 +111,14 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
             if ($order->getIsVirtual()) {
                 return $this->createNotifyForDigital($order);
             } elseif ($order->getData('is_parent') ||
+                !$order->getCustomerId() ||
                 $status === $order->getOrigData(\Magento\Sales\Model\Order::STATUS)
             ) {
-                return;
+                return 0;
             }
 
             $event = '';
+            $this->setting->init($order->getCustomerId(), \SM\Notification\Model\Notification::EVENT_ORDER_STATUS);
             switch ($status) {
                 case \Magento\Sales\Model\Order::STATE_COMPLETE:
                     $event = self::TRIGGER_EVENT_ORDER_COMPLETE;
@@ -134,7 +146,10 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
             }
         } catch (\Exception $e) {
             if ($this->logger) {
-                $this->logger->error("Cannot save notification : order status - {$status}\n" . $e->getMessage());
+                $this->logger->error(
+                    "Cannot save notification : order status - {$status}\n" . $e->getMessage(),
+                    $e->getTrace()
+                );
             }
         }
     }
@@ -151,7 +166,10 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
             ])->save();
         } catch (\Exception $e) {
             if ($this->logger) {
-                $this->logger->error("Cannot save trigger event : {$event}\n" . $e->getMessage());
+                $this->logger->error(
+                    "Cannot save trigger event : {$event}\n" . $e->getMessage(),
+                    $e->getTrace()
+                );
             }
         }
     }
@@ -174,23 +192,21 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
             return 0;
         }
 
-        /** @var \SM\Notification\Model\Notification $notify */
-        $notify = $this->notifyFactory->create();
-        $notify->setTitle('Order ID/%1 has been completed!')
-            ->setContent('Hope you love your shopping experience with Transmart.')
-            ->setImage($this->helper->getMediaPathImage(Helper::XML_IMAGE_ORDER_STATUS_COMPLETED, $order->getStoreId()))
-            ->setEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
-            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
-            ->setPushTitle(__('Order ID/%1 has been completed!', [$order->getIncrementId()]))
-            ->setPushContent(__('Hope you love your shopping experience with Transmart.'))
-            ->setCustomerIds([$order->getCustomerId()])
-            ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_ORDER_DETAIL)
-            ->setRedirectId($order->getData('parent_order') ? $order->getData('parent_order') : $order->getId())
-            ->setParams([
-                'title' => [
-                    $order->getIncrementId(),
-                ],
-            ]);
+        $title = 'Order %1 has been completed!';
+        $content = 'Hope you love your shopping experience with Transmart.';
+        $params = [
+            'title' => [
+                $order->getData('reference_order_id'),
+            ],
+        ];
+
+        $notify = $this->initNotification($order);
+        $notify->setTitle($title)
+            ->setContent($content)
+            ->setImage(
+                $this->helper->getMediaPathImage(Helper::XML_IMAGE_ORDER_STATUS_COMPLETED, $order->getStoreId())
+            )->setParams($params);
+        $this->addNotificationAdditional($notify, $order);
 
         $this->notificationResource->save($notify);
 
@@ -209,29 +225,28 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
             return 0;
         }
 
-        /** @var \SM\Notification\Model\Notification $notify */
-        $notify = $this->notifyFactory->create();
-        $notify->setTitle('Order ID/%1 is on its way!')
-            ->setContent('Check the delivery status in My Order page.')
-            ->setEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
-            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
-            ->setPushTitle(__('Order ID/%1 is on its way!', [$order->getIncrementId()]))
-            ->setPushContent(__('Check the delivery status in My Order page.'))
-            ->setCustomerIds([$order->getCustomerId()])
-            ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_ORDER_DETAIL)
-            ->setRedirectId($order->getData('parent_order') ? $order->getData('parent_order') : $order->getId())
+        $title = 'Order %1 is on its way!';
+        $content = 'Check the delivery status in My Order page.';
+        $params = [
+            'title' => [
+                $order->getData('reference_order_id'),
+            ],
+        ];
+
+        $notify = $this->initNotification($order);
+        $notify->setTitle($title)
+            ->setContent($content)
             ->setImage(
                 $this->helper->getMediaPathImage(
                     Helper::XML_IMAGE_ORDER_STATUS_IN_DELIVERY,
                     $order->getStoreId()
                 )
-            )->setParams([
-                'title' => [
-                    $order->getIncrementId(),
-                ],
-            ]);
+            )->setParams($params);
+        $this->addNotificationAdditional($notify, $order);
 
         $this->notificationResource->save($notify);
+
+        return $notify->getId();
     }
 
     /**
@@ -243,40 +258,33 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
     public function generateDeliveredData($order)
     {
         if ($order->getShippingMethod() !== \SM\Checkout\Model\MultiShippingHandle::STORE_PICK_UP) {
-            $title = '%1, order ID/%2 has been delivered to your address.';
+            $title = '%1, order %2 has been delivered to your address.';
             $content = 'Tap here to confirm your order delivery.';
             $params = [
                 'title'   => [
                     $order->getCustomerName(),
-                    $order->getIncrementId()
+                    $order->getData('reference_order_id')
                 ],
             ];
         } else {
             $source = $this->orderHelper->getOrderStorePickup($order);
-            $title = '%1, thank you for picking up order ID/%2 at %3 Enjoy your products!';
+            $title = '%1, thank you for picking up order %2 at %3 Enjoy your products!';
             $content = '';
             $params = [
                 'title' => [
                     $order->getCustomerName(),
-                    $order->getIncrementId(),
+                    $order->getData('reference_order_id'),
                     $source ? $source->getName() : '',
                 ],
             ];
         }
 
-        /** @var \SM\Notification\Model\Notification $notify */
-        $notify = $this->notifyFactory->create();
+        $notify = $this->initNotification($order);
         $notify->setTitle($title)
-            ->setEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
-            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
-            ->setPushTitle(__($title, $params['title']))
             ->setContent($content)
             ->setImage($this->helper->getMediaPathImage(Helper::XML_IMAGE_ORDER_STATUS_DELIVERED, $order->getStoreId()))
-            ->setPushContent(__($content, $params['content'] ?? []))
-            ->setCustomerIds([$order->getCustomerId()])
-            ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_ORDER_DETAIL)
-            ->setRedirectId($order->getData('parent_order') ? $order->getData('parent_order') : $order->getId())
             ->setParams($params);
+        $this->addNotificationAdditional($notify, $order);
 
         $this->notificationResource->save($notify);
 
@@ -303,38 +311,29 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
             return 0;
         }
 
-        /** @var \SM\Notification\Model\Notification $notify */
-        $notify = $this->notifyFactory->create();
         $source = $this->orderHelper->getOrderStorePickup($order);
-        $notify->setTitle('%1, your order is ready to be picked up.')
-            ->setContent('Please visit %1 to collect order ID/%2.')
-            ->setEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
-            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
-            ->setPushTitle(__('%1, your order is ready to be picked up.', [$order->getCustomerName()]))
-            ->setPushContent(__(
-                'Please visit %1 to collect order ID/%2.',
-                [
-                    $source ? $source->getName() : '',
-                    $order->getIncrementId(),
-                ]
-            ))
-            ->setCustomerIds([$order->getCustomerId()])
-            ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_ORDER_DETAIL)
-            ->setRedirectId($order->getData('parent_order') ? $order->getData('parent_order') : $order->getId())
+        $title = '%1, your order is ready to be picked up.';
+        $content = 'Please visit %1 to collect order %2.';
+        $params = [
+            'title'   => [
+                $order->getCustomerName(),
+            ],
+            'content' => [
+                $source ? $source->getName() : '',
+                $order->getData('reference_order_id'),
+            ],
+        ];
+
+        $notify = $this->initNotification($order);
+        $notify->setTitle($title)
+            ->setContent($content)
             ->setImage(
                 $this->helper->getMediaPathImage(
                     Helper::XML_IMAGE_ORDER_STATUS_READY_TO_PICKUP,
                     $order->getStoreId()
                 )
-            )->setParams([
-                'title'   => [
-                    $order->getCustomerName(),
-                ],
-                'content' => [
-                    $source ? $source->getName() : '',
-                    $order->getIncrementId(),
-                ],
-            ]);
+            )->setParams($params);
+        $this->addNotificationAdditional($notify, $order);
 
         $this->notificationResource->save($notify);
 
@@ -344,6 +343,7 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
     /**
      * @param \Magento\Sales\Model\Order $order
      *
+     * @return int
      * @throws \Magento\Framework\Exception\AlreadyExistsException
      */
     public function createNotifyForDigital($order)
@@ -351,48 +351,88 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
         if (!$order->getData('digital_transaction_fail') ||
             $order->getData('digital_transaction_fail') == $order->getOrigData('digital_transaction_fail')
         ) {
-            return;
+            return 0;
         }
 
         /** @var \Magento\Sales\Model\Order\Item $item */
         $item = $order->getItemsCollection()->getFirstItem();
         $buyRequest = $item->getProductOptionByCode('info_buyRequest') ?? [];
         if (empty($buyRequest[Digital::DIGITAL])) {
-            return;
+            return 0;
         }
 
-        /** @var \SM\Notification\Model\Notification $notify */
-        $notify = $this->notifyFactory->create();
-        $notify->setTitle('Sorry, your %1 transaction has been cancelled.')
-            ->setContent(
-                "Your bill payment ID/%1 failed due to system problem." .
-                " We will refund your payment in nx24 hours"
-            )
-            ->setEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
-            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
-            ->setPushTitle(__(
-                'Sorry, your %1 transaction has been cancelled.',
-                [$buyRequest[Digital::DIGITAL][DigitalProduct::SERVICE_TYPE] ?? '']
-            ))
-            ->setPushContent(__(
-                "Your bill payment ID/%1 failed due to system problem." .
-                " We will refund your payment in nx24 hours",
-                [
-                    $order->getIncrementId(),
-                ]
-            ))
-            ->setCustomerIds([$order->getCustomerId()])
-            ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_ORDER_DETAIL)
-            ->setRedirectId($order->getData('parent_order') ? $order->getData('parent_order') : $order->getId())
-            ->setParams([
-                'title'   => [
-                    $buyRequest[Digital::DIGITAL][DigitalProduct::SERVICE_TYPE] ?? '',
-                ],
-                'content' => [
-                    $order->getIncrementId(),
-                ],
-            ]);
+        $title = 'Sorry, your %1 transaction has been cancelled.';
+        $content = 'Your bill payment %1 failed due to system problem.' .
+            ' We will refund your payment in nx24 hours';
+        $params = [
+            'title'   => [
+                $buyRequest[Digital::DIGITAL][DigitalProduct::SERVICE_TYPE] ?? '',
+            ],
+            'content' => [
+                $order->getData('reference_order_id'),
+            ],
+        ];
+
+        $notify = $this->initNotification($order);
+        $notify->setTitle($title)
+            ->setContent($content)
+            ->setParams($params);
+        $this->addNotificationAdditional($notify, $order);
 
         $this->notificationResource->save($notify);
+
+        return (int) $notify->getId();
+    }
+
+    /**
+     * @param \Magento\Sales\Model\Order $order
+     *
+     * @return \SM\Notification\Model\Notification
+     */
+    protected function initNotification($order)
+    {
+        /** @var \SM\Notification\Model\Notification $notification */
+        $notification = $this->notifyFactory->create();
+        $notification->setEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
+            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
+            ->setCustomerIds([$order->getCustomerId()])
+            ->setRedirectId($order->getData('parent_order') ? $order->getData('parent_order') : $order->getId())
+            ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_ORDER_DETAIL);
+
+        return $notification;
+    }
+
+    /**
+     * @param \SM\Notification\Model\Notification $notify
+     * @param \Magento\Sales\Model\Order          $order
+     * @param int|string|null                     $email
+     * @param string|null                         $sms
+     */
+    protected function addNotificationAdditional($notify, $order, $email = null, $sms = null)
+    {
+        $this->emulation->startEnvironmentEmulation(
+            $order->getStoreId(),
+            \Magento\Framework\App\Area::AREA_FRONTEND,
+            true
+        );
+
+        $params = $notify->getParams() ?: [];
+        if ($this->setting->isPush()) {
+            $notify->setPushTitle(__($notify->getTitle(), $params['title'] ?? [])->__toString())
+                ->setPushContent(__($notify->getContent(), $params['content'] ?? [])->__toString());
+        }
+
+        if ($this->setting->isEmail() && $email) {
+            $notify->setEmailTemplate($email)
+                ->setEmailParams([
+                    \SM\Notification\Model\Notification\Consumer\Email::EMAIL_PARAM_ORDER_KEY => $order->getId(),
+                ]);
+        }
+
+        if ($this->setting->isSms() && $sms) {
+            $notify->setSms(__($sms)->__toString());
+        }
+
+        $this->emulation->stopEnvironmentEmulation();
     }
 }

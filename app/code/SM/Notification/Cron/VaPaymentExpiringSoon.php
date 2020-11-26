@@ -42,7 +42,8 @@ class VaPaymentExpiringSoon extends AbstractGenerate
      * @param \Trans\Sprint\Model\ResourceModel\SprintResponse\CollectionFactory $sprintResponseCollFact
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface               $timezone
      * @param \Magento\Store\Model\App\Emulation                                 $emulation
-     * @param \SM\Notification\Helper\CustomerSetting                            $settingHelper
+     * @param \SM\Notification\Model\EventSetting                                $eventSetting
+     * @param \SM\Notification\Helper\Config                                     $configHelper
      * @param \SM\Notification\Model\NotificationFactory                         $notificationFactory
      * @param \SM\Notification\Model\ResourceModel\Notification                  $notificationResource
      * @param \Magento\Framework\App\ResourceConnection                          $resourceConnection
@@ -56,7 +57,8 @@ class VaPaymentExpiringSoon extends AbstractGenerate
         \Trans\Sprint\Model\ResourceModel\SprintResponse\CollectionFactory $sprintResponseCollFact,
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
         \Magento\Store\Model\App\Emulation $emulation,
-        \SM\Notification\Helper\CustomerSetting $settingHelper,
+        \SM\Notification\Model\EventSetting $eventSetting,
+        \SM\Notification\Helper\Config $configHelper,
         \SM\Notification\Model\NotificationFactory $notificationFactory,
         \SM\Notification\Model\ResourceModel\Notification $notificationResource,
         \Magento\Framework\App\ResourceConnection $resourceConnection,
@@ -65,7 +67,8 @@ class VaPaymentExpiringSoon extends AbstractGenerate
         parent::__construct(
             $filesystem,
             $emulation,
-            $settingHelper,
+            $eventSetting,
+            $configHelper,
             $notificationFactory,
             $notificationResource,
             $resourceConnection,
@@ -102,7 +105,10 @@ class VaPaymentExpiringSoon extends AbstractGenerate
                     );
                 }
             } catch (\Exception $e) {
-                $this->logger->error("Notification Payment Expiring Soon create failed: \n\t" . $e->getMessage());
+                $this->logger->error(
+                    "Notification Payment Expiring Soon create failed: \n\t" . $e->getMessage(),
+                    $e->getTrace()
+                );
             }
         }
     }
@@ -129,7 +135,7 @@ class VaPaymentExpiringSoon extends AbstractGenerate
         }
 
         $title = "Hurry, It's time to make your payment.";
-        $message = 'Order ID/%1 is waiting for your payment. The time is due by %2.';
+        $message = 'Order %1 is waiting for your payment. The time is due by %2.';
         $params = [
             'content' => [
                 $sprintItem->getData('increment_id'),
@@ -169,14 +175,13 @@ class VaPaymentExpiringSoon extends AbstractGenerate
      */
     protected function getRecords()
     {
-        $allowMethods = $this->settingHelper->getConfigValue('sm_notification/generate/va_payment');
+        $allowMethods = $this->configHelper->getVaPaymentList();
 
         if (empty($allowMethods)) {
             return [];
         }
 
-        $allowMethods = explode(',', $allowMethods);
-        $stepTime = (int) $this->settingHelper->getConfigValue('sm_notification/generate/payment_expiring_soon_time');
+        $stepTime = $this->configHelper->getVaPaymentExpiringMinute();
         if ($stepTime < 1) {
             return [];
         }

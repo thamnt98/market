@@ -33,14 +33,15 @@ class Email extends AbstractConsumer
 
     /**
      * Email constructor.
+     *
      * @param \Magento\Customer\Model\ResourceModel\Online\Grid\CollectionFactory $customerOnlineCollFact
-     * @param \SM\Notification\Helper\CustomerSetting $settingHelper
-     * @param \Magento\Framework\App\ResourceConnection $resourceConnection
-     * @param \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
+     * @param \SM\Notification\Helper\CustomerSetting                             $settingHelper
+     * @param \Magento\Framework\App\ResourceConnection                           $resourceConnection
+     * @param \Magento\Customer\Api\CustomerRepositoryInterface                   $customerRepository
      * @param \Trans\IntegrationNotification\Api\IntegrationNotificationInterface $integrationNotification
-     * @param \SM\Notification\Helper\Generate\Email $helper
-     * @param \Magento\Sales\Model\OrderRepository $orderRepository
-     * @param \Magento\Framework\Logger\Monolog $logger
+     * @param \SM\Notification\Helper\Generate\Email                              $helper
+     * @param \Magento\Sales\Model\OrderRepository                                $orderRepository
+     * @param \Magento\Framework\Logger\Monolog                                   $logger
      */
     public function __construct(
         \Magento\Customer\Model\ResourceModel\Online\Grid\CollectionFactory $customerOnlineCollFact,
@@ -104,7 +105,10 @@ class Email extends AbstractConsumer
             $this->reSyncUpdate($request->getId());
             $this->logError(
                 "Consumer `Email` Error:\n\t" . $e->getMessage() . "\n",
-                $request->getData()
+                [
+                    'data'  => $request->getData(),
+                    'trace' => $e->getTrace(),
+                ]
             );
         }
     }
