@@ -19,12 +19,12 @@
             <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_ims_save_store" instance="Trans\IntegrationEntity\Cron\Ims\Save\StoreSave" method="execute">
-            <schedule>* 23 * * *</schedule>
+            <schedule>* 16 * * *</schedule>
         </job>
     </group>
     <group id="assign_sources">
         <job name="assign_ready_sources" instance="Trans\IntegrationEntity\Cron\Ims\Save\AssignSource" method="execute">
-            <schedule>* 23 * * *</schedule>
+            <schedule>* 16 * * *</schedule>
         </job>
     </group>
     <group id="pim_product_attribute">
@@ -35,7 +35,7 @@
             <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_save_product_attribute" instance="Trans\IntegrationEntity\Cron\Pim\Save\ProductAttribute" method="execute">
-            <schedule>* 1 * * *</schedule>
+            <schedule>* 18 * * *</schedule>
         </job>
     </group>
     <group id="pim_product_attribute_set">
@@ -46,7 +46,7 @@
             <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_save_product_attribute_set" instance="Trans\IntegrationEntity\Cron\Pim\Save\ProductAttributeSet" method="execute">
-            <schedule>* 2 * * *</schedule>
+            <schedule>* 19 * * *</schedule>
         </job>
     </group>
 </config>
