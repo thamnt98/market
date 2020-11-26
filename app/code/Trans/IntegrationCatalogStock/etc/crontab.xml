@@ -26,7 +26,7 @@
             <schedule>* * * * *</schedule>
         </job>
         <job name="integration_ims_save_product_stock" instance="Trans\IntegrationCatalogStock\Cron\Ims\Save\Stock" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/30 * * * *</schedule>
         </job>
     </group>
 

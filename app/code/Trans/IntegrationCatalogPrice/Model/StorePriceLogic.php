@@ -277,12 +277,16 @@ class StorePriceLogic implements StorePriceLogicInterface {
 					
 					if(isset($value['sku'])){
 						// Check Store Exist
+						$this->logger->info('Before get inventory store ' . date('d-M-Y H:i:s'));
 						$storeQuery[$i] = $this->storePriceRepositoryInterface->getInventoryStore($value['store_code']);
-						
+						$this->logger->info('After get inventory store ' . date('d-M-Y H:i:s'));
+
 						if (!$storeQuery[$i]) {
 							try {
+								$this->logger->info('Before add new store ' . date('d-M-Y H:i:s'));
 								$this->integrationStock->addNewSource($value['store_code']);
 								$storeQuery[$i] = $this->storePriceRepositoryInterface->getInventoryStore($value['store_code']);
+								$this->logger->info('After add new store ' . date('d-M-Y H:i:s'));
 							} catch (CouldNotSaveException $e) {
 								$this->updateDataValueStatus($row['id'],IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE,"Error : Store " . $value['store_code']." is Not  Available - ");
 							}
@@ -360,6 +364,7 @@ class StorePriceLogic implements StorePriceLogicInterface {
 			
 			// $productIds[$index] = $query[$index]->getMagentoEntityId();
 			try {
+				$this->logger->info('Before get product ' . date('d-M-Y H:i:s'));
 				$productInterface[$index] = $this->productRepositoryInterface->get($sku);
 				if($productInterface[$index] instanceof \Magento\Catalog\Api\Data\ProductInterface) {
 					$product = $productInterface[$index];
@@ -368,6 +373,7 @@ class StorePriceLogic implements StorePriceLogicInterface {
 					$isOwnCourier = strtolower($product->getData('own_courier'));
 					$soldIn = strtolower($product->getData('sold_in'));
 				}
+				$this->logger->info('After get product ' . date('d-M-Y H:i:s'));
 			} catch (\Exception $exception) {
 				foreach ($data as $valueX) {
 					$msgError[] = $exception->getMessage();
@@ -384,7 +390,9 @@ class StorePriceLogic implements StorePriceLogicInterface {
 			try{
 				foreach ($data as $value) {
 					try {
+						$this->logger->info('Before validate store price ' . date('d-M-Y H:i:s'));
 						$productMapingData[$sku][$indexO] = $this->validateStorePrice($this->validateParams($value));
+						$this->logger->info('After validate store price ' . date('d-M-Y H:i:s'));
 					} catch (StateException $e) {
 						$msgError[] = $e->getMessage();
 						$this->updateDataValueStatus($value['data_id'], IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE, $e->getMessage());
@@ -433,41 +441,57 @@ class StorePriceLogic implements StorePriceLogicInterface {
 					$indexO++;
 					
 					try {
+						$this->logger->info('Before load data by sku ' . date('d-M-Y H:i:s'));
 						$querySkuOnline = $this->onlinePriceRepositoryInterface->loadDataBySku($value['sku']);
+						$this->logger->info('After load data by sku ' . date('d-M-Y H:i:s'));
 						$value['custom_status'] = false;
 						if ($value['is_exclusive'] == 1) {
 							if ($querySkuOnline) {
 								$value['custom_status'] = true;
 								if ($querySkuOnline->getIsExclusive() == 1) {
 									// update custom table
+									$this->logger->info('Before save online price custom ' . date('d-M-Y H:i:s'));
 									$this->saveOnlinePriceCustom($this->validateParams($value));
+									$this->logger->info('After save online price custom ' . date('d-M-Y H:i:s'));
 								}
 								if ($querySkuOnline->getIsExclusive() == 0) {
 									// delete staging content
+									$this->logger->info('Before delete staging update ' . date('d-M-Y H:i:s'));
 									$deleteStagingUpdate = $this->updateRepositoryInterface->get($querySkuOnline->getStagingId()); 
 									$this->updateRepositoryInterface->delete($deleteStagingUpdate);
+									$this->logger->info('After delete staging update ' . date('d-M-Y H:i:s'));
 
 									// update custom table
+									$this->logger->info('Before update save online price custom ' . date('d-M-Y H:i:s'));
 									$this->saveOnlinePriceCustom($this->validateParams($value));
+									$this->logger->info('After save online price custom ' . date('d-M-Y H:i:s'));
 								}
 							}
 							else {
+								$this->logger->info('Before save online price custom ' . date('d-M-Y H:i:s'));
 								$this->saveOnlinePriceCustom($this->validateParams($value));
+								$this->logger->info('After save online price custom ' . date('d-M-Y H:i:s'));
 							}
 						}
 
 						if ($value['is_exclusive'] == 0) {
 							if ($querySkuOnline) {
 								if (empty($querySkuOnline->getStagingId())) {
+									$this->logger->info('Before save online price custom ' . date('d-M-Y H:i:s'));
 									$scheduleF = $this->saveStagingUpdate($this->validateParams($value));
 									$value['staging_id'] = $scheduleF;
+									$this->logger->info('After save online price custom ' . date('d-M-Y H:i:s'));
 								}
 							}
 							else {
+								$this->logger->info('Before save staging update ' . date('d-M-Y H:i:s'));
 								$scheduleF = $this->saveStagingUpdate($this->validateParams($value));
 								$value['staging_id'] = $scheduleF;
+								$this->logger->info('After save staging update ' . date('d-M-Y H:i:s'));
 
+								$this->logger->info('Before save online price custom ' . date('d-M-Y H:i:s'));
 								$this->saveOnlinePriceCustom($this->validateParams($value));
+								$this->logger->info('After save online price custom ' . date('d-M-Y H:i:s'));
 							}
 						}
 					}
@@ -477,7 +501,9 @@ class StorePriceLogic implements StorePriceLogicInterface {
 					}
 			
 					try{
+						$this->logger->info('Before save multi price ' . date('d-M-Y H:i:s'));
 						$this->saveMultiPrice($this->validateParams($value));
+						$this->logger->info('After save multi price ' . date('d-M-Y H:i:s'));
 					} catch (\Exception $exception) {
 						$msgError[] =$exception->getMessage();
 						$this->updateDataValueStatus($value['data_id'], IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE_MAPPING, $exception->getMessage());

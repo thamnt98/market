@@ -148,6 +148,7 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 		$this->indexerRegistry = $indexerRegistry;
 		$this->class = str_replace(IntegrationProductImageInterface::CRON_DIRECTORY, "", get_class($this));
 		$this->mediaDirectory = $filesystem->getDirectoryWrite(DirectoryList::MEDIA);
+		$this->indexerDirectory = $filesystem->getDirectoryWrite(DirectoryList::VAR_DIR);
 
 		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_image.log');
         $logger = new \Zend\Log\Logger();
@@ -335,14 +336,28 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 					continue;
 				}
 			}
-			
+
 			try {
 				if(!empty($productIds)) {
-					$this->reindexByProductsIds($productIds, ['catalog_product_attribute', 'catalogsearch_fulltext']);
+					$batchId = $jobs->getFirstItem()->getBatchId();
+					$file = $this->indexerDirectory->openFile("/indexer/integration_image_indexer_" . $batchId, 'a');
+					try {
+						$file->lock();
+						try {
+							$file->write(implode($productIds,"\n"));
+						}
+						finally {
+							$file->unlock();
+						}
+					}
+					finally {
+						$file->close();
+					}
 				}
 			} catch (\Exception $e) {
 				$this->logger->info('reindex fail ' . date('d-M-Y H:i:s'));	
 			}
+			
 			$this->logger->info('end loop ' . date('d-M-Y H:i:s'));
 
 		} catch (\Exception $exception) {
@@ -369,7 +384,7 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
                 $categoryIndexer->reindexList(array_unique($productIds));
             }
         }
-     }
+    }
 	
 
 	protected function checkIsFirstImage($filename)
