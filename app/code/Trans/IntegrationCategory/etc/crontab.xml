@@ -16,13 +16,13 @@
 
     <group id="pim_category">
         <job name="integration_pim_check_category" instance="Trans\IntegrationCategory\Cron\Pim\Check\Category" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_get_category" instance="Trans\IntegrationCategory\Cron\Pim\Get\Category" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_save_category" instance="Trans\IntegrationCategory\Cron\Pim\Save\Category" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>* 22 * * *</schedule>
         </job>
     </group>
 
