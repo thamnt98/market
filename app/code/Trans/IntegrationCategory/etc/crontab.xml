@@ -22,7 +22,7 @@
             <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_save_category" instance="Trans\IntegrationCategory\Cron\Pim\Save\Category" method="execute">
-            <schedule>* 22 * * *</schedule>
+            <schedule>* 15 * * *</schedule>
         </job>
     </group>
 

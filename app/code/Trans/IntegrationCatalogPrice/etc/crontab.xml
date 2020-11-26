@@ -21,7 +21,7 @@
             <schedule>*/5 * * * *</schedule>
         </job>
          <job name="integration_pim_save_price" instance="Trans\IntegrationCatalogPrice\Cron\Pim\Save\Price" method="execute">
-            <schedule>* 3-5 * * *</schedule>
+            <schedule>* 20-22 * * *</schedule>
         </job>
     </group>
 
@@ -29,11 +29,14 @@
         <job name="integration_pim_check_promotion_price" instance="Trans\IntegrationCatalogPrice\Cron\Pim\Check\PromotionPrice" method="execute">
             <schedule>*/5 * * * *</schedule>
         </job>
-       <job name="integration_pim_get_promotion_price" instance="Trans\IntegrationCatalogPrice\Cron\Pim\Get\PromotionPrice" method="execute">
+        <job name="integration_pim_get_promotion_price" instance="Trans\IntegrationCatalogPrice\Cron\Pim\Get\PromotionPrice" method="execute">
             <schedule>*/5 * * * *</schedule>
         </job>
-         <job name="integration_pim_save_promotion_price" instance="Trans\IntegrationCatalogPrice\Cron\Pim\Save\PromotionPrice" method="execute">
-            <schedule>* 6-8 * * *</schedule>
+        <job name="integration_pim_save_promotion_price_1" instance="Trans\IntegrationCatalogPrice\Cron\Pim\Save\PromotionPrice" method="execute">
+            <schedule>* 23 * * *</schedule>
+        </job>
+        <job name="integration_pim_save_promotion_price_2" instance="Trans\IntegrationCatalogPrice\Cron\Pim\Save\PromotionPrice" method="execute">
+            <schedule>* 0-1 * * *</schedule>
         </job> 
     </group>
      
