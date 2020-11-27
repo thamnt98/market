@@ -20,13 +20,13 @@
     </group> -->
     <group id="ims_product_stock_update">
         <job name="integration_ims_check_product_stock_update" instance="Trans\IntegrationCatalogStock\Cron\Ims\Check\StockUpdate" method="execute">
-            <schedule>*/5 * * * *</schedule>
+            <schedule>*/2 * * * *</schedule>
         </job>
         <job name="integration_ims_get_product_stock_update" instance="Trans\IntegrationCatalogStock\Cron\Ims\Get\StockUpdate" method="execute">
-            <schedule>*/5 * * * *</schedule>
+            <schedule>*/2 * * * *</schedule>
         </job>
         <job name="integration_ims_save_product_stock" instance="Trans\IntegrationCatalogStock\Cron\Ims\Save\Stock" method="execute">
-            <schedule>*/30 * * * *</schedule>
+            <schedule>*/2 * * * *</schedule>
         </job>
     </group>
 
