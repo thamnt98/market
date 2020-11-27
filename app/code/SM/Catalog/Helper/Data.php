@@ -67,6 +67,44 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected $searchCriteriaBuilder;
 
+    /**
+     * @var \Magento\Bundle\Api\ProductOptionRepositoryInterface
+     */
+    protected $productOptionRepo;
+
+    /**
+     * @var array
+     */
+    protected $minConfigurableProduct = [];
+
+    /**
+     * @var array
+     */
+    protected $minBundleProduct= [];
+
+    /**
+     * @var array
+     */
+    protected $minGroupProduct = [];
+
+    /**
+     * @var int
+     */
+    protected $countChildren;
+
+    /**
+     * Data constructor.
+     * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+     * @param \Magento\Framework\App\Request\Http $httpRequest
+     * @param \Magento\Framework\App\Helper\Context $context
+     * @param \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollFact
+     * @param \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistry
+     * @param \Magento\Review\Model\ReviewFactory $reviewFactory
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param BundleHelper $bundleHelper
+     * @param \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder
+     * @param \Magento\Bundle\Api\ProductOptionRepositoryInterface $productOptionRepo
+     */
     public function __construct(
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
         \Magento\Framework\App\Request\Http $httpRequest,
@@ -216,16 +254,21 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return \Magento\Catalog\Model\Product|null
      */
-    public function getMinConfigurable($product)
+    public function getMinConfigurable($product, &$count = 0)
     {
-        if ($product->getTypeId() !== \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
-            return null;
+        $id = $product->getId();
+        if (!isset($this->minConfigurableProduct[$id])) {
+            if ($product->getTypeId() !== \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
+                return null;
+            }
+
+            /** @var \Magento\Catalog\Model\Product[] $children */
+            $children = $product->getTypeInstance()->getUsedProducts($product);
+            $count = count($children);
+            $this->minConfigurableProduct[$id] = $this->getMinChildren($children, $id);
         }
 
-        /** @var \Magento\Catalog\Model\Product[] $children */
-        $children = $product->getTypeInstance()->getUsedProducts($product);
-
-        return $this->getMinChildren($children);
+        return $this->minConfigurableProduct[$id];
     }
 
     /**
@@ -259,14 +302,18 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getMinGrouped($product)
     {
-        /** @var \Magento\Catalog\Model\Product[] $associatedProducts */
-        $associatedProducts = $product->getTypeInstance()->getAssociatedProducts($product);
+        $id = $product->getId();
+        if (!isset($this->minGroupProduct[$id])) {
+            /** @var \Magento\Catalog\Model\Product[] $associatedProducts */
+            $associatedProducts = $product->getTypeInstance()->getAssociatedProducts($product);
 
-        if (count($associatedProducts) == 0) {
-            return null;
+            if (count($associatedProducts) == 0) {
+                return null;
+            }
+            $this->minGroupProduct[$id] = $this->getMinChildren($associatedProducts, $id);
         }
 
-        return $this->getMinChildren($associatedProducts);
+        return $this->minGroupProduct[$id];
     }
 
     /**
@@ -289,15 +336,19 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getMinBundle($product)
     {
-        /** @var \Magento\Catalog\Model\Product[] $children */
-        $childrenIds = $product->getTypeInstance()->getChildrenIds($product->getId());
-        /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection $coll */
-        $coll = $this->productCollFact->create();
-        $coll->addFieldToFilter('entity_id', $childrenIds);
-        $coll->addFieldToSelect('price')
-             ->addFieldToSelect('final_price');
+        $id = $product->getId();
+        if (!isset($this->minBundleProduct[$id])) {
+            /** @var \Magento\Catalog\Model\Product[] $children */
+            $childrenIds = $product->getTypeInstance()->getChildrenIds($product->getId());
+            /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection $coll */
+            $coll = $this->productCollFact->create();
+            $coll->addFieldToFilter('entity_id', $childrenIds);
+            $coll->addFieldToSelect('price')
+                 ->addFieldToSelect('final_price');
+            $this->minBundleProduct[$id] = $this->getMinChildren($coll->getItems(), $id);
+        }
 
-        return $this->getMinChildren($coll->getItems());
+        return $this->minBundleProduct[$id];
     }
 
     /**
@@ -343,24 +394,33 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return \Magento\Catalog\Model\Product|null
      */
-    protected function getMinChildren($children)
+    protected function getMinChildren($children, $parentId = 0)
     {
         if (empty($children)) {
             return null;
         } else {
             $minProduct = null;
             $minPrice = null;
+            $countChildren = $count = 0;
 
             foreach ($children as $item) {
-                if ($item->getTypeId() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
-                    $item = $this->getMinConfigurable($item);
+                if (!$item->isSaleable()) {
+                    continue;
                 }
+                if ($item->getTypeId() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
+                    $count = 0;
+                    $item = $this->getMinConfigurable($item, $count);
+                }
+
+                $countChildren = $countChildren + 1 + $count;
 
                 if (is_null($minProduct) || $minPrice > (float)$item->getFinalPrice()) {
                     $minPrice = (float)$item->getFinalPrice();
                     $minProduct = $item;
                 }
             }
+
+            $this->countChildren[$parentId] = $countChildren;
 
             return $minProduct;
         }
@@ -593,6 +653,15 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         return $result;
+    }
+
+    /**
+     * @param $productId
+     * @return int|mixed
+     */
+    public function getCountChildren($productId)
+    {
+        return isset($this->countChildren[$productId]) ? $this->countChildren[$productId] : 0;
     }
 
     /**

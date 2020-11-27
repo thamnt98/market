@@ -48,16 +48,18 @@ class ActiveItems implements ObserverInterface
     public function execute(Observer $observer)
     {
         $request = $observer->getEvent()->getRequest();
-        $quote = $this->checkoutSession->getQuote();
-        if ($request->getFullActionName() == 'checkout_cart_index' && $quote->getIsVirtual()) {
-            foreach ($quote->getItemsCollection() as $item) {
-                if (!$item->getIsVirtual() && $item->getIsActive() == 0) {
-                    $item->setIsActive(1);
-                } elseif ($item->getIsVirtual() && $item->getIsActive() == 1) {
-                    $item->setIsActive(0);
+        if ($request->getFullActionName() == 'checkout_cart_index') {
+            $quote = $this->checkoutSession->getQuote();
+            if ($quote->getIsVirtual()) {
+                foreach ($quote->getItemsCollection() as $item) {
+                    if (!$item->getIsVirtual() && $item->getIsActive() == 0) {
+                        $item->setIsActive(1);
+                    } elseif ($item->getIsVirtual() && $item->getIsActive() == 1) {
+                        $item->setIsActive(0);
+                    }
                 }
+                $this->quoteRepository->save($quote->collectTotals());
             }
-            $this->quoteRepository->save($quote->collectTotals());
         }
     }
 }

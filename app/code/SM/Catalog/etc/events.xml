@@ -1,7 +1,18 @@
 <?xml version="1.0"?>
-<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
     <event name="catalog_product_save_after">
         <observer name="debug_catalog_product_save_after"
-                  instance="SM\Catalog\Observer\DebugCatalogProductSaveAfter" />
+                  instance="SM\Catalog\Observer\DebugCatalogProductSaveAfter"/>
+    </event>
+
+    <event name="catalog_product_get_final_price">
+        <observer name="catalogrule" instance="Magento\CatalogRule\Observer\ProcessFrontFinalPriceObserver"
+                  disabled="true"/>
+    </event>
+    <event name="prepare_catalog_product_collection_prices">
+        <observer name="catalogrule"
+                  instance="Magento\CatalogRule\Observer\PrepareCatalogProductCollectionPricesObserver"
+                  disabled="true"/>
     </event>
 </config>

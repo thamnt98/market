@@ -88,24 +88,7 @@ class ChildrenLabel extends \Magento\Framework\View\Element\Template
             return 0;
         }
 
-        $result = 0;
-        $ids = $product->getTypeInstance()->getChildrenIds($product->getId());
-        $ids = $this->mergeArray($ids);
-
-        /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection $coll */
-        $coll = $this->productCollFact->create();
-        $children = $coll->addFieldToFilter('entity_id', $ids);
-
-        /** @var \Magento\Catalog\Model\Product $child */
-        foreach ($children->getItems() as $child) {
-            if (!$child->isSaleable()) {
-                continue;
-            }
-
-            ++$result;
-        }
-
-        return $result;
+        return $this->helper->getCountChildren($product->getId());
     }
 
     protected function mergeArray($children)

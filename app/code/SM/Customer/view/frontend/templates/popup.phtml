@@ -9,13 +9,20 @@
 
 /** @var \SM\Customer\Block\Form\CheckLogin $block */
 ?>
-
 <?php if (!$block->isLoggedIn()): ?>
     <script type="text/x-magento-init">
-    {
-        "*": {
-            "SM_Customer/js/popup": {}
+        {
+            "*": {
+                "SM_Customer/js/popup": {}
+            }
         }
-    }
-</script>
+    </script>
+<?php else: ?>
+    <script type="text/x-magento-init">
+        {
+            "*": {
+                "SM_Customer/js/popup-recovery": {}
+            }
+        }
+    </script>
 <?php endif; ?>

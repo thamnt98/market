@@ -33,9 +33,11 @@ define(
                 }
             });
             var urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('recoverytoken') && !recoveryForm) {
+            if (urlParams.has('recovery') && recoveryForm === false) {
                 // show recovery popup
                 mod.callAjax('recovery-form');
+            } else if (urlParams.has('recoverytoken')) {
+                mod.callAjax('lock-reset-form');
             } else {
                 // show login popup
                 $('.sign-link a').trigger('click');
@@ -75,7 +77,7 @@ define(
                     optForm = true;
                 }
             });
-        }
+        };
 
         return mod.init();
     }

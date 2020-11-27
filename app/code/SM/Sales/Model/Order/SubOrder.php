@@ -399,29 +399,23 @@ class SubOrder {
 		return $parentOrderIds;
 	}
 
-	/**
-	 * @param int $subOrderId
-	 * @throws InputException
-	 * @throws NoSuchEntityException
-	 * @throws AlreadyExistsException
-	 * @throws \Exception
-	 */
-	public function updateStatusComplete($subOrderId) {
-		$order = $this->orderRepository->get($subOrderId);
-		if ($order->getStatus() == ParentOrderRepositoryInterface::STATUS_DELIVERED) {
-			$orderStatus = $order->getStatus();
-			if ($orderStatus == ParentOrderRepositoryInterface::STATUS_DELIVERED
-				|| $orderStatus == ParentOrderRepositoryInterface::PICK_UP_BY_CUSTOMER) {
-				$orderStatus = $order->getStatus();
-				if ($orderStatus == ParentOrderRepositoryInterface::STATUS_DELIVERED
-					|| $orderStatus == ParentOrderRepositoryInterface::PICK_UP_BY_CUSTOMER) {
-					$this->orderUpdater->updateStatusOrder($order);
-				} else {
-					throw new \Exception(__('The order isn\'t delivered.'));
-				}
-			}
-		}
-	}
+    /**
+     * @param int $subOrderId
+     * @throws InputException
+     * @throws NoSuchEntityException
+     * @throws \Exception
+     */
+    public function updateStatusComplete($subOrderId)
+    {
+        $order       = $this->orderRepository->get($subOrderId);
+        $orderStatus = $order->getStatus();
+        if ($orderStatus == ParentOrderRepositoryInterface::STATUS_DELIVERED
+            || $orderStatus == ParentOrderRepositoryInterface::PICK_UP_BY_CUSTOMER) {
+            $this->orderUpdater->updateStatusOrder($order);
+        } else {
+            throw new \Exception(__('The order isn\'t delivered.'));
+        }
+    }
 
 	/**
 	 * @param OrderCollection $orderCollection
