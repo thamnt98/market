@@ -510,7 +510,8 @@ define(
                             if (result.errors === true) {
                                 if (result.status === true) {
                                     tabLoginModal.modal('closeModal');
-                                    $('#tab-lock').modal('openModal').show();
+                                    self.showLockForm();
+                                    // $('#tab-lock').modal('openModal').show();
                                     return;
                                 }
                                 if (step == 2) {
@@ -520,7 +521,7 @@ define(
                                     tabLoginModal.find('.fieldInputText ').addClass('fieldInputError');
 
                                     if (!caseCustomerOnEco) {
-                                        self.sendLockCustomer(data.username);
+                                            self.sendLockCustomer(data.username);
                                     }
                                 } else if (step == 3) {
                                     tabLoginModal.find('[selector=message-otp-error]').text(result.message).show();

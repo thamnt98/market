@@ -6,57 +6,61 @@
 
 /** @var Magento\Wishlist\Block\Catalog\Product\ProductList\Item\AddTo\Wishlist $block */
 /** @var SM\ShoppingList\Helper\Data $helper */
-$product = $block->getProduct();
-$productImage = $block->getImage($product, "product_base_image")->getData("image_url");
-$productName = $product->getName();
-$productId = $product->getId();
-$helper = $this->helper('SM\ShoppingList\Helper\Data');
-$getMyFavoritesListDefaultId = $helper->getMyFavoritesListDefaultId();
-$isAddedShoppingList = $helper->isAddedShoppingList($productId)? 'true':'false';
-$getAddedItemIdInList = $helper->getAddedItemIdInList($productId);
+
 $shoppingListHelper = $this->helper('SM\ShoppingList\Helper\Data');
 
 ?>
-<?php if ($shoppingListHelper->isActiveShoppingList()):?>
-<a style="cursor: pointer"
-   id="shoppinglist-add-<?= $productId ?>"
-   class="action towishlist"
-   title="<?= $block->escapeHtmlAttr(__('Add to Shopping List')) ?>"
-   aria-label="<?= $block->escapeHtmlAttr(__('Add to Shopping List')) ?>"
-   role="button">
-    <span><?= $block->escapeHtml(__('Add to Shopping List')) ?></span>
-</a>
-<a style="cursor: pointer; display: none;"
-   id="shoppinglist-remove-<?= $productId ?>"
-   class="action remove towishlist"
-   title="<?= $block->escapeHtmlAttr(__('Remove to Shopping List')) ?>"
-   aria-label="<?= $block->escapeHtmlAttr(__('Remove to Shopping List')) ?>"
-   role="button">
-    <span><?= $block->escapeHtml(__('Remove to Shopping List')) ?></span>
-</a>
-<div id="success-alert-modal-<?= $productId ?>" class="content add-success-modal" style="display:none;">
-    <div class="product-info">
-        <img src="<?= $productImage ?>" width="124px"  alt="<?= $productName ?>"/>
-        <div class="success-content">
-            <span class="product-name"><?= $block->escapeHtml($productName) ?></span>
-            <h3><?= $block->escapeHtml(__("This item has been added to"))?></h3>
-            <ul id="destination-list-<?= $productId ?>" style="list-style-type: none;">
-            </ul>
+<?php if ($shoppingListHelper->isActiveShoppingList()): ?>
+    <?php
+    $product = $block->getProduct();
+    $productImage = $block->getImage($product, "product_base_image")->getData("image_url");
+    $productName = $product->getName();
+    $productId = $product->getId();
+
+    $getMyFavoritesListDefaultId = $shoppingListHelper->getMyFavoritesListDefaultId();
+    $isAddedShoppingList = $shoppingListHelper->isAddedShoppingList($productId) ? 'true' : 'false';
+    $getAddedItemIdInList = $shoppingListHelper->getAddedItemIdInList($productId);
+    ?>
+    <a style="cursor: pointer"
+       id="shoppinglist-add-<?= $productId ?>"
+       class="action towishlist"
+       title="<?= $block->escapeHtmlAttr(__('Add to Shopping List')) ?>"
+       aria-label="<?= $block->escapeHtmlAttr(__('Add to Shopping List')) ?>"
+       role="button">
+        <span><?= $block->escapeHtml(__('Add to Shopping List')) ?></span>
+    </a>
+    <a style="cursor: pointer; display: none;"
+       id="shoppinglist-remove-<?= $productId ?>"
+       class="action remove towishlist"
+       title="<?= $block->escapeHtmlAttr(__('Remove to Shopping List')) ?>"
+       aria-label="<?= $block->escapeHtmlAttr(__('Remove to Shopping List')) ?>"
+       role="button">
+        <span><?= $block->escapeHtml(__('Remove to Shopping List')) ?></span>
+    </a>
+    <div id="success-alert-modal-<?= $productId ?>" class="content add-success-modal" style="display:none;">
+        <div class="product-info">
+            <img src="<?= $productImage ?>" width="124px" alt="<?= $productName ?>"/>
+            <div class="success-content">
+                <span class="product-name"><?= $block->escapeHtml($productName) ?></span>
+                <h3><?= $block->escapeHtml(__("This item has been added to")) ?></h3>
+                <ul id="destination-list-<?= $productId ?>" style="list-style-type: none;">
+                </ul>
+            </div>
         </div>
     </div>
-</div>
-<script type="text/x-magento-init">
+    <script type="text/x-magento-init">
 {
     "*": {
         "AddFromList":{
             "product_id":"<?= $productId ?>",
             "store_id":"<?= $product->getStoreId() ?>",
-            "add_item_url":"<?= $block->getUrl("shoppinglist/ajax/additems")?>",
-            "remove_item_url":"<?= $block->getUrl("shoppinglist/ajax/removeitem")?>",
+            "add_item_url":"<?= $block->getUrl("shoppinglist/ajax/additems") ?>",
+            "remove_item_url":"<?= $block->getUrl("shoppinglist/ajax/removeitem") ?>",
             "is_added_shopping_list":"<?php echo $isAddedShoppingList ?>",
             "my_favorite_id": "<?= $getMyFavoritesListDefaultId ?>"
         }
     }
 }
-</script>
-<?php endif;?>
+
+    </script>
+<?php endif; ?>

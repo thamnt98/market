@@ -27,6 +27,13 @@ define(
         };
 
         mod.initElements = function () {
+            let urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('recovery')) {
+                let email = urlParams.has('email') ? urlParams.get('email') : null;
+                let token = urlParams.has('token') ? urlParams.get('token') : null;
+                $('#tab-recovery-password').find('#reset-password-token').val(token);
+                $('#tab-recovery-password').find('#reset-password-email').val(email);
+            }
             mod.container = $('#tab-recovery-password');
             mod.email = mod.container.find('input#reset-password-email');
             mod.token = mod.container.find('input#reset-password-token');
@@ -54,7 +61,6 @@ define(
             });
             mod.submit.on('click', function(e) {
                 e.preventDefault();
-
                 mod.submit.addClass('disabled');
                 if (mod.form.validation('isValid')) {
                     var status = mod.container.find('form').validation('isValid');
@@ -93,7 +99,7 @@ define(
                 mod.container.find('#password-strength-meter').removeClass('disable-forcus');
             });
             var urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('recoverytoken')) {
+            if (urlParams.has('recovery')) {
                 mod.container.modal('openModal').on('modalclosed', function() {
                     $('.sign-link a').trigger('click');
                 });

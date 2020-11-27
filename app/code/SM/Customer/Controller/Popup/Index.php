@@ -49,9 +49,10 @@ class Index extends Action
     public function execute()
     {
         $data = ['html' => ''];
+        $resultPage = $this->resultPageFactory->create();
+
         if (!$this->customerSession->isLoggedIn()) {
             $block = '';
-            $resultPage = $this->resultPageFactory->create();
             if ($this->getRequest()->getParam('type') == 'login-form') {
                 $child = $resultPage->getLayout()->createBlock(\SM\Customer\Block\SocialLogin\Popup\Social::class)
                         ->setTemplate('Mageplaza_SocialLogin::popup/form/authentication/social.phtml');
@@ -99,6 +100,9 @@ class Index extends Action
                 $block = $resultPage->getLayout()->createBlock(\SM\Customer\Block\Form\Register::class)
                     ->setTemplate('SM_Customer::form/lock/form.phtml')
                     ->toHtml();
+                $block .= $resultPage->getLayout()->createBlock(\SM\Customer\Block\Form\ForgotPassword::class)
+                    ->setTemplate('SM_Customer::form/forgot-password/confirm.phtml')
+                    ->toHtml();
             } elseif ($this->getRequest()->getParam('type') == 'lock-reset-form') {
                 $block = $resultPage->getLayout()->createBlock(\SM\Customer\Block\Form\Register::class)
                     ->setTemplate('SM_Customer::form/lock/reset.phtml')
@@ -110,6 +114,16 @@ class Index extends Action
                     ->toHtml();
             }
             $data['html'] = $block;
+        } else {
+            if ($this->getRequest()->getParam('type') == 'lock-reset-form') {
+                $block = $resultPage->getLayout()->createBlock(\SM\Customer\Block\Form\Register::class)
+                    ->setTemplate('SM_Customer::form/lock/reset.phtml')
+                    ->toHtml();
+                $block .= $resultPage->getLayout()->createBlock(\SM\Customer\Block\Form\ForgotPassword::class)
+                    ->setTemplate('SM_Customer::form/recovery-password/form.phtml')
+                    ->toHtml();
+                $data['html'] = $block;
+            }
         }
         $result = $this->jsonResultFactory->create();
         $result->setData($data);

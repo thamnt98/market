@@ -11,39 +11,24 @@ namespace SM\Checkout\Plugin\Magento\Checkout\Block;
 class Cart
 {
     /**
-     * @param \Magento\Checkout\Block\Cart|\Magento\Checkout\Block\Cart\Grid $subject
+     * @param \Magento\Checkout\Block\Cart      $subject
+     * @param \Magento\Quote\Model\Quote\Item[] $result
+     *
      * @return mixed
      */
-    public function aroundGetItems($subject)
+    public function afterGetItems($subject, $result)
     {
-        if ($subject->getCustomItems()) {
-            return $subject->getCustomItems();
-        }
-        return $this->getActiveItems($subject);
-    }
-
-    /**
-     * @param \Magento\Checkout\Block\Cart|\Magento\Checkout\Block\Cart\Grid $subject
-     * @return array
-     */
-    public function getActiveItems($subject)
-    {
-        $items = [];
         /** @var \Magento\Quote\Model\Quote\Item $item */
-        foreach ($subject->getQuote()->getItemsCollection() as $item) {
-            if ($item->getParentItemId()) {
-                continue;
-            }
-
-            if ($subject->getQuote()->getIsVirtual()) {
-                if ($item->getIsVirtual() && !$item->isDeleted()) {
-                    $items[] = $item;
-                }
-            } elseif (!$item->getIsVirtual() && !$item->getParentItemId() && !$item->isDeleted()) {
-                $items[] = $item;
+        foreach ($result as $key => $item) {
+            if ($item->getParentItemId() ||
+                $item->isDeleted() ||
+                ($subject->getQuote()->getIsVirtual() && !$item->getIsVirtual()) ||
+                (!$subject->getQuote()->getIsVirtual() && $item->getIsVirtual())
+            ) {
+                unset($result[$key]);
             }
         }
 
-        return $items;
+        return $result;
     }
 }
