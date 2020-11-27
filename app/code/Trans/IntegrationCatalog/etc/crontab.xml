@@ -16,13 +16,13 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
     <group id="pim_product">
         <job name="integration_pim_check_product" instance="Trans\IntegrationCatalog\Cron\Pim\Check\Product" method="execute">
-            <schedule>*/5 * * * *</schedule>
+            <schedule>* * * * *</schedule>
         </job>
         <job name="integration_pim_get_product" instance="Trans\IntegrationCatalog\Cron\Pim\Get\Product" method="execute">
-            <schedule>*/5 * * * *</schedule>
+            <schedule>* * * * *</schedule>
         </job>
         <job name="integration_pim_save_product" instance="Trans\IntegrationCatalog\Cron\Pim\Save\Product" method="execute">
-            <schedule>* 22 * * *</schedule>
+            <schedule>* 22-23 * * *</schedule>
         </job>
     </group>
 
