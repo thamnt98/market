@@ -185,5 +185,34 @@ class UpgradeData implements UpgradeDataInterface {
 
 			$setup->endSetup();
 		}
+
+		if (version_compare($context->getVersion(), '1.1.6', '<')) {
+			if ($setup->getConnection()->isTableExists($omsStatus) == true) {
+				$data = [
+					[4, 4, 3, '31', 'Failed Delivery', '31', 'Failed to Delivery', '', ''],
+				];
+				$columns = ['status', 'action', 'sub_action', 'fe_status_no', 'fe_status',
+					'fe_sub_status_no', 'fe_sub_status', 'oms_payment_status', 'pg_status_no'];
+				$setup->getConnection()->insertArray($omsStatus, $columns, $data);
+			}
+
+			if ($setup->getConnection()->isTableExists($magentoOrderStatus) == true) {
+				$data = [
+					['failed_delivery', 'Failed Delivery'],
+				];
+				$columns = ['status', 'label'];
+				$setup->getConnection()->insertArray($magentoOrderStatus, $columns, $data);
+			}
+
+			if ($setup->getConnection()->isTableExists($magentoOrderState) == true) {
+				$data = [
+					['failed_delivery', 'in_delivery', 1, 1],
+				];
+				$columns = ['status', 'state', 'is_default', 'visible_on_front'];
+				$setup->getConnection()->insertArray($magentoOrderState, $columns, $data);
+			}
+
+			$setup->endSetup();
+		}
 	}
 }
