@@ -48,64 +48,39 @@ class ConfigurableProductImage {
 	 */
   public function execute()
   {
-    $cron = $this->getCron();
-		$this->logger->info(__('=> Getting Configurable Product <='));
-    $productCollection = $this->imageHelper->getConfigurableProductWithoutImage($cron->getCronOffset(), $cron->getCronLength());
-    if (count($productCollection) > 0) {
-			$this->logger->info(__('=> Process Configurable Product Without Image <='));
-      $this->addImageFromChild($productCollection);
-    } else if((int)$cron->getCronOffset() > (int) $this->imageHelper->getTotalProductConfigurable()) {
-			$this->logger->info(__('=> All Configurable Product Has an Image <='));
-      $this->imageHelper->resetCron($cron);
+    $this->logger->info(__('=> Getting Configurable Product Without Image <='));
+    $productCollection = $this->imageHelper->getConfigurableProductWithoutImage();
+    if ($count = $productCollection->getSize()) {
+        $productItems = $productCollection->getItems();
+        $this->logger->info(__('=> Start Process Configurable Product Without Image <='));
+        $this->addImage($productCollection, $productItems);
     }
-		$this->increaseCron($cron);
   }
 
 	/**
-	 * Increase cron counting
+	 * Add image
 	 *
-	 * @param  Trans\IntegrationCatalog\Api\Data\ConfigurableProductCronSynchInterface $cron
-	 * @return Trans\IntegrationCatalog\Api\Data\ConfigurableProductCronSynchInterface
+	 * @param \Magento\Catalog\Model\ResourceModel\Collection
+	 * @param \SM\Catalog\Override\MagentoCatalog\Model\Product[]
 	 */
-  protected function increaseCron($cron)
+  protected function addImage($collection, $items)
   {
-    $newOffset = (int)$cron->getCronOffset() + (int)$cron->getCronLength();
-    $cron->setCronOffset((string)$newOffset);
-		$cron->setLastUpdated(date("Y-m-d H:i:s"));
-    $this->imageHelper->saveCron($cron);
+    $entityIds = $this->getProductEntityIds($collection);
+    $this->imageHelper->setConfigurablesImage($entityIds, $items);
   }
-
-	/**
-	 * Get Cron
-	 *
-	 * @return Trans\IntegrationCatalog\Api\Data\ConfigurableProductCronSynchInterface
-	 */
-  protected function getCron()
+  
+  /**
+   * Get Product entity ids
+   *
+   * @param \Magento\Catalog\Model\ResourceModel\Collection
+   * @return int[]
+   */
+  protected function getProductEntityIds($collection)
   {
-    $this->logger->info(__('=> Cron Configurable Product Image Synch Start <='));
-    try {
-      $cron = $this->imageHelper->getCron();
-    } catch (NoSuchEntityException $e) {
-      $cron = $this->imageHelper->initCron();
-    } catch (\Exception $e) {
-      $this->logger->info(__('=> '.$e->getMessage().' <='));
-      throw new \Exception(__($e->getMessage()));
-    }
-    $this->logger->info(__('=> '.print_r($cron->getData(), true).' <='));
-
-    return $cron;
-  }
-
-	/**
-	 * Add image from child
-	 *
-	 * @param Magento\Catalog\Model\ResourceModel\Collection
-	 */
-  protected function addImageFromChild($collection)
-  {
+    $result = [];
     foreach ($collection as $key => $value) {
-			$this->logger->info(__('=> Process Configurable Product SKU '.$value->getSku().' <='));
-      $this->imageHelper->setImageFromChild($value);
+      $result[] = $value->getEntityId();
     }
+    return $result;
   }
 }
