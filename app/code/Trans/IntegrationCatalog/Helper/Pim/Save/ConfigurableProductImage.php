@@ -62,7 +62,7 @@ class ConfigurableProductImage extends AbstractHelper
 
   /**
    * Constructor method
-   * @param CronFactory $cronFactory
+   * @param Context $context
    * @param Config $config
    * @param ProductFactory $productFactory
    * @param LinkManagementInterface $linkManagement
