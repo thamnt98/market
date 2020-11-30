@@ -80,14 +80,14 @@ class ProductImage extends AbstractHelper
 
   /**
    * Constructor method
-   * @param Context                            $context
-   * @param Json                               $json
-   * @param ProductRepositoryInterface         $productRepo
-   * @param File                               $file
-   * @param DirectoryList                      $directoryList
+   * @param Context $context
+   * @param Json $json
+   * @param ProductRepositoryInterface $productRepo
+   * @param File $file
+   * @param DirectoryList $directoryList
    * @param IntegrationProductInterfaceFactory $integrationProductFactory
-   * @param IntegrationCatalogDataFactory      $integrationCatalogDataFactory
-   * @param IntegrationCatalogDataFactory      $integrationCatalogDataFactory
+   * @param IntegrationCatalogDataFactory $integrationCatalogDataFactory
+   * @param IntegrationCatalogDataFactory integrationCatalogDataFactory
    * @param \Trans\IntegrationCatalog\Model\ResourceModel\IntegrationProduct\CollectionFactory $integrationProductCollection
    * @param \Magento\Catalog\Model\ResourceModel\Product\Gallery $galleryResource
    * @param \Magento\Eav\Model\ResourceModel\Entity\Attribute $eavAttribute
@@ -175,11 +175,33 @@ class ProductImage extends AbstractHelper
     return $collection->getFirstItem();
   }
 
+  /**
+   * Get integration catalog product by magento parent id
+   *
+   * @param int $entityId
+   * @return \Trans\IntegrationCatalog\Model\ResourceModel\IntegrationProduct\Collection
+   */
   public function getProductByMagentoParentId($entityId)
   {
     $collection = $this->integrationProductCollection->create();
     $collection->addFieldToFilter('magento_parent_id',['eq'=>$entityId])->setOrder('pim_id','ASC')->setPageSize(1);
     return $collection->getFirstItem();
+  }
+  
+  /**
+   * Get integration catalog product by bulk magento parent id
+   *
+   * @param int[] $entityIds
+   * @return \Trans\IntegrationCatalog\Model\ResourceModel\IntegrationProduct\Collection | Boolean
+   */
+  public function getProductByMagentoParentIdBulk($entityIds = [])
+  {
+    if (empty($entityIds) == false) {
+      $collection = $this->integrationProductCollection->create();
+      $collection->addFieldToFilter('magento_parent_id',['in'=> $entityIds])->setOrder('pim_id','ASC');
+      return $collection;
+    }
+    return false;
   }
 
   /**
@@ -213,7 +235,7 @@ class ProductImage extends AbstractHelper
    * Get integration catalog data by pim id
    *
    * @param  string $pimId
-   * @return \Trans\IntegrationCatalog\Model\ResourceModel\IntegrationDataValue\Collection
+   * @return string
    */
   public function getProductCatalogDataByPimId($pimId)
   {
@@ -221,7 +243,9 @@ class ProductImage extends AbstractHelper
     $collection = $catalogData->getCollection();
     $collection->addFieldToFilter('data_value', ['like'=>'%"id":"'.$pimId.'"%']);
     $collection->setPageSize(1);
-    return $collection->getFirstItem();
+    $collection->getSelect()->limit(1)->order('id desc');
+    return $collection->getSelect()->__toString();
+    //return $collection->getFirstItem();
   }
 
   /**
@@ -232,10 +256,8 @@ class ProductImage extends AbstractHelper
    */
   public function getCatalogDataImageUrl($catalogData)
   {
-    if ($catalogData->getData()) {
-      $data = $this->json->unserialize($catalogData['data_value']);
-      return (isset($data['image_url']))? $data['image_url'] : '';
-    }
+    $data = json_decode($catalogData['data_value'], true);
+    return (isset($data['image_url']))? $data['image_url'] : '';
   }
 
   /**
@@ -478,4 +500,5 @@ class ProductImage extends AbstractHelper
 
       return $result;
     }
+
 }

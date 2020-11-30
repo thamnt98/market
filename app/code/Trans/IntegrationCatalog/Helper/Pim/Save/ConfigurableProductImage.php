@@ -17,6 +17,7 @@ use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Catalog\Api\Data\ProductInterfaceFactory as ProductFactory;
 use Magento\Eav\Model\Entity\Collection\AbstractCollection;
 use Magento\ConfigurableProduct\Api\LinkManagementInterface;
+use Magento\Framework\App\ResourceConnection;
 use Trans\IntegrationCatalog\Helper\Config;
 use Trans\IntegrationCatalog\Api\ConfigurableProductCronSynchRepositoryInterface as CronRepo;
 use Trans\IntegrationCatalog\Api\Data\ConfigurableProductCronSynchInterface as CronInterface;
@@ -33,21 +34,6 @@ class ConfigurableProductImage extends AbstractHelper
    * @var string
    */
   protected $aliasPrefix;
-
-  /**
-   * @var \ConfigurableProductCronSynchRepositoryInterface
-   */
-  protected $cronRepo;
-
-  /**
-   * @var \ConfigurableProductCronSynchInterface
-   */
-  protected $cronInterface;
-
-  /**
-   * @var \ConfigurableProductCronSynchInterfaceFactory
-   */
-  protected $cronFactory;
 
   /**
    * @var \Config
@@ -68,86 +54,37 @@ class ConfigurableProductImage extends AbstractHelper
    * @var \ProductImage
    */
   protected $helper;
+  
+  /**
+   * @var ResourceConnection
+   */
+  protected $connection;
 
   /**
    * Constructor method
-   * @param Context                 $context
-   * @param CronRepo                $cronRepo
-   * @param CronInterface           $cronInterface
-   * @param CronFactory             $cronFactory
-   * @param Config                  $config
-   * @param ProductFactory          $productFactory
+   * @param Context $context
+   * @param Config $config
+   * @param ProductFactory $productFactory
    * @param LinkManagementInterface $linkManagement
-   * @param ProductImage            $helper
+   * @param ProductImage $helper
+   * @param ResourceConnection $resourceConnection
    */
   public function __construct
   (
     Context $context,
-    CronRepo $cronRepo,
-    CronInterface $cronInterface,
-    CronFactory $cronFactory,
     Config $config,
     ProductFactory $productFactory,
     LinkManagementInterface $linkManagement,
-    ProductImage $helper
+    ProductImage $helper,
+    ResourceConnection $resourceConnection
   ) {
-    $this->cronRepo = $cronRepo;
-    $this->cronInterface = $cronInterface;
-    $this->cronFactory = $cronFactory;
     $this->config = $config;
     $this->productFactory = $productFactory;
     $this->linkManagement = $linkManagement;
     $this->aliasPrefix = AbstractCollection::ATTRIBUTE_TABLE_ALIAS_PREFIX.self::BASE_IMAGE_ATTRIBUTE;
     $this->helper = $helper;
+    $this->resourceConnection = $resourceConnection;
     parent::__construct($context);
-  }
-
-  /**
-   * Init cron first time
-   *
-   * @return \Trans\IntegrationCatalog\Api\Data\ConfigurableProductCronSynchInterface
-   */
-	public function initCron()
-	{
-    $data = $this->cronFactory->create();
-    return $this->resetCron($data);
-	}
-
-  /**
-   * Reset cron counting
-   *
-   * @param \Trans\IntegrationCatalog\Api\Data\ConfigurableProductCronSynchInterface
-   * @return \Trans\IntegrationCatalog\Api\Data\ConfigurableProductCronSynchInterface
-   */
-  public function resetCron($data)
-  {
-    $data->setCronName($this->config->getCronConfigProductSynchName());
-    $data->setCronLength($this->config->getCronConfigProductSynchLength());
-    $data->setCronOffset('0');
-    $data->setLastUpdated(date("Y-m-d H:i:s"));
-    return $this->saveCron($data);
-  }
-
-  /**
-   * Get cron
-   *
-   * @return \Trans\IntegrationCatalog\Api\Data\ConfigurableProductCronSynchInterface
-   */
-  public function getCron()
-  {
-    $name = $this->config->getCronConfigProductSynchName();
-    return $this->cronRepo->getByName($name);
-  }
-
-  /**
-   * Save cron
-   *
-   * @param  \Trans\IntegrationCatalog\Api\Data\ConfigurableProductCronSynchInterface
-   * @return Trans\IntegrationCatalog\Api\Data\ConfigurableProductCronSynchInterface
-   */
-  public function saveCron($data)
-  {
-    return $this->cronRepo->save($data);
   }
 
   /**
@@ -157,7 +94,7 @@ class ConfigurableProductImage extends AbstractHelper
    * @param  string $limit
    * @return Magento\Catalog\Model\ResourceModel\Collection
    */
-  public function getConfigurableProductWithoutImage($offset, $limit)
+  public function getConfigurableProductWithoutImage()
   {
     $product = $this->productFactory->create();
     $collection = $product->getCollection();
@@ -166,7 +103,7 @@ class ConfigurableProductImage extends AbstractHelper
       ['attribute' => self::BASE_IMAGE_ATTRIBUTE, 'null' => true],
       ['attribute' => self::BASE_IMAGE_ATTRIBUTE, 'eq' => 'no_selection']
     ]);
-    $collection->getSelect()->limit($limit, $offset);
+    $collection->getSelect()->limit($this->getCronConfigLength());
     $collection->getSelect()
       ->reset(\Zend_Db_Select::COLUMNS)
       ->columns([
@@ -204,7 +141,66 @@ class ConfigurableProductImage extends AbstractHelper
    */
   public function setImageFromChild($parent)
   {
-    $childProducts = $this->helper->getProductByMagentoParentId($parent->getId());
+    $childProducts = $this->helper->getProductByMagentoParentId($parent->getEntityId());
     $this->helper->addImageToConfigurableProduct($parent->getId(), $childProducts->getPimId());
   }
+  
+  /**
+   * Set configurable image
+   *
+   * @param int[] $entityIds
+   * @param \SM\Catalog\Override\MagentoCatalog\Model\Product[] $items
+   */
+  public function setConfigurablesImage($entityIds, $items)
+  {
+    $childProducts = $this->helper->getProductByMagentoParentIdBulk($entityIds);
+    $pimIds = $this->getPimIds($childProducts);
+    $connection = $this->resourceConnection->getConnection();
+    foreach($items as $key => $val) {
+      if (array_key_exists($val->getId(), $pimIds)) {
+        try {
+          $pimId = $pimIds[$val->getId()];
+          $integrationCatalogDataQuery = $this->helper->getProductCatalogDataByPimId($pimId);
+          $data = $connection->fetchRow($integrationCatalogDataQuery);
+          if ($imageUrl = $this->helper->getCatalogDataImageUrl($data)) {
+            $this->helper->addImage($val, $imageUrl);
+          }
+        } catch (\Exception $e) {
+          throw $e;
+        }
+      }
+    }
+  }
+  
+  /**
+   * Get Pim Ids
+   *
+   * @param \Trans\IntegrationCatalog\Model\ResourceModel\IntegrationProduct\Collection
+   * @return int[]
+   */
+  public function getPimIds($collection)
+  {
+    $results = [];
+    $existingParent = [];
+    foreach ($collection as $key => $val)
+    {
+      if(in_array($val->getMagentoParentId(), $existingParent) == false)
+      {
+        $results[$val->getMagentoParentId()] = $val->getPimId();
+        $existingParent[] = $val->getMagentoParentId();
+      }
+    }
+    return $results;
+  }
+  
+  /**
+   * Get cron config length
+   * 
+   * @return int
+   */
+  public function getCronConfigLength()
+  {
+    return $this->config->getCronConfigProductSynchLength();
+  }
+
 }
