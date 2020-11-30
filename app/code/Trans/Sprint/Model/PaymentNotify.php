@@ -300,6 +300,7 @@ class PaymentNotify implements \Trans\Sprint\Api\PaymentNotifyInterface
             }
         }
 
+        $this->logger->info('##processingNotify :: $orderSuccessState = ' . $orderSuccessState);
         $this->logger->info('Process Notify End');
 
         return true;
@@ -505,6 +506,7 @@ class PaymentNotify implements \Trans\Sprint\Api\PaymentNotifyInterface
             }
         }
 
+        $this->logger->info('##saveOrderPaymentTransaction :: $orderSuccessState = ' . $orderSuccessState);
         $this->logger->info('****** end saveMainOrderPaymentTransaction ******');
         return false;
     }
