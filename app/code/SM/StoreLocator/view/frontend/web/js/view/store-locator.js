@@ -40,8 +40,8 @@ define([
             var self = this;
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(function (position) {
-                    currentLongitude = position.coords.latitude;
-                    currentLatitude = position.coords.longitude;
+                    currentLongitude = position.coords.longitude;
+                    currentLatitude = position.coords.latitude;
                 })
             } else {
                 alert("Geolocation is not supported by this browser.");
@@ -55,7 +55,7 @@ define([
             this.__actionPushGTM("search_query_store", keyWord);
 
             if (keyWord.length > 0) {
-                serviceUrl = urlBuilder.build('rest/V1/store-locator?searchCriteria[filter_groups][0][filters][0][field]=keyword&searchCriteria[filter_groups][0][filters][0][value]='+ keyWord +'&searchCriteria[filter_groups][0][filters][0][condition_type]=like&searchCriteria[sortOrders][0][field]=distance&searchCriteria[sortOrders][0][direction]=ASC&searchCriteria[sortOrders][0][lat]='+ currentLatitude +'&searchCriteria[sortOrders][0][long]='+ currentLongitude);
+                serviceUrl = urlBuilder.build('rest/V1/store-locator?searchCriteria[sortOrders][0][field]=distance&searchCriteria[sortOrders][0][direction]=ASC&searchCriteria[sortOrders][0][lat]='+ $('#autocomplete-latitude').val() +'&searchCriteria[sortOrders][0][long]='+ $('#autocomplete-longitude').val());
             } else {
                 serviceUrl = urlBuilder.build('rest/V1/store-locator?searchCriteria[sortOrders][0][field]=distance&searchCriteria[sortOrders][0][direction]=ASC&searchCriteria[sortOrders][0][lat]='+ currentLatitude +'&searchCriteria[sortOrders][0][long]='+ currentLongitude);
             }
@@ -72,7 +72,7 @@ define([
         },
 
         searchStoreByAutocomplete : function () {
-            let serviceUrl = urlBuilder.build('rest/V1/store-locator?searchCriteria[sortOrders][0][field]=distance&searchCriteria[sortOrders][0][direction]=ASC&searchCriteria[sortOrders][0][lat]='+ autocompleteLatitude +'&searchCriteria[sortOrders][0][long]='+ autocompleteLongitude);
+            let serviceUrl = urlBuilder.build('rest/V1/store-locator?searchCriteria[sortOrders][0][field]=distance&searchCriteria[sortOrders][0][direction]=ASC&searchCriteria[sortOrders][0][lat]='+ $('#autocomplete-latitude').val() +'&searchCriteria[sortOrders][0][long]='+ $('#autocomplete-longitude').val());
             this.searchStore(serviceUrl, true);
         },
 

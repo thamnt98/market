@@ -41,8 +41,10 @@ define(
                             google.maps.event.addListener(autocomplete, 'place_changed', function () {
                                 let place = autocomplete.getPlace();
 
-                                $('#autocomplete-longitude').val(place.geometry.location.lng());
-                                $('#autocomplete-latitude').val(place.geometry.location.lat());
+                                if (place.geometry) {
+                                    $('#autocomplete-longitude').val(place.geometry.location.lng());
+                                    $('#autocomplete-latitude').val(place.geometry.location.lat());
+                                }
                                 $("#btn-search-store").click();
                             });
 

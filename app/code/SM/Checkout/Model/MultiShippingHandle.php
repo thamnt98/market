@@ -845,6 +845,7 @@ class MultiShippingHandle
             $previewOrder->setShippingMethodTitle($shippingMethodTitle);
             $previewOrder->setAddressId($addressId);
             if ($date != '') {
+                $date = $this->timezone->formatDate($date);
                 $date = date('d M Y', strtotime($date));
             }
             $previewOrder->setDate($date);
