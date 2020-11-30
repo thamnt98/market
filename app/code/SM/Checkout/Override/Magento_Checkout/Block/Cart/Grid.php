@@ -23,6 +23,16 @@ class Grid extends \Magento\Checkout\Block\Cart\Grid
     protected $itemCollection;
 
     /**
+     * @var bool
+     */
+    protected $isPagerDisplayed;
+
+    /**
+     * @var int
+     */
+    protected $itemsCount;
+
+    /**
      * @override
      * @return \Magento\Quote\Model\ResourceModel\Quote\Item\Collection
      */
@@ -34,5 +44,30 @@ class Grid extends \Magento\Checkout\Block\Cart\Grid
         }
 
         return $this->itemCollection;
+    }
+
+    /**
+     * @override
+     * @return int
+     */
+    public function getItemsCount()
+    {
+        if (is_null($this->itemsCount)) {
+            $this->itemsCount = 0;
+            /** @var \Magento\Quote\Model\Quote\Item $item */
+            foreach ($this->getQuote()->getItemsCollection() as $key => $item) {
+                if ($item->getParentItemId() ||
+                    $item->isDeleted() ||
+                    ($this->getQuote()->getIsVirtual() && !$item->getIsVirtual()) ||
+                    (!$this->getQuote()->getIsVirtual() && $item->getIsVirtual())
+                ) {
+                    continue;
+                }
+
+                ++$this->itemsCount;
+            }
+        }
+
+        return $this->itemsCount;
     }
 }

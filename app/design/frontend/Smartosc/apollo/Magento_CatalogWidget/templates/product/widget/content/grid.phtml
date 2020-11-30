@@ -51,7 +51,6 @@ $shoppingListHelper = $this->helper('SM\ShoppingList\Helper\Data');
                     <?php foreach ($items as $_item) : ?>
                         <?php /** @var \Magento\Catalog\Model\Product $_item */ ?>
                         <?php $dataGTM = $block->escapeHtml($block->getGtm($_item)); ?>
-                    <?php if ($helper->isProductStockStatus($_item->getId())): ?>
                         <?php $showCart = ($showCart == 2) ? !$_item->getData('hide_cta_button') : $showCart; ?>
                         <?= /* @noEscape */ ($iterator++ == 1) ? '<li class="product-card col-xs-6 col-sm-4 '.$showProductCount.'">' : '</li><li class="product-card  col-xs-6 col-sm-4 '.$showProductCount.'">' ?>
                         <div class="product-item <?php if (!$showCart) : ?>product-item--hideCart<?php endif; ?>">
@@ -253,7 +252,6 @@ $shoppingListHelper = $this->helper('SM\ShoppingList\Helper\Data');
                             </div>
                             </div>
                         </div>
-                    <?php endif; ?>
                         <script>
                             require(['jquery', "gtmProduct", 'domReady!'], function ($, gtm) {
                                 if (typeof dataLayerSourceObjects !== 'undefined') {

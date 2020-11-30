@@ -221,6 +221,11 @@ class SendOMS {
 			$discPrice    = $item->getDiscountAmount(); // total_discount
 			$subTotal     = $sellPrice * $qty;
 			$padPrice     = $subTotal - $discPrice; // sub_total - total_discount
+
+            if ((int)$product->getData('is_fresh')) {
+                $qty = $weight / 1000 * $qty;
+            }
+
 			$itemData     = [
 				'sku_basic' => '',
 				'sku' => $item->getSku(),

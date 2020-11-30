@@ -263,7 +263,7 @@
     </vars>
 
     <vars module="Magento_ConfigurableProduct">
-        <var name="gallery_switch_strategy">replace</var>
+        <var name="gallery_switch_strategy">prepend</var>
     </vars>
 
     <vars module="Js_Bundle">

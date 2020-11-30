@@ -12,6 +12,9 @@
         <plugin name="SM_Checkout::CartItems"
                 type="SM\Checkout\Plugin\Magento\Checkout\Block\Cart" />
     </type>
+    <type name="Magento\Checkout\Block\Cart\Grid">
+        <plugin name="SM_Checkout::CartItems" disabled="true" />
+    </type>
     <type name="Magento\Checkout\Block\Cart\Sidebar">
         <plugin name="disable_dropdown_minicart_cartpage"
                 type="SM\Checkout\Plugin\Magento\Checkout\Block\Cart\Sidebar" disabled="true"/>
