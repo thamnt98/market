@@ -163,8 +163,9 @@ class TransmartParentOrder extends ParentOrder
                     if ($mepayTxnData = $paymentData->getTransMepayTransaction()) {
                       $txnData = $this->json->unserialize($mepayTxnData);
                       if (isset($txnData['statusData']) && $txnData['statusData']) {
+                        $txExpireDate = date_create($txnData['statusData']['expireTime']);
                         $expireDate = isset($txnData['statusData']['expireTime'])? 
-                          $this->timezone->date(new \DateTime ($txnData['statusData']['expireTime']))->format('M j, Y g:i:s A') : $expireDate;
+                        $this->timezone->date($txExpireDate)->format('M j, Y g:i:s A') : $expireDate;
                         $virtualAccount = isset($txnData['statusData']['vaNumber'])? $txnData['statusData']['vaNumber'] : $virtualAccount;
                       }
                     }
