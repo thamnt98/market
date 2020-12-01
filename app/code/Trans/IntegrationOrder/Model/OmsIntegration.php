@@ -19,6 +19,7 @@ use Trans\IntegrationOrder\Api\OmsIntegrationInterface;
  * @api
  * Class OmsIntegration
  */
+
 class OmsIntegration implements OmsIntegrationInterface {
 
 	/**
@@ -182,7 +183,6 @@ class OmsIntegration implements OmsIntegrationInterface {
 	 * @return array
 	 */
 	public function createOrderOms($order) {
-		$paidPrice = 0;
 		foreach ($order as $dataOrder) {
 			$orderItem                      = [];
 			$billingOrder                   = [];
@@ -202,7 +202,10 @@ class OmsIntegration implements OmsIntegrationInterface {
 			$orders['promotion_value']      = $dataOrder['promotion_value'];
 			$orders['shipping_fee']         = $dataOrder['shipping_fee'];
 			$orders['time_slot']            = $dataOrder['time_slot'];
+			$orders['order_source']         = $dataOrder['order_source'];
+			$orders['code_name']            = $dataOrder['code_name'];
 
+			$paidPrice = 0;
 			foreach ($dataOrder['order_items'] as $items) {
 				$modelItem                = $this->orderIntegrationItemInterfaceFactory->create();
 				$dataItem['sku_basic']    = $items['sku_basic'];
@@ -220,14 +223,12 @@ class OmsIntegration implements OmsIntegrationInterface {
 				$dataItem['is_warehouse'] = $items['is_warehouse'];
 				$orderItem[]              = $dataItem;
 
-				$paidPrice += $items['paid_price'];
-
 				$modelItem->setSku($items['sku']);
 				$modelItem->setOrderId($dataOrder['order_id']);
 				$modelItem->setQty($items['quantity']);
 				$modelItem->setOriginalPrice($items['ori_price']);
-				$modelItem->setSellingPrice($items['sell_price']);
 				$modelItem->setPaidPrice($items['paid_price']);
+				$modelItem->setSellingPrice($items['sell_price']);
 				$modelItem->setSubtotal($items['sub_total']);
 				$modelItem->setWeight($items['weight']);
 				$modelItem->setTotalWeight($items['total_weight']);
@@ -238,6 +239,7 @@ class OmsIntegration implements OmsIntegrationInterface {
 
 				$orderItemSave = $this->orderItemRepo->save($modelItem);
 
+				$paidPrice += $items['paid_price'];
 				$subTotal = $items['quantity'] * $items['sell_price'];
 				// $promoValue = $subTotal - ($items['paid_price'] * $items['quantity']);
 			}
@@ -311,12 +313,7 @@ class OmsIntegration implements OmsIntegrationInterface {
 
 			/*smart osc start remove code*/
 			/*$allocationRuleDataByQuoteId = $this->orderAllocationRepo->loadDataByQuoteId($dataOrder['quote_id']);
-
-				                                                                                                                                                $warehouse                   = $allocationRuleDataByQuoteId->getSpoDetail();
-				                                                                                                                                                $orderOriginId               = $allocationRuleDataByQuoteId->getOarOriginOrderId();
-				                                                                                                                                                $isSpo                       = $allocationRuleDataByQuoteId->getIsSpo();
-				                                                                                                                                                $isOwnCourier                = $allocationRuleDataByQuoteId->getIsOwnCourier();
-				                                                                                                                                                $warehouseSource             = $allocationRuleDataByQuoteId->getWarehouseSource();
+				                                                                                       ;
 			*/
 			/*smart osc end remove code*/
 
