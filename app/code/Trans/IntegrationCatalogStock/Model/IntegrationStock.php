@@ -178,6 +178,15 @@ class IntegrationStock implements IntegrationStockInterface {
 		$dataJobs->setStatus(IntegrationJobInterface::STATUS_PROGRESS_CATEGORY);
 		$this->integrationJobRepositoryInterface->save($dataJobs);
 
+		$connectionCheck = $this->resourceConnection->getConnection();
+		// get attribute id
+		$queryGetAttrIdIsFresh = "SELECT attribute_id FROM eav_attribute WHERE attribute_code = 'is_fresh' AND backend_type = 'int' AND frontend_input = 'boolean' limit 1";
+		$getGetAttrIdIsFresh = $connectionCheck->fetchRow($queryGetAttrIdIsFresh);
+		$queryGetAttrIdWeight = "SELECT attribute_id FROM eav_attribute WHERE attribute_code = 'weight' AND backend_type = 'decimal' AND frontend_input = 'weight' limit 1";
+		$getGetAttrIdWeight = $connectionCheck->fetchRow($queryGetAttrIdWeight);
+		$queryGetAttrIdSoldIn = "SELECT attribute_id FROM eav_attribute WHERE attribute_code = 'sold_in' AND backend_type = 'varchar' AND frontend_input = 'text' limit 1";
+		$getGetAttrIdSoldIn = $connectionCheck->fetchRow($queryGetAttrIdSoldIn);
+
 		try {
 			// $items = [];
 			// $i = 0;			
@@ -189,6 +198,22 @@ class IntegrationStock implements IntegrationStockInterface {
         		$quantity 	  = ($this->validation->validateArray(IntegrationStockInterface::IMS_QUANTITY, $dataStock) == NULL)? 0 : (int) $this->validation->validateArray(IntegrationStockInterface::IMS_QUANTITY, $dataStock);
         	    $checkSource  = $this->checkSourceExist($locationCode);
         	    $messageValue = '';
+
+        	    // get row id
+        	    $queryRowId = "select row_id FROM catalog_product_entity where sku = '".$productSku."' limit 1";
+        	    $getRowId = $connectionCheck->fetchRow($queryRowId);
+
+				// get value is fresh
+        	    $queryIsFresh = "select value FROM catalog_product_entity_int where row_id = '".$getRowId['row_id']."' AND attribute_id = '".$getGetAttrIdIsFresh['attribute_id']."' limit 1";
+				$getIsFresh = $connectionCheck->fetchRow($queryIsFresh);
+
+				// get value weight
+        	    $queryWeight = "select value FROM catalog_product_entity_decimal where row_id = '".$getRowId['row_id']."' AND attribute_id = '".$getGetAttrIdWeight['attribute_id']."' limit 1";
+				$getWeight = $connectionCheck->fetchRow($queryWeight);
+
+				// get value sold_in
+        	    $querySoldIn = "select value FROM catalog_product_entity_varchar where row_id = '".$getRowId['row_id']."' AND attribute_id = '".$getGetAttrIdSoldIn['attribute_id']."' limit 1";
+				$getSoldIn = $connectionCheck->fetchRow($querySoldIn);
 
         	    //Check source, if does not exist added as new source (store).
         	    if ($checkSource == NULL && strpos($locationCode, ' ') === false) {
@@ -207,6 +232,13 @@ class IntegrationStock implements IntegrationStockInterface {
 		                // $sourceItem->setStatus(IntegrationStockInterface::IMS_STATUS);
 		                // $items = array($sourceItem);
 		            	// $this->sourceItemSave->execute($items);
+
+						if ($getIsFresh['value'] == 1) {
+							if ($getSoldIn['value'] == 'kg' || $getSoldIn['value'] == 'Kg' || $getSoldIn['value'] == 'KG') {
+								$qtyCalc = ($quantity * 1000) / $getWeight['value'];
+								$quantity = floor($qtyCalc);
+							}
+						}
 
 						// raw query set stock
 						// check if sku and store exist on table inventory_source_item
