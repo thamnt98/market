@@ -152,23 +152,25 @@ class TransmartParentOrder extends ParentOrder
 
         if ($orderIncrementId != null) {
             $data[PaymentInfoDataInterface::TRANSACTION_ID] = $payment->getLastTransId();
-
             if (is_array($paymentMethodSplit)) {
                 $methodShort = $paymentMethodSplit[count($paymentMethodSplit) - 1];
                 if ($methodShort == "va") {
+                  $expireDate = '';
+                  $virtualAccount = '';
                   try {
-                    $expireDate = '';
-                    $virtualAccount = '';
                     $paymentData = $this->transactionHelper->getLastOrderTransaction($payment->getParentId());
                     if ($mepayTxnData = $paymentData->getTransMepayTransaction()) {
+
+                      $this->logger->critical($mepayTxnData);
                       $txnData = $this->json->unserialize($mepayTxnData);
-                      if (isset($txnData['statusData']) && $txnData['statusData']) {
-                        $txExpireDate = str_replace('T','', $txnData['statusData']['expireTime']);
-                        //$txExpireDate = str_replace('Z', '', $txExpireDate);
-                        $txExpireDate = substr($txExpireDate, 0, strpos($txExpireDate, ".")); 
-                        $expireDate = isset($txnData['statusData']['expireTime'])? 
-                        $this->timezone->date($txExpireDate)->format('M j, Y g:i:s A') : $expireDate;
+                      if (isset($txnData['statusData']['vaNumber']) && $txnData['statusData']['vaNumber']) {
                         $virtualAccount = isset($txnData['statusData']['vaNumber'])? $txnData['statusData']['vaNumber'] : $virtualAccount;
+                        $this->logger->critical($virtualAccount);
+                        $txExpireDate = str_replace('T',' ', $txnData['statusData']['expireTime']);
+                        $txExpireDate = substr($txExpireDate, 0, strpos($txExpireDate, "."));
+                        $this->logger->critical($txExpireDate);
+                        $expireDate = $this->timezone->date(date_create($txExpireDate))->format('M j, Y g:i:s A');
+                        $this->logger->critical($expireDate);
                       }
                     }
 
@@ -189,6 +191,7 @@ class TransmartParentOrder extends ParentOrder
                 }
             }
         }
+
 
         $this->dataObjectHelper->populateWithArray(
             $paymentInfoData,
