@@ -20,6 +20,7 @@ use Magento\Framework\UrlInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Magento\Framework\Serialize\Serializer\Json;
+use Magento\Framework\Stdlib\DateTime\DateTime;
 use Trans\Sprint\Api\SprintResponseRepositoryInterface;
 use SM\Sales\Observer\SetEmailNewOrderData;
 use Trans\Mepay\Helper\Payment\Transaction as TransactionHelper;
@@ -28,14 +29,29 @@ use Trans\Mepay\Helper\Data;
 
 class TransmartSetEmailNewOrderData extends SetEmailNewOrderData
 {
+    /**
+     * @var Json
+     */
     protected $json;
+    
+    /**
+     * @var TransactionHelper
+     */
     protected $transactionHelper;
+    
+    /**
+     * @LoggerWrite
+     */
     protected $logger;
 
     /**
      * SetEmailNewOrderData constructor.
+     * @param Json $json
+     * @param TransactionHelper $transactionHelper
+     * @param LoggerWrite $logger
      * @param PriceHelper $priceHelper
      * @param UrlInterface $url
+     * @param DateTime $date
      * @param SprintResponseRepositoryInterface $sprintResponseRepository
      */
     public function __construct(
@@ -44,12 +60,13 @@ class TransmartSetEmailNewOrderData extends SetEmailNewOrderData
         LoggerWrite $logger,
         PriceHelper $priceHelper,
         UrlInterface $url,
+        DateTime $date,
         SprintResponseRepositoryInterface $sprintResponseRepository
     ) {
         $this->json = $json;
         $this->logger = $logger;
         $this->transactionHelper = $transactionHelper;
-        parent::__construct($priceHelper, $url, $sprintResponseRepository);
+        parent::__construct($priceHelper, $url, $date, $sprintResponseRepository);
     }
 
     /**
