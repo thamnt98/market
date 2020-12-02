@@ -266,6 +266,15 @@
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
             </group>
+            <group id="oar_log" translate="label" sortOrder="70" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Enable OAR Log</label>
+                <field id="active" showInDefault="1" showInStore="1" showInWebsite="1" sortOrder="10" translate="label"
+                       type="select">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
         </section>
         <section id="sm_checkout_fulfillment" translate="label" sortOrder="100" showInDefault="1" showInWebsite="1"
                  showInStore="1">

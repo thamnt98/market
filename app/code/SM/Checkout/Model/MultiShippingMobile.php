@@ -26,6 +26,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
     protected $itemSelectShippingAddressId = [];
     protected $errorCheckout = false;
     protected $errorCheckoutByAddress = false;
+    protected $rebuild = false;
     /**
      * @var bool
      */
@@ -465,7 +466,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
 
         return $this->handleCheckoutData(
             $cartId,
-            $items,
+            $this->requestItems,
             $additionalInfo,
             $customer,
             $checkoutSession,
@@ -647,7 +648,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         $checkoutSession->setQuote($quote);
         $checkoutSession->setCustomer($customer->getDataModel());
         $format = $this->multiShippingHandle->itemsFormat($items);
-        $items = $format['item_format'];
+        //$items = $format['item_format'];
         $this->requestItems = $format['item_request'];
         $this->itemSelectShippingAddressId = $format['shipping_list'];
         $defaultShippingAddress = $customer->getDefaultShippingAddress();
@@ -819,14 +820,15 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
             $items,
             $this->multiShippingHandle->storePickUpFormat($additionalInfo),
             $customer,
-            $checkoutSession
+            $checkoutSession,
+            true
         );
-        if ($init) {
+        /*if ($init) {
             try {
                 $this->voucherInterface->mobileApplyVoucher($cartId, '', true);
             } catch (\Exception $e) {
             }
-        }
+        }*/
         if ($collectVoucher) {
             $voucherData = $this->getAllVoucherApply($cartId, $checkoutSession->getQuote());
         } else {
@@ -837,7 +839,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         $checkoutSession->setQuote($quote);
         $previewOrderProcess = $this->multiShippingHandle->getPreviewOrderData($checkoutSession->getQuote(), false);
         $shippingMethodSelected = $previewOrderProcess['shipping_method_selected'];
-        $quoteItems = $this->getQuoteItemsData($items, $shippingMethodSelected, $checkoutSession, $dataHandle);
+        $quoteItems = $this->getQuoteItemsData($dataHandle['mobile-items-format'], $shippingMethodSelected, $checkoutSession, $dataHandle);
         if (!$message) {
             $message = '';
             if (isset($dataHandle['error_stock']) && $dataHandle['error_stock']) {
@@ -862,36 +864,17 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
             }
         }
 
-        if ($dataHandle['error'] || $this->cartEmpty) {
+        if ($dataHandle['error'] || $this->cartEmpty || $this->errorCheckoutByAddress) {
             $this->errorCheckout = true;
         }
-
         $customerId = $customer->getId();
-        $rebuild = false;
-        foreach ($quoteItems as $item) {
-            $ShippingMethodSelected = $item->getShippingMethodSelected();
-            if ($ShippingMethodSelected == \SM\Checkout\Model\MultiShippingHandle::STORE_PICK_UP) {
-                continue;
-            }
-            $shippingMethodList = $item->getShippingMethod();
-            $shippingMethodListEnable = [];
-            foreach ($shippingMethodList as $shippingMethod) {
-                if (!$shippingMethod->getDisabled()) {
-                    $shippingMethodListEnable[] = $shippingMethod->getValue();
-                }
-            }
-            if (empty($shippingMethodListEnable)) {
-                $items[$item->getItemId()]['shipping_method'] = \SM\Checkout\Model\MultiShippingHandle::NOT_AVAILABLE;
-            } elseif (!in_array($ShippingMethodSelected, $shippingMethodListEnable)) {
-                $rebuild = true;
-                $items[$item->getItemId()]['shipping_method'] = $shippingMethodListEnable[0];
-            }
-        }
-        if ($rebuild) {
+        if ($this->rebuild) {
+            $this->rebuild = false;
             $this->errorCheckout = false;
+            $message = false;
             return $this->handleCheckoutData(
                 $cartId,
-                $items,
+                $quoteItems,
                 $additionalInfo,
                 $customer,
                 $checkoutSession,
@@ -1119,32 +1102,38 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
                 if ($shippingMethod == \SM\Checkout\Model\MultiShippingHandle::TRANS_COURIER) {
                     $shippingMethod = \SM\Checkout\Model\MultiShippingHandle::SAME_DAY;
                 }
-                $quoteItemModel->setShippingMethodSelected($shippingMethod);
                 $shippingMethodList = [];
-
+                $shippingMethodEnable = [];
                 foreach ($this->split->getListMethodFakeName() as $value => $label) {
-                    $shippingMethod = $this->shippingMethodInterfaceFactory->create();
-                    $shippingMethod->setValue('transshipping_transshipping' . $value)->setLabel($label);
+                    $shippingMethodObj = $this->shippingMethodInterfaceFactory->create();
+                    $shippingMethodObj->setValue('transshipping_transshipping' . $value)->setLabel($label);
                     if ($data['shipping_method'] == \SM\Checkout\Model\MultiShippingHandle::DC) {
                         $data['shipping_method'] = \SM\Checkout\Model\MultiShippingHandle::DEFAULT_METHOD;
                     } elseif ($data['shipping_method'] == \SM\Checkout\Model\MultiShippingHandle::TRANS_COURIER) {
                         $data['shipping_method'] = \SM\Checkout\Model\MultiShippingHandle::SAME_DAY;
                     }
                     if ($data['shipping_method'] == \SM\Checkout\Model\MultiShippingHandle::STORE_PICK_UP) {
-                        $shippingMethod->setDisabled(false);
+                        $shippingMethodObj->setDisabled(false);
                     } else {
                         if (in_array(
                             'transshipping_transshipping' . $value,
                             $dataHandle['data'][$quoteItemId]
                         )) {
-                            $shippingMethod->setDisabled(false);
+                            $shippingMethodObj->setDisabled(false);
+                            $shippingMethodEnable[] = 'transshipping_transshipping' . $value;
                         } else {
-                            $shippingMethod->setDisabled(true);
+                            $shippingMethodObj->setDisabled(true);
                         }
                     }
-                    $shippingMethodList[] = $shippingMethod;
+                    $shippingMethodList[] = $shippingMethodObj;
                 }
-
+                if ($shippingMethod != \SM\Checkout\Model\MultiShippingHandle::STORE_PICK_UP && empty($shippingMethodEnable)) {
+                    $shippingMethod = \SM\Checkout\Model\MultiShippingHandle::NOT_AVAILABLE;
+                } elseif ($shippingMethod != \SM\Checkout\Model\MultiShippingHandle::STORE_PICK_UP && !in_array($shippingMethod, $shippingMethodEnable)) {
+                    $this->rebuild = true;
+                    $shippingMethod = $shippingMethodEnable[0];
+                }
+                $quoteItemModel->setShippingMethodSelected($shippingMethod);
                 $quoteItemModel->setShippingMethod($shippingMethodList);
                 $deliveryData = $items[$quoteItemId]['delivery'];
                 $delivery = $this->deliveryInterfaceFactory->create()

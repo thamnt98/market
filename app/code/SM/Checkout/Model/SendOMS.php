@@ -229,14 +229,14 @@ class SendOMS {
 			$itemData     = [
 				'sku_basic' => '',
 				'sku' => $item->getSku(),
-				'quantity' => (int) $qty,
+				'quantity' => (float) $qty,
 				'ori_price' => (int) $oriPrice,
 				'sell_price' => (int) $sellPrice,
 				'disc_price' => (int) $discPrice,
 				'paid_price' => (int) $padPrice,
 				'sub_total' => (int) $subTotal,
-				'total_weight' => (int) $weight * (int) $qty,
-				'weight' => (int) $weight,
+				'total_weight' => (float) $weight * (float) $qty,
+				'weight' => (float) $weight,
 				'coupon_code' => '', // pass
 				'coupon_val' => 0,
 				'is_warehouse' => $product->getIsWarehouse(),

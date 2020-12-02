@@ -100,8 +100,10 @@ $helper = $this->helper(\Magento\Search\Helper\Data::class);
     require(
         [
             'SearchMiniForm'
-        ],
-        function( SearchMiniForm) {
-            SearchMiniForm.init();
+        ], function( SearchMiniForm) {
+            window.addEventListener("load", function() {
+                SearchMiniForm.init();
+            });
         });
+
 </script>

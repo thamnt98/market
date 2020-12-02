@@ -10,6 +10,8 @@ namespace SM\Checkout\Observer;
 
 use Magento\Framework\Event\Observer as EventObserver;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Framework\Exception\InputException;
+use Magento\Framework\Exception\LocalizedException;
 
 /**
  * Class RemoveItemsOutOfStock
@@ -21,43 +23,57 @@ class RemoveItemsOutOfStock implements ObserverInterface
      * @var \Magento\Checkout\Model\Session
      */
     protected $checkoutSession;
+
     /**
      * @var \Magento\Quote\Api\CartRepositoryInterface
      */
     protected $quoteRepository;
+
     /**
      * @var \Magento\CatalogInventory\Api\StockRegistryInterface
      */
     protected $stockRegistryInterface;
+
     /**
      * @var \Magento\Framework\Message\ManagerInterface
      */
     protected $messageManager;
+
     /**
      * @var \Magento\Quote\Model\ResourceModel\Quote\Item\CollectionFactory
      */
     private $quoteItemCollectionFactory;
 
     /**
+     * @var \Magento\InventoryCatalog\Model\GetStockIdForCurrentWebsite
+     */
+    private $getStockIdForCurrentWebsite;
+
+    /**
+     * @var \Magento\InventorySalesApi\Api\GetProductSalableQtyInterface
+     */
+    private $getProductSalableQty;
+
+    /**
      * RemoveItemsOutOfStock constructor.
      * @param \Magento\Checkout\Model\Session $checkoutSession
-     * @param \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistryInterface
      * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
      * @param \Magento\Framework\Message\ManagerInterface $messageManager
-     * @param \Magento\Quote\Model\ResourceModel\Quote\Item\CollectionFactory $quoteItemCollectionFactory
+     * @param \Magento\InventorySalesApi\Api\GetProductSalableQtyInterface $getProductSalableQty
+     * @param \Magento\InventoryCatalog\Model\GetStockIdForCurrentWebsite $getStockIdForCurrentWebsite
      */
     public function __construct(
         \Magento\Checkout\Model\Session $checkoutSession,
-        \Magento\CatalogInventory\Api\StockRegistryInterface $stockRegistryInterface,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Framework\Message\ManagerInterface $messageManager,
-        \Magento\Quote\Model\ResourceModel\Quote\Item\CollectionFactory $quoteItemCollectionFactory
+        \Magento\InventorySalesApi\Api\GetProductSalableQtyInterface $getProductSalableQty,
+        \Magento\InventoryCatalog\Model\GetStockIdForCurrentWebsite $getStockIdForCurrentWebsite
     ) {
         $this->checkoutSession = $checkoutSession;
-        $this->stockRegistryInterface = $stockRegistryInterface;
         $this->quoteRepository = $quoteRepository;
         $this->messageManager = $messageManager;
-        $this->quoteItemCollectionFactory = $quoteItemCollectionFactory;
+        $this->getProductSalableQty = $getProductSalableQty;
+        $this->getStockIdForCurrentWebsite = $getStockIdForCurrentWebsite;
     }
 
     /**
@@ -68,9 +84,19 @@ class RemoveItemsOutOfStock implements ObserverInterface
     public function execute(EventObserver $observer)
     {
         $quote = $this->checkoutSession->getQuote();
+        $needToSaveQuote = false;
 
-        $quote->getPayment()->setMethod(null);
-        $quote->getShippingAddress()->setShippingMethod(null);
+        $quotePayment =  $quote->getPayment();
+        if ($quotePayment->getMethod()) {
+            $quotePayment->setMethod(null);
+            $needToSaveQuote = true;
+        }
+
+        $quoteShippingAddress = $quote->getShippingAddress();
+        if ($quoteShippingAddress->getShippingMethod()) {
+            $quoteShippingAddress->setShippingMethod(null);
+            $needToSaveQuote = true;
+        }
 
         if ($quote->getIsMultiShipping()) {
             $quote->setIsMultiShipping(0);
@@ -80,49 +106,38 @@ class RemoveItemsOutOfStock implements ObserverInterface
             }
         }
 
-        if (($quote->getAllVisibleItems()) > 0) {
+        if ($quoteItems = $quote->getAllVisibleItems()) {
             $hasRemove = false;
             $hasUpdate = false;
 
-            foreach ($quote->getAllVisibleItems() as $item) {
-                $isOutOfStock = $this->stockRegistryInterface->getProductStockStatus($item->getProduct()->getId());
-
-                if (!$isOutOfStock) {
+            foreach ($quoteItems as $item) {
+                $product = $item->getProduct();
+                if (!$product->getIsSalable()) {
                     $quote->removeItem($item->getId());
                     $hasRemove = true;
                 }
 
-
-                switch ($item->getProduct()->getTypeId()) {
-                    case \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE:
-                        $maxqty = $this->getConfigItemStock($item);
-                        break;
-                    case \Magento\Bundle\Model\Product\Type::TYPE_CODE:
-                        $maxqty = $this->getBundleItemStock($item);
-                        break;
-                    default:
-                        $maxqty = $this->getItemStock($item->getProduct()->getId());
-                }
-
-                if ($item->getQty() >= $maxqty) {
-                    $item->setQty($maxqty);
+                $maxQty = $this->getSaleableQty($item->getProduct()->getSku());
+                if ($item->getQty() >= $maxQty) {
+                    $item->setQty((float)$maxQty);
                     $hasUpdate = true;
                 }
             }
 
             if ($hasRemove || $hasUpdate) {
-                $quote->setTotalsCollectedFlag(false)->collectTotals();
-
+                $needToSaveQuote = true;
+                $quote->setTotalsCollectedFlag(false);
                 if ($hasRemove) {
                     $this->messageManager->addSuccessMessage(
                         __("We found some out of stock items in your cart. We've removed the items for you.")
                     );
                 }
             }
+
+            if ($needToSaveQuote) {
+                $this->quoteRepository->save($quote);
+            }
         }
-
-        $this->quoteRepository->save($quote);
-
     }
 
     /**
@@ -184,5 +199,21 @@ class RemoveItemsOutOfStock implements ObserverInterface
         $minQty = $this->stockRegistryInterface->getStockItemBySku($item->getSku())->getMinQty();
         $stockQty = $this->stockRegistryInterface->getStockStatusBySku($item->getSku())->getQty();
         return $stockQty - $minQty;
+    }
+
+    /**
+     * @param string $sku
+     * @return float|int
+     */
+    protected function getSaleableQty(string $sku)
+    {
+        $stockId = $this->getStockIdForCurrentWebsite->execute();
+        try {
+            return $this->getProductSalableQty->execute($sku, $stockId);
+        } catch (InputException $e) {
+            return 0;
+        } catch (LocalizedException $e) {
+            return 0;
+        }
     }
 }

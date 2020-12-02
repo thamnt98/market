@@ -132,7 +132,7 @@ class RemindPickup extends AbstractGenerate
             ],
             'content' => [
                 $data['store_name'] ?? '',
-                $data['increment_id'] ?? '',
+                $data['reference_order_id'] ?? $data['reference_number'] ?? $data['increment_id'] ?? '',
                 $data['expired'] ?? '',
             ],
         ];
@@ -246,6 +246,8 @@ class RemindPickup extends AbstractGenerate
             'o.entity_id',
             'o.increment_id',
             'o.customer_id',
+            'o.reference_number',
+            'o.reference_order_id',
             "CONCAT(o.customer_firstname,' ', o.customer_lastname) as customer_name",
             'source.name as store_name',
             'DATE_ADD(' .

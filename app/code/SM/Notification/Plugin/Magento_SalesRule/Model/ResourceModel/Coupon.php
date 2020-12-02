@@ -23,9 +23,9 @@ class Coupon
     protected $emailHelper;
 
     /**
-     * @var \SM\Notification\Helper\CustomerSetting
+     * @var \SM\Notification\Model\EventSetting
      */
-    protected $settingHelper;
+    protected $eventSetting;
 
     /**
      * @var \SM\Notification\Model\NotificationFactory
@@ -58,7 +58,7 @@ class Coupon
      * @param \Magento\Customer\Model\ResourceModel\CustomerRepository $customerRepository
      * @param \Magento\Store\Model\App\Emulation                       $emulation
      * @param \SM\Notification\Helper\Generate\Email                   $emailHelper
-     * @param \SM\Notification\Helper\CustomerSetting                  $settingHelper
+     * @param \SM\Notification\Model\EventSetting                      $eventSetting
      * @param \SM\Notification\Model\NotificationFactory               $notificationFactory
      * @param \SM\Notification\Model\ResourceModel\Notification        $notificationResource
      * @param \Magento\Framework\Logger\Monolog|null                   $logger
@@ -67,13 +67,13 @@ class Coupon
         \Magento\Customer\Model\ResourceModel\CustomerRepository $customerRepository,
         \Magento\Store\Model\App\Emulation $emulation,
         \SM\Notification\Helper\Generate\Email $emailHelper,
-        \SM\Notification\Helper\CustomerSetting $settingHelper,
+        \SM\Notification\Model\EventSetting $eventSetting,
         \SM\Notification\Model\NotificationFactory $notificationFactory,
         \SM\Notification\Model\ResourceModel\Notification $notificationResource,
         \Magento\Framework\Logger\Monolog $logger = null
     ) {
         $this->emailHelper = $emailHelper;
-        $this->settingHelper = $settingHelper;
+        $this->eventSetting = $eventSetting;
         $this->notificationFactory = $notificationFactory;
         $this->notificationResource = $notificationResource;
         $this->logger = $logger;
@@ -134,43 +134,22 @@ class Coupon
             ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_VOUCHER_DETAIL)
             ->setRedirectId($ruleId);
 
-        $setting = $this->settingHelper->getCustomerSetting($customer->getId());
-        $isSendMail = in_array(
-            $this->settingHelper->generateSettingCode(
-                \SM\Notification\Model\Notification::EVENT_PROMO_AND_EVENT,
-                'email'
-            ),
-            $setting
-        );
-        $isPush = in_array(
-            $this->settingHelper->generateSettingCode(
-                \SM\Notification\Model\Notification::EVENT_PROMO_AND_EVENT,
-                'push'
-            ),
-            $setting
-        );
-        $isSms = in_array(
-            $this->settingHelper->generateSettingCode(
-                \SM\Notification\Model\Notification::EVENT_PROMO_AND_EVENT,
-                'sms'
-            ),
-            $setting
-        );
+        $this->eventSetting->init($customer->getId(), \SM\Notification\Model\Notification::EVENT_PROMO_AND_EVENT);
         // Emulation store view
         $this->emulation->startEnvironmentEmulation(
             $customer->getStoreId(),
             \Magento\Framework\App\Area::AREA_FRONTEND
         );
-        if ($isPush) {
+        if ($this->eventSetting->isPush()) {
             $notification->setPushTitle(__($title, $params)->__toString())
                 ->setPushContent(__($content)->__toString());
         }
 
-        if ($isSendMail) {
+        if ($this->eventSetting->isEmail()) {
             // send mail
         }
 
-        if ($isSms) {
+        if ($this->eventSetting->isSms()) {
             $notification->setSms(
                 __('%1, we have a voucher for you.Find it on My Voucher!', $customerName)->__toString()
             );

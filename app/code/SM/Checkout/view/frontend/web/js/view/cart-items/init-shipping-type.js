@@ -798,16 +798,8 @@ define([
                                 }
                                 shippingMethodListValid[itemId].push(method.method_code);
                             });
-/*                            if (setShippingType.getValue()() == 0 && response.show_each_items) {
-                                if (shippingMethodListValid[itemId].indexOf(selectSingleShippingMethod()) !== -1) {
-                                    processing = true;
-                                    shippingMethodSelectList[itemId](selectSingleShippingMethod());
-                                    return true;
-                                }
-                            }*/
                             if (shippingMethodListValid[itemId].indexOf(shippingMethodSelectList[itemId]()) === -1) {
                                 processing = true;
-                                //deliveryMethodListError[itemId](true);
                                 shippingMethodSelectList[itemId](firsValidShippingMethod);
                             }
                         });

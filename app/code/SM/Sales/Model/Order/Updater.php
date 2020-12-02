@@ -145,7 +145,10 @@ class Updater
             $connection->commit();
             $this->eventManager->dispatch(
                 'sm_sales_order_status_update',
-                ['order' => $order]
+                [
+                    'order' => $order->setStatus(ParentOrderRepositoryInterface::STATUS_COMPLETE)
+                        ->setState(ParentOrderRepositoryInterface::STATUS_COMPLETE)
+                ]
             );
             $this->updateParentOrderStatus($order);
         } catch (\Exception $exception) {

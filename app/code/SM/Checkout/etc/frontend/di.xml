@@ -55,4 +55,7 @@
             </argument>
         </arguments>
     </type>
+    <type name="Magento\Checkout\Block\Cart">
+        <plugin name="sm_transcheckout_cart_items" type="SM\Checkout\Plugin\Checkout\Block\CartPlugin" sortOrder="50" />
+    </type>
 </config>

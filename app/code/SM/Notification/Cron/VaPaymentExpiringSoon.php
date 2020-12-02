@@ -95,7 +95,7 @@ class VaPaymentExpiringSoon extends AbstractGenerate
                         [
                             'event_id'   => $item->getData('order_id'),
                             'event_type' => 'order',
-                            'event_name' => $event
+                            'event_name' => $event,
                         ]
                     );
                 } else {
@@ -138,9 +138,11 @@ class VaPaymentExpiringSoon extends AbstractGenerate
         $message = 'Order %1 is waiting for your payment. The time is due by %2.';
         $params = [
             'content' => [
-                $sprintItem->getData('increment_id'),
-                $expireDate
-            ]
+                $sprintItem->getData('reference_order_id')
+                ?? $sprintItem->getData('reference_number')
+                ?? $sprintItem->getData('increment_id'),
+                $expireDate,
+            ],
         ];
 
         /** @var \SM\Notification\Model\Notification $notification */
@@ -211,9 +213,11 @@ class VaPaymentExpiringSoon extends AbstractGenerate
                 ['o' => 'sales_order'],
                 "o.reference_number = main_table.transaction_no AND o.status = 'pending_payment'",
                 [
-                    'increment_id' => 'o.increment_id',
-                    'order_id'     => 'o.entity_id',
-                    'customer_id'  => 'o.customer_id',
+                    'increment_id'       => 'o.increment_id',
+                    'order_id'           => 'o.entity_id',
+                    'customer_id'        => 'o.customer_id',
+                    'reference_order_id' => 'o.reference_order_id',
+                    'reference_number'   => 'o.reference_number',
                 ]
             )->joinLeft(
                 ['n' => \SM\Notification\Model\ResourceModel\TriggerEvent::TABLE_NAME],

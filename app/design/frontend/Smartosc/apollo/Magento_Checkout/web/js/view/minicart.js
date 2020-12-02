@@ -10,10 +10,11 @@ define([
     'ko',
     'underscore',
     'mage/url',
+    'SM_GTM/js/gtm/sm-gtm-cart-collect-data',
     'sidebar',
     'mage/translate',
     'mage/dropdown',
-], function (Component, customerData, $, ko, _, urlBuilder) {
+], function (Component, customerData, $, ko, _, urlBuilder, gtm) {
     'use strict';
 
     var sidebarInitialized = false,
@@ -246,13 +247,16 @@ define([
                 itemQty = $('#cart-item-'+ itemId),
                 elementId = $('button#minicart-add-cart-item-' + itemId),
                 downElementId = $('button#minicart-subtract-cart-item-' + itemId),
-                increaseItemQty,
-                itemStockQty = $(this).attr('itemStock');
+                itemStockQty = $(this).attr('itemStock'),
+                productId = $(this).attr('productId');
 
             if (elementId.is('[readonly]')) {
                 return this;
             }
             itemQty.val(parseInt(itemQty.val()) + 1);
+
+            //Increase quantity GTM
+            gtm.collectData('addToCart', productId, itemQty.val())
 
             if (parseInt(itemQty.val()) >= 99 || parseInt(itemQty.val()) >= itemStockQty) {
                 elementId.css("background", "#ccc");
@@ -273,7 +277,7 @@ define([
                 itemQty = $('#cart-item-'+ itemId),
                 elementId = $('button#minicart-subtract-cart-item-' + itemId),
                 plusElementId = $('button#minicart-add-cart-item-' + itemId),
-                decreaseItemQty;
+                productId = $(this).attr('productId');
 
             if (elementId.is('[readonly]')) {
                 return this;
@@ -282,6 +286,9 @@ define([
             if (itemQty.val() > 1) {
                 itemQty.val(itemQty.val() - 1);
             }
+
+            //Decrease quantity GTM
+            gtm.collectData('removeFromCart', productId, itemQty.val())
 
             if (parseInt(itemQty.val()) <= 1) {
                 elementId.css("background", "#ccc");

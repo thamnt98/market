@@ -6,7 +6,7 @@
  *
  * @var $block \SM\GTM\Block\Product\ListProduct
  */
-$position = 1;
+$positionGTM = 1;
 $helper = $this->helper('SM\Catalog\Helper\Data');
 $isPopupShowed = false;
 $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
@@ -14,7 +14,6 @@ $category = $block->getLayer()->getCurrentCategory();
 ?>
 <?php foreach ($_productCollection as $_product) : ?>
     <?php $dataGTM = $block->escapeHtml($block->getGtm($_product)); ?>
-<?php if ($helper->isProductStockStatus($_product->getId())): ?>
     <li class="item product product-item">
         <div class="product-item-info"
              data-container="product-<?= /* @noEscape */
@@ -31,7 +30,7 @@ $category = $block->getLayer()->getCurrentCategory();
                class="product photo product-item-photo"
                <?php if ($dataGTM) : ?>
                data-gtm-product="<?= $dataGTM ?>"
-               data-position="<?= $position ?>"
+               data-position="<?= $positionGTM ?>"
                <?php endif; ?>
                tabindex="-1">
                 <?= $productImage->toHtml() ?>
@@ -52,7 +51,7 @@ $category = $block->getLayer()->getCurrentCategory();
                     <a class="product-item-link <?= $_product->getId() ?>plp"
                        <?php if ($dataGTM) : ?>
                        data-gtm-product="<?= $dataGTM ?>"
-                       data-position="<?= $position ?>"
+                       data-position="<?= $positionGTM ?>"
                        <?php endif; ?>
                        href="<?= $block->escapeHtmlAttr($_product->getProductUrl(), false) ?>">
                         <?= /* @noEscape */
@@ -78,11 +77,11 @@ $category = $block->getLayer()->getCurrentCategory();
                     <div class="product actions product-item-actions"
                          <?= strpos($pos, $viewMode . '-actions') ? $block->escapeHtmlAttr($position) : '' ?>
                          data-gtm-product='<?= $dataGTM ?>'
-                         data-position="<?= $position ?>">
+                         data-position="<?= $positionGTM ?>">
                         <?php include($block->getTemplateFile('Magento_Catalog::product/list/cta-button.phtml')) ?>
                         <div <?php if ($dataGTM) : ?>
                              data-gtm-product='<?= $dataGTM ?>'
-                             data-position="<?= $position ?>"
+                             data-position="<?= $positionGTM ?>"
                              <?php endif; ?>
                              data-role="add-to-links" class="actions-secondary"
                              <?= strpos($pos, $viewMode . '-secondary') ? $block->escapeHtmlAttr($position) : '' ?>>
@@ -101,7 +100,7 @@ $category = $block->getLayer()->getCurrentCategory();
                                class="action more"
                                <?php if ($dataGTM) : ?>
                                data-gtm-product='<?= $dataGTM ?>'
-                               data-position="<?= $position ?>"
+                               data-position="<?= $positionGTM ?>"
                                <?php endif; ?>
                             ><?= $block->escapeHtml(__('Learn More')) ?></a>
                         </div>
@@ -122,7 +121,6 @@ $category = $block->getLayer()->getCurrentCategory();
             <?php endif;?>
         <?php endif;?>
     </li>
-    <?php endif; ?>
     <script>
         require(['jquery', "gtmProduct", 'domReady!'], function ($, gtm) {
             if (typeof dataLayerSourceObjects !== 'undefined') {
@@ -141,7 +139,7 @@ $category = $block->getLayer()->getCurrentCategory();
             }
         });
     </script>
-    <?php $position++; ?>
+    <?php $positionGTM++; ?>
 <?php endforeach; ?>
 <script>
     require(['jquery', "gtmProduct", 'Magento_Ui/js/lib/view/utils/async', 'domReady!'], function ($, gtm, async) {

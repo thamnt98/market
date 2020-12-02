@@ -706,8 +706,39 @@ class Multishipping extends \Magento\Framework\DataObject
             }
         }
         $this->prepareShippingAssignment($quote);
+        $this->collectVoucher();
         $this->save();
         return $this;
+    }
+
+    /**
+     * collect Voucher
+     */
+    public function collectVoucher()
+    {
+        $quote = $this->getQuote();
+        $couponCode = $this->getQuote()->getApplyVoucher();
+        $newApplyCoupon = explode(',', $couponCode);
+
+        if ($quote->getApplyVoucher() && $quote->getApplyVoucher() != '') {
+            $oldApplyCoupon = explode(',', $quote->getApplyVoucher());
+        } else {
+            $oldApplyCoupon = [];
+        }
+
+        if (!empty(array_diff($oldApplyCoupon, $newApplyCoupon)) || !empty(array_diff($newApplyCoupon, $oldApplyCoupon))) {
+            $this->getQuote()->setApplyVoucher($couponCode);
+        }
+
+        if ($quote->getCouponCode() && $quote->getCouponCode() != '') {
+            $oldCoupon = explode(',', $quote->getCouponCode());
+        } else {
+            $oldCoupon = [];
+        }
+
+        if (!empty(array_diff($oldCoupon, $newApplyCoupon)) || !empty(array_diff($newApplyCoupon, $oldCoupon))) {
+            $this->getQuote()->setCouponCode($couponCode);
+        }
     }
 
     /**

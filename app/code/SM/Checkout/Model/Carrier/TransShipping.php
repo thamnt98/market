@@ -54,6 +54,11 @@ class TransShipping extends AbstractCarrier implements CarrierInterface
     protected $split;
 
     /**
+     * @var \SM\Checkout\Helper\Config
+     */
+    protected $helperConfig;
+
+    /**
      * TransShipping constructor.
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Quote\Model\Quote\Address\RateResult\ErrorFactory $rateErrorFactory
@@ -64,6 +69,7 @@ class TransShipping extends AbstractCarrier implements CarrierInterface
      * @param \Magento\Directory\Model\RegionFactory $regionFactory
      * @param \Magento\Customer\Api\AddressRepositoryInterface $addressRepository
      * @param \SM\Checkout\Model\Split $split
+     * @param \SM\Checkout\Helper\Config $helperConfig
      * @param array $data
      */
     public function __construct(
@@ -76,6 +82,7 @@ class TransShipping extends AbstractCarrier implements CarrierInterface
         \Magento\Directory\Model\RegionFactory $regionFactory,
         \Magento\Customer\Api\AddressRepositoryInterface $addressRepository,
         \SM\Checkout\Model\Split $split,
+        \SM\Checkout\Helper\Config $helperConfig,
         array $data = []
     ) {
         $this->rateResultFactory = $rateResultFactory;
@@ -84,6 +91,7 @@ class TransShipping extends AbstractCarrier implements CarrierInterface
         $this->regionFactory = $regionFactory;
         $this->addressRepository = $addressRepository;
         $this->split = $split;
+        $this->helperConfig = $helperConfig;
         parent::__construct($scopeConfig, $rateErrorFactory, $logger, $data);
     }
 
@@ -288,25 +296,26 @@ class TransShipping extends AbstractCarrier implements CarrierInterface
         foreach ($items as $item) {
             $resetItems[] = $item;
         }
-        return [
-            [
-                "order_id" => $this->customerId,
-                "merchant_code" => $this->split->getMerchantCode(),
-                "destination" => [
-                    "address" => $request->getDestStreet(),
-                    "province" => $province,
-                    "city" => $city,
-                    "district" => $district,
-                    "postcode" => $request->getDestPostcode(),
-                    "latitude" => (float)$lat,
-                    "longitude" => (float)$long,
-                ],
-                "items" => $resetItems,
-                "total_weight" => (int)$request->getPackageWeight(),
-                "total_price" => (int)$totalPrice,
-                "total_qty" => (int)$request->getPackageQty(),
-                "quote_address_id" => $quote->getId() . '-' . $request->getQuoteAddressId()
-            ]
+        $data = [
+            "order_id" => $this->customerId,
+            "merchant_code" => $this->split->getMerchantCode(),
+            "destination" => [
+                "address" => $request->getDestStreet(),
+                "province" => $province,
+                "city" => $city,
+                "district" => $district,
+                "postcode" => $request->getDestPostcode(),
+                "latitude" => (float)$lat,
+                "longitude" => (float)$long,
+            ],
+            "items" => $resetItems,
+            "total_weight" => (int)$request->getPackageWeight(),
+            "total_price" => (int)$totalPrice,
+            "total_qty" => (int)$request->getPackageQty()
         ];
+        if ((bool)$this->helperConfig->isEnableOarLog()) {
+            $data["quote_address_id"] = $quote->getId() . '-' . $request->getQuoteAddressId();
+        }
+        return [$data];
     }
 }

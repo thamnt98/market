@@ -138,7 +138,6 @@ class VaPaymentExpired extends AbstractGenerate
             )->where('n.event_id IS NULL')
             ->where("p.payment_method IN ('" . implode("','", $allowMethods) . "')")
             ->where('p.expire_date < ?', $current)
-//            ->where('main_table.created_at > ?', '2020-11-20') // not send old order
             ->where('main_table.is_parent = ?', 1)
             ->where('main_table.customer_id IS NOT NULL')
             ->where("main_table.status IN ('" . implode("','", $allowStatus) . "')")
@@ -160,7 +159,9 @@ class VaPaymentExpired extends AbstractGenerate
         $content = 'Order %1 has passed the payment due time.';
         $params = [
             'content' => [
-                $order->getIncrementId(),
+                $order->getData('reference_order_id')
+                ?? $order->getData('reference_number')
+                ?? $order->getIncrementId(),
             ],
         ];
         /** @var \SM\Notification\Model\Notification $notification */
