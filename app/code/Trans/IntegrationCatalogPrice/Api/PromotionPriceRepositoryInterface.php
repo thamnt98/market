@@ -74,6 +74,24 @@ interface PromotionPriceRepositoryInterface
      */
     public function loadDataPromoFive($data);
 
+    /**
+     * Load Integration Product by promotype , item type, mix match code, doesnt has salesrule id
+     *
+     * @param mixed $data
+     * @return mixed
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function loadDataPromoFiveItemTwo($data);
+
+    /**
+     * Load Integration Product by promotype , item type, mix match code, doesnt has salesrule id
+     *
+     * @param mixed $data
+     * @return mixed
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function loadDataPromoFiveItemOne($data);
+
      /**
      * Load Integration Product by promotype , discount type, mix match code , sku.
      *
@@ -84,6 +102,15 @@ interface PromotionPriceRepositoryInterface
     public function loadDataPromoFiveCheck($data);
 
     /**
+     * Load Integration Product by sku,  promotype
+     *
+     * @param mixed $data
+     * @return mixed
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function loadDataPromoBySkuPromoType($data);
+
+    /**
      * Load Integration Product by promo id.
      *
      * @param mixed $data
@@ -91,6 +118,15 @@ interface PromotionPriceRepositoryInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function loadDataPromoByPromoId($data);
+
+    /**
+     * Load Integration Product by promo type, discount type , sku ,  store.
+     *
+     * @param mixed $data
+     * @return mixed
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function loadDataPromoByPromoIdStoreCode($data);
 
     /**
      * Load Integration Product by Store attr code.

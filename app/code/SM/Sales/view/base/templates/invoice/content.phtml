@@ -126,7 +126,7 @@ $invoice = $block->getInvoice();
                     <td class="col subtotal"><?= $block->escapeHtml($discountAmount[1])?></td>
                 </tr>
                 <tr class="total">
-                    <?php $GrandTotal = explode(" ",$block->currencyFormat($invoice->getDiscountAmount())); ?>
+                    <?php $GrandTotal = explode(" ",$block->currencyFormat($invoice->getGrandTotal())); ?>
                     <td class="col id"></td>
                     <td class="col subtotal-text">
                         <?= $block->escapeHtml(__('Total Payment')) ?>

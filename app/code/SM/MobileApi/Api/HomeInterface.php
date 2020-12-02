@@ -18,9 +18,4 @@ interface HomeInterface
      * @return \SM\MobileApi\Api\Data\Product\ListInterface
      */
     public function getMostPopular();
-
-    /**
-     * @return \SM\MobileApi\Api\Data\Product\ListInterface
-     */
-    public function getSurpriseDeal();
 }

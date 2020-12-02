@@ -106,21 +106,6 @@ class Quote
     {
         if (!$item->isDeleted() && $item->getIsActive()) {
             return true;
-        } elseif ($this->isCartUpdate() && !$item->isDeleted() && !$item->getIsActive()) {
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * @return bool
-     */
-    protected function isCartUpdate()
-    {
-        $currentUrl = $this->request->getFullActionName();
-        $listUrl = array('transcheckout_cart_update','checkout_cart_add','checkout_sidebar_UpdateItemQty','checkout_cart_updatePost');
-        if (in_array($currentUrl, $listUrl)) {
-            return true;
         }
         return false;
     }

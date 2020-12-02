@@ -2,7 +2,6 @@
 
 namespace SM\MobileApi\Api;
 
-use SM\MobileApi\Api\Data\Product\ListInterface;
 
 /**
  * Interface for managing category information
@@ -15,10 +14,10 @@ interface ProductInterface
      * @param int $category_id
      * @param int $limit
      * @param int $p
-     *
+     * @param bool $layer
      * @return \SM\MobileApi\Api\Data\Product\ListInterface
      */
-    public function getList($category_id, $limit = 12, $p = 1);
+    public function getList($category_id, $limit = 12, $p = 1, $layer = true);
 
     /**
      * Get product details

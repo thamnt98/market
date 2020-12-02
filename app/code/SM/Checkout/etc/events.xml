@@ -20,6 +20,9 @@
         <observer name="magento_customerbalance" disabled="true"/>
         <observer name="magento_reward" disabled="true"/>
     </event>
+    <event name="customer_session_init">
+        <observer name="magento_reward" disabled="true"/>
+    </event>
     <event name="sales_order_invoice_save_before">
         <observer name="add_invoice_reference_number" instance="SM\Checkout\Observer\SetDataToInvoice" />
     </event>
@@ -34,5 +37,10 @@
     <event name="controller_action_predispatch">
         <observer name="sm_transcheckout_active_items"
                   instance="\SM\Checkout\Observer\ActiveItems" />
+    </event>
+
+    <event name="trans_sprint_set_order_cancel_after">
+        <observer name="sm_trancheckout_payment_expire_send_email"
+                  instance="\SM\Checkout\Observer\PaymentExpireSendEmail" />
     </event>
 </config>

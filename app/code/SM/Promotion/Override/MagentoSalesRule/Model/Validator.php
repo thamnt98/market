@@ -91,6 +91,37 @@ class Validator extends \Magento\SalesRule\Model\Validator
 
     public function processShippingAmount(\Magento\Quote\Model\Quote\Address $address)
     {
+        if ($this->checkoutSession->getMainOrder() && $this->checkoutSession->getMainAddress()) {
+            /** @var \Magento\Quote\Model\Quote\Address $mainAddress */
+            $mainAddress = $this->checkoutSession->getMainAddress();
+            if ($mainAddress->getShippingDiscountAmount()) {
+                $address->setAppliedRuleIds($mainAddress->getAppliedRuleIds());
+                $address->setShippingDiscountAmount($mainAddress->getShippingDiscountAmount());
+                $address->setBaseShippingDiscountAmount($mainAddress->getBaseShippingDiscountAmount());
+                $address->setData(
+                    \SM\Promotion\Model\Data\Rule::SHIPPING_RULE_IDS_FIELD,
+                    $this->validatorUtility->mergeIds(
+                        $address->getData(\SM\Promotion\Model\Data\Rule::SHIPPING_RULE_IDS_FIELD),
+                        $mainAddress->getAppliedRuleIds()
+                    )
+                );
+                $address->getQuote()->setData(
+                    \SM\Promotion\Model\Data\Rule::SHIPPING_RULE_IDS_FIELD,
+                    $this->validatorUtility->mergeIds(
+                        $address->getQuote()->getData(\SM\Promotion\Model\Data\Rule::SHIPPING_RULE_IDS_FIELD),
+                        $mainAddress->getAppliedRuleIds()
+                    )
+                )->setAppliedRuleIds(
+                    $this->validatorUtility->mergeIds(
+                        $address->getQuote()->getAppliedRuleIds(),
+                        $mainAddress->getAppliedRuleIds()
+                    )
+                );
+            }
+
+            return $this;
+        }
+
         $shippingAmount = $address->getShippingAmount();
         $baseShippingAmount = $address->getBaseShippingAmount();
         $quote = $address->getQuote();

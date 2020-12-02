@@ -33,7 +33,8 @@ class RemindPickup extends AbstractGenerate
      * @param \Magento\Framework\Filesystem                     $filesystem
      * @param \SM\Sales\Helper\Data                             $orderHelper
      * @param \Magento\Store\Model\App\Emulation                $emulation
-     * @param \SM\Notification\Helper\CustomerSetting           $settingHelper
+     * @param \SM\Notification\Model\EventSetting               $eventSetting
+     * @param \SM\Notification\Helper\Config                    $configHelper
      * @param \SM\Notification\Model\NotificationFactory        $notificationFactory
      * @param \SM\Notification\Model\ResourceModel\Notification $notificationResource
      * @param \Magento\Framework\App\ResourceConnection         $resourceConnection
@@ -45,7 +46,8 @@ class RemindPickup extends AbstractGenerate
         \Magento\Framework\Filesystem $filesystem,
         \SM\Sales\Helper\Data $orderHelper,
         \Magento\Store\Model\App\Emulation $emulation,
-        \SM\Notification\Helper\CustomerSetting $settingHelper,
+        \SM\Notification\Model\EventSetting $eventSetting,
+        \SM\Notification\Helper\Config $configHelper,
         \SM\Notification\Model\NotificationFactory $notificationFactory,
         \SM\Notification\Model\ResourceModel\Notification $notificationResource,
         \Magento\Framework\App\ResourceConnection $resourceConnection,
@@ -54,7 +56,8 @@ class RemindPickup extends AbstractGenerate
         parent::__construct(
             $filesystem,
             $emulation,
-            $settingHelper,
+            $eventSetting,
+            $configHelper,
             $notificationFactory,
             $notificationResource,
             $resourceConnection,
@@ -99,7 +102,10 @@ class RemindPickup extends AbstractGenerate
                     );
                 }
             } catch (\Exception $e) {
-                $this->logger->error("Notification Reminder Pickup create failed: \n\t" . $e->getMessage());
+                $this->logger->error(
+                    "Notification Reminder Pickup create failed: \n\t" . $e->getMessage(),
+                    $e->getTrace()
+                );
             }
         }
     }
@@ -119,14 +125,14 @@ class RemindPickup extends AbstractGenerate
         }
 
         $title = "%1, you haven't picked your order up.";
-        $message = 'Please visit %1 to collect order ID/%2 before %3.';
+        $message = 'Please visit %1 to collect order %2 before %3.';
         $params = [
             'title'   => [
                 $data['customer_name'] ?? '',
             ],
             'content' => [
                 $data['store_name'] ?? '',
-                $data['increment_id'] ?? '',
+                $data['reference_order_id'] ?? $data['reference_number'] ?? $data['increment_id'] ?? '',
                 $data['expired'] ?? '',
             ],
         ];
@@ -135,6 +141,7 @@ class RemindPickup extends AbstractGenerate
         $notification->setTitle($title)
             ->setContent($message)
             ->setEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
+            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
             ->setCustomerIds([$data['customer_id']])
             ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_ORDER_DETAIL)
             ->setRedirectId($order->getData('parent_order') ? $order->getData('parent_order') : $order->getEntityId())
@@ -146,8 +153,8 @@ class RemindPickup extends AbstractGenerate
             \Magento\Framework\App\Area::AREA_FRONTEND
         );
 
-        $notification->setPushTitle(__($title, $params['title']))
-            ->setPushContent(__($message, $params['content']));
+        $notification->setPushTitle(__($title, $params['title'])->__toString())
+            ->setPushContent(__($message, $params['content'])->__toString());
 
         $this->emulation->stopEnvironmentEmulation(); // End Emulation
 
@@ -161,7 +168,7 @@ class RemindPickup extends AbstractGenerate
      */
     protected function getOrderAfterReady()
     {
-        $afterReady = (int)$this->settingHelper->getConfigValue('sm_notification/generate/remind_pickup');
+        $afterReady = $this->configHelper->getRemindPickupDay();
         $select = $this->generateSelect(self::EVENT_NAME_AFTER_READY, $afterReady);
 
         return $this->connection->fetchAssoc($select);
@@ -172,8 +179,8 @@ class RemindPickup extends AbstractGenerate
      */
     protected function getOrderBeforeLimit()
     {
-        $beforeLimit = (int)$this->settingHelper->getConfigValue('sm_notification/generate/remind_pickup_expired');
-        $time = (int)$this->settingHelper->getConfigValue('carriers/store_pickup/date_limit') - $beforeLimit;
+        $beforeLimit = $this->configHelper->getRemindPickupExpiringSoonDay();
+        $time = $this->configHelper->getPickupLimitDay() - $beforeLimit;
 
         if (!$beforeLimit || $time < 0) {
             return [];
@@ -193,7 +200,7 @@ class RemindPickup extends AbstractGenerate
     protected function generateSelect($event, $time)
     {
         $pickupEvent = \SM\Notification\Observer\Order\SaveAfter::TRIGGER_EVENT_ORDER_READY_TO_PICKUP;
-        $limit = (int)$this->settingHelper->getConfigValue('carriers/store_pickup/date_limit');
+        $limit = $this->configHelper->getPickupLimitDay();
 
         $select = $this->connection->select();
         $select->from(
@@ -239,6 +246,8 @@ class RemindPickup extends AbstractGenerate
             'o.entity_id',
             'o.increment_id',
             'o.customer_id',
+            'o.reference_number',
+            'o.reference_order_id',
             "CONCAT(o.customer_firstname,' ', o.customer_lastname) as customer_name",
             'source.name as store_name',
             'DATE_ADD(' .

@@ -39,7 +39,11 @@ class SortBy
 
         $columns = array_keys($newOptions);
         foreach ($options as $key => $option) {
-            if (in_array($option['value'], $columns) || $option['value'] == 'price') {
+            if (empty($option['value'])) {
+                continue;
+            } elseif ($option['value'] === 'name') {
+                $options[$key]['label'] = __('A to Z');
+            } elseif (in_array($option['value'], $columns) || $option['value'] === 'price') {
                 unset($options[$key]);
             }
         }

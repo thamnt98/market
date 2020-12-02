@@ -26,7 +26,7 @@ class Item extends \Magento\Framework\Api\AbstractExtensibleObject implements \S
     const DISABLE = 'disable';
     const MESSAGE = 'message';
     const FRESH_PRODUCT = "fresh_product";
-
+    const DISABLE_STORE_PICK_UP = "disable_store_pick_up";
     const GTM_DATA = 'gtm_data';
     /**
      * {@inheritdoc}
@@ -362,5 +362,21 @@ class Item extends \Magento\Framework\Api\AbstractExtensibleObject implements \S
     public function getFreshProduct()
     {
         return $this->_get(self::FRESH_PRODUCT);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setDisableStorePickUp($value)
+    {
+        return $this->setData(self::DISABLE_STORE_PICK_UP, $value);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getDisableStorePickUp()
+    {
+        return $this->_get(self::DISABLE_STORE_PICK_UP);
     }
 }

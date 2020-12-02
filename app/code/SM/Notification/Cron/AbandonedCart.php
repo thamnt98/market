@@ -30,7 +30,8 @@ class AbandonedCart extends AbstractGenerate
      * @param \Magento\Framework\Filesystem                     $filesystem
      * @param \Magento\Store\Model\App\Emulation                $emulation
      * @param \Magento\Catalog\Api\ProductRepositoryInterface   $productRepository
-     * @param \SM\Notification\Helper\CustomerSetting           $settingHelper
+     * @param \SM\Notification\Model\EventSetting               $eventSetting
+     * @param \SM\Notification\Helper\Config                    $configHelper
      * @param \SM\Notification\Model\NotificationFactory        $notificationFactory
      * @param \SM\Notification\Model\ResourceModel\Notification $notificationResource
      * @param \Magento\Framework\App\ResourceConnection         $resourceConnection
@@ -42,7 +43,8 @@ class AbandonedCart extends AbstractGenerate
         \Magento\Framework\Filesystem $filesystem,
         \Magento\Store\Model\App\Emulation $emulation,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
-        \SM\Notification\Helper\CustomerSetting $settingHelper,
+        \SM\Notification\Model\EventSetting $eventSetting,
+        \SM\Notification\Helper\Config $configHelper,
         \SM\Notification\Model\NotificationFactory $notificationFactory,
         \SM\Notification\Model\ResourceModel\Notification $notificationResource,
         \Magento\Framework\App\ResourceConnection $resourceConnection,
@@ -51,7 +53,8 @@ class AbandonedCart extends AbstractGenerate
         parent::__construct(
             $filesystem,
             $emulation,
-            $settingHelper,
+            $eventSetting,
+            $configHelper,
             $notificationFactory,
             $notificationResource,
             $resourceConnection,
@@ -72,17 +75,25 @@ class AbandonedCart extends AbstractGenerate
 
             try {
                 if ($this->createNotification($item)) {
+                    $event = self::EVENT_NAME;
+                    $this->connection->delete(
+                        \SM\Notification\Model\ResourceModel\TriggerEvent::TABLE_NAME,
+                        "event_id = '{$item['entity_id']}' AND event_type = 'quote' AND event_name = '{$event}'"
+                    );
                     $this->connection->insert(
                         \SM\Notification\Model\ResourceModel\TriggerEvent::TABLE_NAME,
                         [
                             'event_id'   => $item['entity_id'],
                             'event_type' => 'quote',
-                            'event_name' => self::EVENT_NAME,
+                            'event_name' => $event,
                         ]
                     );
                 }
             } catch (\Exception $e) {
-                $this->logger->error("Notification Abandoned_Cart_One_Hour create failed: \n\t" . $e->getMessage());
+                $this->logger->error(
+                    "Notification Abandoned_Cart_One_Hour create failed: \n\t" . $e->getMessage(),
+                    $e->getTrace()
+                );
             }
         }
     }
@@ -111,6 +122,7 @@ class AbandonedCart extends AbstractGenerate
             ->setContent($message)
             ->setPushContent($message)
             ->setEvent(\SM\Notification\Model\Notification::EVENT_UPDATE)
+            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_PROMO_AND_EVENT)
             ->setCustomerIds([$rowData['customer_id']])
             ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_CART);
 
@@ -121,8 +133,8 @@ class AbandonedCart extends AbstractGenerate
                 \Magento\Framework\App\Area::AREA_FRONTEND
             );
 
-            $notification->setPushTitle(__($title))
-                ->setPushContent(__($message));
+            $notification->setPushTitle(__($title)->__toString())
+                ->setPushContent(__($message)->__toString());
 
             $this->emulation->stopEnvironmentEmulation(); // End Emulation
         }
@@ -144,8 +156,7 @@ class AbandonedCart extends AbstractGenerate
      */
     protected function getAbandonedCart()
     {
-        $time = (int)$this->settingHelper->getConfigValue('sm_notification/generate/abandoned_cart_time');
-
+        $time = $this->configHelper->getAbandonedCartHour();
         $selectLatestDate =$this->connection->select();
         $selectLatestDate->from('quote_item', 'qty_updated_at')
             ->where('quote_id = q.entity_id')
@@ -166,7 +177,7 @@ class AbandonedCart extends AbstractGenerate
             []
         )->joinLeft(
             ['n' => \SM\Notification\Model\ResourceModel\TriggerEvent::TABLE_NAME],
-            'q.entity_id = n.event_id',
+            "q.entity_id = n.event_id AND n.event_name = '" . self::EVENT_NAME . "'",
             []
         )->where(
             'q.is_active = ?',
@@ -174,9 +185,8 @@ class AbandonedCart extends AbstractGenerate
         )->where(
             'q.customer_id IS NOT NULL'
         )->where(
-            'n.id IS NULL OR n.event_name <> ? ' .
-            'OR (n.event_name = ? AND n.created_at < (' . $selectLatestDate->__toString() . '))',
-            self::EVENT_NAME
+            'n.id IS NULL ' .
+            'OR (n.created_at < (' . $selectLatestDate->__toString() . '))'
         )->where(
             'current_timestamp() >= DATE_ADD((' . $selectLatestDate->__toString() . '), INTERVAL ' . $time . ' hour)'
         )->group('q.customer_id');

@@ -50,6 +50,10 @@ class IntegrationTableCleaner implements IntegrationTableCleanerInterface
     ) {
         $this->resource = $resource;
         $this->timezone = $timezone;
+
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_cleaner.log');
+        $logger = new \Zend\Log\Logger();
+        $this->logger = $logger->addWriter($writer);
     }
 
     /**
@@ -57,6 +61,7 @@ class IntegrationTableCleaner implements IntegrationTableCleanerInterface
      */
     public function cleanTableByStatus($table, $status)
     {
+        $this->logger->info('Clean process start table ' . $table);
         try {
             $date = get_object_vars($this->timezone->date());
             $now = $date['date'];
@@ -80,7 +85,9 @@ class IntegrationTableCleaner implements IntegrationTableCleanerInterface
             $tableName = $connection->getTableName($table);
             $connection->delete($tableName, $where);
         } catch (\Exception $e) {
+            $this->logger->info('Clean process end table ' . $table);
             throw new \Exception('Error cleaning integration table. ' . $e->getMessage());
         }
+        $this->logger->info('Clean process end table ' . $table);
     }
 }

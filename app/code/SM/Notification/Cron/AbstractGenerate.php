@@ -23,11 +23,6 @@ abstract class AbstractGenerate
     protected $connection;
 
     /**
-     * @var \SM\Notification\Helper\CustomerSetting
-     */
-    protected $settingHelper;
-
-    /**
      * @var \Magento\Framework\Logger\Monolog
      */
     protected $logger;
@@ -53,22 +48,34 @@ abstract class AbstractGenerate
     protected $directory;
 
     /**
+     * @var \SM\Notification\Model\EventSetting
+     */
+    protected $eventSetting;
+
+    /**
+     * @var \SM\Notification\Helper\Config
+     */
+    protected $configHelper;
+
+    /**
      * constructor.
      *
      * @param \Magento\Framework\Filesystem                     $filesystem
      * @param \Magento\Store\Model\App\Emulation                $emulation
-     * @param \SM\Notification\Helper\CustomerSetting           $settingHelper
+     * @param \SM\Notification\Model\EventSetting               $eventSetting
+     * @param \SM\Notification\Helper\Config                    $configHelper
      * @param \SM\Notification\Model\NotificationFactory        $notificationFactory
      * @param \SM\Notification\Model\ResourceModel\Notification $notificationResource
      * @param \Magento\Framework\App\ResourceConnection         $resourceConnection
-     * @param \Magento\Framework\Logger\Monolog|null            $logger
+     * @param \Magento\Framework\Logger\Monolog                 $logger
      *
      * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function __construct(
         \Magento\Framework\Filesystem $filesystem,
         \Magento\Store\Model\App\Emulation $emulation,
-        \SM\Notification\Helper\CustomerSetting $settingHelper,
+        \SM\Notification\Model\EventSetting $eventSetting,
+        \SM\Notification\Helper\Config $configHelper,
         \SM\Notification\Model\NotificationFactory $notificationFactory,
         \SM\Notification\Model\ResourceModel\Notification $notificationResource,
         \Magento\Framework\App\ResourceConnection $resourceConnection,
@@ -77,13 +84,13 @@ abstract class AbstractGenerate
         $this->notificationFactory = $notificationFactory;
         $this->notificationResource = $notificationResource;
         $this->connection = $resourceConnection->getConnection();
-        $this->settingHelper = $settingHelper;
         $this->logger = $logger;
         $this->emulation = $emulation;
         $this->directory = $filesystem->getDirectoryWrite(\Magento\Framework\App\Filesystem\DirectoryList::VAR_DIR);
+        $this->eventSetting = $eventSetting;
+        $this->configHelper = $configHelper;
 
         $this->construct();
-
     }
 
     protected function construct()
@@ -91,12 +98,18 @@ abstract class AbstractGenerate
     }
 
     abstract protected function process();
+
     abstract protected function getLockFileName();
 
     public function execute()
     {
         if (!$this->isLocked()) {
-            $this->process();
+            try {
+                $this->process();
+            } catch (\Exception $e) {
+                $this->logger->error($e->getMessage(), $e->getTrace());
+            }
+
             $this->unlock();
         }
     }

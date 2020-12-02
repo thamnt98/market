@@ -156,12 +156,14 @@ class SprintResponseRepository implements SprintResponseRepositoryInterface {
 				$storeId = $this->storeManager->getStore()->getId();
 			}
 			/** @var \Trans\Sprint\Model\ResourceModel\SprintResponse\CollectionFactory|\Magento\Framework\Model\AbstractModel $customOrderItem */
-			$data = $this->sprintResCollection->create($quoteId, null, $storeId)->addFieldToSelect('*')->setOrder('id', 'ASC')->setPageSize(1)->load()->getFirstItem();
-
-			if (count($data) === 0) {
+			$data = $this->sprintResCollection->create($quoteId, null, $storeId)
+			->setPageSize(1);
+			if (!$data->getSize()) {
 				throw new NoSuchEntityException(__('Requested Item doesn\'t exist'));
 			}
 
+			$data = $data->getFirstItem();
+			
 			$this->instances[$quoteId] = $data;
 		}
 

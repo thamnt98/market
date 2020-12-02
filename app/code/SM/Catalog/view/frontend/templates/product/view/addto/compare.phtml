@@ -32,7 +32,7 @@ if ($block->isAllowAddToComepare()):
             $('#add-compare').on('click', function (e){
                 e.preventDefault();
 
-                var message = '<?php echo __('Item does not belong to the same category as the item in current comparison list. Adding it to comparison list will replace the current comparison. Do you want to continue?') ?>';
+                var message = '<?php echo __('Are you sure you want to add this product to compare? Products that belong to different category will be removed from comparison list.') ?>';
                 var customUrl = "<?php echo $this->getUrl().'catalog/product_compare/check'?>";
                 var productId = "<?php echo $product->getId() ?>";
                 $.ajax({
@@ -46,7 +46,7 @@ if ($block->isAllowAddToComepare()):
                         clearList = response.responseJSON.clearList;
                         if(clearList == true){
                             confirmation({
-                                title: 'Same Category Warning',
+                                title: '<?php echo __('Renew Comparison List') ?>',
                                 content: message,
                                 actions: {
 
@@ -59,7 +59,28 @@ if ($block->isAllowAddToComepare()):
                                         e.preventDefault();
                                         return false;
                                     }
-                                }
+                                },
+                                buttons: [{
+                                    text: '<?php echo __('Cancel') ?>',
+                                    class: 'action-secondary action-dismiss',
+
+                                    /**
+                                     * Click handler.
+                                     */
+                                    click: function (event) {
+                                        this.closeModal(event);
+                                    }
+                                }, {
+                                    text: '<?php echo __('Continue') ?>',
+                                    class: 'action primary action-accept',
+
+                                    /**
+                                     * Click handler.
+                                     */
+                                    click: function (event) {
+                                        this.closeModal(event, true);
+                                    }
+                                }]
                             });
                         }else{
                             var url = '<?php echo $this->getUrl('catalog/product_compare/customadd',['_query' => ['product' => $product->getId(),'isremove' => false ]])?>';

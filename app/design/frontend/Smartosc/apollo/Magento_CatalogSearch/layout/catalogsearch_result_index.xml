@@ -9,5 +9,6 @@
     <body>
         <referenceBlock name="page.main.title" remove="true"/>
         <referenceBlock name="sidebar.additional" remove="true"/>
+        <referenceBlock class="SM\GTM\Block\Product\ListProduct" name="search_result_list" template="Magento_Catalog::product/list.phtml"/>
     </body>
 </page>

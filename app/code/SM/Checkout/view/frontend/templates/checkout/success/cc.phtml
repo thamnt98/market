@@ -147,9 +147,11 @@ $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
 
                         <?php
                         /** @var \Magento\Sales\Model\Order\Item $orderItem */
+                        $totalQty = 0;
                         $totalItem = 0;
                         foreach ($orderItems as $index => $orderItem):
                             if (empty($orderItem->getParentItemId())):
+                                $totalQty += (int)$orderItem->getQtyOrdered();
                                 $totalItem++;
                                 ?>
 
@@ -235,6 +237,7 @@ $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
             </div>
         </div>
     <?php else: ?>
+        <?php $totalQty = 0; ?>
         <?php foreach ($childOrders as $child): ?>
             <div class="block-payment product-purchased">
                 <div class="block-header product-header">
@@ -255,6 +258,7 @@ $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
                             $totalItem = 0;
                             foreach ($child->getAllItems() as $index => $orderItem):
                                 if (empty($orderItem->getParentItemId())):
+                                    $totalQty += (int)$orderItem->getQtyOrdered();
                                     $totalItem++;
                                     ?>
 
@@ -348,7 +352,7 @@ $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
         </div>
         <div class="block-content bill-paid-content">
             <div class="item">
-                <span class="title-item"><?= $block->escapeHtml(__("Subtotal"))?> (<?= $totalItem ?> item<?= $totalItem>1?'s':'' ?>)</span>
+                <span class="title-item"><?= $block->escapeHtml(__("Subtotal"))?> (<?= $totalQty ?> item<?= $totalQty>1?'s':'' ?>)</span>
                 <span class="info-item"><?= $block->getSubTotal() ?></span>
             </div>
             <div class="item">

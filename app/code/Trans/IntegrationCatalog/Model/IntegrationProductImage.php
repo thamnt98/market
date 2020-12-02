@@ -68,6 +68,16 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 	protected $validation;
 
 	/**
+	 * @var \Magento\Catalog\Model\Product\Gallery\Processor
+	 */
+	protected $galleryProcessor;
+
+	/**
+	 * @var \Magento\Catalog\Model\Product\Media\Config
+	 */
+	protected $mediaConfig;
+
+	/**
 	 * @var IntegrationDataValueRepositoryInterface
 	 */
 	protected $integrationDataValueRepositoryInterface;
@@ -78,44 +88,67 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 	protected $integrationJobRepositoryInterface;
 
 	/**
+	 * @var \Trans\IntegrationCatalog\Helper\Pim\Save\ProductImage
+	 */
+	protected $productImageHelper;
+
+	/**
+	 * @var \Magento\Framework\Indexer\IndexerRegistry
+	 */
+	protected $indexerRegistry;
+
+	/**
 	 * @param Logger $Logger
 	 * @param ProductRepositoryInterface $product
 	 * @param DirectoryList $directoryList
 	 * @param File $file
 	 * @param IntegrationProductRepositoryInterface $productRepo
 	 * @param Filesystem $filesystem
+	 * @param \Magento\Catalog\Model\Product\Media\Config $mediaConfig
+	 * @param \Magento\Catalog\Model\Product\Gallery\Processor $galleryProcessor
 	 * @param IntegrationDataValueRepositoryInterface $integrationDataValueRepositoryInterface
 	 * @param IntegrationJobRepositoryInterface $integrationJobRepositoryInterface
+	 * @param \Trans\IntegrationCatalog\Helper\Pim\Save\ProductImage $productImageHelper
+	 * @param \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
 	 */
-
 	public function __construct
 	(
-		Logger $logger
-		, Data $coreHelper
-		, ProductRepositoryInterface $product
-		, IntegrationJob $jobModel
-		, DirectoryList $directoryList
-		, File $file
-		, IntegrationProductRepositoryInterface $productRepo
-		, Filesystem $filesystem
-		, Validation $validation
-		, IntegrationDataValueRepositoryInterface $integrationDataValueRepositoryInterface
-		, IntegrationDataValueInterfaceFactory $dataValFactory
-		, IntegrationJobRepositoryInterface $integrationJobRepositoryInterface
+		Logger $logger,
+		Data $coreHelper,
+		ProductRepositoryInterface $product,
+		IntegrationJob $jobModel,
+		DirectoryList $directoryList,
+		File $file,
+		IntegrationProductRepositoryInterface $productRepo,
+		Filesystem $filesystem,
+		Validation $validation,
+		\Magento\Catalog\Model\Product\Media\Config $mediaConfig,
+		\Magento\Catalog\Model\Product\Gallery\Processor $galleryProcessor,
+		IntegrationDataValueRepositoryInterface $integrationDataValueRepositoryInterface,
+		IntegrationDataValueInterfaceFactory $dataValFactory,
+		IntegrationJobRepositoryInterface $integrationJobRepositoryInterface,
+		\Trans\IntegrationCatalog\Helper\Pim\Save\ProductImage $productImageHelper,
+		\Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
 	) {
-		$this->coreHelper                              = $coreHelper;
-		$this->logger                                  = $logger;
-		$this->jobModel                                = $jobModel;
-		$this->product                                 = $product;
-		$this->directoryList                           = $directoryList;
-		$this->file                                    = $file;
-		$this->productRepo                             = $productRepo;
-		$this->filesystem                              = $filesystem;
-		$this->validation                              = $validation;
+		$this->coreHelper = $coreHelper;
+		$this->logger = $logger;
+		$this->jobModel = $jobModel;
+		$this->product = $product;
+		$this->directoryList = $directoryList;
+		$this->file = $file;
+		$this->productRepo = $productRepo;
+		$this->filesystem = $filesystem;
+		$this->validation = $validation;
+		$this->galleryProcessor = $galleryProcessor;
+		$this->mediaConfig = $mediaConfig;
 		$this->integrationDataValueRepositoryInterface = $integrationDataValueRepositoryInterface;
-		$this->dataValFactory                          = $dataValFactory;
-		$this->integrationJobRepositoryInterface       = $integrationJobRepositoryInterface;
-		$this->class                                   = str_replace(IntegrationProductImageInterface::CRON_DIRECTORY, "", get_class($this));
+		$this->dataValFactory = $dataValFactory;
+		$this->integrationJobRepositoryInterface = $integrationJobRepositoryInterface;
+		$this->productImageHelper = $productImageHelper;
+		$this->indexerRegistry = $indexerRegistry;
+		$this->class = str_replace(IntegrationProductImageInterface::CRON_DIRECTORY, "", get_class($this));
+		$this->mediaDirectory = $filesystem->getDirectoryWrite(DirectoryList::MEDIA);
+		$this->indexerDirectory = $filesystem->getDirectoryWrite(DirectoryList::VAR_DIR);
 
 		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_image.log');
         $logger = new \Zend\Log\Logger();
@@ -197,12 +230,14 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 		return $result;
 
 	}
+
 	/**
 	 * Save Product Image
 	 * @param $param
 	 * @return string
 	 */
-	public function saveProductImage($jobs = null, $productData = null) {
+	public function saveProductImage($jobs = null, $productData = null)
+	{
 		if (is_null($jobs) || is_null($productData)) {
 			$msg = $this->class . "-" . __FUNCTION__ . " Job / Product data is not available!";
 			throw new StateException(__($msg));
@@ -210,6 +245,175 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 
 		$jobId = $jobs->getFirstItem()->getId();
 		$this->updateJobData($jobId, IntegrationJobInterface::STATUS_PROGRESS_CATEGORY);
+
+		$productIds = [];
+		$product = [];
+		$tmp = [];
+		$index = 1;
+		$dataImages = [];
+
+		try {
+			$this->logger->info('start loop ' . date('d-M-Y H:i:s'));
+			foreach ($productData as $data) {
+				$dataArray = $data->getData();
+				try {
+					$dataValue = [];
+					try {
+						$dataValue = json_decode($dataArray['data_value'], true); 
+					} catch (\Exception $e) {
+						$this->logger->info('Decode data_value fail. Error = ' . $e->getMessage());
+					}
+
+					if(empty($dataValue)) {
+						$this->logger->info('data_value is empty.');
+						continue;
+					}
+
+					$sku = isset($dataValue['sku']) ? $dataValue['sku'] : '';
+					
+					$filename = isset($dataValue['image_name']) ? $dataValue['image_name'] : '';
+					$imageUrl = isset($dataValue['image_url']) ? $dataValue['image_url'] : '';
+					
+					$this->logger->info('start loop row ' . $index . ' ' . date('d-M-Y H:i:s'));
+					try {
+						$this->logger->info(__FUNCTION__ . ' SKU ' . $sku);
+						$product[$index] = $this->product->get($sku);
+					} catch (NoSuchEntityException $exception) {
+						$this->logger->info("=" . $this->class . "-" . __FUNCTION__ . " " . $exception->getMessage());
+						$product[$index] = false;
+					}
+
+					if ($product[$index]) {
+						$this->deleteImage($product[$index], $filename);
+
+						$productRowId = $product[$index]->getRowId();
+						
+						$no = 0;
+
+						if($this->checkIsFirstImage($filename)) {
+							$baseImageAttr = $this->productImageHelper->getAttributeIdByCode('image');
+							$smallImageAttr = $this->productImageHelper->getAttributeIdByCode('small_image');
+							$thumbnailImageAttr = $this->productImageHelper->getAttributeIdByCode('thumbnail');
+							$imageAttr = [$baseImageAttr, $smallImageAttr, $thumbnailImageAttr];
+
+							$this->productImageHelper->deleteProductImageByAttrIds($productRowId, $imageAttr);
+						} else {
+							$swatchImage = $this->productImageHelper->getAttributeIdByCode('swatch_image');
+							$imageAttr = [$swatchImage];
+						}
+
+						$tmp[$index] = $this->saveImageData($product[$index], $filename, [$imageUrl], $imageAttr);
+
+						$this->deleteTmpFile($tmp[$index]);
+						try {
+							$file = $tmp[$index][0];
+
+							$filepath = $file['filename'];
+
+							$this->productImageHelper->saveProductImage($productRowId, $filepath, $imageAttr);
+							$mediaGalleryAttr = $this->productImageHelper->getAttributeIdByCode('media_gallery');
+
+							$this->productImageHelper->insertMediaGalleryValue($mediaGalleryAttr, $filepath, $productRowId);
+
+							$productIds[] = $product[$index]->getId();
+						} catch (\Exception $e) {
+							$this->logger->info("saveProductImage fail: " . $e->getMessage());
+							continue;
+						}
+
+						$this->saveStatusMessage($dataArray['id'], null, IntegrationDataValueInterface::STATUS_DATA_SUCCESS);
+					}
+
+
+					$this->logger->info('end loop row ' . $index . ' ' . date('d-M-Y H:i:s'));
+					$this->logger->info('-----------------------------------------------------');
+					$index++;
+				} catch (\Exception $exception) {
+					$this->logger->info("= SAVE :: " . $this->class . "-" . __FUNCTION__ . " " . $exception->getMessage());
+					$this->saveStatusMessage($dataArray['id'], $exception->getMessage(), IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
+					$this->logger->info('end loop row ' . $index . ' ' . date('d-M-Y H:i:s'));
+					$this->logger->info('-----------------------------------------------------');
+					continue;
+				}
+			}
+
+			try {
+				if(!empty($productIds)) {
+					$batchId = $jobs->getFirstItem()->getBatchId();
+					$file = $this->indexerDirectory->openFile("/indexer/integration_image_indexer_" . $batchId, 'a');
+					try {
+						$file->lock();
+						try {
+							$file->write(implode($productIds,"\n"));
+						}
+						finally {
+							$file->unlock();
+						}
+					}
+					finally {
+						$file->close();
+					}
+				}
+			} catch (\Exception $e) {
+				$this->logger->info('reindex fail ' . date('d-M-Y H:i:s'));	
+			}
+			
+			$this->logger->info('end loop ' . date('d-M-Y H:i:s'));
+
+		} catch (\Exception $exception) {
+			$msg = $this->class . "-" . __FUNCTION__ . " " . $exception->getMessage();
+			$this->updateJobData($jobId, IntegrationJobInterface::STATUS_PROGRES_UPDATE_FAIL, $msg);
+			throw new StateException(__($msg));
+		}
+
+		$this->updateJobData($jobId, IntegrationJobInterface::STATUS_COMPLETE);
+	}
+
+	/**
+	 * reindex bu product ids
+	 *
+	 * @param array $productIds
+	 * @param array $indexLists
+	 * @return void
+	 */
+	public function reindexByProductsIds($productIds, $indexLists)
+    {
+        foreach($indexLists as $indexList) {
+            $categoryIndexer = $this->indexerRegistry->get($indexList);
+            if (!$categoryIndexer->isScheduled()) {
+                $categoryIndexer->reindexList(array_unique($productIds));
+            }
+        }
+    }
+	
+
+	protected function checkIsFirstImage($filename)
+	{
+		$expl = explode('.', $filename);
+		$filename = $expl[0];
+
+		if(substr($filename, -2) == '-1') {
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Save Product Image
+	 * @param $param
+	 * @return string
+	 */
+	public function saveProductImageBackup($jobs = null, $productData = null) {
+		var_dump(date('H:i:s'));
+		// die();
+		if (is_null($jobs) || is_null($productData)) {
+			$msg = $this->class . "-" . __FUNCTION__ . " Job / Product data is not available!";
+			throw new StateException(__($msg));
+		}
+
+		$jobId = $jobs->getFirstItem()->getId();
+		// $this->updateJobData($jobId, IntegrationJobInterface::STATUS_PROGRESS_CATEGORY);
 
 		$product    = [];
 		$tmp        = [];
@@ -390,18 +594,23 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 	 * @param array $images
 	 * @return array
 	 */
-	protected function saveImageData($product, $images) {
-		$imageType       = ['image', 'small_image', 'thumbnail'];
+	protected function saveImageData($product, $filename, $images, $attrType)
+	{
+		$imageType = ['image', 'small_image', 'thumbnail'];
+		if($attrType) {
+			$imageType = $attrType;
+		}
+
 		$imgAttrAssigned = 0;
-		$tmp             = [];
+		$tmp = [];
 
 		// exec("find " . $this->directoryList->getPath(DirectoryList::MEDIA) . " -type d -exec chmod 0777 {} +");
 
-		$i       = 0;
-		$tmpDir  = $this->getMediaDirTmpDir();
+		$i = 0;
+		$tmpDir = $this->getMediaDirTmpDir();
 		$readImg = [];
 		$imgName = [];
-		$i       = 0;
+		$i = 0;
 
 		$this->logger->info('=== START loop images url save' . date('d-M-Y H:i:s'));
 		foreach ($images as $imageUrl) {
@@ -415,11 +624,27 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 				$readImg[$i] = $this->file->read($imageUrl, $imgName[$i]);
 				$this->logger->info("--" . __FUNCTION__ . '$result = ' . json_encode($readImg[$i]));
 
-				if ($readImg[$i]) {
-					$product->addImageToMediaGallery($imgName[$i], $imageType, false, false);
-				}
+				// if ($readImg[$i]) {
+				// 	$product->addImageToMediaGallery($imgName[$i], $imageType, false, false);
+				// }
+				// $filename = $this->galleryProcessor->addImage($product, $imgName[$i], $imageType, false, false);
+				// $product->save();
 
-				$tmp[$i] = $imgName[$i];
+		        $fileName = \Magento\MediaStorage\Model\File\Uploader::getCorrectFileName($filename);
+		        $dispersionPath = \Magento\MediaStorage\Model\File\Uploader::getDispersionPath($fileName);
+		        $fileName = $dispersionPath . '/' . $fileName;
+
+		        $fileName = $this->getNotDuplicatedFilename($fileName, $dispersionPath);
+
+		        $destinationFile = $this->mediaConfig->getMediaPath($fileName);
+
+				$this->mediaDirectory->copyFile(
+		            $imgName[$i],
+		            $destinationFile
+		        );
+
+				$tmp[$i]['tmp'] = $imgName[$i];
+				$tmp[$i]['filename'] = $fileName;
 				$i++;
 
 			} catch (Exception $exception) {
@@ -429,6 +654,7 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 			}
 
 		}
+
 		$this->logger->info('=== END loop images url save' . date('d-M-Y H:i:s'));
 
 		$this->logger->info("=" . __FUNCTION__ . ' Save Image ' . print_r($tmp, true));
@@ -448,17 +674,20 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 			try {
 
 				if ($row) {
-					$baseName     = basename($row);
+					$tmpPath = $row['tmp'];
+					$filepath = $row['filename'];
+					
+					$baseName     = basename($tmpPath);
 					$firstWord    = substr($baseName, 0, 1);
 					$secondWord   = substr($baseName, 1, 1);
-					$pathTmpImage = str_replace($baseName, '', $row);
+					$pathTmpImage = str_replace($baseName, '', $tmpPath);
 
-					if (file_exists($row) === true) {
-						unlink($row);
+					if (file_exists($tmpPath) === true) {
+						unlink($tmpPath);
 					}
 
-					if (file_exists($pathTmpImage . "catalog/product/" . $firstWord . "/" . $secondWord . "/" . $baseName) === true) {
-						unlink($pathTmpImage . "catalog/product/" . $firstWord . "/" . $secondWord . "/" . $baseName);
+					if (file_exists($pathTmpImage . "catalog/product/" . $filepath) === true) {
+						unlink($pathTmpImage . "catalog/product/" . $filepath);
 					}
 				}
 			} catch (Exception $exception) {
@@ -474,27 +703,47 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 	 * @param array $product
 	 * @return bool
 	 */
-	public function deleteImage($product) {
+	public function deleteImage($product, $filename = '')
+	{
+		$productRowId = $product->getRowId();
+		$this->logger->info('====> delete start: ' . date('H:i:s'));
 
 		$mediaGalleryEntries = $product->getMediaGalleryEntries();
-
+		
+		$productImageDeleted = [];
 		foreach ($mediaGalleryEntries as $key => $imageObject) {
-			unset($mediaGalleryEntries[$key]);
+			$productImage = $imageObject->getFile();
+			$extract = explode('/', $productImage);
 
-			$this->logger->info('====> delete existed image: '.$this->directoryList->getPath(DirectoryList::MEDIA) .'/catalog/product'.$imageObject->getFile());
-			try {
-				unlink($this->directoryList->getPath(DirectoryList::MEDIA) .'/catalog/product'.$imageObject->getFile());
-			} catch (\Exception $e) {
-				$this->logger->info($e->getMessage());
+			if(is_array($extract) && $filename && $filename == end($extract)) {
+				unset($mediaGalleryEntries[$key]);
+				$this->logger->info('====> delete existed image: '.$this->directoryList->getPath(DirectoryList::MEDIA) .'/catalog/product' . $imageObject->getFile());
+				try {
+					if(file_exists($this->directoryList->getPath(DirectoryList::MEDIA) .'/catalog/product'.$imageObject->getFile())) {
+						unlink($this->directoryList->getPath(DirectoryList::MEDIA) .'/catalog/product'.$imageObject->getFile());
+					}
+
+					$productImageDeleted[] = (string) $imageObject->getFile();
+					
+					$galleryValue = $this->productImageHelper->getMediaGalleryValue($productRowId, $imageObject->getFile());
+					$this->productImageHelper->deleteMediaGalleryValue($galleryValue['value_id']);
+				} catch (\Exception $e) {
+					$this->logger->info($e->getMessage());
+					continue;
+				}
 			}
+			
 			$this->logger->info('====> existed image deletion done');
-
 		}
+		
+		if(!empty($productImageDeleted)) {
+			$this->productImageHelper->deleteProductImageByValue($productRowId, $productImageDeleted);		
+		}
+		// $product->setMediaGalleryEntries($mediaGalleryEntries);
 
-		$product->setMediaGalleryEntries($mediaGalleryEntries);
+		// $this->product->save($product);
 
-		$this->product->save($product);
-
+		$this->logger->info('====> delete end: ' . date('H:i:s'));
 		return $product;
 	}
 
@@ -543,66 +792,34 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 	}
 
 	/**
-	 * BACKUP
-	 * Save Product Image
-	 * @param $param
-	 * @return string
-	 */
-	public function saveProductImageBackup($jobs = null, $productData = null) {
-		if (is_null($jobs) || is_null($productData)) {
-			$msg = $this->class . "-" . __FUNCTION__ . " Job / Product data is not available!";
-			throw new StateException(__($msg));
-		}
+     * Get filename which is not duplicated with other files in media temporary and media directories
+     *
+     * @param string $fileName
+     * @param string $dispersionPath
+     * @return string
+     * @since 101.0.0
+     */
+    protected function getNotDuplicatedFilename($fileName, $dispersionPath)
+    {
+        $fileMediaName = $dispersionPath . '/'
+            . \Magento\MediaStorage\Model\File\Uploader::getNewFileName($this->mediaConfig->getMediaPath($fileName));
+        $fileTmpMediaName = $dispersionPath . '/'
+            . \Magento\MediaStorage\Model\File\Uploader::getNewFileName($this->mediaConfig->getTmpMediaPath($fileName));
 
-		$jobId = $jobs->getFirstItem()->getId();
-		$this->updateJobData($jobId, IntegrationJobInterface::STATUS_PROGRESS_CATEGORY);
+        if ($fileMediaName != $fileTmpMediaName) {
+            if ($fileMediaName != $fileName) {
+                return $this->getNotDuplicatedFilename(
+                    $fileMediaName,
+                    $dispersionPath
+                );
+            } elseif ($fileTmpMediaName != $fileName) {
+                return $this->getNotDuplicatedFilename(
+                    $fileTmpMediaName,
+                    $dispersionPath
+                );
+            }
+        }
 
-		$product    = [];
-		$tmp        = [];
-		$i          = 0;
-		$dataImages = [];
-		try {
-			foreach ($productData as $sku => $images) {
-				try {
-					$this->logger->info(__FUNCTION__ . ' SKU ' . $sku);
-					$product[$i] = $this->product->get($sku);
-
-				} catch (\Exception $exception) {
-					$this->logger->info("=" . $this->class . "-" . __FUNCTION__ . " " . $exception->getMessage());
-					$product[$i] = false;
-				}
-
-				if ($product[$i]) {
-					$this->deleteImage($product[$i]);
-					$this->unsetImageGalerry($product[$i]);
-					$no = 0;
-
-					try {
-						foreach ($images as $img) {
-							if (isset($img['image_url']) && !empty($img['image_url'])) {
-								$dataImages[$i][$no] = $img['image_url'];
-								$no++;
-							}
-						}
-					} catch (\Exception $exception) {
-						$this->logger->info("=" . __FUNCTION__ . " " . $exception->getMessage());
-						continue;
-					}
-
-					$this->logger->info("= test " . __FUNCTION__ . print_r($dataImages[$i], true));
-					$tmp[$i] = $this->saveImageData($product[$i], $dataImages[$i]);
-					$this->deleteTmpFile($tmp[$i]);
-					$this->product->save($product[$i]);
-				}
-			}
-
-		} catch (\Exception $exception) {
-			$msg = $this->class . "-" . __FUNCTION__ . " " . $exception->getMessage();
-			$this->updateJobData($jobId, IntegrationJobInterface::STATUS_PROGRES_UPDATE_FAIL, $msg);
-			throw new StateException(__($msg));
-		}
-
-		$this->updateJobData($jobId, IntegrationJobInterface::STATUS_COMPLETE);
-
-	}
+        return $fileMediaName;
+    }
 }

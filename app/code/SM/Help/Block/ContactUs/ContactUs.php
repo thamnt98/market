@@ -15,19 +15,20 @@ use Exception;
 use Magento\Catalog\Helper\Image;
 use Magento\Customer\Model\Session;
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\Api\SortOrderBuilder;
 use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\View\Element\Template\Context;
-use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
+use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Store\Model\ScopeInterface;
-use SM\Help\Model\ResourceModel\Topic\CollectionFactory as TopicCollectionFactory;
 use SM\Help\Api\Data\TopicInterface;
 use SM\Help\Model\ResourceModel\Topic\Collection;
-use Magento\Sales\Api\OrderRepositoryInterface;
-use SM\Help\Model\Topic;
-use SM\Theme\Helper\Data;
+use SM\Help\Model\ResourceModel\Topic\CollectionFactory as TopicCollectionFactory;
+use SM\Sales\Model\ParentOrderRepository;
 use SM\StoreLocator\Model\Store\ResourceModel\Location\CollectionFactory as StoreCollectionFactory;
+use SM\Theme\Helper\Data;
+use SM\Sales\Api\SubOrderRepositoryInterface;
 
 /**
  * Class ContactUs
@@ -40,11 +41,6 @@ class ContactUs extends \Magento\Framework\View\Element\Template
      * @var StoreCollectionFactory
      */
     protected $storeCollectionFactory;
-
-    /**
-     * @var OrderCollectionFactory
-     */
-    protected $orderCollectionFactory;
 
     /**
      * @var Session
@@ -72,6 +68,11 @@ class ContactUs extends \Magento\Framework\View\Element\Template
     protected $orderRepository;
 
     /**
+     * @var SubOrderRepositoryInterface
+     */
+    protected $subOrderRepository;
+
+    /**
      * @var SearchCriteriaBuilder
      */
     protected $searchCriteriaBuilder;
@@ -97,12 +98,16 @@ class ContactUs extends \Magento\Framework\View\Element\Template
     protected $config;
 
     /**
+     * @var SortOrderBuilder
+     */
+    protected $sortOrderBuilder;
+
+    /**
      * Constructor
      *
      * @param \SM\Help\Model\Config $config
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param Data $imageHelper
-     * @param OrderCollectionFactory $orderCollectionFactory
      * @param Context $context
      * @param TopicCollectionFactory $topicCollectionFactory
      * @param Session $customerSession
@@ -111,13 +116,14 @@ class ContactUs extends \Magento\Framework\View\Element\Template
      * @param Image $image
      * @param ScopeConfigInterface $scopeConfig
      * @param StoreCollectionFactory $storeCollectionFactory
+     * @param SortOrderBuilder $sortOrderBuilder
+     * @param SubOrderRepositoryInterface $subOrderRepository
      * @param array $data
      */
     public function __construct(
         \SM\Help\Model\Config $config,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         Data $imageHelper,
-        OrderCollectionFactory $orderCollectionFactory,
         Context $context,
         TopicCollectionFactory $topicCollectionFactory,
         Session $customerSession,
@@ -126,10 +132,11 @@ class ContactUs extends \Magento\Framework\View\Element\Template
         Image $image,
         ScopeConfigInterface $scopeConfig,
         StoreCollectionFactory $storeCollectionFactory,
+        SortOrderBuilder $sortOrderBuilder,
+        SubOrderRepositoryInterface $subOrderRepository,
         array $data = []
     ) {
         $this->topicCollectionFactory = $topicCollectionFactory->create();
-        $this->orderCollectionFactory = $orderCollectionFactory;
         $this->customerSession        = $customerSession;
         $this->imageHelper            = $imageHelper;
         $this->orderRepository        = $orderRepository;
@@ -138,6 +145,8 @@ class ContactUs extends \Magento\Framework\View\Element\Template
         $this->image                  = $image;
         $this->scopeConfig            = $scopeConfig;
         $this->storeCollectionFactory = $storeCollectionFactory;
+        $this->sortOrderBuilder       = $sortOrderBuilder;
+        $this->subOrderRepository     = $subOrderRepository;
         parent::__construct($context, $data);
         $this->config = $config;
     }
@@ -190,7 +199,6 @@ class ContactUs extends \Magento\Framework\View\Element\Template
         }
     }
 
-
     /**
      * Get Store Location
      * @return \SM\StoreLocator\Model\Store\ResourceModel\Location\Collection
@@ -207,7 +215,7 @@ class ContactUs extends \Magento\Framework\View\Element\Template
      */
     public function getBackUrl()
     {
-            return $this->config->getBaseUrl();
+        return $this->config->getBaseUrl();
     }
 
     /**
@@ -221,17 +229,17 @@ class ContactUs extends \Magento\Framework\View\Element\Template
             $to = date("Y-m-d h:i:s"); // current date
             $from = strtotime('-90 days', strtotime($to));
             $from = date('Y-m-d h:i:s', $from); // 24 hours before
+            $sortOrder = $this->sortOrderBuilder->setField(ParentOrderRepository::SORT_LATEST)->setDirection('DESC')->create();
 
             $customerId = $this->customerSession->getCustomerId();
             $searchCriteria = $this->searchCriteriaBuilder
-                ->addFilter('customer_id', $customerId, 'in')
-                ->addFilter('is_parent', '0', 'in')
                 ->addFilter('created_at', $from, 'gteq')
                 ->setPageSize(10)
+                ->setSortOrders([$sortOrder])
                 ->create();
 
             if (!$this->orders) {
-                $this->orders = $this->orderRepository->getList($searchCriteria);
+                $this->orders = $this->subOrderRepository->getList($searchCriteria, $customerId);
             }
             return $this->orders;
         } catch (Exception $e) {
@@ -239,18 +247,15 @@ class ContactUs extends \Magento\Framework\View\Element\Template
     }
 
     /**
-     * @param $product
-     * @param $width
-     * @param $height
+     * @param $image
+     * @param null $width
+     * @param null $height
      * @return bool|string
      * @throws Exception
      */
-    public function getImageResize($product, $width = null, $height = null)
+    public function getImageResize($image, $width = null, $height = null)
     {
-        return $this->image->init($product, 'cart_page_product_thumbnail')
-            ->setImageFile($product->getImage())
-            ->resize($width, $height)
-            ->getUrl();
+        return $this->imageHelper->getImageResize($image, $width, $height);
     }
 
     /**

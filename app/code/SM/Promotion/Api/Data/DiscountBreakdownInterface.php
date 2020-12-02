@@ -19,6 +19,8 @@ interface DiscountBreakdownInterface extends \Amasty\Rules\Api\Data\DiscountBrea
 {
     const KEY_COUPON_CODE = 'coupon_code';
     const KEY_RULE_ID     = 'id';
+    const SHIPPING_DISCOUNT = 'shipping_discount';
+    const ITEMS_DISCOUNT = 'items_discount';
 
     /**
      * @return int

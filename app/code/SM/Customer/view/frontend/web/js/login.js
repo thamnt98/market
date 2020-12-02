@@ -12,14 +12,14 @@ define(
     [
         'jquery',
         'Magento_Ui/js/modal/modal',
-        'ForgotPassword',
         'gtmSha256',
         'Magento_Customer/js/customer-data',
+        'mage/url',
         'mage/translate',
         'mage/validation',
-        'mage/mage',
+        'mage/mage'
     ],
-    function ($, modal, ForgotPassword, sha256, customerData) {
+    function ($, modal, sha256, customerData, urlBuilder) {
         'use strict';
 
         var downloadTimer,
@@ -28,7 +28,8 @@ define(
             step = 1,
             caseCustomerOnEco = false,
             caseSentOTP = false,
-            caseResendOTP = false;
+            caseResendOTP = false,
+            lockForm = false;
 
         $.widget(
             'sm.login',
@@ -40,7 +41,6 @@ define(
                     this.showPassword();
                     this.backAction();
                     this.initInputEvent();
-                    this.forgotAction();
                 },
 
                 init: function () {
@@ -122,12 +122,13 @@ define(
                             }
                     };
                     modal(options, $(self.options.tabLoginSelector));
-                    var urlParams = new URLSearchParams(window.location.search);
+                    /*var urlParams = new URLSearchParams(window.location.search);
                     if (!urlParams.has('recovery') && !urlParams.has('recoverytoken')) {
                         tabLoginModal = $(self.options.tabLoginSelector).modal('openModal').show();
                     } else {
                         tabLoginModal = $(self.options.tabLoginSelector);
-                    }
+                    }*/
+                    tabLoginModal = $(self.options.tabLoginSelector).modal('openModal').show();
                     tabLoginModal.find('input').each(function () {
                         $(this).change(function () {
                             $.validator.validateSingleElement($(this));
@@ -194,7 +195,8 @@ define(
                                                 $(document).trigger('customer:login-fail-email-not-registered');
                                                 if (result.status == true) {
                                                     tabLoginModal.modal('closeModal');
-                                                    $('#tab-lock').modal('openModal').show();
+                                                    self.showLockForm();
+                                                    //$('#tab-lock').modal('openModal').show();
                                                 } else {
                                                     tabLoginModal.find('#user-not-exist').text(result.message).show();
                                                 }
@@ -508,7 +510,8 @@ define(
                             if (result.errors === true) {
                                 if (result.status === true) {
                                     tabLoginModal.modal('closeModal');
-                                    $('#tab-lock').modal('openModal').show();
+                                    self.showLockForm();
+                                    // $('#tab-lock').modal('openModal').show();
                                     return;
                                 }
                                 if (step == 2) {
@@ -518,7 +521,7 @@ define(
                                     tabLoginModal.find('.fieldInputText ').addClass('fieldInputError');
 
                                     if (!caseCustomerOnEco) {
-                                        self.sendLockCustomer(data.username);
+                                            self.sendLockCustomer(data.username);
                                     }
                                 } else if (step == 3) {
                                     tabLoginModal.find('[selector=message-otp-error]').text(result.message).show();
@@ -736,13 +739,6 @@ define(
                     });
                 },
 
-                forgotAction: function () {
-                    tabLoginModal.find('#action-forgot-password').click(function () {
-                        $('#tab-forgot-password').removeClass('not-open')
-                        ForgotPassword.openPopup();
-                    });
-                },
-
                 sendLockCustomer: function (user) {
                     var self = this;
                     $.ajax({
@@ -754,6 +750,24 @@ define(
 
                         },
                     });
+                },
+
+                showLockForm: function () {
+                    if (!lockForm) {
+                        $.ajax({
+                            url: urlBuilder.build("customer/popup/index"),
+                            type: 'POST',
+                            dataType: 'json',
+                            data: {'type': 'lock-form'},
+                            showLoader: true,
+                            success: function(response) {
+                                $('body').append(response.html).trigger('contentUpdated');
+                                lockForm = true;
+                            }
+                        });
+                    } else {
+                        $('#tab-lock').modal('openModal').show()
+                    }
                 }
             }
         );

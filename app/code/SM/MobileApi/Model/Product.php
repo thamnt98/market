@@ -56,18 +56,26 @@ class Product implements \SM\MobileApi\Api\ProductInterface
      * @param int $category_id
      * @param int $limit
      * @param int $p
+     * @param boolean $layer
      * @return \SM\MobileApi\Api\Data\Product\ListInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getList($category_id, $limit = 12, $p = 1)
+    public function getList($category_id, $limit = 12, $p = 1, $layer = true)
     {
+        //Init category and apply filter
         $this->catalogCategory->init($category_id);
+
+        //Init toolbar and apply pagination
+        $toolbar = $this->catalogCategory->getToolbarInfo();
 
         /* @var $result \SM\MobileApi\Api\Data\Product\ListInterface */
         $result = $this->productListFactory->create();
         $result->setCategoryId($category_id);
-        $result->setFilters($this->catalogCategory->getFilters());
-        $result->setToolbarInfo($this->catalogCategory->getToolbarInfo());
+        if ($layer) {
+            $result->setFilters($this->catalogCategory->getFilters());
+            $result->setToolbarInfo($toolbar);
+        }
+
         $result->setProducts($this->catalogCategory->getProductsV2());
 
         return $result;
@@ -76,6 +84,7 @@ class Product implements \SM\MobileApi\Api\ProductInterface
     /**
      * @param int $product_id
      * @return \SM\MobileApi\Api\Data\Product\ProductInterface
+     * @throws \Magento\Framework\Webapi\Exception
      */
     public function getDetails($product_id)
     {

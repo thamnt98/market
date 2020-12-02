@@ -16,37 +16,37 @@
     <group id="ims_stores">
 
         <job name="integration_ims_get_store_update" instance="Trans\IntegrationEntity\Cron\Ims\Get\StoreUpdate" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_ims_save_store" instance="Trans\IntegrationEntity\Cron\Ims\Save\StoreSave" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>* 23 * * *</schedule>
         </job>
     </group>
     <group id="assign_sources">
         <job name="assign_ready_sources" instance="Trans\IntegrationEntity\Cron\Ims\Save\AssignSource" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>* 23 * * *</schedule>
         </job>
     </group>
     <group id="pim_product_attribute">
         <job name="integration_pim_check_product_attribute" instance="Trans\IntegrationEntity\Cron\Pim\Check\ProductAttribute" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_get_product_attribute" instance="Trans\IntegrationEntity\Cron\Pim\Get\ProductAttribute" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_save_product_attribute" instance="Trans\IntegrationEntity\Cron\Pim\Save\ProductAttribute" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>* 1 * * *</schedule>
         </job>
     </group>
     <group id="pim_product_attribute_set">
         <job name="integration_pim_check_product_attribute_set" instance="Trans\IntegrationEntity\Cron\Pim\Check\ProductAttributeSet" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_get_product_attribute_set" instance="Trans\IntegrationEntity\Cron\Pim\Get\ProductAttributeSet" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_save_product_attribute_set" instance="Trans\IntegrationEntity\Cron\Pim\Save\ProductAttributeSet" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>* 2 * * *</schedule>
         </job>
     </group>
 </config>

@@ -233,9 +233,14 @@ class PaymentNotify implements \Trans\Sprint\Api\PaymentNotifyInterface
                             $notified = true;
                         }
 
-                        $dataOrder->addStatusHistoryComment(
-                            $comment
-                        )->setIsCustomerNotified($notified);
+                        // $dataOrder->addStatusHistoryComment(
+                        //     $comment
+                        // )->setIsCustomerNotified($notified);
+
+                        // add status history invoice
+                        $orderInvoiceHistory = $this->orderStatusHistoryInterfaceFactory->create();
+                        $orderInvoiceHistory->setParentId($dataOrder->getId())->setComment($comment)->setIsCustomerNotified($notified)->setStatus($orderSuccessState)->setEntityName('order');
+                        $this->orderStatusHistoryRepoInterface->save($orderInvoiceHistory);
 
                         /** change order status */
                         $dataOrder->setState($orderSuccessState);
@@ -482,9 +487,14 @@ class PaymentNotify implements \Trans\Sprint\Api\PaymentNotifyInterface
                 $notified = true;
             }
 
-            $dataOrder->addStatusHistoryComment(
-                $comment
-            )->setIsCustomerNotified($notified);
+            // $dataOrder->addStatusHistoryComment(
+            //     $comment
+            // )->setIsCustomerNotified($notified);
+
+            // add status history invoice
+            $orderSaveInvoiceHistory = $this->orderStatusHistoryInterfaceFactory->create();
+            $orderSaveInvoiceHistory->setParentId($dataOrder->getId())->setComment($comment)->setIsCustomerNotified($notified)->setStatus($orderSuccessState)->setEntityName('invoice');
+            $this->orderStatusHistoryRepoInterface->save($orderSaveInvoiceHistory);
 
             /** change order status */
             $dataOrder->setState($orderSuccessState);

@@ -27,14 +27,16 @@
                 <abandoned_cart_time>1</abandoned_cart_time>
                 <abandoned_cart_repeat_time>3</abandoned_cart_repeat_time>
                 <abandoned_cart_repeat>*/10 * * * *</abandoned_cart_repeat>
+                <va_payment>sprint_bca_va</va_payment>
                 <payment_expiring_soon_time>5</payment_expiring_soon_time>
                 <payment_expiring_soon_time_cron>* * * * *</payment_expiring_soon_time_cron>
+                <payment_expired>*/5 * * * *</payment_expired>
                 <remind_pickup_cron>0 * * * *</remind_pickup_cron>
                 <remind_pickup>5</remind_pickup>
                 <remind_pickup_expired>2</remind_pickup_expired>
             </generate>
             <event_type_config>
-                <event_type><![CDATA[[{"event_type":"order_status","name":"Order Status","enable":"1"},{"event_type":"update","name":"Updates","enable":"1"},{"event_type":"service","name":"Services","enable":"1"},{"event_type":"chat_recap","name":"Chat Recap","enable":"0"},{"event_type":"my_appointment","name":"My Appointment","enable":"0"},{"event_type":"promo","name":"Promotion","enable":"0"},{"event_type":"subscription","name":"Subscription","enable":"0"},{"event_type":"unknown_device","name":"Unknown Device","enable":"0"}]]]></event_type>
+                <event_type><![CDATA[[{"event_type":"order_status","name":"Order Status","enable":"1"},{"event_type":"update","name":"Updates","enable":"1"},{"event_type":"service","name":"Services","enable":"1"}]]]></event_type>
             </event_type_config>
         </sm_notification>
     </default>

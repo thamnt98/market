@@ -8,7 +8,13 @@
                 <input type="checkbox"
                        id="is-installation-<?= $block->getData('item_id') ?>"
                        class="checkbox installation-field" />
-                <label for="is-installation-<?= $block->getData('item_id') ?>"><?= $block->escapeHtml(__('Add free installation to this product.')) ?></label>
+                <label for="is-installation-<?= $block->getData('item_id') ?>">
+                    <?= $block->escapeHtml(__('Add free installation to this product.')) ?>
+                    <span class="dpl-tooltip">
+                        <img src="<?= /* @noEscape */ $block->getViewFileUrl('images/info.svg') ?>" width="13" height="16"/>
+                        <span class="tooltip-content" role="tooltip"><?= $block->escapeHtml($block->getTooltip()) ?></span>
+                    </span>
+                </label>
             </div>
         </div>
         <div class="field installation-note" id="field-installation-note-<?= $block->getData('item_id') ?>" style="display: none">

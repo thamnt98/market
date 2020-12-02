@@ -7,6 +7,7 @@ use Magento\Sales\Api\Data\OrderStatusHistoryInterface;
 use Magento\Sales\Model\Order\Status\History as StatusHistory;
 use Magento\Sales\Model\ResourceModel\Order;
 use SM\Sales\Api\ParentOrderRepositoryInterface;
+use SM\Sales\Model\Order\Updater as OrderUpdater;
 use SM\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
 use SM\Sales\Model\ResourceModel\Order\StatusHistory\Collection as StatusHistoryCollection;
 use SM\Sales\Model\ResourceModel\Order\StatusHistory\CollectionFactory as StatusHistoryCollectionFactory;
@@ -33,19 +34,27 @@ class UpdateDeliveredOrder
     private $orderResourceModel;
 
     /**
+     * @var OrderUpdater
+     */
+    protected $orderUpdater;
+
+    /**
      * UpdateDeliveredOrder constructor.
      * @param OrderCollectionFactory $orderCollectionFactory
      * @param StatusHistoryCollectionFactory $statusHistoryCollectionFactory
      * @param Order $orderResourceModel
+     * @param OrderUpdater $updater
      */
     public function __construct(
         OrderCollectionFactory $orderCollectionFactory,
         StatusHistoryCollectionFactory $statusHistoryCollectionFactory,
-        Order $orderResourceModel
+        Order $orderResourceModel,
+        OrderUpdater $updater
     ) {
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->statusHistoryCollectionFactory = $statusHistoryCollectionFactory;
         $this->orderResourceModel = $orderResourceModel;
+        $this->orderUpdater = $updater;
     }
 
     /**
@@ -94,25 +103,18 @@ class UpdateDeliveredOrder
          */
         $orderCollection = $this->orderCollectionFactory->create();
         $orderCollection->addFieldToFilter(
-                OrderInterface::ENTITY_ID,
-                ["in" => $orderIds]
-            )->addFieldToFilter(
-                OrderInterface::STATE,
-                ["neq" => ParentOrderRepositoryInterface::STATUS_COMPLETE]
-            )->addFieldToFilter(
-                OrderInterface::STATUS,
-                ["neq" => ParentOrderRepositoryInterface::STATUS_COMPLETE]
-            )->setPage(1, 100);
+            OrderInterface::ENTITY_ID,
+            ["in" => $orderIds]
+        )->addFieldToFilter(
+            OrderInterface::STATE,
+            ["neq" => ParentOrderRepositoryInterface::STATUS_COMPLETE]
+        )->addFieldToFilter(
+            OrderInterface::STATUS,
+            ["neq" => ParentOrderRepositoryInterface::STATUS_COMPLETE]
+        )->setPage(1, 100);
 
         foreach ($orderCollection as $order) {
-            $order->setState(ParentOrderRepositoryInterface::STATUS_COMPLETE)
-                ->setStatus(ParentOrderRepositoryInterface::STATUS_COMPLETE)
-                ->addCommentToStatusHistory("Order has been Successfully Completed");
-            try {
-                $this->orderResourceModel->save($order);
-            } catch (\Exception $e) {
-                continue;
-            }
+            $this->orderUpdater->updateStatusOrder($order);
         }
     }
 }

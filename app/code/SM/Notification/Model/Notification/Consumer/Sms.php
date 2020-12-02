@@ -52,13 +52,18 @@ class Sms extends AbstractConsumer
             $this->reSyncUpdate($request->getId());
             $this->logError(
                 "Consumer `SMS` Error:\n\t" . $e->getMessage() . "\n",
-                $request->getData()
+                [
+                    'data'  => $request->getData(),
+                    'trace' => $e->getTrace(),
+                ]
             );
         }
     }
 
     protected function reSyncUpdate($id)
     {
+        // todo turn off re-sync : call push noti response code != 200 but response data success
+        return;
         $this->connection->update(
             \SM\Notification\Model\ResourceModel\CustomerMessage::TABLE_NAME,
             ['sms_status' => \SM\Notification\Model\Notification::SYNC_PENDING],

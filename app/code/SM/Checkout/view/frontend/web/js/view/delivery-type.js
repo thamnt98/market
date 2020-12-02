@@ -16,7 +16,8 @@ define([
     var deliveryTypeList = window.checkoutConfig.delivery_type,
         addressComplete = window.checkoutConfig.address_complete,
         sortSourceDefault = window.checkoutConfig.sortSource,
-        preOrderShippingType = window.checkoutConfig.pre_select_order_shipping_type;
+        preOrderShippingType = window.checkoutConfig.pre_select_order_shipping_type,
+        isFullFill = window.checkoutConfig.fulFill;
 
     return Component.extend({
         isActiveList: {},
@@ -65,7 +66,7 @@ define([
                     });
                 }
             }, null, "arrayChange");
-            if (sortSourceDefault.length == 0) {
+            if (!isFullFill) {
                 this.showNotFulfillmentPopup();
             }
         },
@@ -100,7 +101,7 @@ define([
          */
         deliveryTypeClick: function(value){
             var self = this;
-            if (value == 1 && sortSourceDefault.length == 0) {
+            if (value == 1 && !isFullFill) {
                 this.showNotFulfillmentPopup();
                 return;
             }

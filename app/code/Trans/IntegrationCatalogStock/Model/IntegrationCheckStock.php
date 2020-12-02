@@ -29,7 +29,7 @@ use \Trans\Core\Helper\ValidateRequest;
 class IntegrationCheckStock implements IntegrationCheckStockInterface
 {
     /**
-     * @var \Trans\Integration\Logger\Logger
+     * @var \Trans\IntegrationCatalogStock\Logger\Logger
      */
     protected $logger;
 
@@ -68,7 +68,7 @@ class IntegrationCheckStock implements IntegrationCheckStockInterface
 
 
     public function __construct(
-        \Trans\Integration\Logger\Logger $logger
+        \Trans\IntegrationCatalogStock\Logger\Logger $logger
         ,IntegrationCommonInterface $commonRepository
         ,IntegrationCheckUpdatesInterface $checkUpdates
         ,IntegrationGetUpdatesInterface $getUpdates

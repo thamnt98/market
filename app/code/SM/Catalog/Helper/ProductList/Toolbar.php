@@ -27,6 +27,7 @@ class Toolbar
 
     const SORT_BY_DIRECTION_DESC = 'desc';
     const SORT_BY_DIRECTION_ASC  = 'asc';
+
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
      */
@@ -58,8 +59,8 @@ class Toolbar
     {
         return [
             self::SORT_BY_BEST_SELLERS      => __('Best Sellers'),
-            self::SORT_BY_PRICE_LOW_TO_HIGH => __('Price : Low to High'),
-            self::SORT_BY_PRICE_HIGH_TO_LOW => __('Price : High to Low'),
+            self::SORT_BY_PRICE_LOW_TO_HIGH => __('Price: Low to High'),
+            self::SORT_BY_PRICE_HIGH_TO_LOW => __('Price: High to Low'),
             self::SORT_BY_HIGHEST_RATING    => __('Highest Rating'),
             self::SORT_BY_NEW               => __('New'),
             self::SORT_BY_DISCOUNT          => __('Discount')

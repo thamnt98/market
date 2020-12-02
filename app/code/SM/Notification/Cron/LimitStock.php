@@ -35,7 +35,8 @@ class LimitStock extends AbstractGenerate
      * @param \Magento\Framework\Filesystem                     $filesystem
      * @param \Magento\Catalog\Model\ProductRepository          $productRepository
      * @param \Magento\Store\Model\App\Emulation                $emulation
-     * @param \SM\Notification\Helper\CustomerSetting           $settingHelper
+     * @param \SM\Notification\Model\EventSetting               $eventSetting
+     * @param \SM\Notification\Helper\Config                    $configHelper
      * @param \SM\Notification\Model\NotificationFactory        $notificationFactory
      * @param \SM\Notification\Model\ResourceModel\Notification $notificationResource
      * @param \Magento\Framework\App\ResourceConnection         $resourceConnection
@@ -47,7 +48,8 @@ class LimitStock extends AbstractGenerate
         \Magento\Framework\Filesystem $filesystem,
         \Magento\Catalog\Model\ProductRepository $productRepository,
         \Magento\Store\Model\App\Emulation $emulation,
-        \SM\Notification\Helper\CustomerSetting $settingHelper,
+        \SM\Notification\Model\EventSetting $eventSetting,
+        \SM\Notification\Helper\Config $configHelper,
         \SM\Notification\Model\NotificationFactory $notificationFactory,
         \SM\Notification\Model\ResourceModel\Notification $notificationResource,
         \Magento\Framework\App\ResourceConnection $resourceConnection,
@@ -56,7 +58,8 @@ class LimitStock extends AbstractGenerate
         parent::__construct(
             $filesystem,
             $emulation,
-            $settingHelper,
+            $eventSetting,
+            $configHelper,
             $notificationFactory,
             $notificationResource,
             $resourceConnection,
@@ -100,7 +103,10 @@ class LimitStock extends AbstractGenerate
                     );
                 }
             } catch (\Exception $e) {
-                $this->logger->error("Notification Limit Stock create failed: \n\t" . $e->getMessage());
+                $this->logger->error(
+                    "Notification Limit Stock create failed: \n\t" . $e->getMessage(),
+                    $e->getTrace()
+                );
             }
         }
     }
@@ -133,6 +139,7 @@ class LimitStock extends AbstractGenerate
         $notification->setTitle($title)
             ->setContent($message)
             ->setEvent(\SM\Notification\Model\Notification::EVENT_UPDATE)
+            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_PROMO_AND_EVENT)
             ->setCustomerIds([$data['customer_id']])
             ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_PDP)
             ->setRedirectId($product->getSku())
@@ -145,8 +152,8 @@ class LimitStock extends AbstractGenerate
                 \Magento\Framework\App\Area::AREA_FRONTEND
             );
 
-            $notification->setPushTitle(__($title, $params['title']))
-                ->setPushContent(__($message));
+            $notification->setPushTitle(__($title, $params['title'])->__toString())
+                ->setPushContent(__($message)->__toString());
 
             $this->emulation->stopEnvironmentEmulation(); // End Emulation
         }

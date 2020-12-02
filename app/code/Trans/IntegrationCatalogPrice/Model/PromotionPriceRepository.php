@@ -165,15 +165,99 @@ class PromotionPriceRepository implements PromotionPriceRepositoryInterface
                 'Parameter item_type are empty !'
             ));
         }
+        if (empty($data['store_code'])) {
+            throw new StateException(__(
+                'Parameter store_code are empty !'
+            ));
+        }
         $collection = $this->interface->create()->getCollection();
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_PROMOTION_TYPE, $data['promotion_type']);
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_DISCOUNT_TYPE, $data['discount_type']);
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_MIX_MATCH_CODE, $data['mix_and_match_code']);
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_ITEM_TYPE, $data['item_type']);
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_STORECODE, $data['store_code']);
 
         $getLastCollection =null;
         if ($collection->getSize()) {
             $getLastCollection = $collection->getFirstItem();
+        }
+        return $getLastCollection;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function loadDataPromoFiveItemTwo($data)
+    {
+        if (empty($data['promotion_type'])) {
+            throw new StateException(__(
+                'Parameter promotion_type are empty !'
+            ));
+        }
+        if (empty($data['mix_and_match_code'])) {
+            throw new StateException(__(
+                'Parameter mix_and_match_code are empty !'
+            ));
+        }
+        if (empty($data['item_type'])) {
+            throw new StateException(__(
+                'Parameter item_type are empty !'
+            ));
+        }
+        if (empty($data['store_code'])) {
+            throw new StateException(__(
+                'Parameter store_code are empty !'
+            ));
+        }
+        $collection = $this->interface->create()->getCollection();
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_PROMOTION_TYPE, $data['promotion_type']);
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_MIX_MATCH_CODE, $data['mix_and_match_code']);
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_ITEM_TYPE, $data['item_type']);
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_STORECODE, $data['store_code']);
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_SALESRULE_ID, array('neq' => 0));
+
+        $getLastCollection = null;
+        if ($collection->getSize()) {
+            $getLastCollection = $collection->getFirstItem();
+        }
+        return $getLastCollection;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function loadDataPromoFiveItemOne($data)
+    {
+        if (empty($data['promotion_type'])) {
+            throw new StateException(__(
+                'Parameter promotion_type are empty !'
+            ));
+        }
+        if (empty($data['mix_and_match_code'])) {
+            throw new StateException(__(
+                'Parameter mix_and_match_code are empty !'
+            ));
+        }
+        if (empty($data['item_type_one'])) {
+            throw new StateException(__(
+                'Parameter item_type_one are empty !'
+            ));
+        }
+        if (empty($data['store_code'])) {
+            throw new StateException(__(
+                'Parameter store_code are empty !'
+            ));
+        }
+        $collection = $this->interface->create()->getCollection();
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_PROMOTION_TYPE, $data['promotion_type']);
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_MIX_MATCH_CODE, $data['mix_and_match_code']);
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_ITEM_TYPE, $data['item_type_one']);
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_STORECODE, $data['store_code']);
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_SALESRULE_ID, 0);
+
+        $getLastCollection = null;
+        if ($collection->getSize()) {
+            $getLastCollection = $collection;
         }
         return $getLastCollection;
     }
@@ -219,6 +303,38 @@ class PromotionPriceRepository implements PromotionPriceRepositoryInterface
     /**
      * {@inheritdoc}
      */
+    public function loadDataPromoBySkuPromoType($data)
+    {
+        if (empty($data['promotion_type'])) {
+            throw new StateException(__(
+                'Parameter promotion_type are empty !'
+            ));
+        }
+        if (empty($data['discount_type'])) {
+            throw new StateException(__(
+                'Parameter discount_type are empty !'
+            ));
+        }
+        if (empty($data['sku'])) {
+            throw new StateException(__(
+                'Parameter sku are empty !'
+            ));
+        }
+        $collection = $this->interface->create()->getCollection();
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_PROMOTION_TYPE, $data['promotion_type']);
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_DISCOUNT_TYPE, $data['discount_type']);
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_SKU, $data['sku']);
+
+        $getLastCollection =null;
+        if ($collection->getSize()) {
+            $getLastCollection = $collection->getFirstItem();
+        }
+        return $getLastCollection;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function loadDataPromoByPromoId($data)
     {
         if (empty($data)) {
@@ -228,6 +344,44 @@ class PromotionPriceRepository implements PromotionPriceRepositoryInterface
         }
         $collection = $this->interface->create()->getCollection();
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_PROMOTION_ID, $data);
+
+        $getLastCollection =null;
+        if ($collection->getSize()) {
+            $getLastCollection = $collection->getFirstItem();
+        }
+        return $getLastCollection;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function loadDataPromoByPromoIdStoreCode($data)
+    {
+        if (empty($data['promotion_type'])) {
+            throw new StateException(__(
+                'Parameter promotion_type are empty !'
+            ));
+        }
+        if (empty($data['discount_type'])) {
+            throw new StateException(__(
+                'Parameter discount_type are empty !'
+            ));
+        }
+        if (empty($data['sku'])) {
+            throw new StateException(__(
+                'Parameter sku are empty !'
+            ));
+        }
+        if (empty($data['store_code'])) {
+            throw new StateException(__(
+                'Parameter store code are empty !'
+            ));
+        }
+        $collection = $this->interface->create()->getCollection();
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_PROMOTION_TYPE, $data['promotion_type']);
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_DISCOUNT_TYPE, $data['discount_type']);
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_SKU, $data['sku']);
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_STORECODE, $data['store_code']);
 
         $getLastCollection =null;
         if ($collection->getSize()) {

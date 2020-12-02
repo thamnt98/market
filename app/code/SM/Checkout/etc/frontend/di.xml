@@ -1,10 +1,9 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magento\Checkout\Block\Cart\Grid"
+                type="SM\Checkout\Override\Magento_Checkout\Block\Cart\Grid" />
     <!-- add condition calculate & get item selected -->
-    <type name="Magento\Quote\Model\Quote">
-        <plugin name="trans_model_quote_plugin" type="SM\Checkout\Plugin\Quote\Model\Quote"/>
-    </type>
     <type name="Magento\Quote\Model\Quote\Item\CartItemPersister">
         <plugin name="sm_checkout_quote_item_persister" type="SM\Checkout\Plugin\Quote\Model\Item\CartItemPersister"
                 sortOrder="99"/>
@@ -14,8 +13,7 @@
                 type="SM\Checkout\Plugin\Magento\Checkout\Block\Cart" />
     </type>
     <type name="Magento\Checkout\Block\Cart\Grid">
-        <plugin name="SM_Checkout::CartItems"
-                type="SM\Checkout\Plugin\Magento\Checkout\Block\Cart" />
+        <plugin name="SM_Checkout::CartItems" disabled="true" />
     </type>
     <type name="Magento\Checkout\Block\Cart\Sidebar">
         <plugin name="disable_dropdown_minicart_cartpage"
@@ -56,5 +54,8 @@
                 <item name="fulfillment" xsi:type="string">SM\Checkout\CustomerData\CustomSection</item>
             </argument>
         </arguments>
+    </type>
+    <type name="Magento\Checkout\Block\Cart">
+        <plugin name="sm_transcheckout_cart_items" type="SM\Checkout\Plugin\Checkout\Block\CartPlugin" sortOrder="50" />
     </type>
 </config>

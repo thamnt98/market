@@ -234,15 +234,37 @@ class SalableQuantity
     /**
      * @param $childrenIds
      * @return array
+     * @throws NoSuchEntityException
      */
     protected function extractProductIds($childrenIds)
     {
-        $ids = [];
+        $simpleIds          = [];
+        $configId           = [];
+        $configChildProduct = null;
+
+        //Extract product id
         foreach ($childrenIds as $childrenId) {
             foreach ($childrenId as $id) {
-                $ids[] = $id;
+                $product = $this->productRepository->getById($id);
+                //In case product type is configurable, we need get all children ids
+                if ($product->getTypeId() == Configurable::TYPE_CODE) {
+                    $configChildProduct = $product->getTypeInstance()->getUsedProducts($product);
+                }
+
+                if ($product->getTypeId() == SimpleProduct::TYPE_SIMPLE) {
+                    $simpleIds[] = $id;
+                }
             }
         }
+
+        if (!empty($configChildProduct)) {
+            //Extract child id of config product then merge array with simpleIds
+            foreach ($configChildProduct as $item) {
+                $configId[] = $item->getEntityId();
+            }
+        }
+
+        $ids = array_merge($configId, $simpleIds);
 
         return $ids;
     }

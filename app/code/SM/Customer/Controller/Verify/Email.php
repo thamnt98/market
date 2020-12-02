@@ -10,6 +10,7 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\Redirect;
 use SM\Customer\Helper\Config;
 use SM\Customer\Model\Customer\Validator;
+use SM\Customer\Model\Email\Sender as EmailSender;
 
 class Email extends Action
 {
@@ -24,19 +25,27 @@ class Email extends Action
     protected $validator;
 
     /**
+     * @var EmailSender
+     */
+    protected $emailSender;
+
+    /**
      * Email constructor.
      * @param Context $context
      * @param CustomerRepositoryInterface $repository
      * @param Validator $validator
+     * @param EmailSender $sender
      */
     public function __construct(
         Context $context,
         CustomerRepositoryInterface $repository,
-        Validator $validator
+        Validator $validator,
+        EmailSender $sender
     ) {
         parent::__construct($context);
         $this->repository = $repository;
         $this->validator = $validator;
+        $this->emailSender = $sender;
     }
 
     /**
@@ -54,7 +63,9 @@ class Email extends Action
             $this->validator->validateToken($customerData, $token);
 
             $customerData->setCustomAttribute(Config::IS_VERIFIED_EMAIL_ATTRIBUTE_CODE, 1);
-            $this->repository->save($customerData);
+
+            $savedCustomerData = $this->repository->save($customerData);
+            $this->emailSender->sendRegistrationSuccessEmail($savedCustomerData);
 
             $this->messageManager->addSuccessMessage(__('Your email has been verified.'));
         } catch (\Exception $exception) {

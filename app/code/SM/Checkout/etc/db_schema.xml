@@ -14,6 +14,7 @@
         <column xsi:type="varchar" name="item_rate" nullable="true" length="255" comment="Item Rate"/>
         <column xsi:type="varchar" name="address_tag" nullable="true" length="255" comment="Address Tag"/>
         <column xsi:type="text" name="oar_data" nullable="true" comment="Oar Response"/>
+        <column xsi:type="text" name="oar_order_id" nullable="true" comment="Oar Order ID"/>
     </table>
     <table name="sales_order">
         <column xsi:type="varchar" name="store_pick_up" nullable="true" length="255" comment="store_pick_up"/>

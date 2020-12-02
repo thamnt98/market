@@ -85,9 +85,11 @@ class VoucherManagement implements \SM\Checkout\Api\VoucherInterface
         }
 
         if (!empty($quote->getData('apply_voucher'))) {
-            $oldVoucher = array_merge(
-                $oldVoucher,
-                explode(',', $quote->getData('apply_voucher'))
+            $oldVoucher = array_unique(
+                array_merge(
+                    $oldVoucher,
+                    explode(',', $quote->getData('apply_voucher'))
+                )
             );
         }
 

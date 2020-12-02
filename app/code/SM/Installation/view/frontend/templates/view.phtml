@@ -24,7 +24,7 @@
                             "component"     : "SM_Installation/js/view",
                             "data"          : <?= $block->getJsonData() ?? '{}' ?>,
                             "showNote"      : <?= $block->getData('show_note') ?>,
-                            "tooltip"       : "<?= $block->escapeHtml($block->getTooltip()) ?>",
+                            "tooltip"       : "<?= $block->getTooltip() ?>",
                             "tooltipUrl"    : "<?= /* @noEscape */ $block->getViewFileUrl('images/info.svg') ?>"
                         }
                     }

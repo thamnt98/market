@@ -23,7 +23,7 @@ class AbandonedCartRepeat extends AbandonedCart
      */
     protected function getAbandonedCart()
     {
-        $time = (int)$this->settingHelper->getConfigValue('sm_notification/generate/abandoned_cart_repeat_time');
+        $time = $this->configHelper->getAbandonedCartRepeatDay();
         $select = $this->connection->select();
         $select->from(
             ['q' => 'quote'],
@@ -34,7 +34,7 @@ class AbandonedCartRepeat extends AbandonedCart
             []
         )->joinInner(
             ['n' => \SM\Notification\Model\ResourceModel\TriggerEvent::TABLE_NAME],
-            'q.entity_id = n.event_id',
+            'q.entity_id = n.event_id AND event_name = \'' . self::EVENT_NAME . '\'',
             []
         )->where(
             'q.is_active = ?',

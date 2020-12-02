@@ -20,6 +20,8 @@ define([
 ], function ($, ko, Component, addressList, totals, setShippingType, getShippingMethod, updateStatus, initShippingType, pickup, defaultShipping, singleDateTime, globalVar) {
     'use strict';
 
+    let imageData = window.checkoutConfig.imageData;
+
     return Component.extend({
         showShippingAddressPerItem: ko.observable(false),
         deliveryPerItem: ko.observable(false),
@@ -239,5 +241,12 @@ define([
             this.addressListTime[addressId](value);
             this.closeTimeSlotList(item_id);
         },
+
+        showStorePickUp: function (item_id) {
+            if (imageData[item_id]) {
+                return !imageData[item_id].is_warehouse;
+            }
+            return false;
+        }
     });
 });

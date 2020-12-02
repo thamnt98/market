@@ -53,4 +53,8 @@
     <preference for="SM\Sales\Api\Data\Invoice\InvoiceInterface" type="SM\Sales\Model\Data\Invoice\Invoice"/>
     <preference for="SM\Sales\Api\Data\Invoice\SubInvoiceInterface" type="SM\Sales\Model\Data\Invoice\SubInvoice"/>
     <preference for="SM\Sales\Api\Data\Invoice\SubInvoiceItemInterface" type="SM\Sales\Model\Data\Invoice\SubInvoiceItem"/>
+
+    <type name="\Magento\Sales\Model\Order">
+        <plugin name="sm_sales_model_order" type="\SM\Sales\Plugin\Model\Order" sortOrder="50" />
+    </type>
 </config>

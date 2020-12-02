@@ -142,15 +142,15 @@ class OrderItemRepository implements OrderItemRepositoryInterface
 
     /**
      * @param int $cartId
+     * @param int $customerId
      * @param int $parentOrderId
      * @return ResultDataInterface
      */
-    public function reorderAll($cartId, $parentOrderId)
+    public function reorderAll($cartId, $customerId, $parentOrderId)
     {
         /** @var ResultDataInterface $resultData */
         $resultData = $this->resultDataFactory->create();
         try {
-            $customerId = $this->session->getCustomerId();
             $parentOrder = $this->parentOrderRepository->getById($customerId, $parentOrderId);
 
             /** @var Quote $quote */

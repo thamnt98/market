@@ -49,6 +49,9 @@
         <checkout_order_summary>
             <active>0</active>
         </checkout_order_summary>
+        <oar_log>
+            <active>0</active>
+        </oar_log>
     </sm_checkout>
     <sm_checkout_fulfillment>
         <general>

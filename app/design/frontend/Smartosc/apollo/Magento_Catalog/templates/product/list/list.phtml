@@ -6,7 +6,7 @@
 *
 * @var $block \SM\GTM\Block\Product\ListProduct
 */
-$position = 1;
+$positionGTM = 1;
 $helper = $this->helper('SM\Catalog\Helper\Data');
 $isPopupShowed = false;
 $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
@@ -14,7 +14,6 @@ $category = $block->getLayer()->getCurrentCategory();
 ?>
 <?php foreach ($_productCollection as $_product) :?>
     <?php $dataGTM = $block->escapeHtml($block->getGtm($_product)); ?>
-    <?php if ($helper->isProductStockStatus($_product->getId())): ?>
     <li class="item product product-item">
         <div class="product-item-info" data-container="product-<?= /* @noEscape */ $viewMode ?>">
             <?php
@@ -25,11 +24,11 @@ $category = $block->getLayer()->getCurrentCategory();
             }
             ?>
             <?php // Product Image?>
-            <a href="<?= $block->escapeUrl($_product->getProductUrl()) ?>"
+            <a href="<?= $block->escapeHtmlAttr($_product->getProductUrl(), false) ?>"
                class="product photo product-item-photo"
                <?php if ($dataGTM) : ?>
                data-gtm-product='<?= $dataGTM ?>'
-               data-position="<?= $position ?>"
+               data-position="<?= $positionGTM ?>"
                <?php endif; ?>
                tabindex="-1">
                 <?= $productImage->toHtml() ?>
@@ -49,9 +48,9 @@ $category = $block->getLayer()->getCurrentCategory();
                     <a class="product-item-link <?= $_product->getId() ?>plp"
                        <?php if ($dataGTM) : ?>
                        data-gtm-product='<?= $dataGTM ?>'
-                       data-position="<?= $position ?>"
+                       data-position="<?= $positionGTM ?>"
                        <?php endif; ?>
-                       href="<?= $block->escapeUrl($_product->getProductUrl()) ?>">
+                       href="<?= $block->escapeHtmlAttr($_product->getProductUrl(), false) ?>">
                         <?= /* @noEscape */ $_helper->productAttribute($_product, $_product->getName(), 'name') ?>
                     </a>
                 </strong>
@@ -74,7 +73,7 @@ $category = $block->getLayer()->getCurrentCategory();
                         <div
                             <?php if ($dataGTM) : ?>
                             data-gtm-product='<?= $dataGTM ?>'
-                            data-position="<?= $position ?>"
+                            data-position="<?= $positionGTM ?>"
                             <?php endif; ?>
                             data-role="add-to-links" class="actions-secondary"<?= strpos($pos, $viewMode . '-secondary') ? $block->escapeHtmlAttr($position) : '' ?>>
                             <?php if ($addToBlock = $block->getChildBlock('addto')) :?>
@@ -104,7 +103,6 @@ $category = $block->getLayer()->getCurrentCategory();
             <?php endif;?>
         <?php endif;?>
     </li>
-    <?php endif; ?>
     <script>
         require(['jquery', "gtmProduct", 'domReady!'], function ($, gtm) {
             if (typeof dataLayerSourceObjects !== 'undefined') {
@@ -123,7 +121,7 @@ $category = $block->getLayer()->getCurrentCategory();
             }
         });
     </script>
-    <?php $position++; ?>
+    <?php $positionGTM++; ?>
 <?php endforeach; ?>
 <script>
     require(['jquery', "gtmProduct", 'Magento_Ui/js/lib/view/utils/async', 'domReady!'], function ($, gtm, async) {

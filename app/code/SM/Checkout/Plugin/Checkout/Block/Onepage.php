@@ -34,6 +34,13 @@ class Onepage
     protected $notFulFillMessage;
     protected $currentItemsListId = [];
     protected $isAddressEachItem = false;
+    protected $fulFill = true;
+    protected $storePickUpItemsEnable = [];
+    protected $quote = false;
+    protected $allChildItems = [];
+    protected $allParentItems = [];
+    protected $skuListForPickUp = [];
+
     /**
      * @var \Magento\Framework\Api\SearchCriteriaBuilder
      */
@@ -230,6 +237,7 @@ class Onepage
     ) {
         $fullUrl = $this->request->getRouteName() . '_' . $this->request->getControllerName() . '_' . $this->request->getActionName();
         $data = $this->serializer->unserialize($result);
+        $this->handleQuoteItems();
         $data['msi'] = $this->getSourcesList();
         $data['delivery_type'] = $this->deliveryType->getDeliveryType();
         try {
@@ -240,13 +248,14 @@ class Onepage
         $data['viewFileUrl'] = $imageUrl;
         $data['limitAddress'] = (int)$this->helperConfig->getAddressLimit();
         $data['defaultShippingAddressId'] = $this->getDefaultShippingAddressId();
-        $data['paymentMethods'] = $this->getPaymentMethods($data['quoteData']['entity_id']);
+        $data['paymentMethods'] = $this->getPaymentMethods();
         $data['dateTime'] = $this->helperConfig->getDateTimeConfig();
         $data['canShowVoucher'] = $this->canShowVoucher();
         $data['weightUnit'] = $this->helperConfig->getWeightUnit();
         $data['voucher_list'] = $this->getVoucherList();
         $data['symbol'] = $this->currency->getCurrency()->getCurrencySymbol();
         $data['sortSource'] = $this->getSortSource();
+        $data['fulFill'] = $this->fulFill;
         $data['notFulFillMessage'] = $this->notFulFillMessage;
         $data['latlng'] = ['lat' => $this->defaultLat, 'lng' => $this->defaultLng];
         $data['address_complete'] = $this->isAddressComplete();
@@ -276,25 +285,24 @@ class Onepage
     }
 
     /**
-     * @param $quoteId
      * @return array
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function getPaymentMethods($quoteId)
+    public function getPaymentMethods()
     {
-        $quote = $this->quoteRepository->get($quoteId);
+        $quote = $this->getQuote();
         $this->paymentFail = $quote->getPaymentFailureTime();
         $this->isVirtual = $quote->getIsVirtual();
         $store = $quote ? $quote->getStoreId() : null;
         $methods = [];
+        $logoUrl = $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA);
         foreach ($this->paymentMethodList->getActiveList($store) as $method) {
             $methodInstance = $this->instanceFactory->create($method);
             if ($methodInstance->isAvailable($quote) && $this->canUseMethod($methodInstance, $quote)) {
                 $description = $this->helperConfig->getPaymentDescription($method->getCode());
                 $tooltipDescription = $this->helperConfig->getPaymentTooltipDescription($method->getCode());
                 $logo = "logo/paymentmethod/" . $this->helperConfig->getPaymentLogo($method->getCode());
-                $logoUrl = $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA);
                 $methods[] = [
                     'code'  => $method->getCode(),
                     'title' => $method->getTitle(),
@@ -421,50 +429,20 @@ class Onepage
      */
     protected function getSortSource()
     {
-        $fulFill = true;
-        $skuList = [];
-        $quote = $this->checkoutSession->getQuote();
-        $child = [];
-        $notFulFillType = 0;
-        foreach ($quote->getAllItems() as $item) {
-            if ($item->getParentItemId() && $item->getParentItemId() != null) {
-                $child[$item->getParentItemId()] = $item->getSku();
-            }
-        }
-        foreach ($quote->getAllVisibleItems() as $item) {
-            $product = $item->getProduct();
-            if ($product->getData('is_spo') || $product->getData('own_courier')) {
-                $this->hasSpecialProduct = true;
-            }
-
-            $isWarehouse = $product->getIsWarehouse();
-            if ($isWarehouse == 1) {
-                $fulFill = false;
-                continue;
-            }
-            $notFulFillType = 1;
-            $sku = (isset($child[$item->getItemId()])) ? $child[$item->getItemId()] : $item->getSku();
-            $skuList[$sku] = $item->getQty();
-        }
-        if ($notFulFillType == 0) {
-            $this->notFulFillMessage = __('Sorry, pick-up method is not applicable for this order. Shop conveniently with our delivery.');
-        } else {
-            $this->notFulFillMessage = __('Sorry, some items are not available for pick-up. We have more delivery options for you, try them out!');
-        }
-        if (!$fulFill) {
-            return [];
-        }
         $defaultShipping = $this->getCustomer()->getDefaultShippingAddress();
         $this->defaultLat = $defaultShipping->getCustomAttribute('latitude') ? $defaultShipping->getCustomAttribute('latitude')->getValue() : 0;
         $this->defaultLng = $defaultShipping->getCustomAttribute('longitude') ? $defaultShipping->getCustomAttribute('longitude')->getValue() : 0;
+        if (empty($this->skuListForPickUp)) {
+            return [];
+        }
+        $sourceList = $this->msiFullFill->getMsiFullFill($this->skuListForPickUp);
+        if (empty($sourceList)) {
+            return [];
+        }
         if ($this->defaultLat != 0 && $this->defaultLng != 0) {
             $defaultShipping->setLatitude($this->defaultLat)->setLongitude($this->defaultLng);
         }
         $defaultShipping->setCity($this->split->getCityName($defaultShipping->getCity()));
-        $sourceList = $this->msiFullFill->getMsiFullFill($skuList);
-        if (empty($sourceList)) {
-            return [];
-        }
         return $this->msiFullFill->sortSourceByDistance($sourceList, $defaultShipping);
     }
 
@@ -508,13 +486,12 @@ class Onepage
                 unset($preSelectAddressIds[$key]);
             }
         }
-        $quote = $this->checkoutSession->getQuote();
+        $quote = $this->getQuote();
         $allShippingQuoteAddress = $quote->getAllShippingAddresses();
         $countShippingQuoteAddress = count($allShippingQuoteAddress);
         if ($countShippingQuoteAddress > 1) {
             $this->preSelectSingleShippingMethod = \SM\Checkout\Model\MultiShippingHandle::DEFAULT_METHOD;
         }
-        $this->getCurrentQuoteItems($quote);
         foreach ($allShippingQuoteAddress as $address) {
             if (!$address->getShippingMethod() || $address->getShippingMethod() == '') {
                 $address->setShippingMethod(\SM\Checkout\Model\MultiShippingHandle::DEFAULT_METHOD);
@@ -563,6 +540,8 @@ class Onepage
         }
         $shippingAddress = $quote->getShippingAddress();
         $shippingAddress->importCustomerAddressData($defaultCustomerAddress);
+        $quote->getPayment()->setMethod(null);
+        $quote->setData('service_fee', 0);
         $this->cart->save($quote);
     }
 
@@ -574,6 +553,7 @@ class Onepage
     protected function getItemPreSelect($quoteAddress, $allCustomerAddresses)
     {
         $items = [];
+        $shippingMethod = $quoteAddress->getShippingMethod();
         foreach ($quoteAddress->getAllVisibleItems() as $item) {
             if (!isset($this->currentQuoteItems[$item->getQuoteItemId()]) || $this->currentQuoteItems[$item->getQuoteItemId()]->getQty() != $item->getQty()) {
                 $this->cartUpdate = true;
@@ -584,13 +564,6 @@ class Onepage
             if (!in_array($customerAddressId, $allCustomerAddresses)) {
                 $customerAddressId = $this->getDefaultShippingAddressId();
             }
-            $shippingMethod = $quoteAddress->getShippingMethod();
-            /*if ($shippingMethod == \SM\Checkout\Model\MultiShippingHandle::DC) {
-                $shippingMethod = \SM\Checkout\Model\MultiShippingHandle::DEFAULT_METHOD;
-            }
-            if ($shippingMethod == \SM\Checkout\Model\MultiShippingHandle::TRANS_COURIER) {
-                $shippingMethod = \SM\Checkout\Model\MultiShippingHandle::SAME_DAY;
-            }*/
             if ($shippingMethod == \SM\Checkout\Model\MultiShippingHandle::STORE_PICK_UP) {
                 $type = '1';
             } else {
@@ -632,17 +605,6 @@ class Onepage
             $items[$itemId] = $preSelectData;
         }
         return $items + $preSelectItems;
-    }
-
-    /**
-     * @param $quote
-     */
-    protected function getCurrentQuoteItems($quote)
-    {
-        foreach ($quote->getAllVisibleItems() as $item) {
-            $this->currentQuoteItems[$item->getId()] = $item;
-            $this->currentItemsListId[] = $item->getId();
-        }
     }
 
     /**
@@ -691,5 +653,51 @@ class Onepage
     protected function actionList()
     {
         return ['add', 'change'];
+    }
+
+    /**
+     * @return \Magento\Quote\Api\Data\CartInterface|\Magento\Quote\Model\Quote
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    protected function getQuote()
+    {
+        if (!$this->quote) {
+            $this->quote = $this->checkoutSession->getQuote();
+        }
+        return $this->quote;
+    }
+
+    /**
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    protected function handleQuoteItems()
+    {
+        $notFulFillType = false;
+        $quote = $this->getQuote();
+        foreach ($quote->getAllItems() as $item) {
+            if ($item->getParentItemId() && $item->getParentItemId() != null) {
+                $this->allChildItems[$item->getParentItemId()] = $item->getSku();
+            }
+        }
+        foreach ($quote->getAllVisibleItems() as $item) {
+            $product = $item->getProduct();
+            $this->currentQuoteItems[$item->getId()] = $item;
+            $this->currentItemsListId[] = $item->getId();
+            $isWarehouse = (bool)$product->getIsWarehouse();
+            if ($isWarehouse) {
+                $this->fulFill = false;
+            } else {
+                $notFulFillType = true;
+                $sku = (isset($child[$item->getItemId()])) ? $child[$item->getItemId()] : $item->getSku();
+                $this->skuListForPickUp[$sku] = $item->getQty();
+            }
+        }
+        if (!$this->fulFill && !$notFulFillType) {
+            $this->notFulFillMessage = __('Sorry, pick-up method is not applicable for this order. Shop conveniently with our delivery.');
+        } elseif (!$this->fulFill && $notFulFillType) {
+            $this->notFulFillMessage = __('Sorry, some items are not available for pick-up. We have more delivery options for you, try them out!');
+        }
     }
 }

@@ -4,7 +4,7 @@
     <system>
         <section id="sm_notification" translate="label" type="text" sortOrder="140"
                  showInDefault="1" showInWebsite="1" showInStore="1">
-            <label>Notification Configuration</label>
+            <label>Notification</label>
             <tab>transmart</tab>
             <resource>SM_Review::sm_notification</resource>
             <group id="event_type_config" translate="label" type="text" sortOrder="10" showInDefault="1"
@@ -19,26 +19,26 @@
             </group>
             <group id="sync" translate="label" type="text" sortOrder="20"
                    showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Sync</label>
+                <label>Sync Message to Queue</label>
                 <field id="push_device" translate="label" type="text" sortOrder="0" canRestore="1"
                        showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Cron Sync Push Device</label>
                     <comment>
-                        <![CDATA[Time auto sync.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
+                        <![CDATA[Default: At every minute.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
                     </comment>
                 </field>
                 <field id="sms" translate="label" type="text" sortOrder="0" canRestore="1"
                        showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Cron Sync SMS</label>
                     <comment>
-                        <![CDATA[Time auto sync.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
+                        <![CDATA[Default: At every minute.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
                     </comment>
                 </field>
                 <field id="email" translate="label" type="text" sortOrder="0" canRestore="1"
                        showInDefault="1" showInWebsite="0" showInStore="0">
                     <label>Cron Sync Email</label>
                     <comment>
-                        <![CDATA[Time auto sync.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
+                        <![CDATA[Default: At every minute.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
                     </comment>
                 </field>
             </group>
@@ -53,7 +53,7 @@
                         <label>Cron</label>
                         <config_path>sm_notification/generate/limit_stock</config_path>
                         <comment>
-                            <![CDATA[Time auto sync.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
+                            <![CDATA[Default: At 00:00 every day.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
                         </comment>
                     </field>
                 </group>
@@ -72,7 +72,7 @@
                         <label>Cron</label>
                         <config_path>sm_notification/generate/abandoned_cart</config_path>
                         <comment>
-                            <![CDATA[Time auto sync.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
+                            <![CDATA[Default: At every 10th minute.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
                         </comment>
                     </field>
                     <field id="abandoned_cart_repeat_time" translate="label" type="text" sortOrder="20" canRestore="1"
@@ -86,7 +86,7 @@
                         <label>Repeat Cron</label>
                         <config_path>sm_notification/generate/abandoned_cart_repeat</config_path>
                         <comment>
-                            <![CDATA[Time auto sync.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
+                            <![CDATA[Default: At every 10th minute.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
                         </comment>
                     </field>
                 </group>
@@ -94,20 +94,33 @@
                 <group id="payment_group" translate="label" type="text" sortOrder="20"
                        showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Payment</label>
-                    <field id="payment_expiring_soon_time" translate="label" type="text" sortOrder="0" canRestore="1"
+                    <field id="va_payment" translate="label" type="multiselect" sortOrder="0"
+                           canRestore="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>VA Payment</label>
+                        <source_model>SM\Notification\Model\Source\Config\PaymentMethod</source_model>
+                        <config_path>sm_notification/generate/va_payment</config_path>
+                    </field>
+                    <field id="payment_expiring_soon_time" translate="label" type="text" sortOrder="10" canRestore="1"
                            showInDefault="1" showInWebsite="0" showInStore="0">
                         <label>VA Expiring Soon Time (minute)</label>
                         <config_path>sm_notification/generate/payment_expiring_soon_time</config_path>
                         <validate>validate-zero-or-greater</validate>
-                        <comment><![CDATA[The value of 0 then turn off.]]>
-                        </comment>
+                        <comment><![CDATA[The value of 0 then turn off.]]></comment>
                     </field>
-                    <field id="payment_expiring_soon_time_cron" translate="label" type="text" sortOrder="10"
+                    <field id="payment_expiring_soon_time_cron" translate="label" type="text" sortOrder="20"
                            canRestore="1" showInDefault="1" showInWebsite="0" showInStore="0">
                         <label>VA Expiring Soon (Cron)</label>
                         <config_path>sm_notification/generate/payment_expiring_soon_time_cron</config_path>
                         <comment>
-                            <![CDATA[Time auto sync.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
+                            <![CDATA[Default: At every minute.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
+                        </comment>
+                    </field>
+                    <field id="payment_expired" translate="label" type="text" sortOrder="20"
+                           canRestore="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>VA Expired (Cron)</label>
+                        <config_path>sm_notification/generate/payment_expired</config_path>
+                        <comment>
+                            <![CDATA[Default: At every 5th minute.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
                         </comment>
                     </field>
                 </group>
@@ -120,7 +133,7 @@
                         <label>Cron Reminder Order Picked Up</label>
                         <config_path>sm_notification/generate/remind_pickup_cron</config_path>
                         <comment>
-                            <![CDATA[Time auto sync.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
+                            <![CDATA[Default: At every hour.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
                         </comment>
                     </field>
                     <field id="remind_pickup" translate="label" type="text" sortOrder="10" canRestore="1"

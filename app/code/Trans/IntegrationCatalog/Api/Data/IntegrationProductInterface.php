@@ -75,6 +75,7 @@ interface IntegrationProductInterface {
 	const COL          = 'col';
 	const SIZE         = 'size';
 	const BARCODE      = 'barcode';
+	const COMPANY_CODE = 'company_code';
 	
 	const GTYPE        = 'gtype';
 	const DESCR        = 'descr';
@@ -87,6 +88,8 @@ interface IntegrationProductInterface {
 
 	const QTY          = 'qty';
 	const BRAND        = 'brand_id';
+	const BRAND_CODE = 'brand_code';
+	const BRAND_NAME = 'brand_name';
 	const SEASON       = 'season';
 	const GROUP        = 'group';
 	const CATEGORY     = 'category';

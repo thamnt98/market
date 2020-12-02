@@ -15,6 +15,7 @@
         <referenceBlock name="form.subscribe" remove="true"/>
         <referenceBlock name="store_switcher" remove="true"/>
         <referenceBlock name="catalog.compare.link" remove="true"/>
+        <referenceBlock name="banner.data" remove="true"/>
         <!-- Header -->
         <referenceBlock name="logo">
             <arguments>

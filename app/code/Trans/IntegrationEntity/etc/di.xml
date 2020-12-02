@@ -68,4 +68,14 @@
     <preference for="Trans\IntegrationEntity\Api\Data\IntegrationProductAttributeSetChildInterface"
                 type="Trans\IntegrationEntity\Model\IntegrationProductAttributeSetChild" />
 
+    <!-- add console for checking pim integration functionalities-->
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <!-- pim check product image console-->
+            <argument name="commands" xsi:type="array">
+                 <item name="Trans_IntegrationEntity_Console_Pim_Save_ProductAttribute" xsi:type="object">Trans\IntegrationEntity\Console\Pim\Save\ProductAttribute</item>
+            </argument>
+        </arguments>
+    </type>
+
 </config>

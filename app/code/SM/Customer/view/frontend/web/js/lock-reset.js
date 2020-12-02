@@ -45,14 +45,15 @@ define(
                         $(document).trigger('customer:login');
                         if (self.options.login == 'true') {
                             token = urlParams.get('recoverytoken');
-                            email = '';
+                            email = urlParams.get('email');
                             name = urlParams.get('name');
                             $(self.options.tabLockResetSelector).find('[selector=title]').text($.mage.__('Hi, %1! Your account is back.').replace('%1', name));
                         }
 
                         $(self.options.tabLockResetSelector).modal('openModal').on('modalclosed', function() {
                             if (self.options.login == 'false') {
-                                $('#tab-login').modal('openModal').show();
+                                //$('#tab-login').modal('openModal').show();
+                                $('.sign-link a').trigger('click');
                             }
                         }).show();
                         window.history.replaceState(null, null, window.location.pathname);
@@ -67,6 +68,7 @@ define(
                     $(self.options.tabLockResetSelector).find('[selector=change-password]').click(function () {
                         $(self.options.tabLockResetSelector).modal('closeModal');
                         $('#tab-recovery-password').find('#reset-password-token').val(token);
+                        $('#tab-recovery-password').find('#reset-password-email').val(email);
                         $('#tab-recovery-password').modal('openModal').show();
                     });
                 }

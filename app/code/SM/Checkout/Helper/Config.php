@@ -251,4 +251,14 @@ class Config extends AbstractHelper
             'sm_help/payment_page/terms_conditions_mobile'
         );
     }
+
+    /**
+     * @return mixed
+     */
+    public function isEnableOarLog()
+    {
+        return $this->scopeConfig->getValue(
+            'sm_checkout/oar_log/active'
+        );
+    }
 }

@@ -88,9 +88,13 @@ class SourceItemsSave
             $this->currentSku = $item->getSku();
             $this->item = $item;
             if ($this->configurableStock->checkIsConfigurableBaseSku($this->currentSku)) {
-                $sourceItems = array_merge($sourceItems, $this->getVariantsItemsStock());
+                if ($setItemsSource = $this->getSetItemsSource()) {
+                    $sourceItems = array_merge($sourceItems, $setItemsSource);
+                }
             } elseif ($this->configurableStock->checkIsConfigurableStockSku($this->currentSku, $item->getQuantity())) {
-                $sourceItems = array_merge($sourceItems, $this->getBaseItemStock());
+                if ($baseItemSource = $this->getBaseItemSource()) {
+                    $sourceItems = array_merge($sourceItems, $baseItemSource);
+                }
             }
         }
 
@@ -129,7 +133,7 @@ class SourceItemsSave
     /**
      * @return array
      */
-    private function getVariantsItemsStock()
+    private function getSetItemsSource()
     {
         $items = [];
         if ($products = $this->getOtherVariantsProducts()) {
@@ -147,7 +151,6 @@ class SourceItemsSave
                 } catch (\Exception $e) {
                     continue;
                 }
-
             }
         }
 
@@ -172,7 +175,7 @@ class SourceItemsSave
      * @return mixed
      * @throws LocalizedException
      */
-    private function getBaseItemStock()
+    private function getBaseItemSource()
     {
         $sourceItems = [];
         $data = $this->item->getData();
@@ -199,10 +202,15 @@ class SourceItemsSave
      */
     private function getSubtractItemQty($data, $itemSku)
     {
-        $sourceItem = $this->getSourceItemBySourceCodeAndSku->execute(
-            $data[SourceItemInterface::SOURCE_CODE],
-            $itemSku
-        );
+        try {
+            $sourceItem = $this->getSourceItemBySourceCodeAndSku->execute(
+                $data[SourceItemInterface::SOURCE_CODE],
+                $itemSku
+            );
+        } catch (\Exception $e) {
+            return null;
+        }
+
         $deductQty = $sourceItem->getQuantity() - $this->configurableStock->getBaseQty();
         if ($deductQty >= 0) {
             $sourceItem->setQuantity($sourceItem->getQuantity() - $this->configurableStock->getBaseQty());
@@ -223,14 +231,18 @@ class SourceItemsSave
      * @param $data
      * @param string $itemSku
      * @return SourceItemInterface
-     * @throws NoSuchEntityException
      */
     private function getAdditionalItemQty($data, $itemSku)
     {
-        $sourceItem = $this->getSourceItemBySourceCodeAndSku->execute(
-            $data[SourceItemInterface::SOURCE_CODE],
-            $itemSku
-        );
+        try {
+            $sourceItem = $this->getSourceItemBySourceCodeAndSku->execute(
+                $data[SourceItemInterface::SOURCE_CODE],
+                $itemSku
+            );
+        } catch (\Exception $e) {
+            return null;
+        }
+
         $sourceItem->setQuantity($sourceItem->getQuantity() + $this->configurableStock->getBaseQty());
         $sourceItem->setStatus(SourceItemInterface::STATUS_IN_STOCK);
 

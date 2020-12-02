@@ -220,13 +220,7 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
              $this->throwException();
         }
 
-        if ($customer->getCustomAttribute('telephone')) {
-            $telephone = $customer->getCustomAttribute('telephone')->getValue();
-            $telephone = preg_replace("/^(^\+628|^628|^08|^8)/", '08', $telephone);
-            if (!$this->customerResourceModel->checkTelephoneIsVerified($telephone)) {
-                $this->throwException();
-            }
-        } else {
+        if (!$customer->getCustomAttribute('telephone') || !$customer->getEmail()) {
             $this->throwException();
         }
 
@@ -301,7 +295,6 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
         return $customerToSave;
     }
 
-
     /**
      * @return String[][]
      */
@@ -309,8 +302,6 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
     {
         $attributesToUnset = [
             'group_id',
-            'email',
-            'telephone',
             'is_edit_address',
             'created_in',
             'store_id',
@@ -348,24 +339,28 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
             $telephone = null;
             if ($customer->getCustomAttribute('telephone')) {
                 $telephone = $customer->getCustomAttribute('telephone')->getValue();
-            }
-            //check telephone already exists with new account
-            $entityExist = false;
-            try {
-                $entityExist = $this->getByPhone($telephone);
-            } catch (NoSuchEntityException $e) {
-                // This mean customer is not exist.
-            }
-            if ($customer->getId() == null && $entityExist) {
-                throw new LocalizedException(
-                    __(
-                        'This %fieldName %fieldValue is already exists',
-                        [
-                            'fieldName'  => 'telephone',
-                            'fieldValue' => $telephone
-                        ]
-                    )
-                );
+
+                //check telephone already exists with new account
+                $entityExist = false;
+                try {
+                    $entityExist = $this->getByPhone($telephone);
+                } catch (NoSuchEntityException $e) {
+                    // This mean customer is not exist.
+                }
+                if ($customer->getId() == null && $entityExist) {
+                    throw new LocalizedException(
+                        __(
+                            'This %fieldName %fieldValue is already exists',
+                            [
+                                'fieldName'  => 'telephone',
+                                'fieldValue' => $telephone
+                            ]
+                        )
+                    );
+                }
+
+                // Check Telephone is verified.
+                $this->telephoneIsVerified($telephone);
             }
 
             // Convert raw password to hashed password
@@ -383,7 +378,6 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
                 //verify dob change number
                 try {
                     $currentCustomerData = $this->customerRepositoryInterface->getById($customer->getId());
-                    $customer->setEmail($currentCustomerData->getEmail());
                 } catch (\Exception $e) {
                     $this->throwException($e);
                 }
@@ -425,7 +419,6 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
             if ($customer->getId()) {
                 $customerDataObject = $this->customerRepositoryInterface->getById($customer->getId());
             }
-
 
             //Add Incomplete address
             if (!$customer->getId()) {
@@ -633,6 +626,22 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
     public function getPasswordHash($password)
     {
         return $this->encryptor->getHash($password, true);
+    }
+
+    /**
+     * @param $telephone
+     * @return bool
+     * @throws Exception
+     * @throws LocalizedException
+     */
+    private function telephoneIsVerified($telephone)
+    {
+        $telephone = preg_replace("/^(^\+628|^628|^08|^8)/", '08', $telephone);
+        if (!$this->customerResourceModel->checkTelephoneIsVerified($telephone)) {
+            $this->throwException();
+        }
+
+        return true;
     }
 
     /**

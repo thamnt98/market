@@ -122,21 +122,18 @@ class DiscountRegistry extends \Amasty\Rules\Model\DiscountRegistry
                 if (!$rule->getId()) {
                     continue;
                 }
-
                 $ruleAmount = array_sum($ruleItemsAmount);
+                /** @var \SM\Promotion\Api\Data\DiscountBreakdownInterface $breakdownLine */
+                $breakdownLine = $this->breakdownLineFactory->create();
                 if (isset($shippingDiscountDataForBreakdown[$rule->getId()])) {
                     $ruleAmount += $shippingDiscountDataForBreakdown[$rule->getId()];
                 }
 
                 if ($ruleAmount > 0) {
-                    /** @var \SM\Promotion\Api\Data\DiscountBreakdownInterface $breakdownLine */
-                    $breakdownLine = $this->breakdownLineFactory->create();
-
                     $breakdownLine->setRuleName($rule->getStoreLabel() ? $rule->getStoreLabel() : $rule->getName());
                     $breakdownLine->setId($rule->getId());
                     $breakdownLine->setCode($rule->getCouponCode());
-                    $breakdownLine->setRuleAmount($ruleAmount * -1);
-
+                    $breakdownLine->setRuleAmount(abs($ruleAmount));
                     $totalAmount[$ruleId] = $breakdownLine;
                 }
             }
@@ -233,13 +230,13 @@ class DiscountRegistry extends \Amasty\Rules\Model\DiscountRegistry
             return;
         }
 
+        if (isset($this->shippingAddressDiscount[$addressId][$ruleId])) {
+            $this->shippingAddressDiscount[$addressId] = [];
+        }
+
         if (isset($this->shippingAddressDiscount[$addressId])) {
-            if (isset($this->shippingAddressDiscount[$addressId][$ruleId])) {
-                $this->shippingAddressDiscount[$addressId][$ruleId] = abs($shippingDiscountAmount);
-            } else {
-                $addressDiscount = array_sum($this->shippingAddressDiscount[$addressId]);
-                $this->shippingAddressDiscount[$addressId][$ruleId] = abs($shippingDiscountAmount) - $addressDiscount;
-            }
+            $addressDiscount = array_sum($this->shippingAddressDiscount[$addressId]);
+            $this->shippingAddressDiscount[$addressId][$ruleId] = abs($shippingDiscountAmount) - $addressDiscount;
         } else {
             $this->shippingAddressDiscount[$addressId][$ruleId] = abs($shippingDiscountAmount);
         }
@@ -307,5 +304,17 @@ class DiscountRegistry extends \Amasty\Rules\Model\DiscountRegistry
     {
         $this->dataPersistor->clear(self::DISCOUNT_REGISTRY_FREE_SHIP_RULES);
         parent::unsetDataForBreakdown();
+    }
+
+    /**
+     * @override
+     */
+    public function flushDiscount()
+    {
+        $this->ruleFreeShip = [];
+        $this->shippingAddressDiscount = [];
+        $this->shippingDiscountDataForBreakdown = [];
+
+        return parent::flushDiscount();
     }
 }

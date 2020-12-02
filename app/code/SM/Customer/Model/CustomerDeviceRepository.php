@@ -101,17 +101,8 @@ class CustomerDeviceRepository implements \SM\Customer\Api\CustomerDeviceReposit
      */
     public function save(\SM\Customer\Api\Data\CustomerDeviceInterface $device)
     {
-        /** @var ResourceModel\CustomerDevice\Collection $coll */
-        $coll = $this->collectionFactory->create();
         /** @var CustomerDevice $model */
-        $model = $coll->addFieldToFilter('customer_id', $device->getCustomerId())
-            ->addFieldToFilter('device_id', $device->getDeviceId())
-            ->getFirstItem();
-
-        if (!$model || !$model->getId()) {
-            $model = $this->modelFactory->create();
-        }
-
+        $model = $this->modelFactory->create();
         $model->setData('customer_id', $device->getCustomerId())
             ->setData('device_id', $device->getDeviceId())
             ->setData('type', $device->getType())

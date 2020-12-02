@@ -31,7 +31,7 @@ class ListNotification extends \Magento\Framework\View\Element\Template
     /**
      * @var array
      */
-    protected $eventEnabled = [];
+    protected $eventType = [];
 
     /**
      * ListNotification constructor.
@@ -171,11 +171,11 @@ class ListNotification extends \Magento\Framework\View\Element\Template
      */
     public function convertEventType($type)
     {
-        if (!$this->eventEnabled) {
-            $this->eventEnabled = $this->helper->getEventEnable();
+        if (!isset($this->eventType[$type])) {
+            $this->eventType[$type] = $this->helper->getEventTitle($type);
         }
 
-        return $this->eventEnabled[$type]['name'] ?? $type;
+        return $this->eventType[$type];
     }
 
     /**

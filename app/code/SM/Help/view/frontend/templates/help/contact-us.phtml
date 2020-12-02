@@ -46,19 +46,22 @@
                     <a href="#" id="button-order-track" class="button-order-track"><?= $block->escapeHtml(__('Choose Order…'))?></a>
                     <div class="help-order-list">
                         <div class="txt-title-order-list"><?= $block->escapeHtml(__('Which order has the products with problems? Please choose one from the list below.'))?></div>
-                        <?php if ($_orders->getSize() > 0): ?>
-                            <?php foreach ($_orders->getItems() as $order): ?>
-                                <?php /** @var SM\Sales\Model\Data\SubOrderData $order */?>
+                        <?php if ($_orders->getItems()): ?>
+                            <?php foreach ($_orders->getItems() as $order):?>
+                                <?php /** @var SM\Sales\Model\Data\SubOrderData $order */
+                                    if($order->getStatus() == 'order_canceled' || $order->getStatus() == 'canceled') $classOrder="color-red";
+                                    else $classOrder="color-blue";
+                                ?>
                                 <div id="<?= $order->getId() ?>" class="order-track-box">
                                     <div class="order-track-head">
                                         <div class="gr-date-total">
                                             <span class="date-track"><?= $block->escapeHtml($block->getFormatDate($order->getCreatedAt())) ?></span>
                                             <span class="or-track-total"><?= $block->escapeHtml(__('Order ID ')) ?>
-                                                <span class="color-red"><?= $block->escapeHtml('#'.$order->getIncrementId()) ?></span>
+                                                <span class="color-black"><?= $block->escapeHtml('#'.$order->getSubOrderId()) ?></span>
                                         </span>
                                         </div>
-                                        <div class="gr-status"><span class="or-track-status"><?= $block->escapeHtml(__('Status:')) ?><span
-                                                    class="color-blue"><?= $block->escapeHtml($order->getStatusLabel()) ?></span>
+                                        <div class="gr-status"><span class="or-track-status"><?= $block->escapeHtml(__('Status:')) ?>
+                                                <span class="<?= $block->escapeHtml($classOrder) ?>"><?= $block->escapeHtml($order->getStatusLabel()) ?></span>
                                         </span>
                                         </div>
                                     </div>
@@ -66,8 +69,8 @@
                                         <div id="order-img" class="gr-img">
                                             <?php /** @var \Magento\Catalog\Model\Product $item */ ?>
                                             <?php foreach ($order->getItems() as $item): ?>
-                                            <div id="<?php echo $item->getProductId() ?>" class="img-order" style="display: inline-block">
-                                                <img src="<?php echo $block->getImageResize($item,70,70)?>"/>
+                                            <div id="<?php echo $item->getId() ?>" class="img-order" style="display: inline-block">
+                                                <img src="<?php echo $block->getImageResize($item->getImageUrl(),70,70)?>"/>
                                             </div>
                                             <?php endforeach; ?>
                                         </div>
@@ -75,14 +78,14 @@
                                         <div class="gr-info">
                                             <p>
                                                 <?php foreach ($order->getItems() as $item): ?>
-                                                        <?php array_push($itemName, $item->getName()); ?>
+                                                        <?php array_push($itemName, $item->getProductName()); ?>
                                                 <?php endforeach; ?>
                                                 <?= $block->escapeHtml(__(implode(", ",$itemName))) ?>
                                             </p>
 
                                         </div>
                                     </div>
-                                    <input name="order_increment_id" hidden value="<?=  $order->getIncrementId() ?>" />
+                                    <input name="order_increment_id" hidden value="<?=  $order->getSubOrderId() ?>" />
                                     <input name="order_id" hidden value="<?= $order->getId() ?>" />
                                 </div>
                             <?php endforeach;?>

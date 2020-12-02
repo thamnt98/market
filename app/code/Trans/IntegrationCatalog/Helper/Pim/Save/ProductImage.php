@@ -15,6 +15,9 @@ namespace Trans\IntegrationCatalog\Helper\Pim\Save;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\Serialize\Serializer\Json;
+use Magento\Framework\Exception\NoSuchEntityException;
+
+use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Filesystem\Io\File;
 use Magento\Framework\App\Filesystem\DirectoryList;
@@ -60,19 +63,34 @@ class ProductImage extends AbstractHelper
    */
   protected $integrationProductCollection;
 
+  /**
+   * @var \Magento\Catalog\Model\ResourceModel\Product\Gallery
+   */
+  protected $galleryResource;
+
+  /**
+   * @var \Magento\Eav\Model\ResourceModel\Entity\Attribute
+   */
+  protected $eavAttribute;
+
+  /**
+   * @var store manager
+   */
   protected $storeManager;
 
   /**
    * Constructor method
-   * @param Context                            $context
-   * @param Json                               $json
-   * @param ProductRepositoryInterface         $productRepo
-   * @param File                               $file
-   * @param DirectoryList                      $directoryList
+   * @param Context $context
+   * @param Json $json
+   * @param ProductRepositoryInterface $productRepo
+   * @param File $file
+   * @param DirectoryList $directoryList
    * @param IntegrationProductInterfaceFactory $integrationProductFactory
-   * @param IntegrationCatalogDataFactory      $integrationCatalogDataFactory
-   * @param IntegrationCatalogDataFactory      $integrationCatalogDataFactory
+   * @param IntegrationCatalogDataFactory $integrationCatalogDataFactory
+   * @param IntegrationCatalogDataFactory integrationCatalogDataFactory
    * @param \Trans\IntegrationCatalog\Model\ResourceModel\IntegrationProduct\CollectionFactory $integrationProductCollection
+   * @param \Magento\Catalog\Model\ResourceModel\Product\Gallery $galleryResource
+   * @param \Magento\Eav\Model\ResourceModel\Entity\Attribute $eavAttribute
    */
   public function __construct(
     Context $context,
@@ -83,7 +101,9 @@ class ProductImage extends AbstractHelper
     IntegrationProductInterfaceFactory $integrationProductFactory,
     IntegrationCatalogDataFactory $integrationCatalogDataFactory,
     CollectionFactory $integrationProductCollection,
-    StoreManagerInterface $storeManager
+    StoreManagerInterface $storeManager,
+    \Magento\Eav\Model\ResourceModel\Entity\Attribute $eavAttribute,
+    \Magento\Catalog\Model\ResourceModel\Product\Gallery $galleryResource
   ) {
     $this->json = $json;
     $this->integrationProductFactory = $integrationProductFactory;
@@ -93,6 +113,8 @@ class ProductImage extends AbstractHelper
     $this->integrationCatalogDataFactory = $integrationCatalogDataFactory;
     $this->integrationProductCollection = $integrationProductCollection;
     $this->storeManager = $storeManager;
+    $this->galleryResource = $galleryResource;
+    $this->eavAttribute = $eavAttribute;
     $this->storeManager->setCurrentStore(0);
     parent::__construct($context);
   }
@@ -153,11 +175,33 @@ class ProductImage extends AbstractHelper
     return $collection->getFirstItem();
   }
 
+  /**
+   * Get integration catalog product by magento parent id
+   *
+   * @param int $entityId
+   * @return \Trans\IntegrationCatalog\Model\ResourceModel\IntegrationProduct\Collection
+   */
   public function getProductByMagentoParentId($entityId)
   {
     $collection = $this->integrationProductCollection->create();
     $collection->addFieldToFilter('magento_parent_id',['eq'=>$entityId])->setOrder('pim_id','ASC')->setPageSize(1);
     return $collection->getFirstItem();
+  }
+  
+  /**
+   * Get integration catalog product by bulk magento parent id
+   *
+   * @param int[] $entityIds
+   * @return \Trans\IntegrationCatalog\Model\ResourceModel\IntegrationProduct\Collection | Boolean
+   */
+  public function getProductByMagentoParentIdBulk($entityIds = [])
+  {
+    if (empty($entityIds) == false) {
+      $collection = $this->integrationProductCollection->create();
+      $collection->addFieldToFilter('magento_parent_id',['in'=> $entityIds])->setOrder('pim_id','ASC');
+      return $collection;
+    }
+    return false;
   }
 
   /**
@@ -191,14 +235,17 @@ class ProductImage extends AbstractHelper
    * Get integration catalog data by pim id
    *
    * @param  string $pimId
-   * @return \Trans\IntegrationCatalog\Model\ResourceModel\IntegrationDataValue\Collection
+   * @return string
    */
   public function getProductCatalogDataByPimId($pimId)
   {
     $catalogData = $this->integrationCatalogDataFactory->create();
     $collection = $catalogData->getCollection();
     $collection->addFieldToFilter('data_value', ['like'=>'%"id":"'.$pimId.'"%']);
-    return $collection->getFirstItem();
+    $collection->setPageSize(1);
+    $collection->getSelect()->limit(1)->order('id desc');
+    return $collection->getSelect()->__toString();
+    //return $collection->getFirstItem();
   }
 
   /**
@@ -209,10 +256,8 @@ class ProductImage extends AbstractHelper
    */
   public function getCatalogDataImageUrl($catalogData)
   {
-    if ($catalogData->getData()) {
-      $data = $this->json->unserialize($catalogData['data_value']);
-      return (isset($data['image_url']))? $data['image_url'] : '';
-    }
+    $data = json_decode($catalogData['data_value'], true);
+    return (isset($data['image_url']))? $data['image_url'] : '';
   }
 
   /**
@@ -269,4 +314,191 @@ class ProductImage extends AbstractHelper
       unlink($pathTmpImage . "catalog/product/" . $firstWord . "/" . $secondWord . "/" . $baseName);
     }
   }
+
+  /**
+   * get media gallery value by product row_id and filename
+   * 
+   * @param int $rowId
+   * @param string $filename
+   * @return array
+   * @throws \Exception
+   */
+  public function getMediaGalleryValue($rowId, $filename)
+  {
+    try {
+      $connection = $this->galleryResource->getConnection();
+      $mediaGalleryTable = $connection->getTableName('catalog_product_entity_media_gallery');
+      $mediaGalleryValueTable = $connection->getTableName('catalog_product_entity_media_gallery_value_to_entity');
+
+      $query = 'Select * FROM ' . $mediaGalleryTable . ' mdg JOIN ' . $mediaGalleryValueTable . ' mdgve ON (mdg.value_id = mdgve.value_id) where row_id = ' . $rowId . ' and value = "' . $filename . '"';
+      $result = $connection->fetchRow($query);
+
+      if(!empty($result)) {
+        return $result;
+      }
+    } catch (\Exception $e) {
+      throw new \Exception("Media gallery not found.");
+    }
+  }
+
+  /**
+   * delete media gallery value
+   * 
+   * @param int $valueId
+   * @return void
+   */
+  public function deleteMediaGalleryValue($valueId)
+  {
+    $this->galleryResource->deleteGallery($valueId);
+  }
+
+  /**
+   * insert media gallery value
+   * 
+   * @param int $attrId
+   * @param string $value
+   * @return void
+   */
+  public function insertMediaGalleryValue($attrId, $value, $rowId)
+  {
+    try {
+      $connection = $this->galleryResource->getConnection();
+      $mediaGalleryTable = $connection->getTableName('catalog_product_entity_media_gallery');
+      $mediaGalleryValueTable = $connection->getTableName('catalog_product_entity_media_gallery_value');
+      $mediaGalleryValueEntTable = $connection->getTableName('catalog_product_entity_media_gallery_value_to_entity');
+      
+      $query1 = 'INSERT INTO ' . $mediaGalleryTable . ' (attribute_id, value, media_type, disabled) values (' . $attrId . ', "' . $value . '", "image", 0)';
+      $connection->query($query1);
+
+      $valueId = $connection->lastInsertId($mediaGalleryTable);
+
+      $query2 = 'INSERT INTO ' . $mediaGalleryValueTable . ' (value_id, store_id, disabled, row_id) values (' . $valueId . ', 0, 0, ' . $rowId . ')';
+      $connection->query($query2);
+
+      $query3 = 'INSERT INTO ' . $mediaGalleryValueEntTable . ' (value_id, row_id) values (' . $valueId . ', ' . $rowId . ')';
+      $connection->query($query3);    
+    } catch (\Exception $e) {
+      throw new \Exception("Save product image fail. " . $e->getMessage());
+    }
+  }
+
+  /**
+   * delete product image query
+   *
+   * @param int $rowId
+   * @param array $filename
+   * @return void
+   */
+  public function deleteProductImageByValue($rowId, $filename)
+  {
+    try {
+      $connection = $this->galleryResource->getConnection();
+      $mainTable = $connection->getTableName('catalog_product_entity_varchar');
+
+      if(count($filename) > 1) {
+        $filename = implode(',', $filename);
+      } else {
+        $filename = '"' . $filename[0] . '"';
+      }
+      
+      $query = 'DELETE FROM ' . $mainTable . ' WHERE row_id = ' . $rowId . ' and value in (' . $filename . ')';
+      var_dump($query);
+      $connection->query($query);     
+    } catch (\Exception $e) {
+      throw new \Exception("Delete product image fail." . $e->getMessage());
+    }
+  }
+
+  /**
+   * delete product image query by attribute ids
+   *
+   * @param int $rowId
+   * @param array $attrIds
+   * @return void
+   */
+  public function deleteProductImageByAttrIds($rowId, $attrIds)
+  {
+    try {
+      $connection = $this->galleryResource->getConnection();
+      $mainTable = $connection->getTableName('catalog_product_entity_varchar');
+
+      $attrIds = implode(',', $attrIds);
+      
+      $query = 'DELETE FROM ' . $mainTable . ' WHERE row_id = ' . $rowId . ' and attribute_id in (' . $attrIds . ')';
+      $connection->query($query);     
+    } catch (\Exception $e) {
+      throw new \Exception("Delete product image fail." . $e->getMessage());
+    }
+  }
+
+  /**
+     * Get Attribute Code by attribute id
+     *
+     * @param string $code
+     * @return int
+     * @throws NoSuchEntityException
+     */
+    public function getAttributeIdByCode($code)
+    {
+        return $this->eavAttribute->getIdByCode('catalog_product', $code);
+    }
+
+    /**
+     * save product image
+     *
+     * @param int $rowId
+     * @param string $filename
+     * @param array $attrId
+     * @return void
+     */
+    public function saveProductImage($rowId, $filename, array $attrIds = [])
+    {
+      try {
+        $connection = $this->galleryResource->getConnection();
+        $mainTable = $connection->getTableName('catalog_product_entity_varchar');
+        
+        foreach($attrIds as $attrId) {
+          try {
+            if(!$this->checkProductImageDataExist($rowId, $filename, $attrId)) {
+              $query = 'INSERT INTO ' . $mainTable . ' (attribute_id, store_id, value, row_id) Values (' . $attrId . ', 0, "' . $filename . '", ' . $rowId . ')';
+              $connection->query($query);     
+            }
+          } catch (\Exception $e) {
+            continue;
+          }
+        }
+      
+      } catch (\Exception $e) {
+        throw new \Exception("Save product image fail.");
+      }
+    }
+
+    /**
+     * check product image data exist
+     *
+     * @param int $rowId
+     * @param string $filename
+     * @param int $attrId
+     * @return bool
+     */
+    public function checkProductImageDataExist($rowId, $filename, $attrId)
+    {
+      $result = false;
+      try {
+        $connection = $this->galleryResource->getConnection();
+        $mainTable = $connection->getTableName('catalog_product_entity_varchar');
+
+        $query = 'SELECT * FROM ' . $mainTable . ' where row_id = ' . $rowId . ' and attribute_id = ' . $attrId . ' and value = "' . $filename . '"';
+        $result = $connection->fetchRow($query);
+
+        if(!empty($result)) {
+          $result = true;
+        }
+      } catch (\Exception $e) {
+        throw new \Exception("Image data not found.");
+      }
+
+      return $result;
+    }
+
 }

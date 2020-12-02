@@ -3,7 +3,7 @@
 
 namespace SM\Promotion\Cron;
 
-class ProcessOrderRewardRule extends \SM\Notification\Cron\AbstractGenerate
+class ProcessOrderRewardRule
 {
 
     const REWARD_PENDING = 0;
@@ -35,48 +35,31 @@ class ProcessOrderRewardRule extends \SM\Notification\Cron\AbstractGenerate
     protected $notificationFactory;
 
     /**
+     * @var \Psr\Log\LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * ProcessOrderRewardRule constructor.
      *
-     * @param \Magento\Framework\Filesystem                                    $filesystem
+     * @param \Psr\Log\LoggerInterface                                         $logger
      * @param \Magento\SalesRule\Api\Data\CouponGenerationSpecInterfaceFactory $generationSpecFactory
      * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory       $collectionFactory
      * @param \Magento\SalesRule\Model\ResourceModel\Rule\CollectionFactory    $ruleCollectionFactory
      * @param \Magento\SalesRule\Model\Service\CouponManagementService         $couponManagementService
-     * @param \Magento\Store\Model\App\Emulation                               $emulation
-     * @param \SM\Notification\Helper\CustomerSetting                          $settingHelper
-     * @param \SM\Notification\Model\NotificationFactory                       $notificationFactory
-     * @param \SM\Notification\Model\ResourceModel\Notification                $notificationResource
-     * @param \Magento\Framework\App\ResourceConnection                        $resourceConnection
-     * @param \Magento\Framework\Logger\Monolog|null                           $logger
-     *
-     * @throws \Magento\Framework\Exception\FileSystemException
      */
     public function __construct(
-        \Magento\Framework\Filesystem $filesystem,
+        \Psr\Log\LoggerInterface $logger,
         \Magento\SalesRule\Api\Data\CouponGenerationSpecInterfaceFactory $generationSpecFactory,
         \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $collectionFactory,
         \Magento\SalesRule\Model\ResourceModel\Rule\CollectionFactory $ruleCollectionFactory,
-        \Magento\SalesRule\Model\Service\CouponManagementService $couponManagementService,
-        \Magento\Store\Model\App\Emulation $emulation,
-        \SM\Notification\Helper\CustomerSetting $settingHelper,
-        \SM\Notification\Model\NotificationFactory $notificationFactory,
-        \SM\Notification\Model\ResourceModel\Notification $notificationResource,
-        \Magento\Framework\App\ResourceConnection $resourceConnection,
-        \Magento\Framework\Logger\Monolog $logger
+        \Magento\SalesRule\Model\Service\CouponManagementService $couponManagementService
     ) {
-        parent::__construct(
-            $filesystem,
-            $emulation,
-            $settingHelper,
-            $notificationFactory,
-            $notificationResource,
-            $resourceConnection,
-            $logger
-        );
         $this->generationSpecFactory = $generationSpecFactory;
         $this->collectionFactory = $collectionFactory;
         $this->ruleCollectionFactory = $ruleCollectionFactory;
         $this->couponManagementService = $couponManagementService;
+        $this->logger = $logger;
     }
 
     public function process()
@@ -137,7 +120,6 @@ class ProcessOrderRewardRule extends \SM\Notification\Cron\AbstractGenerate
                         $couponSpec = $this->generationSpecFactory->create(['data' => $couponData]);
                         $couponSpec->getExtensionAttributes()->setCustomerId($order->getCustomerId());
                         $this->couponManagementService->generate($couponSpec);
-                        $this->sendNotification($order);
                         $orderRewarded[] = $order->getId();
                     }
 
@@ -200,48 +182,5 @@ class ProcessOrderRewardRule extends \SM\Notification\Cron\AbstractGenerate
             ->addFieldToFilter('reward_rule', ['notnull' => true])
             ->addFieldToFilter('reward_rule', ['neq' => 0]);
         return $collection;
-    }
-
-    /**
-     * @param \Magento\Sales\Model\Order $order
-     */
-    public function sendNotification($order)
-    {
-        $params = [
-            'title' => [
-                $order->getCustomerName()
-            ]
-        ];
-        /** @var \SM\Notification\Model\Notification $notification */
-        $notification = $this->notificationFactory->create();
-        $notification->setTitle('%1, we have a voucher for you')
-            ->setEvent(\SM\Notification\Model\Notification::EVENT_PROMO)
-            ->setCustomerIds([$order->getCustomerId()])
-            ->setContent('Check this one out and shop now!')
-            ->setParams($params);
-
-        // Emulation store view
-        $this->emulation->startEnvironmentEmulation(
-            $order->getStoreId(),
-            \Magento\Framework\App\Area::AREA_FRONTEND
-        );
-        $notification->setPushTitle(__('%1, we have a voucher for you', $params))
-            ->setPushContent('Check this one out and shop now!')
-            ->setSms($order->getCustomerName() . ', we have a voucher for you\r\nFind it on My Voucher!');
-        $this->emulation->stopEnvironmentEmulation(); // End Emulation
-
-        try {
-            $this->notificationResource->save($notification);
-        } catch (\Exception $e) {
-            $this->logger->error($e);
-        }
-    }
-
-    /**
-     * @return string
-     */
-    protected function getLockFileName()
-    {
-        return 'sm_notification_order_reward_rule.lock';
     }
 }

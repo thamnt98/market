@@ -21,7 +21,7 @@
                     <ul class="dropdown">
                         <!-- ko foreach: { data: getListPaymentVirtualAccount(), as: 'payment'} -->
                         <li  data-bind="click: () => {$parent.setPaymentMethod(payment.method)}, class: 'item'">
-                            <img data-bind="attr:{src: $parent.getPaymentLogo(payment.method), height: 24, width:24,class:'icon-card'}"/><span
+                            <img data-bind="attr:{src: $parent.getPaymentLogo(payment.method), width:24,class:'icon-card'}"/><span
                                 data-bind="click:$parent.selectOption, text:payment.title,attr:{'data-id':payment.method}" data-href="option-selected-va"></span></li>
                         <!-- /ko -->
                     </ul>

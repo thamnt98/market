@@ -38,6 +38,11 @@ class Update extends \Magento\Checkout\Controller\Cart implements HttpPostAction
     private $cartItemRepository;
 
     /**
+     * @var \Magento\Framework\App\Request\DataPersistorInterface
+     */
+    protected $dataPersistor;
+
+    /**
      * Update constructor.
      * @param Context $context
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
@@ -48,6 +53,7 @@ class Update extends \Magento\Checkout\Controller\Cart implements HttpPostAction
      * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
      * @param \Magento\Quote\Api\CartItemRepositoryInterface $cartItemRepository
      * @param CustomerCart $cart
+     * @param \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
@@ -58,11 +64,13 @@ class Update extends \Magento\Checkout\Controller\Cart implements HttpPostAction
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
         \Magento\Quote\Api\CartRepositoryInterface $quoteRepository,
         \Magento\Quote\Api\CartItemRepositoryInterface $cartItemRepository,
-        CustomerCart $cart
+        CustomerCart $cart,
+        \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor
     ) {
         $this->resultJsonFactory = $resultJsonFactory;
         $this->quoteRepository = $quoteRepository;
         $this->cartItemRepository = $cartItemRepository;
+        $this->dataPersistor = $dataPersistor;
         parent::__construct(
             $context,
             $scopeConfig,
@@ -81,7 +89,8 @@ class Update extends \Magento\Checkout\Controller\Cart implements HttpPostAction
         $data = $this->getRequest()->getParams();
         $resultJson = $this->resultJsonFactory->create();
         $response = [
-            'status' => 'success'
+            'status' => 'success',
+            'reload' => 'false'
         ];
 
         try {
@@ -92,7 +101,11 @@ class Update extends \Magento\Checkout\Controller\Cart implements HttpPostAction
                     $checked = self::ITEM_IS_ACTIVE;
                 }
 
-                $this->updateItemActive($checked);
+                $this->updateAll((int) $checked);
+                $isUpdateOmniCode = $this->dataPersistor->get('update_omni_code');
+                if ($isUpdateOmniCode && $checked == self::ITEM_IS_ACTIVE) {
+                    $this->updateResponse();
+                }
             }
             /**
              * remove items
@@ -105,7 +118,7 @@ class Update extends \Magento\Checkout\Controller\Cart implements HttpPostAction
                 foreach ($removeIds as $id) {
                     $this->getQuote()->removeItem($id);
                 }
-                $this->getQuote()->setTotalsCollectedFlag(false)->collectTotals();
+                $this->getQuote()->setData('totals_collected_flag', false);
                 $this->quoteRepository->save($this->getQuote());
                 $this->messageManager->addSuccessMessage(__('Deleted items successfully!'));
 
@@ -113,16 +126,16 @@ class Update extends \Magento\Checkout\Controller\Cart implements HttpPostAction
             }
 
             if (isset($data['itemId'])) {
-                $itemPost = explode('=', $data['itemId']);
-                $this->updateItemActiveById($itemPost[1], $itemPost[0]);
+                $this->updateItem($data['itemId']);
             }
 
-            $this->getQuote()->setTotalsCollectedFlag(false)->collectTotals();
+            $this->getQuote()->setData('totals_collected_flag', false);
             $this->quoteRepository->save($this->getQuote());
             $this->messageManager->getMessages(true);
-            $response['message'] = $this->messageManager->addSuccessMessage(__('Updated items successfully!'));
+            $response['message'] = '';
         } catch (\Exception $e) {
-            $response['message'] = $this->messageManager->addErrorMessage($e->getMessage());
+            $this->messageManager->addErrorMessage($e->getMessage());
+            $response['message'] = $e->getMessage();
             $response['status'] = __('Error');
         }
         $this->_actionFlag->set('', self::FLAG_NO_POST_DISPATCH, true);
@@ -130,31 +143,32 @@ class Update extends \Magento\Checkout\Controller\Cart implements HttpPostAction
     }
 
     /**
-     * @param $checked
-     * @param $id
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     * @throws \Exception
+     * @param string $data
      */
-    protected function updateItemActiveById($checked, $id)
+    protected function updateItem($data)
     {
-        $quoteItem = $this->getQuote()->getItemById($id);
-        if ($quoteItem) {
-            $quoteItem->setIsActive($checked);
-            $this->cartItemRepository->save($quoteItem);
+        [$itemId, $isActive] = explode('=', $data);
+        $isUpdateOmniCode = $this->dataPersistor->get('update_omni_code');
+        if ($item = $this->getQuote()->getItemById($itemId)) {
+            $isActive = (int) $isActive;
+            $item->setData('is_active', $isActive);
+            foreach ($item->getChildren() as $child) {
+                $child->setData('is_active', $isActive);
+
+                if ($isUpdateOmniCode && $isActive == true) {
+                    $this->updateResponse();
+                }
+            }
         }
     }
 
     /**
      * @param $checked
      */
-    protected function updateItemActive($checked)
+    protected function updateAll($checked)
     {
         foreach ($this->getQuote()->getItemsCollection() as $item) {
-            if ($item->getIsActive() != $checked) {
-                $item->setIsActive($checked);
-                $item->save();
-            }
+            $item->setData('is_active', $checked);
         }
     }
 
@@ -172,5 +186,12 @@ class Update extends \Magento\Checkout\Controller\Cart implements HttpPostAction
     protected function setQuote($quote)
     {
         $this->quote = $quote;
+    }
+
+    protected function updateResponse()
+    {
+        $response['reload'] = true;
+        $response['reload_message'] = __('The prices in your cart have been update based on your delivery address');
+        $this->dataPersistor->clear('update_omni_code');
     }
 }

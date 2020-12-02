@@ -437,7 +437,10 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             'promotion_type' => $dataAttr['promotion_type'],
             'discount_type' => $dataAttr['discount_type'],
             'promo_price_qty' => $dataAttr['promo_price_qty'],
-            'promotion_id' => $dataAttr['promotion_id']
+            'promotion_id' => $dataAttr['promotion_id'],
+            'target_group' => $dataAttr['target_group'],
+            'sliding_discount_type' => $dataAttr['sliding_disc_type'],
+            'item_type' => $dataAttr['item_type']
         ];
 
         // for promo type 1 ,7 , 5 ,4 and 2
@@ -453,8 +456,8 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
         // for promo type 5 and 7
         if ($dataAttr['promotion_type'] == 5 || $dataAttr['promotion_type'] == 7) {
             $dataPass['mix_and_match_code'] = $dataAttr['mix_and_match_code'];
-            $dataPass['item_type'] = $dataAttr['item_type'];
             $dataPass['point_per_unit'] = $dataAttr['point_per_unit'];
+            $dataPass['required_point'] = $dataAttr['required_point'];
         }
         // for promo type 7
         if ($dataAttr['promotion_type'] == 7) {
@@ -538,7 +541,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
 
                                     // promotype = 7
                                     case 7:
-                                            $this->promoType7Function($dataPass);
+                                            // $this->promoType7Function($dataPass);
                                         break;
 
                                     // promotype = 4
@@ -605,46 +608,46 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
 
         $datas = $jsonResponse['data'];
 
-        foreach ($datas as $row) {
-            $dataPass = $this->prepareDataPromoGlobal($row);
+        // foreach ($datas as $row) {
+        //     $dataPass = $this->prepareDataPromoGlobal($row);
 
-            switch ($dataPass['promotion_type']) {
-                // promotype = 1
-                case 1:
-                        $this->markdownFunction($dataPass);
-                    break;
+        //     switch ($dataPass['promotion_type']) {
+        //         // promotype = 1
+        //         case 1:
+        //                 $this->markdownFunction($dataPass);
+        //             break;
 
-                // promotype = 2
-                case 2:
-                        $this->promoType2Function($dataPass);
-                    break;
+        //         // promotype = 2
+        //         case 2:
+        //                 $this->promoType2Function($dataPass);
+        //             break;
 
-                // promotype = 8
-                case 8:
-                        $this->promoType8Function($dataPass);
-                    break;
+        //         // promotype = 8
+        //         case 8:
+        //                 $this->promoType8Function($dataPass);
+        //             break;
 
-                // promotype = 5
-                case 5:
-                        $this->promoType5Function($dataPass);
-                    break;
+        //         // promotype = 5
+        //         case 5:
+        //                 $this->promoType5Function($dataPass);
+        //             break;
 
-                // promotype = 7
-                case 7:
-                        $this->promoType7Function($dataPass);
-                    break;
+        //         // promotype = 7
+        //         case 7:
+        //                 $this->promoType7Function($dataPass);
+        //             break;
 
-                // promotype = 4
-                case 4:
-                        $this->promoType4Function($dataPass);
-                    break;
+        //         // promotype = 4
+        //         case 4:
+        //                 $this->promoType4Function($dataPass);
+        //             break;
 
-                default:
-                break;
-            }
+        //         default:
+        //         break;
+        //     }
 
-            $i++;
-        }
+        //     $i++;
+        // }
         return true;
     }
 
@@ -657,63 +660,66 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
     {
         try {
             // if promo id not exist
-            $checkIntPromoId = $this->checkIntegrationPromoByPromoId($dataPass['promotion_id']);
+            if ($dataPass['target_group'] == 0) {
+                // $checkIntPromoId = $this->checkIntegrationPromoByPromoId($dataPass['promotion_id']);
+                $checkIntPromoId = $this->checkIntegrationPromoSkuAndPromoType($dataPass);
 
-            if (!$checkIntPromoId) {
-                // Nested switch discount type
-                // data start time
-                // $startTime = $dataPass['from_date'].' '.$dataPass['from_time'];
-                $startTime = $this->timezone->date(new \DateTime())->format('Y-m-d H:i:s');
-                $endTime = $dataPass['to_date'].' '.$dataPass['to_time'];
-                $skuNumber = $dataPass['sku'];
-                
-                // data campaign and rollback
-                $isCampaign = 0;
-                $isRollback = 1;
+                if (!$checkIntPromoId) {
+                    // Nested switch discount type
+                    // data start time
+                    // $startTime = $dataPass['from_date'].' '.$dataPass['from_time'];
+                    $startTime = $this->timezone->date(new \DateTime())->format('Y-m-d H:i:s');
+                    $endTime = $dataPass['to_date'].' '.$dataPass['to_time'];
+                    $skuNumber = $dataPass['sku'];
+                    
+                    // data campaign and rollback
+                    $isCampaign = 0;
+                    $isRollback = 1;
 
-                // for data function validateStorePrice and saveBasePriceStorePrice
-                $dataStoreCode = [
-                    'sku' => $dataPass['sku'],
-                    'discount_type' => $dataPass['discount_type'],
-                    'percent_disc' => $dataPass['percent_disc'],
-                    'amount_off' => $dataPass['amount_off'],
-                    'promo_selling_price' => $dataPass['promo_selling_price'],
-                    'disc_type' => $dataPass['discount_type'],
-                    'store_code' => $dataPass['store_code']
-                ];
-                
-                switch ($dataPass['discount_type']) {
-                    // promotype = 1 , disctype = 1
-                    case 1:
-                        // data name and desc
-                        $name = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['promo_selling_price'].' fixed price ('.$dataPass['sku'].')';
-                        $desc = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['promo_selling_price'].' fixed price ('.$dataPass['sku'].')';
+                    // for data function validateStorePrice and saveBasePriceStorePrice
+                    $dataStoreCode = [
+                        'sku' => $dataPass['sku'],
+                        'discount_type' => $dataPass['discount_type'],
+                        'percent_disc' => $dataPass['percent_disc'],
+                        'amount_off' => $dataPass['amount_off'],
+                        'promo_selling_price' => $dataPass['promo_selling_price'],
+                        'disc_type' => $dataPass['discount_type'],
+                        'store_code' => $dataPass['store_code']
+                    ];
+                    
+                    switch ($dataPass['discount_type']) {
+                        // promotype = 1 , disctype = 1
+                        case 1:
+                            // data name and desc
+                            $name = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['promo_selling_price'].' fixed price ('.$dataPass['sku'].')';
+                            $desc = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['promo_selling_price'].' fixed price ('.$dataPass['sku'].')';
 
-                        $this->saveStagingUpdate($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode);
-                        break;
+                            $this->saveStagingUpdate($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode);
+                            break;
 
-                    // promotype = 1 , disctype = 2
-                    case 2:
-                        // data name and desc
-                        $name = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price '.$dataPass['percent_disc'].' % Off ('.$dataPass['sku'].')';
-                        $desc = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price '.$dataPass['percent_disc'].' % Off ('.$dataPass['sku'].')';
-                        
-                        $this->saveStagingUpdate($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode);
-                        break;
+                        // promotype = 1 , disctype = 2
+                        case 2:
+                            // data name and desc
+                            $name = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price '.$dataPass['percent_disc'].' % Off ('.$dataPass['sku'].')';
+                            $desc = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price '.$dataPass['percent_disc'].' % Off ('.$dataPass['sku'].')';
+                            
+                            $this->saveStagingUpdate($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode);
+                            break;
 
-                    // promotype = 1 , disctype = 3
-                    case 3:
-                        // data name and desc
-                        $name = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['amount_off'].' Off ('.$dataPass['sku'].')';
-                        $desc = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['amount_off'].' Off ('.$dataPass['sku'].')';
+                        // promotype = 1 , disctype = 3
+                        case 3:
+                            // data name and desc
+                            $name = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['amount_off'].' Off ('.$dataPass['sku'].')';
+                            $desc = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['amount_off'].' Off ('.$dataPass['sku'].')';
 
-                        $this->saveStagingUpdate($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode);
-                        break;
+                            $this->saveStagingUpdate($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode);
+                            break;
+                    }
+
+                    // save to integration prom price table
+                    $dataPass['name'] = $name;
+                    $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
                 }
-
-                // save to integration prom price table
-                $dataPass['name'] = $name;
-                $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
             }
             // --------------
         } catch (\Exception $e) {
@@ -733,7 +739,8 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
     {
         try {
             // if promo id not exist
-            $checkIntPromoId = $this->checkIntegrationPromoByPromoId($dataPass['promotion_id']);
+            // $checkIntPromoId = $this->checkIntegrationPromoByPromoId($dataPass['promotion_id']);
+            $checkIntPromoId = $this->checkIntegrationPromoSkuAndPromoType($dataPass);
 
             if (!$checkIntPromoId) {
                 $dataPass['simple_free_shipping'] = 0;
@@ -744,38 +751,89 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                     case 1:
                         // add dataPass array for name and desc
                         $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Rp '.$dataPass['promo_selling_price'].' Fixed price for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].')';
-                        $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Rp '.$dataPass['promo_selling_price'].' Fixed price for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].')';
+                        $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Rp '.$dataPass['promo_selling_price'].' Fixed price for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                         $dataPass['simple_action'] = 'setof_fixed';
                         $dataPass['discount_amount'] = $dataPass['promo_selling_price'];
 
-                        $this->saveSalesRule($dataPass);
+                        $result = $this->saveSalesRule($dataPass);
+                        $dataPass['salesrule_id'] = $result['rule_id'];
                         break;
 
                     // promotype = 4 , disctype = 2
                     case 2:
                         // add dataPass array for name and desc
                         $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - '.$dataPass['percent_disc'].'% off for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].')';
-                        $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - '.$dataPass['percent_disc'].'% off for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].')';
+                        $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - '.$dataPass['percent_disc'].'% off for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                         $dataPass['simple_action'] = 'by_percent';
                         $dataPass['discount_amount'] = $dataPass['percent_disc'];
 
-                        $this->saveSalesRule($dataPass);
+                        $result = $this->saveSalesRule($dataPass);
+                        $dataPass['salesrule_id'] = $result['rule_id'];
                         break;
 
                     // promotype = 4 , disctype = 3
                     case 3:
                         // add dataPass array for name and desc
                         $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Rp '.$dataPass['amount_off'].' amount off for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].')';
-                        $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Rp '.$dataPass['amount_off'].' amount off for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].')';
+                        $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Rp '.$dataPass['amount_off'].' amount off for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                         $dataPass['simple_action'] = 'by_fixed';
                         $dataPass['discount_amount'] = $dataPass['amount_off'];
 
-                        $this->saveSalesRule($dataPass);
+                        $result = $this->saveSalesRule($dataPass);
+                        $dataPass['salesrule_id'] = $result['rule_id'];
                         break;
                 }
 
                 // save to integration prom price table
                 $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
+            }
+            else {
+                // if promo id not exist
+                $checkIntPromoIdStoreCode = $this->checkIntegrationPromoByPromoIdStoreCode($dataPass);
+                if (!$checkIntPromoIdStoreCode) {
+                    $dataPass['salesrule_id'] = $checkIntPromoId->getData('salesrule_id');
+                    // add dataPass array for name and desc
+                    $dataPass['simple_free_shipping'] = 0;
+                    $dataPass['discount_qty'] = $dataPass['max_promo_price_qty'];
+                    // Nested switch discount type
+                    switch ($dataPass['discount_type']) {
+                        // promotype = 4 , disctype = 1
+                        case 1:
+                            // add dataPass array for name and desc
+                            $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Rp '.$dataPass['promo_selling_price'].' Fixed price for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].')';
+                            $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Rp '.$dataPass['promo_selling_price'].' Fixed price for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
+                            $dataPass['simple_action'] = 'setof_fixed';
+                            $dataPass['discount_amount'] = $dataPass['promo_selling_price'];
+
+                            $this->updateSalesRule($dataPass);
+                            break;
+
+                        // promotype = 4 , disctype = 2
+                        case 2:
+                            // add dataPass array for name and desc
+                            $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - '.$dataPass['percent_disc'].'% off for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].')';
+                            $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - '.$dataPass['percent_disc'].'% off for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
+                            $dataPass['simple_action'] = 'by_percent';
+                            $dataPass['discount_amount'] = $dataPass['percent_disc'];
+
+                            $this->updateSalesRule($dataPass);
+                            break;
+
+                        // promotype = 4 , disctype = 3
+                        case 3:
+                            // add dataPass array for name and desc
+                            $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Rp '.$dataPass['amount_off'].' amount off for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].')';
+                            $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Rp '.$dataPass['amount_off'].' amount off for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
+                            $dataPass['simple_action'] = 'by_fixed';
+                            $dataPass['discount_amount'] = $dataPass['amount_off'];
+
+                            $this->updateSalesRule($dataPass);
+                            break;
+                    }
+                    // save to integration prom price table
+                    $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
+                }
+                
             }
             // --------------
         } catch (\Exception $e) {
@@ -797,10 +855,10 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             // if promo id not exist
             $checkIntPromoId = $this->checkIntegrationPromoByPromoId($dataPass['promotion_id']);
 
-            if (!$checkIntPromoId) {
+            // if (!$checkIntPromoId) {
                 // add dataPass array for name and desc
                 $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - spend x amount, get item (pick only one item from multiple reward item) ('.$dataPass['sku'].')';
-                $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - spend x amount, get item (pick only one item from multiple reward item) ('.$dataPass['sku'].')';
+                $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - spend x amount, get item (pick only one item from multiple reward item) ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                 $dataPass['simple_action'] = 'ampromo_items';
                 $dataPass['discount_amount'] = 1;
                 $dataPass['simple_free_shipping'] = 0;
@@ -849,7 +907,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                         $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
                     }
                 }
-            }
+            // }
             // --------------
         } catch (\Exception $e) {
             $this->logger->error("error saved promo type 7 --->".print_r($dataPass['sku'], true));
@@ -868,8 +926,9 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
     {
         try {
             // if promo id not exist
-            $checkIntPromoId = $this->checkIntegrationPromoByPromoId($dataPass['promotion_id']);
-
+            // $checkIntPromoId = $this->checkIntegrationPromoByPromoId($dataPass['promotion_id']);
+            $checkIntPromoId = $this->checkIntegrationPromoSkuAndPromoType($dataPass);
+            
             if (!$checkIntPromoId) {
                 // add dataPass array for name and desc
                 $dataPass['stop_rules_processing'] = 0;
@@ -882,41 +941,96 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                         // promotype = 2 , disctype = 1, promo selling price == 1
                         if ($dataPass['promo_selling_price'] == 1) {
                             $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only (Free) ('.$dataPass['sku'].')';
-                            $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only: same as buy '.$dataPass['normal_price_qty'].' get '.$dataPass['promo_price_qty'].' free (for the same item) ('.$dataPass['sku'].')';
+                            $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only: same as buy '.$dataPass['normal_price_qty'].' get '.$dataPass['promo_price_qty'].' free (for the same item) ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                             $dataPass['simple_action'] = 'buy_x_get_y';
                             $dataPass['discount_amount'] = $dataPass['promo_selling_price'];
                         }
                         // promotype = 2 , disctype = 1, promo selling price != 1
                         else {
                             $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only (Fixed price) ('.$dataPass['sku'].')';
-                            $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only: same as buy '.$dataPass['normal_price_qty'].' get '.$dataPass['promo_price_qty'].' with Fixed price (for the same item) ('.$dataPass['sku'].')';
+                            $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only: same as buy '.$dataPass['normal_price_qty'].' get '.$dataPass['promo_price_qty'].' with Fixed price (for the same item) ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                             $dataPass['simple_action'] = 'eachn_fixprice';
                             $dataPass['discount_amount'] = $dataPass['promo_selling_price'];
                         }
-                        $this->saveSalesRule($dataPass);
+                        $result = $this->saveSalesRule($dataPass);
+                        $dataPass['salesrule_id'] = $result['rule_id'];
                         break;
 
                     // promotype = 2 , disctype = 2
                     case 2:
                         $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only (Percentage) ('.$dataPass['sku'].')';
-                        $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only: same as buy '.$dataPass['normal_price_qty'].' get '.$dataPass['promo_price_qty'].' with percentage (for the same item) ('.$dataPass['sku'].')';
+                        $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only: same as buy '.$dataPass['normal_price_qty'].' get '.$dataPass['promo_price_qty'].' with percentage (for the same item) ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                         $dataPass['simple_action'] = 'eachn_perc';
                         $dataPass['discount_amount'] = $dataPass['percent_disc'];
-                        $this->saveSalesRule($dataPass);
+                        $result = $this->saveSalesRule($dataPass);
+                        $dataPass['salesrule_id'] = $result['rule_id'];
                         break;
 
                     // promotype = 2 , disctype = 3
                     case 3:
                         $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only (Amount off) ('.$dataPass['sku'].')';
-                        $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only: same as buy '.$dataPass['normal_price_qty'].' get '.$dataPass['promo_price_qty'].' with amount off (for the same item) ('.$dataPass['sku'].')';
+                        $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only: same as buy '.$dataPass['normal_price_qty'].' get '.$dataPass['promo_price_qty'].' with amount off (for the same item) ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                         $dataPass['simple_action'] = 'eachn_fixdisc';
                         $dataPass['discount_amount'] = $dataPass['amount_off'];
-                        $this->saveSalesRule($dataPass);
+                        $result = $this->saveSalesRule($dataPass);
+                        $dataPass['salesrule_id'] = $result['rule_id'];
                         break;
                 }
 
                 // save to integration prom price table
                 $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
+            }
+            else {
+                // if promo id not exist
+                $checkIntPromoIdStoreCode = $this->checkIntegrationPromoByPromoIdStoreCode($dataPass);
+                if (!$checkIntPromoIdStoreCode) {
+                    // add dataPass array for name and desc
+                    $dataPass['stop_rules_processing'] = 0;
+                    $dataPass['discount_step'] = 3;
+                    $dataPass['simple_free_shipping'] = 0;
+                    $dataPass['salesrule_id'] = $checkIntPromoId->getData('salesrule_id');
+                    switch ($dataPass['discount_type']) {
+                        // promotype = 2 , disctype = 1
+                        case 1:
+                            // promotype = 2 , disctype = 1, promo selling price == 1
+                            if ($dataPass['promo_selling_price'] == 1) {
+                                $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only (Free) ('.$dataPass['sku'].')';
+                                $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only: same as buy '.$dataPass['normal_price_qty'].' get '.$dataPass['promo_price_qty'].' free (for the same item) ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
+                                $dataPass['simple_action'] = 'buy_x_get_y';
+                                $dataPass['discount_amount'] = $dataPass['promo_selling_price'];
+                            }
+                            // promotype = 2 , disctype = 1, promo selling price != 1
+                            else {
+                                $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only (Fixed price) ('.$dataPass['sku'].')';
+                                $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only: same as buy '.$dataPass['normal_price_qty'].' get '.$dataPass['promo_price_qty'].' with Fixed price (for the same item) ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
+                                $dataPass['simple_action'] = 'eachn_fixprice';
+                                $dataPass['discount_amount'] = $dataPass['promo_selling_price'];
+                            }
+                            $this->updateSalesRule($dataPass);
+                            break;
+
+                        // promotype = 2 , disctype = 2
+                        case 2:
+                            $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only (Percentage) ('.$dataPass['sku'].')';
+                            $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only: same as buy '.$dataPass['normal_price_qty'].' get '.$dataPass['promo_price_qty'].' with percentage (for the same item) ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
+                            $dataPass['simple_action'] = 'eachn_perc';
+                            $dataPass['discount_amount'] = $dataPass['percent_disc'];
+                            $this->updateSalesRule($dataPass);
+                            break;
+
+                        // promotype = 2 , disctype = 3
+                        case 3:
+                            $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only (Amount off) ('.$dataPass['sku'].')';
+                            $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only: same as buy '.$dataPass['normal_price_qty'].' get '.$dataPass['promo_price_qty'].' with amount off (for the same item) ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
+                            $dataPass['simple_action'] = 'eachn_fixdisc';
+                            $dataPass['discount_amount'] = $dataPass['amount_off'];
+                            $this->updateSalesRule($dataPass);
+                            break;
+                    }
+                    // save to integration prom price table
+                    $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
+                }
+                
             }
             // --------------
         } catch (\Exception $e) {
@@ -936,7 +1050,9 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
     {
         try {
             // if promo id not exist
-            $checkIntPromoId = $this->checkIntegrationPromoByPromoId($dataPass['promotion_id']);
+            // $checkIntPromoId = $this->checkIntegrationPromoByPromoId($dataPass['promotion_id']);
+            $dataPass['discount_type'] = $dataPass['sliding_discount_type'];
+            $checkIntPromoId = $this->checkIntegrationPromoSkuAndPromoType($dataPass);
 
             if (!$checkIntPromoId) {
                 $dataPass['simple_free_shipping'] = 0;
@@ -949,16 +1065,17 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                         // save to sales rule
                         foreach ($dataPass['sliding_disc_type_info'] as $row) {
                             //sliding discount type info child
-                            $sliding_child_arr = explode(",", $row);
+                            $sliding_child_arr = explode("-", $row);
                             $dataPass['sliding_child'] = $sliding_child_arr;
                             $dataPass['sliding_child_sequence'] = $arr;
                             $dataPass['discount_amount'] = $dataPass['sliding_child'][2];
 
                             // add dataPass array for name and desc
                             $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price Rp '.$sliding_child_arr[2].' fixed price ('.$dataPass['sku'].')';
-                            $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price Rp '.$sliding_child_arr[2].' fixed price ('.$dataPass['sku'].')';
+                            $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price Rp '.$sliding_child_arr[2].' fixed price ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
 
-                            $this->saveSalesRule($dataPass);
+                            $result = $this->saveSalesRule($dataPass);
+                            $salesRuleIdArray = $result;
                             $arr++;
                         }
                         break;
@@ -970,14 +1087,14 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                         // save to sales rule
                         foreach ($dataPass['sliding_disc_type_info'] as $row) {
                             //sliding discount type info child
-                            $sliding_child_arr = explode(",", $row);
+                            $sliding_child_arr = explode("-", $row);
                             $dataPass['sliding_child'] = $sliding_child_arr;
                             $dataPass['sliding_child_sequence'] = $arr;
                             $dataPass['discount_amount'] = $dataPass['sliding_child'][2];
 
                             // add dataPass array for name and desc
                             $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price '.$sliding_child_arr[2].' % off ('.$dataPass['sku'].')';
-                            $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price '.$sliding_child_arr[2].' % off ('.$dataPass['sku'].')';
+                            $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price '.$sliding_child_arr[2].' % off ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
 
                             $this->saveSalesRule($dataPass);
                             $arr++;
@@ -991,14 +1108,14 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                         // save to sales rule
                         foreach ($dataPass['sliding_disc_type_info'] as $row) {
                             //sliding discount type info child
-                            $sliding_child_arr = explode(",", $row);
+                            $sliding_child_arr = explode("-", $row);
                             $dataPass['sliding_child'] = $sliding_child_arr;
                             $dataPass['sliding_child_sequence'] = $arr;
                             $dataPass['discount_amount'] = $dataPass['sliding_child'][2];
 
                             // add dataPass array for name and desc
                             $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price Rp '.$sliding_child_arr[2].' Off ('.$dataPass['sku'].')';
-                            $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price Rp '.$sliding_child_arr[2].' Off ('.$dataPass['sku'].')';
+                            $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price Rp '.$sliding_child_arr[2].' Off ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
 
                             $this->saveSalesRule($dataPass);
                             $arr++;
@@ -1007,6 +1124,81 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                 }
                 // save to integration prom price table
                 $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
+            }
+            else {
+                // if promo id not exist
+                $checkIntPromoIdStoreCode = $this->checkIntegrationPromoByPromoIdStoreCode($dataPass);
+                if (!$checkIntPromoIdStoreCode) {
+                    $dataPass['simple_free_shipping'] = 0;
+                    // Nested switch discount type
+                    switch ($dataPass['discount_type']) {
+                        // promotype = 8 , disctype = 1
+                        case 1:
+                            $dataPass['simple_action'] = 'setof_fixed';
+                            $arr = 1;
+                            // save to sales rule
+                            foreach ($dataPass['sliding_disc_type_info'] as $row) {
+                                //sliding discount type info child
+                                $sliding_child_arr = explode("-", $row);
+                                $dataPass['sliding_child'] = $sliding_child_arr;
+                                $dataPass['sliding_child_sequence'] = $arr;
+                                $dataPass['discount_amount'] = $dataPass['sliding_child'][2];
+
+                                // add dataPass array for name and desc
+                                $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price Rp '.$sliding_child_arr[2].' fixed price ('.$dataPass['sku'].')';
+                                $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price Rp '.$sliding_child_arr[2].' fixed price ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
+
+                                $result = $this->saveSalesRule($dataPass);
+                                $salesRuleIdArray = $result;
+                                $arr++;
+                            }
+                            break;
+
+                        // promotype = 8 , disctype = 2
+                        case 2:
+                            $dataPass['simple_action'] = 'by_percent';
+                            $arr = 1;
+                            // save to sales rule
+                            foreach ($dataPass['sliding_disc_type_info'] as $row) {
+                                //sliding discount type info child
+                                $sliding_child_arr = explode("-", $row);
+                                $dataPass['sliding_child'] = $sliding_child_arr;
+                                $dataPass['sliding_child_sequence'] = $arr;
+                                $dataPass['discount_amount'] = $dataPass['sliding_child'][2];
+
+                                // add dataPass array for name and desc
+                                $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price '.$sliding_child_arr[2].' % off ('.$dataPass['sku'].')';
+                                $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price '.$sliding_child_arr[2].' % off ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
+
+                                $this->saveSalesRule($dataPass);
+                                $arr++;
+                            }
+                            break;
+
+                        // promotype = 8 , disctype = 3
+                        case 3:
+                            $dataPass['simple_action'] = 'by_fixed';
+                            $arr = 1;
+                            // save to sales rule
+                            foreach ($dataPass['sliding_disc_type_info'] as $row) {
+                                //sliding discount type info child
+                                $sliding_child_arr = explode("-", $row);
+                                $dataPass['sliding_child'] = $sliding_child_arr;
+                                $dataPass['sliding_child_sequence'] = $arr;
+                                $dataPass['discount_amount'] = $dataPass['sliding_child'][2];
+
+                                // add dataPass array for name and desc
+                                $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price Rp '.$sliding_child_arr[2].' Off ('.$dataPass['sku'].')';
+                                $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price Rp '.$sliding_child_arr[2].' Off ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
+
+                                $this->saveSalesRule($dataPass);
+                                $arr++;
+                            }
+                            break;
+                    }
+                    // save to integration prom price table
+                    $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
+                }
             }
             // --------------
         } catch (\Exception $e) {
@@ -1028,25 +1220,28 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             // if promo id not exist
             $checkIntPromoId = $this->checkIntegrationPromoByPromoId($dataPass['promotion_id']);
 
-            if (!$checkIntPromoId) {
+            // if (!$checkIntPromoId) {
                 $dataPass['discount_step'] = 3;
                 $dataPass['simple_free_shipping'] = 0;
                 $dataPass['item_type'] = $dataPass['item_type'];
                 $dataPass['mix_and_match_code'] = $dataPass['mix_and_match_code'];
                 $dataPass['point_per_unit'] = ($dataPass['point_per_unit'] == 0) ? 1 : $dataPass['point_per_unit'] ;
 
-                // Nested switch discount type
-                switch ($dataPass['discount_type']) {
-                    // promotype = 5 , disctype = 1
-                    case 1:
-                        $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy X qty of A, Get Y qty of B with only IDR '.$dataPass['promo_selling_price'].' - '.$dataPass['promotion_id'].'';
-                        $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy X qty of A, Get Y qty of B with only IDR '.$dataPass['promo_selling_price'].' - '.$dataPass['promotion_id'].'';
-                        $dataPass['simple_action'] = 'buyxgetn_fixprice';
-                        $dataPass['discount_amount'] = $dataPass['promo_selling_price'];
-                        
-                        // check on table integration promo and item type 1
-                        if ($dataPass['item_type'] == 1) {
-                            $checkDataIntPromo = $this->checkIntegrationPromo($dataPass);
+                $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy X qty of A, Get Y qty of B';
+                $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy X qty of A, Get Y qty of B - ' .$dataPass['store_code'].' - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
+
+                if ($dataPass['item_type'] == 2) {
+                    // Nested switch discount type
+                    switch ($dataPass['discount_type']) {
+                        // promotype = 5 , disctype = 1
+                        case 1:
+                            $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy X qty of A, Get Y qty of B with only IDR '.$dataPass['promo_selling_price'].'';
+                            $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy X qty of A, Get Y qty of B with only IDR '.$dataPass['promo_selling_price'].' - ' .$dataPass['store_code'].' - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
+                            $dataPass['simple_action'] = 'buyxgetn_fixprice';
+                            $dataPass['discount_amount'] = $dataPass['promo_selling_price'];
+                            
+                            // check on table integration promo and item type 2
+                            $checkDataIntPromo = $this->checkIntegrationPromoTwo($dataPass);
                             // if check 0 then save
                             if (!$checkDataIntPromo) {
                                 // save to salesrule
@@ -1060,44 +1255,44 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                                 // get salesruleid
                                 $dataPass['salesrule_id'] = $checkDataIntPromo->getData('salesrule_id');
                                 $dataPass['row_id'] = $checkDataIntPromo->getData('row_id');
-                                // save to integration promo
-                                $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
+
                                 // update condition serialize , save to salesrule
                                 $this->updateSalesRule($dataPass);
-                            }
-                        }
-                        // if item type 2
-                        else {
-                            $dataPass['item_type'] = 1;
-                            $checkSalesRule = $this->checkIntegrationPromo($dataPass);
-                            if ($checkSalesRule) {
-                                // get salesruleid
-                                $dataPass['salesrule_id'] = $checkSalesRule->getData('salesrule_id');
-                                $dataPass['row_id'] = $checkSalesRule->getData('row_id');
+
                                 // save to integration promo
-                                $dataPass['item_type'] = 2;
                                 $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
-                                // update condition serialize , save to salesrule
-                                $this->updateSalesRule($dataPass);
-                            } else {
-                                // save to integration promo for item type 2 , first
-                                $dataPass['item_type'] = 2;
-                                $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
+                                
                             }
-                        }
-                        break;
 
-                    // promotype = 5 , disctype = 2
-                    case 2:
+                            // for update item type 1 only
+                            $dataPass['item_type_one'] = 1;
+                            $checkDataIntPromoOne = $this->checkIntegrationPromoOne($dataPass);
 
-                        $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy X qty of A, Get Y qty of B with '.$dataPass['percent_disc'].'% off - '.$dataPass['promotion_id'].'';
-                        $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy X qty of A, Get Y qty of B with '.$dataPass['percent_disc'].'% off - '.$dataPass['promotion_id'].'';
-                        $dataPass['simple_action'] = 'buyxgetn_perc';
-                        $dataPass['discount_amount'] = $dataPass['percent_disc'];
-                        
-                        // check on table integration promo and item type 1
-                        if ($dataPass['item_type'] == 1) {
-                            $checkDataIntPromo = $this->checkIntegrationPromo($dataPass);
+                            if ($checkDataIntPromoOne) {
+                                foreach ($checkDataIntPromoOne as $checkDataIntPromoOneValue) {
+                                    // update condition serialize , save to salesrule
+                                    $dataPass['point_per_unit'] = $checkDataIntPromoOneValue->getData('point_per_unit');
+                                    $dataPass['sku'] = $checkDataIntPromoOneValue->getData('sku');
+                                    $dataPass['item_type'] = 1;
+                                    $this->updateSalesRule($dataPass);
+
+                                    $checkDataIntPromoOneValue->setSaleruleId($dataPass['salesrule_id']);
+                                    $checkDataIntPromoOneValue->setRowId($dataPass['row_id']);
+                                    $result = $this->promotionPriceRepositoryInterface->save($checkDataIntPromoOneValue);
+                                }
+                            }
+                            break;
+
+                        // promotype = 5 , disctype = 2
+                        case 2:
+
+                            $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy X qty of A, Get Y qty of B with '.$dataPass['percent_disc'].'% off';
+                            $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy X qty of A, Get Y qty of B with '.$dataPass['percent_disc'].'% off - '.$dataPass['store_code'].' - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
+                            $dataPass['simple_action'] = 'buyxgetn_perc';
+                            $dataPass['discount_amount'] = $dataPass['percent_disc'];
+                            
+                            // check on table integration promo and item type 2
+                            $checkDataIntPromo = $this->checkIntegrationPromoTwo($dataPass);
                             // if check 0 then save
                             if (!$checkDataIntPromo) {
                                 // save to salesrule
@@ -1111,43 +1306,43 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                                 // get salesruleid
                                 $dataPass['salesrule_id'] = $checkDataIntPromo->getData('salesrule_id');
                                 $dataPass['row_id'] = $checkDataIntPromo->getData('row_id');
-                                // save to integration promo
-                                $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
-                                // update condition serialize , save to salesrule
-                                $this->updateSalesRule($dataPass);
-                            }
-                        }
-                        // if item type 2
-                        else {
-                            $dataPass['item_type'] = 1;
-                            $checkSalesRule = $this->checkIntegrationPromo($dataPass);
-                            if ($checkSalesRule) {
-                                // get salesruleid
-                                $dataPass['salesrule_id'] = $checkSalesRule->getData('salesrule_id');
-                                $dataPass['row_id'] = $checkSalesRule->getData('row_id');
-                                // save to integration promo
-                                $dataPass['item_type'] = 2;
-                                $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
-                                // update condition serialize , save to salesrule
-                                $this->updateSalesRule($dataPass);
-                            } else {
-                                // save to integration promo for item type 2 , first
-                                $dataPass['item_type'] = 2;
-                                $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
-                            }
-                        }
-                        break;
 
-                    // promotype = 5 , disctype = 3
-                    case 3:
-                        $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy X qty of A, Get Y qty of B with '.$dataPass['amount_off'].' amount off - '.$dataPass['promotion_id'].'';
-                        $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy X qty of A, Get Y qty of B with '.$dataPass['amount_off'].' amount off - '.$dataPass['promotion_id'].'';
-                        $dataPass['simple_action'] = 'buyxgetn_fixdisc';
-                        $dataPass['discount_amount'] = $dataPass['amount_off'];
-                       
-                        // check on table integration promo and item type 1
-                        if ($dataPass['item_type'] == 1) {
-                            $checkDataIntPromo = $this->checkIntegrationPromo($dataPass);
+                                // update condition serialize , save to salesrule
+                                $this->updateSalesRule($dataPass);
+
+                                // save to integration promo
+                                $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
+                                
+                            }
+
+                            // for update item type 1 only
+                            $dataPass['item_type_one'] = 1;
+                            $checkDataIntPromoOne = $this->checkIntegrationPromoOne($dataPass);
+
+                            if ($checkDataIntPromoOne) {
+                                foreach ($checkDataIntPromoOne as $checkDataIntPromoOneValue) {
+                                    // update condition serialize , save to salesrule
+                                    $dataPass['point_per_unit'] = $checkDataIntPromoOneValue->getData('point_per_unit');
+                                    $dataPass['sku'] = $checkDataIntPromoOneValue->getData('sku');
+                                    $dataPass['item_type'] = 1;
+                                    $this->updateSalesRule($dataPass);
+
+                                    $checkDataIntPromoOneValue->setSaleruleId($dataPass['salesrule_id']);
+                                    $checkDataIntPromoOneValue->setRowId($dataPass['row_id']);
+                                    $result = $this->promotionPriceRepositoryInterface->save($checkDataIntPromoOneValue);
+                                }
+                            }
+                            break;
+
+                        // promotype = 5 , disctype = 3
+                        case 3:
+                            $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy X qty of A, Get Y qty of B with '.$dataPass['amount_off'].' amount off';
+                            $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy X qty of A, Get Y qty of B with '.$dataPass['amount_off'].' amount off - '.$dataPass['store_code'].' - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
+                            $dataPass['simple_action'] = 'buyxgetn_fixdisc';
+                            $dataPass['discount_amount'] = $dataPass['amount_off'];
+                           
+                            // check on table integration promo and item type 2
+                            $checkDataIntPromo = $this->checkIntegrationPromoTwo($dataPass);
                             // if check 0 then save
                             if (!$checkDataIntPromo) {
                                 // save to salesrule
@@ -1161,35 +1356,58 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                                 // get salesruleid
                                 $dataPass['salesrule_id'] = $checkDataIntPromo->getData('salesrule_id');
                                 $dataPass['row_id'] = $checkDataIntPromo->getData('row_id');
+
+                                // update condition serialize , save to salesrule
+                                $this->updateSalesRule($dataPass);
+
                                 // save to integration promo
                                 $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
-                                // update condition serialize , save to salesrule
-                                $this->updateSalesRule($dataPass);
+                                
                             }
-                        }
-                        // if item type 2
-                        else {
-                            // get salesrule_id from item type 1
-                            $dataPass['item_type'] = 1;
-                            $checkSalesRule = $this->checkIntegrationPromo($dataPass);
-                            if ($checkSalesRule) {
-                                // get salesruleid
-                                $dataPass['salesrule_id'] = $checkSalesRule->getData('salesrule_id');
-                                $dataPass['row_id'] = $checkSalesRule->getData('row_id');
-                                // save to integration promo and back to original value for item type
-                                $dataPass['item_type'] = 2;
-                                $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
-                                // update condition serialize , save to salesrule
-                                $this->updateSalesRule($dataPass);
-                            } else {
-                                // save to integration promo for item type 2 , first
-                                $dataPass['item_type'] = 2;
-                                $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
+
+                            // for update item type 1 only
+                            $dataPass['item_type_one'] = 1;
+                            $checkDataIntPromoOne = $this->checkIntegrationPromoOne($dataPass);
+
+                            if ($checkDataIntPromoOne) {
+                                foreach ($checkDataIntPromoOne as $checkDataIntPromoOneValue) {
+                                    // update condition serialize , save to salesrule
+                                    $dataPass['point_per_unit'] = $checkDataIntPromoOneValue->getData('point_per_unit');
+                                    $dataPass['sku'] = $checkDataIntPromoOneValue->getData('sku');
+                                    $dataPass['item_type'] = 1;
+                                    $this->updateSalesRule($dataPass);
+
+                                    $checkDataIntPromoOneValue->setSaleruleId($dataPass['salesrule_id']);
+                                    $checkDataIntPromoOneValue->setRowId($dataPass['row_id']);
+                                    $result = $this->promotionPriceRepositoryInterface->save($checkDataIntPromoOneValue);
+                                }
                             }
-                        }
-                        break;
+                            break;
+                    }
                 }
-            }
+                else {
+                    // for update item type 1 only
+                    // check on table integration promo and item type 2
+                    $dataPass['item_type'] = 2;
+                    $checkDataIntPromo = $this->checkIntegrationPromoTwo($dataPass);
+                    // if check 0 then save
+                    if (!$checkDataIntPromo) {
+                        $dataPass['item_type'] = 1;
+                        $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
+                    }
+                    else {
+                        $dataPass['item_type'] = 1;
+                        $dataPass['salesrule_id'] = $checkDataIntPromo->getData('salesrule_id');
+                        $dataPass['row_id'] = $checkDataIntPromo->getData('row_id');
+
+                        // update condition serialize , save to salesrule
+                        $this->updateSalesRule($dataPass);
+
+                        // save to integration promo
+                        $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
+                    }
+                }
+            // }
             // --------------
         } catch (\Exception $e) {
             $this->logger->error("error saved promo type 5 --->".print_r($dataPass['sku'], true));
@@ -1253,6 +1471,10 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                 $query->setAmountOff($data['amount_off']);
             }
 
+            if (!empty($data['point_per_unit'])) {
+                $query->setPointPerUnit($data['point_per_unit']);
+            }
+
             $result = $this->promotionPriceRepositoryInterface->save($query);
 
             $this->logger->info("saveIntegrationPromo saved [" . $data['name'] ."]");
@@ -1287,6 +1509,26 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
     }
 
     /**
+     * check to integration catalog promotion price by sku , promo type , discount type and store code
+     * @param $data mixed
+     * @return $query mixed
+     * @throw logger error
+     */
+    protected function checkIntegrationPromoByPromoIdStoreCode($data)
+    {
+        try {
+            $query = $this->promotionPriceRepositoryInterface->loadDataPromoByPromoIdStoreCode($data);
+        } catch (Exception $e) {
+            $this->logger->error("<=End checkIntegrationPromo" .$e->getMessage());
+            throw new StateException(
+                __(__FUNCTION__." - ".$e->getMessage())
+            );
+        }
+
+        return $query;
+    }
+
+    /**
      * check to integration catalog promotion price
      * @param $data mixed
      * @return $query mixed
@@ -1296,6 +1538,46 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
     {
         try {
             $query = $this->promotionPriceRepositoryInterface->loadDataPromoFive($data);
+        } catch (\Exception $e) {
+            $this->logger->error("<=End checkIntegrationPromo" .$e->getMessage());
+            throw new StateException(
+                __(__FUNCTION__." - ".$e->getMessage())
+            );
+        }
+
+        return $query;
+    }
+
+    /**
+     * check to integration catalog promotion price
+     * @param $data mixed
+     * @return $query mixed
+     * @throw logger error
+     */
+    protected function checkIntegrationPromoTwo($data)
+    {
+        try {
+            $query = $this->promotionPriceRepositoryInterface->loadDataPromoFiveItemTwo($data);
+        } catch (\Exception $e) {
+            $this->logger->error("<=End checkIntegrationPromo" .$e->getMessage());
+            throw new StateException(
+                __(__FUNCTION__." - ".$e->getMessage())
+            );
+        }
+
+        return $query;
+    }
+
+    /**
+     * check to integration catalog promotion price
+     * @param $data mixed
+     * @return $query mixed
+     * @throw logger error
+     */
+    protected function checkIntegrationPromoOne($data)
+    {
+        try {
+            $query = $this->promotionPriceRepositoryInterface->loadDataPromoFiveItemOne($data);
         } catch (\Exception $e) {
             $this->logger->error("<=End checkIntegrationPromo" .$e->getMessage());
             throw new StateException(
@@ -1327,6 +1609,26 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
     }
 
     /**
+     * check to integration catalog promotion price + sku + promo type + discount type
+     * @param $data mixed
+     * @return $query mixed
+     * @throw logger error
+     */
+    protected function checkIntegrationPromoSkuAndPromoType($data)
+    {
+        try {
+            $query = $this->promotionPriceRepositoryInterface->loadDataPromoBySkuPromoType($data);
+        } catch (\Exception $e) {
+            $this->logger->error("<=End checkIntegrationPromoSku" .$e->getMessage());
+            throw new StateException(
+                __(__FUNCTION__." - ".$e->getMessage())
+            );
+        }
+
+        return $query;
+    }
+
+    /**
      * Save to staging update
      * @param $startTime datetime
      * @param $endTime datetime
@@ -1339,6 +1641,36 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
      * @throw logger error
      */
     protected function saveStagingUpdate($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode)
+    {
+        try {
+            $dataStoreCode['store_attr_code'] = $dataStoreCode['store_code'];
+            // save special price
+            $stagingRepo = $this->saveBasePriceStorePrice($dataStoreCode);
+
+            $this->logger->info("staging_update saved [" . $name ."]");
+        } catch (\Exception $e) {
+            $this->logger->error("<=End staging_update" .$e->getMessage());
+            throw new StateException(
+                __(__FUNCTION__." - ".$e->getMessage())
+            );
+        }
+
+        return $stagingRepo;
+    }
+
+    /**
+     * Save to staging update Backup
+     * @param $startTime datetime
+     * @param $endTime datetime
+     * @param $name string
+     * @param $desc string
+     * @param $isCampaign int
+     * @param $isRollback int
+     * @param $dataStoreCode mixed
+     * @return $data mixed
+     * @throw logger error
+     */
+    protected function saveStagingUpdateBackup($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode)
     {
         try {
             //Convert to store timezone
@@ -1401,7 +1733,6 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             ->setSortOrder($dataPass['sort_order'])
             ->setSimpleAction($dataPass['simple_action'])
             ->setDiscountQty($dataPass['discount_qty'])
-            ->setDiscountStep($dataPass['discount_step'])
             ->setDiscountAmount($dataPass['discount_amount'])
             ->setApplyToShipping($dataPass['apply_to_shipping'])
             ->setTimesUsed($dataPass['times_used'])
@@ -1414,6 +1745,15 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             ->setCreatedIn($dataPass['created_in'])
             ->setConditions($this->foundProductRuleFactory->create()->setType('Magento\SalesRule\Model\Rule\Condition\Combine')->setValue('1')->setAggregator('all'))
             ->setActions($this->foundProductRuleFactory->create()->setType('Magento\SalesRule\Model\Rule\Condition\Combine')->setValue('1')->setAggregator('all'));
+
+            if ($dataPass['promotion_type'] == 5) {
+                if ($dataPass['item_type'] == 2) {
+                    $statusResponse->setDiscountStep($dataPass['required_point']);
+                }
+            }
+            else {
+                $statusResponse->setDiscountStep($dataPass['discount_step']);
+            }
 
             $result = $this->ruleResource->save($statusResponse);
 
@@ -1431,8 +1771,9 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                 $getSalesruleId = $statusResponse->getRowId();
                 $skuAmasty = $dataPass['sku'];
                 $promoTypeAmasty = $dataPass['promotion_type'];
+                $itemTypeAmasty = $dataPass['item_type'];
                 // save to amasty_amrule
-                $this->saveAmastySalesRule($getSalesruleId, $skuAmasty, $promoTypeAmasty);
+                $this->saveAmastySalesRule($getSalesruleId, $skuAmasty, $promoTypeAmasty, $itemTypeAmasty);
 
                 // return data
                 $resultData = [
@@ -1528,7 +1869,13 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                 ->setOperator('>=')
                 ->setValue($dataPass['promo_price_qty']);
             $item_found->addCondition($conditions);
-           
+            
+            $item_amasty = $this->foundProductRuleFactory->create()
+                ->setType('Amasty\Conditions\Model\Rule\Condition\CustomerAttributes')
+                ->setAttribute('omni_store_id')
+                ->setOperator('()')
+                ->setValue($dataPass['store_code']);
+            $statusResponse->getConditions()->addCondition($item_amasty);
 
             //actions serialize
             $actionqtyCond = $this->foundProductRuleFactory->create()
@@ -1543,20 +1890,22 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
 
         // promotion type 5
         if ($dataPass['promotion_type'] == 5) {
-            $item_found = $this->foundProductRuleFactory->create()
-                ->setType('Magento\SalesRule\Model\Rule\Condition\Product\Subselect')
-                ->setAttribute('qty')
-                ->setOperator('>=')
-                ->setValue($dataPass['point_per_unit'])
-                ->setAggregator('all');
-            $statusResponse->getConditions()->addCondition($item_found);
+            if ($dataPass['item_type'] == 1) {
+                // $item_found = $this->foundProductRuleFactory->create()
+                //     ->setType('Magento\SalesRule\Model\Rule\Condition\Product\Subselect')
+                //     ->setAttribute('qty')
+                //     ->setOperator('>=')
+                //     ->setValue($dataPass['point_per_unit'])
+                //     ->setAggregator('all');
+                // $statusResponse->getConditions()->addCondition($item_found);
 
-            $conditions = $this->foundProductRuleFactory->create()
-                ->setType('Magento\SalesRule\Model\Rule\Condition\Product')
-                ->setAttribute('sku')
-                ->setOperator('==')
-                ->setValue($dataPass['sku']);
-            $item_found->addCondition($conditions);
+                // $conditions = $this->foundProductRuleFactory->create()
+                //     ->setType('Magento\SalesRule\Model\Rule\Condition\Product')
+                //     ->setAttribute('sku')
+                //     ->setOperator('==')
+                //     ->setValue($dataPass['sku']);
+                // $item_found->addCondition($conditions);
+            }
 
             $item_amasty = $this->foundProductRuleFactory->create()
                 ->setType('Amasty\Conditions\Model\Rule\Condition\CustomerAttributes')
@@ -1564,6 +1913,16 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                 ->setOperator('()')
                 ->setValue($dataPass['store_code']);
             $statusResponse->getConditions()->addCondition($item_amasty);
+
+            // if ($dataPass['item_type'] == 1) {
+            //     //actions serialize
+            //     $actionqtyCond = $this->foundProductRuleFactory->create()
+            //         ->setType('Magento\SalesRule\Model\Rule\Condition\Product')
+            //         ->setAttribute('sku')
+            //         ->setOperator('==')
+            //         ->setValue($dataPass['sku']);
+            //     $statusResponse->getActions()->addCondition($actionqtyCond);
+            // }
 
             $this->ruleResource->save($statusResponse);
         }
@@ -1619,6 +1978,13 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                 ->setValue($dataPass['sku']);
             $item_found->addCondition($conditions);
 
+            $item_amasty = $this->foundProductRuleFactory->create()
+                ->setType('Amasty\Conditions\Model\Rule\Condition\CustomerAttributes')
+                ->setAttribute('omni_store_id')
+                ->setOperator('()')
+                ->setValue($dataPass['store_code']);
+            $statusResponse->getConditions()->addCondition($item_amasty);
+
             $this->ruleResource->save($statusResponse);
         }
     }
@@ -1640,29 +2006,69 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             $result = [];
             if ($dataPass['promotion_type'] == 5) {
                 if ($dataPass['item_type'] == 1) {
-                    $item_found = $this->foundProductRuleFactory->create()
-                        ->setType('Magento\SalesRule\Model\Rule\Condition\Product\Subselect')
-                        ->setAttribute('qty')
-                        ->setOperator('>=')
-                        ->setValue($dataPass['point_per_unit'])
-                        ->setAggregator('all');
-                    $statusResponse->getConditions()->addCondition($item_found);
+                    // $item_found = $this->foundProductRuleFactory->create()
+                    //     ->setType('Magento\SalesRule\Model\Rule\Condition\Product\Subselect')
+                    //     ->setAttribute('qty')
+                    //     ->setOperator('>=')
+                    //     ->setValue($dataPass['point_per_unit'])
+                    //     ->setAggregator('all');
+                    // $statusResponse->getConditions()->addCondition($item_found);
 
-                    $conditions = $this->foundProductRuleFactory->create()
-                        ->setType('Magento\SalesRule\Model\Rule\Condition\Product')
-                        ->setAttribute('sku')
-                        ->setOperator('==')
-                        ->setValue($dataPass['sku']);
-                    $item_found->addCondition($conditions);
-                    $result = $this->ruleResource->save($statusResponse);
+                    // $conditions = $this->foundProductRuleFactory->create()
+                    //     ->setType('Magento\SalesRule\Model\Rule\Condition\Product')
+                    //     ->setAttribute('sku')
+                    //     ->setOperator('==')
+                    //     ->setValue($dataPass['sku']);
+                    // $item_found->addCondition($conditions);
+                    // $result = $this->ruleResource->save($statusResponse);
+
+                    // get sku already exist
+                    $ruleData = $statusResponse->getActionsSerialized();
+                    $ruleDataArray = json_decode($ruleData, true);
+                    $typeSubSelect = null;
+
+                    if ($ruleData) {
+                        
+                        if (isset($ruleDataArray['conditions'])) {
+                            $this->logger->info("osoaos");
+                            $conditions = $ruleDataArray['conditions'];
+                            foreach ($conditions as $key => $condition) {
+                                if ($condition['type'] == 'Magento\SalesRule\Model\Rule\Condition\Product') {
+                                    $skuValueNow = $ruleDataArray['conditions'][$key]['value'];
+                                    $ruleDataArray['conditions'][$key]['value'] = $skuValueNow.','.$dataPass['sku'];
+                                }
+                            }
+
+                            $setRuleData = $statusResponse->setActionsSerialized(json_encode($ruleDataArray));
+                            $this->ruleResource->save($statusResponse);
+                        }
+                        else {
+                            $statusResponseOk = $this->ruleFactory->create();
+                            $statusResponseOk->load($dataPass['salesrule_id'], 'rule_id');
+
+                            $actionqtyCond = $this->foundProductRuleFactory->create()
+                                ->setType('Magento\SalesRule\Model\Rule\Condition\Product')
+                                ->setAttribute('sku')
+                                ->setOperator('()')
+                                ->setValue($dataPass['sku']);
+                            $statusResponseOk->getActions()->addCondition($actionqtyCond);
+                            $this->ruleResource->save($statusResponseOk);
+                        }
+                    }
+                    
+
+                    $updateAmrule = $this->updateAmastyAmrule($dataPass);
+                    
                 } else {
-                    $actionqtyCond = $this->foundProductRuleFactory->create()
-                        ->setType('Magento\SalesRule\Model\Rule\Condition\Product')
-                        ->setAttribute('sku')
-                        ->setOperator('==')
-                        ->setValue($dataPass['sku']);
-                    $statusResponse->getActions()->addCondition($actionqtyCond);
-                    $result = $this->ruleResource->save($statusResponse);
+                    // $actionqtyCond = $this->foundProductRuleFactory->create()
+                    //     ->setType('Magento\SalesRule\Model\Rule\Condition\Product')
+                    //     ->setAttribute('sku')
+                    //     ->setOperator('==')
+                    //     ->setValue($dataPass['sku']);
+                    // $statusResponse->getActions()->addCondition($actionqtyCond);
+                    // $result = $this->ruleResource->save($statusResponse);
+                    $statusResponse->setDiscountStep($dataPass['required_point']);
+                    $this->ruleResource->save($statusResponse);
 
                     $updateAmrule = $this->updateAmastyAmrule($dataPass);
                 }
@@ -1747,6 +2153,58 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                     $this->ruleResource->save($statusResponse);
                 }
             }
+
+            if ($dataPass['promotion_type'] == 2) {
+                $ruleData = $statusResponse->getConditionsSerialized();
+                $ruleDataArray = json_decode($ruleData, true);
+
+                if ($ruleData) {
+                    if (isset($ruleDataArray['conditions'])) {
+                        $conditions = $ruleDataArray['conditions'];
+                        foreach ($conditions as $key => $condition) {
+                            if (isset($condition['type'])) {
+                                if ($condition['type'] == 'Amasty\Conditions\Model\Rule\Condition\CustomerAttributes') {
+                                    $typeSubSelect = $condition['type'];
+                                    $typeSubSelectValue = $condition['value'].','.$dataPass['store_code'];
+                                    $ruleDataArray['conditions'][$key]['value'] = $typeSubSelectValue;
+                                }                   
+                            }
+                        }
+                    }
+                }
+
+                if ($typeSubSelect) {
+                    // update conditions serialize
+                    $setRuleData = $statusResponse->setConditionsSerialized(json_encode($ruleDataArray));
+                    $this->ruleResource->save($statusResponse);
+                }
+            }
+
+            if ($dataPass['promotion_type'] == 4) {
+                $ruleData = $statusResponse->getConditionsSerialized();
+                $ruleDataArray = json_decode($ruleData, true);
+
+                if ($ruleData) {
+                    if (isset($ruleDataArray['conditions'])) {
+                        $conditions = $ruleDataArray['conditions'];
+                        foreach ($conditions as $key => $condition) {
+                            if (isset($condition['type'])) {
+                                if ($condition['type'] == 'Amasty\Conditions\Model\Rule\Condition\CustomerAttributes') {
+                                    $typeSubSelect = $condition['type'];
+                                    $typeSubSelectValue = $condition['value'].','.$dataPass['store_code'];
+                                    $ruleDataArray['conditions'][$key]['value'] = $typeSubSelectValue;
+                                }                   
+                            }
+                        }
+                    }
+                }
+
+                if ($typeSubSelect) {
+                    // update conditions serialize
+                    $setRuleData = $statusResponse->setConditionsSerialized(json_encode($ruleDataArray));
+                    $this->ruleResource->save($statusResponse);
+                }
+            }
             // --------------
         } catch (\Exception $e) {
             $this->logger->error("<=End update salesrule" .$e->getMessage());
@@ -1812,10 +2270,11 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
      * @param $dataPass int
      * @param $skuAmasty string
      * @param $promoTypeAmasty int
+     * @param $itemTypeAmasty int
      * @return $result mixed
      * @throw logger error
      */
-    protected function saveAmastySalesRule($dataPass, $skuAmasty, $promoTypeAmasty)
+    protected function saveAmastySalesRule($dataPass, $skuAmasty, $promoTypeAmasty, $itemTypeAmasty)
     {
         try {
             $statusResponse = $this->amastyRuleInterfaceFactory->create();
@@ -1827,13 +2286,19 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                 ->setUseFor(0);
 
             if ($promoTypeAmasty == 5) {
-                $statusResponse->setPromoSkus(" ");
+                if ($itemTypeAmasty == 2) {
+                    $statusResponse->setPromoSkus($skuAmasty);
+                }
             }
 
             if ($promoTypeAmasty != 4) {
                 if ($promoTypeAmasty != 7) {
                     $statusResponse->setNqty(2);
                 }
+            }
+
+            if ($promoTypeAmasty == 4) {
+                $statusResponse->setPromoSkus($skuAmasty);
             }
 
             $result = $this->amastyRuleInterface->save($statusResponse);
@@ -1873,11 +2338,14 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                     $sku = $sku.','.$dataPass['sku'];
                 }
 
-                // count sku for nqty
-                $skuCount = explode(',' , $sku);
+                if ($dataPass['item_type'] == 2) {
+                    $statusResponse->setData('promo_skus', $sku);
+                }
+                
+                if ($dataPass['item_type'] == 1) {
+                    $statusResponse->setData('nqty', $dataPass['point_per_unit']);
+                }
 
-                $statusResponse->setData('promo_skus', $sku);
-                $statusResponse->setData('nqty', count($skuCount));
                 $statusResponse->setData('salesrule_id', $dataPass['row_id']);
 
                 $result = $statusResponse->save();
@@ -2061,6 +2529,56 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
      * @return array $result
      */
     protected function saveBasePriceStorePrice($param)
+    {
+        try {
+            // get base price
+            $basePriceCode = PromotionPriceLogicInterface::PRODUCT_ATTR_BASE_PRICE.$param['store_attr_code'];
+            $product = $this->productRepositoryInterface->get($param['sku']);
+            $productPriceBySku = $product->getCustomAttribute($basePriceCode) ? $product->getCustomAttribute($basePriceCode)->getValue() : 0;
+            $getId = $product->getId();
+            $dataBase = [
+                'base_price' => $productPriceBySku,
+                'id' => $getId,
+            ];
+
+            // calc special price
+            $specialPrice = '';
+            if ($param['disc_type'] == 1) {
+                $specialPrice = $param['promo_selling_price'];
+            }
+            if ($param['disc_type'] == 2) {
+                $specialPrice = $dataBase['base_price'] - ($dataBase['base_price'] * ($param['percent_disc']/100));
+                if ($specialPrice < 0) {
+                    $specialPrice = 0;
+                }
+            }
+            if ($param['disc_type'] == 3) {
+                $specialPrice = $dataBase['base_price'] - $param['amount_off'];
+                if ($specialPrice < 0) {
+                    $specialPrice = 0;
+                }
+            }
+            
+            // save to special price
+            $specialPriceCode = PromotionPriceLogicInterface::PRODUCT_ATTR_PROMO_PRICE.$param['store_attr_code'];
+            $product->setCustomAttribute($specialPriceCode, $specialPrice);
+
+            $this->productRepositoryInterface->save($product);
+
+            return true;
+        } catch (\Exception $exception) {
+            throw new StateException(
+                __(__FUNCTION__." - ".$exception->getMessage())
+            );
+        }
+    }
+
+    /**
+     * save base price Backup
+     * @param mixed $param
+     * @return array $result
+     */
+    protected function saveBasePriceStorePriceBackup($param)
     {
         try {
             // get base price

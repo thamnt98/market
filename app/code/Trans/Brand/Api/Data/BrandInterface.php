@@ -59,6 +59,36 @@ interface BrandInterface {
 	public function getId();
 
 	/**
+	 * Get PIM ID
+	 *
+	 * @return string|null
+	 */
+	public function getPimId();
+
+	/**
+	 * Set PIM ID
+	 *
+	 * @param string $pimId
+	 * @return string|null
+	 */
+	public function setPimId($pimId);
+
+	/**
+	 * Get CODE
+	 *
+	 * @return string|null
+	 */
+	public function getCode();
+
+	/**
+	 * Set CODE
+	 *
+	 * @param string $code
+	 * @return string|null
+	 */
+	public function setCode($code);
+
+	/**
 	 * Get title
 	 *
 	 * @return string|null

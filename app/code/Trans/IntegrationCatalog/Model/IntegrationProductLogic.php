@@ -190,6 +190,16 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	protected $attributeSet;
 
 	/**
+	 * @var \Trans\Brand\Api\BrandRepositoryInterface
+	 */
+	protected $brandRepository;
+
+	/**
+	 * @var \Trans\Brand\Api\Data\BrandInterface
+	 */
+	protected $brandFactory;
+
+	/**
 	 * @param Logger $Logger
 	 * @param \Magento\ConfigurableProduct\Model\Product\Type\Configurable\AttributeFactory $configurableAttribute
 	 * @param IntegrationJobRepositoryInterface $integrationJobRepositoryInterface
@@ -212,6 +222,8 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	 * @param \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable\Attribute $attributeResource
 	 * @param \Trans\IntegrationCatalog\Helper\Data $dataHelper
 	 * @param \Trans\IntegrationEntity\Model\IntegrationProductAttributeRepository $attributeSet
+	 * @param \Trans\Brand\Api\BrandRepositoryInterface $brandRepository
+	 * @param \Trans\Brand\Api\Data\BrandInterface $brandFactory
 	 */
 	public function __construct
 	(
@@ -242,7 +254,9 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		ProductAttributeManagementInterface $productAttributeManagement,
 		\Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable\Attribute $attributeResource,
 		\Trans\IntegrationCatalog\Helper\Data $dataHelper,
-		\Trans\IntegrationEntity\Model\IntegrationProductAttributeRepository $attributeSet
+		\Trans\IntegrationEntity\Model\IntegrationProductAttributeRepository $attributeSet,
+		\Trans\Brand\Api\BrandRepositoryInterface $brandRepository,
+		\Trans\Brand\Api\Data\BrandInterfaceFactory $brandFactory
 	) {
 		$this->logger = $logger;
 		$this->configurableAttribute = $configurableAttribute;
@@ -268,6 +282,8 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		$this->integrationAttributeRepository = $integrationAttributeRepository;
 		$this->dataHelper = $dataHelper;
 		$this->attributeSet = $attributeSet;
+		$this->brandRepository = $brandRepository;
+		$this->brandFactory = $brandFactory;
 
 		// $this->attrGroupGeneralInfoId = $this->integrationAttributeRepository->getAttributeGroupId(IntegrationProductAttributeInterface::ATTRIBUTE_GROUP_CODE_GENERAL);
 		$this->attrGroupGeneralInfoId = IntegrationProductInterface::ATTRIBUTE_SET_ID;
@@ -458,6 +474,8 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			$result['data_attributes']	= $this->validation->validateArray(IntegrationProductInterface::ATTRIBUTES, $dataProduct);
 
 			$result['pim_id'] 			= $this->validation->validateArray(IntegrationProductInterface::ID, $dataProduct);
+			
+			$result[IntegrationProductInterface::COMPANY_CODE] = $this->validation->validateArray(IntegrationProductInterface::COMPANY_CODE, $dataProduct);
 
 			$result[IntegrationProductInterface::PRODUCT_TYPE]	= IntegrationProductInterface::PRODUCT_TYPE_SIMPLE_VALUE;
 			if(isset($dataProduct[IntegrationProductInterface::PRODUCT_TYPE]) && (strtolower($dataProduct[IntegrationProductInterface::PRODUCT_TYPE])==IntegrationProductInterface::PRODUCT_TYPE_DIGITAL_LABEL)){
@@ -471,13 +489,18 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			
 
 			// get magento category id
-			$result['m_category_id'] 	= $this->getCategoryId($result['category_id']);
+			$result['m_category_id'] = $this->getCategoryId($result['category_id']);
 
 			// Item Id
-			$result['item_id'] 			= $this->getItemId($result['sku'] );
+			$result['item_id'] = $this->getItemId($result['sku'] );
 
 			//BARCODE
-			$result['barcode'] 			= $this->validation->validateArray(IntegrationProductInterface::BARCODE, $dataProduct);
+			$result['barcode'] = $this->validation->validateArray(IntegrationProductInterface::BARCODE, $dataProduct);
+
+			//BRAND
+			$result[IntegrationProductInterface::BRAND] = $this->validation->validateArray(IntegrationProductInterface::BRAND, $dataProduct);
+			$result[IntegrationProductInterface::BRAND_CODE] = $this->validation->validateArray(IntegrationProductInterface::BRAND_CODE, $dataProduct);
+			$result[IntegrationProductInterface::BRAND_NAME] = $this->validation->validateArray(IntegrationProductInterface::BRAND_NAME, $dataProduct);
 
 		} catch (Exception $ex) {
 			$msg = __FUNCTION__." Validate Data : ".$ex->getMessage();
@@ -485,6 +508,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			$this->saveStatusMessage($integrationDataValue, $msg, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
 			throw new StateException(__($msg));
 		}
+		
 		return $result;
 
 	}
@@ -645,9 +669,35 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 				}
 			}
 
-			// Save Product
-			$product = $this->productRepositoryInterface->save($product);
+			// BRAND
+			if(isset($dataProduct[IntegrationProductInterface::BRAND])) {
+				$brandAttributeCode = $this->dataHelper->getBrandAttributeCode();
+				try {
+					$brandData = $this->brandRepository->getByPimId($dataProduct[IntegrationProductInterface::BRAND]);
+					$this->saveAttributeDataByType($product, $brandAttributeCode, $brandData->getTitle());
+				} catch (NoSuchEntityException $e) {
+					$brand = $this->brandFactory->create();
+					$brand->setPimId($dataProduct[IntegrationProductInterface::BRAND]);
+					$brand->setCode($dataProduct[IntegrationProductInterface::BRAND_CODE]);
+					$brand->setTitle($dataProduct[IntegrationProductInterface::BRAND_NAME]);
+					$brand->setData('company_code', $dataProduct[IntegrationProductInterface::COMPANY_CODE]);
 
+					try {
+						$brandData = $this->brandRepository->save($brand);
+						$this->logger->info('Create trans_brand data. PIM_ID = ' . $dataProduct[IntegrationProductInterface::BRAND]);
+						$this->saveAttributeDataByType($product, $brandAttributeCode, $brandData->getTitle());
+					} catch (CouldNotSaveException $e) {
+						$this->logger->info('Error create/set brand. SKU = ' . $product->getSku() . ' brand = ' . $dataProduct[IntegrationProductInterface::BRAND] . ' Msg: ' . $e->getMessage());
+					}
+				} catch (\Exception $e) {
+					$this->logger->info('Error create/set brand. SKU = ' . $product->getSku() . ' brand = ' . $dataProduct[IntegrationProductInterface::BRAND] . ' Msg: ' . $e->getMessage());
+				}
+			}
+
+			// Save Product
+			$this->logger->info('Before save productRepositoryInterface '.date('Y-m-d H:i:s'));
+			$product = $this->productRepositoryInterface->save($product);
+			$this->logger->info('After save productRepositoryInterface '.date('Y-m-d H:i:s'));
 			if($visibility && isset($dataProduct['sku']) && $dataProduct['sku']) {
 				$this->integrationProductRepositoryInterface->changeProductVisibility($dataProduct['sku'], $visibility);
 			}
@@ -986,7 +1036,6 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
             try{
                 $attributeData = $this->eavConfig->getAttribute(IntegrationProductInterface::ENTITY_TYPE_CODE, $attributeCode);
                 if ($attributeData->getId()) {
-                
                     if ($attributeData->getAdditionalData() || $attributeData->getFrontendInput() == IntegrationProductInterface::FRONTEND_INPUT_TYPE_SELECT) {
                     	$attrVal = $this->attributeOption->createOrGetId(
                                 $attributeCode, 

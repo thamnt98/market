@@ -179,6 +179,5 @@ define([
         getFormattedFreshPrice: function (price) {
             return priceUtils.formatPrice(price, quote.getPriceFormat()) + "/kg";
         }
-
     });
 });

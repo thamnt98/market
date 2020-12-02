@@ -19,7 +19,7 @@ use Trans\IntegrationCatalogStock\Api\IntegrationCheckUpdatesInterface;
 
 class StockUpdate {
 	/**
-	 * @var \Trans\Integration\Logger\Logger
+	 * @var \Trans\IntegrationCatalogStock\Logger\Logger
 	 */
 	protected $logger;
 
@@ -44,7 +44,7 @@ class StockUpdate {
 	protected $timezone;
 
 	public function __construct(
-		\Trans\Integration\Logger\Logger $logger
+		\Trans\IntegrationCatalogStock\Logger\Logger $logger
 		, IntegrationCommonInterface $commonRepository
 		, IntegrationGetUpdatesInterface $getUpdates
         , IntegrationCheckUpdatesInterface $checkUpdates
@@ -73,6 +73,7 @@ class StockUpdate {
 			$this->logger->info("=".$class." Check Complete Jobs");
 			$channel = $this->checkUpdates->checkCompleteJobs($channel);
 
+			//if there are no waiting_jobs then break by throwing exception
 			$this->logger->info("=".$class." Check Waiting Jobs");
 			$channel = $this->getUpdates->checkWaitingJobs($channel);
 

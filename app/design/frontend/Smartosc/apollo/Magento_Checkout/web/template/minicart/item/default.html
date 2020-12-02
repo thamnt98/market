@@ -77,6 +77,7 @@
                             id: 'minicart-subtract-cart-item-'+item_id,
                             'data-cart-item': item_id,
                             itemId : item_id,
+                            productId : product_id,
                             title: $t('-'),
                             readonly: (qty <= 1 )? true : false
                             },
@@ -106,6 +107,7 @@
                             id: 'minicart-add-cart-item-'+item_id,
                             'data-cart-item': item_id,
                             itemId : item_id,
+                            productId : product_id,
                             itemStock : product_stock,
                             title: $t('+'),
                             readonly: (qty>= 99 || qty>= product_stock)? true : false

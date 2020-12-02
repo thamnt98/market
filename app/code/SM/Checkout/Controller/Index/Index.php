@@ -147,11 +147,6 @@ class Index extends \Magento\Checkout\Controller\Onepage implements HttpGetActio
             $this->_customerSession->regenerateId();
         }
         $this->checkoutSession->setCartWasUpdated(false);
-        $this->removeAllQuoteShippingAddress($quote);
-        $quote->getPayment()->setMethod(null);
-        //reset service fee of installment before checkout
-        $quote->setData('service_fee', 0);
-        $this->cartRepository->save($quote);
         $resultPage = $this->resultPageFactory->create();
         $resultPage->getConfig()->getTitle()->set(__('Checkout'));
         return $resultPage;
@@ -190,21 +185,5 @@ class Index extends \Magento\Checkout\Controller\Onepage implements HttpGetActio
         }
 
         return true;
-    }
-
-    /**
-     * @param $quote
-     */
-    protected function removeAllQuoteShippingAddress($quote)
-    {
-        if ($quote->isVirtual()) {
-            foreach ($quote->getAllShippingAddresses() as $address) {
-                $quote->removeAddress($address->getId());
-            }
-            $defaultShipping = $quote->getCustomer()->getDefaultShipping();
-            $defaultCustomerAddress = $this->addressRepository->getById($defaultShipping);
-            $billingAddress = $quote->getBillingAddress();
-            $billingAddress->importCustomerAddressData($defaultCustomerAddress);
-        }
     }
 }

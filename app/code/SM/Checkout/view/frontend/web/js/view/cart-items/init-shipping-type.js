@@ -798,16 +798,8 @@ define([
                                 }
                                 shippingMethodListValid[itemId].push(method.method_code);
                             });
-                            if (setShippingType.getValue()() == 0 && response.show_each_items) {
-                                if (shippingMethodListValid[itemId].indexOf(selectSingleShippingMethod()) !== -1) {
-                                    processing = true;
-                                    shippingMethodSelectList[itemId](selectSingleShippingMethod());
-                                    return true;
-                                }
-                            }
                             if (shippingMethodListValid[itemId].indexOf(shippingMethodSelectList[itemId]()) === -1) {
                                 processing = true;
-                                deliveryMethodListError[itemId](true);
                                 shippingMethodSelectList[itemId](firsValidShippingMethod);
                             }
                         });
@@ -869,19 +861,17 @@ define([
                 }
                 processing = false;
                 firstOrderSelectAddressList = false;
-                var split = response.show_each_items;
+                var split = response.show_each_items,
+                    showOrderSummary = response.is_split_order;
                 setShippingRates.refreshTotal().done(function (res) {
                     globalVar.splitOrder(split);
+                    globalVar.showOrderSummary(showOrderSummary);
                     if (updateShippingMethod) {
                         mod.getShippingMethod();
                     }
                 }).error(function (res) {
                     globalVar.splitOrder(split);
-                    if (updateShippingMethod) {
-                        mod.getShippingMethod();
-                    }
-                }).always(function () {
-                    globalVar.splitOrder(split);
+                    globalVar.showOrderSummary(showOrderSummary);
                     if (updateShippingMethod) {
                         mod.getShippingMethod();
                     }
@@ -918,7 +908,7 @@ define([
         return {
             'store_date_time': {'date': (pickup.storePickUpDate() == '') ? '': pickup.storePickUpDate() + ' ' + time, 'time': pickup.storePickUpTime()},
             'delivery_date_time': addressListDateTime,
-            'is_split_order': globalVar.splitOrder()
+            'is_split_order': globalVar.showOrderSummary()
         };
     };
 

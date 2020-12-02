@@ -348,6 +348,7 @@ class ProductDataMapper
         $realPrice = $realSpecial = $minProductId = 0;
         $baseAttr = CustomerPrice::PREFIX_OMNI_NORMAL_PRICE . $code;
         $specialAttr = CustomerPrice::PREFIX_OMNI_FINAL_PRICE . $code;
+        $isFirst = true;
         foreach ($productIds as $childrenId) {
             if (!$this->isSalable($childrenId)) {
                 continue;
@@ -371,14 +372,15 @@ class ProductDataMapper
                 $special = $price;
             }
 
-            if ($realSpecial && $special && $realSpecial > $special) {
+            if ($isFirst) {
                 $realPrice = $price;
                 $realSpecial = $special;
                 $minProductId = $childrenId;
+                $isFirst = false;
                 continue;
             }
 
-            if ($price !== 0 && ($realPrice === 0 || $realPrice > $price)) {
+            if ($realSpecial && $special && $realSpecial > $special) {
                 $realPrice = $price;
                 $realSpecial = $special;
                 $minProductId = $childrenId;
@@ -480,12 +482,20 @@ class ProductDataMapper
      */
     protected function isSalable($productId)
     {
-        return isset($this->productRawData[$productId]['status'])
-            && $this->productRawData[$productId]['status'] == ProductStatus::STATUS_ENABLED
-            && (
-                !empty($this->productRawData[$productId]['source']) ||
-                !empty($this->parentProduct[$productId])
-            );
+        if (!empty($this->parentProduct[$productId])) {
+            foreach ($this->parentProduct[$productId] as $child) {
+                if ($this->isSalable($child)) {
+                    return true;
+                }
+            }
+        } else {
+            return isset($this->productRawData[$productId]['status'])
+                && $this->productRawData[$productId]['status'] == ProductStatus::STATUS_ENABLED
+                && (
+                    !empty($this->productRawData[$productId]['source']) ||
+                    !empty($this->parentProduct[$productId])
+                );
+        }
     }
 
     /**
@@ -503,7 +513,7 @@ class ProductDataMapper
             ['entity_id', 'type_id']
         )->joinLeft(
             ['i' => 'inventory_source_item'],
-            'p.sku = i.sku and i.status = 1',
+            "p.sku = i.sku and i.status = 1 and i.source_code <> 'default'",
             'count(i.source_item_id) as source'
         )->where(
             'entity_id IN (?)',

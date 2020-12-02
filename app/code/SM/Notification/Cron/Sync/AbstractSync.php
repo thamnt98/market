@@ -128,7 +128,10 @@ abstract class AbstractSync
         } catch (\Exception $e) {
             $this->logger->error(
                 "Sync to Queue Failed ('{$this->getQueueTopic()}') :\n\t" . $e->getMessage(),
-                $record
+                [
+                    'data'  => $record,
+                    'trace' => $e->getTrace(),
+                ]
             );
 
             return false;
@@ -156,7 +159,7 @@ abstract class AbstractSync
             ->joinInner(
                 ['message' => \SM\Notification\Model\ResourceModel\Notification::TABLE_NAME],
                 'main_table.message_id = message.id',
-                ['event']
+                ['event' => 'sub_event']
             )->where(
                 'message.start_date IS NULL OR message.start_date <= NOW()'
             )->where(
@@ -194,7 +197,8 @@ abstract class AbstractSync
             $this->directory->delete($this->getLockFileName());
         } catch (\Exception $e) {
             $this->logger->error(
-                "Consumer Sync Failed ('{$this->getQueueTopic()}'):\n\tCan not DELETE lock. " . $e->getMessage()
+                "Consumer Sync Failed ('{$this->getQueueTopic()}'):\n\tCan not DELETE lock. " . $e->getMessage(),
+                $e->getTrace()
             );
         }
     }

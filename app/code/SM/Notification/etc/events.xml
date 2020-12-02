@@ -2,10 +2,10 @@
 
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
-    <event name="catalog_product_save_after">
-        <observer name="SMNotificationObserverEventProductInShoppingListOnSale"
-                  instance="SM\Notification\Observer\EventProductInShoppingListOnSale" />
-    </event>
+<!--    <event name="catalog_product_save_after">-->
+<!--        <observer name="SMNotificationObserverEventProductInShoppingListOnSale"-->
+<!--                  instance="SM\Notification\Observer\EventProductInShoppingListOnSale" />-->
+<!--    </event>-->
     <event name="catalog_product_save_before">
         <observer name="SMNotificationObserverEventProductBackToStock"
                   instance="SM\Notification\Observer\EventProductBackToStock" />
@@ -14,8 +14,20 @@
         <observer name="SM_Notification::OrderSaveAfter"
                   instance="SM\Notification\Observer\Order\SaveAfter" />
     </event>
+    <event name="sm_sales_order_status_update">
+        <observer name="SM_Notification::OrderSaveAfter"
+                  instance="SM\Notification\Observer\Order\SaveAfter" />
+    </event>
     <event name="sales_quote_item_save_before">
         <observer name="SM_Notification::QuoteItemSaveAfter"
                   instance="SM\Notification\Observer\QuoteItemSaveBefore" />
+    </event>
+    <event name="customer_device_save_after">
+        <observer name="SM_Notification::CustomerDeviceSaveAfter"
+                  instance="SM\Notification\Observer\DeviceSaveAfter" />
+    </event>
+    <event name="salesrule_rule_save_after">
+        <observer name="SM_Notification::RuleSaveAfter"
+                  instance="SM\Notification\Observer\RuleSaveAfter" />
     </event>
 </config>

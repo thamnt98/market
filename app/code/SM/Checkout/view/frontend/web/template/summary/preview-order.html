@@ -69,15 +69,7 @@
                                 </div>
                             </div>
                             <div class="subtotal">
-                                <!-- ko if: free_shipping -->
-                                <span class="price totals-price old-price"
-                                      data-bind="text: $parent.getFormattedPrice(shipping_fee_not_discount)"></span>
-                                <span class="price totals-price"
-                                      data-bind="text: $parent.getFormattedPrice(shipping_fee, true)"></span>
-                                <!-- /ko -->
-                                <!-- ko ifnot: free_shipping -->
-                                <span class="price totals-price" data-bind="text: $parent.getFormattedPrice(shipping_fee)"></span>
-                                <!-- /ko -->
+                                <span class="price totals-price a" data-bind="text: $parent.getFormattedPrice(shipping_fee_not_discount)"></span>
                             </div>
                         </div>
                         <div class="bx-address-info">

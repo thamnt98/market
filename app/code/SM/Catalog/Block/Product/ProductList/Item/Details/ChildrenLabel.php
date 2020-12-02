@@ -23,26 +23,20 @@ class ChildrenLabel extends \Magento\Framework\View\Element\Template
     protected $helper;
 
     /**
-     * @var \Magento\Catalog\Api\ProductRepositoryInterface
+     * @var \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory
      */
-    protected $productRepository;
+    protected $productCollFact;
 
-    /**
-     * @var \Magento\Framework\Api\SearchCriteriaBuilder
-     */
-    protected $searchCriteriaBuilder;
 
     public function __construct(
-        \Magento\Framework\Api\SearchCriteriaBuilder $searchCriteriaBuilder,
         \SM\Catalog\Helper\Data $helper,
-        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
+        \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollFact,
         \Magento\Framework\View\Element\Template\Context $context,
         array $data = []
     ) {
         parent::__construct($context, $data);
         $this->helper = $helper;
-        $this->productRepository = $productRepository;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->productCollFact = $productCollFact;
     }
 
     /**
@@ -94,23 +88,7 @@ class ChildrenLabel extends \Magento\Framework\View\Element\Template
             return 0;
         }
 
-        $result = 0;
-        $ids = $product->getTypeInstance()->getChildrenIds($product->getId());
-        $ids = $this->mergeArray($ids);
-
-        $searchCriteriaBuilder = $this->searchCriteriaBuilder->addFilter('entity_id', $ids, 'in')->create();
-        $children = $this->productRepository->getList($searchCriteriaBuilder);
-
-        /** @var \Magento\Catalog\Model\Product $child */
-        foreach ($children->getItems() as $child) {
-            if (!$child->isSaleable()) {
-                continue;
-            }
-
-            ++$result;
-        }
-
-        return $result;
+        return $this->helper->getCountChildren($product->getId());
     }
 
     protected function mergeArray($children)
