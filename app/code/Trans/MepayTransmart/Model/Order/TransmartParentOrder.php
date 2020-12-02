@@ -221,4 +221,62 @@ class TransmartParentOrder extends ParentOrder
         }
         return $this->howToPay[$method];
     }
+    
+        /**
+     * @param SprintResponse $sprintOrder
+     * @return string
+     */
+    private function getTransactionId($sprintOrder)
+    {
+        if ($sprintOrder->getId()) {
+            return $sprintOrder->getTransactionNo();
+        }
+        return '';
+    }
+
+    /**
+     * @param SprintResponse $sprintOrder
+     * @return string
+     */
+    private function getExpireTimeByOrder($sprintOrder)
+    {
+        if ($sprintOrder->getId()) {
+            return $sprintOrder->getExpireDate();
+        }
+        return '';
+    }
+    /**
+     * @param SprintResponse $sprintOrder
+     * @return string
+     */
+    private function getVirtualAccount($sprintOrder)
+    {
+        if ($sprintOrder->getId()) {
+            return $sprintOrder->getData(SprintResponseInterface::CUSTOMER_ACCOUNT);
+        }
+        return '';
+    }
+
+    /**
+     * Get redirect URL
+     *
+     * @param SprintResponse $sprintOrder
+     * @return string
+     */
+    private function getRedirectUrl($sprintOrder)
+    {
+        if ($sprintOrder->getId()) {
+            return $sprintOrder->getData(SprintResponseInterface::REDIRECT_URL);
+        }
+        return '';
+    }
+
+    /**
+     * @param string $orderIncrementId
+     * @return SprintResponseInterface
+     */
+    private function getSprintOrder($orderIncrementId)
+    {
+        return $this->sprintResponseRepository->getByTransactionNo($orderIncrementId);
+    }
 }
