@@ -279,4 +279,16 @@ class TransmartParentOrder extends ParentOrder
     {
         return $this->sprintResponseRepository->getByTransactionNo($orderIncrementId);
     }
+    
+        /**
+     * @param string $method
+     * @return mixed|string|null
+     */
+    private function getLogo($method)
+    {
+        if (!isset($this->logo[$method])) {
+            $this->logo[$method] = $this->paymentHelper->getLogoPayment($method, true);
+        }
+        return $this->logo[$method];
+    }
 }
