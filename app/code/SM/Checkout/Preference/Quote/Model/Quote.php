@@ -283,4 +283,20 @@ class Quote extends \Magento\Quote\Model\Quote
 
         return $resultItem;
     }
+
+    /**
+     * @override
+     * @return \Magento\Quote\Model\Quote\Item[]
+     */
+    public function getAllVisibleItemsInCart()
+    {
+        $items = [];
+        foreach ($this->getItemsCollection() as $item) {
+            if (!$item->isDeleted() && !$item->getParentItemId() && !$item->getParentItem()) {
+
+                $items[] = $item;
+            }
+        }
+        return $items;
+    }
 }

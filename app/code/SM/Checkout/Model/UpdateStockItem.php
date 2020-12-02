@@ -142,10 +142,19 @@ class UpdateStockItem
      * @return float
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    protected function getConfigStock($item)
+    public function getConfigStock($item)
     {
         $minQty = $this->stockRegistryInterface->getStockItemBySku($item->getSku())->getMinQty();
         $stockQty = $this->stockRegistryInterface->getStockStatusBySku($item->getSku())->getQty();
         return $stockQty - $minQty;
+    }
+
+    /**
+     * @param $productId
+     * @return int
+     */
+    public function isOutStock($productId)
+    {
+        return $this->stockRegistryInterface->getProductStockStatus($productId);
     }
 }

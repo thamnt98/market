@@ -183,7 +183,9 @@ define([
                     success: onSuccess
                 };
 
-            $.ajax(config);
+            $(window).load(function () {
+                $.ajax(config);
+            });
         },
 
         /**

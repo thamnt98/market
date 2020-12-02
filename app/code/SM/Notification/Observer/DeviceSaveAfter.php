@@ -23,9 +23,9 @@ class DeviceSaveAfter implements \Magento\Framework\Event\ObserverInterface
     protected $helper;
 
     /**
-     * @var \SM\Notification\Helper\CustomerSetting
+     * @var \SM\Notification\Model\EventSetting
      */
-    protected $settingHelper;
+    protected $eventSetting;
 
     /**
      * @var \SM\Notification\Model\NotificationFactory
@@ -47,21 +47,21 @@ class DeviceSaveAfter implements \Magento\Framework\Event\ObserverInterface
      *
      * @param \SM\Notification\Helper\Data                      $helper
      * @param \Magento\Store\Model\App\Emulation                $emulation
-     * @param \SM\Notification\Helper\CustomerSetting           $settingHelper
+     * @param \SM\Notification\Model\EventSetting               $eventSetting
      * @param \SM\Notification\Model\NotificationFactory        $modelFactory
      * @param \SM\Notification\Model\ResourceModel\Notification $resource
      */
     public function __construct(
         \SM\Notification\Helper\Data $helper,
         \Magento\Store\Model\App\Emulation $emulation,
-        \SM\Notification\Helper\CustomerSetting $settingHelper,
+        \SM\Notification\Model\EventSetting $eventSetting,
         \SM\Notification\Model\NotificationFactory $modelFactory,
         \SM\Notification\Model\ResourceModel\Notification $resource
     ) {
         $this->helper = $helper;
         $this->modelFactory = $modelFactory;
         $this->resource = $resource;
-        $this->settingHelper = $settingHelper;
+        $this->eventSetting = $eventSetting;
         $this->emulation = $emulation;
     }
 
@@ -92,45 +92,23 @@ class DeviceSaveAfter implements \Magento\Framework\Event\ObserverInterface
             ->setCustomerIds([$customerId])
             ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_HOME);
 
-        $setting = $this->settingHelper->getCustomerSetting($customerId);
-        $isSendMail = in_array(
-            $this->settingHelper->generateSettingCode(
-                \SM\Notification\Model\Notification::EVENT_UNKNOWN_DEVICE,
-                'email'
-            ),
-            $setting
-        );
-        $isPush = in_array(
-            $this->settingHelper->generateSettingCode(
-                \SM\Notification\Model\Notification::EVENT_UNKNOWN_DEVICE,
-                'push'
-            ),
-            $setting
-        );
-        $isSms = in_array(
-            $this->settingHelper->generateSettingCode(
-                \SM\Notification\Model\Notification::EVENT_UNKNOWN_DEVICE,
-                'sms'
-            ),
-            $setting
-        );
-
+        $this->eventSetting->init($customerId, \SM\Notification\Model\Notification::EVENT_UNKNOWN_DEVICE);
         $this->emulation->startEnvironmentEmulation(
             $this->helper->getStoreId(),
             \Magento\Framework\App\Area::AREA_FRONTEND,
             true
         );
 
-        if ($isPush) {
+        if ($this->eventSetting->isPush()) {
             $notify->setPushTitle(__($title)->__toString())
                 ->setPushContent(__($message)->__toString());
         }
 
-        if ($isSendMail) {
+        if ($this->eventSetting->isEmail()) {
             // Set email
         }
 
-        if ($isSms) {
+        if ($this->eventSetting->isSms()) {
             // Set sms
         }
 

@@ -310,57 +310,29 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
     public function saveShippingItems($items, $additionalInfo, $type, $address)
     {
         $this->checkoutSession->setPreShippingType($type)->setPreAddress(explode(',', $address));
-        $itemsFormat = [];
-        foreach ($items as $item) {
-            $itemsFormat[$item->getItemId()] = [
-                "shipping_method" => $item->getShippingMethodSelected(),
-                "shipping_address" => $item->getShippingAddressId(),
-                "qty" => $item->getQty()
-            ];
-        }
         $storePickUp = $additionalInfo->getStorePickUp();
-        $additionalInfo = [
-            "store_pick_up" => [
-                "store_code" => $storePickUp->getStoreCode(),
-                "date" => $storePickUp->getDate(),
-                "time" => $storePickUp->getTime()
-            ]
-        ];
         $checkoutSession = $this->multiShipping;
-        $validateCartItems = $this->multiShippingHandle->validateItems(
-            $checkoutSession->getQuote()->getAllVisibleItems(),
-            $itemsFormat
-        );
-        $reload = $validateCartItems['reload'];
-        $this->quoteItem = $validateCartItems['quote_items_name'];
-        if ($reload) {
-            $this->messageManager->addWarning(__("Some products are updated."));
-            $dataHandle = ['error' => false, 'errorType' => '', 'data' => [], 'split' => false, 'error_stock' => false];
-            return $this->getEstimateResponse($reload, $dataHandle, $itemsFormat, $checkoutSession);
-        }
         $customer = $this->customerSession->getCustomer();
         $dataHandle = $this->multiShippingHandle->handleData(
-            $itemsFormat,
-            $additionalInfo,
+            $items,
+            $storePickUp,
             $customer,
             $checkoutSession
         );
-        try {
-            $this->voucherInterface->mobileApplyVoucher($checkoutSession->getQuote()->getId(), '', true);
-        } catch (\Exception $e) {
-        }
-        return $this->getEstimateResponse($reload, $dataHandle, $itemsFormat, $checkoutSession);
+        return $this->estimateHandle($dataHandle, $checkoutSession);
     }
 
     /**
-     * @param $reload
      * @param $dataHandle
-     * @param $itemsFormat
      * @param $checkoutSession
-     * @return \SM\Checkout\Api\Data\CheckoutWeb\EstimateShippingInterface
+     * @return mixed
      */
-    protected function getEstimateResponse($reload, $dataHandle, $itemsFormat, $checkoutSession)
+    protected function estimateHandle($dataHandle, $checkoutSession)
     {
+        if ($dataHandle['reload']) {
+            $this->messageManager->addWarning(__("Some products are updated."));
+            return $this->getEstimateResponse(true, [], true, false, '', false);
+        }
         $itemsValidMethod = [];
         foreach ($dataHandle['data'] as $itemId => $methodList) {
             $validMethodList = [];
@@ -369,65 +341,29 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
             }
             $itemsValidMethod[] = $this->itemInterfaceFactory->create()->setItemId($itemId)->setValidMethod($validMethodList);
         }
-        $message = '';
-        if (isset($dataHandle['error_stock']) && $dataHandle['error_stock']) {
-            if (isset($dataHandle['error_stock_message']['out_stock']) && !empty($dataHandle['error_stock_message']['out_stock'])) {
-                $message = __('Unfortunately, some products are allocated in limited stock in your area. We have adjusted the quantity for you.');
-            }
-            if (isset($dataHandle['error_stock_message']['low_stock']) && !empty($dataHandle['error_stock_message']['low_stock'])) {
-                if ($message == '') {
-                    $message = __('Unfortunately, some products are allocated in limited stock in your area. We have adjusted the quantity for you.');
-                } else {
-                    $message = __('Unfortunately, some products are allocated in limited stock or not allocated in your area. We have adjusted the quantity or removed for you.');
-                }
-            }
-        } else {
-            $currentItems = [];
-            $removeItem = $updateItem = false;
-            foreach ($checkoutSession->getQuote()->getAllVisibleItems() as $item) {
-                $currentItems[$item->getId()] = $item->getQty();
-            }
-            foreach ($itemsFormat as $itemId => $item) {
-                if (!isset($currentItems[$itemId])) {
-                    $removeItem = true;
-                } else {
-                    if ((int)$item['qty'] != (int)$currentItems[$itemId]) {
-                        $updateItem = true;
-                    }
-                }
-            }
-            if ($removeItem && $updateItem) {
-                $message = __('Unfortunately, some products are allocated in limited stock or not allocated in your area. We have adjusted the quantity or removed for you.');
-            } elseif ($removeItem) {
-                $message = __('Unfortunately, some products are not allocated to your area. We have removed the products for you.');
-            } elseif ($updateItem) {
-                $message = __('Unfortunately, some products are allocated in limited stock in your area. We have adjusted the quantity for you.');
-            }
-        }
-
-        return $this->estimateShippingInterfaceFactory->create()
-            ->setReload($reload)
-            ->setItemsValidMethod($itemsValidMethod)
-            ->setError($dataHandle['error'])
-            ->setIsSplitOrder($dataHandle['split'])
-            ->setStockMessage($message)
-            ->setShowEachItems($this->multiShippingHandle->isShowEachItems($checkoutSession->getQuote()->getAllShippingAddresses(), $itemsValidMethod, true));
+        $message = $this->multiShippingHandle->handleMessage($dataHandle);
+        $showEachItems = $this->multiShippingHandle->isShowEachItems($checkoutSession->getQuote()->getAllShippingAddresses(), $itemsValidMethod, true);
+        return $this->getEstimateResponse(false, $itemsValidMethod, $dataHandle['error'], $dataHandle['split'], $message, $showEachItems);
     }
 
     /**
+     * @param $reload
+     * @param $itemsValidMethod
+     * @param $error
+     * @param $splitOrder
      * @param $message
-     * @param $list
-     * @return string
+     * @param $showEachItems
+     * @return mixed
      */
-    protected function handleErrorStock($message, $list)
+    protected function getEstimateResponse($reload, $itemsValidMethod, $error, $splitOrder, $message, $showEachItems)
     {
-        foreach ($list as $itemId) {
-            if ($message != '') {
-                $message .= ', ';
-            }
-            $message .= $this->quoteItem[$itemId];
-        }
-        return $message;
+        return $this->estimateShippingInterfaceFactory->create()
+            ->setReload($reload)
+            ->setItemsValidMethod($itemsValidMethod)
+            ->setError($error)
+            ->setIsSplitOrder($splitOrder)
+            ->setStockMessage($message)
+            ->setShowEachItems($showEachItems);
     }
 
     /**
@@ -731,7 +667,6 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
         $skuList = [];
         $quote = $this->multiShipping->getQuote();
         $child = [];
-        $fulFill = true;
         $destinationLatLng = $this->msiFullFill->addLatLngInterface($lat, $lng);
         $distanceOfCurrentStore = $this->msiFullFill->getDistanceBetweenCurrentStoreAndAddress(
             $currentStoreCode,
@@ -748,8 +683,8 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
         foreach ($quote->getAllVisibleItems() as $item) {
             if (in_array($item->getId(), $storePickupItems)) {
                 $product = $item->getProduct();
-                $isWarehouse = $product->getIsWarehouse();
-                if ($isWarehouse == 1) {
+                $isWarehouse = (bool)$product->getIsWarehouse();
+                if ($isWarehouse) {
                     continue;
                 }
                 $sku = (isset($child[$item->getItemId()])) ? $child[$item->getItemId()] : $item->getSku();

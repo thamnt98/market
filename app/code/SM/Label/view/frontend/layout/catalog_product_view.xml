@@ -15,7 +15,8 @@
     <body>
             <referenceBlock name="page.main.title">
             <!--template product label custom in product detail page-->
-                <block class="SM\Label\Block\Product\View\CustomLabel" name="custom.product.label.pdp" after="-"/>
+                <block class="SM\Label\Block\Product\View\CustomLabel" name="custom.product.label.pdp" before="product.info.sku"/>
             </referenceBlock>
+            <move element="custom.product.label.pdp" destination="page.main.title" after="-"/>
     </body>
 </page>

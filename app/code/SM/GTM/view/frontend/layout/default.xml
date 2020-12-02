@@ -17,5 +17,11 @@
                    ifconfig="sm_gtm/general/is_active"
                    after="-" />
         </referenceContainer>
+        <referenceBlock name="related_products_impression" remove="true"/>
+        <referenceBlock name="upsell_products_impression" remove="true"/>
+        <referenceBlock name="crosssell_products_impression" remove="true"/>
+        <referenceBlock name="product_list_impression" remove="true"/>
+        <referenceBlock name="advanced_result_impression" remove="true"/>
+        <referenceBlock name="search_result_impression" remove="true"/>
     </body>
 </page>

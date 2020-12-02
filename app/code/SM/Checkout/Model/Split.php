@@ -490,13 +490,18 @@ class Split
      */
     protected function sendOAR($data)
     {
+        $isEnableOarLog = (bool)$this->scopeConfig->getValue('sm_checkout/oar_log/active');
         $response = [];
         $url = $this->configHelper->getOmsBaseUrl() . $this->configHelper->getOmsOarApi();
         $header = $this->getHeader();
-        $flagLog = 'Quote ID and Quote Address ID:';
-        if (isset($data[0]['quote_address_id'])) {
-            $flagLog .=  ' ' . $data[0]['quote_address_id'];
-            unset($data[0]['quote_address_id']);
+        if ($isEnableOarLog) {
+            $flagLog = 'Quote ID and Quote Address ID:';
+            foreach ($data as $key => $row) {
+                if (isset($row['quote_address_id'])) {
+                    $flagLog .=  ' ' . $row['quote_address_id'];
+                    unset($data[$key]['quote_address_id']);
+                }
+            }
         }
         $dataJson = $this->serializer->serialize($data);
         $dataJsonLog = $dataJson;
@@ -507,7 +512,9 @@ class Split
                 if (is_string($responseOAR)) {
                     $response = $this->serializer->unserialize($responseOAR);
                 }
-                $this->writeSuccessLog($flagLog, $dataJsonLog, $responseOAR);
+                if ($isEnableOarLog) {
+                    $this->writeSuccessLog($flagLog, $dataJsonLog, $responseOAR);
+                }
                 break;
             } catch (\Exception $e) {
                 $result = $this->handleException($e);
@@ -517,10 +524,14 @@ class Split
                     } else {
                         $response = $result['response'];
                     }
-                    $this->writeSuccessLog($flagLog, $dataJsonLog, $result['response']);
+                    if ($isEnableOarLog) {
+                        $this->writeSuccessLog($flagLog, $dataJsonLog, $result['response']);
+                    }
                     break;
                 } else {
-                    $this->writeErrorLog($flagLog, $dataJsonLog, $e);
+                    if ($isEnableOarLog) {
+                        $this->writeErrorLog($flagLog, $dataJsonLog, $e);
+                    }
                     $response['error'] = $e->getMessage();
                 }
             }

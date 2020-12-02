@@ -23,7 +23,7 @@ class AbandonedCartRepeat extends AbandonedCart
      */
     protected function getAbandonedCart()
     {
-        $time = (int)$this->settingHelper->getConfigValue('sm_notification/generate/abandoned_cart_repeat_time');
+        $time = $this->configHelper->getAbandonedCartRepeatDay();
         $select = $this->connection->select();
         $select->from(
             ['q' => 'quote'],

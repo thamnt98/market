@@ -197,7 +197,9 @@ class PaymentNotify
         $content = 'Order %1 has passed the payment due time.';
         $params = [
             'content' => [
-                $order->getIncrementId(),
+                $order->getData('reference_order_id')
+                ?? $order->getData('reference_number')
+                ?? $order->getIncrementId(),
             ],
         ];
         /** @var \SM\Notification\Model\Notification $notification */
@@ -229,7 +231,9 @@ class PaymentNotify
         $content = "Don't worry, you are not charged for order %1";
         $params = [
             'content' => [
-                $order->getIncrementId(),
+                $order->getData('reference_order_id')
+                ?? $order->getData('reference_number')
+                ?? $order->getIncrementId(),
             ],
         ];
 
@@ -278,7 +282,9 @@ class PaymentNotify
             $content = "Don't worry, you are not charged for order %1";
             $params = [
                 'content' => [
-                    $order->getIncrementId(),
+                    $order->getData('reference_order_id')
+                    ?? $order->getData('reference_number')
+                    ?? $order->getIncrementId(),
                 ],
             ];
             $email = $this->emailHelper->getSystemFailedTemplateId($order->getStoreId());
@@ -313,7 +319,9 @@ class PaymentNotify
             $content = 'Order %1 is now being processed. Check out the progress in My Order.';
             $params = [
                 'content' => [
-                    $order->getIncrementId(),
+                    $order->getData('reference_order_id')
+                    ?? $order->getData('reference_number')
+                    ?? $order->getIncrementId(),
                 ],
             ];
         } else {

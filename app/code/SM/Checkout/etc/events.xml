@@ -20,6 +20,9 @@
         <observer name="magento_customerbalance" disabled="true"/>
         <observer name="magento_reward" disabled="true"/>
     </event>
+    <event name="customer_session_init">
+        <observer name="magento_reward" disabled="true"/>
+    </event>
     <event name="sales_order_invoice_save_before">
         <observer name="add_invoice_reference_number" instance="SM\Checkout\Observer\SetDataToInvoice" />
     </event>
