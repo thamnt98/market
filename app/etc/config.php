@@ -550,6 +550,8 @@ return [
         'Trans_IntegrationOrder' => 1,
         'Trans_LocationCoverage' => 1,
         'Trans_MasterPayment' => 1,
+        'Trans_Mepay' => 1,
+        'Trans_MepayTransmart' => 1,
         'SM_Inventory' => 1,
         'Vertex_Tax' => 1,
         'Vertex_AddressValidation' => 1,
