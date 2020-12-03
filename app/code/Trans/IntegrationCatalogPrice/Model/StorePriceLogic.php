@@ -440,65 +440,65 @@ class StorePriceLogic implements StorePriceLogicInterface {
 					
 					$indexO++;
 					
-					try {
-						$this->logger->info('Before load data by sku ' . date('d-M-Y H:i:s'));
-						$querySkuOnline = $this->onlinePriceRepositoryInterface->loadDataBySku($value['sku']);
-						$this->logger->info('After load data by sku ' . date('d-M-Y H:i:s'));
-						$value['custom_status'] = false;
-						if ($value['is_exclusive'] == 1) {
-							if ($querySkuOnline) {
-								$value['custom_status'] = true;
-								if ($querySkuOnline->getIsExclusive() == 1) {
-									// update custom table
-									$this->logger->info('Before save online price custom ' . date('d-M-Y H:i:s'));
-									$this->saveOnlinePriceCustom($this->validateParams($value));
-									$this->logger->info('After save online price custom ' . date('d-M-Y H:i:s'));
-								}
-								if ($querySkuOnline->getIsExclusive() == 0) {
-									// delete staging content
-									$this->logger->info('Before delete staging update ' . date('d-M-Y H:i:s'));
-									$deleteStagingUpdate = $this->updateRepositoryInterface->get($querySkuOnline->getStagingId()); 
-									$this->updateRepositoryInterface->delete($deleteStagingUpdate);
-									$this->logger->info('After delete staging update ' . date('d-M-Y H:i:s'));
+					// try {
+					// 	$this->logger->info('Before load data by sku ' . date('d-M-Y H:i:s'));
+					// 	$querySkuOnline = $this->onlinePriceRepositoryInterface->loadDataBySku($value['sku']);
+					// 	$this->logger->info('After load data by sku ' . date('d-M-Y H:i:s'));
+					// 	$value['custom_status'] = false;
+					// 	if ($value['is_exclusive'] == 1) {
+					// 		if ($querySkuOnline) {
+					// 			$value['custom_status'] = true;
+					// 			if ($querySkuOnline->getIsExclusive() == 1) {
+					// 				// update custom table
+					// 				$this->logger->info('Before save online price custom ' . date('d-M-Y H:i:s'));
+					// 				$this->saveOnlinePriceCustom($this->validateParams($value));
+					// 				$this->logger->info('After save online price custom ' . date('d-M-Y H:i:s'));
+					// 			}
+					// 			if ($querySkuOnline->getIsExclusive() == 0) {
+					// 				// delete staging content
+					// 				$this->logger->info('Before delete staging update ' . date('d-M-Y H:i:s'));
+					// 				$deleteStagingUpdate = $this->updateRepositoryInterface->get($querySkuOnline->getStagingId()); 
+					// 				$this->updateRepositoryInterface->delete($deleteStagingUpdate);
+					// 				$this->logger->info('After delete staging update ' . date('d-M-Y H:i:s'));
 
-									// update custom table
-									$this->logger->info('Before update save online price custom ' . date('d-M-Y H:i:s'));
-									$this->saveOnlinePriceCustom($this->validateParams($value));
-									$this->logger->info('After save online price custom ' . date('d-M-Y H:i:s'));
-								}
-							}
-							else {
-								$this->logger->info('Before save online price custom ' . date('d-M-Y H:i:s'));
-								$this->saveOnlinePriceCustom($this->validateParams($value));
-								$this->logger->info('After save online price custom ' . date('d-M-Y H:i:s'));
-							}
-						}
+					// 				// update custom table
+					// 				$this->logger->info('Before update save online price custom ' . date('d-M-Y H:i:s'));
+					// 				$this->saveOnlinePriceCustom($this->validateParams($value));
+					// 				$this->logger->info('After save online price custom ' . date('d-M-Y H:i:s'));
+					// 			}
+					// 		}
+					// 		else {
+					// 			$this->logger->info('Before save online price custom ' . date('d-M-Y H:i:s'));
+					// 			$this->saveOnlinePriceCustom($this->validateParams($value));
+					// 			$this->logger->info('After save online price custom ' . date('d-M-Y H:i:s'));
+					// 		}
+					// 	}
 
-						if ($value['is_exclusive'] == 0) {
-							if ($querySkuOnline) {
-								if (empty($querySkuOnline->getStagingId())) {
-									$this->logger->info('Before save online price custom ' . date('d-M-Y H:i:s'));
-									$scheduleF = $this->saveStagingUpdate($this->validateParams($value));
-									$value['staging_id'] = $scheduleF;
-									$this->logger->info('After save online price custom ' . date('d-M-Y H:i:s'));
-								}
-							}
-							else {
-								$this->logger->info('Before save staging update ' . date('d-M-Y H:i:s'));
-								$scheduleF = $this->saveStagingUpdate($this->validateParams($value));
-								$value['staging_id'] = $scheduleF;
-								$this->logger->info('After save staging update ' . date('d-M-Y H:i:s'));
+					// 	if ($value['is_exclusive'] == 0) {
+					// 		if ($querySkuOnline) {
+					// 			if (empty($querySkuOnline->getStagingId())) {
+					// 				$this->logger->info('Before save online price custom ' . date('d-M-Y H:i:s'));
+					// 				$scheduleF = $this->saveStagingUpdate($this->validateParams($value));
+					// 				$value['staging_id'] = $scheduleF;
+					// 				$this->logger->info('After save online price custom ' . date('d-M-Y H:i:s'));
+					// 			}
+					// 		}
+					// 		else {
+					// 			$this->logger->info('Before save staging update ' . date('d-M-Y H:i:s'));
+					// 			$scheduleF = $this->saveStagingUpdate($this->validateParams($value));
+					// 			$value['staging_id'] = $scheduleF;
+					// 			$this->logger->info('After save staging update ' . date('d-M-Y H:i:s'));
 
-								$this->logger->info('Before save online price custom ' . date('d-M-Y H:i:s'));
-								$this->saveOnlinePriceCustom($this->validateParams($value));
-								$this->logger->info('After save online price custom ' . date('d-M-Y H:i:s'));
-							}
-						}
-					}
-					catch (\Exception $exception) {
-						$this->updateDataValueStatus($value['data_id'], IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE_MAPPING, $exception->getMessage());
-						// continue; //void if catch error
-					}
+					// 			$this->logger->info('Before save online price custom ' . date('d-M-Y H:i:s'));
+					// 			$this->saveOnlinePriceCustom($this->validateParams($value));
+					// 			$this->logger->info('After save online price custom ' . date('d-M-Y H:i:s'));
+					// 		}
+					// 	}
+					// }
+					// catch (\Exception $exception) {
+					// 	$this->updateDataValueStatus($value['data_id'], IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE_MAPPING, $exception->getMessage());
+					// 	// continue; //void if catch error
+					// }
 			
 					try{
 						$this->logger->info('Before save multi price ' . date('d-M-Y H:i:s'));
