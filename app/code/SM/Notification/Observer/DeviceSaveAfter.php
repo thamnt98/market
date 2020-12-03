@@ -43,9 +43,15 @@ class DeviceSaveAfter implements \Magento\Framework\Event\ObserverInterface
     protected $emulation;
 
     /**
+     * @var \Magento\Framework\Logger\Monolog
+     */
+    protected $logger;
+
+    /**
      * DeviceSaveAfter constructor.
      *
      * @param \SM\Notification\Helper\Data                      $helper
+     * @param \Magento\Framework\Logger\Monolog                 $logger
      * @param \Magento\Store\Model\App\Emulation                $emulation
      * @param \SM\Notification\Model\EventSetting               $eventSetting
      * @param \SM\Notification\Model\NotificationFactory        $modelFactory
@@ -53,6 +59,7 @@ class DeviceSaveAfter implements \Magento\Framework\Event\ObserverInterface
      */
     public function __construct(
         \SM\Notification\Helper\Data $helper,
+        \Magento\Framework\Logger\Monolog $logger,
         \Magento\Store\Model\App\Emulation $emulation,
         \SM\Notification\Model\EventSetting $eventSetting,
         \SM\Notification\Model\NotificationFactory $modelFactory,
@@ -63,6 +70,7 @@ class DeviceSaveAfter implements \Magento\Framework\Event\ObserverInterface
         $this->resource = $resource;
         $this->eventSetting = $eventSetting;
         $this->emulation = $emulation;
+        $this->logger = $logger;
     }
 
     public function execute(\Magento\Framework\Event\Observer $observer)
@@ -70,8 +78,11 @@ class DeviceSaveAfter implements \Magento\Framework\Event\ObserverInterface
         /** @var \SM\Customer\Model\CustomerDevice $device */
         $device = $observer->getEvent()->getData('device');
 
+        $this->logger->info('Notification - After Save Device', $device->getData());
         if ($device->getData(\SM\Customer\Model\CustomerDevice::NEW_DEVICE_KEY)) {
             $this->createNotify($device->getData('customer_id'));
+        } else {
+            $this->logger->info('Old device');
         }
     }
 
@@ -116,7 +127,9 @@ class DeviceSaveAfter implements \Magento\Framework\Event\ObserverInterface
 
         try {
             $this->resource->save($notify);
+            $this->logger->info('Create notify for new device success.');
         } catch (\Exception $e) {
+            $this->logger->error($e->getMessage(), $e->getTrace());
         }
     }
 }

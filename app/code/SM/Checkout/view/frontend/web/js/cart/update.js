@@ -107,6 +107,7 @@ define([
                     const form = $("form[name='remove_selected_item']");
                     form.children('input[name="remove_ids"]').val(removeIds);
                     form.children('button').trigger('click');
+                    customerData.invalidate(['cart']);
                 },
                 cancel: function (){},
                 always: function (){}

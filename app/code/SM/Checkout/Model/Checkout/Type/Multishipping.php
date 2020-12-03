@@ -430,10 +430,6 @@ class Multishipping extends \Magento\Framework\DataObject
      */
     public function setShippingItemsInformation($info)
     {
-        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/create-sub-order.log');
-        $logger = new \Zend\Log\Logger();
-        $logger->addWriter($writer);
-
         if (is_array($info)) {
             $allQty = 0;
             $itemsInfo = [];
@@ -456,9 +452,7 @@ class Multishipping extends \Magento\Framework\DataObject
             }
             $quote = $this->getQuote();
             $addresses = $quote->getAllShippingAddresses();
-            $logger->info('current_shipping_address_count: ' . count($addresses));
             foreach ($addresses as $address) {
-                $logger->info('current_shipping_address_id: ' . $address->getId());
                 $quote->removeAddress($address->getId());
             }
 
@@ -482,7 +476,6 @@ class Multishipping extends \Magento\Framework\DataObject
 
             $billingAddress = $quote->getBillingAddress();
             if ($billingAddress) {
-                $logger->info('current_billing_address_id: ' . $billingAddress->getId());
                 $quote->removeAddress($billingAddress->getId());
             }
 
@@ -509,6 +502,7 @@ class Multishipping extends \Magento\Framework\DataObject
                     }
                 }
             }
+            $this->getQuote()->setData('service_fee', 0)->getPayment()->setMethod(null);
             $this->save();
             $this->_eventManager->dispatch('checkout_type_multishipping_set_shipping_items', ['quote' => $quote]);
         }
@@ -700,10 +694,11 @@ class Multishipping extends \Magento\Framework\DataObject
         /** @var  \Magento\Quote\Model\Quote\Address $address */
         foreach ($addresses as $address) {
             if (isset($methods[$address->getId()])) {
-                $address->setShippingMethod($address->getPreShippingMethod());
+                $address->setShippingMethod($methods[$address->getId()]);
             } else {
                 $address->setShippingMethod('');
             }
+            $address->setCollectShippingRates(false);
         }
         $this->prepareShippingAssignment($quote);
         $this->collectVoucher();
@@ -961,12 +956,6 @@ class Multishipping extends \Magento\Framework\DataObject
      */
     public function createSuborders($mainOrder, $quote, $isMobile = false)
     {
-        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/create-sub-order.log');
-        $logger = new \Zend\Log\Logger();
-        $logger->addWriter($writer);
-        $logger->info('=================');
-        $logger->info('main-order-id:' .$mainOrder->getId());
-        $logger->info(print_r($isMobile, true));
         $quote->setIsActive(true);
         $quote->setInventoryProcessed(false);
         $orderIds = [];
@@ -985,11 +974,9 @@ class Multishipping extends \Magento\Framework\DataObject
                 if ($address->getAddressType() == 'billing') {
                     continue;
                 }
-                $logger->info('quote-shipping-address-id:' .$address->getId());
                 $order = $this->_prepareOrder($address, $quote);
                 $this->adjustDataSubOrder($order, $mainOrder, $j);
                 $orders[] = $order;
-                $logger->info('sub-order-data-count:' . count($orders));
                 $this->_eventManager->dispatch(
                     'checkout_create_suborders_single',
                     ['order' => $order, 'address' => $address, 'quote' => $quote]
@@ -1051,7 +1038,6 @@ class Multishipping extends \Magento\Framework\DataObject
                 $stringOrderIds = implode(',', array_keys($orderIds));
                 $this->setOrderIdsSuccess($stringOrderIds);
             }
-            $logger->info('=================');
             return $this;
         } catch (\Exception $e) {
             $this->_eventManager->dispatch('checkout_suborder_refund_all', ['orders' => $orders]);
@@ -1125,7 +1111,7 @@ class Multishipping extends \Magento\Framework\DataObject
      */
     public function save()
     {
-        $this->getQuote()->setTotalsCollectedFlag(false)->collectTotals();
+        $this->getQuote()->setIsMultiShipping(true)->setTotalsCollectedFlag(false)->collectTotals();
         $this->quoteRepository->save($this->getQuote());
         return $this;
     }

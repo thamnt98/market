@@ -818,7 +818,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
     ) {
         $dataHandle = $this->multiShippingHandle->handleData(
             $items,
-            $this->multiShippingHandle->storePickUpFormat($additionalInfo),
+            $additionalInfo->getStorePickUp(),
             $customer,
             $checkoutSession,
             true

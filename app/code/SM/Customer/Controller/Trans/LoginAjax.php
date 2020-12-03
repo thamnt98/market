@@ -267,6 +267,7 @@ class LoginAjax extends \Magento\Framework\App\Action\Action implements HttpPost
             'message' => __('Login successful.')
         ];
 
+        $browserCustomer = $credentials['device_customers'] ?? [];
         /** login with case customer exist on ecosystem*/
         if (isset($credentials['case_user_on_eco_system'])
             && isset($credentials['username'])
@@ -303,6 +304,8 @@ class LoginAjax extends \Magento\Framework\App\Action\Action implements HttpPost
 
                             $this->customerSession->setCustomerDataAsLoggedIn($customer);
                             $redirectRoute = $this->getAccountRedirect()->getRedirectCookie();
+                            $browserCustomer[] = $customer->getId();
+                            $response['device_customers'] = array_unique($browserCustomer);
                             if ($this->cookieManager->getCookie('mage-cache-sessid')) {
                                 $metadata = $this->cookieMetadataFactory->createCookieMetadata();
                                 $metadata->setPath('/');
@@ -373,6 +376,9 @@ class LoginAjax extends \Magento\Framework\App\Action\Action implements HttpPost
                     $metadata->setPath('/');
                     $this->cookieManager->deleteCookie('mage-cache-sessid', $metadata);
                 }
+
+                $browserCustomer[] = $customer->getId();
+                $response['device_customers'] = array_unique($browserCustomer);
                 if (!$this->getScopeConfig()->getValue('customer/startup/redirect_dashboard') && $redirectRoute) {
                     $response['redirectUrl'] = $this->_redirect->success($redirectRoute);
                     $this->getAccountRedirect()->clearRedirectCookie();

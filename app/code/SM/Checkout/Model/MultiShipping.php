@@ -319,51 +319,38 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
             $customer,
             $checkoutSession
         );
-        return $this->estimateHandle($dataHandle, $checkoutSession);
+        return $this->estimateHandle($dataHandle);
     }
 
     /**
      * @param $dataHandle
-     * @param $checkoutSession
-     * @return mixed
+     * @return \SM\Checkout\Api\Data\CheckoutWeb\EstimateShippingInterface
      */
-    protected function estimateHandle($dataHandle, $checkoutSession)
+    protected function estimateHandle($dataHandle)
     {
         if ($dataHandle['reload']) {
             $this->messageManager->addWarning(__("Some products are updated."));
-            return $this->getEstimateResponse(true, [], true, false, '', false);
-        }
-        $itemsValidMethod = [];
-        foreach ($dataHandle['data'] as $itemId => $methodList) {
-            $validMethodList = [];
-            foreach ($methodList as $method) {
-                $validMethodList[] = $this->methodInterfaceFactory->create()->setMethodCode($method);
-            }
-            $itemsValidMethod[] = $this->itemInterfaceFactory->create()->setItemId($itemId)->setValidMethod($validMethodList);
+            return $this->getEstimateResponse(true, $dataHandle, '');
         }
         $message = $this->multiShippingHandle->handleMessage($dataHandle);
-        $showEachItems = $this->multiShippingHandle->isShowEachItems($checkoutSession->getQuote()->getAllShippingAddresses(), $itemsValidMethod, true);
-        return $this->getEstimateResponse(false, $itemsValidMethod, $dataHandle['error'], $dataHandle['split'], $message, $showEachItems);
+        return $this->getEstimateResponse(false, $dataHandle, $message);
     }
 
     /**
      * @param $reload
-     * @param $itemsValidMethod
-     * @param $error
-     * @param $splitOrder
+     * @param $dataHandle
      * @param $message
-     * @param $showEachItems
-     * @return mixed
+     * @return \SM\Checkout\Api\Data\CheckoutWeb\EstimateShippingInterface
      */
-    protected function getEstimateResponse($reload, $itemsValidMethod, $error, $splitOrder, $message, $showEachItems)
+    protected function getEstimateResponse($reload, $dataHandle, $message)
     {
         return $this->estimateShippingInterfaceFactory->create()
             ->setReload($reload)
-            ->setItemsValidMethod($itemsValidMethod)
-            ->setError($error)
-            ->setIsSplitOrder($splitOrder)
+            ->setItemsValidMethod($dataHandle['data'])
+            ->setError($dataHandle['error'])
+            ->setIsSplitOrder($dataHandle['split'])
             ->setStockMessage($message)
-            ->setShowEachItems($showEachItems);
+            ->setShowEachItems($dataHandle['show_each_items']);
     }
 
     /**

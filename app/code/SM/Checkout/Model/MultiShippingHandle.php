@@ -9,6 +9,7 @@ namespace SM\Checkout\Model;
 class MultiShippingHandle
 {
     const STORE_PICK_UP  = 'store_pickup_store_pickup';
+    const NOT_SHIP  = 'transshipping_transshipping';
     const NOT_AVAILABLE  = 'transshipping_transshipping0';
     const DEFAULT_METHOD = 'transshipping_transshipping1';
     const SAME_DAY       = 'transshipping_transshipping2';
@@ -79,6 +80,21 @@ class MultiShippingHandle
     protected $helperConfig;
 
     /**
+     * @var \SM\Checkout\Api\Data\CheckoutWeb\ItemsValidMethod\ItemInterfaceFactory
+     */
+    protected $itemInterfaceFactory;
+
+    /**
+     * @var \SM\Checkout\Api\Data\CheckoutWeb\ItemsValidMethod\MethodInterfaceFactory
+     */
+    protected $methodInterfaceFactory;
+
+    /**
+     * @var \Magento\Customer\Model\ResourceModel\Address\CollectionFactory
+     */
+    protected $addressCollectionFactory;
+
+    /**
      * MultiShippingHandle constructor.
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
      * @param \Magento\InventoryApi\Api\SourceRepositoryInterface $sourceRepository
@@ -86,6 +102,9 @@ class MultiShippingHandle
      * @param \SM\Checkout\Api\Data\Checkout\Estimate\PreviewOrderInterfaceFactory $previewOrderInterfaceFactory
      * @param UpdateStockItem $updateStockItem
      * @param \SM\Checkout\Helper\Config $helperConfig
+     * @param \SM\Checkout\Api\Data\CheckoutWeb\ItemsValidMethod\ItemInterfaceFactory $itemInterfaceFactory
+     * @param \SM\Checkout\Api\Data\CheckoutWeb\ItemsValidMethod\MethodInterfaceFactory $methodInterfaceFactory
+     * @param \Magento\Customer\Model\ResourceModel\Address\CollectionFactory $addressCollectionFactory
      */
     public function __construct(
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
@@ -93,7 +112,10 @@ class MultiShippingHandle
         \SM\Checkout\Model\Split $split,
         \SM\Checkout\Api\Data\Checkout\Estimate\PreviewOrderInterfaceFactory $previewOrderInterfaceFactory,
         \SM\Checkout\Model\UpdateStockItem $updateStockItem,
-        \SM\Checkout\Helper\Config $helperConfig
+        \SM\Checkout\Helper\Config $helperConfig,
+        \SM\Checkout\Api\Data\CheckoutWeb\ItemsValidMethod\ItemInterfaceFactory $itemInterfaceFactory,
+        \SM\Checkout\Api\Data\CheckoutWeb\ItemsValidMethod\MethodInterfaceFactory $methodInterfaceFactory,
+        \Magento\Customer\Model\ResourceModel\Address\CollectionFactory  $addressCollectionFactory
     ) {
         $this->timezone                     = $timezone;
         $this->sourceRepository             = $sourceRepository;
@@ -101,6 +123,9 @@ class MultiShippingHandle
         $this->previewOrderInterfaceFactory = $previewOrderInterfaceFactory;
         $this->updateStockItem              = $updateStockItem;
         $this->helperConfig              = $helperConfig;
+        $this->itemInterfaceFactory = $itemInterfaceFactory;
+        $this->methodInterfaceFactory = $methodInterfaceFactory;
+        $this->addressCollectionFactory = $addressCollectionFactory;
     }
 
     /**
@@ -125,17 +150,23 @@ class MultiShippingHandle
         $data['split']  = $this->orderIsSplit;
         $this->reBuildQuoteAddress($splitOrderData['data'], $checkoutSession);
         $addressShippingMethod = [];
-        $itemShippingMethod    = [];
+        $itemsValidMethod    = [];
+        $showEachItems = false;
+        $shippingListFromQuoteAddress = [];
+        $validMethodCodeWithQuoteAddress = [];
+        $i = 0;
         foreach ($checkoutSession->getQuote()->getAllShippingAddresses() as $_address) {
             $preShippingMethod = $_address->getPreShippingMethod();
-            if ($preShippingMethod == self::STORE_PICK_UP) {
-                $addressShippingMethod[$_address->getId()] = true;
-                continue;
-            } else {
-                $addressShippingMethod[$_address->getId()] = true;
+            if ($preShippingMethod == self::NOT_SHIP || $preShippingMethod == self::NOT_AVAILABLE) {
+                $preShippingMethod = '';
+            }
+            $addressShippingMethod[$_address->getId()] = $preShippingMethod;
+            if ($preShippingMethod != self::STORE_PICK_UP) {
+                $i++;
                 $_shippingRateGroups                       = $_address->getGroupedAllShippingRates();
                 $shippingMethodList                        = [];
                 $shippingMethodListFake                    = [];
+                $validMethodList = [];
                 if ($_shippingRateGroups) {
                     foreach ($_shippingRateGroups as $code => $_rates) {
                         if ($code == 'transshipping') {
@@ -148,6 +179,11 @@ class MultiShippingHandle
                                 } else {
                                     $rateCode = $_rate->getCode();
                                 }
+                                if ($this->mobile) {
+                                    $validMethodList[$rateCode] = $rateCode;
+                                } else {
+                                    $validMethodList[$rateCode] = $this->methodInterfaceFactory->create()->setMethodCode($rateCode);
+                                }
                                 if (!in_array($rateCode, $shippingMethodListFake)) {
                                     $shippingMethodListFake[] = $rateCode;
                                 }
@@ -155,25 +191,58 @@ class MultiShippingHandle
                         }
                     }
                 }
-                sort($shippingMethodListFake);
+                if ($i == 1) {
+                    $validMethodCodeWithQuoteAddress = $shippingMethodListFake;
+                } else {
+                    if (!empty(array_diff($validMethodCodeWithQuoteAddress, $shippingMethodListFake)) || !empty(array_diff($shippingMethodListFake, $validMethodCodeWithQuoteAddress))) {
+                        $showEachItems = true;
+                    }
+                }
+
+                asort($validMethodList);
+                $validMethodList = array_values($validMethodList);
+                asort($shippingMethodList);
+                $shippingMethodList = array_values($shippingMethodList);
+                if (!in_array($preShippingMethod, $shippingMethodList) && !empty($shippingMethodList)) {
+                    $preShippingMethod = $shippingMethodList[0];
+                    $addressShippingMethod[$_address->getId()] = $preShippingMethod;
+                }
+                if (empty($shippingMethodListFake)) {
+                    $shippingMethodListFake[] = self::NOT_AVAILABLE;
+                    if ($this->mobile) {
+                        $validMethodList[] = self::NOT_AVAILABLE;
+                    } else {
+                        $validMethodList[] = $this->methodInterfaceFactory->create()->setMethodCode(self::NOT_AVAILABLE);
+                    }
+                }
                 foreach ($_address->getAllVisibleItems() as $item) {
                     if ($item instanceof \Magento\Quote\Model\Quote\Address\Item) {
                         $quoteItemId = $item->getQuoteItemId();
                     } else {
                         $quoteItemId = $item->getId();
                     }
-                    if (empty($shippingMethodListFake)) {
-                        $shippingMethodListFake[] = self::NOT_AVAILABLE;
+                    if ($this->mobile) {
+                        $itemsValidMethod[$quoteItemId] = $validMethodList;
+                    } else {
+                        $itemsValidMethod[$quoteItemId] = $this->itemInterfaceFactory->create()->setItemId($quoteItemId)->setValidMethod($validMethodList);
                     }
-                    $itemShippingMethod[$quoteItemId] = $shippingMethodListFake;
-                    if (!in_array($this->inputItemsFormatAfterHandle[$quoteItemId]['shipping_method'], $shippingMethodList)) {
-                        unset($addressShippingMethod[$_address->getId()]);
+                    if (!in_array($preShippingMethod, $shippingMethodList)) {
                         $data['error'] = true;
+                        $preShippingMethod = self::NOT_AVAILABLE;
+                    }
+
+                    if (!in_array($preShippingMethod, $shippingListFromQuoteAddress)) {
+                        $shippingListFromQuoteAddress[] = $preShippingMethod;
                     }
                 }
             }
         }
-        $data['data'] = $itemShippingMethod;
+
+        if (count($shippingListFromQuoteAddress) > 1) {
+            $showEachItems = true;
+        }
+        $data['show_each_items'] = $showEachItems;
+        $data['data'] = $itemsValidMethod;
         $data['addressEachItems']    = $this->addressEachItems;
         if (!empty($this->outStockByOar) || !empty($this->outStockByMagento)) {
             $data['out_stock'] = true;
@@ -200,7 +269,7 @@ class MultiShippingHandle
         $storePickUp = $additionalInfo->getStorePickUp();
         return [
             "store_pick_up" => [
-                "store_code" => ($storePickUp->getStore()) ? $storePickUp->getStore()->getSourceCode() : "",
+                "store_code" => ($storePickUp->getStore()) ? $storePickUp->getStore() : "",
                 "date" => $storePickUp->getDate(),
                 "time" => $storePickUp->getTime(),
             ],
@@ -326,11 +395,16 @@ class MultiShippingHandle
             }
             if ($shippingMethodSelected == self::STORE_PICK_UP) {
                 if (!in_array($quoteItemId, $this->outStockByMagento)) {
+                    if ($this->mobile) {
+                        $storeCode = ($storePickUp->getStore()) ? $storePickUp->getStore()->getSourceCode() : "";
+                    } else {
+                        $storeCode = ($storePickUp->getStore()) ? $storePickUp->getStore() : "";
+                    }
                     $storePickupOrder[][$quoteItemId] = [
                         'qty' => (isset($lowStockByMagento[$quoteItemId])) ? $lowStockByMagento[$quoteItemId] : $quoteItemIdSku[$quoteItemId]->getQty(),
                         'address' => $defaultShippingAddress,
                         'shipping_method' => $shippingMethodSelected,
-                        'store_pickup' => ($storePickUp->getStore()) ? $storePickUp->getStore()->getSourceCode() : "",
+                        'store_pickup' => $storeCode,
                         'split_store_code' => 0,
                     ];
                 }
@@ -354,7 +428,7 @@ class MultiShippingHandle
                     ];
                 }
                 $serviceType = str_replace("transshipping_transshipping", "", $shippingMethodSelected);
-                if (!isset($listMethod[$serviceType])) {
+                if (!isset($listMethod[$serviceType]) && $serviceType != self::NOT_SHIP && $serviceType != 0) {
                     $data['error'] = true;
                 }
                 $this->inputItemsFormatAfterHandle[$quoteItemId] = [
@@ -375,12 +449,23 @@ class MultiShippingHandle
         }
         $dataSendToOar = [];
         if (!empty($addressIds)) {
-            $addressCollection = $customer->getAddressesCollection()->addFieldToFilter('entity_id', ['in' => $addressIds]);
+            $addressCollection = $this->addressCollectionFactory->create()->addFieldToSelect('*')->addFieldToFilter('entity_id', ['in' => $addressIds]);
             $addressData       = $this->split->getAddressData($addressCollection);
+            $postCode = [];
+            if ($this->helperConfig->isActiveFulfillmentStore()) {
+                foreach ($addressData as $addressId => $address) {
+                    $postCode[$addressId] = $address['postcode'];
+                }
+                $enableShipping = $this->split->checkShippingPostCodeList($postCode);
+            }
             //$customerId        = $customer->getId();
             $merchantCode      = $this->getMerchantCode();
             $i = 1;
             foreach ($order as $addressId => $rateItem) {
+                $addressPostCode = '';
+                if ($this->helperConfig->isActiveFulfillmentStore() && isset($postCode[$addressId])) {
+                    $addressPostCode = $postCode[$addressId];
+                }
                 foreach ($rateItem as $serviceType => $item) {
                     $totalWeight                        = 0;
                     $totalQty                           = 0;
@@ -393,6 +478,18 @@ class MultiShippingHandle
                     $orderToSendOar['merchant_code']    = $merchantCode;
                     $orderToSendOar['destination']      = $addressData[$addressId];
                     foreach ($item as $quoteItemId => $qty) {
+                        if ($this->helperConfig->isActiveFulfillmentStore()) {
+                            if (!in_array($addressPostCode, $enableShipping)) {
+                                $storePickupOrder[][$quoteItemId] = [
+                                    'qty' => $qty,
+                                    'address' => $addressId,
+                                    'shipping_method' => self::NOT_SHIP,
+                                    'store_pickup' => '',
+                                    'split_store_code' => 0,
+                                ];
+                                continue;
+                            }
+                        }
                         $itemData    = $quoteItemIdSku[$quoteItemId];
                         $rowTotal    = (int) $itemData->getRowTotal();
                         $totalPrice += $rowTotal;
@@ -452,11 +549,15 @@ class MultiShippingHandle
                             }
                         }
                     }
+                    if ($this->helperConfig->isActiveFulfillmentStore()) {
+                        if (!in_array($addressPostCode, $enableShipping)) {
+                            continue;
+                        }
+                    }
                     $orderToSendOar["total_weight"] = (int) $totalWeight;
                     $orderToSendOar["total_price"]  = (int) $totalPrice;
                     $orderToSendOar["total_qty"]    = (int) $totalQty;
                     if ($orderToSendOar['destination']['district'] != ''
-                        && $this->checkShippingPostCode($orderToSendOar['destination']['postcode'])
                         && $orderToSendOar['destination']['latitude'] != 0
                         && $orderToSendOar['destination']['longitude'] != 0
                     ) {
@@ -506,6 +607,8 @@ class MultiShippingHandle
             $storeCode           = $orderDetail['store']['store_code'];
             $orderItems          = $orderDetail['items'];
             $orderShippingMethod = $this->getShippingListFromOrderSplit($orderDetail['shipping_list']);
+            asort($orderShippingMethod);
+            $orderShippingMethod = array_values($orderShippingMethod);
             foreach ($orderItems as $item) {
                 if (isset($item['sku']) && isset($item['quantity']) && (int) $item['quantity'] > 0) {
                     if (isset($splitOrderWithSku[$item['sku']])) {
@@ -566,6 +669,9 @@ class MultiShippingHandle
                         } else {
                             $this->hasNormal = true;
                         }
+                        if (!in_array($itemData['shipping_method'], $shippingList) && !empty($shippingList)) {
+                            $itemData['shipping_method'] = $shippingList[0];
+                        }
                         $itemAddToQuoteAddress = [
                             'qty' => $qty,
                             'address' => $itemData['shipping_address'],
@@ -623,6 +729,9 @@ class MultiShippingHandle
                             $this->hasFresh = true;
                         } else {
                             $this->hasNormal = true;
+                        }
+                        if (!in_array($itemAddToQuoteAddress['shipping_method'], $shippingList) && !empty($shippingList)) {
+                            $itemAddToQuoteAddress['shipping_method'] = $shippingList[0];
                         }
                         $childItemTotalQty = (int) $childItem->getQty() * $itemAddToQuoteAddress['qty'];
                         if ($childItemTotalQty <= (int) $itemFromOAR['quantity_allocated']) {
@@ -725,7 +834,7 @@ class MultiShippingHandle
             ) {
                 continue;
             }
-            $methodList[] = 'transshipping_transshipping' . $method['service_type'];
+            $methodList[$method['service_type']] = 'transshipping_transshipping' . $method['service_type'];
         }
         return $methodList;
     }
@@ -912,15 +1021,6 @@ class MultiShippingHandle
             $reload = true;
         }
         return ['reload' => $reload, 'quote_items_name' => $quoteItemsName];
-    }
-
-    /**
-     * @param $postCode
-     * @return bool
-     */
-    public function checkShippingPostCode($postCode)
-    {
-        return $this->split->checkShippingPostCode($postCode);
     }
 
     /**

@@ -6,7 +6,7 @@
  * Time: 5:55 PM
  */
 
-namespace SM\Checkout\Plugin\Checkout\Block;
+namespace SM\Checkout\Model;
 
 use Magento\Checkout\Model\Cart;
 use Magento\Customer\Api\AddressRepositoryInterface;
@@ -20,8 +20,17 @@ use SM\Checkout\Model\Split;
  * @package SM\Checkout\Plugin\Checkout\Block
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
-class Onepage
+class CheckoutProviderHandle
 {
+    const STORE_PICK_UP  = 'store_pickup_store_pickup';
+    const NOT_AVAILABLE  = 'transshipping_transshipping0';
+    const DEFAULT_METHOD = 'transshipping_transshipping1';
+    const SAME_DAY       = 'transshipping_transshipping2';
+    const SCHEDULE       = 'transshipping_transshipping3';
+    const NEXT_DAY       = 'transshipping_transshipping4';
+    const DC             = 'transshipping_transshipping5';
+    const TRANS_COURIER  = 'transshipping_transshipping6';
+
     protected $defaultLat;
     protected $defaultLng;
     protected $paymentFail = false;
@@ -231,12 +240,8 @@ class Onepage
      * @throws \Magento\Framework\Exception\LocalizedException
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    public function afterGetSerializedCheckoutConfig(
-        \SM\Checkout\Block\Onepage $subject,
-        $result
-    ) {
-        $fullUrl = $this->request->getRouteName() . '_' . $this->request->getControllerName() . '_' . $this->request->getActionName();
-        $data = $this->serializer->unserialize($result);
+    public function handle()
+    {
         $this->handleQuoteItems();
         $data['msi'] = $this->getSourcesList();
         $data['delivery_type'] = $this->deliveryType->getDeliveryType();
@@ -271,8 +276,7 @@ class Onepage
         $data['payment_fail'] = ($this->cartUpdate) ? false : $this->paymentFail;
         $data['is_virtual'] = $this->isVirtual;
         $data['apiKey'] = $this->helperConfig->getSecretKey();
-        $data['currentUrl'] = $fullUrl;
-        if ($data['is_virtual']) {
+        if ($this->isVirtual) {
             $this->checkoutSession->setDigital(true);
         }
         if ($this->helperConfig->isActiveFulfillmentStore()) {
@@ -281,7 +285,7 @@ class Onepage
         }
         $data['is_address_each_items'] = $this->isAddressEachItem;
         $data['currentItemsListId'] = implode(",", $this->currentItemsListId);
-        return $this->serializer->serialize($data);
+        return $data;
     }
 
     /**
@@ -499,6 +503,11 @@ class Onepage
             if ($countShippingQuoteAddress == 1 && $address->getShippingMethod() != \SM\Checkout\Model\MultiShippingHandle::STORE_PICK_UP) {
                 $this->preSelectSingleShippingMethod = $address->getShippingMethod();
             }
+            if ($this->preSelectSingleShippingMethod == self::DC) {
+                $this->preSelectSingleShippingMethod = self::DEFAULT_METHOD;
+            } elseif ($this->preSelectSingleShippingMethod == self::TRANS_COURIER) {
+                $this->preSelectSingleShippingMethod = self::SAME_DAY;
+            }
             $items = $this->getItemPreSelect($address, $allCustomerAddresses);
             $preSelectItems = $preSelectItems + $items;
         }
@@ -555,6 +564,11 @@ class Onepage
     {
         $items = [];
         $shippingMethod = $quoteAddress->getShippingMethod();
+        if ($shippingMethod == self::DC) {
+            $shippingMethod = self::DEFAULT_METHOD;
+        } elseif ($shippingMethod == self::TRANS_COURIER) {
+            $shippingMethod = self::SAME_DAY;
+        }
         foreach ($quoteAddress->getAllVisibleItems() as $item) {
             if (!isset($this->currentQuoteItems[$item->getQuoteItemId()]) || $this->currentQuoteItems[$item->getQuoteItemId()]->getQty() != $item->getQty()) {
                 $this->cartUpdate = true;

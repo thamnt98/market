@@ -30,36 +30,34 @@ class CustomerDevice extends \Magento\Framework\Model\ResourceModel\Db\AbstractD
 
     protected function _beforeSave(\Magento\Framework\Model\AbstractModel $object)
     {
-        if (
-            (
-                $object->getData('token') &&
-                $this->isNewMobileDevice($object->getData('device_id'), $object->getData('customer_id'))
-            ) ||
-            (
-                !$object->getData('token') &&
-                $this->isNewIP($object->getData('device_id'), $object->getData('customer_id'))
-            )
-        ) {
-            $object->setData(\SM\Customer\Model\CustomerDevice::NEW_DEVICE_KEY, true);
+        if ($this->isNewDevice($object->getData('device_id'), $object->getData('customer_id'))) {
+            if ($object->getData('type') !== \SM\Customer\Model\CustomerDevice::DESKTOP_TYPE) {
+                $object->setData(\SM\Customer\Model\CustomerDevice::NEW_DEVICE_KEY, true);
+            }
         }
 
         if ($object->getData('token')) {
-            $this->removeDuplicateToken($object->getData('device_id'), $object->getData('token'));
+            $this->removeDuplicateToken($object);
         }
 
         return parent::_beforeSave($object);
     }
 
     /**
-     * @param string $deviceId
-     * @param string $token
+     * @param \Magento\Framework\Model\AbstractModel $object
      */
-    protected function removeDuplicateToken($deviceId, $token)
+    protected function removeDuplicateToken(\Magento\Framework\Model\AbstractModel $object)
     {
+        $this->getConnection()
+            ->update(
+                self::TABLE_NAME,
+                ['status' => 0],
+                "device_id = '{$object->getData('device_id')}'"
+            );
         $this->getConnection()
             ->delete(
                 self::TABLE_NAME,
-                "token = '{$token}' OR device_id = '{$deviceId}'"
+                "customer_id = {$object->getData('customer_id')} AND device_id = '{$object->getData('device_id')}'"
             );
     }
 
@@ -69,40 +67,30 @@ class CustomerDevice extends \Magento\Framework\Model\ResourceModel\Db\AbstractD
      *
      * @return bool
      */
-    protected function isNewMobileDevice($deviceId, $customerId)
+    public function isNewDevice($deviceId, $customerId)
     {
-        $select = $this->getConnection()->select();
-        $select->from(self::TABLE_NAME, 'COUNT(id)')
-            ->where('type <> ?', \SM\Customer\Model\CustomerDevice::DESKTOP_TYPE)
-            ->where('customer_id = ?', $customerId);
+        if ($this->isFirstDevice($customerId)) {
+            return true;
+        } else {
+            $select = $this->getConnection()->select();
+            $select->from(self::TABLE_NAME, 'COUNT(id)')
+                ->where('customer_id = ?', $customerId)
+                ->where('device_id = ?', $deviceId);
 
-        if (!$this->getConnection()->fetchOne($select)) { // First device
-            return false;
+            return !$this->getConnection()->fetchOne($select);
         }
-
-        $select->where('device_id = ?', $deviceId);
-
-        return !$this->getConnection()->fetchOne($select);
     }
 
     /**
-     * @param string $ip
-     * @param int    $customerId
+     * @param int $customerId
      *
      * @return bool
      */
-    protected function isNewIP($ip, $customerId)
+    public function isFirstDevice($customerId)
     {
         $select = $this->getConnection()->select();
         $select->from(self::TABLE_NAME, 'COUNT(id)')
-            ->where('customer_id = ?', $customerId)
-            ->where('type = ?', \SM\Customer\Model\CustomerDevice::DESKTOP_TYPE);
-
-        if (!$this->getConnection()->fetchOne($select)) { // First IP
-            return false;
-        }
-
-        $select->where('device_id = ?', $ip);
+            ->where('customer_id = ?', $customerId);
 
         return !$this->getConnection()->fetchOne($select);
     }

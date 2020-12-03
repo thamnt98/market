@@ -19,9 +19,9 @@
         <plugin name="disable_dropdown_minicart_cartpage"
                 type="SM\Checkout\Plugin\Magento\Checkout\Block\Cart\Sidebar" disabled="true"/>
     </type>
-    <type name="SM\Checkout\Block\Onepage">
+<!--    <type name="SM\Checkout\Block\Onepage">
         <plugin name="sm_checkout_config" type="SM\Checkout\Plugin\Checkout\Block\Onepage"/>
-    </type>
+    </type>-->
 
     <type name="Magento\Checkout\CustomerData\ItemPool">
         <plugin name="sm_checkout_item_pool" type="SM\Checkout\Plugin\CustomerData\ItemPoolPlugin" />
