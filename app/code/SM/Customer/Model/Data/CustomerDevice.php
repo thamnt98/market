@@ -136,4 +136,24 @@ class CustomerDevice extends \Magento\Framework\DataObject implements \SM\Custom
 
         return $this;
     }
+
+    /**
+     * @return int
+     */
+    public function getStatus()
+    {
+        return (int) $this->getData(self::STATUS);
+    }
+
+    /**
+     * @param int $status
+     *
+     * @return $this
+     */
+    public function setStatus($status)
+    {
+        $this->setData(self::STATUS, (int) $status);
+
+        return $this;
+    }
 }

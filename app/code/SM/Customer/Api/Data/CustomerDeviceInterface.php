@@ -23,6 +23,10 @@ interface CustomerDeviceInterface extends \Magento\Framework\Api\ExtensibleDataI
     const CREATED_AT  = 'created_at';
     const TYPE        = 'type';
     const DEVICE_ID   = 'device_id';
+    const STATUS      = 'status';
+
+    const STATUS_ENABLE  = 1;
+    const STATUS_DISABLE = 0;
 
     /**
      * @return int
@@ -95,4 +99,16 @@ interface CustomerDeviceInterface extends \Magento\Framework\Api\ExtensibleDataI
      * @return $this
      */
     public function setDeviceId($deviceId);
+
+    /**
+     * @return int
+     */
+    public function getStatus();
+
+    /**
+     * @param int $status
+     *
+     * @return $this
+     */
+    public function setStatus($status);
 }

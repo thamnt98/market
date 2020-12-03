@@ -19,10 +19,11 @@
         <column comment="ID" identity="true" name="id"
                 nullable="false" padding="6" unsigned="true" xsi:type="smallint" />
         <column name="customer_id" xsi:type="int" padding="10" unsigned="true"
-                nullable="false" identity="false" />
-        <column name="device_id" length="255" nullable="false" xsi:type="varchar" />
-        <column name="type" length="255" nullable="true" xsi:type="varchar" />
-        <column name="token" length="255" nullable="true" xsi:type="varchar" />
+                nullable="false" identity="false" comment="Customer ID" />
+        <column name="device_id" length="255" nullable="false" xsi:type="varchar"  comment="Device ID" />
+        <column name="type" length="255" nullable="true" xsi:type="varchar"  comment="Device Type" />
+        <column name="token" length="255" nullable="true" xsi:type="varchar" comment="Token" />
+        <column name="status" nullable="false" xsi:type="boolean" default="1" comment="Status" />
         <constraint referenceId="PRIMARY" xsi:type="primary">
             <column name="id"/>
         </constraint>

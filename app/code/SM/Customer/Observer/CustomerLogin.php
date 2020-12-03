@@ -15,12 +15,12 @@
 
 namespace SM\Customer\Observer;
 
-class CustomerLogin implements \Magento\Framework\Event\ObserverInterface
+class CustomerLogin extends \SM\Notification\Observer\DeviceSaveAfter
 {
     /**
-     * @var \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress
+     * @var \Magento\Framework\App\RequestInterface
      */
-    protected $remoteAddress;
+    protected $request;
 
     /**
      * @var \SM\Customer\Model\CustomerDeviceFactory
@@ -33,60 +33,69 @@ class CustomerLogin implements \Magento\Framework\Event\ObserverInterface
     protected $deviceResource;
 
     /**
-     * @var \SM\Notification\Helper\Data
-     */
-    protected $notificationHelper;
-
-    /**
      * CustomerLogin constructor.
      *
-     * @param \SM\Notification\Helper\Data                         $notificationHelper
-     * @param \SM\Customer\Model\CustomerDeviceFactory             $deviceFactory
-     * @param \SM\Customer\Model\ResourceModel\CustomerDevice      $deviceResource
-     * @param \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
+     * @param \SM\Notification\Helper\Data                      $helper
+     * @param \Magento\Framework\Logger\Monolog                 $logger
+     * @param \Magento\Store\Model\App\Emulation                $emulation
+     * @param \Magento\Framework\App\RequestInterface           $request
+     * @param \SM\Notification\Model\EventSetting               $eventSetting
+     * @param \SM\Notification\Model\NotificationFactory        $modelFactory
+     * @param \SM\Notification\Model\ResourceModel\Notification $resource
+     * @param \SM\Customer\Model\CustomerDeviceFactory          $deviceFactory
+     * @param \SM\Customer\Model\ResourceModel\CustomerDevice   $deviceResource
      */
     public function __construct(
-        \SM\Notification\Helper\Data $notificationHelper,
+        \SM\Notification\Helper\Data $helper,
+        \Magento\Framework\Logger\Monolog $logger,
+        \Magento\Store\Model\App\Emulation $emulation,
+        \Magento\Framework\App\RequestInterface $request,
+        \SM\Notification\Model\EventSetting $eventSetting,
+        \SM\Notification\Model\NotificationFactory $modelFactory,
+        \SM\Notification\Model\ResourceModel\Notification $resource,
         \SM\Customer\Model\CustomerDeviceFactory $deviceFactory,
-        \SM\Customer\Model\ResourceModel\CustomerDevice $deviceResource,
-        \Magento\Framework\HTTP\PhpEnvironment\RemoteAddress $remoteAddress
+        \SM\Customer\Model\ResourceModel\CustomerDevice $deviceResource
     ) {
-        $this->remoteAddress = $remoteAddress;
+        parent::__construct($helper, $logger, $emulation, $eventSetting, $modelFactory, $resource);
+        $this->request = $request;
         $this->deviceFactory = $deviceFactory;
         $this->deviceResource = $deviceResource;
-        $this->notificationHelper = $notificationHelper;
     }
 
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
         /** @var \Magento\Customer\Model\Customer $customer */
         $customer = $observer->getEvent()->getData('customer');
-        $this->initDevice($customer->getId());
+        if ($this->deviceResource->isFirstDevice($customer->getId())) {
+            $this->initDevice($customer->getId());
+
+            return;
+        }
+
+        $params = json_decode($this->request->getContent(), true);
+        $browserCustomer = $params['device_customers'] ?? [];
+        if (!empty($browserCustomer) && in_array($customer->getId(), $browserCustomer)) {
+            return;
+        }
+
+        $this->createNotify($customer->getId());
     }
 
     /**
      * @param int $customerId
      */
-    public function initDevice($customerId)
+    protected function initDevice($customerId)
     {
-        if (!$this->notificationHelper->isApiRequest() && $this->remoteAddress->getRemoteAddress() !== false) {
-            /** @var \SM\Customer\Model\CustomerDevice $device */
-            $device = $this->deviceFactory->create();
-            $coll = $device->getCollection()
-                ->addFieldToFilter('customer_id', $customerId)
-                ->addFieldToFilter('device_id', $this->remoteAddress->getRemoteAddress());
-            if ($coll->getSize()) {
-                return;
-            }
+        /** @var \SM\Customer\Model\CustomerDevice $device */
+        $device = $this->deviceFactory->create();
+        $device->setData('customer_id', $customerId)
+            ->setData('device_id', \SM\Customer\Model\CustomerDevice::DESKTOP_TYPE)
+            ->setData('type', \SM\Customer\Model\CustomerDevice::DESKTOP_TYPE);
 
-            $device->setData('customer_id', $customerId)
-                ->setData('device_id', $this->remoteAddress->getRemoteAddress())
-                ->setData('type', \SM\Customer\Model\CustomerDevice::DESKTOP_TYPE);
-
-            try {
-                $this->deviceResource->save($device);
-            } catch (\Exception $e) {
-            }
+        try {
+            $this->deviceResource->save($device);
+        } catch (\Exception $e) {
+            $this->logger->error($e->getMessage(), $e->getTrace());
         }
     }
 }

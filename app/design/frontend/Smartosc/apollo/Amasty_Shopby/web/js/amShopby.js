@@ -319,13 +319,13 @@ define([
                 && element.name == 'amshopby[cat][]';
         },
         markAsSelected: function (checkbox) {
-            checkbox.closest('form').find('a').each(function () {
-                if (!$(this).siblings('input').prop("checked")) {
+            //checkbox.closest('form').find('a').each(function () {
+                if (!checkbox.prev('input[name^="amshopby"]').prop("checked")) {
                     $(this).removeClass('am_shopby_link_selected');
                 } else {
                     $(this).addClass('am_shopby_link_selected');
                 }
-            });
+            //});
         }
     });
 
@@ -998,7 +998,7 @@ define([
             $button.closest(self.options.selectors.parentSelector).find(self.options.selectors.filterItem).each(function () {
                 if (++count > self.options.numberUnfoldedOptions) {
                     hideCount++;
-                    $(this).hide();
+                    $(this).css('display', 'none');
                 }
             });
 

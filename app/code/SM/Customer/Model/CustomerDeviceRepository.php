@@ -62,10 +62,16 @@ class CustomerDeviceRepository implements \SM\Customer\Api\CustomerDeviceReposit
     protected $searchResultFactory;
 
     /**
+     * @var \Magento\Framework\Logger\Monolog
+     */
+    protected $logger;
+
+    /**
      * CustomerDeviceRepository constructor.
      *
-     * @param ResourceModel\CustomerDevice                                       $resource
      * @param CustomerDeviceFactory                                              $modelFactory
+     * @param ResourceModel\CustomerDevice                                       $resource
+     * @param \Magento\Framework\Logger\Monolog                                  $logger
      * @param \Magento\Framework\Api\DataObjectHelper                            $dataObjectHelper
      * @param ResourceModel\CustomerDevice\CollectionFactory                     $collectionFactory
      * @param \SM\Customer\Api\Data\CustomerDeviceInterfaceFactory               $dataModelFactory
@@ -74,8 +80,9 @@ class CustomerDeviceRepository implements \SM\Customer\Api\CustomerDeviceReposit
      * @param \Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface $collectionProcessor
      */
     public function __construct(
-        ResourceModel\CustomerDevice $resource,
         CustomerDeviceFactory $modelFactory,
+        ResourceModel\CustomerDevice $resource,
+        \Magento\Framework\Logger\Monolog $logger,
         \Magento\Framework\Api\DataObjectHelper $dataObjectHelper,
         ResourceModel\CustomerDevice\CollectionFactory $collectionFactory,
         \SM\Customer\Api\Data\CustomerDeviceInterfaceFactory $dataModelFactory,
@@ -91,6 +98,7 @@ class CustomerDeviceRepository implements \SM\Customer\Api\CustomerDeviceReposit
         $this->collectionProcessor = $collectionProcessor;
         $this->collectionFactory = $collectionFactory;
         $this->searchResultFactory = $searchResultFactory;
+        $this->logger = $logger;
     }
 
     /**
@@ -101,6 +109,7 @@ class CustomerDeviceRepository implements \SM\Customer\Api\CustomerDeviceReposit
      */
     public function save(\SM\Customer\Api\Data\CustomerDeviceInterface $device)
     {
+        $this->logger->info('--- Register device -----------------');
         /** @var CustomerDevice $model */
         $model = $this->modelFactory->create();
         $model->setData('customer_id', $device->getCustomerId())
@@ -110,8 +119,10 @@ class CustomerDeviceRepository implements \SM\Customer\Api\CustomerDeviceReposit
         try {
             $this->resource->save($model);
         } catch (\Exception $e) {
+            $this->logger->error($e->getMessage(), $e->getTrace());
             throw new CouldNotSaveException(__('Could not save the device: %1', $e->getMessage()));
         }
+        $this->logger->info('--- Register done -----------------');
 
         return $this->convertDataModel($model);
     }
@@ -181,10 +192,8 @@ class CustomerDeviceRepository implements \SM\Customer\Api\CustomerDeviceReposit
     public function delete(\SM\Customer\Api\Data\CustomerDeviceInterface $device)
     {
         try {
-            /** @var CustomerDevice $model */
-            $model = $this->modelFactory->create();
-            $this->resource->load($model, $device->getId());
-            $this->resource->delete($model);
+            $device->setStatus(\SM\Customer\Api\Data\CustomerDeviceInterface::STATUS_DISABLE);
+            $this->save($device);
         } catch (\Exception $exception) {
             throw new CouldNotDeleteException(__('Could not delete the Device: %1', $exception->getMessage()));
         }

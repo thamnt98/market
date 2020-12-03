@@ -110,7 +110,7 @@ class TransShipping extends AbstractCarrier implements CarrierInterface
      */
     public function collectRates(RateRequest $request)
     {
-        if (!$this->getConfigFlag('active')) {
+        if (!$this->getConfigFlag('active') || $request->getPreShippingMethod() == 'transshipping_transshipping') {
             return false;
         }
         $shippingMethodList = $this->getShippingMethodList($request);

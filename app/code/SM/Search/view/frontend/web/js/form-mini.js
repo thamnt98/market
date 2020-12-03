@@ -258,7 +258,7 @@ define(
         };
 
         mod.loadLatestViewedProduct = function() {
-            mod.latestViewed.hide();
+            //mod.latestViewed.hide();
             $.ajax({
                 type: "GET",
                 url: BASE_URL + 'reports/ajax/latestViewedProduct',
@@ -266,7 +266,7 @@ define(
                 success: function (response) {
                     if (response) {
                         mod.latestViewedContent.html(response);
-                        mod.latestViewed.show();
+                        //mod.latestViewed.show();
                     }
                 }
             });

@@ -499,8 +499,9 @@ define(
                 },
 
                 loginRequest: function (data) {
-                    var self = this;
+                    let self = this;
 
+                    data['device_customers'] = $.localStorage.get('cus-db');
                     $.ajax({
                         type: "POST",
                         url: self.options.loginUrl,
@@ -542,6 +543,7 @@ define(
                                     console.log("Debug! Can't login by wrong step.");
                                 }
                             } else {
+                                $.localStorage.set('cus-db', result.device_customers);
                                 if (step == 3) {
                                     $(document).trigger('customer:otp');
                                 }

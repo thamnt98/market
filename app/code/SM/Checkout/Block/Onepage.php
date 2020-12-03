@@ -52,6 +52,11 @@ class Onepage extends \Magento\Checkout\Block\Onepage
     protected $freshHelper;
 
     /**
+     * @var \SM\Checkout\Model\CheckoutProviderHandle
+     */
+    protected $checkoutProviderHandle;
+
+    /**
      * Onepage constructor.
      * @param Context $context
      * @param FormKey $formKey
@@ -64,6 +69,8 @@ class Onepage extends \Magento\Checkout\Block\Onepage
      * @param \Trans\LocationCoverage\Model\DistrictFactory $districtFactory
      * @param \Magento\Framework\Serialize\Serializer\Json|null $serializer
      * @param \Magento\Framework\Serialize\SerializerInterface|null $serializerInterface
+     * @param FreshHelper $freshHelper
+     * @param \SM\Checkout\Model\CheckoutProviderHandle $checkoutProviderHandle
      */
     public function __construct(
         Context $context,
@@ -75,9 +82,10 @@ class Onepage extends \Magento\Checkout\Block\Onepage
         \Magento\Framework\App\ResourceConnection $resourceConnection,
         \Trans\LocationCoverage\Model\CityFactory $cityFactory,
         \Trans\LocationCoverage\Model\DistrictFactory $districtFactory,
+        FreshHelper $freshHelper,
+        \SM\Checkout\Model\CheckoutProviderHandle $checkoutProviderHandle,
         \Magento\Framework\Serialize\Serializer\Json $serializer = null,
-        \Magento\Framework\Serialize\SerializerInterface $serializerInterface = null,
-        FreshHelper $freshHelper
+        \Magento\Framework\Serialize\SerializerInterface $serializerInterface = null
     ) {
         parent::__construct(
             $context,
@@ -95,6 +103,7 @@ class Onepage extends \Magento\Checkout\Block\Onepage
         $this->districtFactory = $districtFactory;
         $this->serializer = $serializer;
         $this->freshHelper = $freshHelper;
+        $this->checkoutProviderHandle = $checkoutProviderHandle;
     }
 
     /**
@@ -110,7 +119,9 @@ class Onepage extends \Magento\Checkout\Block\Onepage
      */
     public function getSerializedCheckoutConfig()
     {
-        $data = $this->getCheckoutConfig();
+        $data = $this->checkoutProviderHandle->handle();
+        $data['currentUrl'] = $this->getRequest()->getRouteName() . '_' . $this->getRequest()->getControllerName() . '_' . $this->getRequest()->getActionName();
+        $data = $data + $this->getCheckoutConfig();
         $customerAddressData = $data['customerData']['addresses'];
         $listPostCode = [];
         if ($this->helperConfig->isActiveFulfillmentStore()) {
