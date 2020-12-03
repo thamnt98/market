@@ -403,7 +403,11 @@ class StorePriceLogic implements StorePriceLogicInterface {
 					$indexW = 0;
 			
 					$product->addData(['base_price_in_kg' => '']);
+					$product->getResource()->saveAttribute($product, 'base_price_in_kg');
+
 					$product->addData(['promo_price_in_kg' => '']);
+					$product->getResource()->saveAttribute($product, 'promo_price_in_kg');
+
 					foreach ($productMapingData[$sku][$indexO] as $priceType => $priceValue) {
 						$productMapingData[$sku][$indexO][$indexW]['code'] = $priceType;
 						$productMapingData[$sku][$indexO][$indexW]['price'] = $priceValue;
@@ -419,14 +423,20 @@ class StorePriceLogic implements StorePriceLogicInterface {
 
 							if($priceInKg) {
 								$product->addData([$priceKgAttr => $priceInKg]);
+								$product->getResource()->saveAttribute($product, $priceKgAttr);
 							}
 						}
 
 						if($priceType == 'default_price'){
-							$productInterface[$index]->setPrice($priceValue);
+							// $productInterface[$index]->setPrice($priceValue);
+							$product->setPrice($priceValue);
+							$product->getResource()->saveAttribute($product, 'price');
+
 							$defaultPrice = $priceValue;
 						} else {
-							$productInterface[$index]->addData(array($priceType => $priceValue));
+							// $productInterface[$index]->addData(array($priceType => $priceValue));
+							$product->addData(array($priceType => $priceValue));
+							$product->getResource()->saveAttribute($product, $priceType);
 						}
 						$indexW++;
 					}
@@ -437,6 +447,7 @@ class StorePriceLogic implements StorePriceLogicInterface {
 					}
 					
 					$product->addData(['price_in_kg' => $isPriceInKg]);
+					$product->getResource()->saveAttribute($product, 'price_in_kg');
 					
 					$indexO++;
 					
@@ -516,7 +527,9 @@ class StorePriceLogic implements StorePriceLogicInterface {
 				}
 				
 				// Save Product Price
-				$this->productRepositoryInterface->save($productInterface[$index]);
+				// $this->productRepositoryInterface->save($productInterface[$index]);
+				// $this->productRepositoryInterface->save($product);
+				// $product->save();
 			} catch (\Exception $exception) {
 				$msgError[] =$exception->getMessage();
 				$this->updateDataValueStatus($value['data_id'], IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE, $exception->getMessage());
