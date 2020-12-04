@@ -235,6 +235,7 @@ class IntegrationStock implements IntegrationStockInterface {
 
 						if ($getIsFresh['value'] == 1) {
 							if ($getSoldIn['value'] == 'kg' || $getSoldIn['value'] == 'Kg' || $getSoldIn['value'] == 'KG') {
+								$quantity = $this->validation->validateArray(IntegrationStockInterface::IMS_QUANTITY, $dataStock);
 								$qtyCalc = ($quantity * 1000) / $getWeight['value'];
 								$quantity = floor($qtyCalc);
 							}
