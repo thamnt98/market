@@ -140,6 +140,29 @@ class StorePriceRepository implements StorePriceRepositoryInterface {
         }
 		return $getLastCollection;
 	}
+    
+    /**
+	 * @return string
+	 */
+	public function loadQueryBySkuNStore($sku="",$store="") {
+
+		if (empty($sku)) {
+			throw new StateException(__(
+				'Parameter Sku are empty !'
+			));
+		}
+		if(empty($store)){
+			throw new StateException(__(
+				'Parameter Store are empty !'
+			));
+		}
+		$collection = $this->collectionFactory->create();
+		$collection->addFieldToFilter(StorePriceInterface::SKU, $sku);
+		$collection->addFieldToFilter(StorePriceInterface::SOURCE_CODE, $store);
+        $collection->getSelect()->limit(1)->order('id desc');
+        return $collection->getSelect()->__toString();
+		
+	}
 
 	/**
 	 * {@inheritdoc}
@@ -251,6 +274,33 @@ class StorePriceRepository implements StorePriceRepositoryInterface {
 		return $result;
 
 	}
+    
+    /**
+     * @return string
+     */
+    public function getInventoryStoreListQuery($storeList = [])
+    {
+        $result = '';
+        if (empty($storeList) == false) {
+            $collection = $this->sourceInterface->create()->getCollection();
+            
+            $result = $collection
+                ->addFieldToSelect('source_code')
+                ->addFieldToSelect('name')
+                ->addFieldToSelect('latitude')
+                ->addFieldToSelect('longitude')
+                ->addFieldToSelect('country_id')
+                ->addFieldToSelect('region_id')
+                ->addFieldToSelect('region')
+                ->addFieldToSelect('city')
+                ->addFieldToSelect('email')
+                ->addFieldToSelect('phone')
+                ->addFieldToFilter('source_code',['in' => $storeList])
+                ->getSelect()
+                ->__toString();
+        }
+        return $result;
+    }
 
 	/**
 	 * Get Inventory Store collection
