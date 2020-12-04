@@ -26,6 +26,10 @@
             <payment_page>
                 <terms_conditions_mobile>56</terms_conditions_mobile>
             </payment_page>
+            <refund>
+                <allow_all>0</allow_all>
+                <store_codes_allow>10019</store_codes_allow>
+            </refund>
         </sm_help>
     </default>
 </config>

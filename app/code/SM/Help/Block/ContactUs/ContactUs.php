@@ -20,6 +20,7 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\View\Element\Template\Context;
+use Magento\InventoryApi\Api\Data\SourceItemInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Store\Model\ScopeInterface;
 use SM\Help\Api\Data\TopicInterface;
@@ -103,8 +104,12 @@ class ContactUs extends \Magento\Framework\View\Element\Template
     protected $sortOrderBuilder;
 
     /**
-     * Constructor
-     *
+     * @var \Magento\InventoryApi\Api\SourceRepositoryInterface
+     */
+    protected $sourceRepository;
+
+    /**
+     * ContactUs constructor.
      * @param \SM\Help\Model\Config $config
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param Data $imageHelper
@@ -118,6 +123,7 @@ class ContactUs extends \Magento\Framework\View\Element\Template
      * @param StoreCollectionFactory $storeCollectionFactory
      * @param SortOrderBuilder $sortOrderBuilder
      * @param SubOrderRepositoryInterface $subOrderRepository
+     * @param \Magento\InventoryApi\Api\SourceRepositoryInterface $sourceRepository
      * @param array $data
      */
     public function __construct(
@@ -134,6 +140,7 @@ class ContactUs extends \Magento\Framework\View\Element\Template
         StoreCollectionFactory $storeCollectionFactory,
         SortOrderBuilder $sortOrderBuilder,
         SubOrderRepositoryInterface $subOrderRepository,
+        \Magento\InventoryApi\Api\SourceRepositoryInterface $sourceRepository,
         array $data = []
     ) {
         $this->topicCollectionFactory = $topicCollectionFactory->create();
@@ -149,6 +156,7 @@ class ContactUs extends \Magento\Framework\View\Element\Template
         $this->subOrderRepository     = $subOrderRepository;
         parent::__construct($context, $data);
         $this->config = $config;
+        $this->sourceRepository = $sourceRepository;
     }
 
     /**
@@ -206,7 +214,26 @@ class ContactUs extends \Magento\Framework\View\Element\Template
      */
     public function getStoreLocation()
     {
-        return $this->storeCollectionFactory->create();
+        $useAllStores = (bool)$this->scopeConfig->getValue(
+            'sm_help/refund/allow_all',
+            ScopeInterface::SCOPE_STORE
+        );
+        if (!$useAllStores) {
+            $storeIds = $this->scopeConfig->getValue(
+                'sm_help/refund/store_codes_allow',
+                ScopeInterface::SCOPE_STORE
+            );
+            $storeIds = explode(',', $storeIds);
+            $searchCriteria = $this->searchCriteriaBuilder->addFilter(SourceItemInterface::SOURCE_CODE, ['in' => $storeIds])
+                ->addFilter('enabled', 1)
+                ->create();
+        } else {
+            $searchCriteria = $this->searchCriteriaBuilder->addFilter(SourceItemInterface::SOURCE_CODE, 'default', 'neq')
+                ->addFilter('enabled', 1)
+                ->create();
+        }
+        $sourceData = $this->sourceRepository->getList($searchCriteria);
+        return $sourceData->getItems();
     }
 
     /**

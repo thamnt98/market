@@ -628,6 +628,7 @@ class MultiShippingHandle
                                 'warehouse' => $orderDetail['warehouse'],
                                 'store_name' => $orderDetail['store']['store_name'],
                                 'spo_detail' => $orderDetail['warehouse'],
+                                'store' => $orderDetail['store']
                             ],
                         ];
                     }
@@ -1115,5 +1116,14 @@ class MultiShippingHandle
             $message = __('Unfortunately, some products are allocated in limited stock in your area. We have adjusted the quantity for you.');
         }
         return $message;
+    }
+
+    /**
+     * @param $postCode
+     * @return bool
+     */
+    public function checkShippingPostCode($postCode)
+    {
+        return $this->split->checkShippingPostCode($postCode);
     }
 }

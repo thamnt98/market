@@ -24,6 +24,16 @@
         </resources>
     </route>
 
+    <route url="/V1/homepage/message" method="GET">
+        <service class="SM\MobileApi\Api\HomeInterface" method="getGreetingMessage"/>
+        <resources>
+            <resource ref="self"/>
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+
     <!-- Product -->
     <route url="/V1/product/getProductById" method="GET">
         <service class="SM\MobileApi\Api\ProductInterface" method="getDetails"/>

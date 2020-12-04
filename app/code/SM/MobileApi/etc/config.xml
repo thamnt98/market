@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © 2015 Magento. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <sm_message>
+            <first_time_sign_in>
+                <first_time_message>Hi, %s Welcome to Transmart</first_time_message>
+            </first_time_sign_in>
+
+            <morning_sign_in>
+                <morning_message>Good morning, %s! Ready to shop</morning_message>
+            </morning_sign_in>
+
+            <afternoon_sign_in>
+                <afternoon_message>Good afternoon, %s! Let's shop</afternoon_message>
+            </afternoon_sign_in>
+
+            <after_week_sign_in>
+                <after_week_message>We miss you, %s! Welcome back.</after_week_message>
+            </after_week_sign_in>
+
+            <campaign>
+                <campaign_message>Don't miss the ongoing sale! Check out %s</campaign_message>
+            </campaign>
+
+            <random_message>
+                <message>%s, it's a good time to shop</message>
+            </random_message>
+        </sm_message>
+    </default>
+</config>

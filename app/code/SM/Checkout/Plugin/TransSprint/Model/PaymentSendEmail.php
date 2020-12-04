@@ -8,6 +8,7 @@ use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Address\Renderer;
 use SM\Email\Model\Email\Sender as EmailSender;
 use Trans\Sprint\Helper\Config;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
 class PaymentSendEmail
 {
@@ -46,6 +47,8 @@ class PaymentSendEmail
      */
     protected $emailHelper;
 
+    protected $timezone;
+
     /**
      * PaymentNotify constructor.
      *
@@ -54,6 +57,7 @@ class PaymentSendEmail
      * @param Renderer $addressRenderer
      * @param PriceHelper $priceHelper
      * @param \SM\Checkout\Helper\Email $emailHelper
+     * @param TimezoneInterface $timezone
      * @param \Magento\Framework\Logger\Monolog|null $logger
      */
     public function __construct(
@@ -62,6 +66,7 @@ class PaymentSendEmail
         Renderer $addressRenderer,
         PriceHelper $priceHelper,
         \SM\Checkout\Helper\Email $emailHelper,
+        TimezoneInterface $timezone,
         \Magento\Framework\Logger\Monolog $logger = null
     ) {
         $this->priceHelper = $priceHelper;
@@ -71,6 +76,7 @@ class PaymentSendEmail
         $this->logger = $logger;
         $this->emailSender = $emailSender;
         $this->paymentStatusCode = null;
+        $this->timezone = $timezone;
     }
 
     public function afterProcessingNotify(
@@ -194,7 +200,8 @@ class PaymentSendEmail
             "order" => $order,
             "order_total" => $this->getPrice($order->getGrandTotal()),
             "delivery_method" => $this->getDeliveryMethod($order->getShippingMethod(), $order->getShippingDescription()),
-            "formattedShippingAddress" => $this->getFormattedShippingAddress($order)
+            "formattedShippingAddress" => $this->getFormattedShippingAddress($order),
+            "order_created_at" => $this->formatTimeZone($order->getCreatedAt())
         ];
 
         $this->sendMailParam($order, $templateId, $sender, $templateVars);
@@ -304,5 +311,10 @@ class PaymentSendEmail
     public function getPrice($price)
     {
         return $this->priceHelper->currency($price, true, false);
+    }
+
+    protected function formatTimeZone($time)
+    {
+        return $this->timezone->date(strtotime($time))->format('d M Y | h:i A');
     }
 }
