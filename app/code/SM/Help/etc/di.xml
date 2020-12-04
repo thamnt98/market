@@ -19,6 +19,7 @@
     <preference for="SM\Help\Api\Data\SearchResultsInterface" type="SM\Help\Model\SearchResults"/>
     <preference for="SM\Help\Api\Data\SearchQuestionInterface" type="SM\Help\Model\SearchQuestion"/>
     <preference for="SM\Help\Api\ContactRepositoryInterface" type="SM\Help\Model\ContactRepository"/>
+    <preference for="SM\Help\Api\StoreRefundInterface" type="SM\Help\Model\StoreRefund"/>
 
     <!-- Ui Component -->
     <type name="Magento\Framework\View\Element\UiComponent\DataProvider\CollectionFactory">

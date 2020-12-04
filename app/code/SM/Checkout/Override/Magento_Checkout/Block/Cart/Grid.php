@@ -23,11 +23,6 @@ class Grid extends \Magento\Checkout\Block\Cart\Grid
     protected $itemCollection;
 
     /**
-     * @var bool
-     */
-    protected $isPagerDisplayed;
-
-    /**
      * @var int
      */
     protected $itemsCount;

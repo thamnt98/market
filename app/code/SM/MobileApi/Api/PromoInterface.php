@@ -12,6 +12,7 @@ interface PromoInterface
 {
     /**
      * @return \SM\MobileApi\Api\Data\Promo\PromoListingInterface[]
+     * @deprecated
      */
     public function getPromoListing();
 }

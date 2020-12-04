@@ -42,9 +42,9 @@
                         <item name="components" xsi:type="array">
                             <item name="notification_content" xsi:type="array">
                                 <!-- In Progress -->
-                                <item name="component" xsi:type="string">Magento_Theme/js/view/notification</item>
+                                <item name="component" xsi:type="string">SM_Notification/js/view/side-bar</item>
                                 <item name="config" xsi:type="array">
-                                    <item name="template" xsi:type="string">Magento_Theme/notification/content</item>
+                                    <item name="template" xsi:type="string">SM_Notification/view/side-bar</item>
                                     <!-- Render items -->
                                     <item name="itemRenderer" xsi:type="array">
                                         <item name="default" xsi:type="string">defaultRenderer</item>
@@ -117,7 +117,7 @@
                     <argument name="label" xsi:type="string" translate="true">My Reviews</argument>
                     <argument name="class" xsi:type="string">link my-reviews</argument>
                     <argument name="sortOrder" xsi:type="number">60</argument>
-                    <argument name="path" xsi:type="string">review/customer/list</argument>
+                    <argument name="path" xsi:type="string">review/customer/index</argument>
                 </arguments>
             </block>
 <!--            <block class="SM\Theme\Block\Account\Links" name="subscriptions-link">-->
