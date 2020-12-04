@@ -1,14 +1,31 @@
+/**
+ * SMCommerce
+ *
+ * @category    SM
+ * @package     SM_Notification
+ *
+ * Date: December, 02 2020
+ * Time: 5:17 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ */
 define([
     'uiComponent',
-    'Magento_Customer/js/model/customer',
+    'Magento_Customer/js/customer-data',
     'jquery',
     'ko',
-    'underscore',
     'mage/url',
-    'mage/storage',
-    'mage/translate',
-    'mage/dropdown',
-], function (Component, customer, $, ko, _, urlBuilder, storage) {
+    'mage/storage'
+], function (
+    Component,
+    customerData,
+    $,
+    ko,
+    urlBuilder,
+    storage
+) {
     'use strict';
 
     let notification = $('[data-block="notification"]');
@@ -34,21 +51,27 @@ define([
         orderStatusList       : ko.observable(false),
         updateList            : ko.observable(false),
         total                 : ko.observable(0),
-        orderStatusUnreadTotal: ko.observable(0),
-        updateUnreadTotal     : ko.observable(0),
+        orderStatusUnreadTotal: ko.observable(false),
+        updateUnreadTotal     : ko.observable(false),
         /**
          * @override
          */
         initialize: function () {
-            let self = this;
+            let self     = this,
+                customer = customerData.get('customer');
 
             $('[data-block="notification"]').on('contentLoading', function () {
                 self.isLoading(true);
             });
 
-            if (window.isLoggedIn) {
-                self.countUpdateUnread();
-                self.countOrderStatusUnread();
+            if (customer()['cus_id']) {
+                self.generateNewDevice(customer()['cus_id']);
+            } else {
+                customer.subscribe(function (data) { // Init total after load customer
+                    let cusId = data['cus_id'];
+
+                    self.generateNewDevice(cusId);
+                }, self);
             }
 
             return this._super();
@@ -167,17 +190,17 @@ define([
 
             url += "?searchCriteria[filter_groups][0][filters][0][field]=event&" +
                 "searchCriteria[filter_groups][0][filters][0][value]=order_status&" +
-                "searchCriteria[filter_groups][0][filters][0][condition_type]=eq";
+                "searchCriteria[filter_groups][0][filters][0][condition_type]=neq";
 
             storage.get(
                 url,
                 null,
                 false
             ).done(function (response) {
-                self.orderStatusUnreadTotal(response);
+                self.updateUnreadTotal(response);
                 self.updateTotal();
             }).fail(function () {
-                self.orderStatusUnreadTotal(0);
+                self.updateUnreadTotal(0);
                 self.updateTotal();
             });
         },
@@ -191,17 +214,17 @@ define([
 
             url += "?searchCriteria[filter_groups][0][filters][0][field]=event&" +
                 "searchCriteria[filter_groups][0][filters][0][value]=order_status&" +
-                "searchCriteria[filter_groups][0][filters][0][condition_type]=neq";
+                "searchCriteria[filter_groups][0][filters][0][condition_type]=eq";
 
             storage.get(
                 url,
                 null,
                 false
             ).done(function (response) {
-                self.updateUnreadTotal(response);
+                self.orderStatusUnreadTotal(response);
                 self.updateTotal();
             }).fail(function () {
-                self.updateUnreadTotal(0);
+                self.orderStatusUnreadTotal(0);
                 self.updateTotal();
             });
         },
@@ -334,6 +357,47 @@ define([
                 );
             } else {
                 return notify['content'];
+            }
+        },
+
+        generateNewDevice: function (customerId) {
+            if (!customerId) {
+                return;
+            }
+
+            let self             = this,
+                browserCustomers = $.localStorage.get('cus-db');
+
+            if (!browserCustomers || typeof browserCustomers !== 'object') {
+                browserCustomers = [];
+            }
+
+            let ids = browserCustomers.filter(function (id) {
+                return id == customerId;
+            });
+
+            if (!ids.length) { // Create notification login new device.
+                $.ajax(
+                    {
+                        url: urlBuilder.build('notification/index/createLoginNotify'),
+                        type: 'POST',
+                        data: {
+                            customer_id: customerId
+                        }
+                    }
+                ).done(
+                    function (response) {
+                        if (response.status) {
+                            browserCustomers.push(customerId);
+                            $.localStorage.set('cus-db', browserCustomers);
+                            self.countUpdateUnread();
+                            self.countOrderStatusUnread();
+                        }
+                    }
+                );
+            } else {
+                self.countUpdateUnread();
+                self.countOrderStatusUnread();
             }
         }
     });

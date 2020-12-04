@@ -6,10 +6,10 @@ use Magento\Review\Controller\Customer as CustomerController;
 use Magento\Framework\Controller\ResultFactory;
 
 /**
- * Class ListAction
+ * Class Index
  * @package SM\Review\Controller\Customer
  */
-class ListAction extends CustomerController
+class Index extends CustomerController
 {
     /**
      * Render my product reviews
@@ -21,7 +21,7 @@ class ListAction extends CustomerController
         /** @var \Magento\Framework\View\Result\Page $resultPage */
         $resultPage = $this->resultFactory->create(ResultFactory::TYPE_PAGE);
         if ($navigationBlock = $resultPage->getLayout()->getBlock('customer_account_navigation')) {
-            $navigationBlock->setActive('review/customer/list');
+            $navigationBlock->setActive('review/customer/index');
         }
         if ($block = $resultPage->getLayout()->getBlock('sm_review_customer_list')) {
             $block->setRefererUrl($this->_redirect->getRefererUrl());

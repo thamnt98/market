@@ -528,21 +528,22 @@ class Onepage
     }
 
     /**
-     * @param $quote
+     * @param \Magento\Quote\Model\Quote $quote
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function removeOldQuoteAddress($quote)
     {
+        return;
         $defaultShipping = $quote->getCustomer()->getDefaultShipping();
         $defaultCustomerAddress = $this->addressRepository->getById($defaultShipping);
         foreach ($quote->getAllShippingAddresses() as $address) {
             $quote->removeAddress($address->getId());
         }
         $shippingAddress = $quote->getShippingAddress();
-        $shippingAddress->importCustomerAddressData($defaultCustomerAddress);
+        $shippingAddress->setCollectShippingRates(false)->importCustomerAddressData($defaultCustomerAddress);
         $quote->getPayment()->setMethod(null);
         $quote->setData('service_fee', 0);
-        $this->cart->save($quote);
+        $this->quoteRepository->save($quote);
     }
 
     /**

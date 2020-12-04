@@ -4,24 +4,24 @@ namespace SM\Checkout\Model\Api\CheckoutWeb\AdditionalInfo;
 
 class StorePickUp extends \Magento\Framework\Api\AbstractExtensibleObject implements \SM\Checkout\Api\Data\CheckoutWeb\AdditionalInfo\StorePickUpInterface
 {
-    const STORE_CODE = 'store_code';
+    const STORE = 'store';
     const DATE = 'date';
     const TIME = 'time';
 
     /**
      * {@inheritdoc}
      */
-    public function setStoreCode($storeCode)
+    public function setStore($store)
     {
-        return $this->setData(self::STORE_CODE, $storeCode);
+        return $this->setData(self::STORE, $store);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getStoreCode()
+    public function getStore()
     {
-        return $this->_get(self::STORE_CODE);
+        return $this->_get(self::STORE);
     }
 
     /**

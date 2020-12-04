@@ -115,8 +115,10 @@ class Push extends AbstractConsumer
     protected function getDeviceTokens($customerId)
     {
         $result = [];
-        $searchCriteria = $this->searchCriteriaBuilder->addFilter('customer_id', $customerId)
+        $searchCriteria = $this->searchCriteriaBuilder
+            ->addFilter('customer_id', $customerId)
             ->addFilter('type', \SM\Customer\Model\CustomerDevice::DESKTOP_TYPE, 'neq')
+            ->addFilter('status', \SM\Customer\Api\Data\CustomerDeviceInterface::STATUS_ENABLE)
             ->create();
         $devices = $this->customerDeviceRepository->getList($searchCriteria)->getItems();
 

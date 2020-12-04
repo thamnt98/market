@@ -66,7 +66,6 @@ define([
                      */
                     cartCache.set('totals',null);
                     recollect(true);
-                    updateLabelSubtotalSelected();
                 }
 
                 if (response.reload === true) {
@@ -107,6 +106,7 @@ define([
                     const form = $("form[name='remove_selected_item']");
                     form.children('input[name="remove_ids"]').val(removeIds);
                     form.children('button').trigger('click');
+                    customerData.invalidate(['cart']);
                 },
                 cancel: function (){},
                 always: function (){}
@@ -173,7 +173,6 @@ define([
                      */
                     cartCache.set('totals',null);
                     recollect(true);
-                    updateLabelSubtotalSelected();
                     if (itemValue == 0) {
                         current.prop( "checked", false ).removeAttr('checked');
                     } else if (itemValue == 1) {
@@ -247,7 +246,6 @@ define([
 
                     // The totals summary block reloading
                     recollect(true);
-                    updateLabelSubtotalSelected();
 
                     var messages = $.cookieStorage.get('mage-messages');
                     if (!_.isEmpty(messages)) {
@@ -309,7 +307,6 @@ define([
                     // The totals summary block reloading
 
                     recollect(true);
-                    updateLabelSubtotalSelected();
                 },
                 error: function (xhr, status, error) {
                     let err = eval("(" + xhr.responseText + ")");
@@ -326,30 +323,9 @@ define([
     setInterval(function () {
         let text = $('.totals .sub >  .mark').html();
         if (text ==  $.mage.__('Subtotal')) {
-            updateLabelSubtotalSelected();
             $('.totals-tax').remove();
         }
     }, 1000);
-
-    /**
-     * update subtotal text
-     */
-    function updateLabelSubtotalSelected()
-    {
-        let i= 0;
-        $('.item-checked').each(function () {
-            if ($(this).is(":checked")) {
-                let id = $(this).attr('name');
-                let qty = parseInt($('#cart-qty-'+ id).val());
-                i +=  qty;
-            }
-        });
-        if (i <= 1) {
-            $('.totals .sub >  .mark').html('Subtotal <span class="totals-count-items">' + $.mage.__("(%1 item)").replace('%1', i) + '</span>');
-        } else {
-            $('.totals .sub >  .mark').html('Subtotal <span class="totals-count-items">' + $.mage.__("(%1 items)").replace('%1', i) + '</span>');
-        }
-    }
 
     function reloadPageAfterChangeAddress(response) {
         let customerMessages = customerData.get('messages')() || {},
