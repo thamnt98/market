@@ -44,13 +44,13 @@
     </group>
     <group id="pim_product_association">
         <job name="integration_pim_check_product_association" instance="Trans\IntegrationCatalog\Cron\Pim\Check\ProductAssociation" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_get_product_association" instance="Trans\IntegrationCatalog\Cron\Pim\Get\ProductAssociation" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_save_product_association" instance="Trans\IntegrationCatalog\Cron\Pim\Save\ProductAssociation" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>* 1 * * *</schedule>
         </job>
     </group>
      <group id="pim_product_digital">
