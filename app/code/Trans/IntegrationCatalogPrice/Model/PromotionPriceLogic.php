@@ -519,6 +519,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
         $check = [];
         $productInterface = [];
         $productReindexIds = [];
+        $dataMarkdown = [];
 
         try {
             foreach ($dataProduct as $sku => $data) {
@@ -539,7 +540,10 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                                 switch ($dataPass['promotion_type']) {
                                     // promotype = 1
                                     case 1:
-                                            $this->markdownFunction($dataPass);
+                                            $markdownFunction = $this->markdownFunction($dataPass);
+                                            if ($markdownFunction) {
+                                                $dataMarkdown[] = $markdownFunction;
+                                            }
                                         break;
 
                                     // promotype = 2
@@ -599,6 +603,18 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                 $index++;
             }
 
+            // save bulk markdown
+            try {
+                if ($dataMarkdown) {
+                    $connectionMarkdown = $this->resourceConnection->getConnection();
+                    
+                    $connectionMarkdown->insertOnDuplicate("catalog_product_entity_decimal", $dataMarkdown, ['value']);
+                    $this->logger->info('insertOnDuplicate success ' . date('d-M-Y H:i:s')); 
+                }
+            } catch (\Exception $e) {
+                $this->logger->info('insertOnDuplicate fail ' . date('d-M-Y H:i:s')); 
+            }
+            
             try {
                 if(!empty($productReindexIds)) {
                     $this->reindexByProductsIds($productReindexIds, ['catalog_product_attribute', 'catalogsearch_fulltext']);
@@ -709,7 +725,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                 // $checkIntPromoId = $this->checkIntegrationPromoByPromoId($dataPass['promotion_id']);
                 $checkIntPromoId = $this->checkIntegrationPromoSkuAndPromoType($dataPass);
 
-                if (!$checkIntPromoId) {
+                // if (!$checkIntPromoId) {
                     // Nested switch discount type
                     // data start time
                     // $startTime = $dataPass['from_date'].' '.$dataPass['from_time'];
@@ -764,9 +780,13 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                     // save to integration prom price table
                     $dataPass['name'] = $name;
                     if ($saveStagingUpdateStatus) {
-                        $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
+                        if (!$checkIntPromoId) {
+                            $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
+                        }
                     }
-                }
+                // }
+
+                    return $saveStagingUpdateStatus;
             }
             // --------------
         } catch (\Exception $e) {
@@ -2608,6 +2628,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             
             // save to special price
             $specialPriceCode = PromotionPriceLogicInterface::PRODUCT_ATTR_PROMO_PRICE.$param['store_attr_code'];
+            
             // $product->setCustomAttribute($specialPriceCode, $specialPrice);
 
             // $this->productRepositoryInterface->save($product);
@@ -2618,15 +2639,21 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             $getGetAttrIdPromoPrice = $connectionCheck->fetchRow($queryGetAttrIdPromoPrice);
 
             if (!empty($getGetAttrIdPromoPrice['attribute_id'])) {
-                $queryUpdatePromo = "UPDATE catalog_product_entity_decimal SET value = '" . $specialPrice . "' WHERE row_id = '" . $product->getRowId() . "' AND attribute_id = '".$getGetAttrIdPromoPrice['attribute_id']."'";
-                $connectionCheck->query($queryUpdatePromo);
-               
+                // $queryUpdatePromo = "UPDATE catalog_product_entity_decimal SET value = '" . $specialPrice . "' WHERE row_id = '" . $product->getRowId() . "' AND attribute_id = '".$getGetAttrIdPromoPrice['attribute_id']."'";
+                // $connectionCheck->query($queryUpdatePromo);
+
+                $dataMarkdown =
+                    [
+                        "attribute_id"=>"".$getGetAttrIdPromoPrice['attribute_id']."",
+                        "value"=>"".$specialPrice."",
+                        "row_id"=>"".$product->getRowId().""
+                    ];
             }
             else {
                 return false;
             }
 
-            return true;
+            return $dataMarkdown;
         } catch (\Exception $exception) {
             throw new StateException(
                 __(__FUNCTION__." - ".$exception->getMessage())
