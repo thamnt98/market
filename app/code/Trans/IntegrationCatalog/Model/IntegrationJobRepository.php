@@ -195,6 +195,7 @@ class IntegrationJobRepository implements IntegrationJobRepositoryInterface
         }
 
         if($collection->getSize()){
+            $collection->getSelect()->limit(1)->order('id desc');
             $data = $collection->getFirstItem();
         } else {
             throw new StateException(__('No catalog job data found.'));

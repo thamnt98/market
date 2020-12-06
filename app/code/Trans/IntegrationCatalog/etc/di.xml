@@ -41,7 +41,11 @@
     <preference for="Trans\IntegrationCatalog\Api\Data\IntegrationProductInterface"
                 type="Trans\IntegrationCatalog\Model\IntegrationProduct" />
     <preference for="Trans\IntegrationCatalog\Api\IntegrationProductLogicInterface"
-                type="Trans\IntegrationCatalog\Model\IntegrationProductLogic" />
+                type="Trans\IntegrationCatalog\Model\IntegrationProductSync" />
+
+    <!-- Product import logic test -->
+<!--     <preference for="Magento\CatalogImportExport\Model\Import\Product" 
+                type="Trans\IntegrationCatalog\Preference\ProductImport" /> -->
 
     <!-- Product Image -->
     <preference for="Trans\IntegrationCatalog\Api\IntegrationProductImageInterface"
@@ -81,6 +85,14 @@
             <!-- synch simple product data -->
             <argument name="commands" xsi:type="array">
                  <item name="Trans_IntegrationCatalog_Console_Pim_Save_Product" xsi:type="object">Trans\IntegrationCatalog\Console\Pim\Save\Product</item>
+            </argument>
+            <!-- synch check simple product data -->
+            <argument name="commands" xsi:type="array">
+                 <item name="Trans_IntegrationCatalog_Console_Pim_Check_Product" xsi:type="object">Trans\IntegrationCatalog\Console\Pim\Check\Product</item>
+            </argument>
+            <!-- synch get simple product data -->
+            <argument name="commands" xsi:type="array">
+                 <item name="Trans_IntegrationCatalog_Console_Pim_Get_Product" xsi:type="object">Trans\IntegrationCatalog\Console\Pim\Get\Product</item>
             </argument>
         </arguments>
     </type>

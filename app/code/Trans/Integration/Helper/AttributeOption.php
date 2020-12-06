@@ -170,6 +170,67 @@ class AttributeOption extends \Magento\Framework\App\Helper\AbstractHelper {
 	}
 
 	/**
+	 * Find or create a matching attribute option
+	 *
+	 * @param string $attributeCode Attribute the option should exist in
+	 * @param string $label Label to find or add
+	 * @return int
+	 * @throws \Magento\Framework\Exception\LocalizedException
+	 */
+	public function createOrGetValue($attributeCode, $label) {
+		if ($label) {
+			// Does it already exist?
+			$optionId = $this->getOptionId($attributeCode, $label);
+
+			if (!$optionId) {
+				// If no, add it.
+
+				/** @var \Magento\Eav\Model\Entity\Attribute\OptionLabel $optionLabel */
+				$optionLabel = $this->optionLabelFactory->create();
+				$optionLabel->setStoreId(1);
+				$optionLabel->setLabel($label);
+
+				$option = $this->optionFactory->create();
+				$option->setLabel((string) $label);
+				$option->setStoreLabels([$optionLabel]);
+				$option->setSortOrder(0);
+				$option->setIsDefault(false);
+				$option->setValue($label);
+
+				$this->attributeOptionManagement->add(
+					\Magento\Catalog\Model\Product::ENTITY,
+					$this->getAttribute($attributeCode)->getAttributeId(),
+					$option
+				);
+
+				// Get the inserted ID. Should be returned from the installer, but it isn't.
+				$optionId = $this->getOptionId($attributeCode, $label, true);
+				$attributeData = $this->eavConfig->getAttribute('catalog_product', $attributeCode);
+				$additionalDataSwatch = $attributeData->getAdditionalData();
+				$isSwatch = false;
+				
+				if ($additionalDataSwatch!=NULL && strpos($additionalDataSwatch,'swatch_input_type')==true){
+					$isSwatch = true;
+				}
+				
+				if ($isSwatch==true) {
+					$optionSwatchText = $this->swatchFactory->create();
+					$optionSwatchText->setOptionId($optionId);
+					$optionSwatchText->setStoreId(0);
+					$optionSwatchText->setType(0);
+					$optionSwatchText->setValue($label);
+
+					$this->resourceModelSwatch->save($optionSwatchText);
+				}
+			}
+		} else {
+			$optionId = NULL;
+		}
+
+		return $optionId;
+	}
+
+	/**
 	 * Find the ID of an option matching $label, if any.
 	 *
 	 * @param string $attributeCode Attribute code
@@ -180,7 +241,7 @@ class AttributeOption extends \Magento\Framework\App\Helper\AbstractHelper {
 	public function getOptionId($attributeCode, $label, $force = false) {
 		/** @var \Magento\Catalog\Model\ResourceModel\Eav\Attribute $attribute */
 		$attribute = $this->getAttribute($attributeCode);
-
+		
 		if ($force === true || !isset($this->attributeValues[$attribute->getAttributeId()][$label])) {
 			$this->attributeValues[$attribute->getAttributeId()] = [];
 

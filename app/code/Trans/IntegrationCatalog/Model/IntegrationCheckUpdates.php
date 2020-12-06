@@ -18,6 +18,8 @@ use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Exception\StateException;
 use Magento\Framework\Exception\NoSuchEntityException;
 
+use Magento\Framework\App\ResourceConnection;
+
 use Trans\Integration\Helper\Curl;
 
 use \Trans\Integration\Api\Data\IntegrationChannelInterface;
@@ -80,6 +82,16 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
 	protected $logger;
 
     /**
+     * @var \ResourceConnection
+     */
+    protected $resource;
+
+    /**
+     * @var \Magento\Framework\DB\Adapter\AdapterInterface
+     */
+    protected $connection;
+
+    /**
      * IntegrationCheckUpdates constructor.
      * @param Curl $curl
      * @param IntegrationChannelRepositoryInterface $channelRepository
@@ -87,6 +99,7 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
      * @param IntegrationJobRepositoryInterface $jobRepository
      * @param IntegrationJobInterfaceFactory $jobFactory
      * @param IntegrationCommonInterface $commonRepository
+     * @param ResourceConnection $resource
      */
     public function __construct(
         Curl $curl
@@ -95,6 +108,7 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
         ,IntegrationJobRepositoryInterface $jobRepository
         ,IntegrationJobInterfaceFactory $jobFactory
         ,IntegrationCommonInterface $commonRepository
+        ,ResourceConnection $resource
         ,IntegrationDataValueRepositoryInterface $datavalueRepository
         ,Logger $logger
 
@@ -105,6 +119,8 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
         $this->jobRepository=$jobRepository;
         $this->jobFactory=$jobFactory;
         $this->commonRepository=$commonRepository;
+        $this->resource = $resource;
+        $this->connection = $this->resource->getConnection();
         $this->datavalueRepository=$datavalueRepository;
         $this->logger = $logger;
 
@@ -292,8 +308,8 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
      * @return mixed
      * @throws StateException
      */
-    public function checkReadyJobs($channel){
-
+    public function checkReadyJobs($channel = [])
+    {
         if(!isset($channel['method'])){
             throw new StateException(
                 __(IntegrationCommonInterface::MSG_METHOD_NOTAVAILABLE)
@@ -302,7 +318,12 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
 
         try {
 
-            $channel['jobs'] = $this->jobRepository->getByMdIdWithStatus($channel['method']->getId(),IntegrationJobInterface::STATUS_READY);
+            $job = $this->jobRepository->getByMdIdWithStatus($channel['method']->getId(),IntegrationJobInterface::STATUS_READY);
+            $job->setPageSize(1);
+
+            $data = $job->getFirstItem();
+
+            $channel['jobs'] = $data;
 
         } catch (\Exception $ex) {
             throw new StateException(
@@ -608,9 +629,10 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
             $result[$i][IntegrationJobInterface::BATCH_ID]=$batchId;
             $result[$i][IntegrationJobInterface::LAST_JB_ID]=$data[IntegrationJobInterface::LAST_JB_ID];
             $result[$i][IntegrationJobInterface::OFFSET]=$no;
-            $this->jobRepository->saveJobs($result[$i]);
+            //$this->jobRepository->saveJobs($result[$i]);
             $no++;
         }
+        $this->saveRaw($result);
         return $result;
 
     }
@@ -647,11 +669,25 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
             $result[$i][IntegrationJobInterface::BATCH_ID]=$batchId;
             $result[$i][IntegrationJobInterface::LAST_JB_ID]=$data[IntegrationJobInterface::LAST_JB_ID];
             $result[$i][IntegrationJobInterface::OFFSET]=$result[$i][IntegrationJobInterface::LIMIT]*($no-1);
-            $this->jobRepository->saveJobs($result[$i]);
+            //$this->jobRepository->saveJobs($result[$i]);
             $no++;
         }
+        $this->saveRaw($result);
         return $result;
 
+    }
+
+    /**
+     * Save job with raw query
+     * @param  array  $datas
+     * @return int (number rows affected)
+     */
+    protected function saveRaw($datas = [])
+    {
+        if (!empty($datas)) {
+            $tableName = $this->resource->getTableName(IntegrationJobInterface::TABLE_NAME);
+            return $this->connection->insertMultiple($tableName, $datas);
+        }
     }
 
 

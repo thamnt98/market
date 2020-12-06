@@ -36,6 +36,7 @@ use Trans\IntegrationCatalog\Api\IntegrationJobRepositoryInterface;
 use Trans\IntegrationCatalog\Api\IntegrationProductLogicInterface;
 use Trans\IntegrationCatalog\Api\IntegrationProductRepositoryInterface;
 use Trans\IntegrationCategory\Api\IntegrationCategoryRepositoryInterface;
+use Trans\IntegrationCatalog\Model\ResourceModel\IntegrationDataValue;
 use Trans\Integration\Helper\AttributeOption;
 use Trans\Integration\Helper\Curl;
 use Trans\Integration\Helper\Validation;
@@ -48,7 +49,11 @@ use Magento\Catalog\Api\ProductAttributeManagementInterface;
 use Magento\Catalog\Api\Data\ProductAttributeInterfaceFactory;
 use Magento\Catalog\Api\ProductAttributeRepositoryInterface;
 
-class IntegrationProductLogic implements IntegrationProductLogicInterface {
+/**
+ * Class integrationProductSync
+ */
+class IntegrationProductSync implements IntegrationProductLogicInterface
+{
 	/**
 	 * @var IntegrationJobRepositoryInterface
 	 */
@@ -185,6 +190,16 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	protected $dataHelper;
 
 	/**
+	 * @var \Trans\IntegrationCatalog\Model\ProductImport
+	 */
+	protected $productImport;
+
+	/**
+	 * @var \Trans\IntegrationCatalog\Model\ResourceModel\IntegrationDataValue
+	 */
+	protected $dataValueResource;
+
+	/**
 	 * @var \Trans\IntegrationEntity\Model\IntegrationProductAttributeRepository
 	 */
 	protected $attributeSet;
@@ -221,6 +236,8 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	 * @param IntegrationProductAttributeRepositoryInterface
 	 * @param \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable\Attribute $attributeResource
 	 * @param \Trans\IntegrationCatalog\Helper\Data $dataHelper
+	 * @param \Trans\IntegrationCatalog\Model\ProductImport $productImport
+	 * @param \Trans\IntegrationCatalog\Model\ResourceModel\IntegrationDataValue $dataValueResource
 	 * @param \Trans\IntegrationEntity\Model\IntegrationProductAttributeRepository $attributeSet
 	 * @param \Trans\Brand\Api\BrandRepositoryInterface $brandRepository
 	 * @param \Trans\Brand\Api\Data\BrandInterface $brandFactory
@@ -254,6 +271,8 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		ProductAttributeManagementInterface $productAttributeManagement,
 		\Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable\Attribute $attributeResource,
 		\Trans\IntegrationCatalog\Helper\Data $dataHelper,
+		IntegrationDataValue $dataValueResource,
+		\Trans\IntegrationCatalog\Model\ProductImport $productImport,
 		\Trans\IntegrationEntity\Model\IntegrationProductAttributeRepository $attributeSet,
 		\Trans\Brand\Api\BrandRepositoryInterface $brandRepository,
 		\Trans\Brand\Api\Data\BrandInterfaceFactory $brandFactory
@@ -281,6 +300,8 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		$this->integrationDataValueInterfaceFactory = $integrationDataValueInterfaceFactory;
 		$this->integrationAttributeRepository = $integrationAttributeRepository;
 		$this->dataHelper = $dataHelper;
+		$this->dataValueResource = $dataValueResource;
+		$this->productImport = $productImport;
 		$this->attributeSet = $attributeSet;
 		$this->brandRepository = $brandRepository;
 		$this->brandFactory = $brandFactory;
@@ -306,21 +327,32 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	 * @param string $msg
 	 * @throw error 
 	 */
-	protected function updateJobData($jobId=0,$status="" , $msg=""){
-	
-		if ($jobId<1) {
+	protected function updateJobData($jobId = 0, $status = "", $msg = "", $startJob = "", $endJob = "")
+	{
+		if ($jobId < 1) {
 			throw new StateException(
 				__(IntegrationJobInterface::MSG_DATA_NOTAVAILABLE)
 			);
 		}
-		try{
+
+		try {
 			$dataJobs = $this->integrationJobRepositoryInterface->getById($jobId);
 			$dataJobs->setStatus($status);
+			
+			if($startJob) {
+				$dataJobs->setStartJob($startJob);
+			}
+
+			if($endJob) {
+				$dataJobs->setEndJob($endJob);
+			}
+
 			if(!empty($msg)){
 				$dataJobs->setMessages($msg);
-			}	
+			}
+
 			$this->integrationJobRepositoryInterface->save($dataJobs);
-		}catch (\Exception $exception) {
+		} catch (\Exception $exception) {
 			$this->logger->info(__FUNCTION__."------ ERROR ".$exception->getMessage());
 			throw new CouldNotSaveException(__("Error : Cannot Update Job data - ".$exception->getMessage()));
 		}
@@ -332,17 +364,19 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	 * @throws NoSuchEntityException
 	 * @throws StateException
 	 */
-	public function prepareData($channel = []) {
+	public function prepareData($channel = [])
+	{
 		if (empty($channel)) {
 			throw new StateException(__(
 				'Parameter Channel are empty !'
 			));
 		}
-		try{
-			$jobs      = $channel['jobs'];
-			$jobId     = $jobs->getFirstItem()->getId();
-			$jobStatus = $jobs->getFirstItem()->getStatus();
-			
+
+		$job = $channel['jobs'];
+		$jobId = $job->getId();
+		// $jobId     = 26053;
+		
+		try{	
 			$status    = IntegrationProductInterface::STATUS_JOB;
 			
 			$result = $this->integrationDataValueRepositoryInterface->getByJobIdWithStatus($jobId, $status);
@@ -351,7 +385,13 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			}
 			
 		} catch (\Exception $exception) {
-			$this->logger->info(__FUNCTION__."------ ERROR ".$exception->getMessage());
+			$msg = __FUNCTION__ . "------ " . $exception->getMessage() . ' $jobId: ' . $jobId;
+			$this->logger->info($msg);
+
+			if($job->getStatus() == IntegrationJobInterface::STATUS_READY) {
+				$this->updateJobData($jobId, IntegrationJobInterface::STATUS_PROGRES_UPDATE_FAIL, $msg);
+			}
+			
 			throw new StateException(__($exception->getMessage()));
 		}
 
@@ -361,74 +401,32 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	/**
 	 * @param Object Data Value Product
 	 */
-	public function saveProduct($datas, $jobData = null) {
-		
-		$checkData = array_filter($datas->getData());
-		if (empty($checkData)) {
+	public function saveProduct($datas, $jobData = null)
+	{	
+		if (!$datas->getSize()) {
 			throw new StateException(
 				__(IntegrationJobInterface::MSG_DATA_NOTAVAILABLE)
 			);
 		}
 		
-		$jobId    = $datas->getFirstItem()->getJbId();
-		$this->updateJobData($jobId,IntegrationJobInterface::STATUS_PROGRESS_CATEGORY);
+		$jobId = $jobData->getId();
+		// $jobId = 26053;
+		
+		$startJob = date('H:i:s');
+		$this->updateJobData($jobId, IntegrationJobInterface::STATUS_PROGRESS_CATEGORY, null, $startJob);
 
 		try {
 			$i = 0;
-			$objStatusMessage 	= [];
-			$dataProduct		= [];
-			$saveMagento		= [];
-			$deleted			= [];
-			$resultDataConfigurable=[];
+			$objStatusMessage = [];
+			$dataProduct = [];
+			$saveMagento = [];
+			$deleted = [];
+			$resultDataConfigurable = [];
 
-			foreach ($datas as $data) {
-			
-				$dataProduct[$i] = $this->validateProductDataValue($data);
-				
-				if(empty($dataProduct[$i]['sku']) || is_null($dataProduct[$i]['sku'])){
-					$msg="Error , SKU ARE EMPTY !!";
-					$this->logger->info($msg);
-					$this->saveStatusMessage($data, $msg, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
-					continue;
-				}
-				if(empty($dataProduct[$i]['pim_id']) || is_null($dataProduct[$i]['pim_id'])){
-					$msg="Error , PIM ID ARE EMPTY !!";
-					$this->logger->info($msg);
-					$this->saveStatusMessage($data, $msg, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
-					continue;
-				}
-				
-				if ($dataProduct[$i]['is_deleted']<1) {
-					
-					try {
-						$saveMagento[$i] = $this->saveDataToMagento($dataProduct[$i],$data);
-					} catch (StateException $e) {
-						$this->logger->info($e->getMessage());
-						continue;
-					} catch (\Exception $e) {
-						$this->logger->info($e->getMessage());
-						continue;
-					}
-					
-					if($saveMagento[$i]['entity_id']>0){
-						$integrationProductMap[$i] = $this->saveDataToIntegrationProduct($saveMagento[$i]['entity_id'],$dataProduct[$i],$data);
-					
-						if($saveMagento[$i]['is_configurable']>0){
-							$this->createIntegrationProductMapConfigurable($dataProduct[$i],$data);
-							$this->logger->info("Created configurable ".print_r($dataProduct[$i]['sku'],true));
-						}else{
-							$this->logger->info("Theres no configurable ".print_r($dataProduct[$i]['sku'],true));
-						}
-					}
-				}else{
-					$this->deleteProduct($dataProduct[$i],$data);
-				
-				}
-				$this->saveStatusMessage($data,NULL,IntegrationDataValueInterface::STATUS_DATA_SUCCESS);
-				// return $dataProduct[$i];
-				$i++;
-				
-			}
+			$this->productImport->syncProduct($datas);
+
+			$this->updateDataStatusByJobId($jobId, IntegrationDataValueInterface::STATUS_DATA_SUCCESS);
+
 		} catch (\Exception $exception) {
 			$msg = __FUNCTION__." ERROR : ".$exception->getMessage();
 			$this->logger->info($msg);
@@ -437,9 +435,31 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			throw new StateException(__($exception->getMessage()));
 		}
 
-		$this->updateJobData($jobId,IntegrationJobInterface::STATUS_COMPLETE);
+		$endJob = date('H:i:s');
+		$this->updateJobData($jobId, IntegrationJobInterface::STATUS_COMPLETE, null, null, $endJob);
 		return true;
 	}
+
+	/**
+	 * update data value status
+	 *
+	 * @param int $jobId
+	 * @param string $statusData
+	 * @return void
+	 */
+	protected function updateDataStatusByJobId($jobId, $statusData)
+	{
+		$connection = $this->dataValueResource->getConnection();
+		$tableName = $connection->getTableName(IntegrationDataValue::TABLE_DATA_VALUE);
+
+		$data['status'] = $statusData;
+
+		$connection->update(
+			$tableName,
+			$data,
+			['jb_id = ?' => (int)$jobId]
+		);
+	}	
 
 	/**
 	 * Validate Product Data Value
@@ -1798,7 +1818,4 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			);
 		}	
 	}
-
-
-
 }

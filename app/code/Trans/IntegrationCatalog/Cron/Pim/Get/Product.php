@@ -59,6 +59,9 @@ class Product {
 		$this->checkUpdates     = $checkUpdates;
 		$this->timezone			= $timezone;
 
+		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_product.log');
+        $logger = new \Zend\Log\Logger();
+        $this->logger = $logger->addWriter($writer);
 	}
 
 	/**
@@ -85,6 +88,8 @@ class Product {
 
 			$this->logger->info("=".$class." Set Parameter Request Data");
 			$data = $this->getUpdates->prepareCall($channel);
+
+			$this->logger->info(print_r($data, true));
 
 			$this->logger->info("=".$class." Sending Request Data to API");
 			$response = $this->commonRepository->get($data);

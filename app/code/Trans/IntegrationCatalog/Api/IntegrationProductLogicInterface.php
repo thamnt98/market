@@ -19,10 +19,11 @@ interface IntegrationProductLogicInterface {
 	 * Save data
 	 *
 	 * @param mixed $data
+	 * @param \Trans\IntegrationCatalog\Api\Data\IntegrationJobInterface|null $jobData
 	 * @return mixed
 	 * @throws \Magento\Framework\Exception\LocalizedException
 	 */
-	public function saveProduct($datas);
+	public function saveProduct($datas, $jobData = null);
 
 	/**
 	 * Prepare Data

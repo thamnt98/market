@@ -90,11 +90,29 @@ class IntegrationChannelRepository implements IntegrationChannelRepositoryInterf
             $data = $this->integrationChannelInterface->create();
             $this->resource->load($data, $id);
             if (!$data->getId()) {
-                throw new NoSuchEntityException(__('Requested Data Reservation Response doesn\'t exist'));
+                throw new NoSuchEntityException(__('Requested Data doesn\'t exist'));
             }
             $this->instances[$id] = $data;
         }
         return $this->instances[$id];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getByCode($code)
+    {
+        if (!isset($this->instances[$code])) {
+            /** @var \Trans\Integration\Api\Data\IntegrationChannelInterface|\Magento\Framework\Model\AbstractModel $data */
+            $data = $this->integrationChannelInterface->create();
+            $this->resource->load($data, $code, 'code');
+            
+            if (!$data->getId()) {
+                throw new NoSuchEntityException(__('Requested Data doesn\'t exist'));
+            }
+            $this->instances[$code] = $data;
+        }
+        return $this->instances[$code];
     }
 
     /**

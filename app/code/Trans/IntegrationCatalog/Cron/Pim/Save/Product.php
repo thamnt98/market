@@ -45,18 +45,22 @@ class Product {
     protected $checkUpdates;
 
 	public function __construct(
-		Logger $logger
-		,IntegrationCommonInterface $commonRepository
-		,IntegrationDataValueRepositoryInterface $dataValue
-		,IntegrationProductLogicInterface $integrationProductLogicInterface
-        ,IntegrationCheckUpdatesInterface $checkUpdates
+		Logger $logger,
+		IntegrationCommonInterface $commonRepository,
+		IntegrationDataValueRepositoryInterface $dataValue,
+		IntegrationProductLogicInterface $integrationProductLogicInterface,
+        IntegrationCheckUpdatesInterface $checkUpdates
 	) {
-		$this->logger                           = $logger;
-		$this->commonRepository                 = $commonRepository;
-		$this->dataValue                        = $dataValue;
+		$this->logger = $logger;
+		$this->commonRepository = $commonRepository;
+		$this->dataValue = $dataValue;
 		$this->integrationProductLogicInterface = $integrationProductLogicInterface;
-        $this->checkUpdates                     = $checkUpdates;
+        $this->checkUpdates = $checkUpdates;
 
+
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_product.log');
+        $logger = new \Zend\Log\Logger();
+        $this->logger = $logger->addWriter($writer);
 	}
 
 	/**
@@ -65,8 +69,9 @@ class Product {
 	 * @return void
 	 */
 	public function execute() {
-
-        $class = str_replace(IntegrationCheckUpdatesInterface::CRON_DIRECTORY,"",get_class($this));
+		$class = str_replace(IntegrationCheckUpdatesInterface::CRON_DIRECTORY,"",get_class($this));
+		$this->logger->info('===========================================');
+		$this->logger->info('Start ' . $class . ' ' . date('H:i:s'));
 		try {
 			$this->logger->info("=>".$class." Get Channel Data");
 			$channel = $this->commonRepository->prepareChannel('product');
@@ -76,18 +81,18 @@ class Product {
 
 			$this->logger->info("=".$class." Check Complete Jobs");
 			$channel = $this->checkUpdates->checkReadyJobs($channel);
-
+			
 			$this->logger->info("=".$class." Prepare Data");
 			$data = $this->integrationProductLogicInterface->prepareData($channel);
 			
 			$this->logger->info("=".$class." Save Data");
-			$response = $this->integrationProductLogicInterface->saveProduct($data);
+			$response = $this->integrationProductLogicInterface->saveProduct($data, $channel['jobs']);
 			
-
 		} catch (\Exception $ex) {
-
-			$this->logger->error("<=err".$class." ".$ex->getMessage());
+			$this->logger->info("<=err".$class." ".$ex->getMessage());
 		}
-		$this->logger->info("<=End".$class );
+
+		$this->logger->info('End ' . $class . ' ' . date('H:i:s'));
+		$this->logger->info('===========================================');
 	}
 }

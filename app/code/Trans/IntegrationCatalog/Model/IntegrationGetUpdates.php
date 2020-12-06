@@ -18,6 +18,8 @@ use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Exception\StateException;
 use Magento\Framework\Exception\NoSuchEntityException;
 
+use Magento\Framework\App\ResourceConnection;
+
 use Trans\Integration\Helper\Curl;
 use Trans\Integration\Api\IntegrationCommonInterface;
 
@@ -89,10 +91,21 @@ class IntegrationGetUpdates implements IntegrationGetUpdatesInterface
     protected $timezone;
 
     /**
+     * @var \ResourceConnection
+     */
+    protected $resources;
+
+    /**
+     * @var \Magento\Framework\DB\Adapter\AdapterInterface
+     */
+    protected $connection;
+
+    /**
      * @param integrationJobInterfaceFactory $integrationJobInterface
      */
     public function __construct(
         Curl $curl
+        ,ResourceConnection $resources
         ,IntegrationChannelRepositoryInterface $channelRepository
         ,IntegrationChannelMethodRepositoryInterface $methodRepository
         ,IntegrationJobRepositoryInterface $jobRepository
@@ -104,6 +117,8 @@ class IntegrationGetUpdates implements IntegrationGetUpdatesInterface
 
     ) {
         $this->curl=$curl;
+        $this->resources = $resources;
+        $this->connection = $this->resources->getConnection();
         $this->channelRepository=$channelRepository;
         $this->methodRepository=$methodRepository;
         $this->jobRepository=$jobRepository;
@@ -316,9 +331,10 @@ class IntegrationGetUpdates implements IntegrationGetUpdatesInterface
 
         try{
             if($data) {
-                foreach($data as $row) {
-                    $this->datavalueRepository->saveDataValue($row);
-                }
+                //foreach($data as $row) {
+                //    $this->datavalueRepository->saveDataValue($row);
+                //}
+                $this->saveDataValueRaw($data);
 
                 try {
                     $lastRow = end($data);
@@ -343,6 +359,19 @@ class IntegrationGetUpdates implements IntegrationGetUpdatesInterface
         $this->jobRepository->save($channel['waiting_jobs']);
         return "";
 
+    }
+
+    /**
+     * Save catalog data with raw query
+     * @param  array  $datas
+     * @return int (number rows affected)
+     */
+    public function saveDataValueRaw($datas = [])
+    {
+        if(empty($datas) == false) {
+            $tableName = $this->resources->getTableName(IntegrationDataValueInterface::TABLE_NAME);
+            return $this->connection->insertMultiple($tableName, $datas);
+        }
     }
 
     /**
