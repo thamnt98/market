@@ -347,10 +347,8 @@ class IntegrationProductSync implements IntegrationProductLogicInterface
 				$dataJobs->setEndJob($endJob);
 			}
 
-			if(!empty($msg)){
-				$dataJobs->setMessages($msg);
-			}
-
+			$dataJobs->setMessages($msg);
+			
 			$this->integrationJobRepositoryInterface->save($dataJobs);
 		} catch (\Exception $exception) {
 			$this->logger->info(__FUNCTION__."------ ERROR ".$exception->getMessage());
@@ -391,7 +389,7 @@ class IntegrationProductSync implements IntegrationProductLogicInterface
 			if($job->getStatus() == IntegrationJobInterface::STATUS_READY) {
 				$this->updateJobData($jobId, IntegrationJobInterface::STATUS_PROGRES_UPDATE_FAIL, $msg);
 			}
-			
+
 			throw new StateException(__($exception->getMessage()));
 		}
 
@@ -436,7 +434,7 @@ class IntegrationProductSync implements IntegrationProductLogicInterface
 		}
 
 		$endJob = date('H:i:s');
-		$this->updateJobData($jobId, IntegrationJobInterface::STATUS_COMPLETE, null, null, $endJob);
+		$this->updateJobData($jobId, IntegrationJobInterface::STATUS_COMPLETE, '', null, $endJob);
 		return true;
 	}
 
