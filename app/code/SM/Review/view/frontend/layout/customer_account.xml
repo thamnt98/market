@@ -11,7 +11,7 @@
         <referenceBlock name="customer_account_navigation">
             <block class="Magento\Customer\Block\Account\SortLinkInterface" name="sm-customer-account-navigation-product-reviews">
                 <arguments>
-                    <argument name="path" xsi:type="string">review/customer/index</argument>
+                    <argument name="path" xsi:type="string">review/customer/list</argument>
                     <argument name="label" xsi:type="string" translate="true">My Reviews</argument>
                     <argument name="sortOrder" xsi:type="number">700</argument>
                     <argument name="css_class" xsi:type="string">my-review</argument>

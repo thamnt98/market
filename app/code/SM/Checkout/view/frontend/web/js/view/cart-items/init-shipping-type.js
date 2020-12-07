@@ -856,7 +856,7 @@ define([
                     globalVar.disableGoPaymentButton(false);
                 }
                 if (response.stock_message != '') {
-                    $('body').append("<p id='stock-message'>" + response.stock_message + "</p>");
+                    $('.page.messages').append("<p id='stock-message' class='block-remark delivery-remark stock-message-notify'><span class=\'apl-tick-warning\'></span>" + response.stock_message + "</p>");
                     setTimeout(function()
                     {
                         $('#stock-message').remove();

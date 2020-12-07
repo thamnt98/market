@@ -222,6 +222,11 @@ define([
                         updateContainer.find("input[name='item_qty']").val(item.qty);
                         updateContainer.show();
                         addToCartForm.children('.action.tocart').hide();
+                        if (item.qty >= item.product_stock) {
+                            updateContainer.children('.increase-qty')
+                                .attr('disabled', 'disabled')
+                                .css("background", "grey")
+                        }
                     }
                 }
             });

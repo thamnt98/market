@@ -65,4 +65,12 @@ class Grid extends \Magento\Checkout\Block\Cart\Grid
 
         return $this->itemsCount;
     }
+
+    /**
+     * @return array|\Magento\Framework\DataObject[]
+     */
+    public function getItems()
+    {
+        return $this->getItemsForGrid()->getItems();
+    }
 }

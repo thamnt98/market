@@ -10,7 +10,7 @@ $review = $block->getReview();
 $product = $block->getProduct();
 ?>
 <div class="review-product">
-    <a href="<?= $block->getUrl('review/customer/index', ["tab" => "reviewed"]) ?>" class="back-myreview"><?= $block->escapeHtml(__('Back to My Reviews')) ?></a>
+    <a href="<?= $block->getUrl('review/customer/list', ["tab" => "reviewed"]) ?>" class="back-myreview"><?= $block->escapeHtml(__('Back to My Reviews')) ?></a>
     <div class="form-review">
         <?php
         /** @var \SM\Review\Block\Customer\Form\Detail $formBlock */

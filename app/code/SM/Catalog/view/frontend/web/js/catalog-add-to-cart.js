@@ -153,12 +153,14 @@ define([
                 } else {
                     updateQty = itemQty - 1;
                 }
-                form.find('input[name="item_qty"]').stop().val(updateQty);
+                let $qtyElement = form.find('input[name="item_qty"]').stop();
+                $qtyElement.val(updateQty);
                 formData.set('item_qty', updateQty.toString());
                 formAction = BASE_URL + 'checkout/sidebar/updateItemQty';
             } else {
                 formAction = form.attr('action');
-                form.find('input[name="item_qty"]').stop().val(1);
+                let $qtyElement = form.find('input[name="item_qty"]').stop();
+                $qtyElement.val(1);
             }
             // End Customize
             $.ajax({
@@ -235,7 +237,18 @@ define([
                             form.children('.action.tocart').hide();
                         }
                         updateCartQty.show();
-                    } else if (updateQty > 0) {
+                    }
+
+                    if (res.success === false && (res.qty || res.qty == 0)) {
+                        let $increaseButton = form.find('.increase-qty').stop();
+                        $increaseButton.attr('disabled', 'disabled');
+                        $increaseButton.css("background", "grey");
+
+                        if (typeof $qtyElement != "undefined") {
+                            $qtyElement.val(res.qty);
+                        } else {
+                            form.find('input[name="item_qty"]').stop().val(res.qty);
+                        }
                     }
                     loader.hide();
                     // End Customize

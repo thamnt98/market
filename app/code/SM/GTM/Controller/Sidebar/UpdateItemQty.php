@@ -7,8 +7,12 @@ use Magento\Checkout\Model\Sidebar;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Response\Http;
+use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Json\Helper\Data;
+use Magento\InventoryCatalog\Model\GetStockIdForCurrentWebsite;
+use Magento\InventorySalesApi\Api\GetProductSalableQtyInterface;
+use Magento\Quote\Api\Data\CartItemInterface;
 use Psr\Log\LoggerInterface;
 use SM\GTM\Model\ResourceModel\Basket\CollectionFactory;
 
@@ -40,12 +44,29 @@ class UpdateItemQty extends Action
     protected $basketCollectionFactory;
 
     /**
+     * @var GetStockIdForCurrentWebsite
+     */
+    protected $getStockIdForCurrentWebsite;
+
+    /**
+     * @var GetProductSalableQtyInterface
+     */
+    protected $getProductSalableQty;
+
+    /**
+     * @var float|int
+     */
+    protected $saleableQty;
+
+    /**
      * @param Context $context
      * @param Sidebar $sidebar
      * @param LoggerInterface $logger
      * @param Data $jsonHelper
      * @param CustomerCart $customerCart
      * @param CollectionFactory $basketCollectionFactory
+     * @param GetProductSalableQtyInterface $getProductSalableQty
+     * @param GetStockIdForCurrentWebsite $getStockIdForCurrentWebsite
      * @codeCoverageIgnore
      */
     public function __construct(
@@ -54,13 +75,17 @@ class UpdateItemQty extends Action
         LoggerInterface $logger,
         Data $jsonHelper,
         CustomerCart $customerCart,
-        CollectionFactory $basketCollectionFactory
+        CollectionFactory $basketCollectionFactory,
+        GetProductSalableQtyInterface $getProductSalableQty,
+        GetStockIdForCurrentWebsite $getStockIdForCurrentWebsite
     ) {
         $this->sidebar = $sidebar;
         $this->logger = $logger;
         $this->jsonHelper = $jsonHelper;
         $this->customerCart = $customerCart;
         $this->basketCollectionFactory = $basketCollectionFactory;
+        $this->getProductSalableQty = $getProductSalableQty;
+        $this->getStockIdForCurrentWebsite = $getStockIdForCurrentWebsite;
         parent::__construct($context);
     }
 
@@ -73,19 +98,20 @@ class UpdateItemQty extends Action
         $itemQty = $this->getRequest()->getParam('item_qty') * 1;
 
         try {
-            $this->sidebar->checkQuoteItem($itemId);
+            $item = $this->customerCart->getQuote()->getItemById($itemId);
+            $this->validateItem($item, $itemQty);
             $this->sidebar->updateQuoteItem($itemId, $itemQty);
 
             if ($this->jsonResponse()->isSuccess()) {
                 $message = __(
                     'You updated your shopping cart.'
                 );
-                $this->messageManager->addSuccessMessage($message);
+                //$this->messageManager->addSuccessMessage($message);
             } else {
                 $message = __(
                     'We can\'t update your shopping cart.'
                 );
-                $this->messageManager->addErrorMessage($message);
+                //$this->messageManager->addErrorMessage($message);
             }
 
             $items = $this->customerCart->getQuote() ? $this->customerCart->getQuote()->getAllVisibleItems() : null;
@@ -118,7 +144,69 @@ class UpdateItemQty extends Action
     protected function jsonResponse($error = '')
     {
         return $this->getResponse()->representJson(
-            $this->jsonHelper->jsonEncode($this->sidebar->getResponseData($error))
+            $this->jsonHelper->jsonEncode($this->getResponseData($error))
         );
+    }
+
+    /**
+     * Compile response data
+     *
+     * @param string $error
+     * @return array
+     */
+    protected function getResponseData($error = ''): array
+    {
+        if (empty($error)) {
+            $response = [
+                'success' => true,
+            ];
+        } else {
+            if ($this->saleableQty || $this->saleableQty = 0) {
+                $response = [
+                    'success' => false,
+                    'error_message' => $error,
+                    'qty' => $this->saleableQty
+                ];
+            } else {
+                $response = [
+                    'success' => false,
+                    'error_message' => $error
+                ];
+            }
+
+        }
+        return $response;
+    }
+
+    /**
+     * @param string $sku
+     * @return float|int
+     */
+    protected function getSaleableQty(string $sku)
+    {
+        $stockId = $this->getStockIdForCurrentWebsite->execute();
+        try {
+            return $this->getProductSalableQty->execute($sku, $stockId);
+        } catch (InputException | LocalizedException $e) {
+            return 0;
+        }
+    }
+
+    /**
+     * @param $item
+     * @param float $itemQty
+     * @throws \Exception
+     */
+    protected function validateItem($item, float $itemQty)
+    {
+        if (!$item instanceof CartItemInterface) {
+            throw new LocalizedException(__("The quote item isn't found. Verify the item and try again."));
+        }
+
+        $saleableQty = $this->getSaleableQty($item->getSku());
+        $this->saleableQty = $saleableQty;
+        if ($saleableQty < $itemQty || $saleableQty == 0) {
+            throw new \Exception(__('Sorry, you have reached the maximum number of items for this product.'));
+        }
     }
 }
