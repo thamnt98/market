@@ -117,7 +117,7 @@
                     <argument name="label" xsi:type="string" translate="true">My Reviews</argument>
                     <argument name="class" xsi:type="string">link my-reviews</argument>
                     <argument name="sortOrder" xsi:type="number">60</argument>
-                    <argument name="path" xsi:type="string">review/customer/index</argument>
+                    <argument name="path" xsi:type="string">review/customer/list</argument>
                 </arguments>
             </block>
 <!--            <block class="SM\Theme\Block\Account\Links" name="subscriptions-link">-->

@@ -21,7 +21,7 @@ class Edit extends CustomerController
         /** @var \Magento\Framework\View\Result\Page $resultPage */
         $resultPage = $this->resultFactory->create(ResultFactory::TYPE_PAGE);
         if ($navigationBlock = $resultPage->getLayout()->getBlock('customer_account_navigation')) {
-            $navigationBlock->setActive('review/customer/index');
+            $navigationBlock->setActive('review/customer/list');
         }
         if ($block = $resultPage->getLayout()->getBlock('sm_review_customer_edit')) {
             $block->setRefererUrl($this->_redirect->getRefererUrl());

@@ -331,8 +331,8 @@ class ProductDataMapper
         $baseAttr = CustomerPrice::PREFIX_OMNI_NORMAL_PRICE . $code;
         $specialAttr = CustomerPrice::PREFIX_OMNI_FINAL_PRICE . $code;
         $this->result[$productId][$discountCode] = $this->prepareDiscountValue(
-            (float)$this->result[$productId][$baseAttr],
-            (float)$this->result[$productId][$specialAttr] ?? 0
+            (int)$this->result[$productId][$baseAttr],
+            (int)$this->result[$productId][$specialAttr] ?? 0
         );
     }
 
@@ -361,8 +361,8 @@ class ProductDataMapper
                     $returnId ?: $childrenId
                 );
 
-                $price = (float)($min['price'] ?? 0);
-                $special = (float)($min['special'] ?? 0);
+                $price = (int)($min['price'] ?? 0);
+                $special = (int)($min['special'] ?? 0);
             } else {
                 $price = $this->getPrice($childrenId, $baseAttr);
                 $special = $this->getPrice($childrenId, $specialAttr, true);
@@ -399,7 +399,7 @@ class ProductDataMapper
      */
     protected function getPrice($productId, $priceCode, $isSpecial = false)
     {
-        $price = (float)($this->productRawData[$productId][$priceCode] ?? 0);
+        $price = (int)($this->productRawData[$productId][$priceCode] ?? 0);
 
         if (!$price) {
             if ($isSpecial) {
@@ -409,13 +409,13 @@ class ProductDataMapper
                     $priceCode
                 );
 
-                $price = (float)($this->productRawData[$productId][$basePriceCode] ?? 0);
+                $price = (int)($this->productRawData[$productId][$basePriceCode] ?? 0);
 
                 if (!$price) {
-                    $price = (float)($this->productRawData[$productId]['special_price'] ?? 0);
+                    $price = (int)($this->productRawData[$productId]['special_price'] ?? 0);
                 }
             } else {
-                $price = (float)($this->productRawData[$productId]['price'] ?? 0);
+                $price = (int)($this->productRawData[$productId]['price'] ?? 0);
             }
         }
 
@@ -431,8 +431,8 @@ class ProductDataMapper
     protected function prepareDiscountValue($basePrice, $promoPrice)
     {
         $result = null;
-        $basePrice = (float)$basePrice;
-        $promoPrice = (float)$promoPrice;
+        $basePrice = (int)$basePrice;
+        $promoPrice = (int)$promoPrice;
         if (!empty($promoPrice) && !empty($basePrice) && $basePrice > $promoPrice) {
             $result = ceil(($basePrice - $promoPrice) * 100 / $basePrice);
         }
@@ -513,7 +513,7 @@ class ProductDataMapper
             ['entity_id', 'type_id']
         )->joinLeft(
             ['i' => 'inventory_source_item'],
-            "p.sku = i.sku and i.status = 1 and i.source_code <> 'default'",
+            "p.sku = i.sku AND i.status = 1 AND i.source_code <> 'default' AND i.quantity > 0",
             'count(i.source_item_id) as source'
         )->where(
             'entity_id IN (?)',

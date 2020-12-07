@@ -173,6 +173,8 @@
                 type="SM\Checkout\Plugin\Quote\Model\Quote\Item" />
     </type>
 
+    <preference for="\SM\Checkout\Api\CartTotalRepositoryInterface" type="\SM\Checkout\Model\Cart\CartTotalRepository" />
+
     <!-- *************************** Plugins ********************************** -->
     <!-- Trans -->
     <type name="Trans\Sprint\Model\Total\ServiceFee">

@@ -31,7 +31,13 @@ class Customer extends Session
      */
     protected $tokenUserContext;
 
+    /**
+     * @var \Magento\Eav\Model\Config
+     */
+    protected $eavConfig;
+
     public function __construct(
+        \Magento\Eav\Model\Config $eavConfig,
         \Magento\Framework\App\Request\Http $request,
         \Magento\Framework\Session\SidResolverInterface $sidResolver,
         \Magento\Framework\Session\Config\ConfigInterface $sessionConfig,
@@ -67,6 +73,7 @@ class Customer extends Session
         $this->state              = $state;
         $this->tokenUserContext   = $tokenUserContext;
         $this->customerRepository = $customerRepository;
+        $this->eavConfig = $eavConfig;
     }
 
     /**
@@ -107,9 +114,16 @@ class Customer extends Session
             $omni_store_id = $this->getCustomerData()->getCustomAttribute(\SM\CustomPrice\Model\Customer::OMNI_STORE_ID);
 
         }
+
         if (!empty($omni_store_id)) {
-            return $omni_store_id->getValue();
+            $basePriceCode = \SM\CustomPrice\Model\Customer::PREFIX_OMNI_NORMAL_PRICE . $omni_store_id->getValue();
+            $basePriceAttr = $this->eavConfig->getAttribute(\Magento\Catalog\Model\Product::ENTITY, $basePriceCode);
+
+            if ($basePriceAttr && $basePriceAttr->getId()) {
+                return $omni_store_id->getValue();
+            }
         }
+
         return $this->getDefaultOmniStoreCode();
     }
 

@@ -221,7 +221,7 @@ class Post extends ProductController implements HttpPostActionInterface
         $part = explode("/", $this->_redirect->getRefererUrl());
         if (isset($part[4])) {
             if ($part[4] == "customer") {
-                return $this->_url->getUrl("review/customer/index", ["tab" => "reviewed"]);
+                return $this->_url->getUrl("review/customer/list", ["tab" => "reviewed"]);
             }
         }
         return $this->_redirect->getRefererUrl();
@@ -235,7 +235,7 @@ class Post extends ProductController implements HttpPostActionInterface
         $part = explode("/", $this->_redirect->getRefererUrl());
         if (isset($part[4])) {
             if ($part[4] == "customer") {
-                return $this->_url->getUrl("review/customer/index");
+                return $this->_url->getUrl("review/customer/list");
             }
         }
         return $this->_redirect->getRefererUrl();

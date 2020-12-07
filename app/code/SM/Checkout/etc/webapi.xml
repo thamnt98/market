@@ -233,4 +233,15 @@
             <parameter name="cartId" force="true">%cart_id%</parameter>
         </data>
     </route>
+
+    <!-- Managing My Cart Total -->
+    <route url="/V1/trans-checkout/cart/totals" method="GET">
+        <service class="SM\Checkout\Api\CartTotalRepositoryInterface" method="get"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
 </routes>

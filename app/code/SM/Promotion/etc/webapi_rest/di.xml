@@ -19,7 +19,7 @@
         <plugin name="SM_Promotion::OverrideAmastyAutoAdd"
                 type="SM\Promotion\Plugin\MagentoQuote\Model\Quote\TotalsCollector" />
     </type>
-    <type name="\Magento\Quote\Api\CartTotalRepositoryInterface">
+    <type name="\SM\Checkout\Api\CartTotalRepositoryInterface">
         <plugin name="sm_promotion_rule_suggestion_plugin"
                 type="\SM\Promotion\Plugin\AmastyRules\Model\Cart\CartTotalRepository" sortOrder="60"/>
     </type>
