@@ -10,25 +10,57 @@ namespace SM\Checkout\Plugin\Magento\Checkout\Block;
 
 class Cart
 {
+    protected $items;
+
     /**
-     * @param \Magento\Checkout\Block\Cart      $subject
-     * @param \Magento\Quote\Model\Quote\Item[] $result
+     * @param \Magento\Checkout\Block\Cart $subject
+     * @param callable                     $proceed
      *
-     * @return mixed
+     * @return \Magento\Quote\Model\Quote\Item[]
      */
-    public function afterGetItems($subject, $result)
+    public function aroundGetItems(\Magento\Checkout\Block\Cart $subject, callable $proceed)
     {
-        /** @var \Magento\Quote\Model\Quote\Item $item */
-        foreach ($result as $key => $item) {
-            if ($item->getParentItemId() ||
-                $item->isDeleted() ||
-                ($subject->getQuote()->getIsVirtual() && !$item->getIsVirtual()) ||
-                (!$subject->getQuote()->getIsVirtual() && $item->getIsVirtual())
-            ) {
-                unset($result[$key]);
-            }
+        if (!$this->items) {
+            $this->initItems($subject);
         }
 
-        return $result;
+        return $this->items;
     }
+
+    /**
+     * @param \Magento\Checkout\Block\Cart $subject
+     * @param callable                     $proceed
+     *
+     * @return int
+     */
+    public function aroundGetItemsCount(\Magento\Checkout\Block\Cart $subject, callable $proceed)
+    {
+        if (!$this->items) {
+            $this->initItems($subject);
+        }
+
+        return count($this->items);
+    }
+
+    protected function initItems(\Magento\Checkout\Block\Cart $cart)
+    {
+        if ($cart->getCustomItems()) {
+            $this->items = $cart->getCustomItems() ?: [];
+        } else {
+            $this->items = [];
+            /** @var \Magento\Quote\Model\Quote\Item $item */
+            foreach ($cart->getQuote()->getItemsCollection() as $key => $item) {
+                if ($item->getParentItemId() ||
+                    $item->isDeleted() ||
+                    ($cart->getQuote()->getIsVirtual() && !$item->getIsVirtual()) ||
+                    (!$cart->getQuote()->getIsVirtual() && $item->getIsVirtual())
+                ) {
+                    continue;
+                }
+
+                $this->items[] = $item;
+            }
+        }
+    }
+
 }

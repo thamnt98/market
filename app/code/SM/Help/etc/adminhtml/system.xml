@@ -114,6 +114,18 @@
                     <source_model>SM\Help\Model\Config\Source\Topic</source_model>
                 </field>
             </group>
+            <group id="refund" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
+                <label>Refund Store Config</label>
+                <field id="allow_all" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1"
+                       showInStore="0">
+                    <label>Enable All Store</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="store_codes_allow" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
+                    <label>Store Code List Refund</label>
+                    <comment><![CDATA[Store Code list will be used to refund product if "Enable All Store" is No]]></comment>
+                </field>
+            </group>
         </section>
     </system>
 </config>

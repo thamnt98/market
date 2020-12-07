@@ -8,6 +8,7 @@ use SM\HeroBanner\Model\Banner;
 use SM\MobileApi\Api\HomeInterface;
 use SM\MobileApi\Api\ProductInterface;
 use SM\MobileApi\Model\Data\Slider\HomeSliderFactory;
+use SM\MobileApi\Model\HomepageMessage;
 
 /**
  * Class HomePage
@@ -17,30 +18,59 @@ class HomePage implements HomeInterface
 {
     const XML_PATH_MOST_POPULAR_HOME_PAGE  = 'sm_mobile/mobile_homepage/most_popular';
 
+    /**
+     * @var HomeSliderFactory
+     */
     protected $homeSlider;
 
+    /**
+     * @var ScopeConfigInterface
+     */
     protected $scopeConfig;
 
+    /**
+     * @var ProductInterface
+     */
     protected $productInterface;
 
+    /**
+     * @var CollectionFactory
+     */
     protected $categoryCollection;
+
     /**
      * @var Banner
      */
     protected $banner;
 
+    /**
+     * @var HomepageMessage
+     */
+    protected $greetingMessage;
+
+    /**
+     * HomePage constructor.
+     * @param HomeSliderFactory $homeSliderFactory
+     * @param ScopeConfigInterface $scopeConfig
+     * @param ProductInterface $product
+     * @param CollectionFactory $categoryCollection
+     * @param Banner $banner
+     * @param HomepageMessage $homepageMessage
+     */
     public function __construct(
         HomeSliderFactory $homeSliderFactory,
         ScopeConfigInterface $scopeConfig,
         ProductInterface $product,
         CollectionFactory $categoryCollection,
-        Banner $banner
+        Banner $banner,
+        HomepageMessage $homepageMessage
     ) {
         $this->homeSlider         = $homeSliderFactory;
         $this->scopeConfig        = $scopeConfig;
         $this->productInterface   = $product;
         $this->categoryCollection = $categoryCollection;
         $this->banner             = $banner;
+        $this->greetingMessage    = $homepageMessage;
     }
 
     /**
@@ -66,5 +96,13 @@ class HomePage implements HomeInterface
         }
 
         return $this->productInterface->getList($category_id, 12, 1, false);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getGreetingMessage($customerId)
+    {
+        return $this->greetingMessage->getMessage($customerId);
     }
 }
