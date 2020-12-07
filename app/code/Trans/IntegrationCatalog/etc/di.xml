@@ -100,4 +100,8 @@
     <!-- @anan.fauzi <add configurable product synch cron service contract -->
     <preference for="Trans\IntegrationCatalog\Api\Data\ConfigurableProductCronSynchInterface" type="Trans\IntegrationCatalog\Model\ConfigurableProductCronSynch" />
     <preference for="Trans\IntegrationCatalog\Api\ConfigurableProductCronSynchRepositoryInterface" type="Trans\IntegrationCatalog\Model\ConfigurableProductCronSynchRepository" />
+
+    <type name="Magento\CatalogImportExport\Model\Import\Product\SkuProcessor">
+        <plugin name="sku_processor_plugin" type="Trans\IntegrationCatalog\Plugin\CatalogImportExport\Model\Import\Product\SkuProcessor" disabled="false"  />
+    </type>
 </config>

@@ -860,8 +860,10 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                 $productId = $this->skuProcessor->getNewSku($delSku)['entity_id'];
                 $delProductId[] = $productId;
 
-                foreach (array_keys($categories) as $categoryId) {
-                    $categoriesIn[] = ['product_id' => $productId, 'category_id' => $categoryId, 'position' => 0];
+                if($this->checkSequenceProduct($productId)) {
+                    foreach (array_keys($categories) as $categoryId) {
+                        $categoriesIn[] = ['product_id' => $productId, 'category_id' => $categoryId, 'position' => 0];
+                    }
                 }
             }
             if (Import::BEHAVIOR_APPEND != $this->getBehavior()) {
@@ -1219,6 +1221,7 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                 if ($this->integrationProductRepository->checkPosibilityConfigurable($rowData['sku'])) {
                     $visibility = 'Not Visible Individually';
                 }
+
                 $rowData['visibility'] = $visibility;
 
                 try {
@@ -1230,6 +1233,15 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                 }
 
                 if(isset($rowData['list_attributes'])) {
+
+                    $sellingUnit = substr($rowData['sku'], -3); //get 3 last char from SKU 
+                    $attributeCode = IntegrationProductInterface::SELLING_UNIT_CODE;
+                    
+                    $rowData['list_attributes'][] = [
+                        "attribute_code" => $attributeCode,
+                        "attribute_value" => ltrim($sellingUnit, '0')
+                    ];
+
                     foreach ($rowData['list_attributes'] as $listVal) {
                         $checkAttribute = $this->config->getAttribute(IntegrationProductInterface::ENTITY_TYPE_CODE, $listVal['attribute_code']);
 
@@ -1307,7 +1319,7 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                                 'created_at' => (new \DateTime())->format(DateTime::DATETIME_PHP_FORMAT),
                                 'updated_at' => (new \DateTime())->format(DateTime::DATETIME_PHP_FORMAT),
                             ];
-                            // var_dump($entityRowsIn);
+                            
                             $productsQty++;
                         } else {
                             $rowSku = null;
@@ -1349,23 +1361,6 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                     }
                     unset($rowData['rowNum']);
 
-                    // 4.1. Tier prices phase
-                    if (!empty($rowData['_tier_price_website'])) {
-                        $tierPrices[$rowSku][] = [
-                            'all_groups' => $rowData['_tier_price_customer_group'] == self::VALUE_ALL,
-                            'customer_group_id' => $rowData['_tier_price_customer_group'] ==
-                            self::VALUE_ALL ? 0 : $rowData['_tier_price_customer_group'],
-                            'qty' => $rowData['_tier_price_qty'],
-                            'value' => $rowData['_tier_price_price'],
-                            'website_id' => self::VALUE_ALL == $rowData['_tier_price_website'] ||
-                            $priceIsGlobal ? 0 : $this->storeResolver->getWebsiteCodeToId($rowData['_tier_price_website']),
-                        ];
-                    }
-
-                    if (!$this->validateRow($rowData, $rowNum)) {
-                        continue;
-                    }
-
                     // 6. Attributes phase
                     $rowStore = (self::SCOPE_STORE == $rowScope)
                         ? $this->storeResolver->getStoreCodeToId($rowData[self::COL_STORE])
@@ -1406,7 +1401,6 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                         $rowData,
                         !$this->isSkuExist($rowSku)
                     );
-
                     $product = $this->_proxyProdFactory->create(['data' => $rowData]);
 
                     foreach ($rowData as $attrCode => $attrValue) {
@@ -1455,10 +1449,12 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                                 $attributes[$attrTable][$rowSku][$attrId][$storeId] = $attrValue;
                             }
                         }
+
                         // restore 'backend_model' to avoid 'default' setting
                         $attribute->setBackendModel($backModel);
                     }
                 } catch (\Exception $e) {
+                    var_dump($e->getMessage());
                     continue;
                 }
             }
