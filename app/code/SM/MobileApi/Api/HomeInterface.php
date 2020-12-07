@@ -1,6 +1,5 @@
 <?php
 
-
 namespace SM\MobileApi\Api;
 
 /**
@@ -18,4 +17,12 @@ interface HomeInterface
      * @return \SM\MobileApi\Api\Data\Product\ListInterface
      */
     public function getMostPopular();
+
+    /**
+     * @param int $customerId
+     * @return \SM\MobileApi\Api\Data\HomepageMessage\GreetingMessageInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getGreetingMessage($customerId);
 }

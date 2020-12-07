@@ -174,6 +174,15 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
      */
     protected $amastyPromoInterfaceFactory;
 
+    /**
+     * @var Magento\Framework\App\ResourceConnection
+     */
+    protected $resourceConnection;
+
+    /**
+     * @var \Magento\Framework\Indexer\IndexerRegistry
+     */
+    protected $indexerRegistry;
 
     /**
      * @param \Trans\Integration\Logger\Logger $Logger
@@ -193,6 +202,8 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
      * @param HelperPrice $helperPrice
      * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepositoryInterface
      * @param \Trans\IntegrationEntity\Api\IntegrationProductAttributeRepositoryInterface productRepositoryInterface$integrationAttributeRepository
+     * @param \Magento\Framework\App\ResourceConnection $resourceConnection
+     * @param \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
      */
     public function __construct(
         \Trans\Integration\Logger\Logger $logger,
@@ -211,7 +222,9 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
         CoreHelper $coreHelper,
         HelperPrice $helperPrice,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepositoryInterface,
-        \Trans\IntegrationEntity\Api\IntegrationProductAttributeRepositoryInterface $integrationAttributeRepository
+        \Trans\IntegrationEntity\Api\IntegrationProductAttributeRepositoryInterface $integrationAttributeRepository,
+        \Magento\Framework\App\ResourceConnection $resourceConnection,
+        \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
     ) {
         $this->logger                                   = $logger;
         $this->promotionPriceRepositoryInterface        = $promotionPriceRepositoryInterface;
@@ -247,6 +260,8 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
         $this->versionManager                           = $helperPrice->getVersionManagerFactory();
         $this->timezone                                 = $helperPrice->getTimezoneInterface();
         $this->date                                     = $helperPrice->getDateTime();
+        $this->resourceConnection = $resourceConnection;
+        $this->indexerRegistry = $indexerRegistry;
     }
 
 
@@ -503,6 +518,9 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
         $index = 0;
         $check = [];
         $productInterface = [];
+        $productReindexIds = [];
+        $dataMarkdown = [];
+
         try {
             foreach ($dataProduct as $sku => $data) {
 
@@ -513,6 +531,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                     // validate sku exist or not
                     $productInterface[$index] = $this->productRepositoryInterface->get($sku);
                     if (!empty($productInterface[$index])) {
+                        $productReindexIds[] = $productInterface[$index]->getId();
                         $indexO = 0;
                         $defaultPrice = 0;                
                         foreach ($data as $row) {
@@ -521,7 +540,10 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                                 switch ($dataPass['promotion_type']) {
                                     // promotype = 1
                                     case 1:
-                                            $this->markdownFunction($dataPass);
+                                            $markdownFunction = $this->markdownFunction($dataPass);
+                                            if ($markdownFunction) {
+                                                $dataMarkdown[] = $markdownFunction;
+                                            }
                                         break;
 
                                     // promotype = 2
@@ -580,6 +602,28 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
 
                 $index++;
             }
+
+            // save bulk markdown
+            try {
+                if ($dataMarkdown) {
+                    $connectionMarkdown = $this->resourceConnection->getConnection();
+                    
+                    $connectionMarkdown->insertOnDuplicate("catalog_product_entity_decimal", $dataMarkdown, ['value']);
+                    $this->logger->info('insertOnDuplicate success ' . date('d-M-Y H:i:s')); 
+                }
+            } catch (\Exception $e) {
+                $this->logger->info('insertOnDuplicate fail ' . date('d-M-Y H:i:s')); 
+            }
+            
+            try {
+                if(!empty($productReindexIds)) {
+                    $this->reindexByProductsIds($productReindexIds, ['catalog_product_attribute', 'catalogsearch_fulltext']);
+                    $this->logger->info('reindex success ' . date('d-M-Y H:i:s')); 
+                }
+            } catch (\Exception $e) {
+                $this->logger->info('reindex fail ' . date('d-M-Y H:i:s')); 
+            }
+
         }
         catch (\Exception $exception) {
             $msg = "-".__FUNCTION__." ".$exception->getMessage();    
@@ -589,6 +633,23 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
         
         $this->updateJobStatus($jobId, IntegrationJobInterface::STATUS_COMPLETE);
         return $productMapingData;
+    }
+
+    /**
+     * reindex bu product ids
+     *
+     * @param array $productIds
+     * @param array $indexLists
+     * @return void
+     */
+    protected function reindexByProductsIds($productIds, $indexLists)
+    {
+        foreach($indexLists as $indexList) {
+            $categoryIndexer = $this->indexerRegistry->get($indexList);
+            if (!$categoryIndexer->isScheduled()) {
+                $categoryIndexer->reindexList(array_unique($productIds));
+            }
+        }
     }
 
     /**
@@ -664,7 +725,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                 // $checkIntPromoId = $this->checkIntegrationPromoByPromoId($dataPass['promotion_id']);
                 $checkIntPromoId = $this->checkIntegrationPromoSkuAndPromoType($dataPass);
 
-                if (!$checkIntPromoId) {
+                // if (!$checkIntPromoId) {
                     // Nested switch discount type
                     // data start time
                     // $startTime = $dataPass['from_date'].' '.$dataPass['from_time'];
@@ -694,7 +755,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                             $name = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['promo_selling_price'].' fixed price ('.$dataPass['sku'].')';
                             $desc = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['promo_selling_price'].' fixed price ('.$dataPass['sku'].')';
 
-                            $this->saveStagingUpdate($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode);
+                            $saveStagingUpdateStatus = $this->saveStagingUpdate($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode);
                             break;
 
                         // promotype = 1 , disctype = 2
@@ -703,7 +764,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                             $name = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price '.$dataPass['percent_disc'].' % Off ('.$dataPass['sku'].')';
                             $desc = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price '.$dataPass['percent_disc'].' % Off ('.$dataPass['sku'].')';
                             
-                            $this->saveStagingUpdate($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode);
+                            $saveStagingUpdateStatus = $this->saveStagingUpdate($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode);
                             break;
 
                         // promotype = 1 , disctype = 3
@@ -712,14 +773,20 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                             $name = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['amount_off'].' Off ('.$dataPass['sku'].')';
                             $desc = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['amount_off'].' Off ('.$dataPass['sku'].')';
 
-                            $this->saveStagingUpdate($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode);
+                            $saveStagingUpdateStatus = $this->saveStagingUpdate($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode);
                             break;
                     }
 
                     // save to integration prom price table
                     $dataPass['name'] = $name;
-                    $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
-                }
+                    if ($saveStagingUpdateStatus) {
+                        if (!$checkIntPromoId) {
+                            $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
+                        }
+                    }
+                // }
+
+                    return $saveStagingUpdateStatus;
             }
             // --------------
         } catch (\Exception $e) {
@@ -2561,11 +2628,32 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             
             // save to special price
             $specialPriceCode = PromotionPriceLogicInterface::PRODUCT_ATTR_PROMO_PRICE.$param['store_attr_code'];
-            $product->setCustomAttribute($specialPriceCode, $specialPrice);
+            
+            // $product->setCustomAttribute($specialPriceCode, $specialPrice);
 
-            $this->productRepositoryInterface->save($product);
+            // $this->productRepositoryInterface->save($product);
 
-            return true;
+            // raw query update
+            $connectionCheck = $this->resourceConnection->getConnection();
+            $queryGetAttrIdPromoPrice = "SELECT attribute_id FROM eav_attribute WHERE attribute_code = '".$specialPriceCode."' limit 1";
+            $getGetAttrIdPromoPrice = $connectionCheck->fetchRow($queryGetAttrIdPromoPrice);
+
+            if (!empty($getGetAttrIdPromoPrice['attribute_id'])) {
+                // $queryUpdatePromo = "UPDATE catalog_product_entity_decimal SET value = '" . $specialPrice . "' WHERE row_id = '" . $product->getRowId() . "' AND attribute_id = '".$getGetAttrIdPromoPrice['attribute_id']."'";
+                // $connectionCheck->query($queryUpdatePromo);
+
+                $dataMarkdown =
+                    [
+                        "attribute_id"=>"".$getGetAttrIdPromoPrice['attribute_id']."",
+                        "value"=>"".$specialPrice."",
+                        "row_id"=>"".$product->getRowId().""
+                    ];
+            }
+            else {
+                return false;
+            }
+
+            return $dataMarkdown;
         } catch (\Exception $exception) {
             throw new StateException(
                 __(__FUNCTION__." - ".$exception->getMessage())

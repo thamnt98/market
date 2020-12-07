@@ -12,7 +12,8 @@ define(
     [
         'jquery',
         'Magento_Ui/js/modal/modal',
-        'mage/url'
+        'mage/url',
+        'CustomerSocialProvider'
     ], function ($, modal, urlBuilder) {
         'use strict';
 

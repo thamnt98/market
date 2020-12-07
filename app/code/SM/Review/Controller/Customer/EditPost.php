@@ -67,7 +67,7 @@ class EditPost extends ProductController implements HttpPostActionInterface
         } else {
             $this->messageManager->addErrorMessage(__('We can\'t post your review right now.'));
         }
-        $resultRedirect->setUrl($this->_url->getUrl('review/customer/list'));
+        $resultRedirect->setUrl($this->_url->getUrl('review/customer/index'));
         return $resultRedirect;
     }
 

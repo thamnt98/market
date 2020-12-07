@@ -64,6 +64,9 @@ class Index extends Action
                         'view_model' => 'SM\Customer\ViewModel\Login'
                     ])
                     ->toHtml();
+                $block .= $resultPage->getLayout()->createBlock(\SM\Customer\Block\SocialLogin\Popup\Register::class)
+                    ->setTemplate('SM_Customer::form/social/register.phtml')
+                    ->toHtml();
             } elseif ($this->getRequest()->getParam('type') == 'register-form') {
                 $child1 = $resultPage->getLayout()->createBlock(\SM\Customer\Block\SocialLogin\Popup\Social::class)
                     ->setTemplate('Mageplaza_SocialLogin::popup/form/authentication/social.phtml');

@@ -234,6 +234,10 @@
                 font-size: 30px;
                 line-height: 36px;
             }
+            p.payment-status,
+            p.payment-price{
+                font-family: @font-family-SF-UI-Display-Bold;
+            }
         }
         .account-number{
             margin-bottom: 50px;
@@ -254,9 +258,10 @@
         .check-payment-col{
             margin-bottom: 50px;
             margin-top: 50px;
-            button{
-                display: block;
+            a{
+                display: inline-block;
                 width: 291px;
+                margin: 5px 30px;
             }
             button:first-child{
                 margin: 0 auto 15px auto;
@@ -620,6 +625,10 @@
 //  _____________________________________________
 // @screen__m = 768
 .media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .payment-expired-wrapper{
+        width:800px;
+        margin: 0 auto;
+    }
     .order-info {
         display: flex;
     }

@@ -5,15 +5,15 @@ namespace SM\Checkout\Api\Data\CheckoutWeb\AdditionalInfo;
 interface StorePickUpInterface
 {
     /**
-     * @param string $storeCode
+     * @param string $store
      * @return $this
      */
-    public function setStoreCode($storeCode);
+    public function setStore($store);
 
     /**
      * @return string
      */
-    public function getStoreCode();
+    public function getStore();
 
     /**
      * @param string $date

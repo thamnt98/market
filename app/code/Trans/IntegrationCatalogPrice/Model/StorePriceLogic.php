@@ -5,7 +5,7 @@
  * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  *
  *
- * @author   Muhammad Rifai <muhammad.rifai@ctcorpdigital.com>
+ * @author   Muhammad Rifai <muhammad.rifai@ctcorpdigital.com>, Anan Fauzi <anan.fauzi@transdigital.co.id>
  *
  * Copyright © 2019 PT Trans Digital. All rights reserved.
  * http://www.ctcorpora.com
@@ -38,6 +38,10 @@ use Magento\Eav\Model\Config as EavConfig;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Framework\Exception\StateException;
 use Magento\Framework\Exception\CouldNotSaveException;
+
+use Magento\Framework\App\ResourceConnection;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
+use Magento\Catalog\Api\Data\ProductInterfaceFactory as ProductFactory;
 
 class StorePriceLogic implements StorePriceLogicInterface {
 
@@ -140,6 +144,26 @@ class StorePriceLogic implements StorePriceLogicInterface {
      * @var \Trans\IntegrationCatalogPrice\Helper\Data
      */
     protected $helperPrice;
+    
+    /**
+     * @var ResourceConnection
+     */
+    protected $resourceConnection;
+    
+    /**
+     * @var ProductCollectionFactory
+     */
+    protected $productCollectionFactory;
+    
+    /**
+     * 
+     */
+    protected $connection;
+    
+    /**
+     * @var ProductFactory
+     */
+    protected $productFactory;
 
 	/**
 	 * @param Logger $Logger
@@ -162,6 +186,9 @@ class StorePriceLogic implements StorePriceLogicInterface {
 	 * @param IntegrationProductAttributeRepositoryInterface productRepositoryInterface$integrationAttributeRepository
 	 * @param \Trans\IntegrationCatalogStock\Api\IntegrationStockInterface $integrationStock
 	 * @param \Trans\IntegrationCatalogPrice\Helper\Data $helperPrice
+	 * @param ResourceConnection $resourceConnection
+	 * @param ProductCollectionFactory $productCollectionFactory
+	 * @param ProductFactory $productFactory
 	 */
 	public function __construct
 	(
@@ -185,6 +212,9 @@ class StorePriceLogic implements StorePriceLogicInterface {
 		,IntegrationProductAttributeRepositoryInterface $integrationAttributeRepository
 		,\Trans\IntegrationCatalogStock\Api\IntegrationStockInterface $integrationStock
 		,\Trans\IntegrationCatalogPrice\Helper\Data $helperPrice
+        ,ResourceConnection $resourceConnection
+        ,ProductCollectionFactory $productCollectionFactory
+        ,ProductFactory $productFactory
 	) {
 		$this->logger                           		= $logger;
 		$this->storePriceRepositoryInterface			= $storePriceRepositoryInterface;
@@ -211,6 +241,10 @@ class StorePriceLogic implements StorePriceLogicInterface {
         $this->updateInterfaceFactory                   = $helperPrice->getUpdateInterfaceFactory();
 		$this->versionManager                           = $helperPrice->getVersionManagerFactory();
 		$this->productStaging                           = $helperPrice->getProductStagingInterface();
+        $this->resourceConnection = $resourceConnection;
+        $this->productCollectionFactory = $productCollectionFactory;
+        $this->connection = $this->resourceConnection->getConnection();
+        $this->productFactory = $productFactory;
 
 		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_price.log');
         $logger = new \Zend\Log\Logger();
@@ -242,301 +276,315 @@ class StorePriceLogic implements StorePriceLogicInterface {
 
 		return $result;
 	}
+    
+    /**
+     * Get remap data value
+     * 
+     * @param array $data
+     * @return array
+     */
+    public function getRemapDataValue($data)
+    {
+        $dataValue = [];
+        foreach($data as $index => $value){
+            $dataValue[] = json_decode($value['data_value'], true);
+        }
+        return $dataValue;
+    }
+    
+    /**
+     * Get source list
+     *
+     * @param array $data
+     * @return $data
+     */
+    public function getSourceList($data)
+    {
+        $sourceList = [];
+        foreach ($data as $index => $value) {
+            if (isset($value['sku']) && $value['sku']) {
+                if (in_array($value['store_code'], $sourceList) == false) {
+                    $sourceList[] = $value['store_code'];
+                }
+            }
+        }
+        return $sourceList;
+    }
+    
+    /**
+     * Get new sources
+     * 
+     * @param array $sourcesList
+     * @param array $sources
+     * @return void
+     */
+    public function getNewSources($sourceList, $sources)
+    {
+        $result = [];
+        if (empty($sources) == false) {
+            $existSources = [];
+            foreach ($sources as $index => $value) {
+                $existSources[] = $value['source_code'];
+            }
+            foreach ($sourceList as $index => $value) {
+                if (in_array($value, $existSources) == false) {
+                    $result[] = $value;
+                }
+            }
+        }
+        return $result;
+    }
+    
+    /**
+     * Save new sources
+     * 
+     * @param array $sources
+     * @return void
+     */
+    public function saveNewSources($sources, $dataArray, $dataValue)
+    {
+        if (empty($sources) == false) {
+            $failedSources = [];
+            foreach($sources as $key => $value) {
+                try {
+                    $this->logger->info('Before add new store ' . date('d-M-Y H:i:s'));
+                    $this->integrationStock->addNewSource($value);
+                    $this->logger->info('After add new store ' . date('d-M-Y H:i:s'));
+                } catch (\Exception $e) {
+                    $failedSources[] = $value;
+                }
+            }
+            if (empty($failedSources) == false) {
+                foreach($dataArray as $index => $value) {
+                    if (in_array($dataValue[$index]['store_code'], $failedSources)) {
+                        $this->updateDataValueStatus(
+                            $value['id'],
+                            IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE,
+                            "Error : Store " . $dataValue[$index]['store_code'] ." is Not  Available - "
+                        );
+                    }
+                }
+            }
+        }
+    }
 
-	/**
-	 * Save Data To Magento & Mapping
-	 * @param @channel array
-	 * @param @data array
-	 * @throws NoSuchEntityException
-	 * @return mixed
-	 */
-	public function remapData($jobs=[],$data=[]){
-		
-		$i= 0 ;
-		$dataValue = [];
-		$params=[];
+    /**
+     * Save Data To Magento & Mapping
+     * @param @channel array
+     * @param @data array
+     * @throws NoSuchEntityException
+     * @return mixed
+     */
+    public function remapData($jobs=[], $data=[])
+    {   
+        if(!$jobs->getFirstItem()->getId()){
+            throw new NoSuchEntityException(__('Error Jobs Datas doesn\'t exist'));
+        }
+        
+        $jobId = $jobs->getFirstItem()->getId();
+        $this->updateJobStatus($jobId,IntegrationJobInterface::STATUS_PROGRESS_CATEGORY);
+        
+        $dataProduct = [];
+        
+        try {
+            if($data) {
+                $dataArray = $data->getData();
+                $dataValue = $this->getRemapDataValue($dataArray);
+                $sourceList = $this->getSourceList($dataValue);
+                $sources = $this->connection->fetchAll($this->storePriceRepositoryInterface->getInventoryStoreListQuery($sourceList));
+                $newSources = $this->getNewSources($sourceList, $sources);
+                if (empty($newSources) == false) {
+                    $this->saveNewSources($newSources, $dataArray, $dataValue);
+                }
+                foreach($dataArray as $index => $value)
+                {
+                    $dataProduct[$dataValue[$index]['sku']][$index] = $dataValue[$index];
+                    $dataProduct[$dataValue[$index]['sku']][$index]['data_id'] = $value['id'];
+                }
+            }
+        } catch (\Exception $exception) {
+            $this->updateJobStatus($jobId,IntegrationJobInterface::STATUS_PROGRES_UPDATE_FAIL,$exception->getMessage());
+            throw new StateException(__("Error Validate SKU - ".$exception->getMessage()));
+        }
+        
+        return $dataProduct;
+    }
+    
+    /**
+     * Get product by multiple sku
+     */
+    public function getProductByMultipleSku($skuList)
+    {
+        $result = [];
+        if(empty($skuList) == false) {
+            $this->logger->info('Before get product ' . date('d-M-Y H:i:s'));
+            $collection = $this->productCollectionFactory->create()->addFieldToFilter('sku',['in'=>$skuList]);
+            $collection->getSelect()->reset(\Zend_Db_Select::COLUMNS)->columns(['entity_id','sku']);
+            $result = $collection->getItems();
+            $this->logger->info('After get product ' . date('d-M-Y H:i:s'));
+        }
+        return $result;
+    }
+    
+    /**
+     * get base price on sku
+     */
+    public function getBasePriceOnSku($productMappingData, $sku)
+    {
+        $result = 0;
+        if (isset($productMappingData[$sku]['price'])) {
+            foreach($productMappingData[$sku]['price'] as $index => $value)
+            {
+                if(strpos($index, 'base_price') !== false) {
+                    if((int)$value){
+                        $result = (int)$productMappingData[$sku]['price'][$index];
+                    }
+                }
+            }
+        }
+        return $result;
+    }
+    
+    /**
+     * Is promo price on sku set
+     */
+    public function isPromoPriceOnSkuSet($productMappingData, $sku)
+    {
+        $result = false;
+        if (isset($productMappingData[$sku]['price'])) {
+            foreach($productMappingData[$sku]['price'] as $index => $value)
+            {
+                if(strpos($index, 'promo_price') !== false) {
+                    if((int)$value){
+                        $result = true;
+                    }
+                }
+            }
+        }
+        return $result;
+    }
+    
+    /** Get promo price on sku
+     *
+     */
+    public function getPromoPriceOnSku($productMappingData, $sku)
+    {
+        $result = 0;
+        if (isset($productMappingData[$sku]['price'])) {
+            foreach($productMappingData[$sku]['price'] as $index => $value)
+            {
+                if(strpos($index, 'promo_price') !== false) {
+                    if((int)$value){
+                        $result = (int)$productMappingData[$sku]['price'][$index];
+                    }
+                }
+            }
+        }
+        return $result;
+    }
+    
+    /**
+     * Get default price on sku
+     */
+    public function getDefaultPriceOnSku($productMappingData, $sku)
+    {
+        $result = 0;
+        if (isset($productMappingData[$sku]['price'])) {
+            foreach($productMappingData[$sku]['price'] as $index => $value)
+            {
+                if(strpos($index, 'default_price') !== false) {
+                    if((int)$value){
+                        $result = (int)$productMappingData[$sku]['price'][$index];
+                    }
+                }
+            }
+        }
+        return $result;
+    }
 
-		if(!$jobs->getFirstItem()->getId()){
-			throw new NoSuchEntityException(__('Error Jobs Datas doesn\'t exist'));
-		}
-		$jobId = $jobs->getFirstItem()->getId();
-		$this->updateJobStatus($jobId,IntegrationJobInterface::STATUS_PROGRESS_CATEGORY);
-		
-		$attributeCode=[];
-		$attributeId=[];
-		
-		$dataProduct = [];
-		$storeQuery = [];
-		
-		try {
-			if($data) {
+    /**
+     * Save Product
+     */
+    public function save($jobs = [], $dataProduct = [])
+    {
+        if(!$jobId = $jobs->getFirstItem()->getId()) {
+            $message = 'Error Jobs Datas doesn\'t exist';
+            $this->updateJobStatus($jobId, IntegrationJobInterface::STATUS_PROGRES_UPDATE_FAIL, $message);
+            throw new NoSuchEntityException(__($message));
+        }
+        
+        if(empty($dataProduct)){
+            $message = "Theres No SKU Key Available";
+            $this->updateJobStatus($jobId, IntegrationJobInterface::STATUS_PROGRES_UPDATE_FAIL, $message);
+            throw new StateException(__($message));
+        }
+        
+        $msgError=[];
+        //var_dump($dataProduct);die();
+        $skuList = [];
+        $dataValueList = [];
+        foreach ($dataProduct as $sku => $data) {
+            $skuList[] = $sku;
+            foreach($data as $key => $val) {
+                $dataValueList[] = $val;
+            }
+        }
+        
+        $productMappingData=[];
+        foreach($dataValueList as $index => $value) {
+            $this->logger->info('Before validate store price ' . date('d-M-Y H:i:s'));
+            $productMappingData[$value['sku']]['price'] = $this->validateStorePrice($this->validateParams($value));
+            $this->logger->info('After validate store price ' . date('d-M-Y H:i:s'));
+            $this->logger->info('Before save multi price ' . date('d-M-Y H:i:s'));
+            $this->saveMultiPrice($this->validateParams($value));
+            $this->logger->info('After save multi price ' . date('d-M-Y H:i:s'));
+            $this->logger->info("SKU Catalog Price Updated --->".print_r($value['sku'],true));
+        }
 
-				foreach($data->getData() as $n => $row){
-					$dataValue[$i] = json_decode($row['data_value'], true);
-					$value = $dataValue[$i];
-					
-					if(isset($value['sku'])){
-						// Check Store Exist
-						$this->logger->info('Before get inventory store ' . date('d-M-Y H:i:s'));
-						$storeQuery[$i] = $this->storePriceRepositoryInterface->getInventoryStore($value['store_code']);
-						$this->logger->info('After get inventory store ' . date('d-M-Y H:i:s'));
-
-						if (!$storeQuery[$i]) {
-							try {
-								$this->logger->info('Before add new store ' . date('d-M-Y H:i:s'));
-								$this->integrationStock->addNewSource($value['store_code']);
-								$storeQuery[$i] = $this->storePriceRepositoryInterface->getInventoryStore($value['store_code']);
-								$this->logger->info('After add new store ' . date('d-M-Y H:i:s'));
-							} catch (CouldNotSaveException $e) {
-								$this->updateDataValueStatus($row['id'],IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE,"Error : Store " . $value['store_code']." is Not  Available - ");
-							}
-						}
-
-						if ($storeQuery[$i]) {
-							$dataProduct[$value['sku']][$i] = $value;
-							$dataProduct[$value['sku']][$i]['data_id'] = $row['id'];
-						}
-					}
-					
-					$i++;
-				
-				}
-			} else {
-				throw new StateException(
-					__("No data found.")
-				);
-			}
-
-		} catch (\Exception $exception) {
-			$this->updateJobStatus($jobId,IntegrationJobInterface::STATUS_PROGRES_UPDATE_FAIL,$exception->getMessage());
-			throw new StateException(
-				__("Error Validate SKU - ".$exception->getMessage())
-			);
-		}
-
-		return $dataProduct;
-	}
-
-	/**
-	 * Save Product
-	 */
-	public function save($jobs = [], $dataProduct = [])
-	{
-		$jobId = $jobs->getFirstItem()->getId();
-		if(!$jobs->getFirstItem()->getId()){
-			$message = 'Error Jobs Datas doesn\'t exist';
-			$this->updateJobStatus($jobId, IntegrationJobInterface::STATUS_PROGRES_UPDATE_FAIL, $message);
-			throw new NoSuchEntityException(__($message));
-		}
-
-		$jobId = $jobs->getFirstItem()->getId();
-
-		$checkDataProduct = array_filter($dataProduct);
-
-		if(empty($checkDataProduct)){
-			$message = "Theres No SKU Key Available";
-			$this->updateJobStatus($jobId, IntegrationJobInterface::STATUS_PROGRES_UPDATE_FAIL, $message);
-			throw new StateException(
-				__($message)
-			);
-		}
-		$query = [];
-		$productIds=[];
-		$productMapingData=[];
-		$index=0;
-		$check = [];
-		$productInterface=[];
-		$msgError=[];
-		foreach ($dataProduct as $sku => $data) {
-			if (empty($sku)) {
-				continue;
-			}
-			// $query[$index] = $this->integrationProductRepositoryInterface->loadDataByPimSku($sku);
-			// if (is_null($query[$index])) {
-			// 	if (isset($dataProduct[$sku])) {
-			// 		foreach($dataProduct[$sku] as $failData) {
-			// 			$this->updateDataValueStatus($failData['data_id'], IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE_MAPPING, "SKU Mapping not exist--->".print_r($sku,true));
-			// 		}
-			// 	}
-			// 	$this->logger->info("SKU Mapping not exist--->".print_r($sku,true));
-			// 	continue;
-			// }
-			
-			// $productIds[$index] = $query[$index]->getMagentoEntityId();
-			try {
-				$this->logger->info('Before get product ' . date('d-M-Y H:i:s'));
-				$productInterface[$index] = $this->productRepositoryInterface->get($sku);
-				if($productInterface[$index] instanceof \Magento\Catalog\Api\Data\ProductInterface) {
-					$product = $productInterface[$index];
-
-					$weight = $product->getWeight();
-					$isOwnCourier = strtolower($product->getData('own_courier'));
-					$soldIn = strtolower($product->getData('sold_in'));
-				}
-				$this->logger->info('After get product ' . date('d-M-Y H:i:s'));
-			} catch (\Exception $exception) {
-				foreach ($data as $valueX) {
-					$msgError[] = $exception->getMessage();
-					$this->updateDataValueStatus($valueX['data_id'], IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE_MAPPING, $exception->getMessage());
-					$this->logger->info("Error Save Mapping".__FUNCTION__." : ".$exception->getMessage());
-					
-				}
-				continue;
-			}
-
-			$indexO = 0;
-			$defaultPrice=0;
-			
-			try{
-				foreach ($data as $value) {
-					try {
-						$this->logger->info('Before validate store price ' . date('d-M-Y H:i:s'));
-						$productMapingData[$sku][$indexO] = $this->validateStorePrice($this->validateParams($value));
-						$this->logger->info('After validate store price ' . date('d-M-Y H:i:s'));
-					} catch (StateException $e) {
-						$msgError[] = $e->getMessage();
-						$this->updateDataValueStatus($value['data_id'], IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE, $e->getMessage());
-						$this->logger->info("Error Save Attribute Magento ".__FUNCTION__." : ".$e->getMessage());
-						continue;
-					}
-					
-					$indexW = 0;
-			
-					$product->addData(['base_price_in_kg' => '']);
-					$product->addData(['promo_price_in_kg' => '']);
-					foreach ($productMapingData[$sku][$indexO] as $priceType => $priceValue) {
-						$productMapingData[$sku][$indexO][$indexW]['code'] = $priceType;
-						$productMapingData[$sku][$indexO][$indexW]['price'] = $priceValue;
-
-						if(($isOwnCourier == 'iya' || $isOwnCourier == 1) && $soldIn == 'kg') {
-							$priceInKg = $priceValue;
-							$priceValue = $weight * ($priceInKg/1000);
-
-							$priceKgAttr = 'base_price_in_kg';
-							if (strpos($priceType, 'promo_price') !== false) {
-								$priceKgAttr = 'promo_price_in_kg';
-							}
-
-							if($priceInKg) {
-								$product->addData([$priceKgAttr => $priceInKg]);
-							}
-						}
-
-						if($priceType == 'default_price'){
-							$productInterface[$index]->setPrice($priceValue);
-							$defaultPrice = $priceValue;
-						} else {
-							$productInterface[$index]->addData(array($priceType => $priceValue));
-						}
-						$indexW++;
-					}
-
-					$isPriceInKg = 0;
-					if(($isOwnCourier == 'iya' || $isOwnCourier == 1) && $soldIn == 'kg') {
-						$isPriceInKg = 1;
-					}
-					
-					$product->addData(['price_in_kg' => $isPriceInKg]);
-					
-					$indexO++;
-					
-					try {
-						$this->logger->info('Before load data by sku ' . date('d-M-Y H:i:s'));
-						$querySkuOnline = $this->onlinePriceRepositoryInterface->loadDataBySku($value['sku']);
-						$this->logger->info('After load data by sku ' . date('d-M-Y H:i:s'));
-						$value['custom_status'] = false;
-						if ($value['is_exclusive'] == 1) {
-							if ($querySkuOnline) {
-								$value['custom_status'] = true;
-								if ($querySkuOnline->getIsExclusive() == 1) {
-									// update custom table
-									$this->logger->info('Before save online price custom ' . date('d-M-Y H:i:s'));
-									$this->saveOnlinePriceCustom($this->validateParams($value));
-									$this->logger->info('After save online price custom ' . date('d-M-Y H:i:s'));
-								}
-								if ($querySkuOnline->getIsExclusive() == 0) {
-									// delete staging content
-									$this->logger->info('Before delete staging update ' . date('d-M-Y H:i:s'));
-									$deleteStagingUpdate = $this->updateRepositoryInterface->get($querySkuOnline->getStagingId()); 
-									$this->updateRepositoryInterface->delete($deleteStagingUpdate);
-									$this->logger->info('After delete staging update ' . date('d-M-Y H:i:s'));
-
-									// update custom table
-									$this->logger->info('Before update save online price custom ' . date('d-M-Y H:i:s'));
-									$this->saveOnlinePriceCustom($this->validateParams($value));
-									$this->logger->info('After save online price custom ' . date('d-M-Y H:i:s'));
-								}
-							}
-							else {
-								$this->logger->info('Before save online price custom ' . date('d-M-Y H:i:s'));
-								$this->saveOnlinePriceCustom($this->validateParams($value));
-								$this->logger->info('After save online price custom ' . date('d-M-Y H:i:s'));
-							}
-						}
-
-						if ($value['is_exclusive'] == 0) {
-							if ($querySkuOnline) {
-								if (empty($querySkuOnline->getStagingId())) {
-									$this->logger->info('Before save online price custom ' . date('d-M-Y H:i:s'));
-									$scheduleF = $this->saveStagingUpdate($this->validateParams($value));
-									$value['staging_id'] = $scheduleF;
-									$this->logger->info('After save online price custom ' . date('d-M-Y H:i:s'));
-								}
-							}
-							else {
-								$this->logger->info('Before save staging update ' . date('d-M-Y H:i:s'));
-								$scheduleF = $this->saveStagingUpdate($this->validateParams($value));
-								$value['staging_id'] = $scheduleF;
-								$this->logger->info('After save staging update ' . date('d-M-Y H:i:s'));
-
-								$this->logger->info('Before save online price custom ' . date('d-M-Y H:i:s'));
-								$this->saveOnlinePriceCustom($this->validateParams($value));
-								$this->logger->info('After save online price custom ' . date('d-M-Y H:i:s'));
-							}
-						}
-					}
-					catch (\Exception $exception) {
-						$this->updateDataValueStatus($value['data_id'], IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE_MAPPING, $exception->getMessage());
-						// continue; //void if catch error
-					}
-			
-					try{
-						$this->logger->info('Before save multi price ' . date('d-M-Y H:i:s'));
-						$this->saveMultiPrice($this->validateParams($value));
-						$this->logger->info('After save multi price ' . date('d-M-Y H:i:s'));
-					} catch (\Exception $exception) {
-						$msgError[] =$exception->getMessage();
-						$this->updateDataValueStatus($value['data_id'], IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE_MAPPING, $exception->getMessage());
-						$this->logger->info("Error Save Mapping".__FUNCTION__." : ".$exception->getMessage());
-						continue;
-					}
-
-					$this->logger->info("SKU Catalog Price Updated --->".print_r($sku,true));
-					$this->updateDataValueStatus($value['data_id'], IntegrationDataValueInterface::STATUS_DATA_SUCCESS, NULL);
-				}
-				
-				// Save Product Price
-				$this->productRepositoryInterface->save($productInterface[$index]);
-			} catch (\Exception $exception) {
-				$msgError[] =$exception->getMessage();
-				$this->updateDataValueStatus($value['data_id'], IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE, $exception->getMessage());
-				$this->logger->info("Error Save Magento ".__FUNCTION__." : ".$exception->getMessage());
-				continue;
-			}
-					
-			$index++;
-		}
-		// Set Msg to Job
-		$msg = NULL;
-		$msgCheck = array_filter($msgError);
-		$status = IntegrationJobInterface::STATUS_COMPLETE;
-		if(!empty($msgCheck)){
-			$msgError = array_unique($msgError);
-			$msg = "Success with Error : ".implode("",$msgError);
-			// $status = IntegrationJobInterface::STATUS_COMPLETE_WITH_ERROR;
-		}
-		$this->updateJobStatus($jobId,$status,$msg);
-		return $productMapingData;
+        $productInterfaces = $this->getProductByMultipleSku($skuList);
+        $resource = $this->productFactory->create()->getResource();
+        foreach($productInterfaces as $index => $product) {
+            if($product instanceof \Magento\Catalog\Api\Data\ProductInterface) {
+                $product->addData(['base_price_in_kg' => '']);
+                $resource->saveAttribute($product, 'base_price_in_kg');
+                $product->addData(['promo_price_in_kg' => '']);
+                $resource->saveAttribute($product, 'promo_price_in_kg');
+                $weight = $product->getWeight();
+                $isOwnCourier = strtolower($product->getData('own_courier'));
+                $soldIn = strtolower($product->getData('sold_in'));
+                $isPriceInKg = 0;
+                if(($isOwnCourier == 'iya' || $isOwnCourier == 1) && $soldIn == 'kg') {
+                    $isPriceInKg = 1;
+                    $priceInKg = $this->getBasePriceOnSku($productMappingData, $product->getSku());
+                    $priceKgAttr = 'base_price_in_kg';
+                    if ($this->isPromoPriceOnSkuSet($productMappingData, $product->getSku())) {
+                        $priceKgAttr = 'promo_price_in_kg';
+                        $promoPrice = $this->getPromoPriceOnSku($productMappingData, $product->getSku());
+                        $priceInKg = ($promoPrice)? $promoPrice : $priceInKg;
+                    }
+                    $priceValue = $weight * ($priceInKg/1000);
+                    if($priceInKg) {
+                        $product->addData([$priceKgAttr => $priceInKg]);
+                        $resource->saveAttribute($product, $priceKgAttr);
+                    }
+                }
+                $product->addData(['price_in_kg' => $isPriceInKg]);
+                //$resource->saveAttribute($product, 'price_in_kg');
+                $product->setPrice($this->getDefaultPriceOnSku($productMappingData, $product->getSku()));
+                //$resource->saveAttribute($product, 'price');
+            }
+        }
+        
+        $msg = NULL;
+        $msgCheck = array_filter($msgError);
+        $status = IntegrationJobInterface::STATUS_COMPLETE;
+        if(!empty($msgCheck)){
+            $msgError = array_unique($msgError);
+            $msg = "Success with Error : ".implode("",$msgError);
+        }
+        $this->updateJobStatus($jobId,$status,$msg);
+        return $productMappingData;
+        
 	}
 
 	/**
@@ -661,13 +709,13 @@ class StorePriceLogic implements StorePriceLogicInterface {
 	 */
 	protected function saveMultiPrice($param) {
 		try {
-			$query = $this->storePriceRepositoryInterface->loadDataBySkuNStore($param['sku'],$param['store_code']);
-			
-			if(!$query){
-				$query = $this->storePriceInterfaceFactory->create();
-				$query->setStoreAttrCode($param['store_code']);
+			$qry= $this->storePriceRepositoryInterface->loadQueryBySkuNStore($param['sku'],$param['store_code']);
+			$qry = $this->connection->fetchRow($qry);
+            $query = $this->storePriceInterfaceFactory->create();
+            if($qry){
+				$query->setId($qry['id']);
 			}
-			
+			$query->setStoreAttrCode($param['store_code']);
 			$query->setSourceCode($param['store_code']);		
 			$query->setSku($param['sku']);
 			$query->setPimId($param['pim_id']);

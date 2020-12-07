@@ -2,8 +2,7 @@ define([
     'jquery',
     'eJs',
     'moment',
-    'Magento_Ui/js/lib/view/utils/async',
-    'SM_GTM/js/gtm/action/refresh-data'
+    'Magento_Ui/js/lib/view/utils/async'
 ], function ($, ejs, moment, async, refreshData) {
     let eventCreate = {};
 

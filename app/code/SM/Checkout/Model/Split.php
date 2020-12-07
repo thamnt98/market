@@ -427,13 +427,13 @@ class Split
                 //$order['total_weight'] += $item['weight'];
                 //$order['total_price'] += $item['price'];
                 //$order['total_qty'] += $item['quantity'];
-                /*if ($item['sku'] == '14346002001001') {
+                /*if ($item['sku'] == '40401068001001') {
                     unset($order['data']['shipping_list'][0]);
                     unset($order['data']['shipping_list'][1]);
                     unset($order['data']['shipping_list'][2]);
                     unset($order['data']['shipping_list'][3]);
                     unset($order['data']['shipping_list'][5]);
-                } elseif ($item['sku'] == 'Whiskas') {
+                } elseif ($item['sku'] == '14536043001001') {
                     unset($order['data']['shipping_list'][0]);
                     unset($order['data']['shipping_list'][2]);
                     unset($order['data']['shipping_list'][3]);
@@ -507,7 +507,14 @@ class Split
         $dataJsonLog = $dataJson;
         for ($x = 0; $x <= 2; $x++) {
             try {
-                $responseOAR = $this->curlHelper->post($url, $header, $dataJson);
+                if ($isEnableOarLog) {
+                    $dateStart = microtime(true);
+                    $responseOAR = $this->curlHelper->post($url, $header, $dataJson);
+                    $dateEnd = microtime(true);
+                    $this->writeTimeLog($dateEnd, $dateStart);
+                } else {
+                    $responseOAR = $this->curlHelper->post($url, $header, $dataJson);
+                }
                 $response = $responseOAR;
                 if (is_string($responseOAR)) {
                     $response = $this->serializer->unserialize($responseOAR);
@@ -561,6 +568,30 @@ class Split
             }
         }
         return true;
+    }
+
+    /**
+     * @param $listPostCode
+     * @return array
+     */
+    public function checkShippingPostCodeList($listPostCode)
+    {
+        if ($this->helperConfig->isActiveFulfillmentStore()) {
+            try {
+                $table = $this->readAdapter->getTableName('omni_shipping_postcode');
+                $select = $this->readAdapter->select()->from(
+                    [$table],
+                    ['post_code']
+                )
+                    ->where(
+                        'post_code IN (' . implode(',', $listPostCode) . ')'
+                    );
+                return $this->readAdapter->fetchCol($select);
+            } catch (\Exception $e) {
+                return [];
+            }
+        }
+        return [];
     }
 
     /**
@@ -622,5 +653,18 @@ class Split
             }
         }
         $logger->info($flagLog . '. Request: ' . $dataJsonLog . '. Error: ' . $response);
+    }
+
+    /**
+     * @param $dateEnd
+     * @param $dateStart
+     */
+    protected function writeTimeLog($dateEnd, $dateStart)
+    {
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/oar-response-time.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+        $timeDiff = $dateEnd - $dateStart;
+        $logger->info($timeDiff . 's');
     }
 }

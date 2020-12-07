@@ -13,5 +13,10 @@
         <font src="fonts/sfuidisplay/semibold/sf-ui-display-semibold.woff2"/>
         <font src="fonts/sfuidisplay/bold/sf-ui-display-bold.woff2"/>
         <font src="fonts/apl-icons/fonts/apl.woff2"/>
+        <remove src="fonts/opensans/light/opensans-300.woff2"/>
+        <remove src="fonts/opensans/regular/opensans-400.woff2"/>
+        <remove src="fonts/opensans/semibold/opensans-600.woff2"/>
+        <remove src="fonts/opensans/bold/opensans-700.woff2"/>
+        <remove src="fonts/Luma-Icons.woff2"/>
     </head>
 </page>

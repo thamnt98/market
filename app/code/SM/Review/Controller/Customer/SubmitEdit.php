@@ -89,7 +89,7 @@ class SubmitEdit extends \Magento\Framework\App\Action\Action
 
             if (!is_null($reviewEdit)) {
                 $this->messageManager->addSuccessMessage(__("You have successfully edited your review."));
-                $redirectUrl = $this->_url->getUrl("review/customer/list", ["tab" => "reviewed"]);
+                $redirectUrl = $this->_url->getUrl("review/customer/index", ["tab" => "reviewed"]);
             } else {
                 $this->messageManager->addErrorMessage(__("Error Occurred."));
                 $redirectUrl = $this->_redirect->getRefererUrl();

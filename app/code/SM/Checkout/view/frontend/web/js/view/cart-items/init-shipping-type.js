@@ -152,9 +152,7 @@ define([
         addressSelectedList[item.item_id].subscribe(function (value) {
             console.log('addressSelectedList');
             console.log('address per item change');
-            if (!processing) {
-                mod.getShippingMethod();
-            }
+            mod.getShippingMethod();
         });
 
         /* storeSelectedList init each item id*/
@@ -170,7 +168,7 @@ define([
         }
         shippingMethodSelectList[item.item_id] = ko.observable(shippingMethod);
         shippingMethodSelectList[item.item_id].subscribe(function (value) {
-            if (typeof value !== 'undefined' && !processing && value != notAvailableMethod) {
+            if (typeof value !== 'undefined' && value != notAvailableMethod) {
                 console.log('shipping-method-change');
                 mod.getShippingMethod();
             }
@@ -268,10 +266,8 @@ define([
         if (setShippingType.getValue()() == '0' && addressTagList().length == 1) {
             if (newValue) {
                 // one address, delivery shipping, split order
-                if (!processing) {
-                    console.log('slit-order-change-status get shipping method');
-                    mod.getShippingMethod();
-                }
+                console.log('slit-order-change-status get shipping method');
+                //mod.getShippingMethod();
             } else {
                 // one address, delivery shipping, not split order
                 let currentItemsListId = currentItemsData.getCurrentItemsListId()().split(',');
@@ -378,6 +374,9 @@ define([
 
     /*==============================================*/
     mod.getShippingMethod = function (changeStore = false) {
+        if (processing) {
+            return;
+        }
         console.log('getShippingMethod');
         mod.repareItemsData(changeStore);
     };
@@ -482,7 +481,7 @@ define([
             storePickupItems = [],
             additionalInfo = {
                 "store_pick_up": {
-                    "store_code": null,
+                    "store": null,
                     "date": null,
                     "time": null
                 }
@@ -541,7 +540,7 @@ define([
                         }
                     }
                     items.push({"item_id": itemId, "qty": qty, "shipping_address_id": storePickupAddressId, "shipping_method_selected": "store_pickup_store_pickup"});
-                    additionalInfo.store_pick_up.store_code = pickup.currentPickupId();
+                    additionalInfo.store_pick_up.store = pickup.currentPickupId();
                     additionalInfo.store_pick_up.date = pickup.storePickUpDate();
                     additionalInfo.store_pick_up.time = pickup.storePickUpTime();
                     storePickupItems.push(itemId);
@@ -560,7 +559,7 @@ define([
                             }
                         }
                         items.push({"item_id": itemId, "qty": qty, "shipping_address_id": storePickupAddressId, "shipping_method_selected": "store_pickup_store_pickup"});
-                        additionalInfo.store_pick_up.store_code = pickup.currentPickupId();
+                        additionalInfo.store_pick_up.store = pickup.currentPickupId();
                         additionalInfo.store_pick_up.date = pickup.storePickUpDate();
                         additionalInfo.store_pick_up.time = pickup.storePickUpTime();
                         storePickupItems.push(itemId);
@@ -619,7 +618,7 @@ define([
                         }
                     }
                     items.push({"item_id": itemId, "qty": qty, "shipping_address_id": storePickupAddressId, "shipping_method_selected": "store_pickup_store_pickup"});
-                    additionalInfo.store_pick_up.store_code = pickup.currentPickupId();
+                    additionalInfo.store_pick_up.store = pickup.currentPickupId();
                     additionalInfo.store_pick_up.date = pickup.storePickUpDate();
                     additionalInfo.store_pick_up.time = pickup.storePickUpTime();
                     storePickupItems.push(itemId);
@@ -639,7 +638,7 @@ define([
                             }
                         }
                         items.push({"item_id": itemId, "qty": qty, "shipping_address_id": storePickupAddressId, "shipping_method_selected": "store_pickup_store_pickup"});
-                        additionalInfo.store_pick_up.store_code = pickup.currentPickupId();
+                        additionalInfo.store_pick_up.store = pickup.currentPickupId();
                         additionalInfo.store_pick_up.date = pickup.storePickUpDate();
                         additionalInfo.store_pick_up.time = pickup.storePickUpTime();
                         storePickupItems.push(itemId);
@@ -735,7 +734,7 @@ define([
         findStoreAction.searchShortestStoreAction(latlng, storePickupItems, updateCurrentStore, update).done(
             function (response) {
                 if (currentPickupId == pickup.currentPickupId()) {
-                    data.additional_info.store_pick_up.store_code = currentPickupId;
+                    data.additional_info.store_pick_up.store = currentPickupId;
                     mod.getShippingMethodHandleAction(JSON.stringify(data));
                 }
             }
@@ -818,8 +817,12 @@ define([
                                 }
                             });
                             if (singleDeliveryMethodValid.indexOf(selectSingleShippingMethod()) === -1) {
-                                processing = false;
-                                singleDeliveryMethodError(true);
+                                if (!globalVar.splitOrder()) {
+                                    processing = false;
+                                    singleDeliveryMethodError(true);
+                                } else {
+                                    processing = true;
+                                }
                                 selectSingleShippingMethod(firsValidShippingMethod);
                             }
                             return false;
@@ -867,13 +870,13 @@ define([
                     globalVar.splitOrder(split);
                     globalVar.showOrderSummary(showOrderSummary);
                     if (updateShippingMethod) {
-                        mod.getShippingMethod();
+                        //mod.getShippingMethod();
                     }
                 }).error(function (res) {
                     globalVar.splitOrder(split);
                     globalVar.showOrderSummary(showOrderSummary);
                     if (updateShippingMethod) {
-                        mod.getShippingMethod();
+                        //mod.getShippingMethod();
                     }
                 });
             }

@@ -354,15 +354,17 @@ class SendOMS {
 
 		$orderOriginId = isset($oarData['order_id_origin']) ? (int) $oarData['order_id_origin'] : 0;
 		$codeName      = '';
-		if (isset($oarData['spo_detail']) && $oarData['spo_detail']) {
+		if ((bool)$oarData['is_spo'] && isset($oarData['spo_detail']) && $oarData['spo_detail']) {
 			$spoDetail = json_encode($oarData['spo_detail']);
 			if (isset($spoDetail['code_name'])) {
 				$codeName = $spoDetail['code_name'];
 			}
-		} elseif ($this->byPassWareHouse()) {
-			$spoDetail = $this->getSampleWareHouse();
-			$codeName  = $spoDetail['code_name'];
-			$spoDetail = json_encode($spoDetail);
+		} elseif (!(bool)$oarData['is_spo'] && isset($oarData['store'])) {
+            $storeData = json_encode($oarData['store']);
+            if (isset($storeData['code_name'])) {
+                $codeName = $storeData['code_name'];
+            }
+			$spoDetail = json_encode('');
 		} else {
 			$spoDetail = json_encode('');
 		}
