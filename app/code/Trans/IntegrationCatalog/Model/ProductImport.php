@@ -266,6 +266,11 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
     private $attributeSet;
 
     /**
+     * @var \Trans\IntegrationCatalog\Api\IntegrationProductRepositoryInterface
+     */
+    private $integrationProductRepository;
+
+    /**
      * @param \Magento\Framework\Json\Helper\Data $jsonHelper
      * @param \Magento\ImportExport\Helper\Data $importExportData
      * @param \Magento\ImportExport\Model\ResourceModel\Import\Data $importData
@@ -315,6 +320,7 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
      * @param \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryCollection
      * @param \Magento\Eav\Api\AttributeRepositoryInterface $attributeRepository
      * @param \Trans\Integration\Helper\AttributeOption $attributeOption
+     * @param \Trans\IntegrationCatalog\Api\IntegrationProductRepositoryInterface $integrationProductRepository
      * @throws LocalizedException
      * @throws \Magento\Framework\Exception\FileSystemException
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
@@ -362,6 +368,7 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
         \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryCollection,
         \Trans\IntegrationEntity\Model\IntegrationProductAttributeRepository $attributeSet,
         \Trans\Integration\Helper\AttributeOption $attributeOption,
+        \Trans\IntegrationCatalog\Api\IntegrationProductRepositoryInterface $integrationProductRepository,
         array $data = [],
         array $dateAttrCodes = [],
         CatalogConfig $catalogConfig = null,
@@ -384,6 +391,7 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
         $this->attributeOption = $attributeOption;
         $this->categoryCollection = $categoryCollection;
         $this->attributeRepository = $attributeRepository;
+        $this->integrationProductRepository = $integrationProductRepository;
 
         $this->attrGroupGeneralInfoCode = 'Default';
         $this->attrGroupGeneralInfoId = IntegrationProductInterface::ATTRIBUTE_SET_ID;
@@ -1135,6 +1143,13 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                 $rowData['website_id'] = $websiteId;
                 $rowData['_product_websites'] = $website->getCode();
                 $rowData['product_websites'] = $website->getCode();
+                $rowData['status'] = $rowData['is_active'];
+
+                $visibility = 'Catalog, Search';
+                if ($this->integrationProductRepository->checkPosibilityConfigurable($rowData['sku'])) {
+                    $visibility = 'Not Visible Individually';
+                }
+                $rowData['visibility'] = $visibility;
 
                 try {
                     $rowData['categories'] = $this->prepareCategories($rowData);
@@ -1876,8 +1891,10 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                     $productId = $this->skuProcessor->getNewSku($delSku)['entity_id'];
                     $delProductId[] = $productId;
 
-                    foreach (array_keys($websites) as $websiteId) {
-                        $websitesData[] = ['product_id' => $productId, 'website_id' => $websiteId];
+                    if($this->checkSequenceProduct($productId)) {
+                        foreach (array_keys($websites) as $websiteId) {
+                            $websitesData[] = ['product_id' => $productId, 'website_id' => $websiteId];
+                        }
                     }
                 } catch (\Exception $e) {
                     $this->logger->info(__FUNCTION__ . ' $delSku: ' . $delSku . '. $productId: ' . $productId . '. error: ' . $e->getMessage());
@@ -1899,6 +1916,32 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
             }
         }
         return $this;
+    }
+
+    /**
+     * check squence product id
+     *
+     * @param int $value
+     * @return bool
+     */
+    protected function checkSequenceProduct($value)
+    {
+        $connection = $this->getConnection();
+        $table = $connection->getTableName('sequence_product');
+
+        $check = $connection->select()
+            ->from(
+                $table,
+                ['sequence_value']
+            )->where('sequence_value = ?', $value);
+
+        $data = $connection->fetchRow($check);
+
+        if($data) {
+            return true;
+        }
+        
+        return false;
     }
 
     /**
