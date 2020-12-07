@@ -50,7 +50,8 @@ define([
             templateCC : 'SM_Checkout/payment-methods/method/cc',
             templateDB : 'SM_Checkout/payment-methods/method/db',
             templateOVO: 'SM_Checkout/payment-methods/method/db',
-            templateVA : 'SM_Checkout/payment-methods/method/va'
+            templateVA : 'SM_Checkout/payment-methods/method/va',
+            templateQRIS : 'SM_Checkout/payment-methods/method/qris',
         },
         /**
          * Initialize view.
@@ -82,11 +83,15 @@ define([
             return window.checkoutConfig.paymentMethods;
         },
         getListPaymentVirtualAccount: function () {
-            var methods = ["sprint_bca_va"];
+            var methods = ["sprint_bca_va","trans_mepay_va"];
             return this.getPaymentInList(methods);
         },
         getListPaymentCreditCard    : function () {
-            var methods = ["sprint_allbankfull_cc",'sprint_mega_cc'];
+            var methods = ["sprint_allbankfull_cc",'sprint_mega_cc', 'trans_mepay_cc'];
+            return this.getPaymentInList(methods);
+        },
+        getListPaymentQris    : function () {
+            var methods = ["trans_mepay_qris"];
             return this.getPaymentInList(methods);
         },
         getListPaymentInstallment   : function () {
@@ -160,6 +165,8 @@ define([
                 } else {
                     this.disabledBtnPay();
                 }
+            } else if (idElm == 'qris') {
+                $('[data-clickid="payment-method-' + idElm + '"]').trigger('click');
             } else {
                 setServiceFee(0);
             }
