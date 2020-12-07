@@ -28,6 +28,15 @@ interface IntegrationChannelRepositoryInterface
     public function getById($id);
 
     /**
+     * Retrieve data by code
+     *
+     * @param string $code
+     * @return \Trans\Integration\Api\Data\IntegrationChannelInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getByCode($code);
+
+    /**
      * Save data.
      *
      * @param \Trans\IntegrationChannelInterface\Api\Data\IntegrationChannelInterface $data

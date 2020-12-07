@@ -45,6 +45,9 @@ class Product {
         $this->commonRepository=$commonRepository;
         $this->checkUpdates=$checkUpdates;
 
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_product.log');
+        $logger = new \Zend\Log\Logger();
+        $this->logger = $logger->addWriter($writer);
     }
 
    /**
