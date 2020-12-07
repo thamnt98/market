@@ -148,4 +148,20 @@ interface IntegrationProductAttributeRepositoryInterface {
 	 * @throws \Magento\Framework\Exception\LocalizedException
 	 */
 	public function getAttributeSetIdByPimId($pimId);
+
+	/**
+	 * load data attribute code by pim id
+	 * @param string $pimId
+   	 * @return array $result data type
+	 * @throws \Magento\Framework\Exception\LocalizedException
+	 */
+	public function getAttributeSetCodeByPimId($pimId);
+
+	/**
+	 * load data attribute set code by attribute set id
+	 * @param string $attrSetId
+   	 * @return array $result data type
+	 * @throws \Magento\Framework\Exception\LocalizedException
+	 */
+	public function getAttributeSetCodeByAttrSetId($attrSetId);
 }

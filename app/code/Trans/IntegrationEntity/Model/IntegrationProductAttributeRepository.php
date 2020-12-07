@@ -530,4 +530,70 @@ class IntegrationProductAttributeRepository implements IntegrationProductAttribu
 
 		return $result;
 	}
+
+    /**
+     * load data attribute set code by pim id
+     * @param string $pimId
+     * @return array $result data type
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getAttributeSetCodeByPimId($pimId)
+    {
+        if (empty($pimId)) {
+            throw new StateException(__(
+                'Parameter pim id are empty !'
+            ));
+        }
+
+        $result = NUll;
+        $collection = $this->integrationProductAttributeSetInterfaceFactory->create()->getCollection();
+        $collection->addFieldToFilter(IntegrationProductAttributeSetInterface::PIM_ID, $pimId);
+
+        if($collection->getSize()){
+           
+            try {
+                $result = $collection->getFirstItem()->getName();
+            } catch (\Exception $exception) {
+                throw new StateException(__(
+                   "Error ". __FUNCTION__." : ".$exception->getMessage()
+                ));
+            }
+        }
+        
+
+        return $result;
+    }
+
+    /**
+     * load data attribute set code by attribute set id
+     * @param string $pimId
+     * @return array $result data type
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getAttributeSetCodeByAttrSetId($attrSetId)
+    {
+        if (empty($pimId)) {
+            throw new StateException(__(
+                'Parameter pim id are empty !'
+            ));
+        }
+
+        $result = NUll;
+        $collection = $this->integrationProductAttributeSetInterfaceFactory->create()->getCollection();
+        $collection->addFieldToFilter(IntegrationProductAttributeSetInterface::ATTRIBUTE_SET_ID, $attrSetId);
+
+        if($collection->getSize()){
+           
+            try {
+                $result = $collection->getFirstItem()->getName();
+            } catch (\Exception $exception) {
+                throw new StateException(__(
+                   "Error ". __FUNCTION__." : ".$exception->getMessage()
+                ));
+            }
+        }
+        
+
+        return $result;
+    }
 }
