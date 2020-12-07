@@ -266,6 +266,21 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
     private $attributeSet;
 
     /**
+     * @var \Trans\IntegrationCatalog\Helper\Data
+     */
+    protected $dataHelper;
+
+    /**
+     * @var \Trans\Brand\Api\BrandRepositoryInterface
+     */
+    protected $brandRepository;
+
+    /**
+     * @var \Trans\Brand\Api\Data\BrandInterfaceFactory
+     */
+    protected $brandFactory;
+
+    /**
      * @var \Trans\IntegrationCatalog\Api\IntegrationProductRepositoryInterface
      */
     private $integrationProductRepository;
@@ -319,8 +334,11 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
      * @param ProductRepositoryInterface|null $productRepository
      * @param \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryCollection
      * @param \Magento\Eav\Api\AttributeRepositoryInterface $attributeRepository
+     * @param \Trans\IntegrationCatalog\Helper\Data $dataHelper
      * @param \Trans\Integration\Helper\AttributeOption $attributeOption
      * @param \Trans\IntegrationCatalog\Api\IntegrationProductRepositoryInterface $integrationProductRepository
+     * @param \Trans\Brand\Api\BrandRepositoryInterface $brandRepository
+     * @param \Trans\Brand\Api\Data\BrandInterfaceFactory $brandFactory
      * @throws LocalizedException
      * @throws \Magento\Framework\Exception\FileSystemException
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
@@ -369,6 +387,9 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
         \Trans\IntegrationEntity\Model\IntegrationProductAttributeRepository $attributeSet,
         \Trans\Integration\Helper\AttributeOption $attributeOption,
         \Trans\IntegrationCatalog\Api\IntegrationProductRepositoryInterface $integrationProductRepository,
+        \Trans\IntegrationCatalog\Helper\Data $dataHelper,
+        \Trans\Brand\Api\BrandRepositoryInterface $brandRepository,
+        \Trans\Brand\Api\Data\BrandInterfaceFactory $brandFactory,
         array $data = [],
         array $dateAttrCodes = [],
         CatalogConfig $catalogConfig = null,
@@ -392,6 +413,9 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
         $this->categoryCollection = $categoryCollection;
         $this->attributeRepository = $attributeRepository;
         $this->integrationProductRepository = $integrationProductRepository;
+        $this->dataHelper = $dataHelper;
+        $this->brandRepository = $brandRepository;
+        $this->brandFactory = $brandFactory;
 
         $this->attrGroupGeneralInfoCode = 'Default';
         $this->attrGroupGeneralInfoId = IntegrationProductInterface::ATTRIBUTE_SET_ID;
@@ -1081,7 +1105,47 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
         }
         
         return $result;
+    }
 
+    /**
+     * prepare brand data
+     *
+     * @param array $dataProduct
+     * @return array|bool
+     */
+    protected function prepareBrand($dataProduct = [])
+    {
+        $brandVal = '';
+        if(isset($dataProduct[IntegrationProductInterface::BRAND])) {
+            $brandAttributeCode = $this->dataHelper->getBrandAttributeCode();
+            try {
+                $brandData = $this->brandRepository->getByPimId($dataProduct[IntegrationProductInterface::BRAND]);
+
+                $brandVal = $brandData->getTitle();
+                // $this->saveAttributeDataByType($product, $brandAttributeCode, $brandData->getTitle());
+            } catch (NoSuchEntityException $e) {
+                $brand = $this->brandFactory->create();
+                $brand->setPimId($dataProduct[IntegrationProductInterface::BRAND]);
+                $brand->setCode($dataProduct[IntegrationProductInterface::BRAND_CODE]);
+                $brand->setTitle($dataProduct[IntegrationProductInterface::BRAND_NAME]);
+                $brand->setData('company_code', $dataProduct[IntegrationProductInterface::COMPANY_CODE]);
+
+                try {
+                    $brandData = $this->brandRepository->save($brand);
+                    $brandVal = $brandData->getTitle();
+                    $this->logger->info('Create trans_brand data. PIM_ID = ' . $dataProduct[IntegrationProductInterface::BRAND]);
+                    // $this->saveAttributeDataByType($product, $brandAttributeCode, $brandData->getTitle());
+                } catch (CouldNotSaveException $e) {
+                    $this->logger->info('Error create/set brand. SKU = ' . $product->getSku() . ' brand = ' . $dataProduct[IntegrationProductInterface::BRAND] . ' Msg: ' . $e->getMessage());
+                }
+            } catch (\Exception $e) {
+                $this->logger->info('Error create/set brand. SKU = ' . $product->getSku() . ' brand = ' . $dataProduct[IntegrationProductInterface::BRAND] . ' Msg: ' . $e->getMessage());
+            }
+
+            return ['attribute_code' => $brandAttributeCode, 'attribute_value' => $brandVal];
+        }
+
+        return false;
     }
 
     /**
@@ -1144,6 +1208,12 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                 $rowData['_product_websites'] = $website->getCode();
                 $rowData['product_websites'] = $website->getCode();
                 $rowData['status'] = $rowData['is_active'];
+
+                $productBrand = $this->prepareBrand($rowData);
+
+                if(isset($productBrand['attribute_value'])) {
+                    $rowData[$productBrand['attribute_code']] = $productBrand['attribute_value'];
+                }
 
                 $visibility = 'Catalog, Search';
                 if ($this->integrationProductRepository->checkPosibilityConfigurable($rowData['sku'])) {
