@@ -270,7 +270,7 @@ class Split
                     'store_code' => 10025,
                     'store_name' => 'Carrefour Permata Hijau',
                     'store_address' => 'Grand ITC Permata Hijau, Jl. Let. Jend. Supeno, Jakarta Selatan',
-                    'code_name' => '',
+                    'code_name' => 'test',
                     'distance_radius' => 12,
                     'email' => 'customer_support@transmart.co.id',
                     'province' => 'DKI Jakarta',
@@ -293,7 +293,7 @@ class Split
                     "store_zipcode" => "15117",
                     "latitude" => -6.207323,
                     "longitude" => 106.6294,
-                    "code_name" => "",
+                    "code_name" => "DC",
                     "distance_radius" => 12
                 ],
                 'warehouse_source' => 'DC',
