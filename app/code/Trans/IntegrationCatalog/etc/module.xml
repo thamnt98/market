@@ -14,6 +14,6 @@
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
-  <module name="Trans_IntegrationCatalog" setup_version="1.7.4">
+  <module name="Trans_IntegrationCatalog" setup_version="1.7.5">
   </module>
 </config>
