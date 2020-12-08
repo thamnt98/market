@@ -264,7 +264,7 @@ class IntegrationProductRepository implements IntegrationProductRepositoryInterf
 	 * @param string $sku
 	 * @return bool
 	 */
-	public function checkPosibilityConfigurable($sku)
+	public function checkPosibilityConfigurable($sku, $changeVisibility = true)
 	{
 		$itemId = substr($sku, 0, 8);
 
@@ -274,12 +274,14 @@ class IntegrationProductRepository implements IntegrationProductRepositoryInterf
 		$collection->addFieldToFilter(IntegrationProductInterface::PIM_SKU, ['neq' => $sku]);
 		
 		if($collection->getSize()) {
-			if($collection->getSize() == 1) {
-				$data = $collection->getFirstItem();
-				$sku = $data->getPimSku();
-				try {
-					$this->changeProductVisibility($sku, IntegrationProductInterface::VISIBILITY_NOT_VISIBLE);
-				} catch (\Exception $e) {
+			if($changeVisibility) {
+				if($collection->getSize() == 1) {
+					$data = $collection->getFirstItem();
+					$sku = $data->getPimSku();
+					try {
+						$this->changeProductVisibility($sku, IntegrationProductInterface::VISIBILITY_NOT_VISIBLE);
+					} catch (\Exception $e) {
+					}
 				}
 			}
 			return true;
