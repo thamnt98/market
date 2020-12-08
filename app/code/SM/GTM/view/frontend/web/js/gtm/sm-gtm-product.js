@@ -132,8 +132,8 @@ define([
                                 'initialPrice': data['initialPrice'],
                                 'email': dataLayerSourceObjects.quote.email,
                                 'basket_id': dataLayerSourceObjects.customer.basketID,
-                                'basket_value': dataLayerSourceObjects.quote.cart_total = Math.ceil(dataLayerSourceObjects.quote.cart_total) + Math.ceil(data['price']),
-                                'basket_quantity': dataLayerSourceObjects.quote.product_quantity = dataLayerSourceObjects.quote.product_quantity + 1,
+                                'basket_value': data['price'],
+                                'basket_quantity': 1,
                                 'ecommerce': {
                                     'currencyCode': dataLayerSourceObjects.store.currency,
                                     'add': {
@@ -174,8 +174,8 @@ define([
                                 'initialPrice': data['initialPrice'],
                                 'email': dataLayerSourceObjects.quote.email,
                                 'basket_id': dataLayerSourceObjects.customer.basketID,
-                                'basket_value': dataLayerSourceObjects.quote.cart_total = Math.ceil(dataLayerSourceObjects.quote.cart_total) + Math.ceil(data['price']),
-                                'basket_quantity': dataLayerSourceObjects.quote.product_quantity = dataLayerSourceObjects.quote.product_quantity + 1,
+                                'basket_value': data['price'],
+                                'basket_quantity': 1,
                                 'ecommerce': {
                                     'currencyCode': dataLayerSourceObjects.store.currency,
                                     'remove': {
@@ -499,6 +499,9 @@ define([
                                 'discountRate': value['discountRate'],
                                 'initialPrice': value['initialPrice'],
                                 'promo_ends_time' : dataLayerSourceObjects.promoTime ?? 'Not available',
+                                'basket_id': dataLayerSourceObjects.customer.basketID,
+                                'basket_value': data['price'],
+                                'basket_quantity': value['quantity'],
                                 'ecommerce': {
                                     'currencyCode': dataLayerSourceObjects.store.currency,
                                     'add': {
