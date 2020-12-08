@@ -87,11 +87,11 @@ class ProductImage {
 		$class = str_replace(IntegrationCheckUpdatesInterface::CRON_DIRECTORY,"",get_class($this));
 		try {
 			$this->logger->info("=>".$class." Get Channel Data");
-			$chProduct = $this->commonRepository->prepareChannel('product');
+			// $chProduct = $this->commonRepository->prepareChannel('product');
 			$channel = $this->commonRepository->prepareChannel('product-image');
 
 			$this->logger->info("=".$class." Check Onprogress Jobs (Save Product)");
-			$chProduct = $this->checkUpdates->checkSaveOnProgressJob($chProduct);
+			// $chProduct = $this->checkUpdates->checkSaveOnProgressJob($chProduct);
 			$channel = $this->checkUpdates->checkSaveOnProgressJob($channel);//check status = 1, && last_update not null
 
 			$this->logger->info("=".$class." Check Complete Jobs");
