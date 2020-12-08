@@ -170,8 +170,8 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 		try {
 			$jobs = $channel['jobs'];
 
-			$jobId     = $jobs->getFirstItem()->getId();
-			$jobStatus = $jobs->getFirstItem()->getStatus();
+			$jobId     = $jobs->getId();
+			$jobStatus = $jobs->getStatus();
 			$status    = IntegrationProductInterface::STATUS_JOB;
 
 			$result = $this->integrationDataValueRepositoryInterface->getByJobIdWithStatus($jobId, $status);
@@ -243,7 +243,7 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 			throw new StateException(__($msg));
 		}
 
-		$jobId = $jobs->getFirstItem()->getId();
+		$jobId = $jobs->getId();
 		$this->updateJobData($jobId, IntegrationJobInterface::STATUS_PROGRESS_CATEGORY);
 
 		$productIds = [];
@@ -339,7 +339,7 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 
 			try {
 				if(!empty($productIds)) {
-					$batchId = $jobs->getFirstItem()->getBatchId();
+					$batchId = $jobs->getBatchId();
 					$file = $this->indexerDirectory->openFile("/indexer/integration_image_indexer_" . $batchId, 'a');
 					try {
 						$file->lock();
@@ -412,7 +412,7 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 			throw new StateException(__($msg));
 		}
 
-		$jobId = $jobs->getFirstItem()->getId();
+		$jobId = $jobs->getId();
 		// $this->updateJobData($jobId, IntegrationJobInterface::STATUS_PROGRESS_CATEGORY);
 
 		$product    = [];

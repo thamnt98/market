@@ -266,6 +266,21 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
     private $attributeSet;
 
     /**
+     * @var \Trans\IntegrationCatalog\Helper\Data
+     */
+    protected $dataHelper;
+
+    /**
+     * @var \Trans\Brand\Api\BrandRepositoryInterface
+     */
+    protected $brandRepository;
+
+    /**
+     * @var \Trans\Brand\Api\Data\BrandInterfaceFactory
+     */
+    protected $brandFactory;
+
+    /**
      * @var \Trans\IntegrationCatalog\Api\IntegrationProductRepositoryInterface
      */
     private $integrationProductRepository;
@@ -319,8 +334,11 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
      * @param ProductRepositoryInterface|null $productRepository
      * @param \Magento\Catalog\Model\ResourceModel\Category\CollectionFactory $categoryCollection
      * @param \Magento\Eav\Api\AttributeRepositoryInterface $attributeRepository
+     * @param \Trans\IntegrationCatalog\Helper\Data $dataHelper
      * @param \Trans\Integration\Helper\AttributeOption $attributeOption
      * @param \Trans\IntegrationCatalog\Api\IntegrationProductRepositoryInterface $integrationProductRepository
+     * @param \Trans\Brand\Api\BrandRepositoryInterface $brandRepository
+     * @param \Trans\Brand\Api\Data\BrandInterfaceFactory $brandFactory
      * @throws LocalizedException
      * @throws \Magento\Framework\Exception\FileSystemException
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
@@ -369,6 +387,9 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
         \Trans\IntegrationEntity\Model\IntegrationProductAttributeRepository $attributeSet,
         \Trans\Integration\Helper\AttributeOption $attributeOption,
         \Trans\IntegrationCatalog\Api\IntegrationProductRepositoryInterface $integrationProductRepository,
+        \Trans\IntegrationCatalog\Helper\Data $dataHelper,
+        \Trans\Brand\Api\BrandRepositoryInterface $brandRepository,
+        \Trans\Brand\Api\Data\BrandInterfaceFactory $brandFactory,
         array $data = [],
         array $dateAttrCodes = [],
         CatalogConfig $catalogConfig = null,
@@ -392,6 +413,9 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
         $this->categoryCollection = $categoryCollection;
         $this->attributeRepository = $attributeRepository;
         $this->integrationProductRepository = $integrationProductRepository;
+        $this->dataHelper = $dataHelper;
+        $this->brandRepository = $brandRepository;
+        $this->brandFactory = $brandFactory;
 
         $this->attrGroupGeneralInfoCode = 'Default';
         $this->attrGroupGeneralInfoId = IntegrationProductInterface::ATTRIBUTE_SET_ID;
@@ -836,8 +860,10 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                 $productId = $this->skuProcessor->getNewSku($delSku)['entity_id'];
                 $delProductId[] = $productId;
 
-                foreach (array_keys($categories) as $categoryId) {
-                    $categoriesIn[] = ['product_id' => $productId, 'category_id' => $categoryId, 'position' => 0];
+                if($this->checkSequenceProduct($productId)) {
+                    foreach (array_keys($categories) as $categoryId) {
+                        $categoriesIn[] = ['product_id' => $productId, 'category_id' => $categoryId, 'position' => 0];
+                    }
                 }
             }
             if (Import::BEHAVIOR_APPEND != $this->getBehavior()) {
@@ -1081,7 +1107,47 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
         }
         
         return $result;
+    }
 
+    /**
+     * prepare brand data
+     *
+     * @param array $dataProduct
+     * @return array|bool
+     */
+    protected function prepareBrand($dataProduct = [])
+    {
+        $brandVal = '';
+        if(isset($dataProduct[IntegrationProductInterface::BRAND])) {
+            $brandAttributeCode = $this->dataHelper->getBrandAttributeCode();
+            try {
+                $brandData = $this->brandRepository->getByPimId($dataProduct[IntegrationProductInterface::BRAND]);
+
+                $brandVal = $brandData->getTitle();
+                // $this->saveAttributeDataByType($product, $brandAttributeCode, $brandData->getTitle());
+            } catch (NoSuchEntityException $e) {
+                $brand = $this->brandFactory->create();
+                $brand->setPimId($dataProduct[IntegrationProductInterface::BRAND]);
+                $brand->setCode($dataProduct[IntegrationProductInterface::BRAND_CODE]);
+                $brand->setTitle($dataProduct[IntegrationProductInterface::BRAND_NAME]);
+                $brand->setData('company_code', $dataProduct[IntegrationProductInterface::COMPANY_CODE]);
+
+                try {
+                    $brandData = $this->brandRepository->save($brand);
+                    $brandVal = $brandData->getTitle();
+                    $this->logger->info('Create trans_brand data. PIM_ID = ' . $dataProduct[IntegrationProductInterface::BRAND]);
+                    // $this->saveAttributeDataByType($product, $brandAttributeCode, $brandData->getTitle());
+                } catch (CouldNotSaveException $e) {
+                    $this->logger->info('Error create/set brand. SKU = ' . $product->getSku() . ' brand = ' . $dataProduct[IntegrationProductInterface::BRAND] . ' Msg: ' . $e->getMessage());
+                }
+            } catch (\Exception $e) {
+                $this->logger->info('Error create/set brand. SKU = ' . $product->getSku() . ' brand = ' . $dataProduct[IntegrationProductInterface::BRAND] . ' Msg: ' . $e->getMessage());
+            }
+
+            return ['attribute_code' => $brandAttributeCode, 'attribute_value' => $brandVal];
+        }
+
+        return false;
     }
 
     /**
@@ -1145,10 +1211,17 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                 $rowData['product_websites'] = $website->getCode();
                 $rowData['status'] = $rowData['is_active'];
 
+                $productBrand = $this->prepareBrand($rowData);
+
+                if(isset($productBrand['attribute_value'])) {
+                    $rowData[$productBrand['attribute_code']] = $productBrand['attribute_value'];
+                }
+
                 $visibility = 'Catalog, Search';
                 if ($this->integrationProductRepository->checkPosibilityConfigurable($rowData['sku'])) {
                     $visibility = 'Not Visible Individually';
                 }
+
                 $rowData['visibility'] = $visibility;
 
                 try {
@@ -1160,6 +1233,15 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                 }
 
                 if(isset($rowData['list_attributes'])) {
+
+                    $sellingUnit = substr($rowData['sku'], -3); //get 3 last char from SKU 
+                    $attributeCode = IntegrationProductInterface::SELLING_UNIT_CODE;
+                    
+                    $rowData['list_attributes'][] = [
+                        "attribute_code" => $attributeCode,
+                        "attribute_value" => ltrim($sellingUnit, '0')
+                    ];
+
                     foreach ($rowData['list_attributes'] as $listVal) {
                         $checkAttribute = $this->config->getAttribute(IntegrationProductInterface::ENTITY_TYPE_CODE, $listVal['attribute_code']);
 
@@ -1237,7 +1319,7 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                                 'created_at' => (new \DateTime())->format(DateTime::DATETIME_PHP_FORMAT),
                                 'updated_at' => (new \DateTime())->format(DateTime::DATETIME_PHP_FORMAT),
                             ];
-                            // var_dump($entityRowsIn);
+                            
                             $productsQty++;
                         } else {
                             $rowSku = null;
@@ -1279,23 +1361,6 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                     }
                     unset($rowData['rowNum']);
 
-                    // 4.1. Tier prices phase
-                    if (!empty($rowData['_tier_price_website'])) {
-                        $tierPrices[$rowSku][] = [
-                            'all_groups' => $rowData['_tier_price_customer_group'] == self::VALUE_ALL,
-                            'customer_group_id' => $rowData['_tier_price_customer_group'] ==
-                            self::VALUE_ALL ? 0 : $rowData['_tier_price_customer_group'],
-                            'qty' => $rowData['_tier_price_qty'],
-                            'value' => $rowData['_tier_price_price'],
-                            'website_id' => self::VALUE_ALL == $rowData['_tier_price_website'] ||
-                            $priceIsGlobal ? 0 : $this->storeResolver->getWebsiteCodeToId($rowData['_tier_price_website']),
-                        ];
-                    }
-
-                    if (!$this->validateRow($rowData, $rowNum)) {
-                        continue;
-                    }
-
                     // 6. Attributes phase
                     $rowStore = (self::SCOPE_STORE == $rowScope)
                         ? $this->storeResolver->getStoreCodeToId($rowData[self::COL_STORE])
@@ -1336,7 +1401,6 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                         $rowData,
                         !$this->isSkuExist($rowSku)
                     );
-
                     $product = $this->_proxyProdFactory->create(['data' => $rowData]);
 
                     foreach ($rowData as $attrCode => $attrValue) {
@@ -1385,10 +1449,12 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                                 $attributes[$attrTable][$rowSku][$attrId][$storeId] = $attrValue;
                             }
                         }
+
                         // restore 'backend_model' to avoid 'default' setting
                         $attribute->setBackendModel($backModel);
                     }
                 } catch (\Exception $e) {
+                    var_dump($e->getMessage());
                     continue;
                 }
             }
