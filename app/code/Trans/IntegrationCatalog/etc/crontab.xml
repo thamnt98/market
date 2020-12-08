@@ -39,7 +39,7 @@
     </group>
      <group id="pim_product_configurable">
         <job name="integration_product_configurable" instance="Trans\IntegrationCatalog\Cron\Pim\Save\ProductConfigurable" method="execute">
-            <schedule>* 23 * * *</schedule>
+            <schedule>* 22 * * *</schedule>
         </job>
     </group>
     <group id="pim_product_association">
@@ -50,7 +50,7 @@
             <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_save_product_association" instance="Trans\IntegrationCatalog\Cron\Pim\Save\ProductAssociation" method="execute">
-            <schedule>* 1 * * *</schedule>
+            <schedule>* 23 * * *</schedule>
         </job>
     </group>
      <group id="pim_product_digital">
@@ -61,7 +61,7 @@
             <schedule>*/5 * * * *</schedule>
         </job>
         <job name="integration_pim_save_product_digital" instance="Trans\IntegrationCatalog\Cron\Pim\Save\ProductDigital" method="execute">
-            <schedule>* 22 * * *</schedule>
+            <schedule>* 0 * * *</schedule>
         </job>
     </group>
     <!-- @anan.fauzi <add synch configurable product cron -->
