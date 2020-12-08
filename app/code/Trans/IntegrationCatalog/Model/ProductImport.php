@@ -1188,10 +1188,18 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
             $prevAttributeSet = null;
     
             foreach ($bunch as $rowNum => $rowData) {
+                if(!isset($rowData['data_value_id'])) {
+                    $dataValueId = $rowData['id'];
+                }
+
                 if(isset($rowData['data_value'])) {
                     $rowData = json_decode($rowData['data_value'], true);
                 }
 
+                if($dataValueId) {
+                    $rowData['data_value_id'] = $dataValueId;
+                }
+                
                 $rowData[self::URL_KEY] = null;
 
                 // reset category processor's failed categories array
@@ -1251,7 +1259,7 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                         // $rowData[$listVal['attribute_code']] = $this->saveAttributeDataByType($listVal['attribute_code'], $listVal['attribute_value']);
                     }
 
-                    unset($rowData['list_attributes']);
+                    // unset($rowData['list_attributes']);
                 }
 
                 if (!empty($rowData[self::URL_KEY])) {
