@@ -240,14 +240,10 @@ define([
                     }
 
                     if (res.success === false && (res.qty || res.qty == 0)) {
-                        let $increaseButton = form.find('.increase-qty').stop();
-                        $increaseButton.attr('disabled', 'disabled');
-                        $increaseButton.css("background", "grey");
-
-                        if (typeof $qtyElement != "undefined") {
-                            $qtyElement.val(res.qty);
-                        } else {
-                            form.find('input[name="item_qty"]').stop().val(res.qty);
+                        self.disableIncreaseButton(form, res.qty);
+                    } else {
+                        if (res.qty === updateQty) {
+                            self.disableIncreaseButton(form, res.qty);
                         }
                     }
                     loader.hide();
@@ -272,6 +268,18 @@ define([
                     }
                 }
             });
+        },
+
+        disableIncreaseButton: function (form, qty) {
+            let $increaseButton = form.find('.increase-qty').stop();
+            $increaseButton.attr('disabled', 'disabled');
+            $increaseButton.css("background", "grey");
+
+            if (typeof $qtyElement != "undefined") {
+                $qtyElement.val(qty);
+            } else {
+                form.find('input[name="item_qty"]').stop().val(qty);
+            }
         },
 
         /**

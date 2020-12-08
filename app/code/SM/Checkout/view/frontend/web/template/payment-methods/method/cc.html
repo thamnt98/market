@@ -8,11 +8,11 @@
                     <img data-bind="attr:{src: require.toUrl('images/icon-credit-card.png'), height: 25, width:37,class:'icon-card'}" />
         </span>
         <div class="info-card">
-            <h4 data-bind="i18n: 'Debit / Credit Card'"></h4>
+            <h4 data-bind="i18n: 'Credit Card'"></h4>
             <p data-bind="i18n: 'Full payment & installment available'"></p>
             <div class="full-install-payment hidden" data-href="payment-method-options" data-id="payment-method-cc">
                 <a href="javascript:void(0)" class="fullpayment active" data-bind="click:activeMethod,i18n: 'FULL PAYMENT'" data-href="cc-method" data-id="full-payment"></a>
-                <a style="display: none;" href="javascript:void(0)" class="installment" data-bind="click:(data,event)=>{activeMethod(data,event),showInstalmentOptions(data,event)},i18n: 'INSTALLMENT'" data-href="cc-method" data-id="installment"></a>
+                <a href="javascript:void(0)" class="installment" data-bind="click:(data,event)=>{activeMethod(data,event),showInstalmentOptions(data,event)},i18n: 'INSTALLMENT'" data-href="cc-method" data-id="installment"></a>
             </div>
 
             <!-- ko if: getListPaymentCreditCard() -->

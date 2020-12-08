@@ -18,24 +18,9 @@ namespace SM\Notification\Plugin\Magento_SalesRule\Model\ResourceModel;
 class Coupon
 {
     /**
-     * @var \SM\Notification\Helper\Generate\Email
-     */
-    protected $emailHelper;
-
-    /**
-     * @var \SM\Notification\Model\EventSetting
-     */
-    protected $eventSetting;
-
-    /**
-     * @var \SM\Notification\Model\NotificationFactory
-     */
-    protected $notificationFactory;
-
-    /**
      * @var \SM\Notification\Model\ResourceModel\Notification
      */
-    protected $notificationResource;
+    protected $resource;
 
     /**
      * @var \Magento\Framework\Logger\Monolog|null
@@ -43,42 +28,33 @@ class Coupon
     protected $logger;
 
     /**
-     * @var \Magento\Store\Model\App\Emulation
-     */
-    protected $emulation;
-
-    /**
      * @var \Magento\Customer\Model\ResourceModel\CustomerRepository
      */
     protected $customerRepository;
 
     /**
+     * @var \SM\Notification\Model\Notification\Generate
+     */
+    protected $generate;
+
+    /**
      * Coupon constructor.
      *
+     * @param \SM\Notification\Model\Notification\Generate             $generate
      * @param \Magento\Customer\Model\ResourceModel\CustomerRepository $customerRepository
-     * @param \Magento\Store\Model\App\Emulation                       $emulation
-     * @param \SM\Notification\Helper\Generate\Email                   $emailHelper
-     * @param \SM\Notification\Model\EventSetting                      $eventSetting
-     * @param \SM\Notification\Model\NotificationFactory               $notificationFactory
      * @param \SM\Notification\Model\ResourceModel\Notification        $notificationResource
      * @param \Magento\Framework\Logger\Monolog|null                   $logger
      */
     public function __construct(
+        \SM\Notification\Model\Notification\Generate $generate,
         \Magento\Customer\Model\ResourceModel\CustomerRepository $customerRepository,
-        \Magento\Store\Model\App\Emulation $emulation,
-        \SM\Notification\Helper\Generate\Email $emailHelper,
-        \SM\Notification\Model\EventSetting $eventSetting,
-        \SM\Notification\Model\NotificationFactory $notificationFactory,
         \SM\Notification\Model\ResourceModel\Notification $notificationResource,
         \Magento\Framework\Logger\Monolog $logger = null
     ) {
-        $this->emailHelper = $emailHelper;
-        $this->eventSetting = $eventSetting;
-        $this->notificationFactory = $notificationFactory;
-        $this->notificationResource = $notificationResource;
+        $this->resource = $notificationResource;
         $this->logger = $logger;
-        $this->emulation = $emulation;
         $this->customerRepository = $customerRepository;
+        $this->generate = $generate;
     }
 
     /**
@@ -100,69 +76,15 @@ class Coupon
                 return $result;
             }
 
-            $this->createNotification($customer, $object->getData('rule_id'));
+            try {
+                $this->resource->save($this->generate->haveCoupon($customer));
+            } catch (\Exception $e) {
+                if ($this->logger) {
+                    $this->logger->error("Have Coupon: \n\t" . $e->getMessage(), $e->getTrace());
+                }
+            }
         }
 
         return $result;
-    }
-
-    /**
-     * @param \Magento\Customer\Api\Data\CustomerInterface $customer
-     * @param int                                          $ruleId
-     */
-    public function createNotification($customer, $ruleId)
-    {
-        $customerName = $customer->getFirstname() . ' ' .
-            ($customer->getMiddlename() ? $customer->getMiddlename() . ' ' : '') .
-            $customer->getLastname();
-        $title = '%1, we have a voucher for you.';
-        $content = 'Find it on My Voucher!';
-        $params = [
-            'title' => [
-                $customerName,
-            ],
-        ];
-
-        /** @var \SM\Notification\Model\Notification $notification */
-        $notification = $this->notificationFactory->create();
-        $notification->setTitle($title)
-            ->setEvent(\SM\Notification\Model\Notification::EVENT_UPDATE)
-            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_PROMO_AND_EVENT)
-            ->setCustomerIds([$customer->getId()])
-            ->setContent($content)
-            ->setParams($params)
-            ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_VOUCHER_DETAIL)
-            ->setRedirectId($ruleId);
-
-        $this->eventSetting->init($customer->getId(), \SM\Notification\Model\Notification::EVENT_PROMO_AND_EVENT);
-        // Emulation store view
-        $this->emulation->startEnvironmentEmulation(
-            $customer->getStoreId(),
-            \Magento\Framework\App\Area::AREA_FRONTEND
-        );
-        if ($this->eventSetting->isPush()) {
-            $notification->setPushTitle(__($title, $params)->__toString())
-                ->setPushContent(__($content)->__toString());
-        }
-
-        if ($this->eventSetting->isEmail()) {
-            // send mail
-        }
-
-        if ($this->eventSetting->isSms()) {
-            $notification->setSms(
-                __('%1, we have a voucher for you.Find it on My Voucher!', $customerName)->__toString()
-            );
-        }
-
-        $this->emulation->stopEnvironmentEmulation(); // End Emulation
-
-        try {
-            $this->notificationResource->save($notification);
-        } catch (\Exception $e) {
-            if ($this->logger) {
-                $this->logger->error($e->getMessage(), $e->getTrace());
-            }
-        }
     }
 }
