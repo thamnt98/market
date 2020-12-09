@@ -230,7 +230,7 @@ class IntegrationProductAttributeRepository implements IntegrationProductAttribu
         if($collection->getSize()){
            
             try {
-                $result = $collection;
+                $result = $collection->getFirstItem();
             } catch (\Exception $exception) {
                 throw new StateException(__(
                    "Error ". __FUNCTION__." : ".$exception->getMessage()
@@ -241,6 +241,39 @@ class IntegrationProductAttributeRepository implements IntegrationProductAttribu
 
 		return $result;
 	}
+
+    /**
+     * load data by attribute set group
+     * @param string $attributeSetGroup
+     * @return array $result data type
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function loadAttributeSetByAttrGroup($attributeSetGroup)
+    {
+        if (empty($attributeSetGroup)) {
+            throw new StateException(__(
+                'Parameter attribute set group are empty !'
+            ));
+        }
+
+        $result = NUll;
+        $collection = $this->integrationProductAttributeSetInterfaceFactory->create()->getCollection();
+        $collection->addFieldToFilter(IntegrationProductAttributeSetInterface::ATTRIBUTE_SET_GROUP,$attributeSetGroup);
+
+        if($collection->getSize()){
+           
+            try {
+                $result = $collection;
+            } catch (\Exception $exception) {
+                throw new StateException(__(
+                   "Error ". __FUNCTION__." : ".$exception->getMessage()
+                ));
+            }
+        }
+        
+
+        return $result;
+    }
 
     /**
      * load data by pim id
@@ -315,6 +348,48 @@ class IntegrationProductAttributeRepository implements IntegrationProductAttribu
 
 		return $result;
 	}
+
+    /**
+     * load data by attribute set group and code
+     * @param string $attributeSetGroup
+     * @param string $code
+     * @return array $result data type
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function loadAttributeSetByPimIdAttrSetGroup($attributeSetGroup, $code)
+    {
+        if (empty($attributeSetGroup)) {
+            throw new StateException(__(
+                'Parameter attribute set group is empty !'
+            ));
+        }
+
+        if (empty($code)) {
+            throw new StateException(__(
+                'Parameter code is empty !'
+            ));
+        }
+
+        $result = NUll;
+        $collection = $this->integrationProductAttributeSetChildInterfaceFactory->create()->getCollection();
+        $collection->addFieldToFilter(IntegrationProductAttributeSetChildInterface::ATTRIBUTE_SET_GROUP, $attributeSetGroup);
+        $collection->addFieldToFilter(IntegrationProductAttributeSetChildInterface::CODE, $code);
+        $collection->setPageSize(1);
+
+        if($collection->getSize()){
+           
+            try {
+                $result = $collection->getFirstItem();
+            } catch (\Exception $exception) {
+                throw new StateException(__(
+                   "Error ". __FUNCTION__." : ".$exception->getMessage()
+                ));
+            }
+        }
+        
+
+        return $result;
+    }
 
 	/**
 	 * collection by pim id and code

@@ -25,6 +25,7 @@ interface IntegrationProductAttributeSetChildInterface {
 	const PIM_ID           	= 'pim_id';
 	const CODE              = 'code';  
 	const DELETED_ATTRIBUTE_LIST = 'deleted_attribute_list'; 
+	const ATTRIBUTE_SET_GROUP  = 'attribute_set_group'; 
 	const CREATED_AT 		= 'created_at';
 	const UPDATED_AT 		= 'updated_at';
 	const STATUS      		= 'status'; 
@@ -89,6 +90,21 @@ interface IntegrationProductAttributeSetChildInterface {
 	 */
 	public function setDeletedAttributeList($deletedAttributeList);
 
+	/**
+	 * Get attribute_set_group
+	 *
+	 * @return string
+	 */
+	public function getAttributeSetGroup();
+
+	/**
+	 * Set attribute_set_group
+	 *
+	 * @param string $attributeSetGroup
+	 * @return void
+	 */
+	public function setAttributeSetGroup($attributeSetGroup);
+	
 	/**
 	 * Get Status
 	 *
