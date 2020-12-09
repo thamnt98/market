@@ -114,6 +114,10 @@ class UpdateDeliveredOrder
         )->setPage(1, 100);
 
         foreach ($orderCollection as $order) {
+            $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/order-status.log');
+            $logger = new \Zend\Log\Logger();
+            $logger->addWriter($writer);
+            $logger->info('SM\Sales\Cron\UpdateDeliveredOrder' . '. Order-Id: ' . $order->getId() . '. Before Status: ' . $order->getStatus());
             $this->orderUpdater->updateStatusOrder($order);
         }
     }

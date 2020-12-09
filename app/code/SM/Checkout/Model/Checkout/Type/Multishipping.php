@@ -1003,6 +1003,10 @@ class Multishipping extends \Magento\Framework\DataObject
                     $failedOrders[] = $order;
                 } else {
                     $successfulOrders[] = $order;
+                    $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/order-status.log');
+                    $logger = new \Zend\Log\Logger();
+                    $logger->addWriter($writer);
+                    $logger->info('SM\Checkout\Model\Checkout\Type\Multishipping' . '. Sub-order-Id: ' . $order->getId() . '. Status: ' . $order->getStatus());
                 }
             }
 
