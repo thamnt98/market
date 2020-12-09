@@ -464,10 +464,10 @@ class Split
             2 => __('Same day (3 hours)'),
             3 => __('Scheduling'),
             4 => __('Next day (1 day)'),
-            //5 => __('Regular (2-7 days)'),
-            //6 => __('Same day (3 hours)')
-            5 => __('DC'),
-            6 => __('Transmart Courier')
+            5 => __('Regular (2-7 days)'),
+            6 => __('Same day (3 hours)')
+            //5 => __('DC'),
+            //6 => __('Transmart Courier')
         ];
     }
 
