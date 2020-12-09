@@ -1,8 +1,8 @@
 define([
     'jquery',
-    'gtmCheckout',
+    'gtmProduct',
     'mage/url'
-], function ($, gtmCheckout, urlBuilder) {
+], function ($, gtm, urlBuilder) {
     'use strict';
     return {
         collectData: function (event, productId, qty) {
@@ -25,22 +25,14 @@ define([
                     async: true,
                     success: function (result) {
                         if (result) {
-                            var dataProducts = [];
-                            var quantity = 0;
-                            var total = 0;
                             $.each(result, function(key, value){
                                 try {
                                     let product = JSON.parse(value);
-                                    dataProducts.push(product);
-                                    quantity += (product.quantity * 1);
-                                    total += (product.quantity * product.price);
+                                    gtm.push(event,product);
                                 } catch (e) {
 
                                 }
                             });
-                            dataProducts['basket_value'] = total;
-                            dataProducts['basket_quantity'] = quantity;
-                            gtmCheckout.push(event,dataProducts);
                         }
                     },
                     error: function () {

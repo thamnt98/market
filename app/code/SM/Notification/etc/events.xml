@@ -30,4 +30,8 @@
         <observer name="SM_Notification::RuleSaveAfter"
                   instance="SM\Notification\Observer\RuleSaveAfter" />
     </event>
+    <event name="sm_help_api_data_questioninterface_save_after">
+        <observer name="SM_Notification::HelpQuestionSaveAfter"
+                  instance="SM\Notification\Observer\HelpQuestionSaveAfter" />
+    </event>
 </config>

@@ -77,8 +77,8 @@
                     </argument>
                 </arguments>
             </block>
-            <block class="Magento\Framework\View\Element\Template" name="find-in-stores" after="notification-icon"
-                   template="Magento_Theme::header/find-in-stores.phtml"/>
+<!--            <block class="Magento\Framework\View\Element\Template" name="find-in-stores" after="notification-icon"-->
+<!--                   template="Magento_Theme::header/find-in-stores.phtml"/>-->
         </referenceContainer>
         <move element="header.links" destination="header-wrapper" after="-"/>
         <referenceBlock name="authorization-link-login">

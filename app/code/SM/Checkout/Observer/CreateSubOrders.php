@@ -59,7 +59,10 @@ class CreateSubOrders implements ObserverInterface
     {
         $order = $observer->getEvent()->getOrder();
         $quote = $observer->getEvent()->getQuote();
-
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/order-status.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+        $logger->info('SM\Checkout\Observer\CreateSubOrders' . '. Main-order-Id: ' . $order->getId() . '. Status: ' . $order->getStatus());
         if (!$quote->getIsVirtual()) {
             $area = $this->checkoutSession->getArea();
             if ($area == \SM\Checkout\Helper\OrderReferenceNumber::AREA_APP) {

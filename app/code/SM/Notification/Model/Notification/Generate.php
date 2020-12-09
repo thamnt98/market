@@ -51,6 +51,7 @@ class Generate
      * @var \SM\MyVoucher\Model\RuleRepository
      */
     protected $ruleRepository;
+
     /**
      * @var \SM\Notification\Helper\Generate\Email
      */
@@ -219,6 +220,35 @@ class Generate
             // Set sms
         }
 
+        $this->stopEmulator();
+
+        return $notify;
+    }
+
+    /**
+     * @param int $helpId
+     * @param int $storeId
+     *
+     * @return \SM\Notification\Model\Notification
+     */
+    public function termAndPolicy($helpId, $storeId)
+    {
+        /** @var \SM\Notification\Model\Notification $notify */
+        $notify = $this->modelFactory->create();
+        $title = 'There is something new for you.';
+        $message = 'Check out the new T&C/policy from Transmart';
+
+        $notify->setTitle($title)
+            ->setContent($message)
+            ->setEvent(\SM\Notification\Model\Notification::EVENT_UPDATE)
+            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_INFO)
+            ->setRedirectId($helpId)
+            ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_HELP_PAGE)
+            ->setData('admin_type', \SM\Notification\Model\Source\CustomerType::TYPE_ALL);
+
+        $this->startEmulator($storeId);
+        $notify->setPushTitle(__($title)->__toString());
+        $notify->setPushContent(__($message)->__toString());
         $this->stopEmulator();
 
         return $notify;
