@@ -32,6 +32,8 @@ class Config extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_PICKUP_LIMIT_DAY                = 'carriers/store_pickup/date_limit';
     const XML_PAYMENT_EXPIRING_MINUTE         = 'sm_notification/generate/payment_expiring_soon_time';
     const XML_VA_PAYMENT_LIST                 = 'sm_notification/generate/va_payment';
+    const XML_POLICE_HELP_PAGE                = 'sm_notification/generate/policy_help_id';
+    const XML_TERM_CONDITION_HELP_PAGE        = 'sm_notification/generate/term_help_id';
 
     const XML_EVENT_TYPE = 'sm_notification/event_type_config/event_type';
 
@@ -241,6 +243,34 @@ class Config extends \Magento\Framework\App\Helper\AbstractHelper
     {
         return $this->scopeConfig->getValue(
             \Trans\Sprint\Helper\Config::GENERAL_NEW_ORDER_STATUS,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $store
+        );
+    }
+
+    /**
+     * @param int|string|null $store
+     *
+     * @return string
+     */
+    public function getPolicyHelpId($store = null)
+    {
+        return $this->scopeConfig->getValue(
+            self::XML_POLICE_HELP_PAGE,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $store
+        );
+    }
+
+    /**
+     * @param int|string|null $store
+     *
+     * @return string
+     */
+    public function getTermHelpId($store = null)
+    {
+        return $this->scopeConfig->getValue(
+            self::XML_TERM_CONDITION_HELP_PAGE,
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
             $store
         );

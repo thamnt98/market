@@ -84,6 +84,14 @@
                 });
             });
 
+            function printWithType(val) {
+                document.write('<pre>');
+                document.write(val);
+                document.write(' ');
+                document.writeln(typeof val);
+                document.write('</pre>');
+            }
+
             function pushGTM(eventData, eventName, keyName, isCallback) {
                 let gtmObjData, actionType, data = Object.assign({}, dataLayerSourceObjects);
 
@@ -117,7 +125,7 @@
                         'id'      : data[keyName]['id'],
                         'name'    : data[keyName]['name'],
                         'creative': data[keyName]['creative'],
-                        'position': data[keyName]['position']
+                        'position': parseInt(data[keyName]['position']) + 1
                     }]
                 };
 
