@@ -52,6 +52,11 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), '1.2.6', '<')) {
             $this->changeTypeAttributeSet($setup);
         }
+
+        if (version_compare($context->getVersion(), '1.2.8', '<')) {
+            $this->addColumnAttributeSet($setup);
+            $this->addColumnAttributeSetChild($setup);
+        }
         
     }
 
@@ -372,6 +377,52 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'length' => 50
             ]
         );
+    }
+
+    /**
+     * add column attribute_Set_group
+     */
+    protected function addColumnAttributeSet($setup){
+        // Get Product Mapping Table
+        $tableName = $setup->getTable(IntegrationProductAttributeSetInterface::TABLE_NAME);
+        // Check if the table already exists
+        if ($setup->getConnection()->isTableExists($tableName) == true) {
+            
+            $setup->getConnection()->addColumn(
+                $tableName,
+                IntegrationProductAttributeSetInterface::ATTRIBUTE_SET_GROUP,
+                [
+                    'type' => Table::TYPE_TEXT,
+                    'length' => 100,
+                    'nullable' => true, 
+                    'comment' => IntegrationProductAttributeSetInterface::ATTRIBUTE_SET_GROUP,
+                    'after'=>IntegrationProductAttributeSetInterface::ATTRIBUTE_SET_ID
+                ]
+            );
+        }
+    }
+
+    /**
+     * add column attribute_Set_group
+     */
+    protected function addColumnAttributeSetChild($setup){
+        // Get Product Mapping Table
+        $tableName = $setup->getTable(IntegrationProductAttributeSetChildInterface::TABLE_NAME);
+        // Check if the table already exists
+        if ($setup->getConnection()->isTableExists($tableName) == true) {
+            
+            $setup->getConnection()->addColumn(
+                $tableName,
+                IntegrationProductAttributeSetChildInterface::ATTRIBUTE_SET_GROUP,
+                [
+                    'type' => Table::TYPE_TEXT,
+                    'length' => 100,
+                    'nullable' => true, 
+                    'comment' => IntegrationProductAttributeSetChildInterface::ATTRIBUTE_SET_GROUP,
+                    'after'=>IntegrationProductAttributeSetChildInterface::DELETED_ATTRIBUTE_LIST
+                ]
+            );
+        }
     }
     
 }
