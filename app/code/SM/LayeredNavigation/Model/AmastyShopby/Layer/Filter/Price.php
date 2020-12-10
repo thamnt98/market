@@ -77,7 +77,6 @@ class Price extends \SM\CustomPrice\Model\Layer\Filter\Price
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         SearchEngine $searchEngine,
         \Magento\Framework\Message\ManagerInterface $messageManager,
-        \Magento\Customer\Model\Session $session,
         array $data = []
     ) {
         parent::__construct(
@@ -99,7 +98,6 @@ class Price extends \SM\CustomPrice\Model\Layer\Filter\Price
             $scopeConfig,
             $searchEngine,
             $messageManager,
-            $session,
             $data
         );
         $this->groupHelper = $groupHelper;
