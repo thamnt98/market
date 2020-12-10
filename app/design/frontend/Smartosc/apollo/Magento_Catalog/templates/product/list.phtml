@@ -51,6 +51,9 @@ $_helper = $this->helper(Magento\Catalog\Helper\Output::class);
                 "catalogAddToCartAdvanced": {
                     "product_sku": "<?= $block->escapeJs($_product->getSku()) ?>"
                 }
+            },
+            "*" : {
+                 "updateQtyAddedToProduct": {}
             }
         }
         </script>
