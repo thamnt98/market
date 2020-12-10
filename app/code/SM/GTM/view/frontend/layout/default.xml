@@ -11,7 +11,7 @@
             </block>
         </referenceContainer>
         <referenceContainer name="content">
-            <block class="LiveChat\LiveChat\Block\SnippetBlock"
+            <block class="Magento\Framework\View\Element\Template"
                    name="gtm-live-chat"
                    template="SM_GTM::live_chat.phtml"
                    ifconfig="sm_gtm/general/is_active"
