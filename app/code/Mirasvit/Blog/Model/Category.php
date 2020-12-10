@@ -129,7 +129,7 @@ class Category extends AbstractExtensibleModel implements IdentityInterface, Url
      */
     public function getName()
     {
-        return $this->getData(self::NAME);
+        return __($this->getData(self::NAME));
     }
 
     /**
