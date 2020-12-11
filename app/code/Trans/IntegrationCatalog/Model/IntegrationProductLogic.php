@@ -1807,6 +1807,4 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		}	
 	}
 
-
-
 }
