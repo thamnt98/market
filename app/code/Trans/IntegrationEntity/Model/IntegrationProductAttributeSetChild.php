@@ -92,6 +92,22 @@ IntegrationProductAttributeSetChildInterface
     /**
      * @inheritdoc
      */
+    public function getAttributeSetGroup()
+    {
+        return $this->_getData(IntegrationProductAttributeSetChildInterface::ATTRIBUTE_SET_GROUP);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setAttributeSetGroup($attributeSetGroup)
+    {
+        $this->setData(IntegrationProductAttributeSetChildInterface::ATTRIBUTE_SET_GROUP, $attributeSetGroup);
+    }
+    
+    /**
+     * @inheritdoc
+     */
     public function getStatus()
     {
         return $this->_getData(IntegrationProductAttributeSetChildInterface::STATUS);
