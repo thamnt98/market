@@ -13,13 +13,12 @@
  */
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
-
     <group id="pim_category">
         <job name="integration_pim_check_category" instance="Trans\IntegrationCategory\Cron\Pim\Check\Category" method="execute">
-            <schedule>*/5 * * * *</schedule>
+            <schedule>* * * * *</schedule>
         </job>
         <job name="integration_pim_get_category" instance="Trans\IntegrationCategory\Cron\Pim\Get\Category" method="execute">
-            <schedule>*/5 * * * *</schedule>
+            <schedule>* * * * *</schedule>
         </job>
         <job name="integration_pim_save_category" instance="Trans\IntegrationCategory\Cron\Pim\Save\Category" method="execute">
             <schedule>* * * * *</schedule>
