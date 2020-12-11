@@ -13,7 +13,9 @@
 
 namespace SM\TodayDeal\Model;
 
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
 use Magento\CatalogEvent\Model\Event as SaleEvent;
+use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\UrlInterface as MagentoUrlInterface;
@@ -129,9 +131,16 @@ class PostRepository implements PostRepositoryInterface
     private $collectionProcessor;
 
     /**
-     * @var \Magento\Framework\App\ResourceConnection
+     * @var ResourceConnection
      */
     protected $resourceConnection;
+
+    /**
+     * Product collection factory
+     *
+     * @var ProductCollectionFactory
+     */
+    protected $productCollectionFactory;
     /**
      * @param \SM\Category\Api\CategoryInterface $smCategoryRepository
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
@@ -152,7 +161,7 @@ class PostRepository implements PostRepositoryInterface
      * @param DataObjectProcessor $dataObjectProcessor
      * @param StoreManagerInterface $storeManager
      * @param CollectionProcessorInterface $collectionProcessor
-     * @param \Magento\Framework\App\ResourceConnection $resourceConnection
+     * @param ResourceConnection $resourceConnection
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
     public function __construct(
@@ -175,7 +184,8 @@ class PostRepository implements PostRepositoryInterface
         DataObjectProcessor $dataObjectProcessor,
         StoreManagerInterface $storeManager,
         CollectionProcessorInterface $collectionProcessor = null,
-        \Magento\Framework\App\ResourceConnection $resourceConnection
+        ResourceConnection $resourceConnection,
+        ProductCollectionFactory $productCollectionFactory
     ) {
         $this->resource = $resource;
         $this->postFactory = $postFactory;
@@ -197,6 +207,7 @@ class PostRepository implements PostRepositoryInterface
         $this->timezone = $timezone;
         $this->smCategoryRepository = $smCategoryRepository;
         $this->resourceConnection = $resourceConnection;
+        $this->productCollectionFactory = $productCollectionFactory;
     }
 
     /**
@@ -235,6 +246,22 @@ class PostRepository implements PostRepositoryInterface
         if (!$post->getId()) {
             throw new NoSuchEntityException(__('The Today Deal Post with the "%1" ID doesn\'t exist.', $postId));
         }
+        return $post;
+    }
+
+    /**
+     * @param $postId
+     * @return mixed
+     * @throws NoSuchEntityException
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getByIdMobile($postId)
+    {
+        $post = $this->postFactory->create();
+        $this->resource->load($post, $postId);
+        if (!$post->getId()) {
+            throw new NoSuchEntityException(__('The Today Deal Post with the "%1" ID doesn\'t exist.', $postId));
+        }
         $this->filterData($post);
         return $post;
     }
@@ -261,10 +288,14 @@ class PostRepository implements PostRepositoryInterface
         $sql = "Select product_id FROM " . $tableName ." WHERE post_id = ".$post->getId();
         $result = $connection->fetchAll($sql);
 
+        /**
+         * @var \Magento\Catalog\Model\ResourceModel\Product\Collection $signatureProductsCollection
+         */
+        $signatureProductsCollection = $this->productCollectionFactory->create()
+            ->addFieldToFilter('entity_id',['in' => array_column($result, "product_id")]);
+
         $signatureProducts = [];
-        foreach ($result as $productData) {
-            /** @var \Magento\Catalog\Model\Product $product */
-            $product = $this->productRepository->getById($productData["product_id"]);
+        foreach ($signatureProductsCollection as $product) {
             $data = $this->productHelper->getProductListToResponseV2($product);
             $signatureProducts[] = $data;
         }
@@ -278,8 +309,10 @@ class PostRepository implements PostRepositoryInterface
         try {
             $popularCategory = $this->categoryRepository->get($popularCategoryId);
             $popularProducts = $popularCategory->getProductCollection()
-                ->addAttributeToSelect('*')
+                ->setCurPage(1)
+                ->setPageSize(10)
                 ->getItems();
+
             /** @var \Magento\Catalog\Model\Product $product */
             foreach ($popularProducts as &$product) {
                 try {

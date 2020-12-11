@@ -15,7 +15,7 @@
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
     <!-- Today Deals Post -->
     <route url="/V1/todaydeal/post/:postId" method="GET">
-        <service class="SM\TodayDeal\Api\PostRepositoryInterface" method="getById"/>
+        <service class="SM\TodayDeal\Api\PostRepositoryInterface" method="getByIdMobile"/>
         <resources>
             <resource ref="self"/>
         </resources>
