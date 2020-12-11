@@ -41,7 +41,7 @@
     <preference for="Trans\IntegrationCatalog\Api\Data\IntegrationProductInterface"
                 type="Trans\IntegrationCatalog\Model\IntegrationProduct" />
     <preference for="Trans\IntegrationCatalog\Api\IntegrationProductLogicInterface"
-                type="Trans\IntegrationCatalog\Model\IntegrationProductSync" />
+                type="Trans\IntegrationCatalog\Model\IntegrationProductLogic" />
 
     <!-- Product import logic test -->
 <!--     <preference for="Magento\CatalogImportExport\Model\Import\Product" 

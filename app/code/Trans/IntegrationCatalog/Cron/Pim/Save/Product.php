@@ -35,9 +35,9 @@ class Product {
     protected $dataValue;
 
     /**
-     * @var IntegrationProductLogicInterface
+     * @var \Trans\IntegrationCatalog\Model\IntegrationProductSync
      */
-    protected $integrationProductLogicInterface;
+    protected $integrationProductSync;
 
     /**
      * @var IntegrationCheckUpdatesInterface
@@ -48,13 +48,13 @@ class Product {
 		Logger $logger,
 		IntegrationCommonInterface $commonRepository,
 		IntegrationDataValueRepositoryInterface $dataValue,
-		IntegrationProductLogicInterface $integrationProductLogicInterface,
+		\Trans\IntegrationCatalog\Model\IntegrationProductSync $integrationProductSync,
         IntegrationCheckUpdatesInterface $checkUpdates
 	) {
 		$this->logger = $logger;
 		$this->commonRepository = $commonRepository;
 		$this->dataValue = $dataValue;
-		$this->integrationProductLogicInterface = $integrationProductLogicInterface;
+		$this->integrationProductSync = $integrationProductSync;
         $this->checkUpdates = $checkUpdates;
 
 
@@ -83,10 +83,10 @@ class Product {
 			$channel = $this->checkUpdates->checkReadyJobs($channel);
 			
 			$this->logger->info("=".$class." Prepare Data");
-			$data = $this->integrationProductLogicInterface->prepareData($channel);
+			$data = $this->integrationProductSync->prepareData($channel);
 			
 			$this->logger->info("=".$class." Save Data");
-			$response = $this->integrationProductLogicInterface->saveProduct($data, $channel['jobs']);
+			$response = $this->integrationProductSync->saveProduct($data, $channel['jobs']);
 			
 		} catch (\Exception $ex) {
 			$this->logger->info("<=err".$class." ".$ex->getMessage());
