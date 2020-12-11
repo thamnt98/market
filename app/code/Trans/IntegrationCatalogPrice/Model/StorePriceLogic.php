@@ -506,7 +506,15 @@ class StorePriceLogic implements StorePriceLogicInterface
     {
         $result = [];
         foreach ($productInterfaces as $index => $value) {
-            foreach ($dataProduct[$value->getSku()] as $key => $val) {
+            if(array_key_exists(strtoupper($value->getSku()), $dataProduct)){
+                $product = $dataProduct[strtoupper($value->getSku())];
+            }else if(array_key_exists(strtolower($value->getSku()), $dataProduct)){
+                $product = $dataProduct[strtolower($value->getSku())];
+            }else{
+                $product = $dataProduct[$value->getSku()];
+            }
+            
+            foreach ($product as $key => $val) {
                 $basePrice = '';
                 $promoPrice = '';
                 foreach ($decimalAttributes as $idx => $res) {
@@ -621,12 +629,19 @@ class StorePriceLogic implements StorePriceLogicInterface
         $msgError=[];
 
         //Get all required data
+        $this->logger->info("Get Data List");
         $dataList = $this->getDataList($dataProduct);
+        $this->logger->info("Get Product By Multiple SKU");
         $productInterfaces = $this->getProductByMultipleSku($dataList['sku_list']);
+        $this->logger->info("Get Existing SKU List");
         $existingSkuList = $this->getExistingSkuList($productInterfaces);
+        $this->logger->info("Filter Data List With SKU");
         $dataValueList = $this->filterDataListWithExistSku($dataList['data_list'], $existingSkuList);
+        $this->logger->info("Get Decimal Attribute");
         $decimalAttributes = $this->getDecimalAttribute($dataList['data_list']);
+        $this->logger->info("Get Int Attribute");
         $intAttributes = $this->getIntAttribute();
+        $this->logger->info("Get Product Decimal Attribute");
         $productDecimalAttributes = $this->getProductDecimalAttributes(
             $dataProduct,
             $productInterfaces,
@@ -638,6 +653,7 @@ class StorePriceLogic implements StorePriceLogicInterface
         foreach ($productInterfaces as $index => $product) {
             foreach ($productDecimalAttributes[$product->getSku()] as $key => $val) {
                 if (\array_key_exists($key, $attributeIdMap) == false) {
+                    $this->logger->info("Save Attribute Product");
                     $attributeIdMap[$key] = $this->saveAttributeProduct($key, $product->getSku());
                 }
                 $inputList[] = [

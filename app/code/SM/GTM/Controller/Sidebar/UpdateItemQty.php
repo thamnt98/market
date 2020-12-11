@@ -159,6 +159,7 @@ class UpdateItemQty extends Action
         if (empty($error)) {
             $response = [
                 'success' => true,
+                'qty' => $this->saleableQty
             ];
         } else {
             if ($this->saleableQty || $this->saleableQty = 0) {

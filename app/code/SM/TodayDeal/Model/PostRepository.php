@@ -332,6 +332,7 @@ class PostRepository implements PostRepositoryInterface
         $event = $this->getOpenEvent();
         $items = [];
         $size = $criteria->getPageSize();
+        $currentPage = $criteria->getCurrentPage();
         if ($eventId = (int)$event->getId()) {
             $this->resourceEvent->load($event, $eventId);
 
@@ -369,10 +370,12 @@ class PostRepository implements PostRepositoryInterface
                         "promo_name"=> null,
                         "promo_creative"=> null
                     ];
-//                    $event->setData($data);
-                    $items[] = $data;
-                    if ($criteria->getPageSize()) {
-                        $criteria->setPageSize($criteria->getPageSize() - 1);
+
+                    if ($currentPage == 1) {
+                        $items[] = $data;
+                        if ($criteria->getPageSize() > 0) {
+                            $criteria->setPageSize($criteria->getPageSize() - 1);
+                        }
                     }
                 }
             }

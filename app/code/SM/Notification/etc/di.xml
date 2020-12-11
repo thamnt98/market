@@ -74,6 +74,21 @@
             <argument name="logger" xsi:type="object">SM\Notification\Model\Logger</argument>
         </arguments>
     </type>
+    <type name="SM\Notification\Plugin\Magento_SalesRule\Model\ResourceModel\Coupon">
+        <arguments>
+            <argument name="logger" xsi:type="object">SM\Notification\Model\Logger</argument>
+        </arguments>
+    </type>
+    <type name="SM\Notification\Observer\RuleSaveAfter">
+        <arguments>
+            <argument name="logger" xsi:type="object">SM\Notification\Model\Logger</argument>
+        </arguments>
+    </type>
+    <type name="SM\Notification\Observer\HelpQuestionSaveAfter">
+        <arguments>
+            <argument name="logger" xsi:type="object">SM\Notification\Model\Logger</argument>
+        </arguments>
+    </type>
     <type name="SM\Notification\Logger\Handler">
         <arguments>
             <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>

@@ -915,7 +915,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	 * @param string $categoryPimId
 	 * @return int $result
 	 */
-	protected function getCategoryId($categoryPimIds) {
+	public function getCategoryId($categoryPimIds) {
 		try{
 			$result = [];
 			if ($categoryPimIds) {
@@ -951,7 +951,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	 * @param string $sku
 	 * @return string
 	 */
-	protected function getItemId($sku) {
+	public function getItemId($sku) {
 		$itemId = NULL;
 		if ($sku) {
 			$itemId = substr(str_replace(' ', '', $sku), 0, 8);
@@ -1092,7 +1092,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	 * @return mixed
 	 * @throws CouldNotSaveException
 	 */
-	protected function saveDataToIntegrationProduct($magentoProductId, $dataProduct, $integrationDataValue) {
+	public function saveDataToIntegrationProduct($magentoProductId, $dataProduct, $integrationDataValue = null) {
 		try {
 			$integrationProduct = $this->integrationProductRepositoryInterface->loadDataByPimSku(
 				$dataProduct['sku']
@@ -1137,7 +1137,11 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		} catch (\Exception $ex) {
 			$msg = __FUNCTION__." Save Integration Catalog Map : ".$ex->getMessage();
 			$this->logger->info($msg);
-			$this->saveStatusMessage($integrationDataValue, $msg, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE_MAPPING);
+			
+			if($integrationDataValue) {
+				$this->saveStatusMessage($integrationDataValue, $msg, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE_MAPPING);
+			}
+
 			throw new StateException(__($msg));
 		}
 		return $result ;
@@ -1147,7 +1151,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	/**
 	 * Save Product COnfigurable to Integration Mapping Data Product
 	 */
-	protected function createIntegrationProductMapConfigurable($dataProduct,$integrationDataValue) {
+	public function createIntegrationProductMapConfigurable($dataProduct,$integrationDataValue = null) {
 		
 		try {
 			$integrationProduct = $this->integrationProductRepositoryInterface->loadDataByPimSku(
@@ -1182,7 +1186,11 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		} catch (\Exception $ex) {
 			$msg = __FUNCTION__." Save Integration Catalog Map Create Configurable : ".$ex->getMessage();
 			$this->logger->info($msg);
-			$this->saveStatusMessage($integrationDataValue, $msg, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE_MAPPING);
+
+			if($integrationDataValue) {
+				$this->saveStatusMessage($integrationDataValue, $msg, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE_MAPPING);
+			}
+
 			throw new StateException(__($msg));
 		}
 		return "Success Create / Update Attribute";
@@ -1798,7 +1806,5 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			);
 		}	
 	}
-
-
 
 }

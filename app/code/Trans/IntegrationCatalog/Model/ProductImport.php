@@ -406,7 +406,6 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
         $this->catalogConfig = $catalogConfig ?: ObjectManager::getInstance()->get(CatalogConfig::class);
         $this->productRepository = $productRepository ?? ObjectManager::getInstance()->get(ProductRepositoryInterface::class);
         $this->attributeSet = $attributeSet;
-        $this->attributeSet = $attributeSet;
         $this->config = $config;
         $this->storeManager = $storeManager;
         $this->attributeOption = $attributeOption;
@@ -1188,10 +1187,18 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
             $prevAttributeSet = null;
     
             foreach ($bunch as $rowNum => $rowData) {
+                if(!isset($rowData['data_value_id'])) {
+                    $dataValueId = $rowData['id'];
+                }
+
                 if(isset($rowData['data_value'])) {
                     $rowData = json_decode($rowData['data_value'], true);
                 }
 
+                if($dataValueId) {
+                    $rowData['data_value_id'] = $dataValueId;
+                }
+                
                 $rowData[self::URL_KEY] = null;
 
                 // reset category processor's failed categories array
@@ -1204,6 +1211,7 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                 $attributeSet = $this->prepareAttributeSet($rowData);
 
                 $rowData['name'] = $rowData['product_name'];
+                $rowData['price'] = 0;
                 $rowData['attribute_set_code'] = $attributeSet['attribute_set_code'];
                 $rowData['_attribute_set'] = $attributeSet['attribute_set_code'];
                 $rowData['website_id'] = $websiteId;
@@ -1232,6 +1240,7 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                     continue;
                 }
 
+                $multiselect = [];
                 if(isset($rowData['list_attributes'])) {
 
                     $sellingUnit = substr($rowData['sku'], -3); //get 3 last char from SKU 
@@ -1247,11 +1256,20 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
 
                         if($checkAttribute->getFrontendInput() != 'multiselect') {
                             $rowData[$listVal['attribute_code']] = $listVal['attribute_value'];
+                        } else {
+                            $attrVal = $this->saveAttributeDataByType($listVal['attribute_code'], strtolower($listVal['attribute_value']));
+
+                            $data['code'] = $listVal['attribute_code'];
+                            $data['value'] = $attrVal;
+
+                            $multiselect[] = $data;
+
+                            $this->logger->info('insert option ' . date('H:i:s'));
+                            $rowData[$listVal['attribute_code']] = $attrVal;
                         }
-                        // $rowData[$listVal['attribute_code']] = $this->saveAttributeDataByType($listVal['attribute_code'], $listVal['attribute_value']);
                     }
 
-                    unset($rowData['list_attributes']);
+                    // unset($rowData['list_attributes']);
                 }
 
                 if (!empty($rowData[self::URL_KEY])) {
@@ -1386,6 +1404,13 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                     }
 
                     $productTypeModel = $this->_productTypeModels[$productType];
+
+                    if(!empty($multiselect)) {
+                        foreach($multiselect as $multi) {
+                            $productTypeModel->addAttributeOption($multi['code'], strtolower($multi['value']), strtolower($multi['value']));
+                        }
+                    }
+
                     if (!empty($rowData['tax_class_name'])) {
                         $rowData['tax_class_id'] =
                             $this->taxClassProcessor->upsertTaxClass($rowData['tax_class_name'], $productTypeModel);
@@ -1567,12 +1592,14 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
      */
     protected function saveAttributeDataByType($attributeCode, $attributeValue)
     {
-        $attributeValue = ucwords($attributeValue);
+        // $attributeValue = ucwords($attributeValue);
 
         try{
             $attributeData = $this->config->getAttribute(IntegrationProductInterface::ENTITY_TYPE_CODE, $attributeCode);
             if ($attributeData->getId()) {
-                if ($attributeData->getAdditionalData() || $attributeData->getFrontendInput() == IntegrationProductInterface::FRONTEND_INPUT_TYPE_SELECT) {
+
+                $frontendInputArr = [IntegrationProductInterface::FRONTEND_INPUT_TYPE_SELECT, IntegrationProductInterface::FRONTEND_INPUT_TYPE_MULTISELECT];
+                if ($attributeData->getAdditionalData() || (in_array($attributeData->getFrontendInput(), $frontendInputArr))) {
                     $attrVal = $this->attributeOption->createOrGetId(
                             $attributeCode, 
                             $attributeValue

@@ -155,7 +155,12 @@ class AutoCancel implements \Trans\Sprint\Api\AutoCancelInterface
                 foreach ($collection as $order) {
                     if ($order instanceof \Magento\Sales\Api\Data\OrderInterface) {
                         try {
+                            $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/order-status.log');
+                            $logger = new \Zend\Log\Logger();
+                            $logger->addWriter($writer);
+                            $logger->info('Trans\Sprint\Model\Order\AutoCancel' . '. Order-Id: ' . $order->getId() . '. Before Status: ' . $order->getStatus());
                             $this->orderManagement->cancel($order->getId()); //cancel order
+                            $logger->info('Trans\Sprint\Model\Order\AutoCancel' . '. Order-Id: ' . $order->getId() . '. After Status: ' . $order->getStatus());
                             $refNumber     = $order->getData('reference_number');
                             $orderEntityId = $order->getEntityId();
                             $orderHistory  = $this->orderStatusHistoryInterfaceFactory->create();
