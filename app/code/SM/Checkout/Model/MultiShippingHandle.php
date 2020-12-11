@@ -148,7 +148,11 @@ class MultiShippingHandle
         }
         $data['error']  = $splitOrderData['error'];
         $data['split']  = $this->orderIsSplit;
+        $message = 'SM\Checkout\Model\MultiShippingHandle. Thoi gian tap quote address - quoteID ' . $checkoutSession->getQuote()->getId() . ': ';
+        $dateStart = microtime(true); // log_time
         $this->reBuildQuoteAddress($splitOrderData['data'], $checkoutSession);
+        $dateEnd = microtime(true); // log_time
+        $this->writeTimeLog($dateEnd, $dateStart, $message);
         $addressShippingMethod = [];
         $itemsValidMethod    = [];
         $showEachItems = false;
@@ -261,7 +265,11 @@ class MultiShippingHandle
         }
         $billing = $checkoutSession->getCustomer()->getDefaultBilling();
         $checkoutSession->setQuoteCustomerBillingAddress($billing);
+        $message = 'SM\Checkout\Model\MultiShippingHandle. Thoi gian set shipping method - quoteID ' . $checkoutSession->getQuote()->getId() . ': ';
+        $dateStart = microtime(true); // log_time
         $checkoutSession->setShippingMethods($addressShippingMethod);
+        $dateEnd = microtime(true); // log_time
+        $this->writeTimeLog($dateEnd, $dateStart, $message);
         $data['mobile-items-format'] = $this->mobileItemsFormat;
         return $data;
     }
@@ -321,6 +329,8 @@ class MultiShippingHandle
      */
     protected function getSplitOrderData($items, $storePickUp, $customer, $checkoutSession)
     {
+        $message = 'SM\Checkout\Model\MultiShippingHandle. Thoi gian xu ly check out stock cho quoteID ' . $checkoutSession->getQuote()->getId() . ': ';
+        $dateStart = microtime(true); // log_time
         $data                   = ['reload' => false, 'error' => false, 'data' => [], 'split' => false];
         $defaultShippingAddress = $customer->getDefaultShippingAddress()->getId();
         $quoteItemIdSku         = [];
@@ -362,6 +372,8 @@ class MultiShippingHandle
             }
             $quoteItemIdSku[$item->getId()] = $item;
         }
+        $dateEnd = microtime(true); // log_time
+        $this->writeTimeLog($dateEnd, $dateStart, $message);
         foreach ($items as $item) {
             $quoteItemId = $item->getItemId();
             $shippingMethodSelected = $item->getShippingMethodSelected();
@@ -574,12 +586,25 @@ class MultiShippingHandle
                     }
                 }
             }
+            $message = 'SM\Checkout\Model\MultiShippingHandle. Thoi gian xu ly lay data send to OAR de split order - quoteID ' . $checkoutSession->getQuote()->getId() . ': ';
+            $dateEnd = microtime(true); // log_time
+            $this->writeTimeLog($dateEnd, $dateStart, $message);
+
+            $message = 'SM\Checkout\Model\MultiShippingHandle. Thoi gian OAR tra ve de split order - quoteID ' . $checkoutSession->getQuote()->getId() . ': ';
+            $dateStart = microtime(true); // log_time
             $splitOrder = $this->split->getOarResponse($dataSendToOar);
+            $dateEnd = microtime(true); // log_time
+            $this->writeTimeLog($dateEnd, $dateStart, $message);
+
             if (is_array($splitOrder)
                 && !isset($splitOrder['error'])
                 && isset($splitOrder['content'])
             ) {
+                $message = 'SM\Checkout\Model\MultiShippingHandle. Thoi gian xu ly data OAR de build items cho tao quote address - quoteID ' . $checkoutSession->getQuote()->getId() . ': ';
+                $dateStart = microtime(true); // log_time
                 $data['data'] = $this->convertOarOrder($splitOrder);
+                $dateEnd = microtime(true); // log_time
+                $this->writeTimeLog($dateEnd, $dateStart, $message);
             }
         }
         $data['data'] = array_merge($data['data'], $storePickupOrder);
@@ -1132,5 +1157,19 @@ class MultiShippingHandle
     public function checkShippingPostCode($postCode)
     {
         return $this->split->checkShippingPostCode($postCode);
+    }
+
+    /**
+     * @param $dateEnd
+     * @param $dateStart
+     * @param $message
+     */
+    protected function writeTimeLog($dateEnd, $dateStart, $message)
+    {
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/checkout-log-time.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+        $timeDiff = round($dateEnd - $dateStart, 4);
+        $logger->info($message . $timeDiff . 's');
     }
 }
