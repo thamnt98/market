@@ -30,6 +30,8 @@ use Trans\IntegrationCatalog\Api\IntegrationProductRepositoryInterface;
 use Trans\IntegrationCatalog\Model\IntegrationJob;
 use Trans\Integration\Helper\Validation;
 use Trans\Integration\Logger\Logger;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
+use Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory as AttributeCollectionFactory;
 
 class IntegrationProductImage implements IntegrationProductImageInterface {
 	/**
@@ -98,6 +100,16 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 	protected $indexerRegistry;
 
 	/**
+	 * @var \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory
+	 */
+	protected $productCollectionFactory;
+
+	/**
+	 * @var Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory
+	 */
+	protected $attributeCollectionFactory;
+
+	/**
 	 * @param Logger $Logger
 	 * @param ProductRepositoryInterface $product
 	 * @param DirectoryList $directoryList
@@ -128,7 +140,9 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 		IntegrationDataValueInterfaceFactory $dataValFactory,
 		IntegrationJobRepositoryInterface $integrationJobRepositoryInterface,
 		\Trans\IntegrationCatalog\Helper\Pim\Save\ProductImage $productImageHelper,
-		\Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
+		\Magento\Framework\Indexer\IndexerRegistry $indexerRegistry,
+		ProductCollectionFactory $productCollectionFactory,
+		AttributeCollectionFactory $attributeCollectionFactory
 	) {
 		$this->coreHelper = $coreHelper;
 		$this->logger = $logger;
@@ -149,6 +163,8 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 		$this->class = str_replace(IntegrationProductImageInterface::CRON_DIRECTORY, "", get_class($this));
 		$this->mediaDirectory = $filesystem->getDirectoryWrite(DirectoryList::MEDIA);
 		$this->indexerDirectory = $filesystem->getDirectoryWrite(DirectoryList::VAR_DIR);
+		$this->productCollectionFactory = $productCollectionFactory;
+		$this->attributeCollectionFactory = $attributeCollectionFactory;
 
 		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_image.log');
         $logger = new \Zend\Log\Logger();
@@ -247,16 +263,19 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 		$this->updateJobData($jobId, IntegrationJobInterface::STATUS_PROGRESS_CATEGORY);
 
 		$productIds = [];
-		$product = [];
 		$tmp = [];
-		$index = 1;
 		$dataImages = [];
 
 		try {
 			$this->logger->info('start loop ' . date('d-M-Y H:i:s'));
+			$productsData = array(); 
+			$products = array();
+
+			$index = 1;
 			foreach ($productData as $data) {
 				$dataArray = $data->getData();
-				try {
+				$id = $dataArray['id'];
+				try{
 					$dataValue = [];
 					try {
 						$dataValue = json_decode($dataArray['data_value'], true); 
@@ -273,69 +292,128 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 					
 					$filename = isset($dataValue['image_name']) ? $dataValue['image_name'] : '';
 					$imageUrl = isset($dataValue['image_url']) ? $dataValue['image_url'] : '';
+
+					if(!empty($sku)){
+						if(array_key_exists($sku, $products)){
+							$products[$sku]['images'][] = array(
+								'imageUrl' => $imageUrl,
+								'filename' => $filename
+							);
+						}else{
+							$products[$sku] = array(
+								'images' => [
+									array(
+										'imageUrl' => $imageUrl,
+										'filename' => $filename	
+									),
+								],
+								'dataId' => $id,
+								'index' => $index++
+							);
+						}
+					};
+				}catch(Exception $exception){
+					$this->logger->info("= SAVE :: " . $this->class . "-" . __FUNCTION__ . " " . $exception->getMessage());
+					$this->saveStatusMessage($id, $exception->getMessage(), IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
+					// $this->logger->info('end loop row ' . $index . ' ' . date('d-M-Y H:i:s'));
+					$this->logger->info('-----------------------------------------------------');
+					continue;
+				}
+			}
+
+			$skus = array_keys($products);
+			$productsCollection = $this->getProductByMultipleSku($skus);
+
+			foreach($productsCollection as $productCollection){
+				$sku = $productCollection->getSku();
+
+				$productCollection->load('media_gallery');
+
+				$products[$sku]['product'] = $productCollection;
+
+				$this->logger->info($sku);
+			}
+
+			$this->logger->info('end loop ' . date('d-M-Y H:i:s'));
+
+			$this->logger->info('start loop products ' . date('d-M-Y H:i:s'));
+			foreach ($products as $sku => $product) {
+				if(!isset($product['product'])){
+					continue;
+				}
+
+				if(!isset($product['dataId'])){
+					continue;
+				}
+
+				$id = $product['dataId'];
+				$this->logger->info($id);
+
+				$index = $product['index'];
+
+				try {
+					$this->logger->info(print_r($product['images'], true));
+
+					$productCollection = $product['product'];
+
+					$images = $product['images'];
+
+					$productRowId = $productCollection->getRowId();
+
+					foreach($images as $image){
+						$filename = $image['filename'];
+						$imageUrl = $image['imageUrl'];
+
+						$this->deleteImage($productCollection, $filename);
 					
-					$this->logger->info('start loop row ' . $index . ' ' . date('d-M-Y H:i:s'));
-					try {
-						$this->logger->info(__FUNCTION__ . ' SKU ' . $sku);
-						$product[$index] = $this->product->get($sku);
-					} catch (NoSuchEntityException $exception) {
-						$this->logger->info("=" . $this->class . "-" . __FUNCTION__ . " " . $exception->getMessage());
-						$product[$index] = false;
-					}
-
-					if ($product[$index]) {
-						$this->deleteImage($product[$index], $filename);
-
-						$productRowId = $product[$index]->getRowId();
-						
 						$no = 0;
-
+	
 						if($this->checkIsFirstImage($filename)) {
 							$baseImageAttr = $this->productImageHelper->getAttributeIdByCode('image');
 							$smallImageAttr = $this->productImageHelper->getAttributeIdByCode('small_image');
 							$thumbnailImageAttr = $this->productImageHelper->getAttributeIdByCode('thumbnail');
 							$imageAttr = [$baseImageAttr, $smallImageAttr, $thumbnailImageAttr];
-
+	
 							$this->productImageHelper->deleteProductImageByAttrIds($productRowId, $imageAttr);
 						} else {
 							$swatchImage = $this->productImageHelper->getAttributeIdByCode('swatch_image');
 							$imageAttr = [$swatchImage];
 						}
-
-						$tmp[$index] = $this->saveImageData($product[$index], $filename, [$imageUrl], $imageAttr);
-
+	
+						$tmp[$index] = $this->saveImageData($productCollection, $filename, [$imageUrl], $imageAttr);
+	
 						$this->deleteTmpFile($tmp[$index]);
 						try {
 							$file = $tmp[$index][0];
-
+	
 							$filepath = $file['filename'];
-
+	
 							$this->productImageHelper->saveProductImage($productRowId, $filepath, $imageAttr);
 							$mediaGalleryAttr = $this->productImageHelper->getAttributeIdByCode('media_gallery');
-
+	
 							$this->productImageHelper->insertMediaGalleryValue($mediaGalleryAttr, $filepath, $productRowId);
-
-							$productIds[] = $product[$index]->getId();
+	
+							$productIds[] = $productCollection->getId();
 						} catch (\Exception $e) {
 							$this->logger->info("saveProductImage fail: " . $e->getMessage());
 							continue;
 						}
-
-						$this->saveStatusMessage($dataArray['id'], null, IntegrationDataValueInterface::STATUS_DATA_SUCCESS);
 					}
 
+					$this->saveStatusMessage($id, null, IntegrationDataValueInterface::STATUS_DATA_SUCCESS);
 
 					$this->logger->info('end loop row ' . $index . ' ' . date('d-M-Y H:i:s'));
 					$this->logger->info('-----------------------------------------------------');
 					$index++;
 				} catch (\Exception $exception) {
 					$this->logger->info("= SAVE :: " . $this->class . "-" . __FUNCTION__ . " " . $exception->getMessage());
-					$this->saveStatusMessage($dataArray['id'], $exception->getMessage(), IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
+					$this->saveStatusMessage($id, $exception->getMessage(), IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
 					$this->logger->info('end loop row ' . $index . ' ' . date('d-M-Y H:i:s'));
 					$this->logger->info('-----------------------------------------------------');
 					continue;
 				}
 			}
+			$this->logger->info('end loop products' . date('d-M-Y H:i:s'));
 
 			try {
 				if(!empty($productIds)) {
@@ -357,9 +435,6 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 			} catch (\Exception $e) {
 				$this->logger->info('reindex fail ' . date('d-M-Y H:i:s'));	
 			}
-			
-			$this->logger->info('end loop ' . date('d-M-Y H:i:s'));
-
 		} catch (\Exception $exception) {
 			$msg = $this->class . "-" . __FUNCTION__ . " " . $exception->getMessage();
 			$this->updateJobData($jobId, IntegrationJobInterface::STATUS_PROGRES_UPDATE_FAIL, $msg);
@@ -612,7 +687,7 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 		$imgName = [];
 		$i = 0;
 
-		$this->logger->info('=== START loop images url save' . date('d-M-Y H:i:s'));
+		$this->logger->info('=== START loop images url save ' . date('d-M-Y H:i:s'));
 		foreach ($images as $imageUrl) {
 			try {
 				$this->file->checkAndCreateFolder($tmpDir);
@@ -821,5 +896,28 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
         }
 
         return $fileMediaName;
-    }
+	}
+	
+	/**
+     * Get product by multiple sku
+     */
+    protected function getProductByMultipleSku($skuList)
+    {
+        $result = [];
+        if (empty($skuList) == false) {
+            $this->logger->info('Before get product ' . date('d-M-Y H:i:s'));
+            $collection = $this->productCollectionFactory->create()->addFieldToFilter('sku', ['in'=>$skuList]);
+            $collection->getSelect()->reset(\Zend_Db_Select::COLUMNS)->columns(['entity_id','sku','row_id','type_id']);
+            $result = $collection->getItems();
+            $this->logger->info('After get product ' . date('d-M-Y H:i:s'));
+        }
+        return $result;
+	}
+	
+	protected function getProductAttribute()
+	{
+		$collection = $this->attributeCollectionFactory->create();
+		var_dump($collection->getSelect()->__toString());
+		die();
+	}
 }
