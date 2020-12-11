@@ -198,7 +198,8 @@ class IntegrationStock implements IntegrationStockInterface {
 		try {
 			// $items = [];
 			// $i = 0;	
-			$productReindexIds = [];		
+			$productReindexIds = [];
+			$dataStockList = [];		
 			foreach ($datas as $data) {
 
 				$dataStock    = $this->curl->jsonToArray($data->getDataValue());
@@ -256,24 +257,13 @@ class IntegrationStock implements IntegrationStockInterface {
 						}
 
 						// raw query set stock
-						// check if sku and store exist on table inventory_source_item
-						$connection = $this->resourceConnection->getConnection();
-			        	// $table is table name
-				        $tableName = $connection->getTableName("inventory_source_item");
-
-						$sql = "select source_item_id, sku, source_code from " . $tableName . " where sku = '" . $productSku . "' and source_code = '" . $locationCode . "' limit 1";
-
-						$checkSource = $connection->fetchRow($sql);
-						
-						if (!$checkSource) {
-							//insert Data into table
-							$query = "insert into " . $tableName . " (source_code, sku, quantity, status) values ('" . $locationCode . "', '" . $productSku . "', '" . $quantity . "', '" . IntegrationStockInterface::IMS_STATUS . "')";
-						}
-						else {
-							$query = "update " . $tableName . " set quantity = '" . $quantity . "' where source_item_id = '" . $checkSource['source_item_id'] . "'";
-						}
-
-				        $connection->query($query);
+						$dataStockList[] =
+		                    [
+		                        "source_code"=>"".$locationCode."",
+		                        "sku"=>"".$productSku."",
+		                        "quantity"=>"".$quantity."",
+		                        "status"=>"1"
+		                    ];
 
 						$this->saveStatusMessage($data, $messageValue, IntegrationDataValueInterface::STATUS_DATA_SUCCESS);
 					}
@@ -301,6 +291,16 @@ class IntegrationStock implements IntegrationStockInterface {
             
 	        // $this->sourceItemHelper->stockItemReindex();
 
+            //save stock insert on duplicate
+	        try {
+                if ($dataStockList) {
+                    $connectionCheck->insertOnDuplicate("inventory_source_item", $dataStockList, ['quantity']);
+                    $this->logger->info('insertOnDuplicate success ' . date('d-M-Y H:i:s')); 
+                }
+            } catch (\Exception $e) {
+                $this->logger->info('insertOnDuplicate fail ' . date('d-M-Y H:i:s')); 
+            }
+            
 	        try {
                 if(!empty($productReindexIds)) {
                     $this->reindexByProductsIds($productReindexIds, ['inventory', 'cataloginventory_stock']);
