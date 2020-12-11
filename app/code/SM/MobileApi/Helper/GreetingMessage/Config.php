@@ -14,6 +14,7 @@ class Config extends AbstractHelper
     const FIRST_TIME_SIGN_IN_MESSAGE = 'sm_message/first_time_sign_in/first_time_message';
     const MORNING_SIGN_IN_MESSAGE    = 'sm_message/morning_sign_in/morning_message';
     const AFTERNOON_SIGN_IN_MESSAGE  = 'sm_message/afternoon_sign_in/afternoon_message';
+    const EVENING_SIGN_IN_MESSAGE    = 'sm_message/evening_sign_in/evening_message';
     const AFTER_WEEK_SIGN_IN_MESSAGE = 'sm_message/after_week_sign_in/after_week_message';
 
     const CAMPAIGN_MESSAGE    = 'sm_message/campaign/campaign_message';
@@ -53,6 +54,17 @@ class Config extends AbstractHelper
     {
         return $this->scopeConfig->getValue(
             self::AFTERNOON_SIGN_IN_MESSAGE,
+            ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * @return string
+     */
+    public function getEveningSignInMessage()
+    {
+        return $this->scopeConfig->getValue(
+            self::EVENING_SIGN_IN_MESSAGE,
             ScopeInterface::SCOPE_STORE
         );
     }

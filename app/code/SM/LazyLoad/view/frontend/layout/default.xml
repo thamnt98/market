@@ -2,11 +2,8 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
         <referenceContainer name="before.body.end">
-            <block class="SM\TobaccoAlcoholProduct\Block\Popup" name="tobacco.alcohol.popup">
-                <arguments>
-                    <argument name="is_pdp" xsi:type="boolean">true</argument>
-                </arguments>
-            </block>
+            <block class="Magento\Framework\View\Element\Template" name="lazyload_scripts"
+                   template="SM_LazyLoad::scripts.phtml" />
         </referenceContainer>
     </body>
 </page>
