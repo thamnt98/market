@@ -378,7 +378,7 @@ $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
             </div>
         </div>
     </div>
-    <div class="check-payment-row">
+    <div class="check-payment-row check-payment-col">
         <?php if ($block->getOrderIsVirtual()):?>
             <a class="btn-outline-secondary" href="/sales/order/digital/id/<?= $block->getOrderId() ?>"><?= $block->escapeHtml(__("Check My Order"))?></a>
         <?php else:?>
