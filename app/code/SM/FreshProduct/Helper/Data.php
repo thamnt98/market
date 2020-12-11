@@ -10,7 +10,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_TOOLTIP_CONTENT = 'fresh_product/general/tooltip';
 
     const IS_FRESH = 'is_fresh';
-    const OWN_COURIER = 'own_courier';
+    const OWN_COURIER = 'is_fresh';
     const BASE_PRICE_IN_KG = 'base_price_in_kg';
     const PROMO_PRICE_IN_KG = 'promo_price_in_kg';
     const IS_DECIMAL = 'is_decimal';
