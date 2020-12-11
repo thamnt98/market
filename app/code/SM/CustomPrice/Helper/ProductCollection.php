@@ -22,9 +22,9 @@ class ProductCollection
     protected $_customerSession;
 
     public function __construct(
-        \Magento\Customer\Model\Session $customerSession
+        \Magento\Customer\Model\SessionFactory $customerSessionFactory
     ) {
-        $this->_customerSession = $customerSession;
+        $this->_customerSession = $customerSessionFactory->create();
         if ($this->_customerSession->isLoggedIn()||$this->_customerSession->isLoggedInByAPI()) {
             $this->basePriceCode  = $this->_customerSession->getOmniNormalPriceAttributeCode();
             $this->promoPriceCode = $this->_customerSession->getOmniFinalPriceAttributeCode();

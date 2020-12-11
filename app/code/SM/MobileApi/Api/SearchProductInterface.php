@@ -33,10 +33,10 @@ interface SearchProductInterface
 
     /**
      * @param string $keyword
-     * @param int $categoryId
+     * @param int $category_id
      * @return \SM\MobileApi\Api\Data\Product\SearchInterface
      */
-    public function getSearchSuggestion(string $keyword, $categoryId = null);
+    public function getSearchSuggestion(string $keyword, $category_id = null);
 
     /**
      * @param int $customerId

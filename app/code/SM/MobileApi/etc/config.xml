@@ -20,6 +20,10 @@
                 <afternoon_message>Good afternoon, %s! Let's shop</afternoon_message>
             </afternoon_sign_in>
 
+            <evening_sign_in>
+                <evening_message>Good evening, %s.It's never too late to shop!</evening_message>
+            </evening_sign_in>
+
             <after_week_sign_in>
                 <after_week_message>We miss you, %s! Welcome back.</after_week_message>
             </after_week_sign_in>
