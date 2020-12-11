@@ -1,0 +1,42 @@
+<?php
+$threshold = 200;
+$delay = (int)-1;
+$effect = "show";
+$effectTime = 10
+?>
+<script>
+    require(['jquery', 'lazyLoad', 'lazyLoadPlugins'], function ($) {
+        $(window).load(function () {
+            window.mgzLazyload = function () {
+                $('.lazy').lazy({
+                    bind: "event",
+                    delay: <?= $delay ? $delay : '-1' ?>,
+                    threshold: <?= $threshold ?>,
+                    effect: "<?= $effect ?>",
+                    effectTime: <?= $effectTime ?>,
+                    afterLoad: function (element) {
+                        $(element).removeClass('lazy-loading').addClass('lazy-loaded');
+                    }
+                });
+            }
+            $(window.mgzLazyload);
+            $(document).on('ajaxComplete', function (event, xhr, settings) {
+                $(window.mgzLazyload);
+            });
+            $(document).ready(function ($) {
+                $('.owl-carousel').on('changed.owl.carousel', function (event) {
+                    $(window.mgzLazyload);
+                });
+            });
+            $('.swiper-container').find('img.lazy-loading').each(function (index, el) {
+                var lazySrc = $(this).data('src');
+                $(this).removeClass('lazy-loading');
+                $(this).addClass('lazy-loaded');
+                $(this).attr('src', lazySrc);
+            });
+            $(document).ajaxComplete(function () {
+                $(".log").text("Triggered ajaxComplete handler.");
+            });
+        });
+    });
+</script>

@@ -224,9 +224,12 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             return null;
         }
 
-        return ceil(
-            ($product->getPrice() - $product->getFinalPrice()) * 100 / $product->getPrice()
-        );
+        $percent = ($product->getPrice() - $product->getFinalPrice()) * 100 / $product->getPrice();
+        if ($percent > 99 && $percent < 100) { // round down if 99 < percent < 100
+            return floor($percent);
+        } else {
+            return ceil($percent);
+        }
     }
 
     /**
@@ -244,9 +247,13 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             return null;
         }
 
-        return ceil(
-            ($sumPriceMin - $sumSpecialPriceMin) * 100 / $sumPriceMin
-        );
+        $percent = ($sumPriceMin - $sumSpecialPriceMin) * 100 / $sumPriceMin;
+
+        if ($percent > 99 && $percent < 100) { // round down if 99 < percent < 100
+            return floor($percent);
+        } else {
+            return ceil($percent);
+        }
     }
 
     /**

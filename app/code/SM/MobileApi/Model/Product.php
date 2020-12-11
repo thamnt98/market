@@ -4,64 +4,94 @@ namespace SM\MobileApi\Model;
 
 /**
  * Class Product
+ *
  * @package SM\MobileApi\Model
  */
 class Product implements \SM\MobileApi\Api\ProductInterface
 {
+    /**
+     * @var Data\Product\LiistFactory
+     */
     protected $productListFactory;
-    protected $catalogCategory;
-    protected $productFactory;
-    protected $catalogSearch;
-    protected $productRelated;
-    protected $productUpsell;
-    protected $productCrosssell;
-    protected $productMulti;
-    protected $productUrl;
-    protected $helperData;
-    protected $request;
-    protected $smartProductRepository;
-    protected $_registry;
 
+    /**
+     * @var \SM\Category\Model\Catalog\Category
+     */
+    protected $catalogCategory;
+
+    /**
+     * @var Data\Product\ProductFactory
+     */
+    protected $productFactory;
+
+    /**
+     * @var Product\Related
+     */
+    protected $productRelated;
+
+    /**
+     * @var \SM\Product\Api\Repository\ProductRepositoryInterface
+     */
+    protected $smartProductRepository;
+
+    /**
+     * @var \Magento\Framework\Registry
+     */
+    protected $registry;
+
+    /**
+     * @var \Magento\Customer\Model\CustomerFactory
+     */
+    protected $customerFactory;
+
+    /**
+     * @var \Magento\Customer\Model\Session
+     */
+    protected $session;
+
+    /**
+     * Product constructor.
+     *
+     * @param \Magento\Customer\Model\Session                       $session
+     * @param \Magento\Customer\Model\CustomerFactory               $customerFactory
+     * @param Data\Product\LiistFactory                             $listFactory
+     * @param \SM\Category\Model\Catalog\Category                   $catalogCategory
+     * @param Data\Product\ProductFactory                           $productFactory
+     * @param Product\Related                                       $productRelated
+     * @param \SM\Product\Api\Repository\ProductRepositoryInterface $smartProductRepository
+     * @param \Magento\Framework\Registry                           $registry
+     */
     public function __construct(
-        \Magento\Framework\App\RequestInterface $request,
+        \Magento\Customer\Model\Session $session,
+        \Magento\Customer\Model\CustomerFactory $customerFactory,
         \SM\MobileApi\Model\Data\Product\LiistFactory $listFactory,
         \SM\Category\Model\Catalog\Category $catalogCategory,
         \SM\MobileApi\Model\Data\Product\ProductFactory $productFactory,
-        \SM\Category\Model\Catalog\Search $catalogSearch,
         \SM\MobileApi\Model\Product\Related $productRelated,
-        \SM\MobileApi\Model\Product\Upsell $productUpsell,
-        \SM\MobileApi\Model\Product\Crosssell $productCrosssell,
-        \SM\MobileApi\Model\Product\Multi $productMulti,
-        \SM\MobileApi\Model\Product\Url $productUrl,
-        \SM\MobileApi\Helper\Data $helperData,
         \SM\Product\Api\Repository\ProductRepositoryInterface $smartProductRepository,
         \Magento\Framework\Registry $registry
     ) {
-        $this->request                = $request;
         $this->productListFactory     = $listFactory;
         $this->catalogCategory        = $catalogCategory;
-        $this->catalogSearch          = $catalogSearch;
         $this->productFactory         = $productFactory;
         $this->productRelated         = $productRelated;
-        $this->productUpsell          = $productUpsell;
-        $this->productCrosssell       = $productCrosssell;
-        $this->productMulti           = $productMulti;
-        $this->productUrl             = $productUrl;
-        $this->helperData             = $helperData;
         $this->smartProductRepository = $smartProductRepository;
-        $this->_registry = $registry;
+        $this->registry               = $registry;
+        $this->customerFactory        = $customerFactory;
+        $this->session                = $session;
     }
 
     /**
-     * @param int $category_id
-     * @param int $limit
-     * @param int $p
+     * @param int     $category_id
+     * @param int     $customerId
      * @param boolean $layer
+     *
      * @return \SM\MobileApi\Api\Data\Product\ListInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getList($category_id, $limit = 12, $p = 1, $layer = true)
+    public function getList($category_id, $customerId, $layer = true)
     {
+        $this->initCustomerSession($customerId);
         //Init category and apply filter
         $this->catalogCategory->init($category_id);
 
@@ -105,7 +135,7 @@ class Product implements \SM\MobileApi\Api\ProductInterface
     public function getDetailsBySKU($sku, $customerId)
     {
         //Using customer id for calculate distance between customer and store
-        $this->_registry->register('customer_id', $customerId);
+        $this->registry->register('customer_id', $customerId);
 
         /* @var \SM\MobileApi\Api\Data\Product\ProductInterface $result */
         $result = $this->productFactory->create();
@@ -128,5 +158,21 @@ class Product implements \SM\MobileApi\Api\ProductInterface
         $result->setProducts($this->productRelated->getList($product_id));
 
         return $result;
+    }
+
+    /**
+     * @param int $customerId
+     */
+    protected function initCustomerSession($customerId)
+    {
+        if ($this->session->isLoggedIn() || !$customerId) {
+            return;
+        }
+
+        /** @var \Magento\Customer\Model\Customer $customer */
+        $customer = $this->customerFactory->create()->load($customerId);
+        if ($customer && $customer->getId()) {
+            $this->session->setCustomerAsLoggedIn($customer);
+        }
     }
 }
