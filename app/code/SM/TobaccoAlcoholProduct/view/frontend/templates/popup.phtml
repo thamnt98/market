@@ -2,7 +2,7 @@
      class="content popup-tobacco"
      data-is-show="<?= $block->isShow()?>"
      style="display: none">
-    <img src='<?= $block->getViewFileUrl('images/tobacco-verification.png'); ?>' alt="tobacco"/>
+    <img loading=lazy src='<?= $block->getViewFileUrl('images/tobacco-verification.png'); ?>' alt="Tobacco"/>
     <h4 class="text"><?= $block->escapeHtml(__("You have to be "))?>
         <span class="bold"><?= $block->escapeHtml(__("at least 18 years old "))?></span>
         <?= $block->escapeHtml(__("to purchase tobacco products"))?><br/>
