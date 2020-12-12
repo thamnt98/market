@@ -86,7 +86,6 @@ class Price extends \Amasty\Shopby\Model\Layer\Filter\Price
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         SearchEngine $searchEngine,
         \Magento\Framework\Message\ManagerInterface $messageManager,
-        \Magento\Customer\Model\Session $session,
         array $data = []
     ) {
         parent::__construct($coreRegistry, $filterItemFactory, $storeManager, $layer, $itemDataBuilder, $resource,
@@ -110,10 +109,9 @@ class Price extends \Amasty\Shopby\Model\Layer\Filter\Price
         $this->messageManager     = $messageManager;
 
         $this->currentAttribute = $this->_requestVar;
-        if ($session->isLoggedIn()) {
+        if ($this->customerSession->isLoggedIn()) {
             $this->currentAttribute = $this->customerSession->getOmniFinalPriceAttributeCode();
         }
-
     }
 
     /**

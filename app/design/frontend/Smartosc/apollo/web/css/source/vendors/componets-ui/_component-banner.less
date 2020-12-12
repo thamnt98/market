@@ -946,9 +946,14 @@
 //
 //  Mobile (style-m.css)
 //  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__xs) {
+    div[data-navigation-style^="style-"] {
+        min-height: 150px !important;
+    }
+}
 .media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
     [data-navigation-style^="style-"] {
-        min-height: 350px !important;
+        min-height: 250px !important;
         .pagebuilder-slide-wrapper {
             padding: 40px 20px  !important;
             .pagebuilder-overlay:not(.pagebuilder-poster-overlay){
@@ -1016,6 +1021,12 @@
     div.banner-poster-medium{
         .pagebuilder-banner-wrapper{
             min-height: auto !important;
+        }
+    }
+    .blockInspire .card-img-container{
+        img{
+            width: 100%;
+            height: auto;
         }
     }
 }

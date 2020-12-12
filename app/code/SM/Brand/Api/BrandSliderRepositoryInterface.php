@@ -14,8 +14,8 @@ namespace SM\Brand\Api;
 interface BrandSliderRepositoryInterface
 {
     /**
-     * @param int $categoryId
+     * @param int $category_id
      * @return \Amasty\ShopbyBase\Api\Data\OptionSettingInterface[]
      */
-    public function getBrandSlider($categoryId);
+    public function getBrandSlider($category_id);
 }

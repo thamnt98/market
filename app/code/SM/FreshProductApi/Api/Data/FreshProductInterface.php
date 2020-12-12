@@ -8,7 +8,7 @@ namespace SM\FreshProductApi\Api\Data;
  */
 interface FreshProductInterface
 {
-    const OWN_COURIER = "own_courier";
+    const OWN_COURIER = "is_fresh";
     const BASE_PRICE_IN_KG = "base_price_in_kg";
     const PROMO_PRICE_IN_KG = "promo_price_in_kg";
     const IS_DECIMAL = "is_decimal";

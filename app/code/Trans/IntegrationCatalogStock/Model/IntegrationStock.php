@@ -103,6 +103,11 @@ class IntegrationStock implements IntegrationStockInterface {
      */
     protected $resourceConnection;
 
+    /**
+	 * @var \Magento\Framework\Indexer\IndexerRegistry
+	 */
+	protected $indexerRegistry;
+
 	/**
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param SourceItemsSaveInterface $sourceItemSave
@@ -116,6 +121,7 @@ class IntegrationStock implements IntegrationStockInterface {
 	 * @param SourceItem $sourceItemHelper
      * @param SourceInterfaceFactory $sourceInterfaceFactory
      * @param Magento\Framework\App\ResourceConnection $resourceConnection
+     * @param \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
      */
 	public function __construct
 	(	
@@ -131,7 +137,8 @@ class IntegrationStock implements IntegrationStockInterface {
 		Validation $validation,
 		SourceItem $sourceItemHelper,
         SourceInterfaceFactory $sourceInterfaceFactory,
-        \Magento\Framework\App\ResourceConnection $resourceConnection
+        \Magento\Framework\App\ResourceConnection $resourceConnection,
+        \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
 	) {	
 
         $this->sourceItem 							   = $sourceItem;
@@ -147,6 +154,7 @@ class IntegrationStock implements IntegrationStockInterface {
         $this->sourceInterfaceFactory 				   = $sourceInterfaceFactory; 
 		$this->integrationAssignSources 			   = $integrationAssignSources;
 		$this->resourceConnection = $resourceConnection;
+		$this->indexerRegistry = $indexerRegistry;
 
 		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_catalog_stock_model.log');
         $logger = new \Zend\Log\Logger();
@@ -189,7 +197,9 @@ class IntegrationStock implements IntegrationStockInterface {
 
 		try {
 			// $items = [];
-			// $i = 0;			
+			// $i = 0;	
+			$productReindexIds = [];
+			$dataStockList = [];		
 			foreach ($datas as $data) {
 
 				$dataStock    = $this->curl->jsonToArray($data->getDataValue());
@@ -200,7 +210,7 @@ class IntegrationStock implements IntegrationStockInterface {
         	    $messageValue = '';
 
         	    // get row id
-        	    $queryRowId = "select row_id FROM catalog_product_entity where sku = '".$productSku."' limit 1";
+        	    $queryRowId = "select row_id, entity_id FROM catalog_product_entity where sku = '".$productSku."' limit 1";
         	    $getRowId = $connectionCheck->fetchRow($queryRowId);
 
 				// get value is fresh
@@ -214,6 +224,11 @@ class IntegrationStock implements IntegrationStockInterface {
 				// get value sold_in
         	    $querySoldIn = "select value FROM catalog_product_entity_varchar where row_id = '".$getRowId['row_id']."' AND attribute_id = '".$getGetAttrIdSoldIn['attribute_id']."' limit 1";
 				$getSoldIn = $connectionCheck->fetchRow($querySoldIn);
+
+				//array reindex
+				if ($getRowId['entity_id']) {
+					$productReindexIds[] = $getRowId['entity_id'];
+				}
 
         	    //Check source, if does not exist added as new source (store).
         	    if ($checkSource == NULL && strpos($locationCode, ' ') === false) {
@@ -242,24 +257,13 @@ class IntegrationStock implements IntegrationStockInterface {
 						}
 
 						// raw query set stock
-						// check if sku and store exist on table inventory_source_item
-						$connection = $this->resourceConnection->getConnection();
-			        	// $table is table name
-				        $tableName = $connection->getTableName("inventory_source_item");
-
-						$sql = "select source_item_id, sku, source_code from " . $tableName . " where sku = '" . $productSku . "' and source_code = '" . $locationCode . "' limit 1";
-
-						$checkSource = $connection->fetchRow($sql);
-						
-						if (!$checkSource) {
-							//insert Data into table
-							$query = "insert into " . $tableName . " (source_code, sku, quantity, status) values ('" . $locationCode . "', '" . $productSku . "', '" . $quantity . "', '" . IntegrationStockInterface::IMS_STATUS . "')";
-						}
-						else {
-							$query = "update " . $tableName . " set quantity = '" . $quantity . "' where source_item_id = '" . $checkSource['source_item_id'] . "'";
-						}
-
-				        $connection->query($query);
+						$dataStockList[] =
+		                    [
+		                        "source_code"=>"".$locationCode."",
+		                        "sku"=>"".$productSku."",
+		                        "quantity"=>"".$quantity."",
+		                        "status"=>"1"
+		                    ];
 
 						$this->saveStatusMessage($data, $messageValue, IntegrationDataValueInterface::STATUS_DATA_SUCCESS);
 					}
@@ -285,7 +289,26 @@ class IntegrationStock implements IntegrationStockInterface {
                 }
             }
             
-	        $this->sourceItemHelper->stockItemReindex();
+	        // $this->sourceItemHelper->stockItemReindex();
+
+            //save stock insert on duplicate
+	        try {
+                if ($dataStockList) {
+                    $connectionCheck->insertOnDuplicate("inventory_source_item", $dataStockList, ['quantity']);
+                    $this->logger->info('insertOnDuplicate success ' . date('d-M-Y H:i:s')); 
+                }
+            } catch (\Exception $e) {
+                $this->logger->info('insertOnDuplicate fail ' . date('d-M-Y H:i:s')); 
+            }
+            
+	        try {
+                if(!empty($productReindexIds)) {
+                    $this->reindexByProductsIds($productReindexIds, ['inventory', 'cataloginventory_stock']);
+                    $this->logger->info('reindex success ' . date('d-M-Y H:i:s')); 
+                }
+            } catch (\Exception $e) {
+                $this->logger->info('reindex fail ' . date('d-M-Y H:i:s')); 
+            }
 
 		}
 		catch (\Exception $exception) {
@@ -327,6 +350,23 @@ class IntegrationStock implements IntegrationStockInterface {
 
 		return true;
 	}
+
+	/**
+	 * reindex bu product ids
+	 *
+	 * @param array $productIds
+	 * @param array $indexLists
+	 * @return void
+	 */
+	protected function reindexByProductsIds($productIds, $indexLists)
+    {
+        foreach($indexLists as $indexList) {
+            $stockIndexer = $this->indexerRegistry->get($indexList);
+            if (!$stockIndexer->isScheduled()) {
+                $stockIndexer->reindexList(array_unique($productIds));
+            }
+        }
+    }
 
 	/**
      * Add New Store

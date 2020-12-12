@@ -75,6 +75,15 @@
                 </field>
             </group>
 
+            <group id="evening_sign_in" showInStore="1" showInWebsite="1" showInDefault="1" translate="label comment"
+                   sortOrder="10">
+                <label>Evening sign in</label>
+                <field id="evening_message" sortOrder="10"  type="text" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Message</label>
+                    <comment>% s will be replaced with username</comment>
+                </field>
+            </group>
+
             <group id="after_week_sign_in" showInStore="1" showInWebsite="1" showInDefault="1" translate="label comment"
                    sortOrder="20">
                 <label>After week sign in</label>
