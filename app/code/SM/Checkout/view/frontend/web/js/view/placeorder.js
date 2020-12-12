@@ -20,8 +20,9 @@ define([
     'SM_Checkout/js/view/split',
     'SM_Checkout/js/action/find-store',
     'SM_Checkout/js/view/cart-items/set-shipping-type',
-    'SM_Checkout/js/view/cart-items/init-shipping-type'
-], function ($, ko, Component, storage, urlManager, fullScreenLoader, getTotalsAction, globalVar, customerData, placeOrder,$t,messageList,pickup, split, findStoreAction, setShippingType, initShippingType) {
+    'SM_Checkout/js/view/cart-items/init-shipping-type',
+    'Trans_Mepay/js/view/payment/method-renderer/trans_mepay'
+], function ($, ko, Component, storage, urlManager, fullScreenLoader, getTotalsAction, globalVar, customerData, placeOrder, $t, messageList, pickup, split, findStoreAction, setShippingType, initShippingType, transMepay) {
     'use strict';
 
     return Component.extend({
@@ -34,7 +35,7 @@ define([
         initialize: function () {
             this._super();
             var self = this;
-            this.isStepShipping = ko.computed(function() {
+            this.isStepShipping = ko.computed(function () {
                 var isStepShipping = globalVar.isStepPreviewOrder,
                     isStepPayment = globalVar.isStepShipping;
                 return (isStepShipping() || isStepPayment()) ? true : false;
@@ -42,7 +43,7 @@ define([
             this.disableGoPaymentButton = ko.computed(function () {
                 return (globalVar.disableGoPaymentButton() || (!findStoreAction.storeFullFill() && setShippingType.getValue()() != '0')) ? true : false;
             }, this);
-            this.buttonTitle = ko.computed(function() {
+            this.buttonTitle = ko.computed(function () {
                 if (globalVar.isStepShipping() && globalVar.splitOrder()) {
                     return $t('Continue');
                 } else {
@@ -63,7 +64,7 @@ define([
             fullScreenLoader.startLoader();
             storage.post(
                 urlManager.build('rest/V1/trans-checkout/me/placeorder'),
-                JSON.stringify({'customer_id': window.checkoutConfig.customerData.id})
+                JSON.stringify({ 'customer_id': window.checkoutConfig.customerData.id })
             ).done(
                 function (response) {
                     fullScreenLoader.stopLoader();
@@ -88,7 +89,7 @@ define([
             );
         },
 
-        nextPayment: function(){
+        nextPayment: function () {
             var self = this;
             if (this.disableGoPaymentButton()) {
                 return;
@@ -142,62 +143,78 @@ define([
             );
 
         },
-        placeOrder:function () {
+        placeOrder: function () {
+            // **** BANK MEGA payment ****
+            var obj = this.getPaymentMethods();
+
+            if (obj['method'] == 'trans_mepay_cc' || obj['method'] == 'trans_mepay_va' || obj['method'] == 'trans_mepay_qris') {
+                return $.when(placeOrder(this.getPaymentMethods(), '')).done(
+                    function () {
+
+                        var redirectUrl = urlManager.build('transmepay/payment/redirect');
+                        $('[data-href="payment-error"]').text('').addClass('hidden');
+                        window.location.replace(redirectUrl);
+
+                    }
+                );
+            }
+            // **** end BANK MEGA payment ****
+
             return $.when(placeOrder(this.getPaymentMethods(), '')).done(
                 function () {
 
                     var redirectUrl = urlManager.build('sprint/payment/authorization');
                     $('[data-href="payment-error"]').text('').addClass('hidden');
                     $.ajax({
-                               type: 'post',
-                               showLoader: true,
-                               url: redirectUrl,
-                               cache: false,
-                               success: function(data) {
-                                   let sections = ['cart'];
-                                   customerData.invalidate(sections);
+                        type: 'post',
+                        showLoader: true,
+                        url: redirectUrl,
+                        cache: false,
+                        success: function (data) {
+                            let sections = ['cart'];
+                            customerData.invalidate(sections);
 
-                                   var status = data.insertStatus;
+                            var status = data.insertStatus;
 
-                                   var message = $t(data.insertMessage);
+                            var message = $t(data.insertMessage);
 
-                                   if (data === false) {
-                                       messageList.addErrorMessage({
-                                                                       message: message
-                                                                   });
-                                   }
+                            if (data === false) {
+                                messageList.addErrorMessage({
+                                    message: message
+                                });
+                            }
 
-                                   if (status === '00') {
-                                       var afterPlaceOrder = urlManager.build('transcheckout/index/success');
-                                       if (data.redirectURL) {
-                                            afterPlaceOrder = data.redirectURL;
-                                       }
-                                       window.location.replace(afterPlaceOrder);
+                            if (status === '00') {
+                                var afterPlaceOrder = urlManager.build('transcheckout/index/success');
+                                if (data.redirectURL) {
+                                    afterPlaceOrder = data.redirectURL;
+                                }
+                                window.location.replace(afterPlaceOrder);
 
-                                   } else {
-                                       $('[data-href="payment-error"]').text(message).removeClass('hidden');
-                                       messageList.addErrorMessage({
-                                                                       message: message
-                                                                   });
-                                       console.log({
-                                                 title: 'Error',
-                                                 content: message,
-                                                 actions: {
-                                                     always: function() {}
-                                                 }
-                                             });
-                                       // window.location.replace(urlManager.build('transcheckout/checkout'));
-                                   }
-                               } //end of ajax success
-                        ,error:function (error) {
+                            } else {
+                                $('[data-href="payment-error"]').text(message).removeClass('hidden');
+                                messageList.addErrorMessage({
+                                    message: message
+                                });
+                                console.log({
+                                    title: 'Error',
+                                    content: message,
+                                    actions: {
+                                        always: function () { }
+                                    }
+                                });
+                                // window.location.replace(urlManager.build('transcheckout/checkout'));
+                            }
+                        } //end of ajax success
+                        , error: function (error) {
                             console.log(error);
                         }
-                           });
+                    });
                 }
             );
         },
 
-        getPaymentMethods:function () {
+        getPaymentMethods: function () {
             if (window.digitalProduct) {
                 return {
                     'method': $('input[name="selected-method"]').val(),
@@ -223,7 +240,7 @@ define([
             }));
 
             crumbs.append($("<li/>", {}).append($("<strong/>", {
-                "text" : $.mage.__("Payment"),
+                "text": $.mage.__("Payment"),
             })))
 
         }

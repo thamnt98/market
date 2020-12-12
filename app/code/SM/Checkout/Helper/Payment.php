@@ -13,10 +13,12 @@ class Payment
 {
     const CREDIT          = [
         'sprint_allbankfull_cc',
-        'sprint_mega_cc'
+        'sprint_mega_cc',
+        'trans_mepay_cc'
     ];
     const VIRTUAL_ACCOUNT = [
-        'sprint_bca_va'
+        'sprint_bca_va',
+        'trans_mepay_va'
     ];
     const INSTALLMENT     = [
         'sprint_bca_cc'
