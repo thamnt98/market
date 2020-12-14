@@ -18,12 +18,6 @@ interface MultiShippingInterface
     public function saveShippingItems($items, $additionalInfo, $type, $address);
 
     /**
-     * @param int $customerId
-     * @return string
-     */
-    public function placeOrder($customerId);
-
-    /**
      * @param int    $customerId
      * @param string $paymentMethod
      * @param int    $serviceFee
