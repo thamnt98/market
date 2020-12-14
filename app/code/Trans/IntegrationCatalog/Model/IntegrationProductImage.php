@@ -263,8 +263,8 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 		$this->updateJobData($jobId, IntegrationJobInterface::STATUS_PROGRESS_CATEGORY);
 
 		$productIds = [];
-		$tmp = [];
-		$dataImages = [];
+		// $tmp = [];
+		// $dataImages = [];
 
 		try {
 			$this->logger->info('start loop ' . date('d-M-Y H:i:s'));
@@ -323,21 +323,25 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 
 			$skus = array_keys($products);
 			$productsCollection = $this->getProductByMultipleSku($skus);
-
-			foreach($productsCollection as $productCollection){
-				$sku = $productCollection->getSku();
-
-				$productCollection->load('media_gallery');
-
-				$products[$sku]['product'] = $productCollection;
-
-				$this->logger->info($sku);
-			}
-
 			$this->logger->info('end loop ' . date('d-M-Y H:i:s'));
 
+			$baseImageAttr = $this->productImageHelper->getAttributeIdByCode('image');
+			$smallImageAttr = $this->productImageHelper->getAttributeIdByCode('small_image');
+			$thumbnailImageAttr = $this->productImageHelper->getAttributeIdByCode('thumbnail');
+			$swatchImage = $this->productImageHelper->getAttributeIdByCode('swatch_image');
+
+			$firstImageAttributes = [$baseImageAttr, $smallImageAttr, $thumbnailImageAttr];
+			$swatchAttributes = [$swatchImage];
+
 			$this->logger->info('start loop products ' . date('d-M-Y H:i:s'));
-			foreach ($products as $sku => $product) {
+			foreach($productsCollection as $productCollection){
+				$productCollection->load('media_gallery');
+
+				$sku = $productCollection->getSku();
+				$product = $products[$sku];
+
+				$this->logger->info($sku);
+
 				if(!isset($product['product'])){
 					continue;
 				}
@@ -347,15 +351,10 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 				}
 
 				$id = $product['dataId'];
-				$this->logger->info($id);
 
 				$index = $product['index'];
 
 				try {
-					$this->logger->info(print_r($product['images'], true));
-
-					$productCollection = $product['product'];
-
 					$images = $product['images'];
 
 					$productRowId = $productCollection->getRowId();
@@ -369,22 +368,17 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 						$no = 0;
 	
 						if($this->checkIsFirstImage($filename)) {
-							$baseImageAttr = $this->productImageHelper->getAttributeIdByCode('image');
-							$smallImageAttr = $this->productImageHelper->getAttributeIdByCode('small_image');
-							$thumbnailImageAttr = $this->productImageHelper->getAttributeIdByCode('thumbnail');
-							$imageAttr = [$baseImageAttr, $smallImageAttr, $thumbnailImageAttr];
-	
+							$imageAttr = $firstImageAttributes;
 							$this->productImageHelper->deleteProductImageByAttrIds($productRowId, $imageAttr);
 						} else {
-							$swatchImage = $this->productImageHelper->getAttributeIdByCode('swatch_image');
-							$imageAttr = [$swatchImage];
+							$imageAttr = $swatchAttributes;
 						}
 	
-						$tmp[$index] = $this->saveImageData($productCollection, $filename, [$imageUrl], $imageAttr);
+						$tmpImage = $this->saveImageData($productCollection, $filename, [$imageUrl], $imageAttr);
 	
-						$this->deleteTmpFile($tmp[$index]);
+						$this->deleteTmpFile($tmpImage);
 						try {
-							$file = $tmp[$index][0];
+							$file = $tmpImage[0];
 	
 							$filepath = $file['filename'];
 	
