@@ -511,7 +511,7 @@ return [
         'SM_Help' => 1,
         'SM_Label' => 1,
         'SM_LayeredNavigation' => 1,
-        'SM_LazyLoad' => 0,
+        'SM_LazyLoad' => 1,
         'SM_Sales' => 1,
         'SM_MyVoucher' => 1,
         'SM_Notification' => 1,
