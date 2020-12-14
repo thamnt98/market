@@ -70,7 +70,7 @@ define(
                 var options = {
                     type: 'popup',
                     responsive: true,
-                    innerScroll: true,
+                    innerScroll: false,
                     modalClass: 'pp-shopping-list pp-alcohol-notice',
                     title: $.mage.__('Our Delivery Area'),
                     buttons: [{
