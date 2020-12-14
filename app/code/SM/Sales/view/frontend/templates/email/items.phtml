@@ -1,0 +1,82 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// phpcs:disable Magento2.Templates.ThisInTemplate
+
+/** @var $block \SM\Sales\Block\Order\Email\Items */
+?>
+<?php $_order = $block->getOrder() ?>
+<?php if ($_order) : ?>
+    <?php $_items = $block->getInstallationItems($_order); ?>
+    <table class="order-detail">
+        <tr>
+            <td class="title-order-detail">
+                <p>
+                    <?= $block->escapeHtml(__('Request Items (%1 items)', count($_items))) ?>
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td class="inner-td">
+                <table class="content-order-detail">
+                    <thead>
+                    <tr>
+                        <td class="title-td-1 title-td">
+                            <p class="pl-10">
+                                <?= $block->escapeHtml(__(' No.')) ?>
+                            </p>
+                        </td>
+                        <td class="title-td-2 title-td item-info">
+                            <p>
+                                <?= $block->escapeHtml(__('Product')) ?>
+                            </p>
+                        </td>
+                        <td class="title-td-3 title-td item-qty">
+                            <p>
+                                <?= $block->escapeHtml(__('Qty')) ?>
+                            </p>
+                        </td>
+                        <td class="title-td-4 title-td text-right item-price">
+                            <p class="pr-15">
+                                <?= $block->escapeHtml(__('SKU')) ?>
+                            </p>
+                        </td>
+                    </tr>
+                    </thead>
+                    <?php $position = 1; ?>
+                    <?php foreach ($_items as $_item) : ?>
+                        <?php if (!$_item->getParentItem()) : ?>
+                                <?php $buyRequest = $_item->getProductOptionByCode('info_buyRequest'); ?>
+                                <tbody>
+                            <tr>
+                                <td class="pl-10 text-center"><?= $position ++ ?></td>
+                                <td class="item-info">
+                                    <img src="<?php echo $block->getImage($_item->getProduct())?>"/>
+                                    <br>
+                                    <p class="product-name"><?= $block->escapeHtml($_item->getName()) ?></p>
+                                    <p class="product-name"><?= $block->escapeHtml(__('Notes:')) ?></p>
+                                    <p class="product-name"><?= $block->escapeHtml(__($buyRequest['installation_service']['installation_note'])) ?></p>
+                                </td>
+                                <td class="item-qty"><?= (float) $_item->getQtyOrdered() ?></td>
+                                <td class="item-price text-right">
+                                    <p class="pr-15"><?= /* @noEscape */ $block->escapeHtml($_item->getSku()) ?></p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="4">
+                                    <hr class="hr"/>
+                                </td>
+                            </tr>
+                            </tbody>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                    <!--Done-->
+                </table>
+            </td>
+        </tr>
+    </table>
+    <!--End order-detail-->
+<?php endif; ?>
