@@ -59,6 +59,14 @@ interface IntegrationProductAttributeRepositoryInterface {
 	public function loadAttributeSetByPimId($pimId);
 
 	/**
+     * load data by attribute set group
+     * @param string $attributeSetGroup
+     * @return array $result data type
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function loadAttributeSetByAttrGroup($attributeSetGroup);
+
+	/**
 	 * load data by pim id
 	 * @param string $pimId
    	 * @return array $result data type
@@ -75,6 +83,15 @@ interface IntegrationProductAttributeRepositoryInterface {
 	 */
 	public function loadAttributeSetByPimIdCode($pimId, $code);
 
+	/**
+     * load data by attribute set group and code
+     * @param string $attributeSetGroup
+     * @param string $code
+     * @return array $result data type
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function loadAttributeSetByPimIdAttrSetGroup($attributeSetGroup, $code);
+    
 	/**
 	 * collection by pim id and code
 	 * @param string $pimId

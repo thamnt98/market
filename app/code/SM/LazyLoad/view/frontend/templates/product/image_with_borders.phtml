@@ -1,0 +1,22 @@
+<?php /** @var $block \Magento\Catalog\Block\Product\Image */ ?>
+<?php
+$product = $block->getProduct();
+/** @var \SM\FlashSale\Helper\Quantity $helper */
+$helper = $this->helper(\SM\FlashSale\Helper\Quantity::class);
+?>
+<span class="product-image-container"
+      style="width:<?= $block->escapeHtmlAttr($block->getWidth()) ?>px;">
+    <span class="product-image-wrapper"
+          style="padding-bottom: <?= ($block->getRatio() * 100) ?>%;">
+        <img class="lazy <?= $block->escapeHtmlAttr($block->getClass()) ?>" loading="lazy"
+            <?= $block->escapeHtmlAttr($block->getCustomAttributes()) ?>
+             data-src="<?= $block->escapeUrl($block->getImageUrl()) ?>"
+             src= "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
+             max-width="<?= $block->escapeHtmlAttr($block->getWidth()) ?>"
+             max-height="<?= $block->escapeHtmlAttr($block->getHeight()) ?>"
+             alt="<?= /* @noEscape */ $block->stripTags($block->getLabel(), null, true) ?>"/></span>
+        <?php if (!is_null($product) && !$helper->isCartPage()):?>
+            <span class="product-stock popular-sale-count-<?php echo $product->getId() ?>" style="display: none"></span>
+        <?php endif;?>
+</span>
+

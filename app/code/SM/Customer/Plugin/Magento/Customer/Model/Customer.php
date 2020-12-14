@@ -28,10 +28,13 @@ class Customer
     protected $eavConfig;
 
     protected $customerOption;
+
     /**
      * Customer constructor.
      *
+     * @param \Magento\Eav\Model\Config $eavConfig
      * @param \Magento\Framework\UrlInterface $url
+     * @param \SM\Customer\Api\Data\CustomerOptionInterfaceFactory $customerOption
      */
     public function __construct(
         \Magento\Eav\Model\Config $eavConfig,
@@ -81,16 +84,19 @@ class Customer
     /**
      * @return array
      */
-    protected function getMaritalData(){
+    protected function getMaritalData()
+    {
         $attribute = $this->eavConfig->getAttribute('customer', 'marital_status');
         $options = $attribute->getSource()->getAllOptions();
         $maritalData = [];
-        foreach ($options as $option){
-            if($option["value"] == "" || $option["value"] == null) continue;
+        foreach ($options as $option) {
+            if ($option["value"] == "" || $option["value"] == null) {
+                continue;
+            }
             $maritalObject = $this->customerOption->create();
             $maritalObject->setAttributeCode("marital_status");
             $maritalObject->setOptionLabel($option["label"]);
-            $maritalObject->setOptionValue($option["value"]);
+            $maritalObject->setOptionValue(__($option["value"]));
             $maritalData[] = $maritalObject;
         }
         return $maritalData;
@@ -99,16 +105,19 @@ class Customer
     /**
      * @return array
      */
-    protected function getGenderData(){
+    protected function getGenderData()
+    {
         $attribute = $this->eavConfig->getAttribute('customer', 'gender');
         $options = $attribute->getSource()->getAllOptions();
         $genderData = [];
-        foreach ($options as $option){
-            if($option["value"] == "" || $option["value"] == null) continue;
+        foreach ($options as $option) {
+            if ($option["value"] == "" || $option["value"] == null) {
+                continue;
+            }
             $genderObject = $this->customerOption->create();
             $genderObject->setAttributeCode("gender");
             $genderObject->setOptionLabel($option["label"]);
-            $genderObject->setOptionValue($option["value"]);
+            $genderObject->setOptionValue(__($option["value"]));
             $genderData[] = $genderObject;
         }
         return $genderData;

@@ -11,13 +11,13 @@ interface ProductInterface
     /**
      * Get category assigned products
      *
-     * @param int $category_id
-     * @param int $limit
-     * @param int $p
+     * @param int  $category_id
+     * @param int  $customerId
      * @param bool $layer
+     *
      * @return \SM\MobileApi\Api\Data\Product\ListInterface
      */
-    public function getList($category_id, $limit = 12, $p = 1, $layer = true);
+    public function getList($category_id, $customerId, $layer = true);
 
     /**
      * Get product details
