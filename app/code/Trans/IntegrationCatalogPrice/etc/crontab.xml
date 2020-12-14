@@ -34,13 +34,7 @@
         </job>
         <job name="integration_pim_save_promotion_price" instance="Trans\IntegrationCatalogPrice\Cron\Pim\Save\PromotionPrice" method="execute">
             <schedule>* * * * *</schedule>
-        </job> 
-        <!-- <job name="integration_pim_save_promotion_price_1" instance="Trans\IntegrationCatalogPrice\Cron\Pim\Save\PromotionPrice" method="execute">
-            <schedule>* 23 * * *</schedule>
-        </job> -->
-        <!-- <job name="integration_pim_save_promotion_price_2" instance="Trans\IntegrationCatalogPrice\Cron\Pim\Save\PromotionPrice" method="execute">
-            <schedule>* * * * *</schedule>
-        </job>  -->
+        </job>
     </group>
      
 </config>
