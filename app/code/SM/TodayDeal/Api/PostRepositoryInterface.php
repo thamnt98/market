@@ -36,6 +36,15 @@ interface PostRepositoryInterface
     public function getById($postId);
 
     /**
+     * Retrieve post.
+     *
+     * @param int $postId
+     * @return \SM\TodayDeal\Api\Data\CampaignDetailsMobileInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function getByIdMobile($postId);
+
+    /**
      * Retrieve pages matching the specified criteria.
      *
      * @param \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria
