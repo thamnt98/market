@@ -220,7 +220,7 @@ class TransShipping extends AbstractCarrier implements CarrierInterface
                 $totalPrice += $rowTotal;
                 foreach ($parent[$itemId] as $childItem) {
                     $product = $childItem->getProduct();
-                    $ownCourier = $product->getData('own_courier');
+                    $ownCourier = $product->getData('is_fresh');
                     if ($ownCourier) {
                         $ownCourier = true;
                     } else {
@@ -252,7 +252,7 @@ class TransShipping extends AbstractCarrier implements CarrierInterface
                 $rowTotal = (int)$itemsTrue->getRowTotal();
                 $totalPrice += $rowTotal;
                 $product = $itemsTrue->getProduct();
-                $ownCourier = $product->getData('own_courier');
+                $ownCourier = $product->getData('is_fresh');
                 if ($ownCourier) {
                     $ownCourier = true;
                 } else {

@@ -497,7 +497,7 @@ class MultiShippingHandle
                             // parent quote item id
                             foreach ($child[$quoteItemId] as $itemData) {
                                 $product    = $itemData->getProduct();
-                                $ownCourier = (bool)$product->getData('own_courier');
+                                $ownCourier = (bool)$product->getData('is_fresh');
                                 $sku      = $itemData->getSku();
                                 $childQty = (int) $qty * (int) $itemData->getQty();
                                 $price    = ((int) $itemData->getPrice() != 0) ? (int) $itemData->getPrice() : (int) $product->getFinalPrice();
@@ -523,7 +523,7 @@ class MultiShippingHandle
                             }
                         } else {
                             $product    = $itemData->getProduct();
-                            $ownCourier = (bool)$product->getData('own_courier');
+                            $ownCourier = (bool)$product->getData('is_fresh');
                             // sing quote item id
                             $sku   = $itemData->getSku();
                             $price = ((int) $itemData->getPrice() != 0) ? (int) $itemData->getPrice() : (int) $product->getFinalPrice();

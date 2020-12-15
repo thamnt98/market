@@ -220,6 +220,11 @@ class ProductDataMapper
             $this->updateOnSale($productId, $locationCode);
             $this->updateDiscountPercent($productId, $locationCode);
         }
+
+        $this->result[$productId][self::DISCOUNT_PERCENT_FIELD_NAME] = $this->prepareDiscountValue(
+            ($this->productRawData[$productId]['price'] ?? 0),
+            ($this->productRawData[$productId]['special_price'] ?? 0)
+        );
     }
 
     /**
@@ -434,7 +439,7 @@ class ProductDataMapper
         $basePrice = (int)$basePrice;
         $promoPrice = (int)$promoPrice;
         if (!empty($promoPrice) && !empty($basePrice) && $basePrice > $promoPrice) {
-            $result = ceil(($basePrice - $promoPrice) * 100 / $basePrice);
+            $result = ($basePrice - $promoPrice) * 100 / $basePrice;
         }
 
         return $result;

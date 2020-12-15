@@ -42,19 +42,19 @@ class Sort extends \Magento\Framework\App\Helper\AbstractHelper
      * Sort constructor.
      *
      * @param \SM\CustomPrice\Model\ResourceModel\District $omniDistrict
-     * @param \Magento\Customer\Model\Session              $session
+     * @param \Magento\Customer\Model\SessionFactory       $sessionFactory
      * @param \Magento\Store\Model\StoreManagerInterface   $storeManager
      * @param \Magento\Framework\App\Helper\Context        $context
      */
     public function __construct(
         \SM\CustomPrice\Model\ResourceModel\District $omniDistrict,
-        \Magento\Customer\Model\Session $session,
+        \Magento\Customer\Model\SessionFactory $sessionFactory,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\App\Helper\Context $context
     ) {
         parent::__construct($context);
         $this->omniDistrict = $omniDistrict;
-        $this->session = $session;
+        $this->session = $sessionFactory->create();
         $this->storeManager = $storeManager;
     }
 

@@ -12,6 +12,7 @@ var config = {
     map: {
         '*': {
             catalogAddToCartAdvanced: 'SM_Catalog/js/catalog-add-to-cart',
+            updateQtyAddedToProduct: 'SM_Catalog/js/update-qty-added-to-product',
             JsSocials: 'SM_Catalog/js/social/jssocials',
             SocialsShare: 'SM_Catalog/js/social/social-share',
             'Magento_Theme/js/view/messages':'SM_Catalog/js/view/messages',

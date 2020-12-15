@@ -12,10 +12,6 @@
         <plugin sortOrder="1" name="sm_customer_store_context_product_list_plugin"
                 type="SM\CustomPrice\Plugin\Block\BlockPlugin"/>
     </type>
-    <type name="Magento\Framework\Search\Request\Config\FilesystemReader">
-        <plugin name="sm_custom_price_request_generator"
-                type="SM\CustomPrice\Plugin\Framework\Search\Request\Config\FilesystemReader" sortOrder="99"/>
-    </type>
     <type name="Magento\Catalog\Model\Product">
         <plugin name="get_price_by_store" type="SM\CustomPrice\Plugin\Product" sortOrder="1" disabled="false"/>
     </type>
@@ -35,5 +31,8 @@
         <plugin name="sm_custom_price_pricing_price_special_price"
                 type="SM\CustomPrice\Plugin\Pricing\Price\SpecialPrice" sortOrder="99"/>
     </type>
-
+    <type name="Magento\Framework\Search\Request\Config">
+        <plugin name="SM_CustomPrice::SearchRequestConfigApi"
+                type="SM\CustomPrice\Plugin\Framework\Search\Request\Config" sortOrder="99" />
+    </type>
 </config>
