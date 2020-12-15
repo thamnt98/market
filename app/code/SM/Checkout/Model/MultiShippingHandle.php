@@ -291,7 +291,7 @@ class MultiShippingHandle
                 continue;
             }
             $format['shipping_method']  = $item->getShippingMethodSelected();
-            $format['shipping_address'] = $item->getShippingAddressId();
+            $format['shipping_address'] = ($format['shipping_method'] == self::STORE_PICK_UP) ? 0 : $item->getShippingAddressId();
             $format['qty']              = $item->getQty();
             $additionalInfo             = $item->getAdditionalInfo()->getDelivery();
             $format['delivery']         = [
@@ -299,7 +299,7 @@ class MultiShippingHandle
                 'time' => $additionalInfo->getTime(),
             ];
             $itemsFormat[$item->getItemId()] = $format;
-            if (!in_array($item->getShippingAddressId(), $addressSelect)) {
+            if ($format['shipping_address'] != 0 && !in_array($format['shipping_address'], $addressSelect)) {
                 $addressSelect[] = $item->getShippingAddressId();
             }
         }
@@ -497,7 +497,7 @@ class MultiShippingHandle
                             // parent quote item id
                             foreach ($child[$quoteItemId] as $itemData) {
                                 $product    = $itemData->getProduct();
-                                $ownCourier = (bool)$product->getData('own_courier');
+                                $ownCourier = (bool)$product->getData('is_fresh');
                                 $sku      = $itemData->getSku();
                                 $childQty = (int) $qty * (int) $itemData->getQty();
                                 $price    = ((int) $itemData->getPrice() != 0) ? (int) $itemData->getPrice() : (int) $product->getFinalPrice();
@@ -523,7 +523,7 @@ class MultiShippingHandle
                             }
                         } else {
                             $product    = $itemData->getProduct();
-                            $ownCourier = (bool)$product->getData('own_courier');
+                            $ownCourier = (bool)$product->getData('is_fresh');
                             // sing quote item id
                             $sku   = $itemData->getSku();
                             $price = ((int) $itemData->getPrice() != 0) ? (int) $itemData->getPrice() : (int) $product->getFinalPrice();

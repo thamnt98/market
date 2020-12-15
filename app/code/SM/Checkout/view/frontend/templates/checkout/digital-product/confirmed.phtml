@@ -85,7 +85,7 @@ $serviceType = $digitalOrder->getProductOption()->getExtensionAttributes()->getD
         <?php endif;?>
         <?= $contentBlock->toHtml()?>
     </div>
-    <div class="check-payment-row">
+    <div class="check-payment-row check-payment-col">
         <a href="/sales/order/digital/id/<?= $digitalOrder->getParentOrderId() ?>" class="btn-outline-secondary" type="button"><?= $block->escapeHtml(__("Check My Order"))?></a>
         <a href="/" class="action primary" type="button"><?= $block->escapeHtml(__("Back to Home"))?></a>
     </div>
