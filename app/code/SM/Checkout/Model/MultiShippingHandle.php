@@ -291,7 +291,7 @@ class MultiShippingHandle
                 continue;
             }
             $format['shipping_method']  = $item->getShippingMethodSelected();
-            $format['shipping_address'] = $item->getShippingAddressId();
+            $format['shipping_address'] = ($format['shipping_method'] == self::STORE_PICK_UP) ? 0 : $item->getShippingAddressId();
             $format['qty']              = $item->getQty();
             $additionalInfo             = $item->getAdditionalInfo()->getDelivery();
             $format['delivery']         = [
@@ -299,7 +299,7 @@ class MultiShippingHandle
                 'time' => $additionalInfo->getTime(),
             ];
             $itemsFormat[$item->getItemId()] = $format;
-            if (!in_array($item->getShippingAddressId(), $addressSelect)) {
+            if ($format['shipping_address'] != 0 && !in_array($format['shipping_address'], $addressSelect)) {
                 $addressSelect[] = $item->getShippingAddressId();
             }
         }
