@@ -129,7 +129,7 @@ class PromotionPriceRepository implements PromotionPriceRepositoryInterface
                 'Parameter Store are empty !'
             ));
         }
-        $collection = $this->interface->create()->getCollection();
+        $collection = $this->collectionFactory->create();
         $collection->addFieldToFilter(PromotionPriceInterface::SKU, $sku);
         $collection->addFieldToFilter(PromotionPriceInterface::SOURCE_CODE, $store);
 
@@ -170,7 +170,7 @@ class PromotionPriceRepository implements PromotionPriceRepositoryInterface
                 'Parameter store_code are empty !'
             ));
         }
-        $collection = $this->interface->create()->getCollection();
+        $collection = $this->collectionFactory->create();
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_PROMOTION_TYPE, $data['promotion_type']);
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_DISCOUNT_TYPE, $data['discount_type']);
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_MIX_MATCH_CODE, $data['mix_and_match_code']);
@@ -209,7 +209,7 @@ class PromotionPriceRepository implements PromotionPriceRepositoryInterface
                 'Parameter store_code are empty !'
             ));
         }
-        $collection = $this->interface->create()->getCollection();
+        $collection = $this->collectionFactory->create();
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_PROMOTION_TYPE, $data['promotion_type']);
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_MIX_MATCH_CODE, $data['mix_and_match_code']);
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_ITEM_TYPE, $data['item_type']);
@@ -248,7 +248,7 @@ class PromotionPriceRepository implements PromotionPriceRepositoryInterface
                 'Parameter store_code are empty !'
             ));
         }
-        $collection = $this->interface->create()->getCollection();
+        $collection = $this->collectionFactory->create();
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_PROMOTION_TYPE, $data['promotion_type']);
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_MIX_MATCH_CODE, $data['mix_and_match_code']);
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_ITEM_TYPE, $data['item_type_one']);
@@ -287,7 +287,7 @@ class PromotionPriceRepository implements PromotionPriceRepositoryInterface
                 'Parameter sku are empty !'
             ));
         }
-        $collection = $this->interface->create()->getCollection();
+        $collection = $this->collectionFactory->create();
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_PROMOTION_TYPE, $data['promotion_type']);
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_DISCOUNT_TYPE, $data['discount_type']);
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_MIX_MATCH_CODE, $data['mix_and_match_code']);
@@ -320,7 +320,7 @@ class PromotionPriceRepository implements PromotionPriceRepositoryInterface
                 'Parameter sku are empty !'
             ));
         }
-        $collection = $this->interface->create()->getCollection();
+        $collection = $this->collectionFactory->create();
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_PROMOTION_TYPE, $data['promotion_type']);
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_DISCOUNT_TYPE, $data['discount_type']);
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_SKU, $data['sku']);
@@ -342,7 +342,7 @@ class PromotionPriceRepository implements PromotionPriceRepositoryInterface
                 'Parameter promotion id are empty !'
             ));
         }
-        $collection = $this->interface->create()->getCollection();
+        $collection = $this->collectionFactory->create();
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_PROMOTION_ID, $data);
 
         $getLastCollection =null;
@@ -377,7 +377,7 @@ class PromotionPriceRepository implements PromotionPriceRepositoryInterface
                 'Parameter store code are empty !'
             ));
         }
-        $collection = $this->interface->create()->getCollection();
+        $collection = $this->collectionFactory->create();
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_PROMOTION_TYPE, $data['promotion_type']);
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_DISCOUNT_TYPE, $data['discount_type']);
         $collection->addFieldToFilter(PromotionPriceInterface::PIM_SKU, $data['sku']);
@@ -406,7 +406,7 @@ class PromotionPriceRepository implements PromotionPriceRepositoryInterface
             ));
         }
         
-        $collection = $this->interface->create()->getCollection();
+        $collection = $this->collectionFactory->create();
         $collection->addFieldToFilter(PromotionPriceInterface::STORE_ATTR_CODE, $code);
         $collection->addFieldToFilter(PromotionPriceInterface::SOURCE_CODE, $store);
 
@@ -428,7 +428,7 @@ class PromotionPriceRepository implements PromotionPriceRepositoryInterface
             ));
         }
         
-        $collection = $this->interface->create()->getCollection();
+        $collection = $this->collectionFactory->create();
         $collection->addFieldToFilter(PromotionPriceInterface::SOURCE_CODE, $store);
 
         $getLastCollection =null;
