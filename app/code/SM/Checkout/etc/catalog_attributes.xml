@@ -5,6 +5,7 @@
         <attribute name="is_warehouse"/>
         <attribute name="is_fresh"/>
         <attribute name="is_flashsale"/>
+        <attribute name="own_courier"/>
         <attribute name="flashsale_qty"/>
         <attribute name="flashsale_qty_per_customer"/>
         <attribute name="installation"/>
