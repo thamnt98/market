@@ -235,6 +235,12 @@ class IntegrationStock implements IntegrationStockInterface {
 				$weight = $productCollection->getData('weight');
 				$soldIn = $productCollection->getData('sold_in');
 
+				if(isset($stockData[strtoupper($productSku)])){
+					$productSku = strtoupper($productSku);
+				}else if(isset($stockData[strtolower($productSku)])){
+					$productSku = strtolower($productSku);
+				}
+				
 				$checkSource = $stockData[$productSku]['checkSource'];
 				$locationCode = $stockData[$productSku]['locationCode'];
 				$quantity = $stockData[$productSku]['quantity'];
@@ -265,13 +271,16 @@ class IntegrationStock implements IntegrationStockInterface {
 		                    ];
 
 						$productIds[] = $productCollection->getId();
+						$this->logger->info("success data");
 						$this->saveStatusMessage($data, $messageValue, IntegrationDataValueInterface::STATUS_DATA_SUCCESS);
 					}
 					else {
+						$this->logger->info("failed no store data");
 						$this->saveStatusMessage($data, IntegrationStockInterface::MSG_NO_STORE, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
 					}
 				}
 				else {
+					$this->logger->info("failed stock null data");
 					$this->saveStatusMessage($data, IntegrationStockInterface::MSG_DATA_STOCK_NULL, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
                 }
 			}
@@ -279,7 +288,8 @@ class IntegrationStock implements IntegrationStockInterface {
 			$connectionCheck->insertOnDuplicate("inventory_source_item", $dataStockList, ['quantity']);
 
 			$this->reindexByProductsIds($productIds, ['inventory', 'cataloginventory_stock']);
-		}catch(Exception $e){
+		}catch(Exception $exception){
+			$this->logger->info("error : " . $exception->getMessage());
 			if ($dataJobs) {
 				$dataJobs->setMessage($exception->getMessage());
 				
