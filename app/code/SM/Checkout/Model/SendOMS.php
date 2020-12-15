@@ -359,22 +359,20 @@ class SendOMS
 
         $orderOriginId = isset($oarData['order_id_origin']) ? (int)$oarData['order_id_origin'] : 0;
         $codeName = '';
+        $spoDetail = [];
         $isSpo = isset($oarData['is_spo']) ? (int)$oarData['is_spo'] : 0;
         if ($isSpo == 1 && isset($oarData['spo_detail']) && $oarData['spo_detail']) {
-            $spoDetail = json_encode($oarData['spo_detail']);
+            $spoDetail = $oarData['spo_detail'];
             if (isset($spoDetail['code_name'])) {
                 $codeName = $spoDetail['code_name'];
             }
         } elseif ($isSpo == 0 && isset($oarData['store'])) {
-            $storeData = json_encode($oarData['store']);
+            $storeData = $oarData['store'];
             if (isset($storeData['code_name'])) {
                 $codeName = $storeData['code_name'];
             }
-            $spoDetail = json_encode('');
-        } else {
-            $spoDetail = json_encode('');
         }
-
+        $spoDetail = json_encode($spoDetail);
         $isOwnCourier = isset($oarData['is_own_courier']) ? (int)$oarData['is_own_courier'] : 0;
         $warehouseSource = isset($oarData['warehouse_source']) ? (string)$oarData['warehouse_source'] : '';
         $warehouseCode = (isset($oarData['warehouse']) && isset($oarData['warehouse']['store_code'])) ? (string)$oarData['warehouse']['store_code'] : '';

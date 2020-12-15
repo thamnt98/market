@@ -48,6 +48,21 @@ use Magento\Catalog\Api\Data\ProductInterfaceFactory as ProductFactory;
 class StorePriceLogic implements StorePriceLogicInterface
 {
     /**
+     * @var string
+     */
+    const DATA_LIST = 'data_list';
+
+    /**
+     * @var string
+     */
+    const SOURCE_LIST = 'source_list';
+
+    /**
+     * @var string
+     */
+    const SKU_LIST = 'sku_list';
+
+    /**
      * @var Logger
      */
     protected $logger;
@@ -168,6 +183,11 @@ class StorePriceLogic implements StorePriceLogicInterface
     protected $productFactory;
 
     /**
+     * @var \Magento\Framework\Indexer\IndexerRegistry
+     */
+    protected $indexerRegistry;
+
+    /**
      * @param Logger $Logger
      * @param StorePriceRepositoryInterface $storePriceRepositoryInterface
      * @param StorePriceInterfaceFactory $StorePriceInterfaceFactory
@@ -215,7 +235,8 @@ class StorePriceLogic implements StorePriceLogicInterface
         \Trans\IntegrationCatalogPrice\Helper\Data $helperPrice,
         ResourceConnection $resourceConnection,
         ProductCollectionFactory $productCollectionFactory,
-        ProductFactory $productFactory
+        ProductFactory $productFactory,
+        \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
     ) {
         $this->logger = $logger;
         $this->storePriceRepositoryInterface = $storePriceRepositoryInterface;
@@ -248,6 +269,7 @@ class StorePriceLogic implements StorePriceLogicInterface
         $this->productCollectionFactory = $productCollectionFactory;
         $this->connection = $this->resourceConnection->getConnection();
         $this->productFactory = $productFactory;
+        $this->indexerRegistry = $indexerRegistry;
         $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_price.log');
         $logger = new \Zend\Log\Logger();
         $this->logger = $logger->addWriter($writer);
@@ -382,12 +404,11 @@ class StorePriceLogic implements StorePriceLogicInterface
         if (!$jobs->getFirstItem()->getId()) {
             throw new NoSuchEntityException(__('Error Jobs Datas doesn\'t exist'));
         }
-        
+
         $jobId = $jobs->getFirstItem()->getId();
         $this->updateJobStatus($jobId, IntegrationJobInterface::STATUS_PROGRESS_CATEGORY);
-        
+
         $dataProduct = [];
-        
         try {
             if ($data) {
                 $dataArray = $data->getData();
@@ -437,13 +458,21 @@ class StorePriceLogic implements StorePriceLogicInterface
     {
         $skuList = [];
         $dataValueList = [];
+        $sourceList = [];
         foreach ($dataProduct as $sku => $data) {
             $skuList[] = $sku;
             foreach ($data as $key => $val) {
                 $dataValueList[] = $val;
+                if (in_array($val['store_code'], $sourceList) == false) {
+                    $sourceList[] = $val['store_code'];
+                }
             }
         }
-        return ['sku_list' => $skuList, 'data_list' => $dataValueList];
+        return [
+            self::SKU_LIST => $skuList,
+            self::SOURCE_LIST => $sourceList,
+            self::DATA_LIST => $dataValueList
+        ];
     }
 
     /**
@@ -502,35 +531,32 @@ class StorePriceLogic implements StorePriceLogicInterface
      * @param array $decimalAttributes
      * @return array
      */
-    protected function getProductDecimalAttributes($dataProduct, $productInterfaces, $decimalAttributes)
+    protected function getProductDecimalAttributes($dataList, $productInterfaces, $decimalAttributes)
     {
-        $result = [];
-        foreach ($productInterfaces as $index => $value) {
-            foreach ($dataProduct[$value->getSku()] as $key => $val) {
-                $basePrice = '';
-                $promoPrice = '';
-                foreach ($decimalAttributes as $idx => $res) {
-                    if (\strpos($res, $val['store_code']) !== false) {
-                        if (\strpos($res, 'base') !== false) {
-                            $basePrice = $res;
-                        }
-                        if (\strpos($res, 'promo') !== false) {
-                            $promoPrice = $res;
-                        }
+        $prices = [];
+        foreach ($dataList as $key => $value) {
+            $basePrice = '';
+            $promoPrice = '';
+            $data = \array_pop($value);
+            foreach ($decimalAttributes as $idx => $res) {
+                if (\strpos($res, $data['store_code']) !== false) {
+                    if (\strpos($res, 'base') !== false) {
+                        $basePrice = $res;
+                    }
+                    if (\strpos($res, 'promo') !== false) {
+                        $promoPrice = $res;
                     }
                 }
-
-                $result[$value->getSku()] = $this->priceDecision(
-                    $value,
-                    $basePrice,
-                    $promoPrice,
-                    $val['normal_selling_price'],
-                    $val['online_price'],
-                    $val['promo_selling_price']
-                );
             }
+            $prices[$data['sku']] = [
+                'base_price' => $basePrice,
+                'promo_price' => $promoPrice,
+                'normal_selling_price' => $data['normal_selling_price'],
+                'online_price' => $data['online_price'],
+                'promo_selling_price' => $data['promo_selling_price']
+            ];
         }
-        return $result;
+        return $prices;
     }
 
     /**
@@ -602,6 +628,21 @@ class StorePriceLogic implements StorePriceLogicInterface
     }
 
     /**
+     * Get multiprice data
+     *
+     * @param array $existSkuList
+     * @param array $sourceList
+     * @param array $dataValueList
+     * @return array
+     */
+    public function getMultipriceData($existSkuList, $sourceList, $dataValueList)
+    {
+        $sql = $this->storePriceRepositoryInterface->loadQueryBySkuListNSourceList($existSkuList, $sourceList);
+        $data = $this->connection->fetchAll($sql);
+        return \array_merge($data, $dataValueList);
+    }
+
+    /**
      * Save Product
      */
     public function save($jobs = [], $dataProduct = [])
@@ -626,52 +667,24 @@ class StorePriceLogic implements StorePriceLogicInterface
         $existingSkuList = $this->getExistingSkuList($productInterfaces);
         $dataValueList = $this->filterDataListWithExistSku($dataList['data_list'], $existingSkuList);
         $decimalAttributes = $this->getDecimalAttribute($dataList['data_list']);
-        $intAttributes = $this->getIntAttribute();
+        //$intAttributes = $this->getIntAttribute();
         $productDecimalAttributes = $this->getProductDecimalAttributes(
             $dataProduct,
             $productInterfaces,
             $decimalAttributes
         );
 
-        $inputList = [];
-        $attributeIdMap = [];
-        foreach ($productInterfaces as $index => $product) {
-            foreach ($productDecimalAttributes[$product->getSku()] as $key => $val) {
-                if (\array_key_exists($key, $attributeIdMap) == false) {
-                    $attributeIdMap[$key] = $this->saveAttributeProduct($key, $product->getSku());
-                }
-                $inputList[] = [
-                    'attribute_id' => $attributeIdMap[$key],
-                    'store_id' => 0,
-                    'value' => $val,
-                    'row_id' => $product->getRowId()
-                ];
-            }
-        }
-        
+        //Saving process
         try {
-            $this->logger->info('Before save bulk product price ' . date('d-M-Y H:i:s'));
-            $tableName = $this->connection->getTableName('catalog_product_entity_decimal');
-            $this->connection->insertOnDuplicate($tableName, $inputList, ['value']);
-            $this->logger->info('After save bulk product price ' . date('d-M-Y H:i:s'));
+            $inputList = $this->prepareProductPricesInput($productInterfaces, $productDecimalAttributes);
+            $this->saveProductPrices($inputList);
+            $multiPrices = $this->getMultipriceData($existingSkuList, $dataList[self::SOURCE_LIST], $dataValueList);
+            $productMappingData = $this->saveMultiPriceBulk($multiPrices);
+            $this->updateDataValueStatusBulk($multiPrices, IntegrationDataValueInterface::STATUS_DATA_SUCCESS, null);
+            $this->reindexByProductsIds($productInterfaces, ['catalog_product_attribute', 'catalogsearch_fulltext']);
         } catch (\Exception $e) {
             $this->logger->info($e->getMessage() . date('d-M-Y H:i:s'));
             throw $e;
-        }
-
-        $productMappingData=[];
-        foreach ($dataValueList as $index => $value) {
-            try {
-                $this->logger->info('Before save multi price ' . date('d-M-Y H:i:s'));
-                $this->saveMultiPrice($this->validateParams($value));
-                $this->logger->info('After save multi price ' . date('d-M-Y H:i:s'));
-                $this->logger->info("SKU Catalog Price Updated --->".print_r($value['sku'], true));
-                $this->updateDataValueStatus($value['data_id'], IntegrationDataValueInterface::STATUS_DATA_SUCCESS, null);
-            } catch (\Exception $e) {
-                //\var_dump($e->getMessage());
-                $this->logger->critical('Error occurred ' . $e->getMessage().' '.date('d-M-Y H:i:s'));
-                continue;
-            }
         }
 
         $msg = null;
@@ -686,6 +699,83 @@ class StorePriceLogic implements StorePriceLogicInterface
     }
 
     /**
+     * Reindex
+     *
+     * @param \Magento\Catalog\Api\Data\ProductInterface[] $productInterfaces
+     * @param array $indexLists
+     * @return void
+     */
+    protected function reindexByProductsIds($productInterfaces, $indexLists)
+    {
+        $productIds = [];
+        foreach ($productInterfaces as $key => $value) {
+            $productIds[] = $value->getId();
+        }
+        foreach ($indexLists as $indexList) {
+            $categoryIndexer = $this->indexerRegistry->get($indexList);
+            if (!$categoryIndexer->isScheduled()) {
+                $categoryIndexer->reindexList(array_unique($productIds));
+            }
+        }
+    }
+
+    /**
+     * Prepare Product Prices Input
+     *
+     * @param \Magento\Catalog\Api\Data\ProductInterface[] $productInterfaces
+     * @param array $productDecimalAttributes
+     * @return array
+     */
+    public function prepareProductPricesInput($productInterfaces, $productDecimalAttributes)
+    {
+        $inputList = [];
+        $attributeIdMap = [];
+        foreach ($productInterfaces as $index => $product) {
+            $productPriceAttributes = [];
+            $data = $productDecimalAttributes[$product->getSku()];
+            $productPriceAttributes = $this->priceDecision(
+                $product,
+                $data['base_price'],
+                $data['promo_price'],
+                $data['normal_selling_price'],
+                $data['online_price'],
+                $data['promo_selling_price']
+            );
+            foreach ($productPriceAttributes as $key => $value) {
+                if (\array_key_exists($key, $attributeIdMap) == false) {
+                    $attributeIdMap[$key] = $this->saveAttributeProduct($key, $product->getSku());
+                }
+                $inputList[] = [
+                    'attribute_id' => $attributeIdMap[$key],
+                    'store_id' => 0,
+                    'value' => $value,
+                    'row_id' => $product->getRowId()
+                ];
+            }
+        }
+        return $inputList;
+    }
+
+    /**
+     * Save product prices bulk
+     *
+     * @param [type] $inputList
+     * @return void
+     */
+    public function saveProductPrices($inputList)
+    {
+        try {
+            $this->logger->info('Before save bulk product price ' . date('d-M-Y H:i:s'));
+            $tableName = $this->connection->getTableName('catalog_product_entity_decimal');
+            $this->connection->insertOnDuplicate($tableName, $inputList, ['value']);
+            $this->logger->info('After save bulk product price ' . date('d-M-Y H:i:s'));
+        } catch (\Exception $e) {
+            var_dump($e->getMessage());
+            $this->logger->critical('Error occurred ' . $e->getMessage().' '.date('d-M-Y H:i:s'));
+        }
+    }
+
+    /**
      * Validate Params
      *
      * @param $param mixed
@@ -697,10 +787,10 @@ class StorePriceLogic implements StorePriceLogicInterface
         try {
             $result['sku'] = $this->validation->validateArray(StorePriceInterface::SKU, $param);
             $result['store_code'] = $this->validation->validateArray(StorePriceInterface::SOURCE_CODE, $param);
-            $result['normal_sell_price'] = $this->validation->validateArray(StorePriceInterface::NORMAL_SELLING_PRICE, $param);
-            $result['online_sell_price'] = $this->validation->validateArray(StorePriceInterface::ONLINE_SELLING_PRICE, $param);
-            $result['promo_sell_price'] = $this->validation->validateArray(StorePriceInterface::PROMO_SELLING_PRICE, $param);
-            $result['store_attr_code'] = $result['store_code'];
+            $result['normal_selling_price'] = $this->validation->validateArray(StorePriceInterface::NORMAL_SELLING_PRICE, $param);
+            $result['online_price'] = $this->validation->validateArray(StorePriceInterface::ONLINE_SELLING_PRICE, $param);
+            $result['promo_selling_price'] = $this->validation->validateArray(StorePriceInterface::PROMO_SELLING_PRICE, $param);
+            //$result['store_attr_code'] = $result['store_code'];
 
             $result['pim_id'] = $this->validation->validateArray(StorePriceInterface::ID, $param);
             $result['pim_code'] = $this->validation->validateArray(StorePriceInterface::CODE, $param);
@@ -710,13 +800,13 @@ class StorePriceLogic implements StorePriceLogicInterface
             $result['normal_purchase_price'] = $this->validation->validateArray('normal_purchase_price', $param);
             $result['promo_purchase_price'] = $this->validation->validateArray('promo_purchase_price', $param);
 
-            $result['is_exclusive'] = $this->validation->validateArray('is_exclusive', $param);
-            $result['start_date'] = $this->validation->validateArray('start_date', $param);
-            $result['end_date'] = $this->validation->validateArray('end_date', $param);
-            $result['modified_at'] = $this->validation->validateArray('modified_at', $param);
+            //$result['is_exclusive'] = $this->validation->validateArray('is_exclusive', $param);
+            //$result['start_date'] = $this->validation->validateArray('start_date', $param);
+            //$result['end_date'] = $this->validation->validateArray('end_date', $param);
+            //$result['modified_at'] = $this->validation->validateArray('modified_at', $param);
 
-            $result['staging_id'] = $this->validation->validateArray('staging_id', $param);
-            $result['custom_status'] = $this->validation->validateArray('custom_status', $param);
+            //$result['staging_id'] = $this->validation->validateArray('staging_id', $param);
+            //$result['custom_status'] = $this->validation->validateArray('custom_status', $param);
             // $result['store_attr_code'] = $this->createAttributeCode($result);
         } catch (\Exception $exception) {
             // $this->updateJobStatus($jobId,IntegrationJobInterface::STATUS_PROGRES_UPDATE_FAIL,$exception->getMessage());
@@ -729,45 +819,25 @@ class StorePriceLogic implements StorePriceLogicInterface
     }
 
     /**
-     * Function for change product category reflect
-     *
-     * @param int $productId
-     * @param ProductInterface $product
-     * @param array $dataProduct
-     * @return bolean
+     * Function for change product category reflect (bulk)
      */
-    protected function saveMultiPrice($param)
+    public function saveMultiPriceBulk($dataList)
     {
         try {
-            $qry= $this->storePriceRepositoryInterface->loadQueryBySkuNStore($param['sku'], $param['store_code']);
-            $qry = $this->connection->fetchRow($qry);
-            $query = $this->storePriceInterfaceFactory->create();
-            if ($qry) {
-                $query->setId($qry['id']);
+            $this->logger->info('Before save multi price ' . date('d-M-Y H:i:s'));
+            foreach ($dataList as $key => $value) {
+                $dataList[$key] = $this->validateParams($dataList[$key]);
+                $dataList[$key]['status'] = 1;
             }
-            $query->setStoreAttrCode($param['store_code']);
-            $query->setSourceCode($param['store_code']);
-            $query->setSku($param['sku']);
-            $query->setPimId($param['pim_id']);
-            $query->setPimCode($param['pim_code']);
-            $query->setPimProductId($param['pim_product_id']);
-            $query->setPimCompanyCode($param['pim_company_code']);
-
-            $query->setNormalSellingPrice($param['normal_sell_price']);
-            $query->setPromoSellingPrice($param['promo_sell_price']);
-            $query->setOnlinePrice($param['online_sell_price']);
-
-            $query->setNormalPurchasePrice($param['normal_purchase_price']);
-            $query->setPromoPurchasePrice($param['promo_purchase_price']);
-            $query->setStatus(1);
-        
-            $this->storePriceRepositoryInterface->save($query);
-        } catch (\Exception $exception) {
-            // $this->updateJobStatus($jobId,IntegrationJobInterface::STATUS_PROGRES_UPDATE_FAIL,$exception->getMessage());
-            throw new StateException(
-                __($exception->getMessage())
-            );
+            $tableName = $this->connection->getTableName('integration_catalog_store_price');
+            $this->connection->insertOnDuplicate($tableName, $dataList);
+            $this->logger->info("SKU Catalog Price Updated ---> \n ".print_r($dataList, true)."\n");
+            return $dataList;
+        } catch (\Exception $e) {
+            var_dump($e->getMessage());
+            $this->logger->critical('Error occurred ' . $e->getMessage().' '.date('d-M-Y H:i:s'));
         }
+        return false;
     }
 
     /**
@@ -794,6 +864,24 @@ class StorePriceLogic implements StorePriceLogicInterface
             throw new StateException(
                 __('Cannot Update Job Status! - '.$exception->getMessage())
             );
+        }
+    }
+
+    /**
+     * Update Data Value Status (bulk)
+     */
+    public function updateDataValueStatusBulk($multiPrices, $status = 0, $msg = "")
+    {
+        try {
+            $ids = [];
+            foreach ($multiPrices as $key => $value) {
+                $ids[] = ['id' => $value['data_id'], 'status' => $status];
+            }
+            $tableName = $this->connection->getTableName(IntegrationDataValueInterface::TABLE_NAME);
+            $this->connection->insertOnDuplicate($tableName, $ids);
+        } catch (\Exception $e) {
+            \var_dump($e->getMessage());
+            $this->logger->critical('Error occurred ' . $e->getMessage().' '.date('d-M-Y H:i:s'));
         }
     }
 
@@ -894,8 +982,9 @@ class StorePriceLogic implements StorePriceLogicInterface
                     $attributeId = $attributeDatas->getAttributeId();
                 }
             }
-            if (!$attributeId)
-                $this->createAttributeProduct($sku, $attributeCode);
+            if (!$attributeId) {
+                $attributeId = $this->createAttributeProduct($sku, $attributeCode);
+            }
         } catch (\Exception $exception) {
             throw new StateException(
                 __(__FUNCTION__." - ".$exception->getMessage())
@@ -915,16 +1004,13 @@ class StorePriceLogic implements StorePriceLogicInterface
     protected function createAttributeProduct($sku, $attributeCode = "")
     {
         try {
-            $frontentInput    = StorePriceLogicInterface::INPUT_TYPE_FRONTEND_FORMAT_PRICE;
-            $backendInput     = StorePriceLogicInterface::INPUT_TYPE_BACKEND_FORMAT_PRICE;
-            
+            $frontentInput = StorePriceLogicInterface::INPUT_TYPE_FRONTEND_FORMAT_PRICE;
+            $backendInput = StorePriceLogicInterface::INPUT_TYPE_BACKEND_FORMAT_PRICE;
+
             $attributeValue = $this->productAttributeFactory->create();
-            
-            
             $attributeValue->setPosition(StorePriceLogicInterface::POSITION);
             $attributeValue->setApplyTo(StorePriceLogicInterface::APPLY_TO);
             $attributeValue->setIsVisible(StorePriceLogicInterface::IS_VISIBLE);
-            
             $attributeValue->setScope(StorePriceLogicInterface::SCOPE);
             $attributeValue->setAttributeCode($attributeCode);
             $attributeValue->setFrontendInput($frontentInput);
@@ -935,7 +1021,6 @@ class StorePriceLogic implements StorePriceLogicInterface
             $attributeValue->setBackendType($backendInput);
             $attributeValue->setDefaultValue(0);
             $attributeValue->setIsUnique(StorePriceLogicInterface::IS_UNIQUE);
-
             // Smart OSC Required
             $attributeValue->setIsSearchable(StorePriceLogicInterface::IS_SEARCHBLE);
             $attributeValue->setIsFilterable(StorePriceLogicInterface::IS_FILTERABLE);
@@ -953,20 +1038,27 @@ class StorePriceLogic implements StorePriceLogicInterface
             $attributeValue->setIsVisibleInGrid(StorePriceLogicInterface::IS_VISIBLE_IN_GRID);
             $attributeValue->setIsFilterableInGrid(StorePriceLogicInterface::IS_FILTERABLE_IN_GRID);
             // $attributeValue->setIsPagebuilderEnable();
-            
             $attributeValue->setIsUsedForPriceRules(StorePriceLogicInterface::IS_USED_FOR_PRICE_RULES);
-            
-            $this->productAttributeRepository->save($attributeValue);
+
+            $attributeId = $this->productAttributeRepository->save($attributeValue);
             
             //Set Attribute to Attribute Set (Default)
-            $this->productAttributeManagement->assign($this->attrGroupGeneralInfoId, $this->attrGroupProductDetailId, $attributeCode, StorePriceLogicInterface::SORT_ORDER);
+            $this->productAttributeManagement->assign(
+                $this->attrGroupGeneralInfoId, 
+                $this->attrGroupProductDetailId, 
+                $attributeCode, 
+                StorePriceLogicInterface::SORT_ORDER
+            );
 
             //Set Attribute to Attribute Set (attribute set base on SKU)
             $attributeSetId = $this->getAttributeSetId($sku);
             $this->logger->info($sku . ' = ' . $attributeSetId);
             if ($attributeSetId != $this->attrGroupGeneralInfoId) {
                 try {
-                    $attrGroup = $this->integrationAttributeRepository->getAttributeGroupIdBySet(IntegrationProductAttributeInterface::ATTRIBUTE_GROUP_CODE_PRODUCT, $attributeSetId);
+                    $attrGroup = $this->integrationAttributeRepository->getAttributeGroupIdBySet(
+                        IntegrationProductAttributeInterface::ATTRIBUTE_GROUP_CODE_PRODUCT,
+                        $attributeSetId
+                    );
                     $this->productAttributeManagement->assign($attributeSetId, $attrGroup, $attributeCode, StorePriceLogicInterface::SORT_ORDER);
 
                     $this->logger->info($sku . ' Assign attribute ' . $attributeCode . ' to attibute set ' . $attributeSetId . ' SUCCESS');
@@ -980,6 +1072,7 @@ class StorePriceLogic implements StorePriceLogicInterface
                 __(__FUNCTION__." - ".$exception->getMessage())
             );
         }
+        return $attributeId;
     }
 
     /**

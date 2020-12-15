@@ -26,6 +26,7 @@ interface IntegrationProductAttributeSetInterface {
 	const NAME    	        = 'name';
 	const CODE              = 'code'; 
 	const ATTRIBUTE_SET_ID  = 'attribute_set_id'; 
+	const ATTRIBUTE_SET_GROUP  = 'attribute_set_group'; 
 	const DELETED   	    = 'deleted'; 
 	const DELETED_ATTRIBUTE_LIST = 'deleted_attribute_list'; 
 	const CREATED_AT 		= 'created_at';
@@ -93,6 +94,21 @@ interface IntegrationProductAttributeSetInterface {
 	 * @return void
 	 */
 	public function setAttributeSetId($attributeSetId);
+
+	/**
+	 * Get attribute_set_group
+	 *
+	 * @return string
+	 */
+	public function getAttributeSetGroup();
+
+	/**
+	 * Set attribute_set_group
+	 *
+	 * @param string $attributeSetGroup
+	 * @return void
+	 */
+	public function setAttributeSetGroup($attributeSetGroup);
 
 	/**
 	 * Get deleted

@@ -63,6 +63,37 @@ class UpgradeSchema implements UpgradeSchemaInterface
           $this->addConfigurableProductCronSynchTable($setup);
         }
 
+        if (version_compare($context->getVersion(), '1.7.5', '<')) {
+           $this->upgradeTableIntegrationCatalogProduct($setup);
+        }
+
+    }
+
+    /**
+     * upgrade table integration_catalog_product
+     */
+    protected function upgradeTableIntegrationCatalogProduct($setup)
+    {
+        $setup->getConnection()->changeColumn(
+            $setup->getTable('integration_catalog_product'),
+            'pim_sku',
+            'pim_sku',
+            [
+                'type'     => \Magento\Framework\DB\Ddl\Table::TYPE_TEXT,
+                'length'   => 100,
+                'nullable' => false,
+                'comment'  => 'PIM SKU'
+            ]
+        );
+
+        $setup->getConnection()
+            ->addIndex(
+                    $setup->getTable('integration_catalog_product'),
+                    $setup->getConnection()->getIndexName($setup->getTable('integration_catalog_product'), ['pim_sku'], \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE),
+            ['pim_sku'],
+           \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
+        );
+
     }
 
     /**

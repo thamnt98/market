@@ -155,6 +155,23 @@
                         </comment>
                     </field>
                 </group>
+
+                <group id="policy_group" translate="label" type="text" sortOrder="40"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label><![CDATA[T&C / Privacy Policy]]></label>
+                    <field id="policy_help_id" translate="label" type="select" sortOrder="0" canRestore="1"
+                           showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Privacy Policy</label>
+                        <config_path>sm_notification/generate/policy_help_id</config_path>
+                        <source_model>SM\Notification\Model\Source\Config\Help</source_model>
+                    </field>
+                    <field id="term_help_id" translate="label" type="select" sortOrder="10" canRestore="1"
+                           showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label><![CDATA[T&C]]></label>
+                        <config_path>sm_notification/generate/term_help_id</config_path>
+                        <source_model>SM\Notification\Model\Source\Config\Help</source_model>
+                    </field>
+                </group>
             </group>
             <group id="email" translate="label" type="text" sortOrder="30"
                    showInDefault="1" showInWebsite="1" showInStore="1">

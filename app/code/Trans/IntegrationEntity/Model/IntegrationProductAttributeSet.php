@@ -92,6 +92,22 @@ IntegrationProductAttributeSetInterface
     /**
      * @inheritdoc
      */
+    public function getAttributeSetGroup()
+    {
+        return $this->_getData(IntegrationProductAttributeSetInterface::ATTRIBUTE_SET_GROUP);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setAttributeSetGroup($attributeSetGroup)
+    {
+        $this->setData(IntegrationProductAttributeSetInterface::ATTRIBUTE_SET_GROUP, $attributeSetGroup);
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getDeleted()
     {
         return $this->_getData(IntegrationProductAttributeSetInterface::DELETED);

@@ -154,6 +154,7 @@ interface IntegrationProductInterface {
 	 * Product Attribute Type
 	 */
 	const FRONTEND_INPUT_TYPE_SELECT = "select";
+	const FRONTEND_INPUT_TYPE_MULTISELECT = "multiselect";
 	const FRONTEND_INPUT_TYPE_TEXT   = "text";
 
 	/**

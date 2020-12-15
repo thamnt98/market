@@ -173,6 +173,11 @@ class IntegrationProductAttribute implements IntegrationProductAttributeInterfac
 	 * @var \Magento\Eav\Api\AttributeRepositoryInterface
 	 */
 	protected $attributeRepositoryInterface;
+
+	/**
+     * @var Magento\Framework\App\ResourceConnection
+     */
+    protected $resourceConnection;
 	
 
 	/**
@@ -200,6 +205,7 @@ class IntegrationProductAttribute implements IntegrationProductAttributeInterfac
 	 * @param AttributeInterface $eavAttributeInterface
 	 * @param \Trans\IntegrationEntity\Api\Data\IntegrationProductAttributeSetChildInterface $integrationProductAttributeSetChildInterface
 	 * @param \Trans\IntegrationEntity\Api\Data\IntegrationProductAttributeSetChildInterfaceFactory $integrationProductAttributeSetChildInterfaceFactory
+	 * @param \Magento\Framework\App\ResourceConnection $resourceConnection
      */
 	public function __construct
 	(	
@@ -227,7 +233,8 @@ class IntegrationProductAttribute implements IntegrationProductAttributeInterfac
 		\Magento\Eav\Api\AttributeSetRepositoryInterface $attributeSetRepositoryInterface,
 		\Magento\Eav\Api\AttributeRepositoryInterface $attributeRepositoryInterface,
 		\Trans\IntegrationEntity\Api\Data\IntegrationProductAttributeSetChildInterface $integrationProductAttributeSetChildInterface,
-		\Trans\IntegrationEntity\Api\Data\IntegrationProductAttributeSetChildInterfaceFactory $integrationProductAttributeSetChildInterfaceFactory
+		\Trans\IntegrationEntity\Api\Data\IntegrationProductAttributeSetChildInterfaceFactory $integrationProductAttributeSetChildInterfaceFactory,
+		\Magento\Framework\App\ResourceConnection $resourceConnection
 	) {	
 
 		$this->attrOptionCollectionFactory = $attrOptionCollectionFactory;
@@ -259,6 +266,7 @@ class IntegrationProductAttribute implements IntegrationProductAttributeInterfac
 		$this->attributeRepositoryInterface = $attributeRepositoryInterface;
 		$this->integrationProductAttributeSetChildInterface = $integrationProductAttributeSetChildInterface;
 		$this->integrationProductAttributeSetChildInterfaceFactory = $integrationProductAttributeSetChildInterfaceFactory;
+		$this->resourceConnection = $resourceConnection;
 
 		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_attribute.log');
         $logger = new \Zend\Log\Logger();
@@ -349,7 +357,6 @@ class IntegrationProductAttribute implements IntegrationProductAttributeInterfac
 			foreach ($datas as $data) {
 				try {
 					$pimDataAttribute[$i] = $this->curl->jsonToArray($data->getDataValue());
-
 					// $pimAttrCode[$i] = str_replace(" ","_",strtolower($this->validation->validateArray(IntegrationProductAttributeInterface::PIM_LABEL, $pimDataAttribute[$i])));
 					$pimAttrCode[$i] = $pimDataAttribute[$i]['code'] ? $this->generateAttrCodeByString($pimDataAttribute[$i]['code']) : $this->generateAttrCodeByString($pimDataAttribute[$i]['name']);
 					$this->logger->info("Data Value = " . $data->getDataValue());
@@ -719,7 +726,12 @@ class IntegrationProductAttribute implements IntegrationProductAttributeInterfac
 		$jobId    = $datas->getFirstItem()->getJbId();
 		$this->updateJobData($jobId,IntegrationJobInterface::STATUS_PROGRESS_CATEGORY);
 
+		$connection = $this->resourceConnection->getConnection();
+
 		try {
+			$entityType = $this->entityType->create()->loadByCode('catalog_product');
+			$defaultSetId = $this->productFactory->create()->getDefaultAttributeSetid();
+
 			foreach ($datas as $data) {
 				$pimDataAttribute[$i] = $this->curl->jsonToArray($data->getDataValue());
 
@@ -738,99 +750,74 @@ class IntegrationProductAttribute implements IntegrationProductAttributeInterfac
 					}
 
 					if ($getAttrSetPimId) {
-						// delete attribute set and custom table
-						if ($pimDataAttribute[$i]['deleted'] > 0) {
-							//delete attribute set
-							$getAttributeSetIdInt = $getAttrSetPimId->getFirstItem()->getData();
-							try {
-								$this->attributeSetRepositoryInterface->deleteById($getAttributeSetIdInt['attribute_set_id']);
-							} catch (\Exception $exception) {
-								continue;
+						
+						// create attribute set
+						try {
+							if ($getAttrSetPimId->getAttributeSetId() == 0 || empty($getAttrSetPimId->getAttributeSetId())) {
+								$attributeSet = $this->attributeSetInterfaceFactory->create();
+								$dataOk = [
+									'attribute_set_name' => $getAttrSetPimId->getAttributeSetGroup(),
+									'entity_type_id' => $entityType->getId(),
+									'sort_order' => 100,
+								];
+
+								$attributeSet->setData($dataOk);
+								$attributeSet->validate();
+								$attributeSet->save();
+								$attributeSet->initFromSkeleton($defaultSetId);
+								$attributeSet->save();
+
+								$attributeList['attribute_set_id'] = $attributeSet->getId();
+
+								
+									$getAttrSetGroup = $this->integrationAttributeRepository->loadAttributeSetByAttrGroup($getAttrSetPimId->getAttributeSetGroup());
+
+									foreach ($getAttrSetGroup as $getAttrSetGroupValue) {
+							            $getAttrSetGroupValue->setAttributeSetId($attributeList['attribute_set_id']);
+							            $resultAttrSetGroupValue = $this->integrationAttributeRepository->saveAttributeSetIntegration($getAttrSetGroupValue);
+									}
+								
+							}
+							else {
+								$attributeList['attribute_set_id'] = $getAttrSetPimId->getAttributeSetId();
+								
 							}
 
-							//delete custom table parent
-							$queryDeleteAttrSet = $this->integrationAttributeRepository->loadAttributeSetByPimId($getAttributeSetIdInt['pim_id']);
-							foreach ($queryDeleteAttrSet as $valueDeleteAttrSet) {
-								$resultDeleteAttrSet = $this->integrationAttributeRepository->deleteAttributeSetIntegration($valueDeleteAttrSet);
-							}
-
-							//delete custom table child
-							$queryDeleteAttrSetChild = $this->integrationAttributeRepository->loadAttributeSetChildByPimId($getAttributeSetIdInt['pim_id']);
-							foreach ($queryDeleteAttrSetChild as $valueDeleteAttrSetChild) {
-								$resultDeleteAttrSetChild = $this->integrationAttributeRepository->deleteAttributeSetChildIntegration($valueDeleteAttrSetChild);
-							}
-						}
-						else {
-							// update and deleted = 0
-							$getAttributeSetIdInt = $getAttrSetPimId->getFirstItem()->getData();
-							$getAttrGroupId = $this->integrationAttributeRepository->loadAttributeGroupId($getAttributeSetIdInt['attribute_set_id']);
+							$getAttrGroupId = $this->integrationAttributeRepository->loadAttributeGroupId($attributeList['attribute_set_id']);
 
 							// foreach attribute list
 							foreach ($pimDataAttribute[$i]['attribute_list'] as $valueAttr) {
+								
 								// check if code already exist on custom table
-								$queryCodeAttrSet = $this->integrationAttributeRepository->loadAttributeSetByPimIdCode($getAttributeSetIdInt['pim_id'], $valueAttr['code']);
+								$queryCodeAttrSet = $this->integrationAttributeRepository->loadAttributeSetByPimIdAttrSetGroup($getAttrSetPimId->getAttributeSetGroup(), $valueAttr['code']);
 
 								// if not exist
-								if (!$queryCodeAttrSet) {
+								if (empty($queryCodeAttrSet) || $queryCodeAttrSet == NULL) {
 									if ($valueAttr['deleted'] == 0) {
-										try {
-											$this->productAttributeManagement->assign($getAttributeSetIdInt['attribute_set_id'], $getAttrGroupId['attribute_group_id'], $valueAttr['code'], IntegrationProductAttributeInterface::SORT_ORDER);
+										// get attribute id
+										$queryGetAttrId = "SELECT attribute_id FROM eav_attribute WHERE attribute_code = '".$valueAttr['code']."' limit 1";
+										$getGetAttrId = $connection->fetchRow($queryGetAttrId);
+										
+										$queryGetAttrDef = "SELECT * FROM eav_entity_attribute WHERE attribute_set_id = '".IntegrationProductAttributeInterface::ATTRIBUTE_SET_ID."' AND attribute_group_id = '".IntegrationProductAttributeInterface::ATTRIBUTE_GROUP_ID."' AND attribute_id = '".$getGetAttrId['attribute_id']."' limit 1";
+										$getGetAttrDef = $connection->fetchRow($queryGetAttrDef);
 
-											$attributeList['attribute_set_id'] = $getAttributeSetIdInt['attribute_set_id'];
-											$attributeList['deleted'] = $valueAttr['deleted'];
-											$attributeList['is_active'] = $valueAttr['is_active'];
-											$attributeList['code'] = $valueAttr['code'];
-											$this->saveIntegrationAttributeSetChild($pimDataAttribute[$i], $attributeList);
-										} catch (\Exception $exception) {
-											$this->logger->info("Error assign Attribute set . Message = " . $exception->getMessage());
-											continue;
+										if ($getGetAttrDef) {
+											$this->productAttributeManagement->unassign($this->attrGroupGeneralInfoId, $valueAttr['code']);
 										}
-									}
-								}
-								// if exist
-								else {
-									if ($valueAttr['deleted'] > 0) {
-										try {
-											// unassign attribute
-											$this->productAttributeManagement->unassign($getAttributeSetIdInt['attribute_set_id'], $valueAttr['code']);
+										
+										$this->productAttributeManagement->assign($attributeList['attribute_set_id'], $getAttrGroupId['attribute_group_id'], $valueAttr['code'], IntegrationProductAttributeInterface::SORT_ORDER);
 
-											// delete custom table
-											$collectCodeAttrSet = $this->integrationAttributeRepository->collectionAttributeSetByPimIdCode($getAttributeSetIdInt['pim_id'], $valueAttr['code']);
-											foreach ($collectCodeAttrSet as $valueCodeAttrSet) {
-												$resultCodeAttrSet = $this->integrationAttributeRepository->deleteAttributeSetChildIntegration($valueCodeAttrSet);
-											}
-										} catch (\Exception $exception) {
-											$this->logger->info("Error unassign Attribute set . Message = " . $exception->getMessage());
-											continue;
-										}
+									
+										$attributeList['attribute_set_id'] = $attributeList['attribute_set_id'];
+										$attributeList['attribute_set_group'] = $getAttrSetPimId->getAttributeSetGroup();
+										$attributeList['deleted'] = $valueAttr['deleted'];
+										$attributeList['is_active'] = $valueAttr['is_active'];
+										$attributeList['code'] = $valueAttr['code'];
+										$this->saveIntegrationAttributeSetChild($pimDataAttribute[$i], $attributeList);
 									}
 								}
 							}
-						}
-						
-						$msgDataValue = IntegrationProductAttributeInterface::MSG_ATTRIBUTE_UPDATE;
-					}
-					else {
-						// create attribute set
-						try {
-							$attributeSet = $this->attributeSetInterfaceFactory->create();
-
-							$entityType = $this->entityType->create()->loadByCode('catalog_product');
-							$defaultSetId = $this->productFactory->create()->getDefaultAttributeSetid();
-
-							$dataOk = [
-								'attribute_set_name' => $pimDataAttribute[$i]['category_name'] . '-' . $pimDataAttribute[$i]['id'],
-								'entity_type_id' => $entityType->getId(),
-								'sort_order' => 100,
-							];
-
-							$attributeSet->setData($dataOk);
-							$attributeSet->validate();
-							$attributeSet->save();
-							$attributeSet->initFromSkeleton($defaultSetId);
-							$attributeSet->save();
-
-							$attributeList['attribute_set_id'] = $attributeSet->getId();
+							
 						}
 						catch (\Exception $exception) {
 							$msgDataValue = $exception->getMessage();
@@ -838,72 +825,182 @@ class IntegrationProductAttribute implements IntegrationProductAttributeInterfac
 							continue;
 						}
 
-						try {
-							$getAttrGroupId = $this->integrationAttributeRepository->loadAttributeGroupId($attributeSet->getId());
+						
 
-							$this->saveIntegrationAttributeSet($pimDataAttribute[$i], $attributeList);
-
-							// assign to attribute set
-							foreach ($pimDataAttribute[$i]['attribute_list'] as $valueAssign) {
-								// check if attribute exist
-								$attributeExist = $this->eavConfig->getAttribute('catalog_product', $valueAssign['code']);
-
-								try {
-									// get attribute by code
-									$getAttributeidByCode = $this->integrationAttributeRepository->loadAttributeSetByCode($valueAssign['code']);
-									
-									//unasign from default
-									if ($attributeExist->getAttributeId()) {
-										if (!$getAttributeidByCode) {
-											$this->productAttributeManagement->unassign($this->attrGroupGeneralInfoId, $valueAssign['code']);
-										}
-									}
-
-									if ($attributeExist->getAttributeId()) {
-										$this->productAttributeManagement->assign($attributeSet->getId(), $getAttrGroupId['attribute_group_id'], $valueAssign['code'], IntegrationProductAttributeInterface::SORT_ORDER);
-
-										// update custom table
-										$attributeList['deleted'] = $valueAssign['deleted'];
-										$attributeList['is_active'] = $valueAssign['is_active'];
-										$attributeList['code'] = $valueAssign['code'];
-										$this->saveIntegrationAttributeSetChild($pimDataAttribute[$i], $attributeList);
-									}
-
-								} catch (\Exception $e) {
-									$this->logger->info("Error unassign Attribute set default. Message = " . $e->getMessage());
-
-									if ($attributeExist->getAttributeId()) {
-										$this->productAttributeManagement->assign($attributeSet->getId(), $getAttrGroupId['attribute_group_id'], $valueAssign['code'], IntegrationProductAttributeInterface::SORT_ORDER);
-
-										// update custom table
-										$attributeList['deleted'] = $valueAssign['deleted'];
-										$attributeList['is_active'] = $valueAssign['is_active'];
-										$attributeList['code'] = $valueAssign['code'];
-										$this->saveIntegrationAttributeSetChild($pimDataAttribute[$i], $attributeList);
-									}
-
-									continue;
-								}
-
-								// try {
-								// 	if ($attributeExist->getAttributeId()) {
-								// 		$this->productAttributeManagement->assign($attributeSet->getId(), $getAttrGroupId['attribute_group_id'], $valueAssign['code'], IntegrationProductAttributeInterface::SORT_ORDER);
-
-								// 		// update custom table
-								// 		$attributeList['deleted'] = $valueAssign['deleted'];
-								// 		$attributeList['is_active'] = $valueAssign['is_active'];
-								// 		$attributeList['code'] = $valueAssign['code'];
-								// 		$this->saveIntegrationAttributeSetChild($pimDataAttribute[$i], $attributeList);
-								// 	}
-								// } catch (\Exception $exception) {
-								// 	$this->logger->info("Error assign Attribute set . Message = " . $exception->getMessage());
-								// 	continue;
-								// }
-							}
-						} catch (\Exception $exception) {
-							continue;
-						}
+						
+						$msgDataValue = IntegrationProductAttributeInterface::MSG_ATTRIBUTE_UPDATE;
 					}
+					
+
+					// if ($getAttrSetPimId) {
+					// 	// delete attribute set and custom table
+					// 	if ($pimDataAttribute[$i]['deleted'] > 0) {
+					// 		//delete attribute set
+					// 		$getAttributeSetIdInt = $getAttrSetPimId->getFirstItem()->getData();
+					// 		try {
+					// 			$this->attributeSetRepositoryInterface->deleteById($getAttributeSetIdInt['attribute_set_id']);
+					// 		} catch (\Exception $exception) {
+					// 			continue;
+					// 		}
+
+					// 		//delete custom table parent
+					// 		$queryDeleteAttrSet = $this->integrationAttributeRepository->loadAttributeSetByPimId($getAttributeSetIdInt['pim_id']);
+					// 		foreach ($queryDeleteAttrSet as $valueDeleteAttrSet) {
+					// 			$resultDeleteAttrSet = $this->integrationAttributeRepository->deleteAttributeSetIntegration($valueDeleteAttrSet);
+					// 		}
+
+					// 		//delete custom table child
+					// 		$queryDeleteAttrSetChild = $this->integrationAttributeRepository->loadAttributeSetChildByPimId($getAttributeSetIdInt['pim_id']);
+					// 		foreach ($queryDeleteAttrSetChild as $valueDeleteAttrSetChild) {
+					// 			$resultDeleteAttrSetChild = $this->integrationAttributeRepository->deleteAttributeSetChildIntegration($valueDeleteAttrSetChild);
+					// 		}
+					// 	}
+					// 	else {
+					// 		// update and deleted = 0
+					// 		$getAttributeSetIdInt = $getAttrSetPimId->getFirstItem()->getData();
+					// 		$getAttrGroupId = $this->integrationAttributeRepository->loadAttributeGroupId($getAttributeSetIdInt['attribute_set_id']);
+
+					// 		// foreach attribute list
+					// 		foreach ($pimDataAttribute[$i]['attribute_list'] as $valueAttr) {
+					// 			// check if code already exist on custom table
+					// 			$queryCodeAttrSet = $this->integrationAttributeRepository->loadAttributeSetByPimIdCode($getAttributeSetIdInt['pim_id'], $valueAttr['code']);
+
+					// 			// if not exist
+					// 			if (!$queryCodeAttrSet) {
+					// 				if ($valueAttr['deleted'] == 0) {
+					// 					try {
+					// 						$this->productAttributeManagement->assign($getAttributeSetIdInt['attribute_set_id'], $getAttrGroupId['attribute_group_id'], $valueAttr['code'], IntegrationProductAttributeInterface::SORT_ORDER);
+
+					// 						$attributeList['attribute_set_id'] = $getAttributeSetIdInt['attribute_set_id'];
+					// 						$attributeList['deleted'] = $valueAttr['deleted'];
+					// 						$attributeList['is_active'] = $valueAttr['is_active'];
+					// 						$attributeList['code'] = $valueAttr['code'];
+					// 						$this->saveIntegrationAttributeSetChild($pimDataAttribute[$i], $attributeList);
+					// 					} catch (\Exception $exception) {
+					// 						$this->logger->info("Error assign Attribute set . Message = " . $exception->getMessage());
+					// 						continue;
+					// 					}
+					// 				}
+					// 			}
+					// 			// if exist
+					// 			else {
+					// 				if ($valueAttr['deleted'] > 0) {
+					// 					try {
+					// 						// unassign attribute
+					// 						$this->productAttributeManagement->unassign($getAttributeSetIdInt['attribute_set_id'], $valueAttr['code']);
+
+					// 						// delete custom table
+					// 						$collectCodeAttrSet = $this->integrationAttributeRepository->collectionAttributeSetByPimIdCode($getAttributeSetIdInt['pim_id'], $valueAttr['code']);
+					// 						foreach ($collectCodeAttrSet as $valueCodeAttrSet) {
+					// 							$resultCodeAttrSet = $this->integrationAttributeRepository->deleteAttributeSetChildIntegration($valueCodeAttrSet);
+					// 						}
+					// 					} catch (\Exception $exception) {
+					// 						$this->logger->info("Error unassign Attribute set . Message = " . $exception->getMessage());
+					// 						continue;
+					// 					}
+					// 				}
+					// 			}
+					// 		}
+					// 	}
+						
+					// 	$msgDataValue = IntegrationProductAttributeInterface::MSG_ATTRIBUTE_UPDATE;
+					// }
+					// else {
+					// 	// create attribute set
+					// 	try {
+					// 		$attributeSet = $this->attributeSetInterfaceFactory->create();
+
+					// 		$entityType = $this->entityType->create()->loadByCode('catalog_product');
+					// 		$defaultSetId = $this->productFactory->create()->getDefaultAttributeSetid();
+
+					// 		$dataOk = [
+					// 			'attribute_set_name' => $pimDataAttribute[$i]['category_name'] . '-' . $pimDataAttribute[$i]['id'],
+					// 			'entity_type_id' => $entityType->getId(),
+					// 			'sort_order' => 100,
+					// 		];
+
+					// 		$attributeSet->setData($dataOk);
+					// 		$attributeSet->validate();
+					// 		$attributeSet->save();
+					// 		$attributeSet->initFromSkeleton($defaultSetId);
+					// 		$attributeSet->save();
+
+					// 		$attributeList['attribute_set_id'] = $attributeSet->getId();
+					// 	}
+					// 	catch (\Exception $exception) {
+					// 		$msgDataValue = $exception->getMessage();
+					// 		$this->saveStatusMessage($data, $msgDataValue, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
+					// 		continue;
+					// 	}
+
+					// 	try {
+					// 		$getAttrGroupId = $this->integrationAttributeRepository->loadAttributeGroupId($attributeSet->getId());
+
+					// 		$this->saveIntegrationAttributeSet($pimDataAttribute[$i], $attributeList);
+
+					// 		// assign to attribute set
+					// 		foreach ($pimDataAttribute[$i]['attribute_list'] as $valueAssign) {
+					// 			// check if attribute exist
+					// 			$attributeExist = $this->eavConfig->getAttribute('catalog_product', $valueAssign['code']);
+
+					// 			try {
+					// 				// get attribute by code
+					// 				$getAttributeidByCode = $this->integrationAttributeRepository->loadAttributeSetByCode($valueAssign['code']);
+									
+					// 				//unasign from default
+					// 				if ($attributeExist->getAttributeId()) {
+					// 					if (!$getAttributeidByCode) {
+					// 						$this->productAttributeManagement->unassign($this->attrGroupGeneralInfoId, $valueAssign['code']);
+					// 					}
+					// 				}
+
+					// 				if ($attributeExist->getAttributeId()) {
+					// 					$this->productAttributeManagement->assign($attributeSet->getId(), $getAttrGroupId['attribute_group_id'], $valueAssign['code'], IntegrationProductAttributeInterface::SORT_ORDER);
+
+					// 					// update custom table
+					// 					$attributeList['deleted'] = $valueAssign['deleted'];
+					// 					$attributeList['is_active'] = $valueAssign['is_active'];
+					// 					$attributeList['code'] = $valueAssign['code'];
+					// 					$this->saveIntegrationAttributeSetChild($pimDataAttribute[$i], $attributeList);
+					// 				}
+
+					// 			} catch (\Exception $e) {
+					// 				$this->logger->info("Error unassign Attribute set default. Message = " . $e->getMessage());
+
+					// 				if ($attributeExist->getAttributeId()) {
+					// 					$this->productAttributeManagement->assign($attributeSet->getId(), $getAttrGroupId['attribute_group_id'], $valueAssign['code'], IntegrationProductAttributeInterface::SORT_ORDER);
+
+					// 					// update custom table
+					// 					$attributeList['deleted'] = $valueAssign['deleted'];
+					// 					$attributeList['is_active'] = $valueAssign['is_active'];
+					// 					$attributeList['code'] = $valueAssign['code'];
+					// 					$this->saveIntegrationAttributeSetChild($pimDataAttribute[$i], $attributeList);
+					// 				}
+
+					// 				continue;
+					// 			}
+
+					// 			// try {
+					// 			// 	if ($attributeExist->getAttributeId()) {
+					// 			// 		$this->productAttributeManagement->assign($attributeSet->getId(), $getAttrGroupId['attribute_group_id'], $valueAssign['code'], IntegrationProductAttributeInterface::SORT_ORDER);
+
+					// 			// 		// update custom table
+					// 			// 		$attributeList['deleted'] = $valueAssign['deleted'];
+					// 			// 		$attributeList['is_active'] = $valueAssign['is_active'];
+					// 			// 		$attributeList['code'] = $valueAssign['code'];
+					// 			// 		$this->saveIntegrationAttributeSetChild($pimDataAttribute[$i], $attributeList);
+					// 			// 	}
+					// 			// } catch (\Exception $exception) {
+					// 			// 	$this->logger->info("Error assign Attribute set . Message = " . $exception->getMessage());
+					// 			// 	continue;
+					// 			// }
+					// 		}
+					// 	} catch (\Exception $exception) {
+					// 		continue;
+					// 	}
+					// }
+
+					
 				}
 				else {
 					$msgDataValue = IntegrationProductAttributeInterface::MSG_ATTRIBUTE_SET_NULL;
@@ -964,6 +1061,7 @@ class IntegrationProductAttribute implements IntegrationProductAttributeInterfac
             $query->setCode($attributeList['code']);
             $query->setDeletedAttributeList($attributeList['deleted']);
             $query->setStatus($attributeList['is_active']);
+            $query->setAttributeSetGroup($attributeList['attribute_set_group']);
             $result = $this->integrationAttributeRepository->saveAttributeSetChildIntegration($query);
         } catch (\Exception $e) {
             throw new StateException(

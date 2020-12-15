@@ -170,6 +170,25 @@ class StorePriceRepository implements StorePriceRepositoryInterface
         return $collection->getSelect()->__toString();
     }
 
+    public function loadQueryBySkuListNSourceList($skuList = [], $sourceList = [])
+    {
+        if (empty($skuList)) {
+            throw new StateException(__(
+                'Parameter Sku are empty !'
+            ));
+        }
+        if (empty($sourceList)) {
+            throw new StateException(__(
+                'Parameter Store are empty !'
+            ));
+        }
+        $collection = $this->collectionFactory->create();
+        $collection->addFieldToFilter(StorePriceInterface::SOURCE_CODE, ['in' => $sourceList]);
+        $collection->addFieldToFilter(StorePriceInterface::SKU, ['in' => $skuList]);
+        $collection->getSelect()->order('id desc');
+        return $collection->getSelect()->__toString();
+    }
+
     /**
      * {@inheritdoc}
      */
