@@ -66,6 +66,7 @@ class OrderStatus implements OrderStatusInterface {
 
 	public function __construct(
 		\Magento\Framework\Event\ManagerInterface $eventManager,
+		\Magento\Sales\Model\Order $order,
 		\Magento\Sales\Model\Convert\OrderFactory $orderConvert,
 		\Magento\Framework\HTTP\Client\Curl $curl,
 		\Magento\InventoryApi\Api\GetSourceItemsBySkuInterface $sourceItemsBySku,
@@ -77,6 +78,16 @@ class OrderStatus implements OrderStatusInterface {
 		\Magento\Sales\Api\Data\ShipmentTrackInterfaceFactory $trackInterface,
 		\Magento\Sales\Api\Data\OrderItemInterfaceFactory $orderItemFactory,
 		\Magento\Sales\Api\OrderItemRepositoryInterface $orderItemRepository,
+		\Magento\Backend\App\Action\Context $context,
+		\Magento\Sales\Model\Order\Email\Sender\CreditmemoSender $creditmemoSender,
+		\Magento\Sales\Controller\Adminhtml\Order\CreditmemoLoader $creditmemoLoader,
+		\Magento\Sales\Api\CreditmemoManagementInterfaceFactory $creditMemoInterfaceFactory,
+		\Magento\Sales\Model\Service\CreditmemoService $creditmemoService,
+		\Magento\Sales\Model\Order\CreditmemoFactory $creditmemoFactory,
+		\Magento\Sales\Model\RefundOrder $refundOrder,
+		\Magento\Sales\Model\Order\Creditmemo\ItemCreationFactory $itemCreationFactory,
+		\Magento\Sales\Model\Order\Invoice $invoice,
+		\Magento\Sales\Model\Order\InvoiceRepositoryFactory $invoiceFactory,
 		\Trans\Core\Helper\Data $coreHelper,
 		\Trans\IntegrationOrder\Helper\Integration $integrationHelper,
 		\Trans\IntegrationOrder\Helper\Config $orderConfig,
@@ -90,6 +101,7 @@ class OrderStatus implements OrderStatusInterface {
 		\Trans\IntegrationOrder\Api\Data\RefundInterfaceFactory $refundInterface
 	) {
 		$this->eventManager                       = $eventManager;
+		$this->order                              = $order;
 		$this->orderConvert                       = $orderConvert;
 		$this->curl                               = $curl;
 		$this->integrationHelper                  = $integrationHelper;
@@ -112,6 +124,15 @@ class OrderStatus implements OrderStatusInterface {
 		$this->configPg                           = $configPg;
 		$this->refundRepository                   = $refundRepository;
 		$this->refundInterface                    = $refundInterface;
+		$this->creditmemoSender                   = $creditmemoSender;
+		$this->creditmemoLoader                   = $creditmemoLoader;
+		$this->creditMemoInterfaceFactory         = $creditMemoInterfaceFactory;
+		$this->creditmemoService                  = $creditmemoService;
+		$this->creditmemoFactory                  = $creditmemoFactory;
+		$this->refundOrder                        = $refundOrder;
+		$this->itemCreationFactory                = $itemCreationFactory;
+		$this->invoice                            = $invoice;
+		$this->invoiceFactory                     = $invoiceFactory;
 
 		$this->loggerOrder = $helperData->getLogger();
 	}
@@ -129,7 +150,7 @@ class OrderStatus implements OrderStatusInterface {
 	 */
 	protected function getHeader() {
 		$token                    = $this->integrationHelper->getToken();
-		$headers['dest']          = $this->orderConfig->getOmsDest();
+		$headers['dest']          = $this->getHeader();
 		$headers['Content-Type']  = 'application/json';
 		$headers['Authorization'] = 'Bearer ' . $token;
 
@@ -513,6 +534,10 @@ class OrderStatus implements OrderStatusInterface {
 		$url               = $this->configPg->getApiBaseUrl($paymentMethod) . '/' . Config::REFUND_POST_URL;
 		$loadItemByOrderId = $this->statusRepo->loadByOrderId($orderId);
 
+		/** Load Item By Order Id */
+		$fetchData = $this->statusRepo->loadItemByOrderIds($entityIdSalesOrder);
+		$itemId    = $fetchData->getItemId();
+
 		/**
 		 * trigger capture - refund by payment method
 		 */
@@ -527,6 +552,7 @@ class OrderStatus implements OrderStatusInterface {
 					$amount         = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 
 					$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
+					$this->creditMemos($entityIdSalesOrder, $itemId, $qtyAllocated);
 				}
 				$this->eventManager->dispatch(
 					'refund_with_mega_payment',
@@ -544,6 +570,8 @@ class OrderStatus implements OrderStatusInterface {
 					$amount         = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 
 					$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
+					$this->creditMemos($entityIdSalesOrder, $itemId, $qtyAllocated);
+
 				}
 				/* update quantity adjusment */
 				$url            = $this->orderConfig->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
@@ -575,6 +603,7 @@ class OrderStatus implements OrderStatusInterface {
 
 			elseif ($paymentMethod === 'sprint_mega_cc' || 'sprint_allbankfull_cc' || 'sprint_mega_debit') {
 				if ($itemData['quantity'] > $itemData['quantity_allocated']) {
+
 					$this->helperData->sprintLog()->info('===== Capture Process ===== Start');
 
 					/**
@@ -607,18 +636,6 @@ class OrderStatus implements OrderStatusInterface {
 					if ($responseStatus === $success || $decline || $pending) {
 						$this->helperData->sprintLog()->info('===== Refund Process ===== Start');
 
-						// /**
-						//  * prepare data array refund send to PG
-						//  */
-						// $paidPriceOrder = 0;
-						// $qtyOrder       = 0;
-						// foreach ($loadItemByOrderId as $itemOrder) {
-						//     $paidPriceOrder += $itemOrder->getPaidPrice();
-						//     $qtyOrder += $itemOrder->getQty();
-						//     $qtyAllocated          = $allocatedQty;
-						//     $matrixAdjusmentAmount = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
-						// }
-
 						$amount = 0;
 						/**
 						 * prepare data array refund send to PG
@@ -630,6 +647,7 @@ class OrderStatus implements OrderStatusInterface {
 							$amount         = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 
 							$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
+							$this->creditMemos($entityIdSalesOrder, $itemId, $qtyAllocated);
 						}
 
 						$refTrxNumber = RefundInterface::PREFIX_REFUND . $this->helperData->genRefNumber() . $orderId;
@@ -956,5 +974,62 @@ class OrderStatus implements OrderStatusInterface {
 			$saveHistory = $this->statusRepo->saveHistory($model);
 		}
 		return $result;
+	}
+
+	/**
+	 * Prepare store data for Credit Memo
+	 *
+	 * @param string $orderId
+	 * @param string $orderItemId
+	 * @param string $orderQty
+	 *
+	 */
+	protected function creditMemos($orderId, $orderItemId, $orderQty) {
+		$creditMemoData                        = [];
+		$creditMemoData['do_offline']          = 1;
+		$creditMemoData['shipping_amount']     = 0;
+		$creditMemoData['adjustment_positive'] = 0;
+		$creditMemoData['adjustment_negative'] = 0;
+		$creditMemoData['comment_text']        = 'Pengembalian Refund';
+		$creditMemoData['send_email']          = 1;
+		$itemToCredit[$orderItemId]            = ['qty' => $orderQty];
+		$creditMemoData['items']               = $itemToCredit;
+		try {
+			$this->creditmemoLoader->setOrderId($orderId); //pass order id
+			$this->creditmemoLoader->setCreditmemo($creditMemoData);
+
+			$creditmemo = $this->creditmemoLoader->load();
+			if ($creditmemo) {
+				if (!$creditmemo->isValidGrandTotal()) {
+					throw new \Magento\Framework\Exception\LocalizedException(
+						__('The credit memo\'s total must be positive.')
+					);
+				}
+
+				if (!empty($creditMemoData['comment_text'])) {
+					$creditmemo->addComment(
+						$creditMemoData['comment_text'],
+						isset($creditMemoData['comment_customer_notify']),
+						isset($creditMemoData['is_visible_on_front'])
+					);
+
+					$creditmemo->setCustomerNote($creditMemoData['comment_text']);
+					$creditmemo->setCustomerNoteNotify(isset($creditMemoData['comment_customer_notify']));
+				}
+
+				$creditmemoManagement = $this->creditMemoInterfaceFactory->create();
+				$creditmemo->getOrder()->setCustomerNoteNotify(!empty($creditMemoData['send_email']));
+				$creditmemoManagement->refund($creditmemo, (bool) $creditMemoData['do_offline']);
+
+				if (!empty($creditMemoData['send_email'])) {
+					$this->creditmemoSender->send($creditmemo);
+				}
+				$this->messageManager->addSuccess(__('You created the credit memo.'));
+			}
+		} catch (\Exception $e) {
+			$this->loggerOrder->info('Credit memo check = ' . $e->getMessage());
+		}
+
+		return $creditMemoData;
 	}
 }
