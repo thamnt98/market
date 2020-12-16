@@ -24,6 +24,10 @@
             <allow_multiple_address>1</allow_multiple_address>
         </method>
 
+        <method name="trans_mepay_debit">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
+
         <method name="trans_mepay_va">
             <allow_multiple_address>1</allow_multiple_address>
         </method>

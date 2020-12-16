@@ -71,12 +71,34 @@ class TransmartOrderDataBuilder extends OrderDataBuilder
     $items = $this->getOrderItems($order);
 
     //buid order id
-    return [
+    // return [
+    //   self::ORDER =>[
+    //     self::ID => $order->getOrderIncrementId(),
+    //     self::ITEMS => $items
+    //   ]
+    // ];
+
+    $payment = $paymentDO->getPayment();
+    $method = $payment->getMethodInstance();
+    $code = $method->getCode();
+    
+    //buid order id
+    $result = [
       self::ORDER =>[
         self::ID => $order->getOrderIncrementId(),
         self::ITEMS => $items
       ]
     ];
+
+    if (strpos($code, 'cc') !== false) {
+        $result[self::ORDER][self::AFTER_DISCOUNT] = self::CREDIT_MEGA;
+    }
+
+    if (strpos($code, 'debit') !== false) {
+        $result[self::ORDER][self::AFTER_DISCOUNT] = self::DEBIT_MEGA;
+    }
+
+    return $result; 
   }
 
   /**
