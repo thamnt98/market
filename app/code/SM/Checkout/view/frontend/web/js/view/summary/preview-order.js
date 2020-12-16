@@ -92,7 +92,7 @@ define([
 
         isFreshProduct: function (item_id) {
             if (imageData[item_id]) {
-                if (imageData[item_id].own_courier == 1) {
+                if (imageData[item_id].is_fresh == 1) {
                     return true
                 }
             }
