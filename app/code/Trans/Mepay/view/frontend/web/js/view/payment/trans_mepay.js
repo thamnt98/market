@@ -17,12 +17,21 @@ define(
             component: 'Trans_Mepay/js/view/payment/method-renderer/trans_mepay'
           }
         );
+
+        rendererList.push(
+          {
+            type: 'trans_mepay_debit',
+            component: 'Trans_Mepay/js/view/payment/method-renderer/trans_mepay'
+          }
+        );
+        
         rendererList.push(
           {
             type: 'trans_mepay_va',
             component: 'Trans_Mepay/js/view/payment/method-renderer/trans_mepay'
           }
         );
+        
         rendererList.push(
           {
             type: 'trans_mepay_qris',

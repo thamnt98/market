@@ -49,6 +49,26 @@ class OrderDataBuilder implements BuilderInterface
   const AMOUNT = 'amount';
 
   /**
+   * @var string
+   */
+  const MEGA_CARDS = 'megacards';
+
+  /**
+   * @var string
+   */
+  const DEBIT_MEGA = 'debitmega';
+
+  /**
+   * @var string
+   */
+  const CREDIT_MEGA = 'creditmega';
+
+  /**
+   * @var string
+   */
+  const AFTER_DISCOUNT = 'afterDiscount';
+
+  /**
    * @var SubjectReader
    */
   private $subjectReader;
@@ -79,12 +99,28 @@ class OrderDataBuilder implements BuilderInterface
     $paymentDO = $this->subjectReader->readPayment($buildSubject);
     $order = $paymentDO->getOrder();
     $items = $this->getOrderItems($order);
-    return [
+
+    $payment = $paymentDO->getPayment();
+    $method = $payment->getMethodInstance();
+    $code = $method->getCode();
+    
+    //buid order id
+    $result = [
       self::ORDER =>[
         self::ID => $order->getOrderIncrementId(),
         self::ITEMS => $items
       ]
     ];
+
+    if (strpos($code, 'cc') !== false) {
+        $result[self::ORDER][self::AFTER_DISCOUNT] = self::CREDIT_MEGA;
+    }
+
+    if (strpos($code, 'debit') !== false) {
+        $result[self::ORDER][self::AFTER_DISCOUNT] = self::DEBIT_MEGA;
+    }
+
+    return $result; 
   }
 
   /**
