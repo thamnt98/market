@@ -29,7 +29,11 @@
                             <?php if ($category->thumbnail): ?>
                             <div class="product-image-container">
                                 <div class="product-image-wrapper">
-                                    <img class="product-image-photo" src="<?= $viewModel->getImageResize($category->thumbnail,128)?>" title="<?= $block->escapeHtmlAttr($category->name)?>" alt="<?= $block->escapeHtmlAttr($category->name)?>">
+                                    <img class="product-image-photo lazy"
+                                         src="<?= $block->getViewFileUrl('SM_LazyLoad::images/loader.gif') ?>"
+                                         data-src="<?= $viewModel->getImageResize($category->thumbnail,128)?>"
+                                         title="<?= $block->escapeHtmlAttr($category->name)?>"
+                                         alt="<?= $block->escapeHtmlAttr($category->name)?>">
                                 </div>
                             </div>
 
