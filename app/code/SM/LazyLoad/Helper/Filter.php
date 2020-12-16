@@ -114,7 +114,7 @@ class Filter
     protected function getViewFileUrl($fileId, array $params = []): string
     {
         try {
-            $params = array_merge(['_secure' => $this->getRequest()->isSecure()], $params);
+            $params = array_merge(['_secure' => true], $params);
             return $this->assetRepo->getUrlWithParams($fileId, $params);
         } catch (\Exception $e) {
             return "";
