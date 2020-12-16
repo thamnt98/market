@@ -639,88 +639,88 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
      */
     public function saveTest($dataProduct)
     {
-        $i = 0;
-        $jsonResponse = json_decode($dataProduct, true);
+        // $i = 0;
+        // $jsonResponse = json_decode($dataProduct, true);
         
-        // validate if data exist
-        if (!isset($jsonResponse['data'])) {
-            return false;
-        }
+        // // validate if data exist
+        // if (!isset($jsonResponse['data'])) {
+        //     return false;
+        // }
 
-        $datas = $jsonResponse['data'];
+        // $datas = $jsonResponse['data'];
 
         
-        $productInterface = [];
-        $attributeInterfaces = [];
+        // $productInterface = [];
+        // $attributeInterfaces = [];
 
 
-        //Get all required data
-        $dataList = $this->getDataListxx($datas);
-        $productInterfaces = $this->getProductByMultipleSku($dataList['sku_list']);
-        $attributeInterfaces = $this->getAttributeIdList($dataList['store_list']);
+        // //Get all required data
+        // $dataList = $this->getDataListxx($datas);
+        // $productInterfaces = $this->getProductByMultipleSku($dataList['sku_list']);
+        // $attributeInterfaces = $this->getAttributeIdList($dataList['store_list']);
 
-        foreach ($datas as $row) {
-            try {
-                $dataPass = $this->prepareDataPromoGlobal($row);
-                switch ($dataPass['promotion_type']) {
-                    // promotype = 1
-                    case 1:
-                            $markdownFunction = $this->markdownFunction($dataPass, $attributeInterfaces);
-                            if ($markdownFunction) {
-                                $dataMarkdown[] = $markdownFunction;
-                            }
-                        break;
+        // foreach ($datas as $row) {
+        //     try {
+        //         $dataPass = $this->prepareDataPromoGlobal($row);
+        //         switch ($dataPass['promotion_type']) {
+        //             // promotype = 1
+        //             case 1:
+        //                     $markdownFunction = $this->markdownFunction($dataPass, $attributeInterfaces);
+        //                     if ($markdownFunction) {
+        //                         $dataMarkdown[] = $markdownFunction;
+        //                     }
+        //                 break;
 
-                    // promotype = 2
-                    case 2:
-                            $this->promoType2Function($dataPass);
-                        break;
+        //             // promotype = 2
+        //             case 2:
+        //                     $this->promoType2Function($dataPass);
+        //                 break;
 
-                    // promotype = 8
-                    case 8:
-                            $this->promoType8Function($dataPass);
-                        break;
+        //             // promotype = 8
+        //             case 8:
+        //                     $this->promoType8Function($dataPass);
+        //                 break;
 
-                    // promotype = 5
-                    case 5:
-                            $this->promoType5Function($dataPass);
-                        break;
+        //             // promotype = 5
+        //             case 5:
+        //                     $this->promoType5Function($dataPass);
+        //                 break;
 
-                    // promotype = 7
-                    case 7:
-                            // $this->promoType7Function($dataPass);
-                        break;
+        //             // promotype = 7
+        //             case 7:
+        //                     // $this->promoType7Function($dataPass);
+        //                 break;
 
-                    // promotype = 4
-                    case 4:
-                            $this->promoType4Function($dataPass);
-                        break;
+        //             // promotype = 4
+        //             case 4:
+        //                     $this->promoType4Function($dataPass);
+        //                 break;
 
-                    default:
-                    break;
-                }
+        //             default:
+        //             break;
+        //         }
 
-                $indexO++;
+        //         $indexO++;
 
-                $this->updateDataValueStatus($row['data_id'], IntegrationDataValueInterface::STATUS_DATA_SUCCESS, null);
+        //         $this->updateDataValueStatus($row['data_id'], IntegrationDataValueInterface::STATUS_DATA_SUCCESS, null);
 
-            } catch (\Exception $exception) {
+        //     } catch (\Exception $exception) {
                 
-                continue;
-            }
-        }
+        //         continue;
+        //     }
+        // }
 
-        // // save bulk markdown
-        try {
-            if ($dataMarkdown) {
-                $connectionMarkdown = $this->resourceConnection->getConnection();
+        // // // save bulk markdown
+        // try {
+        //     if ($dataMarkdown) {
+        //         $connectionMarkdown = $this->resourceConnection->getConnection();
                 
-                $connectionMarkdown->insertOnDuplicate("catalog_product_entity_decimal", $dataMarkdown, ['value']);
-                $this->logger->info('insertOnDuplicate success ' . date('d-M-Y H:i:s')); 
-            }
-        } catch (\Exception $e) {
-            $this->logger->info('insertOnDuplicate fail ' . date('d-M-Y H:i:s')); 
-        }
+        //         $connectionMarkdown->insertOnDuplicate("catalog_product_entity_decimal", $dataMarkdown, ['value']);
+        //         $this->logger->info('insertOnDuplicate success ' . date('d-M-Y H:i:s')); 
+        //     }
+        // } catch (\Exception $e) {
+        //     $this->logger->info('insertOnDuplicate fail ' . date('d-M-Y H:i:s')); 
+        // }
         
         return true;
     }
