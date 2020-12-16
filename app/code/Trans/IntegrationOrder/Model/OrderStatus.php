@@ -1027,7 +1027,7 @@ class OrderStatus implements OrderStatusInterface {
 				if (!empty($creditMemoData['send_email'])) {
 					$this->creditmemoSender->send($creditmemo);
 				}
-				$this->messageManager->addSuccess(__('You created the credit memo.'));
+				$this->loggerOrder->info('You created the credit memo.');
 			}
 		} catch (\Exception $e) {
 			$this->loggerOrder->info('Credit memo check = ' . $e->getMessage());
