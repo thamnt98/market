@@ -3,7 +3,7 @@
 namespace SM\Sales\Block\Order\Physical;
 
 use Exception;
-use Magento\Customer\Model\Session;
+use Magento\Customer\Model\SessionFactory;
 use Magento\Framework\Pricing\Helper\Data;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
@@ -20,10 +20,22 @@ use SM\Sales\Model\SubOrderRepository;
 class Detail extends AbstractDetail
 {
     /**
-     * @var Session
+     * @var SessionFactory
      */
-    protected $session;
+    protected $customerSessionFactory;
 
+    /**
+     * Detail constructor.
+     * @param ParentOrderRepository $parentOrderRepository
+     * @param DigitalOrderRepository $digitalOrderRepository
+     * @param SubOrderRepository $subOrderRepository
+     * @param Template\Context $context
+     * @param Data $priceHelper
+     * @param TimezoneInterface $timezone
+     * @param DateTime $dateTime
+     * @param SessionFactory $customerSessionFactory
+     * @param array $data
+     */
     public function __construct(
         ParentOrderRepository $parentOrderRepository,
         DigitalOrderRepository $digitalOrderRepository,
@@ -32,11 +44,20 @@ class Detail extends AbstractDetail
         Data $priceHelper,
         TimezoneInterface $timezone,
         DateTime $dateTime,
-        Session $customerSession,
+        SessionFactory $customerSessionFactory,
         array $data = []
     ) {
-        $this->session = $customerSession;
-        parent::__construct($parentOrderRepository, $digitalOrderRepository, $subOrderRepository, $context, $priceHelper, $timezone, $dateTime, $data);
+        $this->customerSessionFactory = $customerSessionFactory;
+        parent::__construct(
+            $parentOrderRepository,
+            $digitalOrderRepository,
+            $subOrderRepository,
+            $context,
+            $priceHelper,
+            $timezone,
+            $dateTime,
+            $data
+        );
     }
 
     /**
@@ -47,7 +68,7 @@ class Detail extends AbstractDetail
         $orderId = $this->getRequest()->getParam("id", 0);
         if ($orderId) {
             try {
-                $customerId = $this->session->getCustomerId();
+                $customerId =$this->customerSessionFactory->create()->getCustomerId();
                 $this->setParentOrder($this->parentOrderRepository->getById($customerId, $orderId));
                 return;
             } catch (Exception $e) {

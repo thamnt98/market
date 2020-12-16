@@ -79,10 +79,22 @@ class Fresh extends AbstractHelper
      */
     public function toDataArray()
     {
+        $basePriceInKg = $this->validateAttribute(FreshProductInterface::BASE_PRICE_IN_KG);
+        if (!$basePriceInKg) {
+            $basePriceInKg = 0;
+        } else {
+            $basePriceInKg = (int)$basePriceInKg;
+        }
+        $promoPriceInKg = $this->validateAttribute(FreshProductInterface::PROMO_PRICE_IN_KG);
+        if (!$promoPriceInKg) {
+            $promoPriceInKg = 0;
+        } else {
+            $promoPriceInKg = (int)$promoPriceInKg;
+        }
         return [
-            FreshProductInterface::OWN_COURIER => $this->validateAttribute(FreshProductInterface::OWN_COURIER) ?? false,
-            FreshProductInterface::BASE_PRICE_IN_KG => $this->validateAttribute(FreshProductInterface::BASE_PRICE_IN_KG),
-            FreshProductInterface::PROMO_PRICE_IN_KG => $this->validateAttribute(FreshProductInterface::PROMO_PRICE_IN_KG),
+            FreshProductInterface::OWN_COURIER => $this->validateAttribute('is_fresh') ?? false,
+            FreshProductInterface::BASE_PRICE_IN_KG => $basePriceInKg,
+            FreshProductInterface::PROMO_PRICE_IN_KG => $promoPriceInKg,
             FreshProductInterface::IS_DECIMAL => $this->validateAttribute(FreshProductInterface::IS_DECIMAL) ?? false,
             FreshProductInterface::WEIGHT => $this->getProduct()->getWeight(),
             FreshProductInterface::SOLD_IN => $this->validateAttribute(FreshProductInterface::SOLD_IN),
@@ -101,7 +113,7 @@ class Fresh extends AbstractHelper
         if ($attribute) {
             return $attribute->getValue();
         }
-        return null;
+        return 0;
     }
 
     /**

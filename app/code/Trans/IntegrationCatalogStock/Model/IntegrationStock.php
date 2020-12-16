@@ -32,6 +32,8 @@ use Trans\IntegrationEntity\Api\IntegrationAssignSourcesInterface;
 use Trans\Integration\Helper\Curl;
 use Trans\Integration\Helper\Validation;
 use Trans\Core\Helper\SourceItem;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
+use Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory as AttributeCollectionFactory;
 
 /**
  * @inheritdoc
@@ -109,6 +111,16 @@ class IntegrationStock implements IntegrationStockInterface {
 	protected $indexerRegistry;
 
 	/**
+	 * @var \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory
+	 */
+	protected $productCollectionFactory;
+
+	/**
+	 * @var Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory
+	 */
+	protected $attributeCollectionFactory;
+
+	/**
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param SourceItemsSaveInterface $sourceItemSave
      * @param SourceItemInterfaceFactory $sourceItem
@@ -138,7 +150,9 @@ class IntegrationStock implements IntegrationStockInterface {
 		SourceItem $sourceItemHelper,
         SourceInterfaceFactory $sourceInterfaceFactory,
         \Magento\Framework\App\ResourceConnection $resourceConnection,
-        \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
+		\Magento\Framework\Indexer\IndexerRegistry $indexerRegistry,
+		ProductCollectionFactory $productCollectionFactory,
+		AttributeCollectionFactory $attributeCollectionFactory
 	) {	
 
         $this->sourceItem 							   = $sourceItem;
@@ -153,8 +167,10 @@ class IntegrationStock implements IntegrationStockInterface {
 		$this->integrationJobRepositoryInterface       = $integrationJobRepositoryInterface;
         $this->sourceInterfaceFactory 				   = $sourceInterfaceFactory; 
 		$this->integrationAssignSources 			   = $integrationAssignSources;
-		$this->resourceConnection = $resourceConnection;
-		$this->indexerRegistry = $indexerRegistry;
+		$this->resourceConnection 					   = $resourceConnection;
+		$this->indexerRegistry 						   = $indexerRegistry;
+		$this->productCollectionFactory 			   = $productCollectionFactory;
+		$this->attributeCollectionFactory 			   = $attributeCollectionFactory;
 
 		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_catalog_stock_model.log');
         $logger = new \Zend\Log\Logger();
@@ -167,8 +183,10 @@ class IntegrationStock implements IntegrationStockInterface {
      * @return mixed
      */
 	public function saveStock($datas) {
-		$dataStock = [];
-		$result    = [];
+		$productIds = [];
+		$dataStockList = [];
+
+		$messageValue = '';
 
 		$checkData = array_filter($datas->getData());
 		if (empty($checkData)) {
@@ -187,76 +205,63 @@ class IntegrationStock implements IntegrationStockInterface {
 		$this->integrationJobRepositoryInterface->save($dataJobs);
 
 		$connectionCheck = $this->resourceConnection->getConnection();
-		// get attribute id
-		$queryGetAttrIdIsFresh = "SELECT attribute_id FROM eav_attribute WHERE attribute_code = 'is_fresh' AND backend_type = 'int' AND frontend_input = 'boolean' limit 1";
-		$getGetAttrIdIsFresh = $connectionCheck->fetchRow($queryGetAttrIdIsFresh);
-		$queryGetAttrIdWeight = "SELECT attribute_id FROM eav_attribute WHERE attribute_code = 'weight' AND backend_type = 'decimal' AND frontend_input = 'weight' limit 1";
-		$getGetAttrIdWeight = $connectionCheck->fetchRow($queryGetAttrIdWeight);
-		$queryGetAttrIdSoldIn = "SELECT attribute_id FROM eav_attribute WHERE attribute_code = 'sold_in' AND backend_type = 'varchar' AND frontend_input = 'text' limit 1";
-		$getGetAttrIdSoldIn = $connectionCheck->fetchRow($queryGetAttrIdSoldIn);
 
-		try {
-			// $items = [];
-			// $i = 0;	
-			$productReindexIds = [];
-			$dataStockList = [];		
+		try{
 			foreach ($datas as $data) {
-
 				$dataStock    = $this->curl->jsonToArray($data->getDataValue());
 				$productSku   = $this->validation->validateArray(IntegrationStockInterface::IMS_PRODUCT_SKU, $dataStock);
-        		$locationCode = $this->validation->validateArray(IntegrationStockInterface::IMS_LOCATION_CODE, $dataStock);
-        		$quantity 	  = ($this->validation->validateArray(IntegrationStockInterface::IMS_QUANTITY, $dataStock) == NULL)? 0 : (int) $this->validation->validateArray(IntegrationStockInterface::IMS_QUANTITY, $dataStock);
-        	    $checkSource  = $this->checkSourceExist($locationCode);
-        	    $messageValue = '';
+				$locationCode = $this->validation->validateArray(IntegrationStockInterface::IMS_LOCATION_CODE, $dataStock);
+				$quantity 	  = ($this->validation->validateArray(IntegrationStockInterface::IMS_QUANTITY, $dataStock) == NULL)? 0 : (int) $this->validation->validateArray(IntegrationStockInterface::IMS_QUANTITY, $dataStock);
+				$checkSource  = $this->checkSourceExist($locationCode);
 
-        	    // get row id
-        	    $queryRowId = "select row_id, entity_id FROM catalog_product_entity where sku = '".$productSku."' limit 1";
-        	    $getRowId = $connectionCheck->fetchRow($queryRowId);
+				$stockData[$productSku] = array(
+					'productSku' => $productSku,
+					'locationCode' => $locationCode,
+					'quantity' => $quantity,
+					'checkSource' => $checkSource,
+					'data' => $data
+				);
+			}
 
-				// get value is fresh
-        	    $queryIsFresh = "select value FROM catalog_product_entity_int where row_id = '".$getRowId['row_id']."' AND attribute_id = '".$getGetAttrIdIsFresh['attribute_id']."' limit 1";
-				$getIsFresh = $connectionCheck->fetchRow($queryIsFresh);
+			$attributeCodes = ['is_fresh', 'weight', 'sold_in'];
+			$skus = array_keys($stockData);
+			$productsCollection = $this->getProductByMultipleSkuAndAttributeCodes($skus, $attributeCodes);
 
-				// get value weight
-        	    $queryWeight = "select value FROM catalog_product_entity_decimal where row_id = '".$getRowId['row_id']."' AND attribute_id = '".$getGetAttrIdWeight['attribute_id']."' limit 1";
-				$getWeight = $connectionCheck->fetchRow($queryWeight);
+			foreach($productsCollection as $productCollection){
+				$rowId = $productCollection->getRowId();
+				$productSku = $productCollection->getSku();
 
-				// get value sold_in
-        	    $querySoldIn = "select value FROM catalog_product_entity_varchar where row_id = '".$getRowId['row_id']."' AND attribute_id = '".$getGetAttrIdSoldIn['attribute_id']."' limit 1";
-				$getSoldIn = $connectionCheck->fetchRow($querySoldIn);
+				$isFresh = $productCollection->getData('is_fresh');
+				$weight = $productCollection->getData('weight');
+				$soldIn = $productCollection->getData('sold_in');
 
-				//array reindex
-				if ($getRowId['entity_id']) {
-					$productReindexIds[] = $getRowId['entity_id'];
+				if(isset($stockData[strtoupper($productSku)])){
+					$productSku = strtoupper($productSku);
+				}else if(isset($stockData[strtolower($productSku)])){
+					$productSku = strtolower($productSku);
 				}
+				
+				$checkSource = $stockData[$productSku]['checkSource'];
+				$locationCode = $stockData[$productSku]['locationCode'];
+				$quantity = $stockData[$productSku]['quantity'];
+				$data = $stockData[$productSku]['data'];
 
-        	    //Check source, if does not exist added as new source (store).
         	    if ($checkSource == NULL && strpos($locationCode, ' ') === false) {
         	    	$this->addNewSource($locationCode);
         	    	$checkSource  = $this->checkSourceExist($locationCode);
         	    	$messageValue = IntegrationStockInterface::MSG_NEW_STORE;
-        	    }
-
+				}
+				
 				if ($productSku != NULL && $locationCode != NULL) {
-
 					if ($checkSource != NULL) {
-						// $sourceItem = $this->sourceItem->create();
-		                // $sourceItem->setSku($productSku);
-		                // $sourceItem->setSourceCode($locationCode);
-		                // $sourceItem->setQuantity($quantity);
-		                // $sourceItem->setStatus(IntegrationStockInterface::IMS_STATUS);
-		                // $items = array($sourceItem);
-		            	// $this->sourceItemSave->execute($items);
-
-						if ($getIsFresh['value'] == 1) {
-							if ($getSoldIn['value'] == 'kg' || $getSoldIn['value'] == 'Kg' || $getSoldIn['value'] == 'KG') {
+						if ($isFresh == 1) {
+							if ($soldIn == 'kg' || $soldIn == 'Kg' || $soldIn == 'KG') {
 								$quantity = $this->validation->validateArray(IntegrationStockInterface::IMS_QUANTITY, $dataStock);
-								$qtyCalc = ($quantity * 1000) / $getWeight['value'];
+								$qtyCalc = ($quantity * 1000) / $weight;
 								$quantity = floor($qtyCalc);
 							}
 						}
 
-						// raw query set stock
 						$dataStockList[] =
 		                    [
 		                        "source_code"=>"".$locationCode."",
@@ -265,73 +270,36 @@ class IntegrationStock implements IntegrationStockInterface {
 		                        "status"=>"1"
 		                    ];
 
+						$productIds[] = $productCollection->getId();
+						$this->logger->info("success data");
 						$this->saveStatusMessage($data, $messageValue, IntegrationDataValueInterface::STATUS_DATA_SUCCESS);
 					}
 					else {
+						$this->logger->info("failed no store data");
 						$this->saveStatusMessage($data, IntegrationStockInterface::MSG_NO_STORE, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
-
-						$this->logger->info("start - store not found");
-						$this->logger->info("sku: " . $productSku);
-						$this->logger->info("store_code: " . $locationCode);
-						$this->logger->info("quantity: " . $quantity);
-						$this->logger->info("query: " . $query);
-						$this->logger->info("end - store not found");
 					}
-
 				}
 				else {
+					$this->logger->info("failed stock null data");
 					$this->saveStatusMessage($data, IntegrationStockInterface::MSG_DATA_STOCK_NULL, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
-
-					$this->logger->info("start - sku and store not provided");
-					$this->logger->info("quantity: " . $quantity);
-					$this->logger->info("query: " . $query);
-					$this->logger->info("end - sku and store not provided");
                 }
-            }
-            
-	        // $this->sourceItemHelper->stockItemReindex();
+			}
 
-            //save stock insert on duplicate
-	        try {
-                if ($dataStockList) {
-                    $connectionCheck->insertOnDuplicate("inventory_source_item", $dataStockList, ['quantity']);
-                    $this->logger->info('insertOnDuplicate success ' . date('d-M-Y H:i:s')); 
-                }
-            } catch (\Exception $e) {
-                $this->logger->info('insertOnDuplicate fail ' . date('d-M-Y H:i:s')); 
-            }
-            
-	        try {
-                if(!empty($productReindexIds)) {
-                    $this->reindexByProductsIds($productReindexIds, ['inventory', 'cataloginventory_stock']);
-                    $this->logger->info('reindex success ' . date('d-M-Y H:i:s')); 
-                }
-            } catch (\Exception $e) {
-                $this->logger->info('reindex fail ' . date('d-M-Y H:i:s')); 
-            }
+			$connectionCheck->insertOnDuplicate("inventory_source_item", $dataStockList, ['quantity']);
 
-		}
-		catch (\Exception $exception) {
+			$this->reindexByProductsIds($productIds, ['inventory', 'cataloginventory_stock']);
+		}catch(Exception $exception){
+			$this->logger->info("error : " . $exception->getMessage());
 			if ($dataJobs) {
 				$dataJobs->setMessage($exception->getMessage());
 				
 				if ($tryHit >= IntegrationStockInterface::MAX_TRY_HIT){
 					$dataJobs->setHit($tryHit);
 					$dataJobs->setStatus(IntegrationJobInterface::STATUS_PROGRESS_FAIL);
-
-					$this->logger->info("start - job exceed maximum hit to save the data");
-					$this->logger->info("job_id: " . $jobId);
-					$this->logger->info("max_try_hit: " . IntegrationStockInterface::MAX_TRY_HIT);
-					$this->logger->info("end - job exceed maximum hit to save the data");
 				}
 				else {
 					$dataJobs->setHit($tryHit);
 					$dataJobs->setStatus(IntegrationJobInterface::STATUS_READY);
-
-					$this->logger->info("start - job retried to hit to save the data");
-					$this->logger->info("job_id: " . $jobId);
-					$this->logger->info("hit: " . $tryHit);
-					$this->logger->info("end - job retried to hit to save the data");
 				}
 
 				$this->integrationJobRepositoryInterface->save($dataJobs);
@@ -342,13 +310,12 @@ class IntegrationStock implements IntegrationStockInterface {
 			));
 		}
 
-
 		$dataJobs->setHit($tryHit);
 		$dataJobs->setStatus(IntegrationJobInterface::STATUS_COMPLETE);
 
 		$this->integrationJobRepositoryInterface->save($dataJobs);
 
-		return true;
+		return $dataStockList;
 	}
 
 	/**
@@ -475,6 +442,38 @@ class IntegrationStock implements IntegrationStockInterface {
 		}
 
 		return $result;
+	}
+
+	/**
+     * Get product by multiple sku
+     */
+    protected function getProductByMultipleSku($skuList)
+    {
+        $result = [];
+        if (empty($skuList) == false) {
+            $this->logger->info('Before get product ' . date('d-M-Y H:i:s'));
+            $collection = $this->productCollectionFactory->create()->addFieldToFilter('sku', ['in'=>$skuList]);
+            $collection->getSelect()->reset(\Zend_Db_Select::COLUMNS)->columns(['entity_id','sku','row_id','type_id']);
+            $result = $collection->getItems();
+            $this->logger->info('After get product ' . date('d-M-Y H:i:s'));
+        }
+        return $result;
+	}
+
+	/**
+     * Get product by multiple sku
+     */
+    protected function getProductByMultipleSkuAndAttributeCodes($skuList, $attributeCodes)
+    {
+        $result = [];
+        if (empty($skuList) == false) {
+            $this->logger->info('Before get product ' . date('d-M-Y H:i:s'));
+            $collection = $this->productCollectionFactory->create()->addFieldToFilter('sku', ['in'=>$skuList])->addAttributeToSelect($attributeCodes);
+            $collection->getSelect()->reset(\Zend_Db_Select::COLUMNS)->columns(['entity_id','sku','row_id','type_id']);
+            $result = $collection->getItems();
+            $this->logger->info('After get product ' . date('d-M-Y H:i:s'));
+        }
+        return $result;
 	}
 
 }
