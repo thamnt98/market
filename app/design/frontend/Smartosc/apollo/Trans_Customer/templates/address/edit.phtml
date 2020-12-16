@@ -372,6 +372,7 @@
 
         async.async('#region_id option', function() {
             if (region_id.children('option').length >= 33 ) {
+                regionUl.html('');
                 region_id.find('option').each(function () {
                     let self = $(this);
                     regionUl.append('<li value="'+self.val()+'">'+'<label>'+self.text()+'</label>'+'</li>');
