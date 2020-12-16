@@ -147,7 +147,7 @@ define([
             // **** BANK MEGA payment ****
             var obj = this.getPaymentMethods();
 
-            if (obj['method'] == 'trans_mepay_cc' || obj['method'] == 'trans_mepay_va' || obj['method'] == 'trans_mepay_qris') {
+            if (obj['method'] == 'trans_mepay_debit' || obj['method'] == 'trans_mepay_cc' || obj['method'] == 'trans_mepay_va' || obj['method'] == 'trans_mepay_qris') {
                 return $.when(placeOrder(this.getPaymentMethods(), '')).done(
                     function () {
 

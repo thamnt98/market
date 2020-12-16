@@ -87,7 +87,7 @@ define([
             return this.getPaymentInList(methods);
         },
         getListPaymentCreditCard: function () {
-            var methods = ["sprint_allbankfull_cc", 'sprint_mega_cc', 'trans_mepay_cc'];
+            var methods = ["sprint_allbankfull_cc", 'sprint_mega_cc', 'trans_mepay_cc', 'trans_mepay_debit'];
             return this.getPaymentInList(methods);
         },
         getListPaymentQris: function () {
