@@ -174,9 +174,9 @@ class OrderStatus implements OrderStatusInterface {
 	 * @param int $action
 	 */
 	public function statusNonSubAction($orderId, $status, $action) {
-        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/order-status.log');
-        $logger = new \Zend\Log\Logger();
-        $logger->addWriter($writer);
+		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/order-status.log');
+		$logger = new \Zend\Log\Logger();
+		$logger->addWriter($writer);
 		$idsOrder = $this->statusRepo->loadByOrderIds($orderId);
 		$data     = $this->statusRepo->loadByIdNonSubAction($status, $action);
 		if (!$idsOrder->getOrderId()) {
@@ -208,7 +208,7 @@ class OrderStatus implements OrderStatusInterface {
 		$entityIdSalesOrder         = $loadDataOrder->getEntityId();
 		$loadDataOrderStatusHistory = $this->statusRepo->loadDataByParentOrderId($entityIdSalesOrder);
 		$saveDataToStatusHistory    = $this->orderStatusHistoryInterfaceFactory->create();
-        $logger->info('Trans\IntegrationOrder\Model\OrderStatus' . '. Order-Id: ' . $entityIdSalesOrder . '. Before Status: ' . $loadDataOrder->getStatus());
+		$logger->info('Trans\IntegrationOrder\Model\OrderStatus' . '. Order-Id: ' . $entityIdSalesOrder . '. Before Status: ' . $loadDataOrder->getStatus());
 		/* Updating data status order in core magento table */
 		if ($loadDataOrder && $data->getFeStatusNo() == $configStatus->getNumberInProcess()) {
 			$loadDataOrder->setStatus($configStatus->getInProcessOrderStatus());
@@ -262,7 +262,7 @@ class OrderStatus implements OrderStatusInterface {
 
 		$this->orderRepoInterface->save($loadDataOrder);
 		$this->orderStatusHistoryRepoInterface->save($saveDataToStatusHistory);
-        $logger->info('Trans\IntegrationOrder\Model\OrderStatus' . '. Order-Id: ' . $entityIdSalesOrder . '. After Status: ' . $loadDataOrder->getStatus());
+		$logger->info('Trans\IntegrationOrder\Model\OrderStatus' . '. Order-Id: ' . $entityIdSalesOrder . '. After Status: ' . $loadDataOrder->getStatus());
 		if ($orderIds) {
 			$model = $this->historyInterface->create();
 			$model->setReferenceNumber($idsOrder->getReferenceNumber());
@@ -534,7 +534,7 @@ class OrderStatus implements OrderStatusInterface {
 		$serviceCode       = $this->configPg->getPaymentChannelRefundServicecode($paymentMethod);
 		$reffId            = $idsOrder->getReferenceNumber();
 		$trxAmount         = (int) $loadDataOrder->getGrandTotal();
-		$url               = $this->configPg->getApiBaseUrl($paymentMethod) . '/' . Config::REFUND_POST_URL;
+		$urlPg             = $this->configPg->getApiBaseUrl($paymentMethod) . '/' . Config::REFUND_POST_URL;
 		$loadItemByOrderId = $this->statusRepo->loadByOrderId($orderId);
 
 		/** Load Item By Order Id */
@@ -621,7 +621,7 @@ class OrderStatus implements OrderStatusInterface {
 					$dataCapture['transactionType']   = RefundInterface::CAPTURE;
 					try {
 						$this->curl->setOption(CURLOPT_RETURNTRANSFER, true);
-						$this->curl->post($url, $dataCapture);
+						$this->curl->post($urlPg, $dataCapture);
 					} catch (\Exception $e) {
 						$this->logger->info('Capture Error = ' . $e->getMessage());
 					};
@@ -670,7 +670,7 @@ class OrderStatus implements OrderStatusInterface {
 						$dataRefund['transactionType'] = RefundInterface::REFUND;
 						try {
 							$this->curl->setOption(CURLOPT_RETURNTRANSFER, true);
-							$this->curl->post($url, $dataRefund);
+							$this->curl->post($urlPg, $dataRefund);
 						} catch (\Exception $e) {
 							$this->logger->info('Refund error = ' . $e->getMessage());
 						};
