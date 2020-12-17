@@ -124,14 +124,14 @@ if ($parentOrder) {
                             <?php if (!$isPickUp): ?>
                                 <span class="delivery-address"><?= $block->escapeHtml(__('Tracking Number')) ?></span>
                                 <h4><?= $block->escapeHtml(__('SK383092814')) ?></h4>
-                                <a href="#" class="track-order" data-trigger="track-order"
+                                <a href="#" class="track-order" data-trigger="track-order-<?= $subOrder->getId() ?>"
                                    data-gtm-event="track_order_click"
                                    data-gtm="<?= $block->escapeHtml($parentOrder->getParentOrderId()) ?>"><?= $block->escapeHtml(__('Order Updates')) ?></a>
                                 <div data-bind="mageInit: {
                             'Magento_Ui/js/modal/modal':{
                             'type': 'popup',
                             'title': 'Track Order',
-                            'trigger': '[data-trigger=track-order]',
+                            'trigger': '[data-trigger=track-order-<?= $subOrder->getId() ?>]',
                             'modalClass': 'pp-track-order',
                             'responsive': true
                             }}">
