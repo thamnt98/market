@@ -102,15 +102,6 @@ interface PromotionPriceRepositoryInterface
     public function loadDataPromoFiveCheck($data);
 
     /**
-     * Load Integration Product by sku,  promotype
-     *
-     * @param mixed $data
-     * @return mixed
-     * @throws \Magento\Framework\Exception\LocalizedException
-     */
-    public function loadDataPromoBySkuPromoType($data);
-
-    /**
      * Load Integration Product by promo id.
      *
      * @param mixed $data
@@ -120,7 +111,7 @@ interface PromotionPriceRepositoryInterface
     public function loadDataPromoByPromoId($data);
 
     /**
-     * Load Integration Product by promo type, discount type , sku ,  store.
+     * Load Integration Product by promo id and store code
      *
      * @param mixed $data
      * @return mixed
@@ -152,4 +143,13 @@ interface PromotionPriceRepositoryInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getInventoryStore($store);
+
+    /**
+     * Load Integration Product promo type 2 by promo type, discount type, percent disc, promo price qty, normal price qty , start date, end date
+     *
+     * @param mixed $data
+     * @return mixed
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function loadDataPromoTypeTwoBySameRulePercentage($data);
 }
