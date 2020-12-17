@@ -74,13 +74,13 @@ interface InquiryOrderInterface
 
     /**
    * Get After discount
-   * @return boolean
+   * @return string
    */
   public function getAfterDiscount();
 
   /**
    * Set after discount
-   * @param boolean
+   * @param string
    * @return  void
    */
   public function setAfterDiscount($data);
