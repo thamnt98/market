@@ -34,6 +34,7 @@ use Trans\Integration\Helper\Validation;
 use Trans\Core\Helper\SourceItem;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
 use Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory as AttributeCollectionFactory;
+use Magento\InventoryIndexer\Indexer\SourceItem\IndexDataBySkuListProvider;
 
 /**
  * @inheritdoc
@@ -121,6 +122,11 @@ class IntegrationStock implements IntegrationStockInterface {
 	protected $attributeCollectionFactory;
 
 	/**
+	 * @var Magento\InventoryIndexer\Indexer\SourceItem\IndexDataBySkuListProvider
+	 */
+	protected $indexDataBySkuListProvider;
+
+	/**
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param SourceItemsSaveInterface $sourceItemSave
      * @param SourceItemInterfaceFactory $sourceItem
@@ -152,7 +158,8 @@ class IntegrationStock implements IntegrationStockInterface {
         \Magento\Framework\App\ResourceConnection $resourceConnection,
 		\Magento\Framework\Indexer\IndexerRegistry $indexerRegistry,
 		ProductCollectionFactory $productCollectionFactory,
-		AttributeCollectionFactory $attributeCollectionFactory
+		AttributeCollectionFactory $attributeCollectionFactory,
+		IndexDataBySkuListProvider $indexDataBySkuListProvider
 	) {	
 
         $this->sourceItem 							   = $sourceItem;
@@ -171,6 +178,7 @@ class IntegrationStock implements IntegrationStockInterface {
 		$this->indexerRegistry 						   = $indexerRegistry;
 		$this->productCollectionFactory 			   = $productCollectionFactory;
 		$this->attributeCollectionFactory 			   = $attributeCollectionFactory;
+		$this->indexDataBySkuListProvider			   = $indexDataBySkuListProvider;
 
 		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_catalog_stock_model.log');
         $logger = new \Zend\Log\Logger();
@@ -183,6 +191,7 @@ class IntegrationStock implements IntegrationStockInterface {
      * @return mixed
      */
 	public function saveStock($datas) {
+		$sources = [];
 		$productIds = [];
 		$dataStockList = [];
 
@@ -235,10 +244,10 @@ class IntegrationStock implements IntegrationStockInterface {
 				$weight = $productCollection->getData('weight');
 				$soldIn = $productCollection->getData('sold_in');
 
-				if(isset($stockData[strtoupper($productSku)])){
-					$productSku = strtoupper($productSku);
-				}else if(isset($stockData[strtolower($productSku)])){
-					$productSku = strtolower($productSku);
+				$productSku = $this->validateSku($productSku, $stockData);
+
+				if(!array_key_exists($productSku, $stockData)){
+					continue;
 				}
 				
 				$checkSource = $stockData[$productSku]['checkSource'];
@@ -270,7 +279,6 @@ class IntegrationStock implements IntegrationStockInterface {
 		                        "status"=>"1"
 		                    ];
 
-						$productIds[] = $productCollection->getId();
 						$this->logger->info("success data");
 						$this->saveStatusMessage($data, $messageValue, IntegrationDataValueInterface::STATUS_DATA_SUCCESS);
 					}
@@ -286,8 +294,8 @@ class IntegrationStock implements IntegrationStockInterface {
 			}
 
 			$connectionCheck->insertOnDuplicate("inventory_source_item", $dataStockList, ['quantity']);
-
-			$this->reindexByProductsIds($productIds, ['inventory', 'cataloginventory_stock']);
+			$this->reindexByStockIdAndProductsId(1, $skus);
+			$this->reindexByStockIdAndProductsId(2, $skus);
 		}catch(Exception $exception){
 			$this->logger->info("error : " . $exception->getMessage());
 			if ($dataJobs) {
@@ -476,4 +484,16 @@ class IntegrationStock implements IntegrationStockInterface {
         return $result;
 	}
 
+	protected function reindexByStockIdAndProductsId($stockId, $skuList){
+		$this->indexDataBySkuListProvider->execute($stockId, $skuList);
+	}
+
+	protected function validateSku($productSku, $stockData){
+		if(isset($stockData[strtoupper($productSku)])){
+			$productSku = strtoupper($productSku);
+		}else if(isset($stockData[strtolower($productSku)])){
+			$productSku = strtolower($productSku);
+		}
+		return $productSku;
+	}
 }
