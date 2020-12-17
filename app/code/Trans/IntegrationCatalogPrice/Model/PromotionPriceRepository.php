@@ -501,4 +501,62 @@ class PromotionPriceRepository implements PromotionPriceRepositoryInterface
         }
         return $result;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function loadDataPromoTypeTwoBySameRulePercentage($data)
+    {
+        if (empty($data['promotion_type'])) {
+            throw new StateException(__(
+                'Parameter promotion_type are empty !'
+            ));
+        }
+        if (empty($data['discount_type'])) {
+            throw new StateException(__(
+                'Parameter discount_type are empty !'
+            ));
+        }
+        if (empty($data['percent_disc'])) {
+            throw new StateException(__(
+                'Parameter percent_disc are empty !'
+            ));
+        }
+        if (empty($data['promo_price_qty'])) {
+            throw new StateException(__(
+                'Parameter promo_price_qty are empty !'
+            ));
+        }
+        if (empty($data['normal_price_qty'])) {
+            throw new StateException(__(
+                'Parameter normal_price_qty are empty !'
+            ));
+        }
+        if (empty($data['from_date'])) {
+            throw new StateException(__(
+                'Parameter start_date are empty !'
+            ));
+        }
+        if (empty($data['to_date'])) {
+            throw new StateException(__(
+                'Parameter end_date are empty !'
+            ));
+        }
+        
+        
+        $collection = $this->collectionFactory->create();
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_PROMOTION_TYPE, $data['promotion_type']);
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_DISCOUNT_TYPE, $data['discount_type']);
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_PERCENT_DISC, $data['percent_disc']);
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_PROMO_PRICE_QTY, $data['promo_price_qty']);
+        $collection->addFieldToFilter(PromotionPriceInterface::PIM_NORMAL_PRICE_QTY, $data['normal_price_qty']);
+        $collection->addFieldToFilter(PromotionPriceInterface::START_DATE, $data['from_date']);
+        $collection->addFieldToFilter(PromotionPriceInterface::END_DATE, $data['to_date']);
+
+        $getLastCollection =null;
+        if ($collection->getSize()) {
+            $getLastCollection = $collection->getFirstItem();
+        }
+        return $getLastCollection;
+    }
 }
