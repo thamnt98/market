@@ -1,0 +1,38 @@
+<div class="bx-payment " data-href="group-methods">
+    <div class="radio-custom">
+        <input data-bind="click: showOptions, attr:{type: 'radio',name: 'payment_method'}" data-option="" id="va"/>
+        <label for="va"></label>
+    </div>
+    <div class="bx-payment-content">
+        <span class="icon-payment-va">
+            <img data-bind="attr:{src: require.toUrl('images/icon-virtual-account.png'), height: 25, width:37,class:'icon-card'}" />
+        </span>
+        <div class="info-card">
+            <h4 data-bind="i18n: 'Virtual Account'"></h4>
+            <p data-bind="i18n: 'BCA, Bank Mega'"></p>
+            <!-- ko if: invalidMinimumAmount('virtual_account')==false -->
+            <div class="select-bank hidden" data-href="payment-method-options" data-id="payment-method-va">
+                <div class="sortby-dropdown">
+                                                    <span class="action toggle" data-mage-init='{"dropdown":{}}'
+                                                          data-toggle="dropdown" aria-haspopup="true">
+                                                        <span data-bind="i18n: 'Select Bank'" data-id="option-selected-va"></span>
+                                                    </span>
+
+                    <ul class="dropdown">
+                        <!-- ko foreach: { data: getListPaymentVirtualAccount(), as: 'payment'} -->
+                        <li  data-bind="click: () => {$parent.setPaymentMethod(payment.method)}, class: 'item'">
+                            <img data-bind="attr:{src: $parent.getPaymentLogo(payment.method), width:24,class:'icon-card'}"/><span
+                                data-bind="click:$parent.selectOption, text:payment.title,attr:{'data-id':payment.method}" data-href="option-selected-va"></span></li>
+                        <!-- /ko -->
+                    </ul>
+                </div>
+
+
+            </div>
+            <!-- /ko -->
+            <!-- ko if: invalidMinimumAmount('virtual_account') -->
+            <p class="payment-valid hidden" data-href="valid-min-amount-va">The minimum payment for Virtual Account is Rp <span data-bind="text:invalidMinimumAmount('virtual_account')"></span></p>
+            <!-- /ko -->
+        </div>
+    </div>
+</div>
