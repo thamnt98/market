@@ -141,8 +141,10 @@ class TransmartCapture extends Capture
   public function createOrderInvoiceParentAndChild($initOrder, $transaction)
   {
       $connection = Data::getConnection();
-      $invoice = $this->invoice->create($initOrder, $transaction);
-      $this->invoice->send($invoice);
+        if ($initOrder->getIsParent()) {
+            $invoice = $this->invoice->create($initOrder, $transaction);
+            $this->invoice->send($invoice);
+        }
       $initOrder->setState('in_process');
       $initOrder->setStatus('in_process');
       $this->transactionHelper->saveOrder($initOrder);
