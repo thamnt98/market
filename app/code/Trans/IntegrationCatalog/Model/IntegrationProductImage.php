@@ -329,26 +329,27 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 			$smallImageAttr = $this->productImageHelper->getAttributeIdByCode('small_image');
 			$thumbnailImageAttr = $this->productImageHelper->getAttributeIdByCode('thumbnail');
 			$swatchImage = $this->productImageHelper->getAttributeIdByCode('swatch_image');
+			$mediaGalleryAttr = $this->productImageHelper->getAttributeIdByCode('media_gallery');
 
 			$firstImageAttributes = [$baseImageAttr, $smallImageAttr, $thumbnailImageAttr];
 			$swatchAttributes = [$swatchImage];
+
+			$productImages = [];
 
 			$this->logger->info('start loop products ' . date('d-M-Y H:i:s'));
 			foreach($productsCollection as $productCollection){
 				$productCollection->load('media_gallery');
 
 				$sku = $productCollection->getSku();
+
+				$sku = $this->validateSku($sku, $products);
+
+				if(!array_key_exists($sku, $products)){
+					$this->logger->info("key not exist for $sku");
+					continue;
+				}
+				
 				$product = $products[$sku];
-
-				$this->logger->info($sku);
-
-				if(!isset($product['product'])){
-					continue;
-				}
-
-				if(!isset($product['dataId'])){
-					continue;
-				}
 
 				$id = $product['dataId'];
 
@@ -363,30 +364,48 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 						$filename = $image['filename'];
 						$imageUrl = $image['imageUrl'];
 
+						$this->logger->info('delete image');
 						$this->deleteImage($productCollection, $filename);
-					
-						$no = 0;
 	
+						$this->logger->info('check is first image');
 						if($this->checkIsFirstImage($filename)) {
 							$imageAttr = $firstImageAttributes;
+
+							$this->logger->info('delete product image by attr ids');
 							$this->productImageHelper->deleteProductImageByAttrIds($productRowId, $imageAttr);
 						} else {
 							$imageAttr = $swatchAttributes;
 						}
 	
+						$this->logger->info('save image data');
 						$tmpImage = $this->saveImageData($productCollection, $filename, [$imageUrl], $imageAttr);
 	
+						$this->logger->info('delete tmp file');
 						$this->deleteTmpFile($tmpImage);
 						try {
 							$file = $tmpImage[0];
 	
 							$filepath = $file['filename'];
-	
-							$this->productImageHelper->saveProductImage($productRowId, $filepath, $imageAttr);
-							$mediaGalleryAttr = $this->productImageHelper->getAttributeIdByCode('media_gallery');
-	
-							$this->productImageHelper->insertMediaGalleryValue($mediaGalleryAttr, $filepath, $productRowId);
-	
+							
+							foreach($imageAttr as $key => $attr){
+								$this->logger->info('check product image data exist');
+								$this->logger->info($attr);
+								if(!$this->productImageHelper->checkProductImageDataExist($productRowId, $filepath, $attr)) 
+								{
+									$productImage = array(
+										'attribute_id' => $attr,
+										'store_id' => 0,
+										'value' => $filepath,
+										'row_id' => $productRowId
+									);
+
+									$productImages[] = $productImage;
+								}
+
+								$this->logger->info('insert media gallery value');
+								$this->productImageHelper->insertMediaGalleryValue($mediaGalleryAttr, $filepath, $productRowId);
+							}
+
 							$productIds[] = $productCollection->getId();
 						} catch (\Exception $e) {
 							$this->logger->info("saveProductImage fail: " . $e->getMessage());
@@ -408,6 +427,10 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 				}
 			}
 			$this->logger->info('end loop products' . date('d-M-Y H:i:s'));
+
+			//bulk save product image
+			$this->logger->info('bulk save product image');
+			$this->productImageHelper->bulkSaveProductImage($productImages);
 
 			try {
 				if(!empty($productIds)) {
@@ -780,6 +803,8 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 		$mediaGalleryEntries = $product->getMediaGalleryEntries();
 		
 		$productImageDeleted = [];
+		$galleryDeleted = [];
+
 		foreach ($mediaGalleryEntries as $key => $imageObject) {
 			$productImage = $imageObject->getFile();
 			$extract = explode('/', $productImage);
@@ -795,7 +820,7 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 					$productImageDeleted[] = (string) $imageObject->getFile();
 					
 					$galleryValue = $this->productImageHelper->getMediaGalleryValue($productRowId, $imageObject->getFile());
-					$this->productImageHelper->deleteMediaGalleryValue($galleryValue['value_id']);
+					$galleryDeleted[] = $galleryValue['value_id'];
 				} catch (\Exception $e) {
 					$this->logger->info($e->getMessage());
 					continue;
@@ -808,9 +833,11 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 		if(!empty($productImageDeleted)) {
 			$this->productImageHelper->deleteProductImageByValue($productRowId, $productImageDeleted);		
 		}
-		// $product->setMediaGalleryEntries($mediaGalleryEntries);
 
-		// $this->product->save($product);
+		if(!empty($productImageDeleted)) {
+			$this->productImageHelper->deleteMediaGalleryValue($galleryDeleted);
+		}
+
 
 		$this->logger->info('====> delete end: ' . date('H:i:s'));
 		return $product;
@@ -913,5 +940,15 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 		$collection = $this->attributeCollectionFactory->create();
 		var_dump($collection->getSelect()->__toString());
 		die();
+	}
+
+	protected function validateSku($sku, $data){
+		if(isset($data[strtoupper($sku)])){
+			$sku = strtoupper($sku);
+		}else if(isset($data[strtolower($sku)])){
+			$sku = strtolower($sku);
+		}
+		$this->logger->info($sku);
+		return $sku;
 	}
 }
