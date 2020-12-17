@@ -25,9 +25,9 @@ class Detail extends ParentDetail
         $orderId = $this->getRequest()->getParam("id", 0);
         if ($orderId) {
             try {
-                $customerId = $this->session->getCustomerId();
+                $customerId = $this->customerSessionFactory->create()->getCustomerId();
                 if (!$customerId) {
-                    $order = MepayHelper::getOrderById($orderId);
+                    $order = MepayHelper::getOrderById($orderId); 
                     $customerId = $order->getCustomerId();
                 }
                 $this->setParentOrder($this->parentOrderRepository->getById($customerId, $orderId));
