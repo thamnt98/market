@@ -82,6 +82,22 @@ class Order extends DataObject implements InquiryOrderInterface
   }
 
   /**
+   * @inheritdoc
+   */
+  public function getAfterDiscount()
+  {
+    return $this->_getData(InquiryOrderInterface::AFTER_DISCOUNT);
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function setAfterDiscount($data)
+  {
+    $this->setData(InquiryOrderInterface::AFTER_DISCOUNT, $data);
+  }
+
+  /**
    * Validate
    * @return boolean
    */
