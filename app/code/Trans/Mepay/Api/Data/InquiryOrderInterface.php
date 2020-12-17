@@ -28,6 +28,11 @@ interface InquiryOrderInterface
    */
   const DISABLE_PROMO = 'disablePromo';
 
+    /**
+   * @var  string
+   */
+  const AFTER_DISCOUNT = 'disablePromo';
+
   /**
    * Get id
    * @return string
@@ -66,4 +71,17 @@ interface InquiryOrderInterface
    * @return  void
    */
   public function setDisablePromo($data);
+
+    /**
+   * Get After discount
+   * @return boolean
+   */
+  public function getAfterDiscount();
+
+  /**
+   * Set after discount
+   * @param boolean
+   * @return  void
+   */
+  public function setAfterDiscount($data);
 }
