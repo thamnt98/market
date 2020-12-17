@@ -45,5 +45,12 @@
           <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
           <can_be_empty>1</can_be_empty>
       </field>
+      <field id="logo" type="image" sortOrder="112" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Logo</label>
+          <backend_model>Magento\Config\Model\Config\Backend\Image</backend_model>
+          <upload_dir config="system/filesystem/media" scope_info="1">logo/paymentmethod</upload_dir>
+          <base_url type="media" scope_info="1">logo/paymentmethod</base_url>
+          <config_path>payment/trans_mepay_cc/logo</config_path>
+      </field>
   </group>
 </include>
