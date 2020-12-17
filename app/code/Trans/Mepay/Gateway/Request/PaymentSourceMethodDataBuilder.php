@@ -78,6 +78,14 @@ class PaymentSourceMethodDataBuilder implements BuilderInterface
    */
   public function build(array $buildSubject)
   {
+    $paymentDO = $this->subjectReader->readPayment($buildSubject);
+    
+    $payment = $paymentDO->getPayment();
+    $method = $payment->getMethodInstance();
+    $code = $method->getCode();
+
+    $this->code = $code;
+    
     $source = $this->provider->getPaymentSource($this->code);
     $method = $this->getPaymentSourceMethod($source);
     return [self::PAYMENT_SOURCE_METHOD => $method];
