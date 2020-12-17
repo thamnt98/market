@@ -192,6 +192,109 @@
     <!-- End Cc -->
 
 
+    <!-- Debit -->
+  <virtualType name="TransMepayDebitFacade" type="Magento\Payment\Model\Method\Adapter">
+    <arguments>
+      <argument name="code" xsi:type="const">\Trans\Mepay\Model\Config\Provider\Debit::CODE</argument>
+      <argument name="formBlockType" xsi:type="string">TransMepayDebitBlockInfo</argument>
+      <argument name="infoBlockType" xsi:type="string">Trans\Mepay\Block\Info</argument>
+      <argument name="valueHandlerPool" xsi:type="object">TransMepayDebitValueHandlerPool</argument>
+      <argument name="commandPool" xsi:type="object">TransMepayDebitCommandPool</argument>
+    </arguments>
+  </virtualType>
+
+  <!-- Debit Configuration reader -->
+  <virtualType name="TransMepayDebitConfig" type="Magento\Payment\Gateway\Config\Config">
+    <arguments>
+      <argument name="methodCode" xsi:type="const">\Trans\Mepay\Model\Config\Provider\Debit::CODE</argument>
+    </arguments>
+  </virtualType>
+  <virtualType name="TransMepayDebitBlockInfo" type="Trans\Mepay\Block\Info">
+    <arguments>
+      <argument name="config" xsi:type="object">TransMepayDebitConfig</argument>
+    </arguments>
+  </virtualType>
+
+    <!-- Value handlers infrastructure -->
+    <virtualType name="TransMepayDebitValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">TransMepayDebitConfigValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="TransMepayDebitConfigValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">TransMepayDebitConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Debit Commands infrastructure -->
+    <virtualType name="TransMepayDebitCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="authorize" xsi:type="string">TransMepayDebitInquiryCommand</item>
+                <item name="capture" xsi:type="string">TransMepayCaptureStrategyCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Initialize Debit command -->
+    <virtualType name="TransMepayDebitInquiryCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">TransMepayDebitInquiryRequest</argument>
+            <argument name="transferFactory" xsi:type="object">Trans\Mepay\Gateway\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">Trans\Mepay\Gateway\Http\Client\Connect</argument>
+            <argument name="handler" xsi:type="object">TransMepayDebitInquiryHandler</argument>
+            <argument name="validator" xsi:type="object">Trans\Mepay\Gateway\Validator\ResponseValidator</argument>
+            <argument name="errorMessageMapper" xsi:type="object">Magento\Payment\Gateway\ErrorMapper\ErrorMessageMapper</argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="TransMepayCaptureStrategyCommand" type="Magento\Braintree\Gateway\Command\CaptureStrategyCommand">
+        <arguments>
+            <argument name="commandPool" xsi:type="object">BraintreeCommandPool</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Debit inquiry request -->
+    <virtualType name="TransMepayDebitInquiryRequest" type="Trans\Mepay\Gateway\Request\Builder\Composite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="customer" xsi:type="string">Trans\Mepay\Gateway\Request\CustomerDataBuilder</item>
+                <item name="order" xsi:type="string">Trans\Mepay\Gateway\Request\OrderDataBuilder</item>
+                <item name="referenceUrl" xsi:type="string">Trans\Mepay\Gateway\Request\ReferenceUrlDataBuilder</item>
+                <item name="amount" xsi:type="string">Trans\Mepay\Gateway\Request\AmountDataBuilder</item>
+                <item name="currency" xsi:type="string">Trans\Mepay\Gateway\Request\CurrencyDataBuilder</item>
+                <item name="paymentSource" xsi:type="string">TransMepayCcPaymentSourceInquiryData</item>
+                <item name="paymentSourceMethod" xsi:type="string">TransMepayCcPaymentSourceMethodInquiryData</item>
+                <item name="token" xsi:type="string">Trans\Mepay\Gateway\Request\TokenDataBuilder</item>
+                <item name="attributes" xsi:type="string">Trans\Mepay\Gateway\Request\AttributesDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="TransMepayDebitPaymentSourceInquiryData" type="Trans\Mepay\Gateway\Request\PaymentSourceDataBuilder">
+      <arguments>
+        <argument name="code" xsi:type="const">\Trans\Mepay\Model\Config\Provider\Debit::CODE</argument>
+      </arguments>
+    </virtualType>
+    <virtualType name="TransMepayDebitPaymentSourceMethodInquiryData" type="Trans\Mepay\Gateway\Request\PaymentSourceMethodDataBuilder">
+      <arguments>
+        <argument name="code" xsi:type="const">\Trans\Mepay\Model\Config\Provider\Debit::CODE</argument>
+      </arguments>
+    </virtualType>
+
+    <!-- Debit inquiry handler -->
+    <virtualType name="TransMepayDebitInquiryHandler" type="Magento\Payment\Gateway\Response\HandlerChain">
+      <arguments>
+        <argument name="handlers" xsi:type="array">
+          <item name="payment_transaction" xsi:type="string">Trans\Mepay\Gateway\Response\SalesPaymentTransactionHandler</item>
+        </argument>
+      </arguments>
+    </virtualType>
+
+    <!-- End Debit -->
+
+
     <!-- Va -->
   <virtualType name="TransMepayVaFacade" type="Magento\Payment\Model\Method\Adapter">
     <arguments>

@@ -37,6 +37,7 @@ define([
     priceUtils
 ) {
     'use strict';
+    console.log('test override js bambang');
     return Component.extend({
         ccFullPaymentCode: 'sprint_allbankfull_cc',
         selectedMethod: ko.observable(),
@@ -47,10 +48,10 @@ define([
         canPay: true,
         defaults: {
             template: 'SM_Checkout/payment-methods/list',
-            templateCC: 'SM_Checkout/payment-methods/method/cc',
+            templateCC: 'Trans_MepayTransmart/payment-methods/method/cc',
             templateDB: 'SM_Checkout/payment-methods/method/db',
             templateOVO: 'SM_Checkout/payment-methods/method/db',
-            templateVA: 'SM_Checkout/payment-methods/method/va',
+            templateVA: 'Trans_MepayTransmart/payment-methods/method/va',
             templateQRIS: 'SM_Checkout/payment-methods/method/qris'
         },
         /**

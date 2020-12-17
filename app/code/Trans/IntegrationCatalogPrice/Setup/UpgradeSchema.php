@@ -24,8 +24,6 @@ use \Trans\IntegrationCatalogPrice\Api\Data\StorePriceInterface;
 use \Trans\IntegrationCatalogPrice\Api\Data\PromotionPriceInterface;
 use \Trans\IntegrationCatalogPrice\Api\Data\OnlinePriceInterface;
 
-use \Trans\IntegrationCatalogPrice\Api\Data\IntegrationDataValueInterface;
-
 class UpgradeSchema implements UpgradeSchemaInterface
 {
     public function upgrade(SchemaSetupInterface $setup, ModuleContextInterface $context)
@@ -53,42 +51,9 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), '1.8.0', '<')) {
             $this->updateTableCatalogPricePromotionColumnTwo($setup);
         }
-        if (version_compare($context->getVersion(), '1.8.1', '<')) {
-            $this->updateTableIntegrationCatalogPriceAddConstraint($setup);
+        if (version_compare($context->getVersion(), '1.9.0', '<')) {
+            $this->updateTableCatalogPricePromotionColumnThree($setup);
         }
-    }
-
-    /**
-     * Add unique constraint on integration_catalog_store_price
-     */
-    protected function updateTableIntegrationCatalogPriceAddConstraint($setup)
-    {
-        $setup->getConnection()->modifyColumn(
-            $setup->getTable(StorePriceInterface::TABLE_NAME),
-            'sku',
-            [
-                'type' => Table::TYPE_TEXT,
-                'nullable' => true,
-                'length' => 20,
-                'comment' =>  ucfirst(str_replace('_',' ',StorePriceInterface::PIM_ID))
-            ]
-        );
-        $setup->getConnection()->modifyColumn(
-            $setup->getTable(StorePriceInterface::TABLE_NAME),
-            'store_code',
-            [
-                'type' => Table::TYPE_TEXT,
-                'nullable' => true,
-                'length' => 10,
-                'comment' =>  ucfirst(str_replace('_',' ',StorePriceInterface::PIM_ID))
-            ]
-        );
-        $setup->getConnection()->addIndex(
-            $setup->getTable(StorePriceInterface::TABLE_NAME),
-            'INTEGRATION_CATALOG_STORE_PRICE_SKU_STORE',
-            ['sku','store_code'],
-            \Magento\Framework\DB\Adapter\AdapterInterface::INDEX_TYPE_UNIQUE
-        );
     }
 
     /**
@@ -573,6 +538,61 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'nullable' => true,
                 'comment' =>  ucfirst(str_replace('_',' ',PromotionPriceInterface::PIM_POINT_PER_UNIT)),
                 'after' => PromotionPriceInterface::PIM_AMOUNT_OFF,
+            ]
+        );
+    }
+
+    /**
+     * Update integration catalog promotion promo price qty,normal price qty,start date,end date
+     */
+    protected function updateTableCatalogPricePromotionColumnThree($setup){
+        $tableName = $setup->getTable(PromotionPriceInterface::TABLE_NAME);
+        // Check if the table already exists
+        if ($setup->getConnection()->isTableExists($tableName) != true) {
+            throw new StateException(__(
+                'Table '. $tableName." is not exist!"
+            ));
+        }  
+
+        // Add Column
+        $setup->getConnection()->addColumn(
+            $setup->getTable($tableName),
+            PromotionPriceInterface::PIM_PROMO_PRICE_QTY,
+            [
+                'type' => Table::TYPE_INTEGER,
+                'nullable' => true,
+                'comment' =>  ucfirst(str_replace('_',' ',PromotionPriceInterface::PIM_PROMO_PRICE_QTY)),
+                'after' => PromotionPriceInterface::PIM_POINT_PER_UNIT,
+            ]
+        );
+        $setup->getConnection()->addColumn(
+            $setup->getTable($tableName),
+            PromotionPriceInterface::PIM_NORMAL_PRICE_QTY,
+            [
+                'type' => Table::TYPE_INTEGER,
+                'nullable' => true,
+                'comment' =>  ucfirst(str_replace('_',' ',PromotionPriceInterface::PIM_NORMAL_PRICE_QTY)),
+                'after' => PromotionPriceInterface::PIM_PROMO_PRICE_QTY,
+            ]
+        );
+        $setup->getConnection()->addColumn(
+            $setup->getTable($tableName),
+            PromotionPriceInterface::START_DATE,
+            [
+                'type' => Table::TYPE_TIMESTAMP,
+                'nullable' => true,
+                'comment' =>  ucfirst(str_replace('_',' ',PromotionPriceInterface::START_DATE)),
+                'after' => PromotionPriceInterface::PIM_NORMAL_PRICE_QTY,
+            ]
+        );
+        $setup->getConnection()->addColumn(
+            $setup->getTable($tableName),
+            PromotionPriceInterface::END_DATE,
+            [
+                'type' => Table::TYPE_TIMESTAMP,
+                'nullable' => true,
+                'comment' =>  ucfirst(str_replace('_',' ',PromotionPriceInterface::END_DATE)),
+                'after' => PromotionPriceInterface::START_DATE,
             ]
         );
     }

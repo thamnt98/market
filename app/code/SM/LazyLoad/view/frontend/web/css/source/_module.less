@@ -1,14 +1,38 @@
-.lazy-blur {
-	transform: translate3d(0,0,0);
-	transform: translateZ(0);
-	transition: 0.3s filter linear;
-	-o-transition: 0.3s -o-filter linear;
-	-webkit-filter: blur(5px);
-	filter: blur(5px);
+// /**
+//  * Copyright © Magento, Inc. All rights reserved.
+//  * See COPYING.txt for license details.
+//  */
 
-	&.lazy-loaded{
-		-webkit-filter: blur(0px);
-		filter: blur(0px);
-		image-rendering: initial;
-	}
+//
+//  Common
+//  _____________________________________________
+
+& when (@media-common = true) {
+
+    .lazy-blur {
+        transform: translate3d(0, 0, 0);
+        transform: translateZ(0);
+        transition: 0.3s filter linear;
+        -o-transition: 0.3s -o-filter linear;
+        -webkit-filter: blur(5px);
+        filter: blur(5px);
+
+        &.lazy-loaded {
+            -webkit-filter: blur(0px);
+            filter: blur(0px);
+            image-rendering: initial;
+        }
+    }
+    figure, .inspire-image, .card-img-container {
+        text-align: center;
+    }
+    .lazy{
+        &.lazy-loading{
+            max-width: 32px;
+            max-height: 32px;
+            margin: auto;
+            min-height: 1px;
+            min-width: 1px;
+        }
+    }
 }

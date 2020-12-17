@@ -75,11 +75,6 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
     protected $eavAttribute;
 
     /**
-     * @var ProductAttributeManagementInterface
-     */
-    protected $productAttributeManagement;
-
-    /**
      * @var AttributeOption
      */
     protected $attributeOptionHelper;
@@ -88,16 +83,6 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
      * @var \Magento\Eav\Model\Config
      */
     protected $eavConfig;
-
-    /**
-     * @var ProductAttributeInterfaceFactory
-     */
-    protected $productAttributeFactory;
-
-    /**
-     * @var ProductAttributeRepositoryInterface
-     */
-    protected $productAttributeRepository;
 
     /**
      * @var IntegrationProductRepositoryInterface
@@ -185,6 +170,11 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
     protected $indexerRegistry;
 
     /**
+     * @var \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory
+     */
+    protected $productCollectionFactory;
+
+    /**
      * @param \Trans\Integration\Logger\Logger $Logger
      * @param \Trans\IntegrationCatalogPrice\Api\PromotionPriceRepositoryInterface $promotionPriceRepositoryInterface
      * @param \Trans\IntegrationCatalogPrice\Api\Data\PromotionPriceInterfaceFactory $promotionPriceInterfaceFactory
@@ -192,11 +182,8 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
      * @param Validation $validation
      * @param \Trans\IntegrationCatalogPrice\Api\IntegrationJobRepositoryInterface $integrationJobRepositoryInterface
      * @param \Magento\Catalog\Model\ResourceModel\Eav\Attribute $eavAttribute
-     * @param \Magento\Catalog\Api\ProductAttributeManagementInterface $productAttributeManagement
      * @param AttributeOption $attributeOptionHelper
      * @param \Magento\Eav\Model\Config $eavConfig
-     * @param \Magento\Catalog\Api\Data\ProductAttributeInterfaceFactory $productAttributeFactory
-     * @param \Magento\Catalog\Api\ProductAttributeRepositoryInterface $productAttributeRepository
      * @param \Trans\IntegrationCatalog\Api\IntegrationProductRepositoryInterface $productRepository
      * @param CoreHelper $coreHelper
      * @param HelperPrice $helperPrice
@@ -204,6 +191,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
      * @param \Trans\IntegrationEntity\Api\IntegrationProductAttributeRepositoryInterface productRepositoryInterface$integrationAttributeRepository
      * @param \Magento\Framework\App\ResourceConnection $resourceConnection
      * @param \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
+     * @param \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory
      */
     public function __construct(
         \Trans\Integration\Logger\Logger $logger,
@@ -213,18 +201,16 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
         Validation $validation,
         \Trans\IntegrationCatalogPrice\Api\IntegrationJobRepositoryInterface $integrationJobRepositoryInterface,
         \Magento\Catalog\Model\ResourceModel\Eav\Attribute $eavAttribute,
-        \Magento\Catalog\Api\ProductAttributeManagementInterface $productAttributeManagement,
         AttributeOption $attributeOptionHelper,
         EavConfig $eavConfig,
-        \Magento\Catalog\Api\Data\ProductAttributeInterfaceFactory $productAttributeFactory,
-        \Magento\Catalog\Api\ProductAttributeRepositoryInterface $productAttributeRepository,
         \Trans\IntegrationCatalog\Api\IntegrationProductRepositoryInterface $integrationProductRepositoryInterface,
         CoreHelper $coreHelper,
         HelperPrice $helperPrice,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepositoryInterface,
         \Trans\IntegrationEntity\Api\IntegrationProductAttributeRepositoryInterface $integrationAttributeRepository,
         \Magento\Framework\App\ResourceConnection $resourceConnection,
-        \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry
+        \Magento\Framework\Indexer\IndexerRegistry $indexerRegistry,
+        \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory
     ) {
         $this->logger                                   = $logger;
         $this->promotionPriceRepositoryInterface        = $promotionPriceRepositoryInterface;
@@ -233,17 +219,12 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
         $this->validation                               = $validation;
         $this->integrationJobRepositoryInterface        = $integrationJobRepositoryInterface;
         $this->eavAttribute                             = $eavAttribute;
-        $this->productAttributeManagement               = $productAttributeManagement;
         $this->attributeOptionHelper                    = $attributeOptionHelper;
         $this->eavConfig                                = $eavConfig;
-        $this->productAttributeFactory                  = $productAttributeFactory;
-        $this->productAttributeRepository               = $productAttributeRepository;
         $this->integrationProductRepositoryInterface    = $integrationProductRepositoryInterface;
         $this->coreHelper                               = $coreHelper;
         $this->productRepositoryInterface               = $productRepositoryInterface;
         $this->integrationAttributeRepository           = $integrationAttributeRepository;
-        $this->attrGroupGeneralInfoId                   = IntegrationProductAttributeInterface::ATTRIBUTE_SET_ID;
-        $this->attrGroupProductDetailId                 = $this->integrationAttributeRepository->getAttributeGroupId(IntegrationProductAttributeInterface::ATTRIBUTE_GROUP_CODE_PRODUCT);
         $this->updateRepositoryInterface                = $helperPrice->getUpdateRepositoryInterface();
         $this->updateInterfaceFactory                   = $helperPrice->getUpdateInterfaceFactory();
         $this->updateFactory                            = $helperPrice->getUpdateFactory();
@@ -262,6 +243,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
         $this->date                                     = $helperPrice->getDateTime();
         $this->resourceConnection = $resourceConnection;
         $this->indexerRegistry = $indexerRegistry;
+        $this->productCollectionFactory = $productCollectionFactory;
     }
 
 
@@ -518,20 +500,18 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
         $index = 0;
         $check = [];
         $productInterface = [];
-        $productReindexIds = [];
         $dataMarkdown = [];
+
+        //Get all required data
+        $dataList = $this->getDataList($dataProduct);
+        $productInterfaces = $this->getProductByMultipleSku($dataList['sku_list']);
+        $attributeInterfaces = $this->getAttributeIdList($dataList['store_list']);
 
         try {
             foreach ($dataProduct as $sku => $data) {
-
-                if (empty($sku)) {
-                    continue;
-                }
                 try {
                     // validate sku exist or not
-                    $productInterface[$index] = $this->productRepositoryInterface->get($sku);
-                    if (!empty($productInterface[$index])) {
-                        $productReindexIds[] = $productInterface[$index]->getId();
+                    if (in_array($sku, $productInterfaces['sku'])) {
                         $indexO = 0;
                         $defaultPrice = 0;                
                         foreach ($data as $row) {
@@ -540,7 +520,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                                 switch ($dataPass['promotion_type']) {
                                     // promotype = 1
                                     case 1:
-                                            $markdownFunction = $this->markdownFunction($dataPass);
+                                            $markdownFunction = $this->markdownFunction($dataPass, $attributeInterfaces);
                                             if ($markdownFunction) {
                                                 $dataMarkdown[] = $markdownFunction;
                                             }
@@ -587,6 +567,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                             }
                         }
                     }
+
                     
                 } catch (\Exception $exception) {
                     foreach ($data as $valueX) {
@@ -603,7 +584,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                 $index++;
             }
 
-            // save bulk markdown
+            // // save bulk markdown
             try {
                 if ($dataMarkdown) {
                     $connectionMarkdown = $this->resourceConnection->getConnection();
@@ -614,10 +595,9 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             } catch (\Exception $e) {
                 $this->logger->info('insertOnDuplicate fail ' . date('d-M-Y H:i:s')); 
             }
-            
             try {
-                if(!empty($productReindexIds)) {
-                    $this->reindexByProductsIds($productReindexIds, ['catalog_product_attribute', 'catalogsearch_fulltext']);
+                if(!empty($productInterfaces['id'])) {
+                    $this->reindexByProductsIds($productInterfaces['id'], ['catalog_product_attribute', 'catalogsearch_fulltext']);
                     $this->logger->info('reindex success ' . date('d-M-Y H:i:s')); 
                 }
             } catch (\Exception $e) {
@@ -659,65 +639,99 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
      */
     public function saveTest($dataProduct)
     {
-        $i = 0;
-        $jsonResponse = json_decode($dataProduct, true);
+        // $i = 0;
+        // $jsonResponse = json_decode($dataProduct, true);
         
-        // validate if data exist
-        if (!isset($jsonResponse['data'])) {
-            return false;
-        }
+        // // validate if data exist
+        // if (!isset($jsonResponse['data'])) {
+        //     return false;
+        // }
 
-        $datas = $jsonResponse['data'];
+        // $datas = $jsonResponse['data'];
+
+        
+        // $productInterface = [];
+        // $attributeInterfaces = [];
+
+
+        // //Get all required data
+        // $dataList = $this->getDataListxx($datas);
+        // $productInterfaces = $this->getProductByMultipleSku($dataList['sku_list']);
+        // $attributeInterfaces = $this->getAttributeIdList($dataList['store_list']);
 
         // foreach ($datas as $row) {
-        //     $dataPass = $this->prepareDataPromoGlobal($row);
+        //     try {
+        //         $dataPass = $this->prepareDataPromoGlobal($row);
+        //         switch ($dataPass['promotion_type']) {
+        //             // promotype = 1
+        //             case 1:
+        //                     $markdownFunction = $this->markdownFunction($dataPass, $attributeInterfaces);
+        //                     if ($markdownFunction) {
+        //                         $dataMarkdown[] = $markdownFunction;
+        //                     }
+        //                 break;
 
-        //     switch ($dataPass['promotion_type']) {
-        //         // promotype = 1
-        //         case 1:
-        //                 $this->markdownFunction($dataPass);
+        //             // promotype = 2
+        //             case 2:
+        //                     $this->promoType2Function($dataPass);
+        //                 break;
+
+        //             // promotype = 8
+        //             case 8:
+        //                     $this->promoType8Function($dataPass);
+        //                 break;
+
+        //             // promotype = 5
+        //             case 5:
+        //                     $this->promoType5Function($dataPass);
+        //                 break;
+
+        //             // promotype = 7
+        //             case 7:
+        //                     // $this->promoType7Function($dataPass);
+        //                 break;
+
+        //             // promotype = 4
+        //             case 4:
+        //                     $this->promoType4Function($dataPass);
+        //                 break;
+
+        //             default:
         //             break;
+        //         }
 
-        //         // promotype = 2
-        //         case 2:
-        //                 $this->promoType2Function($dataPass);
-        //             break;
+        //         $indexO++;
 
-        //         // promotype = 8
-        //         case 8:
-        //                 $this->promoType8Function($dataPass);
-        //             break;
+        //         $this->updateDataValueStatus($row['data_id'], IntegrationDataValueInterface::STATUS_DATA_SUCCESS, null);
 
-        //         // promotype = 5
-        //         case 5:
-        //                 $this->promoType5Function($dataPass);
-        //             break;
-
-        //         // promotype = 7
-        //         case 7:
-        //                 $this->promoType7Function($dataPass);
-        //             break;
-
-        //         // promotype = 4
-        //         case 4:
-        //                 $this->promoType4Function($dataPass);
-        //             break;
-
-        //         default:
-        //         break;
+        //     } catch (\Exception $exception) {
+                
+        //         continue;
         //     }
-
-        //     $i++;
         // }
+
+        // // // save bulk markdown
+        // try {
+        //     if ($dataMarkdown) {
+        //         $connectionMarkdown = $this->resourceConnection->getConnection();
+                
+        //         $connectionMarkdown->insertOnDuplicate("catalog_product_entity_decimal", $dataMarkdown, ['value']);
+        //         $this->logger->info('insertOnDuplicate success ' . date('d-M-Y H:i:s')); 
+        //     }
+        // } catch (\Exception $e) {
+        //     $this->logger->info('insertOnDuplicate fail ' . date('d-M-Y H:i:s')); 
+        // }
+        
         return true;
     }
 
     /**
      * function for markdown
      * @param $dataPass mixed
+     * @param $attributeInterfaces mixed
      * @throw new StateException
      */
-    protected function markdownFunction($dataPass)
+    protected function markdownFunction($dataPass, $attributeInterfaces)
     {
         try {
             // if promo id not exist
@@ -725,68 +739,70 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                 // $checkIntPromoId = $this->checkIntegrationPromoByPromoId($dataPass['promotion_id']);
                 $checkIntPromoId = $this->checkIntegrationPromoSkuAndPromoType($dataPass);
 
-                // if (!$checkIntPromoId) {
-                    // Nested switch discount type
-                    // data start time
-                    // $startTime = $dataPass['from_date'].' '.$dataPass['from_time'];
-                    $startTime = $this->timezone->date(new \DateTime())->format('Y-m-d H:i:s');
-                    $endTime = $dataPass['to_date'].' '.$dataPass['to_time'];
-                    $skuNumber = $dataPass['sku'];
-                    
-                    // data campaign and rollback
-                    $isCampaign = 0;
-                    $isRollback = 1;
+                // Nested switch discount type
+                // data start time
+                $startTime = $this->timezone->date(new \DateTime())->format('Y-m-d H:i:s');
+                $endTime = $dataPass['to_date'].' '.$dataPass['to_time'];
+                $endTime = (new \DateTime($endTime))->format('Y-m-d H:i:s');
+                $skuNumber = $dataPass['sku'];
+                
+                // data campaign and rollback
+                $isCampaign = 0;
+                $isRollback = 1;
 
-                    // for data function validateStorePrice and saveBasePriceStorePrice
-                    $dataStoreCode = [
-                        'sku' => $dataPass['sku'],
-                        'discount_type' => $dataPass['discount_type'],
-                        'percent_disc' => $dataPass['percent_disc'],
-                        'amount_off' => $dataPass['amount_off'],
-                        'promo_selling_price' => $dataPass['promo_selling_price'],
-                        'disc_type' => $dataPass['discount_type'],
-                        'store_code' => $dataPass['store_code']
-                    ];
-                    
-                    switch ($dataPass['discount_type']) {
-                        // promotype = 1 , disctype = 1
-                        case 1:
-                            // data name and desc
-                            $name = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['promo_selling_price'].' fixed price ('.$dataPass['sku'].')';
-                            $desc = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['promo_selling_price'].' fixed price ('.$dataPass['sku'].')';
+                // for data function validateStorePrice and saveBasePriceStorePrice
+                $dataStoreCode = [
+                    'sku' => $dataPass['sku'],
+                    'discount_type' => $dataPass['discount_type'],
+                    'percent_disc' => $dataPass['percent_disc'],
+                    'amount_off' => $dataPass['amount_off'],
+                    'promo_selling_price' => $dataPass['promo_selling_price'],
+                    'disc_type' => $dataPass['discount_type'],
+                    'store_code' => $dataPass['store_code']
+                ];
+                
+                switch ($dataPass['discount_type']) {
+                    // promotype = 1 , disctype = 1
+                    case 1:
+                        // data name and desc
+                        $name = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['promo_selling_price'].' fixed price ('.$dataPass['sku'].')';
+                        $desc = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['promo_selling_price'].' fixed price ('.$dataPass['sku'].')';
 
-                            $saveStagingUpdateStatus = $this->saveStagingUpdate($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode);
-                            break;
+                        $savePromoPriceStoreStatus = $this->savePromoPriceStore($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode, $attributeInterfaces);
+                        break;
 
-                        // promotype = 1 , disctype = 2
-                        case 2:
-                            // data name and desc
-                            $name = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price '.$dataPass['percent_disc'].' % Off ('.$dataPass['sku'].')';
-                            $desc = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price '.$dataPass['percent_disc'].' % Off ('.$dataPass['sku'].')';
-                            
-                            $saveStagingUpdateStatus = $this->saveStagingUpdate($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode);
-                            break;
+                    // promotype = 1 , disctype = 2
+                    case 2:
+                        // data name and desc
+                        $name = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price '.$dataPass['percent_disc'].' % Off ('.$dataPass['sku'].')';
+                        $desc = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price '.$dataPass['percent_disc'].' % Off ('.$dataPass['sku'].')';
+                        
+                        $savePromoPriceStoreStatus = $this->savePromoPriceStore($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode, $attributeInterfaces);
+                        break;
 
-                        // promotype = 1 , disctype = 3
-                        case 3:
-                            // data name and desc
-                            $name = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['amount_off'].' Off ('.$dataPass['sku'].')';
-                            $desc = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['amount_off'].' Off ('.$dataPass['sku'].')';
+                    // promotype = 1 , disctype = 3
+                    case 3:
+                        // data name and desc
+                        $name = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['amount_off'].' Off ('.$dataPass['sku'].')';
+                        $desc = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['amount_off'].' Off ('.$dataPass['sku'].')';
 
-                            $saveStagingUpdateStatus = $this->saveStagingUpdate($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode);
-                            break;
+                        $savePromoPriceStoreStatus = $this->savePromoPriceStore($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode, $attributeInterfaces);
+                        break;
+                }
+
+                // save to integration prom price table
+                $dataPass['name'] = $name;
+                if ($savePromoPriceStoreStatus) {
+                    if (!$checkIntPromoId) {
+                        $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
+                        $this->logger->info('ga ada');
                     }
-
-                    // save to integration prom price table
-                    $dataPass['name'] = $name;
-                    if ($saveStagingUpdateStatus) {
-                        if (!$checkIntPromoId) {
-                            $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
-                        }
+                    else {
+                        $this->logger->info('ada');
                     }
-                // }
+                }
 
-                    return $saveStagingUpdateStatus;
+                return $savePromoPriceStoreStatus;
             }
             // --------------
         } catch (\Exception $e) {
@@ -993,13 +1009,16 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
     {
         try {
             // if promo id not exist
-            // $checkIntPromoId = $this->checkIntegrationPromoByPromoId($dataPass['promotion_id']);
+            $dataPass['from_date'] = (new \DateTime($dataPass['from_date']))->format('Y-m-d H:i:s');
+            $dataPass['to_date'] = (new \DateTime($dataPass['to_date']))->format('Y-m-d H:i:s');
+            $dataPass['same_rule'] = 0;
+
             $checkIntPromoId = $this->checkIntegrationPromoSkuAndPromoType($dataPass);
             
             if (!$checkIntPromoId) {
                 // add dataPass array for name and desc
                 $dataPass['stop_rules_processing'] = 0;
-                $dataPass['discount_step'] = 3;
+                $dataPass['discount_step'] = $dataPass['promo_price_qty'];
                 $dataPass['simple_free_shipping'] = 0;
 
                 switch ($dataPass['discount_type']) {
@@ -1029,8 +1048,27 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                         $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only: same as buy '.$dataPass['normal_price_qty'].' get '.$dataPass['promo_price_qty'].' with percentage (for the same item) ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                         $dataPass['simple_action'] = 'eachn_perc';
                         $dataPass['discount_amount'] = $dataPass['percent_disc'];
-                        $result = $this->saveSalesRule($dataPass);
-                        $dataPass['salesrule_id'] = $result['rule_id'];
+
+                        // check if discount same rule
+                        try {
+                            $checkIntPromoTwoPercentage = $this->promotionPriceRepositoryInterface->loadDataPromoTypeTwoBySameRulePercentage($dataPass);
+                        } catch (\Exception $e) {
+                            $this->logger->error("<=End " .$e->getMessage());
+                            throw new StateException(
+                                __(__FUNCTION__." - ".$e->getMessage())
+                            );
+                        }
+                        
+                        if (!$checkIntPromoTwoPercentage) {
+                            $result = $this->saveSalesRule($dataPass);
+                            $dataPass['salesrule_id'] = $result['rule_id'];
+                        }
+                        else {
+                            $dataPass['same_rule'] = 1;
+                            $dataPass['salesrule_id'] = $checkIntPromoTwoPercentage->getData('salesrule_id');
+                            $this->updateSalesRule($dataPass);
+                        }
+                        
                         break;
 
                     // promotype = 2 , disctype = 3
@@ -1048,12 +1086,13 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                 $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
             }
             else {
-                // if promo id not exist
+                // if sku and store not exist
                 $checkIntPromoIdStoreCode = $this->checkIntegrationPromoByPromoIdStoreCode($dataPass);
+
                 if (!$checkIntPromoIdStoreCode) {
                     // add dataPass array for name and desc
                     $dataPass['stop_rules_processing'] = 0;
-                    $dataPass['discount_step'] = 3;
+                    $dataPass['discount_step'] = $dataPass['promo_price_qty'];
                     $dataPass['simple_free_shipping'] = 0;
                     $dataPass['salesrule_id'] = $checkIntPromoId->getData('salesrule_id');
                     switch ($dataPass['discount_type']) {
@@ -1542,6 +1581,25 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                 $query->setPointPerUnit($data['point_per_unit']);
             }
 
+            if (!empty($data['promo_price_qty'])) {
+                $query->setPromoPriceQty($data['promo_price_qty']);
+            }
+
+            if (!empty($data['normal_price_qty'])) {
+                $query->setNormalPriceQty($data['normal_price_qty']);
+            }
+
+            if ($data['promotion_type'] == 2) {
+                if (!empty($data['from_date'])) {
+                    $query->setStartDate($data['from_date']);
+                }
+
+                if (!empty($data['to_date'])) {
+                    $query->setEndDate($data['to_date']);
+                }
+            }
+            
+
             $result = $this->promotionPriceRepositoryInterface->save($query);
 
             $this->logger->info("saveIntegrationPromo saved [" . $data['name'] ."]");
@@ -1696,7 +1754,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
     }
 
     /**
-     * Save to staging update
+     * Save to promo price by store
      * @param $startTime datetime
      * @param $endTime datetime
      * @param $name string
@@ -1704,76 +1762,91 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
      * @param $isCampaign int
      * @param $isRollback int
      * @param $dataStoreCode mixed
+     * @param $attributeIdarray array
      * @return $data mixed
      * @throw logger error
      */
-    protected function saveStagingUpdate($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode)
+    protected function savePromoPriceStore($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode, $attributeIdarray)
     {
         try {
             $dataStoreCode['store_attr_code'] = $dataStoreCode['store_code'];
             // save special price
-            $stagingRepo = $this->saveBasePriceStorePrice($dataStoreCode);
+            $promoPriceRepo = $this->saveBasePriceStorePrice($dataStoreCode, $attributeIdarray);
 
-            $this->logger->info("staging_update saved [" . $name ."]");
+            $this->logger->info("promo price saved [" . $name ."]");
         } catch (\Exception $e) {
-            $this->logger->error("<=End staging_update" .$e->getMessage());
+            $this->logger->error("<=End promo price" .$e->getMessage());
             throw new StateException(
                 __(__FUNCTION__." - ".$e->getMessage())
             );
         }
 
-        return $stagingRepo;
+        return $promoPriceRepo;
     }
 
     /**
-     * Save to staging update Backup
-     * @param $startTime datetime
-     * @param $endTime datetime
-     * @param $name string
-     * @param $desc string
-     * @param $isCampaign int
-     * @param $isRollback int
-     * @param $dataStoreCode mixed
-     * @return $data mixed
-     * @throw logger error
+     * save base price
+     * @param mixed $param
+     * @return array $result
      */
-    protected function saveStagingUpdateBackup($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode)
+    protected function saveBasePriceStorePrice($param, $attributeIdarray)
     {
         try {
-            //Convert to store timezone
-            $created = new \DateTime($startTime);
-            $createdAsString = $created->modify('-7 hours')->format('Y-m-d H:i:s');
-            $lasted = new \DateTime($endTime);
-            $lastedAsString = $lasted->modify('-7 hours')->format('Y-m-d H:i:s');
+            // get base price
+            $basePriceCode = PromotionPriceLogicInterface::PRODUCT_ATTR_BASE_PRICE.$param['store_attr_code'];
 
-            // save new schedule
-            $schedule = $this->updateInterfaceFactory->create();
-            $schedule->setName($name);
-            $schedule->setDescription($desc); 
-            $schedule->setStartTime($createdAsString);
-            $schedule->setEndTime($lastedAsString);
-            $schedule->setIsCampaign($isCampaign);
-            $stagingRepo = $this->updateRepositoryInterface->save($schedule);
-            $this->versionManager->setCurrentVersionId($stagingRepo->getId());
+            $product = $this->productRepositoryInterface->get($param['sku']);
+            $productPriceBySku = $product->getCustomAttribute($basePriceCode) ? $product->getCustomAttribute($basePriceCode)->getValue() : 0;
+            
+            $dataBase = [
+                'base_price' => $productPriceBySku
+            ];
 
-            // save promo price by schedule
-            $dataStoreCode['staging_id'] = $stagingRepo->getId();
-            $dataStoreCode_arr = explode(",", $dataStoreCode['store_code']);
-            foreach ($dataStoreCode_arr as $dataStore) {
-                $dataStoreCode['store_attr_code'] = $dataStore;
-                // save special price
-                $this->saveBasePriceStorePrice($dataStoreCode);
+            // calc special price
+            $specialPrice = '';
+            if ($param['disc_type'] == 1) {
+                $specialPrice = $param['promo_selling_price'];
+            }
+            if ($param['disc_type'] == 2) {
+                $specialPrice = $dataBase['base_price'] - ($dataBase['base_price'] * ($param['percent_disc']/100));
+                if ($specialPrice < 0) {
+                    $specialPrice = 0;
+                }
+            }
+            if ($param['disc_type'] == 3) {
+                $specialPrice = $dataBase['base_price'] - $param['amount_off'];
+                if ($specialPrice < 0) {
+                    $specialPrice = 0;
+                }
+            }
+            
+            // save to special price
+            $specialPriceCode = PromotionPriceLogicInterface::PRODUCT_ATTR_PROMO_PRICE.$param['store_attr_code'];
+            
+            // $product->setCustomAttribute($specialPriceCode, $specialPrice);
+
+            // $this->productRepositoryInterface->save($product);
+
+            if ($attributeIdarray[$specialPriceCode]['attribute_id']) {
+                $this->logger->info($productPriceBySku);
+                $dataMarkdown =
+                    [
+                        "attribute_id"=>"".$attributeIdarray[$specialPriceCode]['attribute_id'][0]."",
+                        "value"=>"".$specialPrice."",
+                        "row_id"=>"".$product->getRowId().""
+                    ];
+
+            }
+            else {
+                return false;
             }
 
-            $this->logger->info("staging_update saved [" . $name ."]");
-        } catch (\Exception $e) {
-            $this->logger->error("<=End staging_update" .$e->getMessage());
+            return $dataMarkdown;
+        } catch (\Exception $exception) {
             throw new StateException(
-                __(__FUNCTION__." - ".$e->getMessage())
+                __(__FUNCTION__." - ".$exception->getMessage())
             );
         }
-
-        return $stagingRepo;
     }
 
     /**
@@ -1821,7 +1894,6 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             else {
                 $statusResponse->setDiscountStep($dataPass['discount_step']);
             }
-
             $result = $this->ruleResource->save($statusResponse);
 
             // check if salesrule success save
@@ -2097,7 +2169,6 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                     if ($ruleData) {
                         
                         if (isset($ruleDataArray['conditions'])) {
-                            $this->logger->info("osoaos");
                             $conditions = $ruleDataArray['conditions'];
                             foreach ($conditions as $key => $condition) {
                                 if ($condition['type'] == 'Magento\SalesRule\Model\Rule\Condition\Product') {
@@ -2226,23 +2297,69 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                 $ruleDataArray = json_decode($ruleData, true);
 
                 if ($ruleData) {
-                    if (isset($ruleDataArray['conditions'])) {
-                        $conditions = $ruleDataArray['conditions'];
-                        foreach ($conditions as $key => $condition) {
-                            if (isset($condition['type'])) {
-                                if ($condition['type'] == 'Amasty\Conditions\Model\Rule\Condition\CustomerAttributes') {
-                                    $typeSubSelect = $condition['type'];
-                                    $typeSubSelectValue = $condition['value'].','.$dataPass['store_code'];
-                                    $ruleDataArray['conditions'][$key]['value'] = $typeSubSelectValue;
-                                }                   
+                    if ($dataPass['same_rule'] == 1) {
+                        $this->logger->info('true');
+                        if (isset($ruleDataArray['conditions'])) {
+                            $conditions = $ruleDataArray['conditions'];
+                            foreach ($conditions as $key => $condition) {
+                                if (isset($condition['type'])) {
+                                    if ($condition['type'] == 'Magento\SalesRule\Model\Rule\Condition\Product\Found') {
+                                        foreach ($condition['conditions'] as $keySku => $conditionSku) {
+                                            if (isset($conditionSku['attribute'])) {
+                                                if ($conditionSku['attribute'] == 'sku') {
+                                                    $typeSubSelect = $conditionSku['attribute'];
+                                                    $typeSubSelectValue = $conditionSku['value'].','.$dataPass['sku'];
+                                                    $ruleDataArray['conditions'][$key]['conditions'][$keySku]['value'] = $typeSubSelectValue;
+                                                    $ruleDataArray['conditions'][$key]['conditions'][$keySku]['operator'] = '()';
+                                                }                   
+                                            }
+                                        }
+                                    }                   
+                                }
+                            }
+                        }
+
+                        $ruleDataAction = $statusResponse->getActionsSerialized();
+                        $ruleDataActionArray = json_decode($ruleDataAction, true);
+
+                        if ($ruleDataAction) {
+                            if (isset($ruleDataActionArray['conditions'])) {
+                                $conditionsAction = $ruleDataActionArray['conditions'];
+                                foreach ($conditionsAction as $keyAction => $conditionAction) {
+                                    if ($conditionAction['type'] == 'Magento\SalesRule\Model\Rule\Condition\Product') {
+                                        $skuValueNow = $ruleDataActionArray['conditions'][$keyAction]['value'];
+                                        $ruleDataActionArray['conditions'][$keyAction]['value'] = $skuValueNow.','.$dataPass['sku'];
+                                        $ruleDataActionArray['conditions'][$keyAction]['operator'] = '()';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        if (isset($ruleDataArray['conditions'])) {
+                            $conditions = $ruleDataArray['conditions'];
+                            foreach ($conditions as $key => $condition) {
+                                if (isset($condition['type'])) {
+                                    if ($condition['type'] == 'Amasty\Conditions\Model\Rule\Condition\CustomerAttributes') {
+                                        $typeSubSelect = $condition['type'];
+                                        $typeSubSelectValue = $condition['value'].','.$dataPass['store_code'];
+                                        $ruleDataArray['conditions'][$key]['value'] = $typeSubSelectValue;
+                                    }                   
+                                }
                             }
                         }
                     }
                 }
 
+
+
                 if ($typeSubSelect) {
                     // update conditions serialize
                     $setRuleData = $statusResponse->setConditionsSerialized(json_encode($ruleDataArray));
+                    if ($dataPass['same_rule'] == 1) {
+                        $setRuleData = $statusResponse->setActionsSerialized(json_encode($ruleDataActionArray));
+                        $setRuleData = $statusResponse->setDescription($statusResponse->getDescription() . " (" . $dataPass['sku'] . ')');
+                    }
                     $this->ruleResource->save($statusResponse);
                 }
             }
@@ -2482,25 +2599,6 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
     }
 
     /**
-     * special Price Logic Validate & Create Attribute
-     * @param mixed $param
-     * @return array $specialPriceCodeId
-     */
-    protected function validateStorePrice($param)
-    {
-        try {
-            $specialPriceCode      = PromotionPriceLogicInterface::PRODUCT_ATTR_SPECIAL_PRICE.$param['store_attr_code'];
-            $specialPriceCodeId    = $this->saveAttributeProduct($specialPriceCode);
-        } catch (\Exception $exception) {
-            throw new StateException(
-                __(__FUNCTION__." - ".$exception->getMessage())
-            );
-        }
-        
-        return $specialPriceCodeId;
-    }
-
-    /**
      * Check Attribute Id Exist
      * @param string $attributeCode
      * @return mixed $attributeId
@@ -2530,187 +2628,90 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
     }
 
     /**
-     * Create New Attribute
+     * Get data list
      *
-     * @param $attributeCode string
-     * @return
+     * @param array $dataProduct
+     * @return array
      */
-    protected function createAttributeProduct($attributeCode = "")
+    protected function getDataList($dataProduct)
     {
-        try {
-            $frontentInput    = PromotionPriceLogicInterface::INPUT_TYPE_FRONTEND_FORMAT_PRICE;
-            $backendInput     = PromotionPriceLogicInterface::INPUT_TYPE_BACKEND_FORMAT_PRICE;
-            
-            $attributeValue = $this->productAttributeFactory->create();
-            
-            
-            $attributeValue->setPosition(PromotionPriceLogicInterface::POSITION);
-            $attributeValue->setApplyTo(PromotionPriceLogicInterface::APPLY_TO);
-            $attributeValue->setIsVisible(PromotionPriceLogicInterface::IS_VISIBLE);
-            
-            $attributeValue->setScope(PromotionPriceLogicInterface::SCOPE);
-            $attributeValue->setAttributeCode($attributeCode);
-            $attributeValue->setFrontendInput($frontentInput);
-            $attributeValue->setEntityTypeId(PromotionPriceLogicInterface::ENTITY_TYPE_ID);
-            $attributeValue->setIsRequired(PromotionPriceLogicInterface::IS_REQUIRED);
-            $attributeValue->setIsUserDefined(PromotionPriceLogicInterface::IS_USER_DEFINED);
-            $attributeValue->setDefaultFrontendLabel($attributeCode);
-            $attributeValue->setBackendType($backendInput);
-            $attributeValue->setDefaultValue(0);
-            $attributeValue->setIsUnique(PromotionPriceLogicInterface::IS_UNIQUE);
-
-            // Smart OSC Required
-            $attributeValue->setIsSearchable(PromotionPriceLogicInterface::IS_SEARCHBLE);
-            $attributeValue->setIsFilterable(PromotionPriceLogicInterface::IS_FILTERABLE);
-            $attributeValue->setIsComparable(PromotionPriceLogicInterface::IS_COMPARABLE);
-            $attributeValue->setIsHtmlAllowedOnFront(PromotionPriceLogicInterface::IS_HTML_ALLOWED_ON_FRONT);
-            $attributeValue->setIsVisibleOnFront(PromotionPriceLogicInterface::IS_VISIBLE_ON_FRONT);
-            $attributeValue->setIsFilterableInSearch(PromotionPriceLogicInterface::IS_FILTERABLE_IN_SEARCH);
-            $attributeValue->setUsedInProductListing(PromotionPriceLogicInterface::USED_IN_PRODUCT_LISTING);
-            $attributeValue->setUsedForSortBy(PromotionPriceLogicInterface::USED_FOR_SORT_BY);
-            $attributeValue->setIsVisibleInAdvancedSearch(PromotionPriceLogicInterface::IS_VISIBLE_IN_ADVANCED_SEARCH);
-            $attributeValue->setIsWysiwygEnabled(PromotionPriceLogicInterface::IS_WYSIWYG_ENABLED);
-            $attributeValue->setIsUsedForPromoRules(PromotionPriceLogicInterface::IS_USED_FOR_PROMO_RULES);
-            // $attributeValue->setIsRequiredInAdminStore(StorePriceLogicInterface::IS_USED_FOR_PROMO_RULES);
-            $attributeValue->setIsUsedInGrid(PromotionPriceLogicInterface::IS_USED_IN_GRID);
-            $attributeValue->setIsVisibleInGrid(PromotionPriceLogicInterface::IS_VISIBLE_IN_GRID);
-            $attributeValue->setIsFilterableInGrid(PromotionPriceLogicInterface::IS_FILTERABLE_IN_GRID);
-            // $attributeValue->setIsPagebuilderEnable();
-            
-            $attributeValue->setIsUsedForPriceRules(PromotionPriceLogicInterface::IS_USED_FOR_PRICE_RULES);
-            
-            $this->productAttributeRepository->save($attributeValue);
-            
-            //Set Attribute to Attribute Set (Default)
-            $this->productAttributeManagement->assign($this->attrGroupGeneralInfoId, $this->attrGroupProductDetailId, $attributeCode, PromotionPriceLogicInterface::SORT_ORDER);
-        } catch (\Exception $exception) {
-            throw new StateException(
-                __(__FUNCTION__." - ".$exception->getMessage())
-            );
+        $skuList = [];
+        $dataValueList = [];
+        $sourceList = [];
+        foreach ($dataProduct as $sku => $data) {
+            $skuList[] = $sku;
+            foreach ($data as $key => $val) {
+                $dataValueList[] = $val;
+                if (in_array($val['attributes']['store_code'], $sourceList) == false) {
+                    $sourceList[] = PromotionPriceLogicInterface::PRODUCT_ATTR_PROMO_PRICE.$val['attributes']['store_code'];
+                }
+            }
         }
+        return [
+            'sku_list' => $skuList,
+            'store_list' => $sourceList
+        ];
     }
 
     /**
-     * save base price
-     * @param mixed $param
-     * @return array $result
+     * Get data list
+     *
+     * @param array $dataProduct
+     * @return array
      */
-    protected function saveBasePriceStorePrice($param)
+    protected function getDataListxx($dataProduct)
     {
-        try {
-            // get base price
-            $basePriceCode = PromotionPriceLogicInterface::PRODUCT_ATTR_BASE_PRICE.$param['store_attr_code'];
-            $product = $this->productRepositoryInterface->get($param['sku']);
-            $productPriceBySku = $product->getCustomAttribute($basePriceCode) ? $product->getCustomAttribute($basePriceCode)->getValue() : 0;
-            $getId = $product->getId();
-            $dataBase = [
-                'base_price' => $productPriceBySku,
-                'id' => $getId,
-            ];
-
-            // calc special price
-            $specialPrice = '';
-            if ($param['disc_type'] == 1) {
-                $specialPrice = $param['promo_selling_price'];
+        $skuList = [];
+        $sourceList = [];
+        foreach ($dataProduct as $data) {
+            $skuList[] = $data['sku'];
+            if (in_array($data['attributes']['store_code'], $sourceList) == false) {
+                $sourceList[] = PromotionPriceLogicInterface::PRODUCT_ATTR_PROMO_PRICE.$data['attributes']['store_code'];
             }
-            if ($param['disc_type'] == 2) {
-                $specialPrice = $dataBase['base_price'] - ($dataBase['base_price'] * ($param['percent_disc']/100));
-                if ($specialPrice < 0) {
-                    $specialPrice = 0;
-                }
-            }
-            if ($param['disc_type'] == 3) {
-                $specialPrice = $dataBase['base_price'] - $param['amount_off'];
-                if ($specialPrice < 0) {
-                    $specialPrice = 0;
-                }
-            }
-            
-            // save to special price
-            $specialPriceCode = PromotionPriceLogicInterface::PRODUCT_ATTR_PROMO_PRICE.$param['store_attr_code'];
-            
-            // $product->setCustomAttribute($specialPriceCode, $specialPrice);
-
-            // $this->productRepositoryInterface->save($product);
-
-            // raw query update
-            $connectionCheck = $this->resourceConnection->getConnection();
-            $queryGetAttrIdPromoPrice = "SELECT attribute_id FROM eav_attribute WHERE attribute_code = '".$specialPriceCode."' limit 1";
-            $getGetAttrIdPromoPrice = $connectionCheck->fetchRow($queryGetAttrIdPromoPrice);
-
-            if (!empty($getGetAttrIdPromoPrice['attribute_id'])) {
-                // $queryUpdatePromo = "UPDATE catalog_product_entity_decimal SET value = '" . $specialPrice . "' WHERE row_id = '" . $product->getRowId() . "' AND attribute_id = '".$getGetAttrIdPromoPrice['attribute_id']."'";
-                // $connectionCheck->query($queryUpdatePromo);
-
-                $dataMarkdown =
-                    [
-                        "attribute_id"=>"".$getGetAttrIdPromoPrice['attribute_id']."",
-                        "value"=>"".$specialPrice."",
-                        "row_id"=>"".$product->getRowId().""
-                    ];
-            }
-            else {
-                return false;
-            }
-
-            return $dataMarkdown;
-        } catch (\Exception $exception) {
-            throw new StateException(
-                __(__FUNCTION__." - ".$exception->getMessage())
-            );
         }
+        return [
+            'sku_list' => $skuList,
+            'store_list' => $sourceList
+        ];
     }
 
     /**
-     * save base price Backup
-     * @param mixed $param
-     * @return array $result
+     * Get product by multiple sku
      */
-    protected function saveBasePriceStorePriceBackup($param)
+    protected function getProductByMultipleSku($skuList)
     {
-        try {
-            // get base price
-            $basePriceCode = PromotionPriceLogicInterface::PRODUCT_ATTR_BASE_PRICE.$param['store_attr_code'];
-            $product = $this->productRepositoryInterface->get($param['sku']);
-            $productPriceBySku = $product->getCustomAttribute($basePriceCode) ? $product->getCustomAttribute($basePriceCode)->getValue() : 0;
-            $getId = $product->getId();
-            $dataBase = [
-                'base_price' => $productPriceBySku,
-                'id' => $getId,
-            ];
-            $this->logger->info("getBasePriceStorePrice [".$basePriceCode."][" . $productPriceBySku ."][ ID is ". $getId ."] saved");
+        $prepare = [];
+        $result = [];
+        if (empty($skuList) == false) {
+            $collection = $this->productCollectionFactory->create()->addFieldToFilter('sku', ['in' => $skuList]);
+            $collection->getSelect()->reset(\Zend_Db_Select::COLUMNS)->columns(['entity_id','sku','row_id']);
+            $prepare = $collection->getItems();
 
-            // calc special price
-            $specialPrice = '';
-            if ($param['disc_type'] == 1) {
-                $specialPrice = $param['promo_selling_price'];
+            foreach ($prepare as $value) {
+                $result['sku'][] = $value->getSku();
+                $result['id'][] = $value->getId();
             }
-            if ($param['disc_type'] == 2) {
-                $specialPrice = $dataBase['base_price'] - ($dataBase['base_price'] * ($param['percent_disc']/100));
-                if ($specialPrice < 0) {
-                    $specialPrice = 0;
-                }
-            }
-            if ($param['disc_type'] == 3) {
-                $specialPrice = $dataBase['base_price'] - $param['amount_off'];
-                if ($specialPrice < 0) {
-                    $specialPrice = 0;
-                }
-            }
-            
-            // save to special price
-            $specialPriceCode = PromotionPriceLogicInterface::PRODUCT_ATTR_PROMO_PRICE.$param['store_attr_code'];
-            $product->setCustomAttribute($specialPriceCode, $specialPrice);
-            
-            $result = $this->productStaging->schedule($product, $param['staging_id']);
-
-            $this->logger->info("saveBasePriceStorePrice [" . $specialPriceCode ."][" . $specialPrice ."] saved");
-            
-            return $result;
-        } catch (\Exception $exception) {
-            throw new StateException(
-                __(__FUNCTION__." - ".$exception->getMessage())
-            );
         }
+        return $result;
     }
+
+    /**
+     * Get data list attribute id from attribute
+     */
+    protected function getAttributeIdList($attributeCode)
+    {
+        $prepare = [];
+        $result = [];
+        if (empty($attributeCode) == false) {
+            $collection = $this->eavAttribute->getCollection()->addFieldToFilter('attribute_code', ['in' => $attributeCode]);
+            $prepare = $collection->getItems();
+
+            foreach ($prepare as $value) {
+                $result[$value->getAttributeCode()]['attribute_id'][] = $value->getId();
+            }
+        }
+
+        return $result;
+    }
+
 }

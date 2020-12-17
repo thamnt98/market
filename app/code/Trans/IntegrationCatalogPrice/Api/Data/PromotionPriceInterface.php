@@ -47,6 +47,10 @@ interface PromotionPriceInterface
     const PIM_PERCENT_DISC          = 'percent_disc';
     const PIM_AMOUNT_OFF            = 'amount_off';
     const PIM_POINT_PER_UNIT        = 'point_per_unit';
+    const PIM_PROMO_PRICE_QTY = 'promo_price_qty';
+    const PIM_NORMAL_PRICE_QTY = 'normal_price_qty';
+    const START_DATE = 'start_date';
+    const END_DATE = 'end_date';
 
     /**
      * get id
@@ -377,4 +381,64 @@ interface PromotionPriceInterface
      * @return void
      */
     public function setPointPerUnit($point);
+
+    /**
+     * get promo price qty
+     *
+     * @return int
+     */
+    public function getPromoPriceQty();
+
+    /**
+     * Set promo price qty
+     *
+     * @param int $promoqty
+     * @return void
+     */
+    public function setPromoPriceQty($promoqty);
+
+    /**
+     * get normal price qty
+     *
+     * @return int
+     */
+    public function getNormalPriceQty();
+
+    /**
+     * Set normal price qty
+     *
+     * @param int $normalqty
+     * @return void
+     */
+    public function setNormalPriceQty($normalqty);
+
+    /**
+     * get start date
+     *
+     * @return int
+     */
+    public function getStartDate();
+
+    /**
+     * Set start date
+     *
+     * @param int $startDate
+     * @return void
+     */
+    public function setStartDate($startDate);
+
+    /**
+     * get end date
+     *
+     * @return int
+     */
+    public function getEndDate();
+
+    /**
+     * Set end date
+     *
+     * @param int $endDate
+     * @return void
+     */
+    public function setEndDate($endDate);
 }
