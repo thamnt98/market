@@ -52,6 +52,23 @@
                 <payment_channel>credit_card</payment_channel>
             </trans_mepay_cc>
 
+            <trans_mepay_debit>
+                <active>1</active>
+                <title>Mepay Debit Solution</title>
+                <model>TransMepayDebitFacade</model>
+                <group>trans_mepay</group>
+                <payment_code>trans_mepay_debit</payment_code>
+                <order_status>pending_payment</order_status>
+                <order_state>new</order_state>
+                <allowspecific>1</allowspecific>
+                <payment_action>authorize</payment_action>
+                <is_gateway>1</is_gateway>
+                <can_use_checkout>1</can_use_checkout>
+                <can_authorize>1</can_authorize>
+                <can_capture>1</can_capture>
+                <payment_channel>debit</payment_channel>
+            </trans_mepay_debit>
+
             <trans_mepay_va>
                 <active>1</active>
                 <title>Mepay Virtual Account Solution</title>

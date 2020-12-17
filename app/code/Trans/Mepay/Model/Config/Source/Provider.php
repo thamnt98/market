@@ -14,6 +14,7 @@
 
  use Magento\Framework\Option\ArrayInterface;
  use Trans\Mepay\Model\Config\Provider\Cc;
+ use Trans\Mepay\Model\Config\Provider\Debit;
  use Trans\Mepay\Model\Config\Provider\Va;
  use Trans\Mepay\Model\Config\Provider\Qris;
 
@@ -28,9 +29,19 @@
   const MEGA_CC = 'megacc';
 
   /**
+    * @var string
+    */
+  const MEGA_DEBIT = 'megadebit';
+
+  /**
    * @var string
    */
   const LABEL_MEGA_CC = 'Bank Mega Credit/debit card';
+
+  /**
+   * @var string
+   */
+  const LABEL_MEGA_DEBIT = 'Bank Mega Debit';
 
   /**
    * @var string
@@ -65,6 +76,10 @@
          'label' => self::LABEL_MEGA_CC
        ],
        [
+         'value' => self::MEGA_DEBIT,
+         'label' => self::LABEL_MEGA_DEBIT
+       ],
+       [
          'value' => self::MEGA_VA,
          'label' => self::LABEL_MEGA_VA
        ],
@@ -85,6 +100,8 @@
     $source = '';
     switch($paymentCode) {
       case Cc::CODE_CC : $source = self::MEGA_CC;
+        break;
+      case Debit::CODE : $source = self::MEGA_CC;
         break;
       case Va::CODE_VA : $source = self::MEGA_VA;
         break;

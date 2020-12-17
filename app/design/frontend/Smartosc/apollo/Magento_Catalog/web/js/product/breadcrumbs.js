@@ -215,10 +215,13 @@ define([
                     categoryMenuItem = null;
 
                 if (categoryUrl && menu.length) {
-                    categoryMenuItem = menu.find(
+                     menu.find(
                         this.options.categoryItemSelector +
                         ' > a[href="' + categoryUrl + '"]'
-                    );
+                    ).each(function (){
+                         categoryMenuItem = $(this);
+                     });
+
                 }
 
                 return categoryMenuItem;
