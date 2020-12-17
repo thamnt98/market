@@ -150,7 +150,7 @@ class OrderStatus implements OrderStatusInterface {
 	 */
 	protected function getHeader() {
 		$token                    = $this->integrationHelper->getToken();
-		$headers['dest']          = $this->orderConfig->getHeader();
+		$headers['dest']          = $this->orderConfig->getOmsDest();
 		$headers['Content-Type']  = 'application/json';
 		$headers['Authorization'] = 'Bearer ' . $token;
 
