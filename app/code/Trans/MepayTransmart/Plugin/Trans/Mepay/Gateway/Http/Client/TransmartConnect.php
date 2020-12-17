@@ -32,7 +32,7 @@ class TransmartConnect
     $collection->addFieldToFilter('customer_id',['eq'=>$customer->getId()]);
     $collection->getSelect()->order('entity_id desc')->limit(1);
     $exist = $collection->getFirstItem()->getData();
-    $referenceNumberExist = $exist['reference_number'];
+    $referenceNumberExist = (isset($exist['reference_number']))? $exist['reference_number'] : null;
     if ($referenceNumber !== $referenceNumberExist) {
       return $proceed($transferObject);
     }
