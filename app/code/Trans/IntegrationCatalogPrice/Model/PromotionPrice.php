@@ -374,4 +374,68 @@ class PromotionPrice extends \Magento\Framework\Model\AbstractModel implements P
     {
         $this->setData(PromotionPriceInterface::PIM_POINT_PER_UNIT, $point);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getPromoPriceQty()
+    {
+        return $this->_getData(PromotionPriceInterface::PIM_PROMO_PRICE_QTY);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setPromoPriceQty($promoqty)
+    {
+        $this->setData(PromotionPriceInterface::PIM_PROMO_PRICE_QTY, $promoqty);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getNormalPriceQty()
+    {
+        return $this->_getData(PromotionPriceInterface::PIM_NORMAL_PRICE_QTY);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setNormalPriceQty($normalqty)
+    {
+        $this->setData(PromotionPriceInterface::PIM_NORMAL_PRICE_QTY, $normalqty);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getStartDate()
+    {
+        return $this->_getData(PromotionPriceInterface::START_DATE);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setStartDate($startDate)
+    {
+        $this->setData(PromotionPriceInterface::START_DATE, $startDate);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getEndDate()
+    {
+        return $this->_getData(PromotionPriceInterface::END_DATE);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setEndDate($endDate)
+    {
+        $this->setData(PromotionPriceInterface::END_DATE, $endDate);
+    }
 }

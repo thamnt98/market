@@ -1009,13 +1009,16 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
     {
         try {
             // if promo id not exist
-            // $checkIntPromoId = $this->checkIntegrationPromoByPromoId($dataPass['promotion_id']);
+            $dataPass['from_date'] = (new \DateTime($dataPass['from_date']))->format('Y-m-d H:i:s');
+            $dataPass['to_date'] = (new \DateTime($dataPass['to_date']))->format('Y-m-d H:i:s');
+            $dataPass['same_rule'] = 0;
+
             $checkIntPromoId = $this->checkIntegrationPromoSkuAndPromoType($dataPass);
             
             if (!$checkIntPromoId) {
                 // add dataPass array for name and desc
                 $dataPass['stop_rules_processing'] = 0;
-                $dataPass['discount_step'] = 3;
+                $dataPass['discount_step'] = $dataPass['promo_price_qty'];
                 $dataPass['simple_free_shipping'] = 0;
 
                 switch ($dataPass['discount_type']) {
@@ -1045,8 +1048,27 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                         $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only: same as buy '.$dataPass['normal_price_qty'].' get '.$dataPass['promo_price_qty'].' with percentage (for the same item) ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                         $dataPass['simple_action'] = 'eachn_perc';
                         $dataPass['discount_amount'] = $dataPass['percent_disc'];
-                        $result = $this->saveSalesRule($dataPass);
-                        $dataPass['salesrule_id'] = $result['rule_id'];
+
+                        // check if discount same rule
+                        try {
+                            $checkIntPromoTwoPercentage = $this->promotionPriceRepositoryInterface->loadDataPromoTypeTwoBySameRulePercentage($dataPass);
+                        } catch (\Exception $e) {
+                            $this->logger->error("<=End " .$e->getMessage());
+                            throw new StateException(
+                                __(__FUNCTION__." - ".$e->getMessage())
+                            );
+                        }
+                        
+                        if (!$checkIntPromoTwoPercentage) {
+                            $result = $this->saveSalesRule($dataPass);
+                            $dataPass['salesrule_id'] = $result['rule_id'];
+                        }
+                        else {
+                            $dataPass['same_rule'] = 1;
+                            $dataPass['salesrule_id'] = $checkIntPromoTwoPercentage->getData('salesrule_id');
+                            $this->updateSalesRule($dataPass);
+                        }
+                        
                         break;
 
                     // promotype = 2 , disctype = 3
@@ -1064,12 +1086,13 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                 $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
             }
             else {
-                // if promo id not exist
+                // if sku and store not exist
                 $checkIntPromoIdStoreCode = $this->checkIntegrationPromoByPromoIdStoreCode($dataPass);
+
                 if (!$checkIntPromoIdStoreCode) {
                     // add dataPass array for name and desc
                     $dataPass['stop_rules_processing'] = 0;
-                    $dataPass['discount_step'] = 3;
+                    $dataPass['discount_step'] = $dataPass['promo_price_qty'];
                     $dataPass['simple_free_shipping'] = 0;
                     $dataPass['salesrule_id'] = $checkIntPromoId->getData('salesrule_id');
                     switch ($dataPass['discount_type']) {
@@ -1557,6 +1580,25 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             if (!empty($data['point_per_unit'])) {
                 $query->setPointPerUnit($data['point_per_unit']);
             }
+
+            if (!empty($data['promo_price_qty'])) {
+                $query->setPromoPriceQty($data['promo_price_qty']);
+            }
+
+            if (!empty($data['normal_price_qty'])) {
+                $query->setNormalPriceQty($data['normal_price_qty']);
+            }
+
+            if ($data['promotion_type'] == 2) {
+                if (!empty($data['from_date'])) {
+                    $query->setStartDate($data['from_date']);
+                }
+
+                if (!empty($data['to_date'])) {
+                    $query->setEndDate($data['to_date']);
+                }
+            }
+            
 
             $result = $this->promotionPriceRepositoryInterface->save($query);
 
@@ -2127,7 +2169,6 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                     if ($ruleData) {
                         
                         if (isset($ruleDataArray['conditions'])) {
-                            $this->logger->info("osoaos");
                             $conditions = $ruleDataArray['conditions'];
                             foreach ($conditions as $key => $condition) {
                                 if ($condition['type'] == 'Magento\SalesRule\Model\Rule\Condition\Product') {
@@ -2256,23 +2297,69 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                 $ruleDataArray = json_decode($ruleData, true);
 
                 if ($ruleData) {
-                    if (isset($ruleDataArray['conditions'])) {
-                        $conditions = $ruleDataArray['conditions'];
-                        foreach ($conditions as $key => $condition) {
-                            if (isset($condition['type'])) {
-                                if ($condition['type'] == 'Amasty\Conditions\Model\Rule\Condition\CustomerAttributes') {
-                                    $typeSubSelect = $condition['type'];
-                                    $typeSubSelectValue = $condition['value'].','.$dataPass['store_code'];
-                                    $ruleDataArray['conditions'][$key]['value'] = $typeSubSelectValue;
-                                }                   
+                    if ($dataPass['same_rule'] == 1) {
+                        $this->logger->info('true');
+                        if (isset($ruleDataArray['conditions'])) {
+                            $conditions = $ruleDataArray['conditions'];
+                            foreach ($conditions as $key => $condition) {
+                                if (isset($condition['type'])) {
+                                    if ($condition['type'] == 'Magento\SalesRule\Model\Rule\Condition\Product\Found') {
+                                        foreach ($condition['conditions'] as $keySku => $conditionSku) {
+                                            if (isset($conditionSku['attribute'])) {
+                                                if ($conditionSku['attribute'] == 'sku') {
+                                                    $typeSubSelect = $conditionSku['attribute'];
+                                                    $typeSubSelectValue = $conditionSku['value'].','.$dataPass['sku'];
+                                                    $ruleDataArray['conditions'][$key]['conditions'][$keySku]['value'] = $typeSubSelectValue;
+                                                    $ruleDataArray['conditions'][$key]['conditions'][$keySku]['operator'] = '()';
+                                                }                   
+                                            }
+                                        }
+                                    }                   
+                                }
+                            }
+                        }
+
+                        $ruleDataAction = $statusResponse->getActionsSerialized();
+                        $ruleDataActionArray = json_decode($ruleDataAction, true);
+
+                        if ($ruleDataAction) {
+                            if (isset($ruleDataActionArray['conditions'])) {
+                                $conditionsAction = $ruleDataActionArray['conditions'];
+                                foreach ($conditionsAction as $keyAction => $conditionAction) {
+                                    if ($conditionAction['type'] == 'Magento\SalesRule\Model\Rule\Condition\Product') {
+                                        $skuValueNow = $ruleDataActionArray['conditions'][$keyAction]['value'];
+                                        $ruleDataActionArray['conditions'][$keyAction]['value'] = $skuValueNow.','.$dataPass['sku'];
+                                        $ruleDataActionArray['conditions'][$keyAction]['operator'] = '()';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        if (isset($ruleDataArray['conditions'])) {
+                            $conditions = $ruleDataArray['conditions'];
+                            foreach ($conditions as $key => $condition) {
+                                if (isset($condition['type'])) {
+                                    if ($condition['type'] == 'Amasty\Conditions\Model\Rule\Condition\CustomerAttributes') {
+                                        $typeSubSelect = $condition['type'];
+                                        $typeSubSelectValue = $condition['value'].','.$dataPass['store_code'];
+                                        $ruleDataArray['conditions'][$key]['value'] = $typeSubSelectValue;
+                                    }                   
+                                }
                             }
                         }
                     }
                 }
 
+
+
                 if ($typeSubSelect) {
                     // update conditions serialize
                     $setRuleData = $statusResponse->setConditionsSerialized(json_encode($ruleDataArray));
+                    if ($dataPass['same_rule'] == 1) {
+                        $setRuleData = $statusResponse->setActionsSerialized(json_encode($ruleDataActionArray));
+                        $setRuleData = $statusResponse->setDescription($statusResponse->getDescription() . " (" . $dataPass['sku'] . ')');
+                    }
                     $this->ruleResource->save($statusResponse);
                 }
             }

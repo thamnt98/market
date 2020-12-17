@@ -555,7 +555,14 @@ class OrderStatus implements OrderStatusInterface {
 					$amount         = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 
 					$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
-					$this->creditMemos($entityIdSalesOrder, $itemId, $qtyAllocated);
+
+					$this->loggerOrder->info('===== Credit Memo ===== Start');
+
+					$credit       = $this->creditMemos($entityIdSalesOrder, $itemId, $qtyAllocated);
+					$creditEncode = json_encode($credit);
+
+					$this->loggerOrder->info('$creditEncode : ' . $creditEncode);
+					$this->loggerOrder->info('===== Credit Memo ===== End');
 				}
 				$this->eventManager->dispatch(
 					'refund_with_mega_payment',
@@ -566,7 +573,7 @@ class OrderStatus implements OrderStatusInterface {
 					]
 				);
 			}
-			if ($paymentMethod === 'sprint_bca_va' || $paymentMethod === 'sprint_permata_va') {
+			if ($paymentMethod === 'sprint_bca_va' || $paymentMethod === 'sprint_permata_va' || $paymentMethod === 'trans_mepay_va') {
 				foreach ($loadItemByOrderId as $itemOrder) {
 					$paidPriceOrder = $itemOrder->getPaidPrice();
 					$qtyOrder       = $itemOrder->getQty();
@@ -574,7 +581,14 @@ class OrderStatus implements OrderStatusInterface {
 					$amount         = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 
 					$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
-					$this->creditMemos($entityIdSalesOrder, $itemId, $qtyAllocated);
+
+					$this->loggerOrder->info('===== Credit Memo ===== Start');
+
+					$credit       = $this->creditMemos($entityIdSalesOrder, $itemId, $qtyAllocated);
+					$creditEncode = json_encode($credit);
+
+					$this->loggerOrder->info('$creditEncode : ' . $creditEncode);
+					$this->loggerOrder->info('===== Credit Memo ===== End');
 
 				}
 				/* update quantity adjusment */
@@ -605,7 +619,7 @@ class OrderStatus implements OrderStatusInterface {
 			}
 			/* End Non CC*/
 
-			if ($paymentMethod === 'sprint_mega_cc' || $paymentMethod === 'sprint_allbankfull_cc' || $paymentMethod === 'sprint_mega_debit') {
+			if ($paymentMethod === 'sprint_mega_cc' || $paymentMethod === 'sprint_allbankfull_cc' || $paymentMethod === 'sprint_mega_debit' || $paymentMethod === 'trans_mepay_cc') {
 				if ($itemData['quantity'] > $itemData['quantity_allocated']) {
 					/**
 					 * prepare data array refund send to PG
@@ -618,7 +632,14 @@ class OrderStatus implements OrderStatusInterface {
 						$amount         = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 
 						$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
-						$this->creditMemos($entityIdSalesOrder, $itemId, $qtyAllocated);
+
+						$this->loggerOrder->info('===== Credit Memo ===== Start');
+
+						$credit       = $this->creditMemos($entityIdSalesOrder, $itemId, $qtyAllocated);
+						$creditEncode = json_encode($credit);
+
+						$this->loggerOrder->info('$creditEncode : ' . $creditEncode);
+						$this->loggerOrder->info('===== Credit Memo ===== End');
 					}
 
 					/* update quantity adjusment */
