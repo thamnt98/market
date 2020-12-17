@@ -565,7 +565,8 @@ class OrderStatus implements OrderStatusInterface {
 						'new_amount' => $trxAmount - $matrixAdjusmentAmount,
 					]
 				);
-			} elseif ($paymentMethod === 'sprint_bca_va' || 'sprint_permata_va') {
+			}
+			if ($paymentMethod === 'sprint_bca_va' || 'sprint_permata_va') {
 				foreach ($loadItemByOrderId as $itemOrder) {
 					$paidPriceOrder = $itemOrder->getPaidPrice();
 					$qtyOrder       = $itemOrder->getQty();
@@ -604,127 +605,58 @@ class OrderStatus implements OrderStatusInterface {
 			}
 			/* End Non CC*/
 
-			elseif ($paymentMethod === 'sprint_mega_cc' || 'sprint_allbankfull_cc' || 'sprint_mega_debit') {
+			if ($paymentMethod === 'sprint_mega_cc' || 'sprint_allbankfull_cc' || 'sprint_mega_debit') {
 				if ($itemData['quantity'] > $itemData['quantity_allocated']) {
-
-					$this->helperData->sprintLog()->info('===== Capture Process ===== Start');
-
 					/**
-					 * prepare data array capture send to PG
+					 * prepare data array refund send to PG
 					 */
-					$dataCapture                      = array();
-					$dataCapture['channelId']         = $channelId;
-					$dataCapture['serviceCode']       = $serviceCode;
-					$dataCapture['transactionNo']     = RefundInterface::PREFIX_CAPTURE . $orderId;
-					$dataCapture['transactionReffId'] = $reffId;
-					$dataCapture['transactionAmount'] = $trxAmount;
-					$dataCapture['transactionType']   = RefundInterface::CAPTURE;
-					try {
-						$this->curl->setOption(CURLOPT_RETURNTRANSFER, true);
-						$this->curl->post($urlPg, $dataCapture);
-					} catch (\Exception $e) {
-						$this->logger->info('Capture Error = ' . $e->getMessage());
-					};
-					$saveOrderItem  = $this->orderInterfaceFactory->create();
-					$response       = $this->curl->getBody();
-					$obj            = json_decode($response);
-					$responseStatus = $obj->transactionStatus;
-					$success        = Config::TRANSACTION_STATUS_SUCCESS;
-					$decline        = Config::TRANSACTION_STATUS_DECLINED;
-					$pending        = Config::TRANSACTION_STATUS_NOPAYMENT;
+					$refTrxNumber = RefundInterface::PREFIX_REFUND . $this->helperData->genRefNumber() . $orderId;
+					foreach ($loadItemByOrderId as $itemOrder) {
+						$paidPriceOrder = $itemOrder->getPaidPrice();
+						$qtyOrder       = $itemOrder->getQty();
+						$qtyAllocated   = $itemOrder->getQtyAllocated();
+						$amount         = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 
-					$this->helperData->sprintLog()->info('Response Data = ' . json_encode($obj));
-					$this->helperData->sprintLog()->info('===== Capture Process ===== End');
-
-					if ($responseStatus === $success || $decline || $pending) {
-						$this->helperData->sprintLog()->info('===== Refund Process ===== Start');
-
-						$amount = 0;
-						/**
-						 * prepare data array refund send to PG
-						 */
-						foreach ($loadItemByOrderId as $itemOrder) {
-							$paidPriceOrder = $itemOrder->getPaidPrice();
-							$qtyOrder       = $itemOrder->getQty();
-							$qtyAllocated   = $itemOrder->getQtyAllocated();
-							$amount         = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
-
-							$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
-							$this->creditMemos($entityIdSalesOrder, $itemId, $qtyAllocated);
-						}
-
-						$refTrxNumber = RefundInterface::PREFIX_REFUND . $this->helperData->genRefNumber() . $orderId;
-
-						$dataRefund                      = array();
-						$dataRefund['channelId']         = $channelId;
-						$dataRefund['serviceCode']       = $serviceCode;
-						$dataRefund['transactionNo']     = $refTrxNumber;
-						$dataRefund['transactionReffId'] = RefundInterface::PREFIX_CAPTURE . $orderId;
-						if ($itemData['quantity_allocated'] === 0) {
-							$dataRefund['transactionAmount'] = $trxAmount;
-							$saveOrderItem->setGrandTotal($trxAmount);
-						} else {
-							$dataRefund['transactionAmount'] = $matrixAdjusmentAmount;
-							$saveOrderItem->setGrandTotal($matrixAdjusmentAmount);
-						}
-						$dataRefund['transactionType'] = RefundInterface::REFUND;
-						try {
-							$this->curl->setOption(CURLOPT_RETURNTRANSFER, true);
-							$this->curl->post($urlPg, $dataRefund);
-						} catch (\Exception $e) {
-							$this->logger->info('Refund error = ' . $e->getMessage());
-						};
-						$responseRf = $this->curl->getBody();
-						$objRf      = json_decode($responseRf);
-
-						/* update quantity adjusment */
-						$url            = $this->orderConfig->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
-						$headers        = $this->getHeader();
-						$dataAdjustment = array(
-							'reference_number' => $reffId,
-							'status' => 3,
-							'amount_adjustment' => ceil($matrixAdjusmentAmount),
-
-						);
-						$dataJson = json_encode($dataAdjustment);
-						$this->loggerOrder->info($dataJson);
-
-						$this->curl->setOption(CURLOPT_RETURNTRANSFER, true);
-						$this->curl->setOption(CURLOPT_CUSTOMREQUEST, 'PATCH');
-						$this->curl->setHeaders($headers);
-						$this->curl->post($url, $dataJson);
-						$responseOrder = $this->curl->getBody();
-						$this->loggerOrder->info('$headers : ' . json_encode($headers));
-						$this->loggerOrder->info('$responseOrder : ' . $responseOrder);
-						$objOrder = json_decode($responseOrder);
-						$this->loggerOrder->info('Body: ' . $dataJson . '. Response: ' . $responseOrder);
-						$json_string = stripcslashes($responseOrder);
-						if ($objOrder->code == 200) {
-							return json_decode($responseOrder, true);
-						}
-
-						/* save to table sales_order_item */
-						$saveOrderItem = $this->orderItemFactory->create();
-						$saveOrderItem->setQtyRefunded($itemData['quantity_allocated']);
-						$this->orderItemRepository->save($saveOrderItem);
-
-						/* save to table sales_order */
-						$this->orderRepoInterface->save($saveOrderItem);
-
-						/* save to table integration_oms_refund */
-						$saveRefundData = $this->refundInterface->create();
-						$saveRefundData->setOrderRefNumber($idsOrder->getReferenceNumber());
-						$saveRefundData->setRefundTrxNumber($refTrxNumber);
-						$saveRefundData->setOrderId($orderId);
-						$saveRefundData->setSku($item['sku']);
-						$saveRefundData->setQtyRefund($itemData['quantity_allocated']);
-						$saveRefundData->setAmountRefundOrder($matrixAdjusmentAmount);
-
-						$this->refundRepository->save($saveRefundData);
-
-						$this->helperData->sprintLog()->info('Response Data = ' . json_encode($objRf));
-						$this->helperData->sprintLog()->info('===== Refund Process ===== End');
+						$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
+						$this->creditMemos($entityIdSalesOrder, $itemId, $qtyAllocated);
 					}
+
+					/* update quantity adjusment */
+					$url            = $this->orderConfig->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
+					$headers        = $this->getHeader();
+					$dataAdjustment = array(
+						'reference_number' => $reffId,
+						'status' => 3,
+						'amount_adjustment' => ceil($matrixAdjusmentAmount),
+
+					);
+					$dataJson = json_encode($dataAdjustment);
+					$this->loggerOrder->info($dataJson);
+
+					$this->curl->setOption(CURLOPT_RETURNTRANSFER, true);
+					$this->curl->setOption(CURLOPT_CUSTOMREQUEST, 'PATCH');
+					$this->curl->setHeaders($headers);
+					$this->curl->post($url, $dataJson);
+					$responseOrder = $this->curl->getBody();
+					$this->loggerOrder->info('$headers : ' . json_encode($headers));
+					$this->loggerOrder->info('$responseOrder : ' . $responseOrder);
+					$objOrder = json_decode($responseOrder);
+					$this->loggerOrder->info('Body: ' . $dataJson . '. Response: ' . $responseOrder);
+					$json_string = stripcslashes($responseOrder);
+					if ($objOrder->code == 200) {
+						return json_decode($responseOrder, true);
+					}
+
+					/* save to table integration_oms_refund */
+					$saveRefundData = $this->refundInterface->create();
+					$saveRefundData->setOrderRefNumber($idsOrder->getReferenceNumber());
+					$saveRefundData->setRefundTrxNumber($refTrxNumber);
+					$saveRefundData->setOrderId($orderId);
+					$saveRefundData->setSku($item['sku']);
+					$saveRefundData->setQtyRefund($itemData['quantity_allocated']);
+					$saveRefundData->setAmountRefundOrder($matrixAdjusmentAmount);
+
+					$this->refundRepository->save($saveRefundData);
 				}
 			}
 		}
