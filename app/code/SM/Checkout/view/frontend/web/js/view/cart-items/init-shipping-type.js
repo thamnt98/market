@@ -817,13 +817,9 @@ define([
                                 }
                             });
                             if (singleDeliveryMethodValid.indexOf(selectSingleShippingMethod()) === -1) {
-                                if (!globalVar.splitOrder()) {
-                                    processing = false;
-                                    singleDeliveryMethodError(true);
-                                } else {
-                                    processing = true;
-                                }
+                                processing = true;
                                 selectSingleShippingMethod(firsValidShippingMethod);
+                                processing = false;
                             }
                             return false;
                         });
