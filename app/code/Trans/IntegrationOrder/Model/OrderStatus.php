@@ -566,7 +566,7 @@ class OrderStatus implements OrderStatusInterface {
 					]
 				);
 			}
-			if ($paymentMethod === 'sprint_bca_va' || 'sprint_permata_va') {
+			if ($paymentMethod === 'sprint_bca_va' || $paymentMethod === 'sprint_permata_va') {
 				foreach ($loadItemByOrderId as $itemOrder) {
 					$paidPriceOrder = $itemOrder->getPaidPrice();
 					$qtyOrder       = $itemOrder->getQty();
@@ -605,7 +605,7 @@ class OrderStatus implements OrderStatusInterface {
 			}
 			/* End Non CC*/
 
-			if ($paymentMethod === 'sprint_mega_cc' || 'sprint_allbankfull_cc' || 'sprint_mega_debit') {
+			if ($paymentMethod === 'sprint_mega_cc' || $paymentMethod === 'sprint_allbankfull_cc' || $paymentMethod === 'sprint_mega_debit') {
 				if ($itemData['quantity'] > $itemData['quantity_allocated']) {
 					/**
 					 * prepare data array refund send to PG
