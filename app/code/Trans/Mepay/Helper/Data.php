@@ -17,13 +17,14 @@ use Magento\Framework\App\Helper\Context;
 use Trans\Mepay\Model\Config\Provider\Cc;
 use Trans\Mepay\Model\Config\Provider\Qris;
 use Trans\Mepay\Model\Config\Provider\Va;
+use Trans\Mepay\Model\Config\Provider\Debit;
 
 class Data extends AbstractHelper
 {
   /**
    * @var array
    */
-  const BANK_MEGA_PAYMENT_METHOD = [ Cc::CODE_CC, Qris::CODE_QRIS, Va::CODE_VA ];
+  const BANK_MEGA_PAYMENT_METHOD = [ Cc::CODE_CC, Qris::CODE_QRIS, Va::CODE_VA, Debit::CODE ];
 
   /**
    * Constructor
