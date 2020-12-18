@@ -194,6 +194,10 @@ class IntegrationStock implements IntegrationStockInterface {
 		$sources = [];
 		$productIds = [];
 		$dataStockList = [];
+		
+		$monitoringStockSql = "update monitoring_stock set has_processed = 1, processed_at = current_timestamp() where writer_id in ";
+		$monitoringStockLabelKey = "writer_id";
+		$monitoringStockIds = [];
 
 		$messageValue = '';
 
@@ -213,7 +217,7 @@ class IntegrationStock implements IntegrationStockInterface {
 		$dataJobs->setStatus(IntegrationJobInterface::STATUS_PROGRESS_CATEGORY);
 		$this->integrationJobRepositoryInterface->save($dataJobs);
 
-		$connectionCheck = $this->resourceConnection->getConnection();
+		$connectionCheck = $this->resourceConnection->getConnection();		
 
 		try{
 			foreach ($datas as $data) {
@@ -230,6 +234,10 @@ class IntegrationStock implements IntegrationStockInterface {
 					'checkSource' => $checkSource,
 					'data' => $data
 				);
+
+				if (!empty($dataStock[$monitoringStockLabelKey])) {
+					$monitoringStockIds[] = $dataStock[$monitoringStockLabelKey];
+				}				
 			}
 
 			$attributeCodes = ['is_fresh', 'weight', 'sold_in'];
@@ -276,7 +284,7 @@ class IntegrationStock implements IntegrationStockInterface {
 		                        "source_code"=>"".$locationCode."",
 		                        "sku"=>"".$productSku."",
 		                        "quantity"=>"".$quantity."",
-		                        "status"=>"1"
+		                        "status"=> ($quantity > 0 ? "1" : "0")
 		                    ];
 
 						$this->logger->info("success data");
@@ -295,8 +303,9 @@ class IntegrationStock implements IntegrationStockInterface {
 
 			$connectionCheck->insertOnDuplicate("inventory_source_item", $dataStockList, ['quantity']);
 			$this->reindexByStockIdAndProductsId(1, $skus);
-			$this->reindexByStockIdAndProductsId(2, $skus);
-		}catch(Exception $exception){
+			$this->reindexByStockIdAndProductsId(2, $skus);			
+
+		} catch(Exception $exception){
 			$this->logger->info("error : " . $exception->getMessage());
 			if ($dataJobs) {
 				$dataJobs->setMessage($exception->getMessage());
@@ -322,6 +331,33 @@ class IntegrationStock implements IntegrationStockInterface {
 		$dataJobs->setStatus(IntegrationJobInterface::STATUS_COMPLETE);
 
 		$this->integrationJobRepositoryInterface->save($dataJobs);
+
+
+		try {
+
+			if (!empty($monitoringStockIds)) {
+
+				$monitoringStockSql .= "(" . implode(",", $monitoringStockIds) . ")";
+				$this->logger->info("monitoring_stock query: " + $monitoringStockSql);
+				
+				$this->logger->info("start executing monitoring_stock query");
+				
+				$startTime = microtime(true);				
+				$monitoringQueryResult = $connectionCheck->exec($monitoringStockSql);
+
+				$this->logger->info("finish executing monitoring_stock query" + 
+					" - result: " + $monitoringQueryResult +
+					" - duration: " + (microtime(true) - $startTime) . " second");
+				
+			}
+
+		}
+		catch (Exception $exception) {
+
+			$this->logger->info("failed executing monitoring_stock query");
+
+		}
+
 
 		return $dataStockList;
 	}
