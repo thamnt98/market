@@ -254,10 +254,10 @@ class IntegrationStock implements IntegrationStockInterface {
 
 				$productSku = $this->validateSku($productSku, $stockData);
 
-				if(!array_key_exists($productSku, $stockData)){
+				if(!isset($stockData[$productSku])){
 					continue;
 				}
-				
+					
 				$checkSource = $stockData[$productSku]['checkSource'];
 				$locationCode = $stockData[$productSku]['locationCode'];
 				$quantity = $stockData[$productSku]['quantity'];

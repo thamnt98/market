@@ -743,7 +743,7 @@ class StorePriceLogic implements StorePriceLogicInterface
                 $data['promo_selling_price']
             );
             foreach ($productPriceAttributes as $key => $value) {
-                if (\array_key_exists($key, $attributeIdMap) == false) {
+                if(!isset($attributeIdMap[$key])){
                     $attributeIdMap[$key] = $this->saveAttributeProduct($key, $product->getSku());
                 }
                 $inputList[] = [

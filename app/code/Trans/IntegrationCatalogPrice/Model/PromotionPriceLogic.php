@@ -2460,8 +2460,8 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                         if (isset($ruleDataArray['conditions'])) {
                             $conditions = $ruleDataArray['conditions'];
                             foreach ($conditions as $key => $condition) {
-                                if (array_key_exists('value', $ruleDataArray)) {
-                                    $ruleDataArray['conditions'][$key]['value'] = $dataPass['required_point'];
+                                if(isset($ruleDataArray['value'])){
+                                    $ruleDataArray['conditions'][$key]['value'] = $dataPass['required_point'];                                    
                                 }
                             }
                         }
