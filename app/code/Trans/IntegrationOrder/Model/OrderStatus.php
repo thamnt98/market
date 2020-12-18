@@ -539,7 +539,7 @@ class OrderStatus implements OrderStatusInterface {
 		$serviceCode       = $this->configPg->getPaymentChannelRefundServicecode($paymentMethod);
 		$urlPg             = $this->configPg->getApiBaseUrl($paymentMethod) . '/' . Config::REFUND_POST_URL;
 		$loadItemByOrderId = $this->statusRepo->loadByOrderId($orderId);
-
+		$trxAmount         = (int) $loadDataOrder->getGrandTotal();
 		/** Load Item By Order Id */
 		$fetchData = $this->statusRepo->loadItemByOrderIds($entityIdSalesOrder);
 		$itemId    = $fetchData->getItemId();
