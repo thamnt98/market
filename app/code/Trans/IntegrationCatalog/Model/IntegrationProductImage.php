@@ -294,7 +294,7 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 					$imageUrl = isset($dataValue['image_url']) ? $dataValue['image_url'] : '';
 
 					if(!empty($sku)){
-						if(array_key_exists($sku, $products)){
+						if(isset($products[$sku])){
 							$products[$sku]['images'][] = array(
 								'imageUrl' => $imageUrl,
 								'filename' => $filename
@@ -344,7 +344,7 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 
 				$sku = $this->validateSku($sku, $products);
 
-				if(!array_key_exists($sku, $products)){
+				if(!isset($products[$sku])){
 					$this->logger->info("key not exist for $sku");
 					continue;
 				}
@@ -380,9 +380,10 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 						$this->logger->info('save image data');
 						$tmpImage = $this->saveImageData($productCollection, $filename, [$imageUrl], $imageAttr);
 	
-						$this->logger->info('delete tmp file');
-						$this->deleteTmpFile($tmpImage);
 						try {
+							$this->logger->info('delete tmp file');
+							$this->deleteTmpFile($tmpImage);
+							
 							$file = $tmpImage[0];
 	
 							$filepath = $file['filename'];
