@@ -98,7 +98,8 @@ class OrderStatus implements OrderStatusInterface {
 		\Trans\IntegrationOrder\Api\IntegrationOrderPaymentRepositoryInterface $orderPaymentRepo,
 		\Trans\Sprint\Helper\Config $configPg,
 		\Trans\IntegrationOrder\Api\RefundRepositoryInterface $refundRepository,
-		\Trans\IntegrationOrder\Api\Data\RefundInterfaceFactory $refundInterface
+		\Trans\IntegrationOrder\Api\Data\RefundInterfaceFactory $refundInterface,
+		\Trans\Mepay\Helper\Payment\Transaction $transactionMegaHelper
 	) {
 		$this->eventManager                       = $eventManager;
 		$this->order                              = $order;
@@ -133,6 +134,7 @@ class OrderStatus implements OrderStatusInterface {
 		$this->itemCreationFactory                = $itemCreationFactory;
 		$this->invoice                            = $invoice;
 		$this->invoiceFactory                     = $invoiceFactory;
+		$this->transactionMegaHelper              = $transactionMegaHelper;
 
 		$this->loggerOrder = $helperData->getLogger();
 	}
@@ -530,11 +532,11 @@ class OrderStatus implements OrderStatusInterface {
 		 * preparing data for refund PG
 		 */
 		$refNumber         = $idsOrder->getReferenceNumber();
+		$parentIdFetch     = $this->transactionMegaHelper->getSalesOrderArray($refNumber);
+		$parentEntityId    = $parentIdFetch['entity_id'];
 		$paymentMethod     = $loadDataOrder->getPayment()->getMethod();
 		$channelId         = $this->configPg->getPaymentChannelId($paymentMethod);
-		$serviceCode       = $this->configPg->getPaymentChannelRefundServicecode($paymentMethod);
-		$reffId            = $idsOrder->getReferenceNumber();
-		$trxAmount         = (int) $loadDataOrder->getGrandTotal();
+		$serviceCode       = $this->configPg->getPaymentChannelRefundServicecode($paymentMethod);();
 		$urlPg             = $this->configPg->getApiBaseUrl($paymentMethod) . '/' . Config::REFUND_POST_URL;
 		$loadItemByOrderId = $this->statusRepo->loadByOrderId($orderId);
 
@@ -558,7 +560,7 @@ class OrderStatus implements OrderStatusInterface {
 
 					$this->loggerOrder->info('===== Credit Memo ===== Start');
 
-					$credit       = $this->creditMemos($entityIdSalesOrder, $itemId, $qtyAllocated);
+					$credit       = $this->creditMemos($parentEntityId, $itemId, $qtyAllocated);
 					$creditEncode = json_encode($credit);
 
 					$this->loggerOrder->info('$creditEncode : ' . $creditEncode);
@@ -569,7 +571,7 @@ class OrderStatus implements OrderStatusInterface {
 				$url            = $this->orderConfig->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
 				$headers        = $this->getHeader();
 				$dataAdjustment = array(
-					'reference_number' => $reffId,
+					'reference_number' => $refNumber,
 					'status' => 3,
 					'amount_adjustment' => ceil($matrixAdjusmentAmount),
 
@@ -609,7 +611,7 @@ class OrderStatus implements OrderStatusInterface {
 
 						$this->loggerOrder->info('===== Credit Memo ===== Start');
 
-						$credit       = $this->creditMemos($entityIdSalesOrder, $itemId, $qtyAllocated);
+						$credit       = $this->creditMemos($parentEntityId, $itemId, $qtyAllocated);
 						$creditEncode = json_encode($credit);
 
 						$this->loggerOrder->info('$creditEncode : ' . $creditEncode);
@@ -628,7 +630,7 @@ class OrderStatus implements OrderStatusInterface {
 					$url            = $this->orderConfig->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
 					$headers        = $this->getHeader();
 					$dataAdjustment = array(
-						'reference_number' => $reffId,
+						'reference_number' => $refNumber,
 						'status' => 3,
 						'amount_adjustment' => ceil($matrixAdjusmentAmount),
 
