@@ -24,6 +24,7 @@ interface ParentOrderRepositoryInterface
     const STATUS_PROCESSING = "processing";
     const STATUS_IN_PROCESS = "in_process";
     const STATUS_IN_DELIVERY = "in_delivery";
+    const STATUS_FAILED_DELIVERY = "failed_delivery";
     const STATUS_DELIVERED = "delivered";
     const IN_PROCESS_WAITING_FOR_PICKUP = "in_process_waiting_for_pickup";
     const PICK_UP_BY_CUSTOMER = "pick_up_by_customer";
