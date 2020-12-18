@@ -703,6 +703,11 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
 
         $productInfo->setCouponLabel($this->getRuleLabel($product));
         $productInfo->setCouponTooltip($this->getRuleToolTip($product));
+        $discountPercent = $this->smCatalogHelper->getDiscountPercent($product);
+        if (!$discountPercent) {
+            $discountPercent = 0;
+        }
+        $productInfo->setDiscountPercent($discountPercent);
         return $productInfo;
     }
 
