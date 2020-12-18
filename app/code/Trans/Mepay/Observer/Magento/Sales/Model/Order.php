@@ -18,6 +18,7 @@ use Magento\Sales\Api\Data\OrderStatusHistoryInterfaceFactory;
 use Magento\Sales\Api\OrderStatusHistoryRepositoryInterface;
 use Trans\Mepay\Helper\Payment\Transaction as TransactionHelper;
 use Trans\Mepay\Model\Config\Config;
+use Trans\Mepay\Helper\Data;
 
 class Order implements ObserverInterface
 {
@@ -83,9 +84,11 @@ class Order implements ObserverInterface
     //set order state & status
     $order= $observer->getData(self::ORDER);
     $payment = $order->getPayment();
-    $order->setState($this->config->getOrderState($payment->getMethod()));
-    $order->setStatus($this->config->getOrderStatus($payment->getMethod()));
-    $this->orderRepo->save($order);
+    if (Data::isMegaMethod($payment->getMethod())) {
+        $order->setState($this->config->getOrderState($payment->getMethod()));
+        $order->setStatus($this->config->getOrderStatus($payment->getMethod()));
+        $this->orderRepo->save($order);
+    }
   }
 
   /**
@@ -95,9 +98,12 @@ class Order implements ObserverInterface
   public function setOrderStatusAfterPayment($order)
   {
     //set order history status
-    $statusHistory = $this->statusHistory->create();
-    $statusHistory->setParentId($order->getId());
-    $statusHistory->setStatus($this->config->getOrderStatus($payment->getMethod()));
-    $this->statusHistoryRepo->save($statusHistory);
+    $payment = $order->getPayment();
+    if (Data::isMegaMethod($payment->getMethod())) {
+        $statusHistory = $this->statusHistory->create();
+        $statusHistory->setParentId($order->getId());
+        $statusHistory->setStatus($this->config->getOrderStatus($payment->getMethod()));
+        $this->statusHistoryRepo->save($statusHistory);
+    }
   }
 }
