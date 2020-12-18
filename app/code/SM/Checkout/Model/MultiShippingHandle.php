@@ -503,31 +503,7 @@ class MultiShippingHandle
             $shippingMethodSelected = $item->getShippingMethodSelected();
             $addressIdSelected = $item->getShippingAddressId();
             if ($this->mobile) {
-                if ($item->getDisable()) {
-                    continue;
-                }
-                if ($item->getAdditionalInfo()) {
-                    $additionalInfo = $item->getAdditionalInfo()->getDelivery();
-                    $this->mobileItemsFormat[$quoteItemId] = [
-                        'shipping_method' => $shippingMethodSelected,
-                        'shipping_address' => $addressIdSelected,
-                        'qty' => $item->getQty(),
-                        'delivery' => [
-                            'date' => $additionalInfo->getDate(),
-                            'time' => $additionalInfo->getTime()
-                        ]
-                    ];
-                } else {
-                    $this->mobileItemsFormat[$quoteItemId] = [
-                        'shipping_method' => $shippingMethodSelected,
-                        'shipping_address' => $addressIdSelected,
-                        'qty' => $item->getQty(),
-                        'delivery' => [
-                            'date' => null,
-                            'time' => null
-                        ]
-                    ];
-                }
+                $this->mobileItemsFormat[$quoteItemId] = $item;
             }
             if (isset($currentParentItems[$quoteItemId])) {
                 unset($currentParentItems[$quoteItemId]);

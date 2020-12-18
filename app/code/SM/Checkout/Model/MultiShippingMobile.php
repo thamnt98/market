@@ -698,7 +698,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         } else {
             $voucherData = ['cart_total' => null, 'voucher_data' => null];
         }
-        $previewOrderProcess = $this->multiShippingHandle->getPreviewOrderData($checkoutSession->getQuote(), false, $dataHandle['data'], $items, $dataHandle['child-items']);
+        $previewOrderProcess = $this->multiShippingHandle->getPreviewOrderData($checkoutSession->getQuote(), false, $dataHandle['data'], $dataHandle['mobile-items-format'], $dataHandle['child-items']);
         $quoteItems = $previewOrderProcess['quote_item_data'];
         $this->disablePickUp = $previewOrderProcess['disable_store_pickup'];
         $skuList = $previewOrderProcess['sku-list'];
