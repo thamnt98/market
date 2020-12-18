@@ -29,7 +29,9 @@
             <!-- ko if: (JSON.parse($parent.options).length > 0)-->
             <div class="details-options">
                 <!--ko foreach: JSON.parse($parent.options)-->
-                <p class="option"><span data-bind="text: label"></span>: <span data-bind="html: value"></span></p>
+                    <!-- ko if: (value != '')-->
+                    <p class="option"><span data-bind="text: label"></span>: <span data-bind="html: value"></span></p>
+                    <!-- /ko -->
                 <!-- /ko -->
             </div>
             <!-- /ko -->
