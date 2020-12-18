@@ -596,7 +596,6 @@ class OrderStatus implements OrderStatusInterface {
 			/* End Non CC*/
 
 			if ($paymentMethod === 'sprint_mega_cc' || $paymentMethod === 'sprint_allbankfull_cc' || $paymentMethod === 'sprint_mega_debit' || $paymentMethod === 'trans_mepay_cc') {
-				if ($itemData['quantity'] > $itemData['quantity_allocated']) {
 					/**
 					 * prepare data array refund send to PG
 					 */
@@ -662,7 +661,6 @@ class OrderStatus implements OrderStatusInterface {
 					$saveRefundData->setAmountRefundOrder($matrixAdjusmentAmount);
 
 					$this->refundRepository->save($saveRefundData);
-				}
 			}
 		}
 
