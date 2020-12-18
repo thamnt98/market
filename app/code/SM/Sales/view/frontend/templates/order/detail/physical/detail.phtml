@@ -123,7 +123,8 @@ if ($parentOrder) {
                         <div class="tracking-order">
                             <?php if (!$isPickUp): ?>
 
-                                <a href="#" class="track-order" data-trigger="track-order"
+                                <a href="#" class="track-order"
+                                   data-trigger="track-order-<?= $subOrder->getId() ?>"
                                    data-gtm-event="track_order_click"
                                    data-gtm="<?= $block->escapeHtml($parentOrder->getParentOrderId()) ?>"><?= $block->escapeHtml(__('Order Updates')) ?></a>
                                 <div data-bind="mageInit: {
