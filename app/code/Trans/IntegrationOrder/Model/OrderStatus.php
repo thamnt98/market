@@ -536,7 +536,7 @@ class OrderStatus implements OrderStatusInterface {
 		$parentEntityId    = $parentIdFetch['entity_id'];
 		$paymentMethod     = $loadDataOrder->getPayment()->getMethod();
 		$channelId         = $this->configPg->getPaymentChannelId($paymentMethod);
-		$serviceCode       = $this->configPg->getPaymentChannelRefundServicecode($paymentMethod);();
+		$serviceCode       = $this->configPg->getPaymentChannelRefundServicecode($paymentMethod);
 		$urlPg             = $this->configPg->getApiBaseUrl($paymentMethod) . '/' . Config::REFUND_POST_URL;
 		$loadItemByOrderId = $this->statusRepo->loadByOrderId($orderId);
 
