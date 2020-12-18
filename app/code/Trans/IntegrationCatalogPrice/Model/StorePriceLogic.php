@@ -680,7 +680,8 @@ class StorePriceLogic implements StorePriceLogicInterface
             $this->saveProductPrices($inputList);
             $multiPrices = $this->getMultipriceData($existingSkuList, $dataList[self::SOURCE_LIST], $dataValueList);
             $productMappingData = $this->saveMultiPriceBulk($multiPrices);
-            $this->updateDataValueStatusBulk($multiPrices, IntegrationDataValueInterface::STATUS_DATA_SUCCESS, null);
+            // $this->updateDataValueStatusBulk($multiPrices, IntegrationDataValueInterface::STATUS_DATA_SUCCESS, null);
+            $this->updateDataValueStatusBulk($dataValueList, IntegrationDataValueInterface::STATUS_DATA_SUCCESS, null);
             $this->reindexByProductsIds($productInterfaces, ['catalog_product_attribute', 'catalogsearch_fulltext']);
         } catch (\Exception $e) {
             $this->logger->info($e->getMessage() . date('d-M-Y H:i:s'));
@@ -823,16 +824,17 @@ class StorePriceLogic implements StorePriceLogicInterface
      */
     public function saveMultiPriceBulk($dataList)
     {
+        $result = array();
         try {
             $this->logger->info('Before save multi price ' . date('d-M-Y H:i:s'));
             foreach ($dataList as $key => $value) {
-                $dataList[$key] = $this->validateParams($dataList[$key]);
-                $dataList[$key]['status'] = 1;
+                $result[$key] = $this->validateParams($dataList[$key]);
+                $result[$key]['status'] = 1;
             }
             $tableName = $this->connection->getTableName('integration_catalog_store_price');
-            $this->connection->insertOnDuplicate($tableName, $dataList);
-            $this->logger->info("SKU Catalog Price Updated ---> \n ".print_r($dataList, true)."\n");
-            return $dataList;
+            $this->connection->insertOnDuplicate($tableName, $result);
+            $this->logger->info("SKU Catalog Price Updated ---> \n ".print_r($result, true)."\n");
+            return $result;
         } catch (\Exception $e) {
             var_dump($e->getMessage());
             $this->logger->critical('Error occurred ' . $e->getMessage().' '.date('d-M-Y H:i:s'));
