@@ -100,12 +100,18 @@ class Transaction extends AbstractHelper
   protected $sortOrderBuilder;
 
   /**
+   * @var \Magento\Sales\Model\ResourceModel\Order
+   */
+  protected $salesOrderResource;
+
+  /**
    * Constructor
    * @param Context                        $context
    * @param SearchCriteriaBuilder          $searchBuilder
    * @param OrderRepositoryInterface       $orderRepo
    * @param OrderInterfaceFactory          $orderfactory
    * @param TransactionRepositoryInterface $transactionRepo
+   * @param \Magento\Sales\Model\ResourceModel\Order $salesOrderResource
    * @param TransactionBuilder             $transactionBuilder
    * @param  LoggerWrite $logger
    */
@@ -119,6 +125,7 @@ class Transaction extends AbstractHelper
     ResponseHelper $responseHelper,
     InquiryResponseHelper $inquiryResponseHelper,
     TransactionResponseHelper $transactionResponseHelper,
+    \Magento\Sales\Model\ResourceModel\Order $salesOrderResource,
     Json $json,
     SortOrderBuilder $sortOrderBuilder,
     LoggerWrite $logger
@@ -129,6 +136,7 @@ class Transaction extends AbstractHelper
     $this->transactionRepo = $transactionRepo;
     $this->transactionBuilder = $transactionBuilder;
     $this->responseHelper = $responseHelper;
+    $this->salesOrderResource = $salesOrderResource;
     $this->inquiryResponseHelper = $inquiryResponseHelper;
     $this->transactionResponseHelper = $transactionResponseHelper;
     $this->json = $json;
@@ -343,5 +351,27 @@ class Transaction extends AbstractHelper
     }
     $searchCriteria = $this->getSearchCriteria($param);
     return $this->transactionRepo->getList($searchCriteria);
+  }
+
+  /**
+   * Get sales order data by reference_number with raw query
+   *
+   * @param string $referenceNumber
+   * @return array
+   */
+  public function getSalesOrderArray($referenceNumber = null)
+  {
+    if($referenceNumber) {
+      $connection = $this->salesOrderResource->getConnection();
+      $table = $connection->getTableName('sales_order');
+
+      $query = $connection->select();
+      $query->from(
+        $table,
+        ['*']
+      )->where('reference_number = ?', $referenceNumber)->where('is_parent = ?', 1);
+
+      return $collection = $connection->fetchRow($query); 
+    }
   }
 }
