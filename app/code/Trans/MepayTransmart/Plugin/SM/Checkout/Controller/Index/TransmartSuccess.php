@@ -64,7 +64,7 @@ class TransmartSuccess
         'order_status' => $order->getStatus()
      ];
 
-      if ($order && $order->getStatus() == 'canceled') {
+      if ($order && (in_array($order->getStatus(), ['canceled','order_canceled']))) {
           $res['status'] = false;
           $res['message'] = 'payment failed';
           $res['order_status'] = $order->getStatus();
