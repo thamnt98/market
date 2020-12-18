@@ -710,7 +710,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
         //     }
         // }
 
-        // // // save bulk markdown
+        // // save bulk markdown
         // try {
         //     if ($dataMarkdown) {
         //         $connectionMarkdown = $this->resourceConnection->getConnection();
@@ -795,10 +795,6 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                 if ($savePromoPriceStoreStatus) {
                     if (!$checkIntPromoId) {
                         $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
-                        $this->logger->info('ga ada');
-                    }
-                    else {
-                        $this->logger->info('ada');
                     }
                 }
 
@@ -1038,8 +1034,27 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                             $dataPass['simple_action'] = 'eachn_fixprice';
                             $dataPass['discount_amount'] = $dataPass['promo_selling_price'];
                         }
-                        $result = $this->saveSalesRule($dataPass);
-                        $dataPass['salesrule_id'] = $result['rule_id'];
+
+                        // check if discount same rule
+                        try {
+                            $checkIntPromoTwoFixed = $this->promotionPriceRepositoryInterface->loadDataPromoTypeTwoBySameRuleFixed($dataPass);
+                        } catch (\Exception $e) {
+                            $this->logger->error("<=End " .$e->getMessage());
+                            throw new StateException(
+                                __(__FUNCTION__." - ".$e->getMessage())
+                            );
+                        }
+                        
+                        if (!$checkIntPromoTwoFixed) {
+                            $result = $this->saveSalesRule($dataPass);
+                            $dataPass['salesrule_id'] = $result['rule_id'];
+                        }
+                        else {
+                            $dataPass['same_rule'] = 1;
+                            $dataPass['salesrule_id'] = $checkIntPromoTwoFixed->getData('salesrule_id');
+                            $this->updateSalesRule($dataPass);
+                        }
+
                         break;
 
                     // promotype = 2 , disctype = 2
@@ -1077,8 +1092,27 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                         $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only: same as buy '.$dataPass['normal_price_qty'].' get '.$dataPass['promo_price_qty'].' with amount off (for the same item) ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                         $dataPass['simple_action'] = 'eachn_fixdisc';
                         $dataPass['discount_amount'] = $dataPass['amount_off'];
-                        $result = $this->saveSalesRule($dataPass);
-                        $dataPass['salesrule_id'] = $result['rule_id'];
+                        
+                        // check if discount same rule
+                        try {
+                            $checkIntPromoTwoFixed = $this->promotionPriceRepositoryInterface->loadDataPromoTypeTwoBySameRuleAmount($dataPass);
+                        } catch (\Exception $e) {
+                            $this->logger->error("<=End " .$e->getMessage());
+                            throw new StateException(
+                                __(__FUNCTION__." - ".$e->getMessage())
+                            );
+                        }
+                        
+                        if (!$checkIntPromoTwoFixed) {
+                            $result = $this->saveSalesRule($dataPass);
+                            $dataPass['salesrule_id'] = $result['rule_id'];
+                        }
+                        else {
+                            $dataPass['same_rule'] = 1;
+                            $dataPass['salesrule_id'] = $checkIntPromoTwoFixed->getData('salesrule_id');
+                            $this->updateSalesRule($dataPass);
+                        }
+                        
                         break;
                 }
 
