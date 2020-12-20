@@ -59,5 +59,30 @@ interface IntegrationGetUpdatesInterface
     public function setResponseData($channel,$response);
 
 
+    /**
+     * @param array $channel
+     * @return mixed
+     */
+    public function getFirstWaitingJobUsingRawQuery($channel);
+
+    /**
+     * @param array $channel
+     * @return array
+     */
+    public function prepareCallUsingRawQuery($channel);
+
+    /**
+     * @param array $channel
+     * @param array $response
+     * @return array
+    */
+    public function prepareStockDataUsingRawQuery($channel, $response);
+
+    /**
+     * @param array $channel
+     * @param array $data
+     * @return array
+    */
+    public function insertStockDataUsingRawQuery($channel, $data); 
 
 }

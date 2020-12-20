@@ -58,6 +58,11 @@ class IntegrationJobRepository implements IntegrationJobRepositoryInterface
      * @var integrationJobInterface
      */
     protected $interface;
+
+    /**
+     * @var ResourceConnection
+     */
+	protected $dbConnection;
     
     /**
      * @param integrationJobInterfaceFactory $integrationJobInterface
@@ -66,13 +71,16 @@ class IntegrationJobRepository implements IntegrationJobRepositoryInterface
         ResourceModel $resource,
         CollectionFactory $collectionFactory,
         IntegrationJobSearchResultInterfaceFactory $searchResultFactory,
-        IntegrationJobInterfaceFactory $interface
+        IntegrationJobInterfaceFactory $interface,
+        \Magento\Framework\App\ResourceConnection $resourceConnection
     ) {
         $this->resource = $resource;
 
         $this->collectionFactory = $collectionFactory;
         $this->searchResultFactory = $searchResultFactory;
         $this->interface = $interface;
+
+        $this->dbConnection = $resourceConnection->getConnection();
     }
 
     /**
@@ -369,5 +377,294 @@ class IntegrationJobRepository implements IntegrationJobRepositoryInterface
         return $data;
 
     }
+
+    /**
+     * @param $mdId int
+     * @param $status array
+     * @return mixed
+     */
+    public function getAnyByMdIdMultiStatusUsingRawQuery($mdId, $status)
+    {
+
+        try {
+
+            if (empty($mdId)) {
+                throw new StateException(__(
+                    'Parameter MD are empty !'
+                ));
+            }
+    
+            if (!is_array($status) || empty($status)) {
+                throw new StateException(__(
+                    'Parameter Status are empty !'
+                ));
+            }
+
+
+            $str = "select `id`, `md_id`, `batch_id`, `last_updated`, `total_data`, `limit`, `offset`, `start_job`, `end_job`, `message`, `hit`, `last_jb_id`, `status`, `created_at`, `updated_at`, `created_by`, `updated_by`
+            from `integration_catalogstock_job` where `md_id` = %d";
+    
+            $sql = sprintf($str, $mdId);
+
+            $strStatus = "";
+
+            foreach ($status as $st) {
+                $strStatus .= sprintf(",%d", $st);
+            }
+
+            if ($strStatus == "") {
+                throw new StateException(__(
+                    'Parameter Status are empty !'
+                ));
+            }
+
+            $sql .= " and `status` in (" . substr($strStatus, 1) . ") limit 1";    
+
+            return $this->dbConnection->fetchRow($sql);
+
+        } 
+        catch (\Exception $ex) {
+            throw new StateException(__(
+                $ex->getMessage()
+             ));
+        }
+        
+    }
+
+    /**
+     * @param int $mdId
+     * @param int $status
+     * @return mixed
+     */
+    public function getFirstByMdIdStatusUsingRawQuery($mdId, $status)
+    {
+
+        try  {
+
+            if (empty($mdId)) {
+                throw new StateException(__(
+                    'Parameter MD are empty !'
+                ));
+            }
+
+            if (empty($status)) {
+                throw new StateException(__(
+                    'Parameter Status are empty !'
+                ));
+            }
+            
+            $str = "select `id`, `md_id`, `batch_id`, `last_updated`, `total_data`, `limit`, `offset`, `start_job`, `end_job`, `message`, `hit`, `last_jb_id`, `status`, `created_at`, `updated_at`, `created_by`, `updated_by`
+            from `integration_catalogstock_job` where `id` = (select min(`id`) from `integration_catalogstock_job` where `md_id` = %d and `status` = %d) limit 1";
+    
+            $sql = sprintf($str, $mdId, $status);
+    
+            return $this->dbConnection->fetchRow($sql);
+
+        } 
+        catch (\Exception $ex) {
+            throw new StateException(__(
+                $ex->getMessage()
+             ));
+        }
+        
+    }    
+
+    /**
+     * @param int $mdId
+     * @param int $status
+     * @return mixed
+     */
+    public function getLastByMdIdStatusUsingRawQuery($mdId, $status)
+    {
+     
+        try {            
+
+            if (empty($mdId)) {
+                throw new StateException(__(
+                    'Parameter MD are empty !'
+                ));
+            }
+
+            if (empty($status)) {
+                throw new StateException(__(
+                    'Parameter Status are empty !'
+                ));
+            }
+            
+            $str = "select `id`, `md_id`, `batch_id`, `last_updated`, `total_data`, `limit`, `offset`, `start_job`, `end_job`, `message`, `hit`, `last_jb_id`, `status`, `created_at`, `updated_at`, `created_by`, `updated_by`
+            from `integration_catalogstock_job` where `id` = (select max(`id`) from `integration_catalogstock_job` where `md_id` = %d and `status` = %d) limit 1";
+    
+            $sql = sprintf($str, $mdId, $status);
+
+            return $this->dbConnection->fetchRow($sql);
+
+        } 
+        catch (NoSuchEntityException $ex) {
+            throw new StateException(__(
+                $ex->getMessage()
+             ));
+        }
+
+    }    
+
+    /**
+     * @param array $inserts
+     * @return int
+     */
+    public function insertBulkUsingRawQuery($inserts) {
+
+        try {
+
+            if (!is_array($inserts) || empty($inserts)) {
+                throw new StateException(__(
+                    'Parameter Inserts are empty !'
+                ));
+            }
+
+            $columns = array("id" => true, "md_id" => true, "batch_id" => true, "last_updated" => true, "total_data" => true, "limit" => true, "offset" => true, "start_job" => true, "end_job" => true, "message" => true, "hit" => true, "last_jb_id" => true, "status" => true, "created_at" => true, "updated_at" => true, "created_by" => true, "updated_by" => true);
+
+            $bulk = array();
+
+            foreach ($inserts as $insert) {
+
+                $record = array();
+
+                foreach($insert as $key => $value) {
+                    if (isset($columns[$key])) {
+                        $record[$key] = $value;                        
+                    }
+                }
+    
+                if (empty($record)) {
+                    throw new StateException(__(
+                        'Parameter Inserts are empty !'
+                    ));
+                }
+
+                $bulk[] = $record;
+                                
+            }
+            
+            if (empty($bulk)) {
+                throw new StateException(__(
+                    'Parameter Inserts are empty !'
+                ));
+            }
+    
+            return $this->dbConnection->insertMultiple("integration_catalogstock_job", $bulk);
+
+        }
+        catch (\Exception $ex) {
+            throw new StateException(
+                __($ex->getMessage())
+            );
+        }
+
+    }
+
+
+    /**
+     * @param int $id
+     * @param int $mdId
+     * @param int $status
+     * @return mixed
+     */
+    public function getByIdMdIdStatusUsingRawQuery($id, $mdId, $status)
+    {
+     
+        try {            
+
+            if (empty($id)) {
+                throw new StateException(__(
+                    'Parameter ID are empty !'
+                ));
+            }
+    
+            if (empty($mdId)) {
+                throw new StateException(__(
+                    'Parameter MD are empty !'
+                ));
+            }
+
+            if (empty($status)) {
+                throw new StateException(__(
+                    'Parameter Status are empty !'
+                ));
+            }
+            
+            $str = "select `id`, `md_id`, `batch_id`, `last_updated`, `total_data`, `limit`, `offset`, `start_job`, `end_job`, `message`, `hit`, `last_jb_id`, `status`, `created_at`, `updated_at`, `created_by`, `updated_by`
+            from `integration_catalogstock_job` where `id` = %d and `md_id` = %d and `status` = %d limit 1";
+    
+            $sql = sprintf($str, $id, $mdId, $status);
+            
+            return $this->dbConnection->fetchRow($sql);
+
+        } 
+        catch (\Exception $ex) {
+            throw new StateException(__(
+                $ex->getMessage()
+             ));
+        }        
+
+    }
+
+    /**
+     * @param int $id
+     * @param array $updates
+     * @return int
+     */
+    public function updateUsingRawQuery($id, $updates) {
+
+        try {
+
+            if (empty($id)) {
+                throw new StateException(__(
+                    'Parameter ID are empty !'
+                ));    
+            }
+
+            if (!is_array($updates) || empty(($updates))) {
+                throw new StateException(__(
+                    'Parameter Updates are empty !'
+                ));
+            }
+
+            $columns = array("md_id" => true, "batch_id" => true, "last_updated" => true, "total_data" => true, "limit" => true, "offset" => true, "start_job" => true, "end_job" => true, "message" => true, "hit" => true, "last_jb_id" => true, "status" => true, "created_at" => true, "updated_at" => true, "created_by" => true, "updated_by" => true);
+
+            $clause = "";
+            
+            foreach($updates as $key => $value) {
+
+                if (isset($columns[$key])) {                    
+
+                    if ($value === null) {
+                        $clause .= ",`{$key}` = null";
+                    }
+                    else {
+                        $clause .= ",`{$key}` = '{$value}'";
+                    }
+
+                }
+
+            }
+
+            if ($clause == "") {
+                throw new StateException(__(
+                    'Parameter Updates are empty !'
+                ));
+            }
+            
+            $sql = sprintf("update `integration_catalogstock_job` set " . substr($clause, 1) . " where `id` = %d", $id);
+
+            return $this->dbConnection->exec($sql);
+
+        }
+        catch (\Exception $ex) {
+            throw new StateException(
+                __($ex->getMessage())
+            );
+        }
+
+    }    
 
 }

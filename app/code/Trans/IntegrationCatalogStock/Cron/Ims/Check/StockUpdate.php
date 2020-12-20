@@ -34,17 +34,14 @@ class StockUpdate {
     protected $checkUpdates;
 
 
-
     public function __construct(
-        \Trans\IntegrationCatalogStock\Logger\Logger $logger
-        ,IntegrationCommonInterface $commonRepository
-        ,IntegrationCheckUpdatesInterface $checkUpdates
-
-        ) {
+        \Trans\IntegrationCatalogStock\Logger\Logger $logger,
+        IntegrationCommonInterface $commonRepository,
+        IntegrationCheckUpdatesInterface $checkUpdates
+    ) {
         $this->logger = $logger;
-        $this->commonRepository=$commonRepository;
-        $this->checkUpdates=$checkUpdates;
-
+        $this->commonRepository = $commonRepository;
+        $this->checkUpdates = $checkUpdates;
     }
 
    /**
@@ -52,6 +49,57 @@ class StockUpdate {
     *
     * @return void
     */
+
+    public function execute() {
+
+        $startTime = microtime(true);
+
+        $label = "stock-check";
+        $label .= " --> ";
+
+        $this->logger->info($label . "start");
+
+        try {
+            
+            $this->logger->info($label . "retrieving channel-integration-metadata");
+            $channelIntegrationMetadata = $this->commonRepository->prepareChannelUsingRawQuery("product-stock-update");
+            $this->logger->info($label . "channel-integration-metadata = " . print_r($channelIntegrationMetadata, true));
+
+            $this->logger->info($label . "retrieving on-progress-job");
+            $this->checkUpdates->checkOnProgressJobUsingRawQuery($channelIntegrationMetadata);
+            $this->logger->info($label . "channel-integration-metadata = " . print_r($channelIntegrationMetadata, true));
+
+            $this->logger->info($label . "retrieving last-complete-job");
+            $channelIntegrationMetadata = $this->checkUpdates->getLastCompleteJobUsingRawQuery($channelIntegrationMetadata);
+            $this->logger->info($label . "channel-integration-metadata = " . print_r($channelIntegrationMetadata, true));
+
+            $this->logger->info($label . "preparing to call stock-check-api");
+            $callData = $this->checkUpdates->prepareCallUsingRawQuery($channelIntegrationMetadata);
+            $this->logger->info($label . "call-data = " . print_r($callData, true));
+
+            $this->logger->info($label . "calling stock-check-api");
+            $callResponse = $this->commonRepository->doCallUsingRawQuery($data);
+            $this->logger->info($label . "call-response = " . print_r($callResponse, true));
+
+            $this->logger->info($label . "preparing job-candidates based on stock-check-api result");
+            $jobCandidates = $this->checkUpdates->prepareJobCandidatesUsingRawQuery($channelIntegrationMetadata, $callResponse);
+            $this->logger->info($label . "job-candidates = " . print_r($jobCandidates, true));
+            
+            $this->logger->info($label . "persisting job-candidates into job-temporary-table db");
+            $persistingResult = $this->checkUpdates->insertJobCandidatesUsingRawQuery($jobCandidates);
+            $this->logger->info($label . "persisting-result = " . print_r($persistingResult, true));
+            $this->logger->info($label . "complete");
+       
+        }
+        catch (\Exception $ex) {
+            $this->logger->info($label . "exception = " . strtolower($ex->getMessage()));
+        }
+
+        $this->logger->info($label . "finish " . (microtime(true) - $startTime) . " second");
+
+    }
+    
+    /*
     public function execute() {
         $class = str_replace(IntegrationCheckUpdatesInterface::CRON_DIRECTORY,"",get_class($this));
 
@@ -85,6 +133,7 @@ class StockUpdate {
         }
         $this->logger->info("<=End ".$class);
     }
+    */
 
 
 

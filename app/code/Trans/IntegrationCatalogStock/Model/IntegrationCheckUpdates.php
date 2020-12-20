@@ -616,6 +616,313 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
     }
 
 
+    /**
+     * @param array $channel
+     * @return mixed
+     */
+    public function checkOnProgressJobUsingRawQuery($channel) 
+    {
 
+        try {
+
+            if (empty($channel['method'])) {
+                throw new StateException(
+                    __(IntegrationCommonInterface::MSG_METHOD_NOTAVAILABLE)
+                );
+            }    
+
+            $job = $this->jobRepository->getAnyByMdIdMultiStatusUsingRawQuery(
+                $channel['method']['id'],
+                [
+                    IntegrationJobInterface::STATUS_WAITING, 
+                    IntegrationJobInterface::STATUS_PROGRESS_CATEGORY, 
+                    IntegrationJobInterface::STATUS_READY
+                ]
+            );
+
+            if (!empty($job)) {
+                throw new StateException(
+                    __("On-Progress-Job found ... process aborted ...")
+                );
+            }
+
+            return $channel;
+
+        }
+        catch (\Exception $ex) {
+            throw new StateException(
+                __($ex->getMessage())
+            );
+        }
+        
+    }
+
+
+    /**
+     * @param array $channel
+     * @return mixed
+     */
+    public function getLastCompleteJobUsingRawQuery($channel) {
+
+        try {
+
+            if (empty($channel['method'])) {
+                throw new StateException(
+                    __(IntegrationCommonInterface::MSG_METHOD_NOTAVAILABLE)
+                );
+            }
+    
+            $lastCompleteJob = $this->jobRepository->getLastByMdIdStatusUsingRawQuery(
+                $channel['method']['id'], 
+                IntegrationJobInterface::STATUS_COMPLETE
+            );
+
+            if (!empty($lastCompleteJob)) {
+                $channel['last_complete_job'] = $lastCompleteJob;
+            }
+
+            return $channel;
+
+        }
+        catch (\Exception $ex) {
+            throw new StateException(
+                __($ex->getMessage())
+            );
+        }
+
+    }
+    
+
+    /**
+     * @param array $channel
+     * @return array
+     */
+    public function prepareCallUsingRawQuery($channel) {
+
+        try {
+
+            if (empty($channel['method'])) {
+                throw new StateException(
+                    __(IntegrationCheckUpdatesInterface::MSG_METHOD_NOTAVAILABLE)
+                );
+            }
+
+            if (empty($channel['channel'])) {
+                throw new StateException(
+                    __(IntegrationCheckUpdatesInterface::MSG_CHANNEL_NOTAVAILABLE)
+                );
+            }
+
+            $result = array();
+
+            $result[IntegrationChannelInterface::URL] = $channel['channel']['url'] . $channel['method']['path'];
+            $result[IntegrationChannelMethodInterface::HEADERS] = $this->curl->jsonToArray($channel['method']['headers']);
+
+            $result[IntegrationChannelMethodInterface::QUERY_PARAMS] = $this->curl->jsonToArray($channel['method']['query_params']);
+            $result[IntegrationChannelMethodInterface::QUERY_PARAMS]['_count'] = '*';            
+            
+            // Set _modified_at from last_complete_job if exists
+            if (!empty($channel['last_complete_job'])) {
+                $modifiedAt = date('Y-m-d H:i:s', strtotime($channel['last_complete_job']['last_updated']));                
+            }
+            else {
+                $magentoTime = $this->timezone->date(new \DateTime())->format('Y-m-d H:i:s');
+                $modifiedAt = date('Y-m-d H:i:s', strtotime('-1 day', strtotime($magentoTime)));
+            }
+
+            $result[IntegrationChannelMethodInterface::QUERY_PARAMS]['_modified_at'] = $modifiedAt;    
+
+            return $result;
+
+        }
+        catch (\Exception $ex) {
+            throw new StateException(
+                __($ex->getMessage())
+            );
+        }
+
+    }
+    
+
+     /**
+     * @param array $channel
+     * @param array $response
+     * @return array
+     */
+    public function prepareJobCandidatesUsingRawQuery($channel, $response) {
+
+        try {
+
+            if (empty($channel['method'])) {
+                throw new StateException(
+                    __(IntegrationCheckUpdatesInterface::MSG_METHOD_NOTAVAILABLE)
+                );
+            }
+    
+            if (empty($response['data'])) {
+                throw new StateException(
+                    __(IntegrationCheckUpdatesInterface::MSG_RESP_NOTAVAILABLE)
+                );
+            }
+        
+            if (empty($response['data']['count']) || $response['data']['count'] < 1) {
+                throw new StateException(
+                    __(IntegrationCheckUpdatesInterface::MSG_DATA_NOTAVAILABLE)
+                );
+            }
+            
+            $result = [];
+    
+            $result[IntegrationJobInterface::METHOD_ID] = $channel['method']['id'];
+    
+            //default status of integration_catalogstock_job is STATUS_WAITING == 1
+            $result[IntegrationJobInterface::STATUS] = IntegrationJobInterface::STATUS_WAITING;        
+    
+            if (!empty($channel['last_complete_job'])) {
+                $result[IntegrationJobInterface::LAST_JB_ID] = $channel['last_complete_job']['id'];
+            }
+
+            $result[IntegrationJobInterface::TOTAL_DATA] = $response['data']['count'];
+
+            if (!empty($channel['method']['limit'])) {
+                $result[IntegrationJobInterface::LIMIT] = $channel['method']['limit'];
+            }
+            else {
+                $result[IntegrationJobInterface::LIMIT] = IntegrationChannelMethodInterface::VAL_LIMIT;
+            }
+        
+            return $result;
+            
+        }
+        catch (\Exception $ex) {
+            throw new StateException(
+                __($ex->getMessage())
+            );
+        }
+
+    }
+    
+    
+    /**
+     * @param array $data
+     * @return array
+     */
+    public function insertJobCandidatesUsingRawQuery($data) {
+
+        try {
+
+            if (empty($data)) {
+                throw new StateException(
+                    __(IntegrationCheckUpdatesInterface::MSG_DATA_NOTAVAILABLE)
+                );
+            }
+
+            $result = [];            
+
+            $batchId = uniqid();
+            
+            $jobCandidatesNumber = ceil($data[IntegrationJobInterface::TOTAL_DATA] / $data[IntegrationJobInterface::LIMIT]);
+
+            for ($i = 0; $i < $jobCandidatesNumber; $i++) {
+                $result[$i][IntegrationJobInterface::BATCH_ID] = $batchId;
+                $result[$i][IntegrationJobInterface::STATUS] = $data[IntegrationJobInterface::STATUS];
+                $result[$i][IntegrationJobInterface::METHOD_ID] = $data[IntegrationJobInterface::METHOD_ID];
+                $result[$i][IntegrationJobInterface::TOTAL_DATA] = $data[IntegrationJobInterface::TOTAL_DATA];                
+                $result[$i][IntegrationJobInterface::LIMIT] = $data[IntegrationJobInterface::LIMIT];
+                $result[$i][IntegrationJobInterface::OFFSET] = $result[$i][IntegrationJobInterface::LIMIT] * $i;
+                if (!empty($data[IntegrationJobInterface::LAST_JB_ID])) {
+                    $result[$i][IntegrationJobInterface::LAST_JB_ID] = $data[IntegrationJobInterface::LAST_JB_ID];
+                }
+            }
+
+            return $this->jobRepository->insertBulkUsingRawQuery($result);
+
+        }
+        catch (\Exception $ex) {
+            throw new StateException(
+                __($ex->getMessage())
+            );
+        }
+
+    }
+    
+
+    /**
+     * @param $channel
+     * @return mixed
+     */
+    public function checkOnProgressDataSavingJobUsingRawQuery($channel) {
+
+        try {
+
+            if (empty($channel['method'])) {
+                throw new StateException(
+                    __(IntegrationCommonInterface::MSG_METHOD_NOTAVAILABLE)
+                );
+            }    
+
+            $job = $this->jobRepository->getAnyByMdIdMultiStatusUsingRawQuery(
+                $channel['method']['id'],
+                [
+                    IntegrationJobInterface::STATUS_PROGRESS_CATEGORY
+                ]
+            );
+
+            if (!empty($job)) {
+                throw new StateException(
+                    __('On-Progress-Data-Saving-Job found ... process aborted ...')
+                );
+            }
+
+            return $channel;
+
+        }
+        catch (\Exception $ex) {
+            throw new StateException(
+                __($ex->getMessage())
+            );
+        }
+
+    }
+    
+
+    /**
+     * @param array $channel
+     * @return mixed
+     */
+    public function getFirstDataReadyJobUsingRawQuery($channel) {
+
+        try {
+
+            if (empty($channel['method'])) {
+                throw new StateException(
+                    __(IntegrationCommonInterface::MSG_METHOD_NOTAVAILABLE)
+                );
+            }
+    
+            $job = $this->jobRepository->getFirstByMdIdStatusUsingRawQuery(
+                $channel['method']['id'],
+                IntegrationJobInterface::STATUS_READY
+            );
+
+            if (empty($job)) {
+                throw new StateException(
+                    __("First-Data-Ready-Job not found ... process aborted ...")
+                );
+            }
+
+            $channel['first_data_ready_job'] = $job;
+
+            return $channel;
+
+        }
+        catch (\Exception $ex) {
+            throw new StateException(
+                __($ex->getMessage())
+            );
+        }
+
+    }
+    
 
 }

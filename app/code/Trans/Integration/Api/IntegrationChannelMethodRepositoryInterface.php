@@ -65,5 +65,11 @@ interface IntegrationChannelMethodRepositoryInterface
      */
     public function getItemInTagByStatusActive($tag);
 
+    /**
+     * @param $tag
+     * @return array
+     */
+    public function getByStatusActiveUsingRawQuery($tag);    
+
 
 }
