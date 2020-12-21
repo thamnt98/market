@@ -257,7 +257,7 @@ class IntegrationStock implements IntegrationStockInterface {
 				if(!isset($stockData[$productSku])){
 					continue;
 				}
-					
+
 				$checkSource = $stockData[$productSku]['checkSource'];
 				$locationCode = $stockData[$productSku]['locationCode'];
 				$quantity = $stockData[$productSku]['quantity'];
@@ -338,16 +338,16 @@ class IntegrationStock implements IntegrationStockInterface {
 			if (!empty($monitoringStockIds)) {
 
 				$monitoringStockSql .= "(" . implode(",", $monitoringStockIds) . ")";
-				$this->logger->info("monitoring_stock query: " + $monitoringStockSql);
+				$this->logger->info("monitoring_stock query: " . $monitoringStockSql);
 				
 				$this->logger->info("start executing monitoring_stock query");
 				
 				$startTime = microtime(true);				
 				$monitoringQueryResult = $connectionCheck->exec($monitoringStockSql);
 
-				$this->logger->info("finish executing monitoring_stock query" + 
-					" - result: " + $monitoringQueryResult +
-					" - duration: " + (microtime(true) - $startTime) . " second");
+				$this->logger->info("finish executing monitoring_stock query" . 
+					" - result: " . $monitoringQueryResult .
+					" - duration: " . (microtime(true) - $startTime) . " second");
 				
 			}
 
