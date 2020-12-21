@@ -20,19 +20,28 @@ class TransmartConnect
   ){
     //init transfer data
     $data = $transferObject->getBody();
-    $email = $data['customer']['email'];
-    $referenceNumber = $data['order']['id'];
+    $exist = [];
+    $referenceNumber = 0;
+    
+    if(isset($data['order'])) {
+      $referenceNumber = $data['order']['id'];
+    }
 
-    //init magento object
-    $customerRepo = Data::getCustomerRepo();
-    $collection = Data::getOrderCollection();
+    if(isset($data['customer'])) {
+      $email = $data['customer']['email'];
 
-    //check if same reference number order already sending
-    $customer = $customerRepo->get($email);
-    $collection->addFieldToFilter('customer_id',['eq'=>$customer->getId()]);
-    $collection->getSelect()->order('entity_id desc')->limit(1);
-    $exist = $collection->getFirstItem()->getData();
-    $referenceNumberExist = (isset($exist['reference_number']))? $exist['reference_number'] : null;
+      //init magento object
+      $customerRepo = Data::getCustomerRepo();
+      $collection = Data::getOrderCollection();
+
+      //check if same reference number order already sending
+      $customer = $customerRepo->get($email);
+      $collection->addFieldToFilter('customer_id',['eq'=>$customer->getId()]);
+      $collection->getSelect()->order('entity_id desc')->limit(1);
+      $exist = $collection->getFirstItem()->getData();
+    }
+
+    $referenceNumberExist = ($exist && isset($exist['reference_number']))? $exist['reference_number'] : null;
     if ($referenceNumber !== $referenceNumberExist) {
       return $proceed($transferObject);
     }
