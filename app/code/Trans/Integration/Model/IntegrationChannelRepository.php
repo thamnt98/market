@@ -70,6 +70,7 @@ class IntegrationChannelRepository implements IntegrationChannelRepositoryInterf
      * @param ResourceModel\CollectionFactory $integrationChannelCollectionFactory
      * @param IntegrationChannelSearchResultInterfaceFactory $integrationChannelSearchResultInterfaceFactory
      * @param IntegrationChannelInterfaceFactory $integrationChannelInterface
+     * \Magento\Framework\App\ResourceConnection $resourceConnection
      */
     public function __construct(
         ResourceModel $resource,
