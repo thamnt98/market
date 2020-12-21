@@ -226,6 +226,20 @@ class Transaction extends AbstractHelper
     return $this->transactionRepo->getList($searchCriteria)->getFirstItem();
   }
 
+  public function getSalesPaymentTransactionByOrderId($orderId)
+  {
+    $connection = $this->salesOrderResource->getConnection();
+    $table = $connection->getTableName('sales_payment_transaction');
+
+    $query = $connection->select();
+    $query->from(
+      $table,
+      ['*']
+    )->where('order_id = ?', $orderId);
+
+    return $connection->fetchRow($query);
+  }
+
   /**
    * Get search criteria
    * @param  array $filters
