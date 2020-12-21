@@ -34,6 +34,7 @@ use Trans\Integration\Helper\Validation;
 use Trans\Core\Helper\SourceItem;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
 use Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory as AttributeCollectionFactory;
+use Magento\InventoryIndexer\Indexer\SourceItem\IndexDataBySkuListProvider;
 
 /**
  * @inheritdoc
@@ -121,6 +122,11 @@ class IntegrationStock implements IntegrationStockInterface {
 	protected $attributeCollectionFactory;
 
 	/**
+	 * @var Magento\InventoryIndexer\Indexer\SourceItem\IndexDataBySkuListProvider
+	 */
+	protected $indexDataBySkuListProvider;
+
+	/**
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param SourceItemsSaveInterface $sourceItemSave
      * @param SourceItemInterfaceFactory $sourceItem
@@ -152,7 +158,8 @@ class IntegrationStock implements IntegrationStockInterface {
         \Magento\Framework\App\ResourceConnection $resourceConnection,
 		\Magento\Framework\Indexer\IndexerRegistry $indexerRegistry,
 		ProductCollectionFactory $productCollectionFactory,
-		AttributeCollectionFactory $attributeCollectionFactory
+		AttributeCollectionFactory $attributeCollectionFactory,
+		IndexDataBySkuListProvider $indexDataBySkuListProvider
 	) {	
 
         $this->sourceItem 							   = $sourceItem;
@@ -171,6 +178,7 @@ class IntegrationStock implements IntegrationStockInterface {
 		$this->indexerRegistry 						   = $indexerRegistry;
 		$this->productCollectionFactory 			   = $productCollectionFactory;
 		$this->attributeCollectionFactory 			   = $attributeCollectionFactory;
+		$this->indexDataBySkuListProvider			   = $indexDataBySkuListProvider;
 
 		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_catalog_stock_model.log');
         $logger = new \Zend\Log\Logger();
@@ -183,8 +191,13 @@ class IntegrationStock implements IntegrationStockInterface {
      * @return mixed
      */
 	public function saveStock($datas) {
+		$sources = [];
 		$productIds = [];
 		$dataStockList = [];
+		
+		$monitoringStockSql = "update monitoring_stock set has_processed = 1, processed_at = current_timestamp() where writer_id in ";
+		$monitoringStockLabelKey = "writer_id";
+		$monitoringStockIds = [];
 
 		$messageValue = '';
 
@@ -204,7 +217,7 @@ class IntegrationStock implements IntegrationStockInterface {
 		$dataJobs->setStatus(IntegrationJobInterface::STATUS_PROGRESS_CATEGORY);
 		$this->integrationJobRepositoryInterface->save($dataJobs);
 
-		$connectionCheck = $this->resourceConnection->getConnection();
+		$connectionCheck = $this->resourceConnection->getConnection();		
 
 		try{
 			foreach ($datas as $data) {
@@ -221,6 +234,10 @@ class IntegrationStock implements IntegrationStockInterface {
 					'checkSource' => $checkSource,
 					'data' => $data
 				);
+
+				if (!empty($dataStock[$monitoringStockLabelKey])) {
+					$monitoringStockIds[] = $dataStock[$monitoringStockLabelKey];
+				}				
 			}
 
 			$attributeCodes = ['is_fresh', 'weight', 'sold_in'];
@@ -235,10 +252,10 @@ class IntegrationStock implements IntegrationStockInterface {
 				$weight = $productCollection->getData('weight');
 				$soldIn = $productCollection->getData('sold_in');
 
-				if(isset($stockData[strtoupper($productSku)])){
-					$productSku = strtoupper($productSku);
-				}else if(isset($stockData[strtolower($productSku)])){
-					$productSku = strtolower($productSku);
+				$productSku = $this->validateSku($productSku, $stockData);
+
+				if(!array_key_exists($productSku, $stockData)){
+					continue;
 				}
 				
 				$checkSource = $stockData[$productSku]['checkSource'];
@@ -267,10 +284,9 @@ class IntegrationStock implements IntegrationStockInterface {
 		                        "source_code"=>"".$locationCode."",
 		                        "sku"=>"".$productSku."",
 		                        "quantity"=>"".$quantity."",
-		                        "status"=>"1"
+		                        "status"=> ($quantity > 0 ? "1" : "0")
 		                    ];
 
-						$productIds[] = $productCollection->getId();
 						$this->logger->info("success data");
 						$this->saveStatusMessage($data, $messageValue, IntegrationDataValueInterface::STATUS_DATA_SUCCESS);
 					}
@@ -286,9 +302,10 @@ class IntegrationStock implements IntegrationStockInterface {
 			}
 
 			$connectionCheck->insertOnDuplicate("inventory_source_item", $dataStockList, ['quantity']);
+			$this->reindexByStockIdAndProductsId(1, $skus);
+			$this->reindexByStockIdAndProductsId(2, $skus);			
 
-			$this->reindexByProductsIds($productIds, ['inventory', 'cataloginventory_stock']);
-		}catch(Exception $exception){
+		} catch(Exception $exception){
 			$this->logger->info("error : " . $exception->getMessage());
 			if ($dataJobs) {
 				$dataJobs->setMessage($exception->getMessage());
@@ -314,6 +331,33 @@ class IntegrationStock implements IntegrationStockInterface {
 		$dataJobs->setStatus(IntegrationJobInterface::STATUS_COMPLETE);
 
 		$this->integrationJobRepositoryInterface->save($dataJobs);
+
+
+		try {
+
+			if (!empty($monitoringStockIds)) {
+
+				$monitoringStockSql .= "(" . implode(",", $monitoringStockIds) . ")";
+				$this->logger->info("monitoring_stock query: " + $monitoringStockSql);
+				
+				$this->logger->info("start executing monitoring_stock query");
+				
+				$startTime = microtime(true);				
+				$monitoringQueryResult = $connectionCheck->exec($monitoringStockSql);
+
+				$this->logger->info("finish executing monitoring_stock query" + 
+					" - result: " + $monitoringQueryResult +
+					" - duration: " + (microtime(true) - $startTime) . " second");
+				
+			}
+
+		}
+		catch (Exception $exception) {
+
+			$this->logger->info("failed executing monitoring_stock query");
+
+		}
+
 
 		return $dataStockList;
 	}
@@ -476,4 +520,16 @@ class IntegrationStock implements IntegrationStockInterface {
         return $result;
 	}
 
+	protected function reindexByStockIdAndProductsId($stockId, $skuList){
+		$this->indexDataBySkuListProvider->execute($stockId, $skuList);
+	}
+
+	protected function validateSku($productSku, $stockData){
+		if(isset($stockData[strtoupper($productSku)])){
+			$productSku = strtoupper($productSku);
+		}else if(isset($stockData[strtolower($productSku)])){
+			$productSku = strtolower($productSku);
+		}
+		return $productSku;
+	}
 }

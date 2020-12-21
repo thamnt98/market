@@ -152,4 +152,22 @@ interface PromotionPriceRepositoryInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function loadDataPromoTypeTwoBySameRulePercentage($data);
+
+    /**
+     * Load Integration Product promo type 2 by promo type, discount type, percent disc, promo price qty, normal price qty , start date, end date , promo selling price
+     *
+     * @param mixed $data
+     * @return mixed
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function loadDataPromoTypeTwoBySameRuleFixed($data);
+
+    /**
+     * Load Integration Product promo type 2 by promo type, discount type, percent disc, promo price qty, normal price qty , start date, end date , amount off
+     *
+     * @param mixed $data
+     * @return mixed
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function loadDataPromoTypeTwoBySameRuleAmount($data);
 }

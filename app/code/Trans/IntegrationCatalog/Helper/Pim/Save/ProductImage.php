@@ -474,6 +474,26 @@ class ProductImage extends AbstractHelper
     }
 
     /**
+     * save product image
+     *
+     * @param int $rowId
+     * @param string $filename
+     * @param array $attrId
+     * @return void
+     */
+    public function bulkSaveProductImage($data)
+    {
+      try {
+        $connection = $this->galleryResource->getConnection();
+        $mainTable = $connection->getTableName('catalog_product_entity_varchar');      
+        return $connection->insertOnDuplicate($mainTable, $data, ['value']);  
+        // return $connection->insertMultiple($mainTable, $data);      
+      } catch (\Exception $e) {
+        throw new \Exception($e->getMessage());
+      }
+    }
+
+    /**
      * check product image data exist
      *
      * @param int $rowId
