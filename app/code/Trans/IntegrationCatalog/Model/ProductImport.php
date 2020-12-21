@@ -1328,6 +1328,11 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                             $entityLinkField => $this->getExistingSku($rowSku)[$entityLinkField]
                         ];
                     } else {
+                        $rowData['url_key'] = $this->changeUrlKeyChildProduct(
+                            $rowData['name'], 
+                            $rowData['sku']
+                        );
+                        
                         if (!$productLimit || $productsQty < $productLimit) {
                             $entityRowsIn[strtolower($rowSku)] = [
                                 'attribute_set_id' => $attributeSet['attribute_set_id'],
@@ -1580,6 +1585,20 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                     }
                 }
                 break;
+        }
+
+        return $result;
+    }
+
+    /**
+     * Update URL
+     */
+    public function changeUrlKeyChildProduct($name, $extraForUrlKey) {
+        $result = "";
+        if ($extraForUrlKey) {
+            $result = str_replace(' ', '-', strtolower($name)) . '-' . $extraForUrlKey;
+        } else {
+            $result = str_replace(' ', '-', strtolower($name));
         }
 
         return $result;
