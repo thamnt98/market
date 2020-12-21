@@ -93,7 +93,9 @@ class TransmartCapture extends Capture
             /**
              * Send order to oms
              */
+            $this->logger->log('{{oms-event-dispatch:start: '.$order->getIncrementId().'}}');
             $this->sendOrderToOms($order);
+            $this->logger->log('{{oms-event-dispatch:end: '.$order->getIncrementId().'}}');
 
         }
 
