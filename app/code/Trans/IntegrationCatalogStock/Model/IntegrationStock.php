@@ -263,7 +263,7 @@ class IntegrationStock implements IntegrationStockInterface {
 				if(!isset($stockData[$productSku])){
 					continue;
 				}
-					
+
 				$checkSource = $stockData[$productSku]['checkSource'];
 				$locationCode = $stockData[$productSku]['locationCode'];
 				$quantity = $stockData[$productSku]['quantity'];

@@ -57,9 +57,11 @@ $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
                     <?= $block->escapeHtml($block->getProductName()) ?>
                 <?php endif; ?>
             </strong>
+            <?php $productType = $product->getTypeId(); ?>
             <?php if ($_options = $block->getOptionList()) : ?>
                 <dl class="item-options">
                     <?php foreach ($_options as $_option) : ?>
+                        <?php if ($productType == 'configurable' && $_option['value'] == '') { continue; } ?>
                         <?php $_formatedOptionValue = $block->getFormatedOptionValue($_option) ?>
                         <dt><?= $block->escapeHtml($_option['label']) ?></dt>
                         <dd>

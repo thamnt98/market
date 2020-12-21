@@ -548,7 +548,7 @@ class OrderStatus implements OrderStatusInterface {
 		 * trigger capture - refund by payment method
 		 */
 		$matrixAdjusmentAmount = 0;
-		if ($status == 2 && $action == 2 && $subAction == 7) {
+		if ($status == 2 && $action == 2 && $subAction == 7 || $status == 2 && $action == 99 && $subAction == 0) {
 			if ($paymentMethod === 'sprint_bca_va' || $paymentMethod === 'sprint_permata_va' || $paymentMethod === 'trans_mepay_va') {
 				foreach ($loadItemByOrderId as $itemOrder) {
 					$paidPriceOrder = $itemOrder->getPaidPrice();
