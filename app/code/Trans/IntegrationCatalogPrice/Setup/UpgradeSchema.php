@@ -54,6 +54,9 @@ class UpgradeSchema implements UpgradeSchemaInterface
         if (version_compare($context->getVersion(), '1.9.0', '<')) {
             $this->updateTableCatalogPricePromotionColumnThree($setup);
         }
+        if (version_compare($context->getVersion(), '2.0.0', '<')) {
+            $this->updateTableCatalogPricePromotionColumnFour($setup);
+        }
     }
 
     /**
@@ -593,6 +596,31 @@ class UpgradeSchema implements UpgradeSchemaInterface
                 'nullable' => true,
                 'comment' =>  ucfirst(str_replace('_',' ',PromotionPriceInterface::END_DATE)),
                 'after' => PromotionPriceInterface::START_DATE,
+            ]
+        );
+    }
+
+    /**
+     * Update integration catalog promotion rule name
+     */
+    protected function updateTableCatalogPricePromotionColumnFour($setup){
+        $tableName = $setup->getTable(PromotionPriceInterface::TABLE_NAME);
+        // Check if the table already exists
+        if ($setup->getConnection()->isTableExists($tableName) != true) {
+            throw new StateException(__(
+                'Table '. $tableName." is not exist!"
+            ));
+        }  
+
+        // Add Column
+        $setup->getConnection()->addColumn(
+            $setup->getTable($tableName),
+            PromotionPriceInterface::RULE_NAME,
+            [
+                'type' => Table::TYPE_TEXT,
+                'nullable' => true,
+                'comment' =>  ucfirst(str_replace('_',' ',PromotionPriceInterface::RULE_NAME)),
+                'after' => PromotionPriceInterface::PIM_NAME,
             ]
         );
     }

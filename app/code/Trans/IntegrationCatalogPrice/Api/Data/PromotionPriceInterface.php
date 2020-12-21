@@ -51,6 +51,7 @@ interface PromotionPriceInterface
     const PIM_NORMAL_PRICE_QTY = 'normal_price_qty';
     const START_DATE = 'start_date';
     const END_DATE = 'end_date';
+    const RULE_NAME = 'rule_name';
 
     /**
      * get id
@@ -441,4 +442,19 @@ interface PromotionPriceInterface
      * @return void
      */
     public function setEndDate($endDate);
+
+    /**
+     * get rule name
+     *
+     * @return int
+     */
+    public function getRuleName();
+
+    /**
+     * Set rule name
+     *
+     * @param int $ruleName
+     * @return void
+     */
+    public function setRuleName($ruleName);
 }
