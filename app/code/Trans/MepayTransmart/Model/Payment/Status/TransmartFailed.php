@@ -88,6 +88,8 @@ class TransmartFailed extends Failed
           // $order->cancel();
           // $this->transactionHelper->saveOrder($order);
           $this->orderManagement->cancel($order->getId());
+          $order->setStatus('order_canceled');
+          $this->transactionHelper->saveOrder($order);
 
           /**
            * send order to oms
