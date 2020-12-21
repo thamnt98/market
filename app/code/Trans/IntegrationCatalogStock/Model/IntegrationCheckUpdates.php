@@ -642,7 +642,7 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
 
             if (!empty($job)) {
                 throw new StateException(
-                    __("On-Progress-Job found ... process aborted ...")
+                    __("on-progress-job found then process aborted ...")
                 );
             }
 
@@ -870,7 +870,7 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
 
             if (!empty($job)) {
                 throw new StateException(
-                    __('On-Progress-Data-Saving-Job found ... process aborted ...')
+                    __('on-progress-data-saving-job found then process aborted ...')
                 );
             }
 
@@ -907,7 +907,7 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
 
             if (empty($job)) {
                 throw new StateException(
-                    __("First-Data-Ready-Job not found ... process aborted ...")
+                    __("first-data-ready-job not-found then process aborted ...")
                 );
             }
 

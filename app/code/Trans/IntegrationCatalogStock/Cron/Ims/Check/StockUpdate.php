@@ -65,29 +65,29 @@ class StockUpdate {
             $channelIntegrationMetadata = $this->commonRepository->prepareChannelUsingRawQuery("product-stock-update");
             $this->logger->info($label . "channel-integration-metadata = " . print_r($channelIntegrationMetadata, true));
 
-            $this->logger->info($label . "retrieving on-progress-job");
+            $this->logger->info($label . "checking on-progress-job");
             $this->checkUpdates->checkOnProgressJobUsingRawQuery($channelIntegrationMetadata);
-            $this->logger->info($label . "channel-integration-metadata = " . print_r($channelIntegrationMetadata, true));
+            $this->logger->info($label . "on-progress-job not-found then process continued ...");
 
             $this->logger->info($label . "retrieving last-complete-job");
             $channelIntegrationMetadata = $this->checkUpdates->getLastCompleteJobUsingRawQuery($channelIntegrationMetadata);
-            $this->logger->info($label . "channel-integration-metadata = " . print_r($channelIntegrationMetadata, true));
+            $this->logger->info($label . "last-complete-job = " . (isset($channelIntegrationMetadata['last_complete_job']) ? print_r($channelIntegrationMetadata['last_complete_job'], true) : "not-found"));
 
             $this->logger->info($label . "preparing to call stock-check-api");
             $callData = $this->checkUpdates->prepareCallUsingRawQuery($channelIntegrationMetadata);
             $this->logger->info($label . "call-data = " . print_r($callData, true));
 
             $this->logger->info($label . "calling stock-check-api");
-            $callResponse = $this->commonRepository->doCallUsingRawQuery($data);
+            $callResponse = $this->commonRepository->doCallUsingRawQuery($callData);
             $this->logger->info($label . "call-response = " . print_r($callResponse, true));
 
-            $this->logger->info($label . "preparing job-candidates based on stock-check-api result");
+            $this->logger->info($label . "preparing job-candidates based on stock-check-api call-response");
             $jobCandidates = $this->checkUpdates->prepareJobCandidatesUsingRawQuery($channelIntegrationMetadata, $callResponse);
-            $this->logger->info($label . "job-candidates = " . print_r($jobCandidates, true));
+            $this->logger->info($label . "job-candidates prepared = " . print_r($jobCandidates, true));
             
             $this->logger->info($label . "persisting job-candidates into job-temporary-table db");
             $persistingResult = $this->checkUpdates->insertJobCandidatesUsingRawQuery($jobCandidates);
-            $this->logger->info($label . "persisting-result = " . print_r($persistingResult, true));
+            $this->logger->info($label . "job-candidates bulk persisted = " . ($persistingResult > 0 ? "success" : "failed"));
             $this->logger->info($label . "complete");
        
         }

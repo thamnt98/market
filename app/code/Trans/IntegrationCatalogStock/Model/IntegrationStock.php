@@ -521,20 +521,16 @@ class IntegrationStock implements IntegrationStockInterface {
 			);
 
 			if (empty($stockData)) {
-				throw new NoSuchEntityException(__('Stock data doesn\'t exist'));
-			}
-	
-			if (empty($stockData['data_value'])) {
-
+		
 				$updates = array();
 				$updates['message'] = IntegrationJobInterface::MSG_DATA_NOTAVAILABLE;
 				$updates['status'] = IntegrationJobInterface::STATUS_PROGRESS_FAIL;
-				$this->jobRepository->updateUsingRawQuery($channel['first_data_ready_job']['id'], $updates);
+				$this->integrationJobRepositoryInterface->updateUsingRawQuery($channel['first_data_ready_job']['id'], $updates);
 
 				throw new NoSuchEntityException(__(IntegrationJobInterface::MSG_DATA_NOTAVAILABLE));
-	
-			}
 
+			}
+	
             return $stockData;
 
         }
@@ -562,10 +558,8 @@ class IntegrationStock implements IntegrationStockInterface {
 		$locationCodeList = array();
 		$skuList = array();
 				
-		$stockListInvalidIndex = -1;
 		$stockListInvalid = array();
 
-		$stockListValidIndex = -1;
 		$stockListValid = array();		
 
 		$stockCandidateIndex = -1;
@@ -573,7 +567,6 @@ class IntegrationStock implements IntegrationStockInterface {
 		$stockCandidatePointerList = array();
 
 		$monitoringLabel = "writer_id";
-		$monitoringIdListIndex = -1;
 		$monitoringIdList = [];
 
 		$label = "upsert-stock";
@@ -599,56 +592,46 @@ class IntegrationStock implements IntegrationStockInterface {
 			);
 		}
 
+		$tryHit = (int) $channel['first_data_ready_job']['hit'];			
+		$tryHit = ($tryHit > 0 ? $tryHit++ : 0);
 
         try {
-
-			$tryHit = (int) $channel['first_data_ready_job']['hit'];			
-			$tryHit = ($tryHit > 0 ? $tryHit++ : 0);
 				
 			$updates = array();            
 			$updates['status'] = IntegrationJobInterface::STATUS_PROGRESS_CATEGORY;
 			$updates['message'] = null;
-			$this->jobRepository->updateUsingRawQuery($channel['first_data_ready_job']['id'], $updates);			
-
+			$this->integrationJobRepositoryInterface->updateUsingRawQuery($channel['first_data_ready_job']['id'], $updates);
+			
 			foreach ($data as $dataRecord) {
 
-				$theStockValue = $this->curl->jsonToArray($dataRecord['data_value']);				
+				$theStockValue = $this->curl->jsonToArray($dataRecord['data_value']);
 
+				$locationCode = null;
 				if (isset($theStockValue[IntegrationStockInterface::IMS_LOCATION_CODE])) {
 					$locationCode = $theStockValue[IntegrationStockInterface::IMS_LOCATION_CODE];
 				}
-				else {
-					$locationCode = null;
-				}
 
+				$productSku = null;
 				if (isset($theStockValue[IntegrationStockInterface::IMS_PRODUCT_SKU])) {
 					$productSku = $theStockValue[IntegrationStockInterface::IMS_PRODUCT_SKU];
 				}
-				else {
-					$productSku = null;
-				}
-
+				
+				$quantity = 0;
 				if (isset($theStockValue[IntegrationStockInterface::IMS_QUANTITY])) {
 					$quantity = (float) $theStockValue[IntegrationStockInterface::IMS_QUANTITY];
 					if ($quantity < 0) {
 						$quantity = 0;
 					}
 				}
-				else {
-					$quantity = null;
-				}
 
-				if (empty($locationCode) || empty($productSku) || $quantity == null) {
-					$stockListInvalidIndex++;
-					$stockListInvalid[$stockListInvalidIndex] = $dataRecord['id'];
+				if (empty($locationCode) || empty($productSku)) {
+					$stockListInvalid[] = $dataRecord['id'];
 				}
 				else {
-					$stockListValidIndex++;
-					$stockListValid[$stockListValidIndex] = $dataRecord['id'];
+					$stockListValid[] = $dataRecord['id'];
 
 					if (isset($theStockValue[$monitoringLabel])) {
-						$monitoringIdListIndex++;
-						$monitoringIdList[$monitoringIdListIndex] = $theStockValue[$monitoringLabel];	
+						$monitoringIdList[] = $theStockValue[$monitoringLabel];	
 					}
 
 					if (!isset($locationCodeList[$locationCode])) {
@@ -674,7 +657,7 @@ class IntegrationStock implements IntegrationStockInterface {
 
 			}
 
-			if ($stockListValidIndex > -1) {
+			if (!empty($stockListValid)) {
 
 				$attributeCodes = ['is_fresh', 'weight', 'sold_in'];
 				$productsCollection = $this->getProductByMultipleSkuAndAttributeCodes($skuList, $attributeCodes);
@@ -711,7 +694,7 @@ class IntegrationStock implements IntegrationStockInterface {
 						" where `id` in (" . implode(",", $stockListValid) . ")";
 				$this->dbConnection->exec($sql);
 
-				if ($stockListInvalidIndex > -1) {
+				if (!empty($stockListInvalid)) {
 					$sql =	" update `integration_catalogstock_data` " . 
 							" set " .
 							" `status` = " . IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE . ", " . 
@@ -774,8 +757,8 @@ class IntegrationStock implements IntegrationStockInterface {
 
 					$updates = array();            
 					$updates['status'] = IntegrationJobInterface::STATUS_PROGRESS_FAIL;
-					$updates['hit'] = tryHit;
-					$this->jobRepository->updateUsingRawQuery($channel['first_data_ready_job']['id'], $updates);
+					$updates['hit'] = $tryHit;
+					$this->integrationJobRepositoryInterface->updateUsingRawQuery($channel['first_data_ready_job']['id'], $updates);
 
 					$this->logger->info($label . "job-exceeding-max-try-hit = " . IntegrationStockInterface::MAX_TRY_HIT);
 					$this->logger->info($label . "job-hit = {$tryHit}");
@@ -799,8 +782,8 @@ class IntegrationStock implements IntegrationStockInterface {
 
 					$updates = array();
 					$updates['status'] = IntegrationJobInterface::STATUS_READY;
-					$updates['hit'] = tryHit;
-					$this->jobRepository->updateUsingRawQuery($channel['first_data_ready_job']['id'], $updates);
+					$updates['hit'] = $tryHit;
+					$this->integrationJobRepositoryInterface->updateUsingRawQuery($channel['first_data_ready_job']['id'], $updates);
 
 					$this->logger->info($label . "job-increasing-hit");
 					$this->logger->info($label . "job-hit = {$tryHit}");
@@ -830,7 +813,7 @@ class IntegrationStock implements IntegrationStockInterface {
 
 
 		try {
-			if ($monitoringIdListIndex > -1) {
+			if (!empty($monitoringIdList)) {
 				$sql = "update monitoring_stock set has_processed = 1, processed_at = current_timestamp() where writer_id in (" . implode(",", $monitoringIdList) . ")";
 				
 				$this->logger->info($label . "start executing monitoring-stock query");				
@@ -843,12 +826,12 @@ class IntegrationStock implements IntegrationStockInterface {
 					" - duration: " . (microtime(true) - $st) . " second");				
 			}
 		}
-		catch (\Exception $exception) {
+		catch (\Exception $exmon) {
 			$this->logger->info($label . "failed executing monitoring-stock query");
 		}		
 
 
-		$this->logger->info($label . "stock-data-persisted = {$stockPersisted}");
+		$this->logger->info($label . "stock-data persisted = {$stockPersisted}");
 		$this->logger->info($label . "finish " . (microtime(true) - $startTime) . " second");
 
 

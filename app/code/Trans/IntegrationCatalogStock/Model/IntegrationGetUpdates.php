@@ -430,7 +430,7 @@ class IntegrationGetUpdates implements IntegrationGetUpdatesInterface
 
             if (empty($job)) {
                 throw new StateException(
-                    __("Aborting Because First-Waiting-Job Is Not Available")
+                    __("first-waiting-job not-found then process aborted ...")
                 );
             }
 
@@ -534,18 +534,18 @@ class IntegrationGetUpdates implements IntegrationGetUpdatesInterface
                 );
             }
 
+            $i = -1;
             $return = [];
             $result = [];
-            $i = -1;
     
             foreach ($response['data'] as $data) {
-                $result[$i][IntegrationDataValueInterface::JOB_ID] = $channel['first_waiting_job']['id'];
-                $result[$i][IntegrationDataValueInterface::DATA_VALUE] = json_encode($data);
                 $i++;
+                $result[$i][IntegrationDataValueInterface::JOB_ID] = $channel['first_waiting_job']['id'];
+                $result[$i][IntegrationDataValueInterface::DATA_VALUE] = json_encode($data);                
             }
 
             $return['data'] = $result;
-            $return['last_updated'] = $data[$i]['updated_time'];
+            $return['last_updated'] = $response['data'][$i]['updated_time'];
 
             return $return;
 

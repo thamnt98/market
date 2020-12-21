@@ -80,11 +80,11 @@ class StockUpdate {
 
 			$this->logger->info($label . "retrieving last-complete-job");
 			$channelIntegrationMetadata = $this->checkUpdates->getLastCompleteJobUsingRawQuery($channelIntegrationMetadata);
-			$this->logger->info($label . "channel-integration-metadata = " . print_r($channelIntegrationMetadata, true));
+			$this->logger->info($label . "last-complete-job = " . (isset($channelIntegrationMetadata['last_complete_job']) ? print_r($channelIntegrationMetadata['last_complete_job'], true) : "not-found"));
 
 			$this->logger->info($label . "retrieving first-waiting-job");
 			$channelIntegrationMetadata = $this->getUpdates->getFirstWaitingJobUsingRawQuery($channelIntegrationMetadata);
-			$this->logger->info($label . "channel-integration-metadata = " . print_r($channelIntegrationMetadata, true));
+			$this->logger->info($label . "first-waiting-job = " . (isset($channelIntegrationMetadata['first_waiting_job']) ? print_r($channelIntegrationMetadata['first_waiting_job'], true) : "not-found"));
 
 			$this->logger->info($label . "preparing to call stock-get-api");
 			$callData = $this->getUpdates->prepareCallUsingRawQuery($channelIntegrationMetadata);
@@ -92,15 +92,16 @@ class StockUpdate {
 
 			$this->logger->info($label . "calling stock-get-api");
 			$callResponse = $this->commonRepository->doCallUsingRawQuery($callData);
-			$this->logger->info($label . "call-response = " . print_r($callResponse, true));
+			$this->logger->info($label . "call-response received = " . (!empty($callResponse) ? "yes" : "no"));
+			$this->logger->info($label . "call-response data number = " . (isset($callResponse['data']) ? count($callResponse['data']) : 0));
 
-			$this->logger->info($label . "preparing stock-data based on stock-get-api result");
+			$this->logger->info($label . "preparing stock-data based on stock-get-api call-response");
 			$stockData = $this->getUpdates->prepareStockDataUsingRawQuery($channelIntegrationMetadata, $callResponse);
-			$this->logger->info($label . "stock-data = " . print_r($stockData, true));
+			$this->logger->info($label . "stock-data prepared number = " . (isset($stockData['data']) ? count($stockData['data']) : 0));
 
-			$this->logger->info($label . "persisting stock-data into stock-temporary-table db");
+			$this->logger->info($label . "persisting stock-data into temporary-stock-table db");
 			$persistingResult = $this->getUpdates->insertStockDataUsingRawQuery($channelIntegrationMetadata, $stockData);
-            $this->logger->info($label . "persisting-result = " . print_r($persistingResult, true));
+            $this->logger->info($label . "stock-data bulk persisted = " . ($persistingResult > 0 ? "success" : "failed"));
             $this->logger->info($label . "complete");
 
 		} 

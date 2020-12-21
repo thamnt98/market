@@ -59,21 +59,21 @@ class Stock {
             $channelIntegrationMetadata = $this->commonRepository->prepareChannelUsingRawQuery("product-stock-update");
             $this->logger->info($label . "channel-integration-metadata = " . print_r($channelIntegrationMetadata, true));
 
-			$this->logger->info($label . "retrieving on-progress-data-saving-job");
+			$this->logger->info($label . "checking on-progress-data-saving-job");
 			$channelIntegrationMetadata = $this->checkUpdates->checkOnProgressDataSavingJobUsingRawQuery($channelIntegrationMetadata);
-			$this->logger->info($label . "channel-integration-metadata = " . print_r($channelIntegrationMetadata, true));
+			$this->logger->info($label . "on-progress-data-saving-job not-found then process continued ...");
 
 			$this->logger->info($label . "retrieving first-data-ready-job");
 			$channelIntegrationMetadata = $this->checkUpdates->getFirstDataReadyJobUsingRawQuery($channelIntegrationMetadata);
-			$this->logger->info($label . "channel-integration-metadata = " . print_r($channelIntegrationMetadata, true));
+			$this->logger->info($label . "first-data-ready-job = " . (isset($channelIntegrationMetadata['first_data_ready_job']) ? print_r($channelIntegrationMetadata['first_data_ready_job'], true) : "not-found"));
 		
-			$this->logger->info($label . "retrieving stock-data from stock-temporary-table db");
+			$this->logger->info($label . "retrieving stock-data from temporary-stock-table db");
 			$stockData = $this->integrationStockInterface->prepareStockDataUsingRawQuery($channelIntegrationMetadata);
-			$this->logger->info($label . "stock-data = " . print_r($stockData, true));
+			$this->logger->info($label . "stock-data retrieved number = " . count($stockData));
 
 			$this->logger->info($label . "persisting stock-data into stock-magento-table db");
-			$persistingResult = $this->integrationStockInterface->insertStockDataUsingRawQuery($stockData);
-			$this->logger->info($label . "persisting-result = " . print_r($persistingResult, true));
+			$persistingResult = $this->integrationStockInterface->insertStockDataUsingRawQuery($channelIntegrationMetadata, $stockData);
+			$this->logger->info($label . "stock-data bulk persisted = " . ($persistingResult > 0 ? "success" : "failed"));
 			$this->logger->info($label . "complete");
 
 		}
