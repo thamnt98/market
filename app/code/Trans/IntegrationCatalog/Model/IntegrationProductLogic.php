@@ -1721,7 +1721,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		$connection = $this->resource->getConnection();
 		$table = $connection->getTableName('url_rewrite');
 
-		$query = 'UPDATE INTO ' . $table . ' set requestPath = ' . $requestPath . ' where url_rewrite_id = ' . $urlRewriteId;
+		$query = 'UPDATE INTO ' . $table . ' set request_path = ' . $requestPath . ' where url_rewrite_id = ' . $urlRewriteId;
 		$connection->query($query);
 
 		$this->resource->closeConnection();
