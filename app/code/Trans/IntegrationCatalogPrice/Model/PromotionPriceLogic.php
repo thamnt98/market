@@ -829,6 +829,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                     // promotype = 4 , disctype = 1
                     case 1:
                         // add dataPass array for name and desc
+                        $dataPass['rule_name'] = 'Only Rp '.$dataPass['promo_selling_price'].' (Max. '.$dataPass['max_promo_price_qty'].')';
                         $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Rp '.$dataPass['promo_selling_price'].' Fixed price for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].')';
                         $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Rp '.$dataPass['promo_selling_price'].' Fixed price for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                         $dataPass['simple_action'] = 'setof_fixed';
@@ -841,6 +842,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                     // promotype = 4 , disctype = 2
                     case 2:
                         // add dataPass array for name and desc
+                        $dataPass['rule_name'] = 'Disc. '.$dataPass['percent_disc'].'% (Max. '.$dataPass['max_promo_price_qty'].')';
                         $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - '.$dataPass['percent_disc'].'% off for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].')';
                         $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - '.$dataPass['percent_disc'].'% off for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                         $dataPass['simple_action'] = 'by_percent';
@@ -853,6 +855,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                     // promotype = 4 , disctype = 3
                     case 3:
                         // add dataPass array for name and desc
+                        $dataPass['rule_name'] = 'Disc. Rp '.$dataPass['amount_off'].' (Max. '.$dataPass['max_promo_price_qty'].')';
                         $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Rp '.$dataPass['amount_off'].' amount off for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].')';
                         $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Rp '.$dataPass['amount_off'].' amount off for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                         $dataPass['simple_action'] = 'by_fixed';
@@ -879,6 +882,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                         // promotype = 4 , disctype = 1
                         case 1:
                             // add dataPass array for name and desc
+                            $dataPass['rule_name'] = 'Only Rp '.$dataPass['promo_selling_price'].' (Max. '.$dataPass['max_promo_price_qty'].')';
                             $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Rp '.$dataPass['promo_selling_price'].' Fixed price for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].')';
                             $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Rp '.$dataPass['promo_selling_price'].' Fixed price for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                             $dataPass['simple_action'] = 'setof_fixed';
@@ -890,6 +894,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                         // promotype = 4 , disctype = 2
                         case 2:
                             // add dataPass array for name and desc
+                            $dataPass['rule_name'] = 'Disc. '.$dataPass['percent_disc'].'% (Max. '.$dataPass['max_promo_price_qty'].')';
                             $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - '.$dataPass['percent_disc'].'% off for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].')';
                             $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - '.$dataPass['percent_disc'].'% off for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                             $dataPass['simple_action'] = 'by_percent';
@@ -901,6 +906,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                         // promotype = 4 , disctype = 3
                         case 3:
                             // add dataPass array for name and desc
+                            $dataPass['rule_name'] = 'Disc. Rp '.$dataPass['amount_off'].' (Max. '.$dataPass['max_promo_price_qty'].')';
                             $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Rp '.$dataPass['amount_off'].' amount off for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].')';
                             $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Rp '.$dataPass['amount_off'].' amount off for SKU '.$dataPass['sku'].' with maximum of '.$dataPass['max_promo_price_qty'].' qty per transaction ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                             $dataPass['simple_action'] = 'by_fixed';
@@ -1022,6 +1028,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                     case 1:
                         // promotype = 2 , disctype = 1, promo selling price == 1
                         if ($dataPass['promo_selling_price'] == 1) {
+                            $dataPass['rule_name'] = 'Buy Z, Get Y';
                             $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only (Free) ('.$dataPass['sku'].')';
                             $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only: same as buy '.$dataPass['normal_price_qty'].' get '.$dataPass['promo_price_qty'].' free (for the same item) ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                             $dataPass['simple_action'] = 'buy_x_get_y';
@@ -1029,6 +1036,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                         }
                         // promotype = 2 , disctype = 1, promo selling price != 1
                         else {
+                            $dataPass['rule_name'] = 'Buy Y, Get Rp '.$dataPass['promo_selling_price'].' Off';
                             $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only (Fixed price) ('.$dataPass['sku'].')';
                             $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only: same as buy '.$dataPass['normal_price_qty'].' get '.$dataPass['promo_price_qty'].' with Fixed price (for the same item) ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                             $dataPass['simple_action'] = 'eachn_fixprice';
@@ -1059,6 +1067,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
 
                     // promotype = 2 , disctype = 2
                     case 2:
+                        $dataPass['rule_name'] = 'Buy Y, Get '.$dataPass['percent_disc'].'% Off';
                         $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only (Percentage) ('.$dataPass['sku'].')';
                         $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only: same as buy '.$dataPass['normal_price_qty'].' get '.$dataPass['promo_price_qty'].' with percentage (for the same item) ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                         $dataPass['simple_action'] = 'eachn_perc';
@@ -1088,6 +1097,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
 
                     // promotype = 2 , disctype = 3
                     case 3:
+                        $dataPass['rule_name'] = 'Buy Y, Get Rp '.$dataPass['amount_off'].' Off';
                         $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only (Amount off) ('.$dataPass['sku'].')';
                         $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only: same as buy '.$dataPass['normal_price_qty'].' get '.$dataPass['promo_price_qty'].' with amount off (for the same item) ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                         $dataPass['simple_action'] = 'eachn_fixdisc';
@@ -1134,6 +1144,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                         case 1:
                             // promotype = 2 , disctype = 1, promo selling price == 1
                             if ($dataPass['promo_selling_price'] == 1) {
+                                $dataPass['rule_name'] = 'Buy Z, Get Y';
                                 $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only (Free) ('.$dataPass['sku'].')';
                                 $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only: same as buy '.$dataPass['normal_price_qty'].' get '.$dataPass['promo_price_qty'].' free (for the same item) ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                                 $dataPass['simple_action'] = 'buy_x_get_y';
@@ -1141,6 +1152,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                             }
                             // promotype = 2 , disctype = 1, promo selling price != 1
                             else {
+                                $dataPass['rule_name'] = 'Buy Y, Get Rp '.$dataPass['promo_selling_price'].' Off';
                                 $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only (Fixed price) ('.$dataPass['sku'].')';
                                 $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only: same as buy '.$dataPass['normal_price_qty'].' get '.$dataPass['promo_price_qty'].' with Fixed price (for the same item) ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                                 $dataPass['simple_action'] = 'eachn_fixprice';
@@ -1151,6 +1163,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
 
                         // promotype = 2 , disctype = 2
                         case 2:
+                            $dataPass['rule_name'] = 'Buy Y, Get '.$dataPass['percent_disc'].'% Off';
                             $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only (Percentage) ('.$dataPass['sku'].')';
                             $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only: same as buy '.$dataPass['normal_price_qty'].' get '.$dataPass['promo_price_qty'].' with percentage (for the same item) ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                             $dataPass['simple_action'] = 'eachn_perc';
@@ -1160,6 +1173,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
 
                         // promotype = 2 , disctype = 3
                         case 3:
+                            $dataPass['rule_name'] = 'Buy Y, Get Rp '.$dataPass['amount_off'].' Off';
                             $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only (Amount off) ('.$dataPass['sku'].')';
                             $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy Y pcs, Pay for Z pcs only: same as buy '.$dataPass['normal_price_qty'].' get '.$dataPass['promo_price_qty'].' with amount off (for the same item) ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                             $dataPass['simple_action'] = 'eachn_fixdisc';
@@ -1211,6 +1225,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                             $dataPass['discount_amount'] = $dataPass['sliding_child'][2];
 
                             // add dataPass array for name and desc
+                            $dataPass['rule_name'] = 'Buy More, Save More';
                             $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price Rp '.$sliding_child_arr[2].' fixed price ('.$dataPass['sku'].')';
                             $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price Rp '.$sliding_child_arr[2].' fixed price ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
 
@@ -1233,6 +1248,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                             $dataPass['discount_amount'] = $dataPass['sliding_child'][2];
 
                             // add dataPass array for name and desc
+                            $dataPass['rule_name'] = 'Buy More, Save More';
                             $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price '.$sliding_child_arr[2].' % off ('.$dataPass['sku'].')';
                             $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price '.$sliding_child_arr[2].' % off ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
 
@@ -1254,6 +1270,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                             $dataPass['discount_amount'] = $dataPass['sliding_child'][2];
 
                             // add dataPass array for name and desc
+                            $dataPass['rule_name'] = 'Buy More, Save More';
                             $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price Rp '.$sliding_child_arr[2].' Off ('.$dataPass['sku'].')';
                             $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price Rp '.$sliding_child_arr[2].' Off ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
 
@@ -1285,6 +1302,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                                 $dataPass['discount_amount'] = $dataPass['sliding_child'][2];
 
                                 // add dataPass array for name and desc
+                                $dataPass['rule_name'] = 'Buy More, Save More';
                                 $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price Rp '.$sliding_child_arr[2].' fixed price ('.$dataPass['sku'].')';
                                 $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price Rp '.$sliding_child_arr[2].' fixed price ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
 
@@ -1307,6 +1325,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                                 $dataPass['discount_amount'] = $dataPass['sliding_child'][2];
 
                                 // add dataPass array for name and desc
+                                $dataPass['rule_name'] = 'Buy More, Save More';
                                 $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price '.$sliding_child_arr[2].' % off ('.$dataPass['sku'].')';
                                 $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price '.$sliding_child_arr[2].' % off ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
 
@@ -1328,6 +1347,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                                 $dataPass['discount_amount'] = $dataPass['sliding_child'][2];
 
                                 // add dataPass array for name and desc
+                                $dataPass['rule_name'] = 'Buy More, Save More';
                                 $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price Rp '.$sliding_child_arr[2].' Off ('.$dataPass['sku'].')';
                                 $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Tier Price Rp '.$sliding_child_arr[2].' Off ('.$dataPass['sku'].') - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
 
@@ -1375,6 +1395,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                     switch ($dataPass['discount_type']) {
                         // promotype = 5 , disctype = 1
                         case 1:
+                            $dataPass['rule_name'] = 'Buy Y, Get Rp '.$dataPass['promo_selling_price'].' Off';
                             $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy X qty of A, Get Y qty of B with only IDR '.$dataPass['promo_selling_price'].'';
                             $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy X qty of A, Get Y qty of B with only IDR '.$dataPass['promo_selling_price'].' - ' .$dataPass['store_code'].' - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                             $dataPass['simple_action'] = 'buyxgetn_fixprice';
@@ -1426,6 +1447,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                         // promotype = 5 , disctype = 2
                         case 2:
 
+                            $dataPass['rule_name'] = 'Buy Y, Get '.$dataPass['percent_disc'].'% Off';
                             $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy X qty of A, Get Y qty of B with '.$dataPass['percent_disc'].'% off';
                             $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy X qty of A, Get Y qty of B with '.$dataPass['percent_disc'].'% off - '.$dataPass['store_code'].' - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                             $dataPass['simple_action'] = 'buyxgetn_perc';
@@ -1476,6 +1498,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
 
                         // promotype = 5 , disctype = 3
                         case 3:
+                            $dataPass['rule_name'] = 'Buy Y, Get Rp '.$dataPass['amount_off'].' Off';
                             $dataPass['name'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy X qty of A, Get Y qty of B with '.$dataPass['amount_off'].' amount off';
                             $dataPass['desc'] = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Buy X qty of A, Get Y qty of B with '.$dataPass['amount_off'].' amount off - '.$dataPass['store_code'].' - ('.$dataPass['from_date'].' - '.$dataPass['to_date'].')';
                             $dataPass['simple_action'] = 'buyxgetn_fixdisc';
@@ -1623,6 +1646,10 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                 $query->setNormalPriceQty($data['normal_price_qty']);
             }
 
+            if (!empty($data['rule_name'])) {
+                $query->setRuleName($data['rule_name']);
+            }
+            
             if ($data['promotion_type'] == 2) {
                 if (!empty($data['from_date'])) {
                     $query->setStartDate($data['from_date']);
@@ -1894,7 +1921,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
         try {
             $statusResponse = $this->ruleFactory->create();
 
-            $statusResponse->setName($dataPass['name'])
+            $statusResponse->setName($dataPass['rule_name'])
             ->setDescription($dataPass['desc'])
             ->setFromDate($dataPass['from_date'])
             ->setToDate($dataPass['to_date'])
