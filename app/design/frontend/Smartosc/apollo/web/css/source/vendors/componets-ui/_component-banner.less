@@ -60,7 +60,6 @@
         .ic-icon{
             color:@color-text-navbar;
             font-size: 16px;
-            display: flex;
             > * {
                 margin:0;
                 line-height: 25px;
@@ -1037,6 +1036,9 @@
 //  _____________________________________________
 
 .media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    div[data-navigation-style^="style-"] {
+        min-height: 320px !important;
+    }
     .block-static-block{
         .pagebuilder-column:nth-child(1){
             .pagebuilder-overlay{
@@ -1105,6 +1107,9 @@
 //  Desktop (style-l.css)
 //  _____________________________________________
 .media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__xl) {
+    div[data-navigation-style^="style-"] {
+        min-height: inherit !important;
+    }
     .row-header-nabar{
         .pagebuilder-column-group{
 

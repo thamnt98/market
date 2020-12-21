@@ -122,27 +122,27 @@ if ($parentOrder) {
                         </div>
                         <div class="tracking-order">
                             <?php if (!$isPickUp): ?>
-                                <span class="delivery-address"><?= $block->escapeHtml(__('Tracking Number')) ?></span>
-                                <h4><?= $block->escapeHtml(__('SK383092814')) ?></h4>
-                                <a href="#" class="track-order" data-trigger="track-order-<?= $subOrder->getId() ?>"
+
+                                <a href="#" class="track-order"
+                                   data-trigger="track-order-<?= $subOrder->getId() ?>"
                                    data-gtm-event="track_order_click"
                                    data-gtm="<?= $block->escapeHtml($parentOrder->getParentOrderId()) ?>"><?= $block->escapeHtml(__('Order Updates')) ?></a>
                                 <div data-bind="mageInit: {
                             'Magento_Ui/js/modal/modal':{
                             'type': 'popup',
-                            'title': 'Track Order',
+                            'title': '<?= __('Order Updates') ?>',
                             'trigger': '[data-trigger=track-order-<?= $subOrder->getId() ?>]',
                             'modalClass': 'pp-track-order',
                             'responsive': true
                             }}">
                                     <div class="ct-track-order">
-                                        <div class="tracking-number">
-                                            <span><?= $block->escapeHtml(__('Tracking Number')) ?></span>
-                                            <h3><?= $block->escapeHtml(__('SK383092821')) ?></h3>
+                                        <div class="order-id">
+                                            <span><?= $block->escapeHtml(__('Order ID')) ?></span>
+                                            <h3><?= $block->escapeHtml($subOrder->getSubOrderId()) ?></h3>
                                         </div>
                                         <div class="deliver-from">
-                                            <span><?= $block->escapeHtml(__('Deliver From')) ?></span>
-                                            <h3><?= $block->escapeHtml(__('JNE Tomang')) ?></h3>
+                                            <span><?= $block->escapeHtml(__('Service Type')) ?></span>
+                                            <h3><?= $block->escapeHtml($subOrder->getShippingMethod()) ?></h3>
                                         </div>
                                         <div class="status-history">
                                             <h5 class="tl-status-history"><?= $block->escapeHtml(__('Status History')) ?></h5>
