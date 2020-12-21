@@ -1217,6 +1217,9 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
                     $optionFormat[] = $value;
                 }
             }
+            if (implode(', ', $optionFormat) == '') {
+                continue;
+            }
             $optionsData[$index] = $this->productOptionsInterfaceFactory->create()->setLabel($optionValue['label'])->setValue(implode(', ', $optionFormat));
         }
         return $optionsData;

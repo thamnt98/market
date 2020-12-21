@@ -29,6 +29,11 @@ class ConnectAuthCapture extends AbstractHelper
   const NEW_AMOUNT = 'newAmount';
 
   /**
+   * @var string
+   */
+  const AMOUNT = 'amount';
+
+  /**
    * @var array
    */
   protected $inquiry;
@@ -42,6 +47,11 @@ class ConnectAuthCapture extends AbstractHelper
    * @var string
    */
   protected $newAmount;
+
+  /**
+   * @var string
+   */
+  protected $amount;
 
   /**
    * @var Json
@@ -64,24 +74,32 @@ class ConnectAuthCapture extends AbstractHelper
   protected $authCapture;
 
   /**
+   * @var \Trans\Mepay\Gateway\Http\Client\Connect
+   */
+  protected $connect;
+
+  /**
    * Constructor
-   * @param Context                      $context           
-   * @param Json                         $json              
+   * @param Context $context           
+   * @param Json $json              
    * @param PostCaptureTransactionStatus $client            
-   * @param TransactionHelper            $transactionHelper 
-   * @param AuthCapture                  $autchCapture      
+   * @param TransactionHelper $transactionHelper 
+   * @param AuthCapture $autchCapture      
+   * @param \Trans\Mepay\Gateway\Http\Client\Connect $connect      
    */
   public function __construct(
     Context $context,
     Json $json,
     PostCaptureTransactionStatus $client,
     TransactionHelper $transactionHelper,
-    AuthCapture $autchCapture
+    AuthCapture $authCapture,
+    \Trans\Mepay\Gateway\Http\Client\Connect $connect
   ) {
     $this->json = $json;
     $this->client = $client;
     $this->transactionHelper = $transactionHelper;
     $this->authCapture = $authCapture;
+    $this->connect = $connect;
     parent::__construct($context);
   }
 
@@ -92,8 +110,10 @@ class ConnectAuthCapture extends AbstractHelper
   public function send()
   {
     if (isset($this->inquiry['id']) && isset($this->transaction['id'])) {
-      $this->client->create($this->inquiry['id'], $this->transaction['id'], $this->getBodyParams());
-      $this->authCapture->create($this->inquiry['id'], $this->transaction['id'], $this->getBodyParams());
+      $transferBuilder = $this->client->create($this->inquiry['id'], $this->transaction['id'], $this->getBodyParams());
+      $hit = $this->connect->placeRequest($transferBuilder);
+      
+      // $this->authCapture->create($this->inquiry['id'], $this->transaction['id'], $this->getBodyParams());
     }
   }
 
@@ -103,10 +123,12 @@ class ConnectAuthCapture extends AbstractHelper
    */
   public function getBodyParams()
   {
+    // var_dump($this->transaction);die();
     try {
       return [
         TransactionInterface::AUTHORIZATION_CODE => $this->transaction[TransactionInterface::AUTHORIZATION_CODE],
-        TransactionInterface::AMOUNT => $this->transaction[TransactionInterface::AMOUNT],
+        // TransactionInterface::AMOUNT => $this->transaction[TransactionInterface::AMOUNT],
+        TransactionInterface::AMOUNT => $this->getAmount(),
         self::NEW_AMOUNT => $this->getNewAmount()
       ];
     } catch (\Exception $e) {
@@ -133,17 +155,40 @@ class ConnectAuthCapture extends AbstractHelper
   }
 
   /**
+   * Get amount
+   * @return string
+   */
+  public function getAmount()
+  {
+    return $this->amount;
+  }
+
+  /**
+   * Set amount
+   * @param $input
+   */
+  public function setAmount($input)
+  {
+    $this->amount = $input;
+  }
+
+  /**
    * Set transaction by order id
    * @param  $orderId 
    */
-  public function setTxnByOrderId($orderId)
+  public function setTxnByOrderId($refNumber)
   {
-    $txn = $this->transactionHelper->getLastOrderTransaction($orderId);
-    if ($txn->getTransMepayInquiry()) {
-      $this->inquiry = $this->json->unserialize($txn->getTransMepayInquiry());
+    $order = $this->transactionHelper->getSalesOrderArray($refNumber);
+    $orderId = $order['entity_id'];
+    
+    // $txn = $this->transactionHelper->getLastOrderTransaction($orderId);
+    $txn = $this->transactionHelper->getSalesPaymentTransactionByOrderId($orderId);
+    
+    if ($txn) {
+      $this->inquiry = $this->json->unserialize($txn['trans_mepay_inquiry']);
     }
-    if ($txn->getTransMepayTransaction()) {
-      $this->transaction = $this->json->unserialize($this->getTransMepayTransaction());
+    if (isset($txn['trans_mepay_transaction'])) {
+      $this->transaction = $this->json->unserialize($txn['trans_mepay_transaction']);
     }
   }
 }

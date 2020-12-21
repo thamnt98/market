@@ -35,7 +35,7 @@ class Method implements OptionSourceInterface
      */
     public function toOptionArray()
     {
-        $options = [
+        return [
             [
                 'value' => self::SAME_DAY,
                 'label' => __('Instant (3 hours)')
@@ -50,10 +50,8 @@ class Method implements OptionSourceInterface
             ],
             [
                 'value' => self::SCHEDULED,
-                'label' => __('Schedule')
+                'label' => __('Schedule for Later')
             ]
         ];
-
-        return $options;
     }
 }

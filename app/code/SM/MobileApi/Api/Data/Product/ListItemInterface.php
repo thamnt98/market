@@ -53,6 +53,7 @@ interface ListItemInterface extends \Magento\Framework\Api\ExtensibleDataInterfa
     const IS_TOBACCO = "is_tobacco";
 
     const FRESH_PRODUCT = "fresh_product";
+    const DISCOUNT_PERCENT = "discount_percent";
 
     /**
      * Get Product Id
@@ -502,4 +503,15 @@ interface ListItemInterface extends \Magento\Framework\Api\ExtensibleDataInterfa
      * @return $this
      */
     public function setFreshProduct($value);
+
+    /**
+     * @return int
+     */
+    public function getDiscountPercent();
+
+    /**
+     * @param int $value
+     * @return int
+     */
+    public function setDiscountPercent($value);
 }
