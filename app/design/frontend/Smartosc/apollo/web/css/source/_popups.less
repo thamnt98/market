@@ -304,6 +304,11 @@
                        .lib-font-size(16);
                        color:@c-tsm-grey20;
                    }
+                    span.date{
+                        flex-basis: 100%;
+                        .lib-font-size(13);
+                        margin: 0 10%;
+                    }
                     .tl-status-history {
                         .lib-font-size(16);
                         .lib-list-reset-styles();
@@ -318,7 +323,9 @@
                 .status-history-info {
                     display: flex;
                     position: relative;
-                    min-height: 100px;
+                    min-height: 55px;
+                    padding-bottom: 30px;
+                    flex-wrap: wrap;
                     &:before {
                         content:"";
                         height: 100%;
@@ -337,10 +344,12 @@
                         display: inline-block;
                         background: @c-tsm-grey4;
                         border-radius: 100%;
+                        flex-basis: 30px;
                     }
                     h4 {
                         margin:0 5%;
-                        max-width: 220px;
+                        font-size: 15px
+                        padding: 5px 0;
                         min-width: 220px;
                     }
                     &.active {

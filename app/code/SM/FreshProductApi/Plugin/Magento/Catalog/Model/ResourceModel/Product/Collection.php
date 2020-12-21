@@ -15,6 +15,7 @@ class Collection
     public function beforeLoad(\Magento\Catalog\Model\ResourceModel\Product\Collection $subject)
     {
         $subject->addAttributeToSelect([
+            'is_fresh',
             FreshProductInterface::OWN_COURIER,
             FreshProductInterface::BASE_PRICE_IN_KG,
             FreshProductInterface::PROMO_PRICE_IN_KG,

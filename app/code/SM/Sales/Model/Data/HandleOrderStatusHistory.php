@@ -35,6 +35,7 @@ class HandleOrderStatusHistory
         Statuses::STATUS_PENDING_PAYMENT => self::SVG_PENDING_PAYMENT,
         Statuses::STATUS_ORDER_CANCELED => self::SVG_ORDER_CANCELED,
         Statuses::STATUS_IN_DELIVERY => self::SVG_IN_DELIVERY,
+        Statuses::STATUS_FAILED_DELIVERY => self::SVG_IN_DELIVERY,
         Statuses::STATUS_IN_PROCESS => self::SVG_IN_PROGRESS,
         Statuses::STATUS_DELIVERED => self::SVG_COMPLETE,
         Statuses::STATUS_COMPLETE => self::SVG_COMPLETE,
@@ -52,11 +53,24 @@ class HandleOrderStatusHistory
     const MAP_STATUS_SVG_CLASS = [
         Statuses::STATUS_PENDING_PAYMENT => self::SVG_CLASS_PENDING_PAYMENT,
         Statuses::STATUS_IN_DELIVERY => self::SVG_CLASS_IN_DELIVERY,
+        Statuses::STATUS_FAILED_DELIVERY => self::SVG_CLASS_IN_DELIVERY,
         Statuses::STATUS_IN_PROCESS => self::SVG_CLASS_IN_PROGRESS,
         Statuses::STATUS_DELIVERED => self::SVG_CLASS_COMPLETE,
         Statuses::STATUS_COMPLETE => self::SVG_CLASS_COMPLETE,
         Statuses::IN_PROCESS_WAITING_FOR_PICKUP => self::SVG_CLASS_IN_PROGRESS,
         Statuses::PICK_UP_BY_CUSTOMER => self::SVG_CLASS_PICK_UP,
+    ];
+
+    const MAP_STATUS_WITH_LABEL = [
+        Statuses::STATUS_PENDING_PAYMENT => 'Order Created. Waiting For Payment',
+        Statuses::STATUS_ORDER_CANCELED => 'Order has been cancelled',
+        Statuses::STATUS_IN_DELIVERY => 'Waiting to be picked up by Courier',
+        Statuses::STATUS_FAILED_DELIVERY => 'Recipient was absent. Order is now to be picked up in store',
+        Statuses::STATUS_IN_PROCESS => 'Payment Successful',
+        Statuses::STATUS_DELIVERED => 'Order has been Successfully Delivered into Destination',
+        Statuses::STATUS_COMPLETE => 'Order has been Successfully Completed',
+        Statuses::IN_PROCESS_WAITING_FOR_PICKUP => 'Waiting to be picked up by Courier',
+        Statuses::PICK_UP_BY_CUSTOMER => 'Waiting to be picked up by Customer',
     ];
 
     const CANCEL_BY_PAYMENT = 1;
@@ -67,6 +81,7 @@ class HandleOrderStatusHistory
      * @var \Magento\Framework\Stdlib\DateTime\DateTime
      */
     private $dateTime;
+
     /**
      * @var TimezoneInterface
      */
@@ -151,11 +166,25 @@ class HandleOrderStatusHistory
     public function getStatusHistoryDetails()
     {
         $items = [];
+        foreach ($this->histories as $i => $history) {
+            $key = count($items) - 1;
+            if ($i > 0 && $key >= 0) {
+                $previousStatus = $items[$key]->getStatus();
+                if ($previousStatus == $history->getStatus()) {
+                    unset($items[$key]);
+                    $items = array_values($items);
+                }
+            }
 
-        foreach ($this->histories as $history) {
             $currentHistory = $this->statusHistoryDataFactory->create();
             $currentHistory->setData($history->getData());
             $currentHistory->setLabel($history->getStatusLabel());
+            if (isset(self::MAP_STATUS_WITH_LABEL[$history->getStatus()])) {
+                $currentHistory->setOrderUpdate(self::MAP_STATUS_WITH_LABEL[$history->getStatus()]);
+            } else {
+                continue;
+            }
+
             $currentHistory->setCreatedAt($this->formatDate($history->getCreatedAt()));
             $currentHistory->setRawFormatDate($history->getCreatedAt());
             $items[] = $currentHistory;
@@ -426,7 +455,7 @@ class HandleOrderStatusHistory
      */
     private function getPlaceHolderIcon($status)
     {
-        return$this->viewRepository->getUrl(self::ICON_PATH . self::MAP_STATUS_SVG[$status]);
+        return $this->viewRepository->getUrl(self::ICON_PATH . self::MAP_STATUS_SVG[$status]);
     }
 
     /**

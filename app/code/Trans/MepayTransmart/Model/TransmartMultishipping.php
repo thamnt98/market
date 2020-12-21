@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * @category Trans
  * @package  Trans_MepayTransmart
@@ -26,7 +26,7 @@ class TransmartMultishipping extends MultiShipping
      */
     private $basketFactory;
 
-    /** 
+    /**
      * @inheritdoc
      */
     public function __construct(
@@ -144,12 +144,11 @@ class TransmartMultishipping extends MultiShipping
             ->setStatus($pg['insertStatus'] ?? '')
             ->setMessage($pg['insertMessage'] ?? '')
             ->setRedirectUrl($pg['redirectURL'] ?? '');
-
+        $bank = $this->bankInterfaceFactory->create()
+            ->setLogo($this->paymentHelper->getLogoPayment($paymentMethod, true))
+            ->setTitle($mainOrder->getPayment()->getMethodInstance()->getTitle());
         if ($this->paymentHelper->isVirtualAccount($paymentMethod) && !empty($pg['account_number'])) {
-            $bank = $this->bankInterfaceFactory->create()
-                ->setLogo($this->paymentHelper->getLogoPayment($paymentMethod, true))
-                ->setTitle($mainOrder->getPayment()->getMethodInstance()->getTitle())
-                ->setMinimumAmount($this->paymentHelper->getMinimumAmountVA());
+            $bank->setMinimumAmount($this->paymentHelper->getMinimumAmountVA());
             $expiredTime = $pg['expired_time'] ?? null;
             if (!empty($expiredTime)) {
                 $utc = strtotime($expiredTime) - $this->dateTime->getGmtOffset();
@@ -160,9 +159,9 @@ class TransmartMultishipping extends MultiShipping
                 ->setHowToPayObjects($this->paymentHelper->getBlockHowToPay($paymentMethod, true))
                 ->setReferenceNumber($pg['reference_number'])
                 ->setTotalAmount($pg['total_amount'])
-                ->setRelateUrl($this->paymentHelper->getWebsiteBanking($paymentMethod))
-                ->setBank($bank);
+                ->setRelateUrl($this->paymentHelper->getWebsiteBanking($paymentMethod));
         }
+        $payment->setBank($bank);
         $error = false;
         if (!empty($pg['insertStatus']) && $pg['insertStatus'] != '00') {
             $error = true;
