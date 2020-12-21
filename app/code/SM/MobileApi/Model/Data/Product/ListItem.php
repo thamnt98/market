@@ -382,4 +382,20 @@ class ListItem extends \Magento\Framework\Model\AbstractExtensibleModel implemen
     {
         return $this->setData(self::FRESH_PRODUCT, $value);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getDiscountPercent()
+    {
+        return $this->getData(self::DISCOUNT_PERCENT);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setDiscountPercent($value)
+    {
+        return $this->setData(self::DISCOUNT_PERCENT, $value);
+    }
 }

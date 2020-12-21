@@ -774,9 +774,12 @@ class Cart implements \SM\MobileApi\Api\CartInterface
             $itemData->setOptionList($optionData);
         } elseif ($item->getProductType() == 'configurable') {
             $configOptionList = $this->helperConfiguration->getOptions($item);
-            $configData = $item->getBuyRequest()->getData('super_attribute');
-            foreach ($configOptionList as &$config) {
-                if (strtolower($config["label"]) == "color" && isset($configData[$config["option_id"]])) {
+            //$configData = $item->getBuyRequest()->getData('super_attribute');
+            foreach ($configOptionList as $key => $config) {
+                if (is_string($config["option_value"]) && $config["option_value"] == '') {
+                    unset($configOptionList[$key]);
+                }
+                /*if (strtolower($config["label"]) == "color" && isset($configData[$config["option_id"]])) {
                     $attr = $item->getProduct()->getResource()->getAttribute('color');
                     if ($attr->usesSource()) {
                         $optionText = $attr->getSource()->getOptionText($configData[$config["option_id"]]);
@@ -788,7 +791,7 @@ class Cart implements \SM\MobileApi\Api\CartInterface
                     }
 
                     $config["option_value"] = $configData[$config["option_id"]];
-                }
+                }*/
             }
             $itemData->setConfigOptionList($this->convertOptionListToObject($configOptionList));
         } else {

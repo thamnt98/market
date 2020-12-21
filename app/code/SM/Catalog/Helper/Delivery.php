@@ -76,7 +76,7 @@ class Delivery
             ],
             [
                 'value' => Method::SCHEDULED,
-                'label' => __('Schedule')
+                'label' => __('Schedule for Later')
             ]
         ];
 

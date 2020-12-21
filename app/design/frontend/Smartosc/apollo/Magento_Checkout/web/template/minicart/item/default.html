@@ -36,18 +36,36 @@
                 <div data-role="content" class="content">
                     <dl class="product options list">
                         <!-- ko foreach: { data: options, as: 'option' } -->
-                        <dt class="label"><!-- ko text: option.label --><!-- /ko --></dt>
-                        <dd class="values">
-                            <!-- ko if: Array.isArray(option.value) -->
-                            <span data-bind="html: option.value.join('<br>')"></span>
+                            <!-- ko if: ($parent.product_type === 'configurable') -->
+                                <!-- ko if: (Array.isArray(option.value) || option.option_type == 'file' || option.value != '') -->
+                                    <dt class="label"><!-- ko text: option.label --><!-- /ko --></dt>
+                                <!-- /ko -->
+                                <dd class="values">
+                                    <!-- ko if: Array.isArray(option.value) -->
+                                    <span data-bind="html: option.value.join('<br>')"></span>
+                                    <!-- /ko -->
+                                    <!-- ko if: (!Array.isArray(option.value) && option.option_type == 'file') -->
+                                    <span data-bind="html: option.value"></span>
+                                    <!-- /ko -->
+                                    <!-- ko if: (!Array.isArray(option.value) && option.option_type != 'file' && option.value != '') -->
+                                    <span data-bind="text: option.value"></span>
+                                    <!-- /ko -->
+                                </dd>
                             <!-- /ko -->
-                            <!-- ko if: (!Array.isArray(option.value) && option.option_type == 'file') -->
-                            <span data-bind="html: option.value"></span>
+                            <!-- ko if: ($parent.product_type !== 'configurable') -->
+                                <dt class="label"><!-- ko text: option.label --><!-- /ko --></dt>
+                                <dd class="values">
+                                    <!-- ko if: Array.isArray(option.value) -->
+                                    <span data-bind="html: option.value.join('<br>')"></span>
+                                    <!-- /ko -->
+                                    <!-- ko if: (!Array.isArray(option.value) && option.option_type == 'file') -->
+                                    <span data-bind="html: option.value"></span>
+                                    <!-- /ko -->
+                                    <!-- ko if: (!Array.isArray(option.value) && option.option_type != 'file') -->
+                                    <span data-bind="text: option.value"></span>
+                                    <!-- /ko -->
+                                </dd>
                             <!-- /ko -->
-                            <!-- ko if: (!Array.isArray(option.value) && option.option_type != 'file') -->
-                            <span data-bind="text: option.value"></span>
-                            <!-- /ko -->
-                        </dd>
                         <!-- /ko -->
                     </dl>
                 </div>
