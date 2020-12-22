@@ -264,5 +264,75 @@ class IntegrationCommon implements IntegrationCommonInterface
     }
 
 
+    /**
+     * @param array $data
+     * @return array
+     */
+    public function doCallUsingRawQuery($data) 
+    {
+
+        try {
+
+            if (!is_array($data) || empty($data)) {
+                throw new StateException(__(
+                    'Parameter Data are empty !'
+                ));
+            }
+    
+            $response = $this->curl->get(
+                $data[IntegrationChannelInterface::URL] ,
+                $data[IntegrationChannelMethodInterface::HEADERS],
+                $data[IntegrationChannelMethodInterface::QUERY_PARAMS]
+            );
+
+            return $this->curl->jsonToArray($response);
+
+        }
+        catch (\Exception $ex) {
+            throw new StateException(
+                __($ex->getMessage())
+            );
+        }        
+
+    }
+
+
+    /**
+     * @param string $tag
+     * @return array
+     */
+    public function prepareChannelUsingRawQuery($tag)
+    {                
+
+        try {
+
+            if (empty($tag)) {
+                throw new StateException(__(
+                    'Parameter Tag are empty !'
+                ));
+            }
+
+            $result = [];
+
+            $method = $this->methodRepository->getByStatusActiveUsingRawQuery($tag);
+            if (!empty($method)) {
+                $result['method'] = $method;
+                $channel = $this->channelRepository->getByIdUsingRawQuery($result['method']['ch_id']);
+                if (!empty($channel)) {
+                    $result['channel'] = $channel;
+                }
+            }                        
+
+            return $result;
+
+        }
+        catch (\Exception $ex) {
+            throw new StateException(
+                __($ex->getMessage())
+            );
+        }
+
+    }
+
 
 }

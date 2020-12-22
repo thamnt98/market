@@ -54,16 +54,22 @@ interface IntegrationCommonInterface
      */
     public function post($data);
 
-
     /**
      * @param $tag
      * @return mixed
      */
     public function prepareChannelMultiTag($tag);
 
+    /**
+     * @param string $tag
+     * @return array
+     */
+    public function prepareChannelUsingRawQuery($tag);
 
-
-
-
+    /**
+     * @param array $data
+     * @return array
+     */
+    public function doCallUsingRawQuery($data);
 
 }

@@ -53,6 +53,7 @@ interface IntegrationJobInterface {
 
 	const STATUS_PROGRES_UPDATE_FAIL = 35;
 
+	const STATUS_PARTIAL_COMPLETE = 49; // Data partially successfully saved sync
 	const STATUS_COMPLETE = 50; // Data successfully saved sync
 
 	const STATUS_CANCEL = 60; // cancel
@@ -61,7 +62,8 @@ interface IntegrationJobInterface {
 	/**
 	 * Constant for Message
 	 */
-	const MSG_DATA_NOTAVAILABLE = 'Theres no data available';
+	const MSG_DATA_NOTAVAILABLE = 'There is no data available';
+	const MSG_DATA_PARTIALLY_AVAILABLE = 'Data partially available';
 
 	/**
 	 * Get id
