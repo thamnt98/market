@@ -1220,6 +1220,11 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                 $rowData['status'] = $rowData['is_active'];
                 $rowData['description'] = $rowData['long_description'];
 
+                $rowData['url_key'] = $this->changeUrlKeyChildProduct(
+                    $rowData['name'], 
+                    $rowData['sku']
+                );
+
                 $productBrand = $this->prepareBrand($rowData);
 
                 if(isset($productBrand['attribute_value'])) {
@@ -1303,6 +1308,8 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                 try {
                     // 1. Entity phase
                     if ($this->isSkuExist($rowSku)) {
+                        unset($rowData['url_key']);
+                        
                         // existing row
                         if (isset($rowData['attribute_set_code'])) {
                             $attributeSetId = $this->catalogConfig->getAttributeSetId(
@@ -1328,12 +1335,7 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                             'attribute_set_id' => $attributeSetId,
                             $entityLinkField => $this->getExistingSku($rowSku)[$entityLinkField]
                         ];
-                    } else {
-                        $rowData['url_key'] = $this->changeUrlKeyChildProduct(
-                            $rowData['name'], 
-                            $rowData['sku']
-                        );
-                        
+                    } else {                        
                         if (!$productLimit || $productsQty < $productLimit) {
                             $entityRowsIn[strtolower($rowSku)] = [
                                 'attribute_set_id' => $attributeSet['attribute_set_id'],
