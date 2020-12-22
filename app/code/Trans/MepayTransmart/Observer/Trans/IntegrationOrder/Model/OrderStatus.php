@@ -101,14 +101,15 @@ class OrderStatus implements ObserverInterface
 
         $this->clientHelper->setAmount($amount);
         $this->clientHelper->setNewAmount($newAmount);
-        $this->clientHelper->setTxnByOrderId($orderId);
+        $this->clientHelper->setTxnByOrderId($refNumber);
         $send = $this->clientHelper->send();
 
+        $this->logger->info('$send ' . json_encode($send));
+        
         $this->saveCaptureTrack($send, $observer);
       } else {
         $this->logger->info('== {{Order with reference number ' . $refNumber . ' Captured already}} ==');
       }
-
 
       $this->logger->info('== {{Auth Capture End}} ==');
     }
