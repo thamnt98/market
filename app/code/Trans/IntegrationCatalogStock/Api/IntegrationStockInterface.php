@@ -54,4 +54,18 @@ interface IntegrationStockInterface {
      * @return mixed
      */
 	public function addNewSource($locationCode);
+
+	/**
+	 * @param mixed $channel
+	 * @return array
+	 */
+	public function prepareStockDataUsingRawQuery($channel);
+
+    /**
+     * @param array $channel
+     * @param array $data
+     * @return int
+     */
+	public function insertStockDataUsingRawQuery($channel, $data);
+	
 }

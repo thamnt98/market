@@ -119,4 +119,47 @@ interface IntegrationCheckUpdatesInterface
      */
     public function prepareJobsDataProperRespWithoutCount($channel,$response);
 
+
+    /**
+     * @param array $channel
+     * @return mixed
+     */
+    public function checkOnProgressJobUsingRawQuery($channel);
+
+    /**
+     * @param array $channel
+     * @return mixed
+     */
+    public function getLastCompleteJobUsingRawQuery($channel);
+
+    /**
+     * @param array $channel
+     * @return array
+     */
+    public function prepareCallUsingRawQuery($channel);
+
+     /**
+     * @param array $channel
+     * @param array $response
+     * @return array
+     */
+    public function prepareJobCandidatesUsingRawQuery($channel, $response);
+
+    /**
+     * @param array $data
+     * @return array
+     */
+    public function insertJobCandidatesUsingRawQuery($data);
+
+    /**
+     * @param array $channel
+     * @return mixed
+     */
+    public function checkOnProgressDataSavingJobUsingRawQuery($channel);
+
+    /**
+     * @param array $channel
+     * @return mixed
+     */
+    public function getFirstDataReadyJobUsingRawQuery($channel);     
 }

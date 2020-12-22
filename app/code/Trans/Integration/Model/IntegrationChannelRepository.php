@@ -59,25 +59,34 @@ class IntegrationChannelRepository implements IntegrationChannelRepositoryInterf
     protected $integrationChannelInterface;
 
     /**
+    * @var ResourceConnection
+    */
+    protected $dbConnection;
+
+    /**
      * IntegrationChannelRepository constructor.
      * @param ResourceModel $resource
      * @param IntegrationChannelFactory $integrationChannelFactory
      * @param ResourceModel\CollectionFactory $integrationChannelCollectionFactory
      * @param IntegrationChannelSearchResultInterfaceFactory $integrationChannelSearchResultInterfaceFactory
      * @param IntegrationChannelInterfaceFactory $integrationChannelInterface
+     * \Magento\Framework\App\ResourceConnection $resourceConnection
      */
     public function __construct(
         ResourceModel $resource,
         IntegrationChannelFactory $integrationChannelFactory,
         IntegrationChannelCollectionFactory $integrationChannelCollectionFactory,
         IntegrationChannelSearchResultInterfaceFactory $integrationChannelSearchResultInterfaceFactory,
-        IntegrationChannelInterfaceFactory $integrationChannelInterface
+        IntegrationChannelInterfaceFactory $integrationChannelInterface,
+        \Magento\Framework\App\ResourceConnection $resourceConnection
     ) {
         $this->resource = $resource;
         $this->integrationChannelFactory = $integrationChannelFactory;
         $this->integrationChannelCollectionFactory = $integrationChannelCollectionFactory;
         $this->searchResultFactory = $integrationChannelSearchResultInterfaceFactory;
         $this->integrationChannelInterface = $integrationChannelInterface;
+        
+        $this->dbConnection = $resourceConnection->getConnection();
     }
 
     /**
@@ -153,4 +162,34 @@ class IntegrationChannelRepository implements IntegrationChannelRepositoryInterf
         unset($this->instances[$id]);
         return true;
     }
+
+    /**
+     * @param string $id
+     * @return array
+     */
+    public function getByIdUsingRawQuery($id)
+    {     
+        try {
+
+            if (empty($id)) {
+                throw new StateException(__(
+                    'Parameter ID are empty !'
+                ));
+            }
+
+            $str = "select `id`, `name`, `code`, `url`, `env`, `status`, `created_at`, `updated_at`, `created_by`, `updated_by` from `integration_channel` where `id` = %d limit 1";
+    
+            $sql = sprintf($str, $id);
+    
+            $result = $this->dbConnection->fetchRow($sql);
+
+        } 
+        catch (\Exception $ex) {
+            throw new StateException(__(
+                $ex->getMessage()
+             ));
+        }
+
+        return $result;        
+    }    
 }
