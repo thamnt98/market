@@ -635,11 +635,9 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         if (!$product || !$product->getId()) {
             return null;
         }
-
-        if ($this->_getProductStockQty($product) <= 0) {
-            throw new Exception(__('Product is out of stock or product is alcohol, tobacco'), 0, Exception::HTTP_NOT_FOUND);
+        if ($product->getData('is_tobacco')) {
+            throw new Exception(__('Product is tobacco'), 0, Exception::HTTP_NOT_FOUND);
         }
-
         $this->registry->register('current_product', $product, true);
         $this->registry->register('product', $product, true);
 
