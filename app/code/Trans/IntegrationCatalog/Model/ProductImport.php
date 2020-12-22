@@ -1218,6 +1218,7 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                 $rowData['_product_websites'] = $website->getCode();
                 $rowData['product_websites'] = $website->getCode();
                 $rowData['status'] = $rowData['is_active'];
+                $rowData['description'] = $rowData['long_description'];
 
                 $productBrand = $this->prepareBrand($rowData);
 
