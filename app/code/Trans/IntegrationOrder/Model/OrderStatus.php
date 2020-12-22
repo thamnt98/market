@@ -261,6 +261,13 @@ class OrderStatus implements OrderStatusInterface {
 			$saveDataToStatusHistory->setComment($data->getFeStatus() . $data->getFeSubStatus());
 			$saveDataToStatusHistory->setEntityName('order');
 		}
+		if ($loadDataOrder && $data->getFeStatusNo() == $configStatus->getNumberFailedDelivery()) {
+			$loadDataOrder->setStatus($configStatus->getFailedDeliveryStatus());
+			$saveDataToStatusHistory->setParentId($entityIdSalesOrder);
+			$saveDataToStatusHistory->setStatus($configStatus->getFailedDeliveryStatus());
+			$saveDataToStatusHistory->setComment($data->getFeStatus() . $data->getFeSubStatus());
+			$saveDataToStatusHistory->setEntityName('order');
+		}
 
 		$this->orderRepoInterface->save($loadDataOrder);
 		$this->orderStatusHistoryRepoInterface->save($saveDataToStatusHistory);
@@ -368,6 +375,13 @@ class OrderStatus implements OrderStatusInterface {
 			$loadDataOrder->setStatus($configStatus->getInProcessWaitingPickupStatus());
 			$saveDataToStatusHistory->setParentId($entityIdSalesOrder);
 			$saveDataToStatusHistory->setStatus($configStatus->getInProcessWaitingPickupStatus());
+			$saveDataToStatusHistory->setComment($data->getFeStatus() . $data->getFeSubStatus());
+			$saveDataToStatusHistory->setEntityName('order');
+		}
+		if ($loadDataOrder && $data->getFeStatusNo() == $configStatus->getNumberFailedDelivery()) {
+			$loadDataOrder->setStatus($configStatus->getFailedDeliveryStatus());
+			$saveDataToStatusHistory->setParentId($entityIdSalesOrder);
+			$saveDataToStatusHistory->setStatus($configStatus->getFailedDeliveryStatus());
 			$saveDataToStatusHistory->setComment($data->getFeStatus() . $data->getFeSubStatus());
 			$saveDataToStatusHistory->setEntityName('order');
 		}
@@ -509,6 +523,13 @@ class OrderStatus implements OrderStatusInterface {
 			$loadDataOrder->setStatus($configStatus->getInProcessWaitingPickupStatus());
 			$saveDataToStatusHistory->setParentId($entityIdSalesOrder);
 			$saveDataToStatusHistory->setStatus($configStatus->getInProcessWaitingPickupStatus());
+			$saveDataToStatusHistory->setComment($data->getFeStatus() . $data->getFeSubStatus());
+			$saveDataToStatusHistory->setEntityName('order');
+		}
+		if ($loadDataOrder && $data->getFeStatusNo() == $configStatus->getNumberFailedDelivery()) {
+			$loadDataOrder->setStatus($configStatus->getFailedDeliveryStatus());
+			$saveDataToStatusHistory->setParentId($entityIdSalesOrder);
+			$saveDataToStatusHistory->setStatus($configStatus->getFailedDeliveryStatus());
 			$saveDataToStatusHistory->setComment($data->getFeStatus() . $data->getFeSubStatus());
 			$saveDataToStatusHistory->setEntityName('order');
 		}
