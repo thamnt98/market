@@ -158,7 +158,7 @@ class TransmartPaymentMethods extends PaymentMethods
                 ->setCode($key)
                 ->setLogo($this->paymentHelper->getLogoPayment($key,true))
                 ->setDescription($this->scopeConfig->getValue('payment/sprint/sprint_cc_payment/'.$key.'/description'))
-                ->setTitle($this->methods[$key]);
+                ->setTitle($this->methods[$key]['title']);
             }
         }
 
