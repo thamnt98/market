@@ -696,13 +696,8 @@ class IntegrationStock implements IntegrationStockInterface {
 					}
 	
 					$isFresh = $productCollection->getData('is_fresh');
-					$this->logger->info($label . "sku-is-fresh = {$isFresh}");
-
 					$soldIn = $productCollection->getData('sold_in');
-					$this->logger->info($label . "sku-sold-in = {$soldIn}");
-
 					$weight = $productCollection->getData('weight');
-					$this->logger->info($label . "sku-weight = {$weight}");
 
 					foreach ($stockCandidatePointerList[$productSku] as $idx) {
 						if ($isFresh == 1) {
