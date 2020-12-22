@@ -103,17 +103,16 @@ class Listing
             $data[] = [
                 self::START_TIME => str_replace(',', ':', $randomStartTime),
                 self::END_TIME   => str_replace(',', ':', $randomEndTime),
-                self::MESSAGE    => sprintf($randomMessage, $name),
+                self::MESSAGE    => $randomMessage,
                 self::REDIRECT   => null
             ];
-
             $this->cache->save($this->serializer->serialize($data), $cacheKey);
             $cache = $this->cache->load($cacheKey);
-            return $this->serializer->unserialize($cache);
-        } else {
-            $cache = $this->serializer->unserialize($cache);
         }
-
+        $cache = $this->serializer->unserialize($cache);
+        if (isset($cache[1])) {
+            $cache[1][self::MESSAGE] = sprintf($cache[1][self::MESSAGE], $name);
+        }
         return $cache;
     }
 
