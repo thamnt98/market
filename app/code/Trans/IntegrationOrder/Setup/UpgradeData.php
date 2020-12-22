@@ -214,5 +214,18 @@ class UpgradeData implements UpgradeDataInterface {
 
 			$setup->endSetup();
 		}
+
+		if (version_compare($context->getVersion(), '1.1.7', '<')) {
+			if ($setup->getConnection()->isTableExists($omsStatus) == true) {
+				$data = [
+					[2, 99, 0, '91', 'Order Canceled', '91', 'Order Canceled by Transmart', '', ''],
+				];
+				$columns = ['status', 'action', 'sub_action', 'fe_status_no', 'fe_status',
+					'fe_sub_status_no', 'fe_sub_status', 'oms_payment_status', 'pg_status_no'];
+				$setup->getConnection()->insertArray($omsStatus, $columns, $data);
+			}
+
+			$setup->endSetup();
+		}
 	}
 }

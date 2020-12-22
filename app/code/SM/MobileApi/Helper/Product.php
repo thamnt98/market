@@ -68,6 +68,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
     protected $quote;
     protected $adjustPrice;
     protected $productInstallation;
+    protected $smCatalogHelper;
 
     public function __construct(
         \SM\GTM\Block\Product\ListProduct $productGtm,
@@ -115,7 +116,8 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\Customer\Model\Customer $customer,
         \Magento\Quote\Model\QuoteManagement $quote,
         \SM\MobileApi\Model\Product\Price\AdjustPrice $adjustPrice,
-        \SM\MobileApi\Model\Product\Common\Installation $productInstallation
+        \SM\MobileApi\Model\Product\Common\Installation $productInstallation,
+        \SM\Catalog\Helper\Data $smCatalogHelper
     ) {
         $this->productGtm = $productGtm;
         $this->optionFactory = $optionFactory;
@@ -162,6 +164,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $this->quote = $quote;
         $this->adjustPrice = $adjustPrice;
         $this->productInstallation = $productInstallation;
+        $this->smCatalogHelper = $smCatalogHelper;
         parent::__construct($context);
     }
 
@@ -486,7 +489,11 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
             $productInfo->setItemId($inCart['item_id']);
             $productInfo->setItemQty($inCart['item_qty']);
         }
-
+        $discountPercent = $this->smCatalogHelper->getDiscountPercent($product);
+        if (!$discountPercent) {
+            $discountPercent = 0;
+        }
+        $productInfo->setDiscountPercent($discountPercent);
         return $productInfo;
     }
 
@@ -696,6 +703,11 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
 
         $productInfo->setCouponLabel($this->getRuleLabel($product));
         $productInfo->setCouponTooltip($this->getRuleToolTip($product));
+        $discountPercent = $this->smCatalogHelper->getDiscountPercent($product);
+        if (!$discountPercent) {
+            $discountPercent = 0;
+        }
+        $productInfo->setDiscountPercent($discountPercent);
         return $productInfo;
     }
 

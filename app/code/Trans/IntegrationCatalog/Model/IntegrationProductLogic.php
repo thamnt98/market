@@ -180,6 +180,11 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	protected $attributeResource;
 
 	/**
+	 * @var \Magento\Eav\Api\AttributeRepositoryInterface
+	 */
+	protected $attributeRepo;
+
+	/**
 	 * @var \Trans\IntegrationCatalog\Helper\Data
 	 */
 	protected $dataHelper;
@@ -200,6 +205,11 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	protected $brandFactory;
 
 	/**
+	 * @var \Magento\Framework\App\ResourceConnection
+	 */
+	protected $resource;
+
+	/**
 	 * @param Logger $Logger
 	 * @param \Magento\ConfigurableProduct\Model\Product\Type\Configurable\AttributeFactory $configurableAttribute
 	 * @param IntegrationJobRepositoryInterface $integrationJobRepositoryInterface
@@ -210,6 +220,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	 * @param ProductRepositoryInterface $productRepositoryInterface
 	 * @param ProductInterfaceFactory $productInterfaceFactory
 	 * @param AttributeOption $attributeOption
+	 * @param \Magento\Eav\Api\AttributeRepositoryInterface $attributeRepo
 	 * @param Validation $validation
 	 * @param Curl $curl
 	 * @param ProductOptionFactory $productOptionFactory
@@ -220,6 +231,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	 * @param CategoryLinkManagementInterface $categoryLinkManagementInterface
 	 * @param IntegrationProductAttributeRepositoryInterface
 	 * @param \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable\Attribute $attributeResource
+	 * @param \Magento\Framework\App\ResourceConnection $resource
 	 * @param \Trans\IntegrationCatalog\Helper\Data $dataHelper
 	 * @param \Trans\IntegrationEntity\Model\IntegrationProductAttributeRepository $attributeSet
 	 * @param \Trans\Brand\Api\BrandRepositoryInterface $brandRepository
@@ -249,10 +261,12 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		IntegrationDataValueInterfaceFactory $integrationDataValueInterfaceFactory,
 		IntegrationProductAttributeRepositoryInterface $integrationAttributeRepository,
 		\Magento\Catalog\Model\ResourceModel\Eav\Attribute $eavAttribute,
+		\Magento\Eav\Api\AttributeRepositoryInterface $attributeRepo,
 		ProductAttributeInterfaceFactory $productAttributeFactory,
 		ProductAttributeRepositoryInterface $productAttributeRepository,
 		ProductAttributeManagementInterface $productAttributeManagement,
 		\Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable\Attribute $attributeResource,
+		\Magento\Framework\App\ResourceConnection $resource,
 		\Trans\IntegrationCatalog\Helper\Data $dataHelper,
 		\Trans\IntegrationEntity\Model\IntegrationProductAttributeRepository $attributeSet,
 		\Trans\Brand\Api\BrandRepositoryInterface $brandRepository,
@@ -268,6 +282,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		$this->productRepositoryInterface = $productRepositoryInterface;
 		$this->productInterfaceFactory = $productInterfaceFactory;
 		$this->attributeOption = $attributeOption;
+		$this->attributeRepo = $attributeRepo;
 		$this->attributeResource = $attributeResource;
 		$this->validation = $validation;
 		$this->curl = $curl;
@@ -289,6 +304,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		$this->attrGroupGeneralInfoId = IntegrationProductInterface::ATTRIBUTE_SET_ID;
 		$this->attrGroupProductDetailId = $this->integrationAttributeRepository->getAttributeGroupId(IntegrationProductAttributeInterface::ATTRIBUTE_GROUP_CODE_PRODUCT);
 
+		$this->resource = $resource;
 		$this->eavAttribute = $eavAttribute;
 		$this->productAttributeFactory = $productAttributeFactory;
 		$this->productAttributeRepository = $productAttributeRepository;
@@ -1471,7 +1487,11 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		} catch (NoSuchEntityException $e) {
 			$product = $this->productInterfaceFactory->create();
 			$product->setSku($sku);
-			$product->setUrlKey($this->changeUrlKeyChildProduct($simpleProducts['default_product_name'] , $sku));
+
+			$urlKey = $this->changeUrlKeyChildProduct($simpleProducts['default_product_name'] , $sku);
+			$this->checkUrlKey($urlKey, $sku);
+
+			$product->setUrlKey($urlKey);
 			$this->logger->info(__FUNCTION__."---- Create New Product");
 		}
 		
@@ -1638,6 +1658,93 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		}
 
 		return $productSave;
+	}
+
+	/**
+	 * check url key
+	 * 
+	 * @param string $urlKey
+	 * @param string $sku
+	 * @return bool
+	 */
+	protected function checkUrlKey($urlKey, $sku)
+	{
+		$connection = $this->resource->getConnection();
+		$table = $connection->getTableName('url_rewrite');
+		
+		$query = $connection->select();
+		$query->from(
+			$table,
+			['*']
+		)->where('request_path like "%' . $urlKey . '.%"');
+
+		$collection = $query->fetchAll($query);
+
+		if($collection) {
+			$skus = [];
+			foreach($collection as $data) {
+				$product = $this->getProductDataRaw($data['entity_id']);
+
+				if(!in_array($product['sku'], $skus)) {
+					$skus[] = $product['sku'];
+				}
+
+				$reqPath = explode('.', $data['request_path']);
+				$newReqPath = implode('-' . $product['sku'] . '.', $reqPath);
+
+				$this->updateUrlRewrite($data['url_rewrite_id'], $newReqPath);
+			}
+
+			$attribute = $this->attributeRepository->get(ProductModel::ENTITY, 'url_key');
+        	$attributeId = $attribute->getAttributeId();
+
+        	if(!empty($skus)) {
+        		foreach ($skus as $sku) {
+        			$this->updateUrlKey($attributeId, $urlKey, $sku);
+        		}
+        	}
+		}
+	}
+
+	protected function updateUrlKey($attributeId, $urlKey, $sku)
+	{
+		$connection = $this->resource->getConnection();
+		$table = $connection->getTableName('catalog_product_entity_varchar');
+		$newUrlKey = $urlKey . '-' . $sku;
+		$query = 'UPDATE INTO ' . $table . ' set value = ' . $newUrlKey . ' where value = ' . $urlKey . ' and attribute_id = ' . $attributeId;
+
+		$connection->query($query);
+	}
+
+	protected function updateUrlRewrite($urlRewriteId, $requestPath)
+	{
+		$connection = $this->resource->getConnection();
+		$table = $connection->getTableName('url_rewrite');
+
+		$query = 'UPDATE INTO ' . $table . ' set request_path = ' . $requestPath . ' where url_rewrite_id = ' . $urlRewriteId;
+		$connection->query($query);
+
+		$this->resource->closeConnection();
+	}
+
+	protected function getProductDataRaw($entityId)
+	{
+		$connection = $this->getConnection();
+		$table = $connection->getTableName('catalog_product_entity');
+
+		$query = $connection->select();
+		$query->from(
+			$table,
+			['*']
+		)->where('entity_id = ?', $entityId);
+
+		$data = $connection->fetchRow($query);
+
+		if($data) {
+			return $data;
+		}
+
+		return [];
 	}
 
 	/**
