@@ -438,4 +438,20 @@ class PromotionPrice extends \Magento\Framework\Model\AbstractModel implements P
     {
         $this->setData(PromotionPriceInterface::END_DATE, $endDate);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getRuleName()
+    {
+        return $this->_getData(PromotionPriceInterface::RULE_NAME);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setRuleName($ruleName)
+    {
+        $this->setData(PromotionPriceInterface::RULE_NAME, $ruleName);
+    }
 }

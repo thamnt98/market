@@ -60,6 +60,11 @@ class IntegrationChannelMethodRepository implements IntegrationChannelMethodRepo
     protected $interface;
 
     /**
+     * @var ResourceConnection
+     */
+	protected $dbConnection;
+
+    /**
      * IntegrationChannelMethodRepository constructor.
      * @param ResourceModel $resource
      * @param CollectionFactory $collectionFactory
@@ -70,13 +75,16 @@ class IntegrationChannelMethodRepository implements IntegrationChannelMethodRepo
         ResourceModel $resource,
         CollectionFactory $collectionFactory,
         IntegrationChannelMethodSearchResultInterfaceFactory $searchResultFactory,
-        IntegrationChannelMethodInterfaceFactory $interface
+        IntegrationChannelMethodInterfaceFactory $interface,
+        \Magento\Framework\App\ResourceConnection $resourceConnection
     ) {
         $this->resource = $resource;
 
         $this->collectionFactory = $collectionFactory;
         $this->searchResultFactory = $searchResultFactory;
         $this->interface = $interface;
+
+        $this->dbConnection = $resourceConnection->getConnection();
     }
 
     /**
@@ -209,4 +217,32 @@ class IntegrationChannelMethodRepository implements IntegrationChannelMethodRepo
         }
         return $collection;
     }
+
+    /**
+     * @param $tag
+     * @return array
+     */
+    public function getByStatusActiveUsingRawQuery($tag)
+    {     
+        try {
+
+            if (empty($tag)) {
+                throw new StateException(__(
+                    'Parameter Tag are empty !'
+                ));
+            }
+
+            $str = "select `id`, `ch_id`, `tag`, `desc`, `method`, `headers`, `query_params`, `body`, `path`, `limit`, `status`, `created_at`, `updated_at`, `created_by`, `updated_by` from `integration_channel_method` where `tag` = '%s' and `status` = %d limit 1";
+    
+            $sql = sprintf($str, $tag, IntegrationChannelInterface::STATUS_ACTIVE);        
+    
+            return $this->dbConnection->fetchRow($sql);
+
+        } 
+        catch (\Exception $ex) {
+            throw new StateException(__(
+                $ex->getMessage()
+             ));
+        }
+    }    
 }

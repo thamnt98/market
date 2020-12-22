@@ -28,10 +28,10 @@ class Stock {
     protected $checkUpdates;
 
 	public function __construct(
-		\Trans\Integration\Logger\Logger $logger,
+		\Trans\IntegrationCatalogStock\Logger\Logger $logger,
 		IntegrationCommonInterface $commonRepository,
-		IntegrationStockInterface $integrationStockInterface
-        , IntegrationCheckUpdatesInterface $checkUpdates
+		IntegrationStockInterface $integrationStockInterface,
+        IntegrationCheckUpdatesInterface $checkUpdates
 	) {
 		$this->logger                    = $logger;
 		$this->commonRepository          = $commonRepository;
@@ -45,29 +45,70 @@ class Stock {
 	 * @return void
 	 */
 	public function execute() {
-        $class = str_replace(IntegrationCheckUpdatesInterface::CRON_DIRECTORY,"",get_class($this));
+
+        $startTime = microtime(true);
+
+        $label = "stock-save";
+        $label .= " --> ";
+
+        $this->logger->info($label . "start");
+
 		try {
 
-			$this->logger->info("=>".$class." Get Channel Data");
-			$channel = $this->commonRepository->prepareChannel('product-stock-update');
+            $this->logger->info($label . "retrieving channel-integration-metadata");
+            $channelIntegrationMetadata = $this->commonRepository->prepareChannelUsingRawQuery("product-stock-update");
+            $this->logger->info($label . "channel-integration-metadata = " . print_r($channelIntegrationMetadata, true));
 
-			$this->logger->info("=".$class." Check Onprogress Jobs (Save Product)");
-			$channel = $this->checkUpdates->checkSaveOnProgressJob($channel);
+			$this->logger->info($label . "checking on-progress-data-saving-job");
+			$channelIntegrationMetadata = $this->checkUpdates->checkOnProgressDataSavingJobUsingRawQuery($channelIntegrationMetadata);
+			$this->logger->info($label . "on-progress-data-saving-job not-found then process continued ...");
 
-			$this->logger->info("=".$class."  Check Complete Jobs");
-			$channel = $this->checkUpdates->checkReadyJobs($channel);
+			$this->logger->info($label . "retrieving first-data-ready-job");
+			$channelIntegrationMetadata = $this->checkUpdates->getFirstDataReadyJobUsingRawQuery($channelIntegrationMetadata);
+			$this->logger->info($label . "first-data-ready-job = " . (isset($channelIntegrationMetadata['first_data_ready_job']) ? print_r($channelIntegrationMetadata['first_data_ready_job'], true) : "not-found"));
+		
+			$this->logger->info($label . "retrieving stock-data from temporary-stock-table db");
+			$stockData = $this->integrationStockInterface->prepareStockDataUsingRawQuery($channelIntegrationMetadata);
+			$this->logger->info($label . "stock-data retrieved number = " . count($stockData));
 
-			$this->logger->info("=".$class." Prepare Data");
-			$data = $this->integrationStockInterface->prepareData($channel);
+			$this->logger->info($label . "persisting stock-data into stock-magento-table db");
+			$persistingResult = $this->integrationStockInterface->insertStockDataUsingRawQuery($channelIntegrationMetadata, $stockData);
+			$this->logger->info($label . "stock-data bulk persisted = " . ($persistingResult > 0 ? "success" : "failed"));
+			$this->logger->info($label . "complete");
 
-			$this->logger->info("=".$class." Save Data");
-			$stock = $this->integrationStockInterface->saveStock($data);			
-
-		} catch (\Exception $ex) {
-
-			$this->logger->error("<=End ".$class." ".$ex->getMessage());
 		}
-		$this->logger->info("<=End ".$class);
+        catch (\Exception $ex) {
+            $this->logger->info($label . "exception = " . strtolower($ex->getMessage()));
+        }
+
+		$this->logger->info($label . "finish " . (microtime(true) - $startTime) . " second");
+
 	}
+	
+	// public function execute() {
+    //     $class = str_replace(IntegrationCheckUpdatesInterface::CRON_DIRECTORY,"",get_class($this));
+	// 	try {
+
+	// 		$this->logger->info("=>".$class." Get Channel Data");
+	// 		$channel = $this->commonRepository->prepareChannel('product-stock-update');
+
+	// 		$this->logger->info("=".$class." Check Onprogress Jobs (Save Product)");
+	// 		$channel = $this->checkUpdates->checkSaveOnProgressJob($channel);
+
+	// 		$this->logger->info("=".$class."  Check Complete Jobs");
+	// 		$channel = $this->checkUpdates->checkReadyJobs($channel);
+
+	// 		$this->logger->info("=".$class." Prepare Data");
+	// 		$data = $this->integrationStockInterface->prepareData($channel);
+
+	// 		$this->logger->info("=".$class." Save Data");
+	// 		$stock = $this->integrationStockInterface->saveStock($data);			
+
+	// 	} catch (\Exception $ex) {
+
+	// 		$this->logger->error("<=End ".$class." ".$ex->getMessage());
+	// 	}
+	// 	$this->logger->info("<=End ".$class);
+	// }
 
 }

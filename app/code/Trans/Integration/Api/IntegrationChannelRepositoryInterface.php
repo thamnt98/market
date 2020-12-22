@@ -53,4 +53,11 @@ interface IntegrationChannelRepositoryInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function delete(IntegrationChannelInterface $data);
+
+    /**
+     * @param string $id
+     * @return array
+     */
+    public function getByIdUsingRawQuery($id);
+    
 }

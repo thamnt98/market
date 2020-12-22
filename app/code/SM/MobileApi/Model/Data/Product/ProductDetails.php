@@ -443,4 +443,20 @@ class ProductDetails extends \Magento\Framework\Model\AbstractExtensibleModel im
     {
         return $this->setData(self::FRESH_PRODUCT, $value);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getDiscountPercent()
+    {
+        return $this->getData(self::DISCOUNT_PERCENT);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setDiscountPercent($value)
+    {
+        return $this->setData(self::DISCOUNT_PERCENT, $value);
+    }
 }

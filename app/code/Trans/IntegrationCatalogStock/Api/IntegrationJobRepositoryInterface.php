@@ -98,4 +98,46 @@ interface IntegrationJobRepositoryInterface
      * @return mixed
      */
     public function getByIdMdIdlastItem($id,$mdId,$status);
+
+    /**
+     * @param array $inserts
+     * @return int
+     */
+    public function insertBulkUsingRawQuery($inserts);
+
+    /**
+     * @param $mdId int
+     * @param $status array
+     * @return mixed
+     */
+    public function getAnyByMdIdMultiStatusUsingRawQuery($mdId, $status);    
+
+    /**
+     * @param int $mdId
+     * @param int $status
+     * @return mixed
+     */
+    public function getFirstByMdIdStatusUsingRawQuery($mdId, $status);
+
+    /**
+     * @param int $mdId
+     * @param int $status
+     * @return mixed
+     */
+    public function getLastByMdIdStatusUsingRawQuery($mdId, $status);
+
+    /**
+     * @param int $id
+     * @param int $mdId
+     * @param int $status
+     * @return mixed
+     */
+    public function getByIdMdIdStatusUsingRawQuery($id, $mdId, $status);
+
+    /**
+     * @param int $id
+     * @param array $updates
+     * @return int
+     */
+    public function updateUsingRawQuery($id, $updates);    
 }
