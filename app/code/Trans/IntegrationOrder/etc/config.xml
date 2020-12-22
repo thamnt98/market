@@ -55,6 +55,10 @@
                     <number_in_process_waiting_pickup>21</number_in_process_waiting_pickup>
                     <in_process_waiting_pickup_status_order/>
                 </in_process_waiting_pickup_status>
+                <failed_delivery_status>
+                    <number_failed_delivery>71</number_failed_delivery>
+                    <failed_delivery_status_order/>
+                </failed_delivery_status>
             </update_order_status_oms>
         </integrationorder>
     </default>
