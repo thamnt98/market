@@ -619,7 +619,8 @@ class OrderStatus implements OrderStatusInterface {
 				$this->eventManager->dispatch(
 					'refund_with_mega_payment',
 					[
-						'order_id' => $refNumber,
+						'order_id' => $orderId,
+						'reference_number' => $refNumber,
 						'amount' => $trxAmount,
 						'new_amount' => $trxAmount - $matrixAdjusmentAmount,
 					]
