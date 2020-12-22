@@ -40,7 +40,9 @@ class Config extends \Magento\Framework\App\Helper\AbstractHelper {
 	const PICKUP_BY_CUSTOMER_STATUS        = 'integrationorder/update_order_status_oms/pickup_by_customer_status/pickup_by_customer_status_order';
 	const IN_TRANSIT_STATUS                = 'integrationorder/update_order_status_oms/in_transit_status/in_transit_status_order';
 	const IN_PROCESS_WAITING_PICKUP_STATUS = 'integrationorder/update_order_status_oms/in_process_waiting_pickup_status/in_process_waiting_pickup_status_order';
+	const FAILED_DELIVERY_STATUS           = 'integrationorder/update_order_status_oms/failed_delivery_status/failed_delivery_status_order';
 
+	/* NUMBER STATUS ORDER */
 	const NUMBER_STATUS_IN_PROCESS         = 'integrationorder/update_order_status_oms/in_process_status/number_status_in_process';
 	const NUMBER_STATUS_IN_DELIVERY        = 'integrationorder/update_order_status_oms/in_delivery_status/number_status_in_delivery';
 	const NUMBER_STATUS_DELIVERED          = 'integrationorder/update_order_status_oms/delivered_status/number_status_delivered';
@@ -48,6 +50,7 @@ class Config extends \Magento\Framework\App\Helper\AbstractHelper {
 	const NUMBER_PICKUP_BY_CUSTOMER        = 'integrationorder/update_order_status_oms/pickup_by_customer_status/number_pickup_by_customer';
 	const NUMBER_IN_TRANSIT                = 'integrationorder/update_order_status_oms/in_transit_status/number_in_transit';
 	const NUMBER_IN_PROCESS_WAITING_PICKUP = 'integrationorder/update_order_status_oms/in_process_waiting_pickup_status/number_in_process_waiting_pickup';
+	const NUMBER_FAILED_DELIVERY           = 'integrationorder/update_order_status_oms/failed_delivery_status/number_failed_delivery';
 
 	/**
 	 * Get config value by path
@@ -195,6 +198,15 @@ class Config extends \Magento\Framework\App\Helper\AbstractHelper {
 	}
 
 	/**
+	 * Get data Order Failed Delivery status
+	 *
+	 * @return string
+	 */
+	public function getFailedDeliveryStatus() {
+		return $this->getConfigValue(self::FAILED_DELIVERY_STATUS);
+	}
+
+	/**
 	 * Get number In Process status from table OMS Order Status (11)
 	 *
 	 * @return string
@@ -255,6 +267,15 @@ class Config extends \Magento\Framework\App\Helper\AbstractHelper {
 	 */
 	public function getNumberInProcessWaitingPickup() {
 		return $this->getConfigValue(self::NUMBER_IN_PROCESS_WAITING_PICKUP);
+	}
+
+	/**
+	 * Get number Failed Delivery Status
+	 *
+	 * @return string
+	 */
+	public function getNumberFailedDelivery() {
+		return $this->getConfigValue(self::NUMBER_FAILED_DELIVERY);
 	}
 
 	/**

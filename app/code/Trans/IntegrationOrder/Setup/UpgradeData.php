@@ -227,5 +227,42 @@ class UpgradeData implements UpgradeDataInterface {
 
 			$setup->endSetup();
 		}
+
+		if (version_compare($context->getVersion(), '1.1.8', '<')) {
+			if ($setup->getConnection()->isTableExists($magentoOrderState) == true) {
+				$whereConditions = [
+					$setup->getConnection()->quoteInto(
+						'status = ?', 'failed_delivery'),
+				];
+				$setup->getConnection()->delete($magentoOrderState, $whereConditions);
+			}
+
+			if ($setup->getConnection()->isTableExists($omsStatus) == true) {
+				$whereConditions = [
+					$setup->getConnection()->quoteInto(
+						'fe_sub_status = ?', 'Failed Delivery'),
+				];
+				$setup->getConnection()->delete($omsStatus, $whereConditions);
+			}
+
+			if ($setup->getConnection()->isTableExists($omsStatus) == true) {
+				$data = [
+					[4, 4, 3, '71', 'Failed Delivery', '71', 'Failed to Delivery', '', ''],
+				];
+				$columns = ['status', 'action', 'sub_action', 'fe_status_no', 'fe_status',
+					'fe_sub_status_no', 'fe_sub_status', 'oms_payment_status', 'pg_status_no'];
+				$setup->getConnection()->insertArray($omsStatus, $columns, $data);
+			}
+
+			if ($setup->getConnection()->isTableExists($magentoOrderState) == true) {
+				$data = [
+					['failed_delivery', 'processing', 1, 1],
+				];
+				$columns = ['status', 'state', 'is_default', 'visible_on_front'];
+				$setup->getConnection()->insertArray($magentoOrderState, $columns, $data);
+			}
+
+			$setup->endSetup();
+		}
 	}
 }
