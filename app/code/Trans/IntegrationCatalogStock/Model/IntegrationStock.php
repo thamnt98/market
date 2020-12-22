@@ -682,11 +682,16 @@ class IntegrationStock implements IntegrationStockInterface {
 					$productSku = $productCollection->getSku();
 					$this->logger->info($label . "sku-by-magento = {$productSku}");
 
+					if ($productSku === NULL) {
+						$this->logger->info($label . "sku-by-magento is null then skipped");
+						continue;
+					}
+
 					$productSku = $this->validateSku($productSku, $stockCandidatePointerList);
 					$this->logger->info($label . "sku-by-magento-validated = {$productSku}");
 
 					if (!isset($stockCandidatePointerList[$productSku])) {
-						$this->logger->info($label . "ssku-by-magento-validated not-found-in-api-response = {$productSku}");
+						$this->logger->info($label . "ssku-by-magento-validated not-found-in-api-response = {$productSku} then skipped");
 						continue;
 					}
 	
