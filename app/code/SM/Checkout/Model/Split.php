@@ -462,7 +462,7 @@ class Split
         return [
             1 => __('Regular (2-7 days)'),
             2 => __('Same day (3 hours)'),
-            3 => __('Scheduling'),
+            3 => __('Schedule for Later'),
             4 => __('Next day (1 day)'),
             5 => __('Regular (2-7 days)'),
             6 => __('Same day (3 hours)')
@@ -479,7 +479,7 @@ class Split
         return [
             1 => __('Regular (2-7 days)'),
             2 => __('Same day (3 hours)'),
-            3 => __('Scheduling'),
+            3 => __('Schedule for Later'),
             4 => __('Next day (1 day)')
         ];
     }
