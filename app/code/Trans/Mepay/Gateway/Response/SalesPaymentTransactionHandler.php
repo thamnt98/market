@@ -19,6 +19,7 @@ use Magento\Sales\Model\Order\Payment;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Sales\Model\Order\Payment\Transaction as PaymentTransaction;
 use Trans\Mepay\Helper\Response\Response;
+use Trans\Mepay\Gateway\Request\PaymentSourceMethodDataBuilder;
 use Trans\Mepay\Logger\Logger;
 
 class SalesPaymentTransactionHandler implements HandlerInterface
@@ -87,6 +88,9 @@ class SalesPaymentTransactionHandler implements HandlerInterface
    */
   protected function savePayment($orderPayment, $resp)
   {
+    if (isset($resp[PaymentSourceMethodDataBuilder::PAYMENT_SOURCE_METHOD])) {
+        $orderPayment->setCcType($resp[PaymentSourceMethodDataBuilder::PAYMENT_SOURCE_METHOD]);
+    }
     $orderPayment->setLastTransId($resp[Response::RESPONSE_ID]);
     $orderPayment->setTransactionId($resp[Response::RESPONSE_ID]);
     $orderPayment->setIsTransactionClosed($this->shouldCloseTransaction());
@@ -119,7 +123,7 @@ class SalesPaymentTransactionHandler implements HandlerInterface
    */
   protected function getDummyResponse()
   {
-    $dummy = '{"id":"7f6d769f7-7ffc-4184-a77e-d70f77a9085f","createdTime":"2020-10-12T15:20:53.918Z","referenceId":"MI000000076","status":"unpaid","amount":37,"currency":"USD","paymentSources":["visa","megacc","megava","megaqris","megawallet","megadebit","brankasdirect"],"urls":{"selections":"https://checkout.dev.megapay.app/checkout/eKNsqr52734JUkhqbEPXvr","checkout":"https://checkout.dev.megapay.app/checkout/eKNsqr52734JUkhqbEPXvr"}}';
+    $dummy = '{"id":"7f6d769f7-7ffc-4184-a77e-d70f77a9085f","createdTime":"2020-10-12T15:20:53.918Z","referenceId":"MI000000076","status":"unpaid","amount":37,"currency":"USD","paymentSources":["visa","megacc","megava","megaqris","megawallet","megadebit","brankasdirect"],"urls":{"selections":"https://checkout.dev.megapay.app/checkout/eKNsqr52734JUkhqbEPXvr","checkout":"https://checkout.dev.megapay.app/checkout/eKNsqr52734JUkhqbEPXvr"},"paymentSourceMethod":"authcapture"}';
     return $this->json->unserialize($dummy);
   }
 }
