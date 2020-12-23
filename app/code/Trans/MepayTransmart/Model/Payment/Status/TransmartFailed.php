@@ -24,6 +24,7 @@ use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Trans\Mepay\Model\Payment\Status\Failed;
 use Trans\Sprint\Helper\Config as SprintConfig;
+use Trans\Mepay\Helper\Data;
 use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Sales\Api\OrderManagementInterface;
 
@@ -90,6 +91,21 @@ class TransmartFailed extends Failed
           $this->orderManagement->cancel($order->getId());
           $order->setStatus('order_canceled');
           $this->transactionHelper->saveOrder($order);
+          $connection = Data::getConnection();
+          $table = $connection->getTableName('sales_order_status_history');
+          $query = "SELECT entity_id FROM ".$table." WHERE parent_id = '".$orderId."' and status = 'canceled'";
+          $exist = $connection->fetchAll($query);
+          if (count($exist)) {
+              $this->logger->log('{{ Update sales order status history cancel exist start }}');
+              $query = "UPDATE ".$table." set status = 'order_canceled' where status = 'canceled' ";
+              $connection->query($query);
+              $this->logger->log('{{ Update sales order status history cancel exist end }}');
+          } else {
+              $this->logger->log('{{ Update sales order status history cancel new start }}');
+              $query = "INSERT INTO ".$table." (parent_id, status, entity_name) VALUES ('".$orderId."','order_canceled','order')";
+              $connection->query($query);
+              $this->logger->log('{{ Update sales order status history cancel new end }}');
+          }
 
           /**
            * send order to oms

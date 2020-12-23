@@ -19,6 +19,7 @@ use Magento\Payment\Gateway\Http\ConverterInterface;
 use Magento\Payment\Gateway\Http\TransferInterface;
 use Magento\Framework\Serialize\Serializer\Json;
 use Trans\Mepay\Model\Config\Config;
+use Trans\Mepay\Gateway\Request\PaymentSourceMethodDataBuilder;
 use Trans\Mepay\Logger\LoggerWrite;
 
 
@@ -112,7 +113,13 @@ class Connect implements ClientInterface
 
       try {
           $response = $client->request();
-          $result = $this->converter ? $this->converter->convert($response->getBody()) : [$response->getBody()];
+          $responseBody = $this->json->unserialize($response->getBody());
+          $preAuthData = $this->getPreAuthData($transferObject->getBody());
+          if (empty($preAuthData) == false) {
+              $responseBody = \array_merge($responseBody, $preAuthData);
+          }
+          $responseBody = $this->json->serialize($responseBody);
+          $result = $this->converter ? $this->converter->convert($responseBody) : [$responseBody];
           $log['response'] = $result;
       } catch (\Zend_Http_Client_Exception $e) {
 
@@ -131,6 +138,36 @@ class Connect implements ClientInterface
       }
 
       return $result;
+  }
+
+  /**
+   * Get pre-auth data
+   *
+   * @param array $request
+   * @return array
+   */
+  protected function getPreAuthData($request)
+  {
+    if ($this->isPreAuth($request)) {
+        return [PaymentSourceMethodDataBuilder::PAYMENT_SOURCE_METHOD => PaymentSourceMethodDataBuilder::AUTH_CAPTURE];
+    }
+    return [];
+  }
+
+  /**
+   * Is pre-auth
+   *
+   * @param array $request
+   * @return boolean
+   */
+  protected function isPreAuth($request)
+  {
+        if (isset($request[PaymentSourceMethodDataBuilder::PAYMENT_SOURCE_METHOD])
+            && $request[PaymentSourceMethodDataBuilder::PAYMENT_SOURCE_METHOD] == PaymentSourceMethodDataBuilder::AUTH_CAPTURE
+        ) {
+            return true;
+        }
+      return false;
   }
 
 }

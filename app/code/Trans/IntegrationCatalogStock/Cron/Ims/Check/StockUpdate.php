@@ -18,10 +18,16 @@ use Trans\IntegrationCatalogStock\Api\IntegrationCheckUpdatesInterface;
 
 
 class StockUpdate {
+
+	/**
+	 * @var \Trans\IntegrationCatalogStock\Logger\Logger
+	 */
+	protected $loggerfile;
+
     /**
-     * @var \Trans\IntegrationCatalogStock\Logger\Logger
+     * @var \Trans\Integration\Api\IntegrationLogToDatabaseInterface
      */
-    protected $logger;
+    protected $loggerdb;
 
     /**
      * @var IntegrationCommonInterface
@@ -35,67 +41,143 @@ class StockUpdate {
 
 
     public function __construct(
-        \Trans\IntegrationCatalogStock\Logger\Logger $logger,
-        IntegrationCommonInterface $commonRepository,
+        \Trans\IntegrationCatalogStock\Logger\Logger $loggerfile,
+        \Trans\Integration\Api\IntegrationLogToDatabaseInterface $loggerdb,
+        IntegrationCommonInterface $commonRepository,        
         IntegrationCheckUpdatesInterface $checkUpdates
     ) {
-        $this->logger = $logger;
-        $this->commonRepository = $commonRepository;
+        $this->loggerfile = $loggerfile;
+        $this->loggerdb = $loggerdb;
+        $this->commonRepository = $commonRepository;        
         $this->checkUpdates = $checkUpdates;
     }
 
-   /**
-    * Write to system.log
-    *
-    * @return void
-    */
 
     public function execute() {
 
         $startTime = microtime(true);
 
-        $label = "stock-check";
-        $label .= " --> ";
+        $cronType = "stock";
+        $cronTypeDetail = "check";
+        $cronLabel = $cronType . "-" . $cronTypeDetail . " --> ";
 
-        $this->logger->info($label . "start");
+        $logMessageTopic = "start";
+        $logMessage = "start";
+        $this->loggerfile->info($cronLabel . $logMessage);
+        $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
 
         try {
             
-            $this->logger->info($label . "retrieving channel-integration-metadata");
+            $logMessageTopic = "prepareChannelUsingRawQuery";
+
+            $logMessage = "retrieving channel-integration-metadata";            
+            $this->loggerfile->info($cronLabel . $logMessage);
+            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+
             $channelIntegrationMetadata = $this->commonRepository->prepareChannelUsingRawQuery("product-stock-update");
-            $this->logger->info($label . "channel-integration-metadata = " . print_r($channelIntegrationMetadata, true));
 
-            $this->logger->info($label . "checking on-progress-job");
+            $logMessage = "channel-integration-metadata = " . print_r($channelIntegrationMetadata, true);
+            $this->loggerfile->info($cronLabel . $logMessage);
+            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+
+
+            $logMessageTopic = "checkOnProgressJobUsingRawQuery";
+
+            $logMessage = "checking on-progress-job";
+            $this->loggerfile->info($cronLabel . $logMessage);
+            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+
             $this->checkUpdates->checkOnProgressJobUsingRawQuery($channelIntegrationMetadata);
-            $this->logger->info($label . "on-progress-job not-found then process continued ...");
-
-            $this->logger->info($label . "retrieving last-complete-job");
-            $channelIntegrationMetadata = $this->checkUpdates->getLastCompleteJobUsingRawQuery($channelIntegrationMetadata);
-            $this->logger->info($label . "last-complete-job = " . (isset($channelIntegrationMetadata['last_complete_job']) ? print_r($channelIntegrationMetadata['last_complete_job'], true) : "not-found"));
-
-            $this->logger->info($label . "preparing to call stock-check-api");
-            $callData = $this->checkUpdates->prepareCallUsingRawQuery($channelIntegrationMetadata);
-            $this->logger->info($label . "call-data = " . print_r($callData, true));
-
-            $this->logger->info($label . "calling stock-check-api");
-            $callResponse = $this->commonRepository->doCallUsingRawQuery($callData);
-            $this->logger->info($label . "call-response = " . print_r($callResponse, true));
-
-            $this->logger->info($label . "preparing job-candidates based on stock-check-api call-response");
-            $jobCandidates = $this->checkUpdates->prepareJobCandidatesUsingRawQuery($channelIntegrationMetadata, $callResponse);
-            $this->logger->info($label . "job-candidates prepared = " . print_r($jobCandidates, true));
             
-            $this->logger->info($label . "persisting job-candidates into job-temporary-table db");
+            $logMessage = "on-progress-job not-found then process continued ...";
+            $this->loggerfile->info($cronLabel . $logMessage);
+            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+
+
+            $logMessageTopic = "getLastCompleteJobUsingRawQuery";
+
+            $logMessage = "retrieving last-complete-job";
+            $this->loggerfile->info($cronLabel . $logMessage);
+            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+
+            $channelIntegrationMetadata = $this->checkUpdates->getLastCompleteJobUsingRawQuery($channelIntegrationMetadata);
+
+            $logMessage = "last-complete-job = " . (isset($channelIntegrationMetadata['last_complete_job']) ? print_r($channelIntegrationMetadata['last_complete_job'], true) : "not-found");
+            $this->loggerfile->info($cronLabel . $logMessage);
+            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+
+
+            $logMessageTopic = "prepareCallUsingRawQuery";
+
+            $logMessage = "preparing to call stock-check-api";
+            $this->loggerfile->info($cronLabel . $logMessage);
+            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+
+            $callData = $this->checkUpdates->prepareCallUsingRawQuery($channelIntegrationMetadata);
+
+            $logMessage = "call-data = " . print_r($callData, true);
+            $this->loggerfile->info($cronLabel . $logMessage);
+            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+
+
+            $logMessageTopic = "doCallUsingRawQuery";
+            
+            $logMessage = "calling stock-check-api";
+            $this->loggerfile->info($cronLabel . $logMessage);
+            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+
+            $callResponse = $this->commonRepository->doCallUsingRawQuery($callData);
+
+            $logMessage = "call-response = " . print_r($callResponse, true);
+            $this->loggerfile->info($cronLabel . $logMessage);
+            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+
+            
+            $logMessageTopic = "prepareJobCandidatesUsingRawQuery";
+
+            $logMessage = "preparing job-candidates based on stock-check-api call-response";
+            $this->loggerfile->info($cronLabel . $logMessage);
+            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+
+            $jobCandidates = $this->checkUpdates->prepareJobCandidatesUsingRawQuery($channelIntegrationMetadata, $callResponse);
+
+            $logMessage = "job-candidates prepared = " . print_r($jobCandidates, true);
+            $this->loggerfile->info($cronLabel . $logMessage);
+            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+            
+
+            $logMessageTopic = "insertJobCandidatesUsingRawQuery";
+
+            $logMessage = "persisting job-candidates into job-temporary-table db";
+            $this->loggerfile->info($cronLabel . $logMessage);
+            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+
             $persistingResult = $this->checkUpdates->insertJobCandidatesUsingRawQuery($jobCandidates);
-            $this->logger->info($label . "job-candidates bulk persisted = " . ($persistingResult > 0 ? "success" : "failed"));
-            $this->logger->info($label . "complete");
+
+            $logMessage = "job-candidates bulk persisted = " . ($persistingResult > 0 ? "success" : "failed");
+            $this->loggerfile->info($cronLabel . $logMessage);
+            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+
+            
+            $logMessageTopic = "complete";
+            $logMessage = "complete";
+            $this->loggerfile->info($cronLabel . $logMessage);
+            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
        
         }
         catch (\Exception $ex) {
-            $this->logger->info($label . "exception = " . strtolower($ex->getMessage()));
+
+            $logMessageTopic = "exception";
+            $logMessage = "exception = " . $ex->getMessage();
+            $this->loggerfile->info($cronLabel . $logMessage);
+            $this->loggerdb->logCronErrorFatal($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+
         }
 
-        $this->logger->info($label . "finish " . (microtime(true) - $startTime) . " second");
+        $logMessageTopic = "finish";
+        $logMessage = "finish " . (microtime(true) - $startTime) . " second";
+        $this->loggerfile->info($cronLabel . $logMessage);
+        $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
 
     }
     
@@ -104,37 +186,35 @@ class StockUpdate {
         $class = str_replace(IntegrationCheckUpdatesInterface::CRON_DIRECTORY,"",get_class($this));
 
         try {
-            $this->logger->info("=>".$class." Get Channel Data");
+            $this->loggerfile->info("=>".$class." Get Channel Data");
             $channel    = $this->commonRepository->prepareChannel('product-stock-update');
 
-            $this->logger->info("=".$class." Check On Progress Job");
+            $this->loggerfile->info("=".$class." Check On Progress Job");
             $this->checkUpdates->checkOnProgressJobs($channel);
 
-            $this->logger->info("=".$class." Get Last Complete Jobs");
+            $this->loggerfile->info("=".$class." Get Last Complete Jobs");
             $channel    = $this->checkUpdates->checkCompleteJobs($channel);
 
-            $this->logger->info("=".$class." Set Parameter Request Data");
+            $this->loggerfile->info("=".$class." Set Parameter Request Data");
             $data       = $this->checkUpdates->prepareCall($channel);
-            $this->logger->info("=".print_r($data ,true));
+            $this->loggerfile->info("=".print_r($data ,true));
 
-            $this->logger->info("=".$class." Sending Request Data to API");
+            $this->loggerfile->info("=".$class." Sending Request Data to API");
             $response    = $this->commonRepository->get($data);
 
-            $this->logger->info("=".$class." Set Response to Job data");
+            $this->loggerfile->info("=".$class." Set Response to Job data");
             $jobsData = $this->checkUpdates->prepareJobsDataImsStockUpdate($channel,$response);
             
-            $this->logger->info("=".$class." Save data to databases");
+            $this->loggerfile->info("=".$class." Save data to databases");
             $result = $this->checkUpdates->saveProperOffset($jobsData);
 
 
         } catch (\Exception $ex) {
 
-            $this->logger->error("<=End ".$class." ".$ex->getMessage());
+            $this->loggerfile->error("<=End ".$class." ".$ex->getMessage());
         }
-        $this->logger->info("<=End ".$class);
+        $this->loggerfile->info("<=End ".$class);
     }
     */
-
-
 
 }
