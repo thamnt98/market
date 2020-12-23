@@ -553,7 +553,7 @@ class OrderStatus implements OrderStatusInterface {
 		 * preparing data for refund PG
 		 */
 		$refNumber         = $idsOrder->getReferenceNumber();
-		$parentIdFetch     = $this->transactionMegaHelper->getSalesOrderArray($refNumber);
+		$parentIdFetch     = $this->transactionMegaHelper->getSalesOrderArrayParent($refNumber);
 		$parentEntityId    = $parentIdFetch['entity_id'];
 		$paymentMethod     = $loadDataOrder->getPayment()->getMethod();
 		$channelId         = $this->configPg->getPaymentChannelId($paymentMethod);
