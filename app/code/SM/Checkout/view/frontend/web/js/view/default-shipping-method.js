@@ -17,7 +17,7 @@ define([
             {label: $.mage.__('Not Available Method'), value: 'transshipping_transshipping0'},
             {label: $.mage.__('Regular (2-7 days)'), value: 'transshipping_transshipping1'},
             {label: $.mage.__('Same day (3 hours)'), value: 'transshipping_transshipping2'},
-            {label: $.mage.__('Scheduling'), value: 'transshipping_transshipping3'},
+            {label: $.mage.__('Schedule for Later'), value: 'transshipping_transshipping3'},
             {label: $.mage.__('Next day (1 day)'), value: 'transshipping_transshipping4'},
         ])
     };

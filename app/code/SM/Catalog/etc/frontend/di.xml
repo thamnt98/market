@@ -16,4 +16,8 @@
                 type="SM\Catalog\Plugin\Model\Product" sortOrder="30"/>
     </type>
     <preference for="Magento\Catalog\Controller\Product\View" type="SM\Catalog\Controller\Product\View" />
+    <type name="Magento\Swatches\Block\Product\Renderer\Configurable">
+        <plugin name="sm_catalog_swatches_configurable"
+                type="SM\Catalog\Plugin\Swatches\Block\Product\Renderer\Configurable" sortOrder="30"/>
+    </type>
 </config>
