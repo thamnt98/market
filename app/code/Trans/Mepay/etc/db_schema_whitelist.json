@@ -10,5 +10,18 @@
         "constraint": {
             "PRIMARY": true
         }
+    },
+    "trans_mepay_auth_capture": {
+        "column": {
+            "id": true,
+            "reference_number": true,
+            "reference_order_id": true,
+            "status": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
     }
 }
