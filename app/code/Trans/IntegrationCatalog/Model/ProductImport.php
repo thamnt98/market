@@ -1547,7 +1547,7 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                         try {
                             $attributeSetCode = $this->attributeSet->getAttributeSetCodeByPimId($pimId);
                             $attributeSetId = $this->attributeSet->getAttributeSetIdByPimId($pimId);
-                            if($attributeSet) {
+                            if($attributeSetId) {
                                 $result['attribute_set_id'] = $attributeSetId;
                                 $result['attribute_set_code'] = $attributeSetCode;
                                 break;

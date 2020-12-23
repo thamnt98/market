@@ -627,7 +627,7 @@ class IntegrationProductAttributeRepository implements IntegrationProductAttribu
         if($collection->getSize()){
            
             try {
-                $result = $collection->getFirstItem()->getName();
+                $result = $collection->getFirstItem()->getAttributeSetGroup();
             } catch (\Exception $exception) {
                 throw new StateException(__(
                    "Error ". __FUNCTION__." : ".$exception->getMessage()
