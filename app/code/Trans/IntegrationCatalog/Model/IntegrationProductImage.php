@@ -32,6 +32,8 @@ use Trans\Integration\Helper\Validation;
 use Trans\Integration\Logger\Logger;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductCollectionFactory;
 use Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory as AttributeCollectionFactory;
+use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable as ConfigurableResourceModel;
+use Magento\ConfigurableProduct\Model\Product\Type\Configurable as ConfigurableProduct;
 
 class IntegrationProductImage implements IntegrationProductImageInterface {
 	/**
@@ -110,6 +112,12 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 	protected $attributeCollectionFactory;
 
 	/**
+	 * @var Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable
+	 */
+	protected $catalogProductTypeConfigurable;
+
+
+	/**
 	 * @param Logger $Logger
 	 * @param ProductRepositoryInterface $product
 	 * @param DirectoryList $directoryList
@@ -142,7 +150,9 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 		\Trans\IntegrationCatalog\Helper\Pim\Save\ProductImage $productImageHelper,
 		\Magento\Framework\Indexer\IndexerRegistry $indexerRegistry,
 		ProductCollectionFactory $productCollectionFactory,
-		AttributeCollectionFactory $attributeCollectionFactory
+		AttributeCollectionFactory $attributeCollectionFactory,
+		\Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable $catalogProductTypeConfigurable,
+		\Magento\ConfigurableProduct\Model\Product\Type\Configurable $productTypeConfigurable
 	) {
 		$this->coreHelper = $coreHelper;
 		$this->logger = $logger;
@@ -165,6 +175,8 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 		$this->indexerDirectory = $filesystem->getDirectoryWrite(DirectoryList::VAR_DIR);
 		$this->productCollectionFactory = $productCollectionFactory;
 		$this->attributeCollectionFactory = $attributeCollectionFactory;
+		$this->catalogProductTypeConfigurable = $catalogProductTypeConfigurable;
+		$this->productTypeConfigurable = $productTypeConfigurable;
 
 		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_image.log');
         $logger = new \Zend\Log\Logger();
@@ -245,6 +257,22 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 		}
 		return $result;
 
+	}
+
+	protected function getParentId($childId){
+		$products = $this->catalogProductTypeConfigurable->getParentIdsByChild($childId);
+		if(isset($products[0])){
+			return $products[0];
+	   }
+	   return false;
+	}
+
+	protected function getFirstChildId($parentId){
+		$products = $this->productTypeConfigurable->getUsedProducts($parentId);
+		if(isset($products[0])){
+			return $products[0]->getId();
+	   }
+	   return false;
 	}
 
 	/**
@@ -335,10 +363,28 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 			$swatchAttributes = [$swatchImage];
 
 			$productImages = [];
+			$configurableProductImages = [];
+
+			$updateParentImage = false;
 
 			$this->logger->info('start loop products ' . date('d-M-Y H:i:s'));
 			foreach($productsCollection as $productCollection){
 				$productCollection->load('media_gallery');
+
+				$productId = $productCollection->getId();
+
+				$parentId = $this->getParentId($productId);
+				if($parentId){
+					$firstChildId = $this->getFirstChildId($parentId);
+
+					if($firstChildId && $firstChildId == $productId){
+						$parentProductCollection = $this->getProductById($parentId);
+
+						if($parentProductCollection){
+							$updateParentImage = true;
+						}
+					}
+				}
 
 				$sku = $productCollection->getSku();
 
@@ -366,6 +412,10 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 
 						$this->logger->info('delete image');
 						$this->deleteImage($productCollection, $filename);
+
+						if($updateParentImage){
+							$this->deleteImage($parentProductCollection, $filename);
+						}
 	
 						$this->logger->info('check is first image');
 						if($this->checkIsFirstImage($filename)) {
@@ -373,6 +423,10 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 
 							$this->logger->info('delete product image by attr ids');
 							$this->productImageHelper->deleteProductImageByAttrIds($productRowId, $imageAttr);
+
+							if($updateParentImage){
+								$this->productImageHelper->deleteProductImageByAttrIds($parentId, $imageAttr);
+							}
 						} else {
 							$imageAttr = $swatchAttributes;
 						}
@@ -401,13 +455,35 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 									);
 
 									$productImages[] = $productImage;
+
+									if($updateParentImage){
+										// $parentProductImage = array(
+										// 	'attribute_id' => $attr,
+										// 	'store_id' => 0,
+										// 	'value' => $filepath,
+										// 	'row_id' => $parentId
+										// );
+
+										// $configurableProductImages[] = $parentProductImage;
+
+										$productImage['row_id'] = $parentId;
+										$configurableProductImages[] = $productImage;
+									}
 								}
 
 								$this->logger->info('insert media gallery value');
 								$this->productImageHelper->insertMediaGalleryValue($mediaGalleryAttr, $filepath, $productRowId);
+
+								if($updateParentImage){
+									$this->productImageHelper->insertMediaGalleryValue($mediaGalleryAttr, $filepath, $parentId);
+								}
 							}
 
-							$productIds[] = $productCollection->getId();
+							$productIds[] = $productId;
+
+							if($updateParentImage){
+								$productIds[] = $parentId;
+							}
 						} catch (\Exception $e) {
 							$this->logger->info("saveProductImage fail: " . $e->getMessage());
 							continue;
@@ -431,7 +507,14 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
 
 			//bulk save product image
 			$this->logger->info('bulk save product image');
-			$this->productImageHelper->bulkSaveProductImage($productImages);
+
+			if(!empty($productImages)){
+				$this->productImageHelper->bulkSaveProductImage($productImages);
+			}
+
+			if(!empty($configurableProductImages)){
+				$this->productImageHelper->bulkSaveProductImage($configurableProductImages);
+			}
 
 			try {
 				if(!empty($productIds)) {
@@ -932,6 +1015,22 @@ class IntegrationProductImage implements IntegrationProductImageInterface {
             $collection->getSelect()->reset(\Zend_Db_Select::COLUMNS)->columns(['entity_id','sku','row_id','type_id']);
             $result = $collection->getItems();
             $this->logger->info('After get product ' . date('d-M-Y H:i:s'));
+        }
+        return $result;
+	}
+
+	/**
+     * Get product by multiple sku
+     */
+    protected function getProductById($productId)
+    {
+        $result = null;
+        if ($productId) {
+            $this->logger->info('Before get product by id ' . date('d-M-Y H:i:s'));
+            $collection = $this->productCollectionFactory->create()->addFieldToFilter('entity_id', ['eq'=>$productId]);
+            $collection->getSelect()->reset(\Zend_Db_Select::COLUMNS)->columns(['entity_id','sku','row_id','type_id']);
+            $result = $collection->getFirstItem();
+			$this->logger->info('After get product by id ' . date('d-M-Y H:i:s'));
         }
         return $result;
 	}

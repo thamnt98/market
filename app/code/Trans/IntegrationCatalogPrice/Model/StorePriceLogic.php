@@ -733,7 +733,13 @@ class StorePriceLogic implements StorePriceLogicInterface
         $attributeIdMap = [];
         foreach ($productInterfaces as $index => $product) {
             $productPriceAttributes = [];
-            $data = $productDecimalAttributes[$product->getSku()];
+            $sku = $this->validate($product->getSku());
+
+            if(!isset($productDecimalAttributes[$sku])){
+                continue;
+            }
+
+            $data = $productDecimalAttributes[$sku];
             $productPriceAttributes = $this->priceDecision(
                 $product,
                 $data['base_price'],
@@ -744,7 +750,7 @@ class StorePriceLogic implements StorePriceLogicInterface
             );
             foreach ($productPriceAttributes as $key => $value) {
                 if(!isset($attributeIdMap[$key])){
-                    $attributeIdMap[$key] = $this->saveAttributeProduct($key, $product->getSku());
+                    $attributeIdMap[$key] = $this->saveAttributeProduct($key, $sku);
                 }
                 $inputList[] = [
                     'attribute_id' => $attributeIdMap[$key],
@@ -1094,4 +1100,19 @@ class StorePriceLogic implements StorePriceLogicInterface
             );
         }
     }
+
+    protected function validateSku($sku, $data) {		
+		$skuUpperCase = strtoupper($sku);
+		if (isset($data[$skuUpperCase])) {
+			return $skuUpperCase;
+		}
+		
+		$skuLowerCase = strtoupper($sku);
+		if (isset($data[$skuLowerCase])) {
+			return $skuLowerCase;
+		}
+
+		return $sku;
+
+	}
 }
