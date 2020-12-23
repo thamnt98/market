@@ -11,7 +11,7 @@
  * http://carrefour.co.id
  */
 
-namespace Trans\IntegrationCatalogStock\Api;
+namespace Trans\Integration\Api;
 
 interface IntegrationLogToDatabaseInterface {
 	

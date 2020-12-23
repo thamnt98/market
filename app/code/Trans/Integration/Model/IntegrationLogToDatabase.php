@@ -15,6 +15,7 @@ namespace Trans\Integration\Model;
 
 use Trans\Integration\Api\IntegrationLogToDatabaseInterface;
 
+
 class IntegrationLogToDatabase implements IntegrationLogToDatabaseInterface
 {
 
@@ -107,7 +108,7 @@ class IntegrationLogToDatabase implements IntegrationLogToDatabaseInterface
      * @param string $messageDetail
      * @return mixed
      */
-    public function logCronFatal($cronType, $cronTypeDetail, $messageTopic, $messageDetail)
+    public function logCronErrorFatal($cronType, $cronTypeDetail, $messageTopic, $messageDetail)
     {
      
         return $this->logCron($cronType, $cronTypeDetail, IntegrationLogToDatabaseInterface::LOG_CRON_LEVEL_ERROR_FATAL, $messageTopic, $messageDetail);
