@@ -18,6 +18,8 @@ use Magento\Sales\Model\Order\Payment\Transaction;
 use Trans\Mepay\Model\Config\Config;
 use Trans\Mepay\Helper\Payment\Transaction as TransactionHelper;
 use Trans\Mepay\Helper\Customer\Customer as CustomerHelper;
+use  Trans\Mepay\Helper\Data;
+use Trans\Mepay\Gateway\Request\PaymentSourceMethodDataBuilder;
 use Trans\Mepay\Model\Invoice;
 use Trans\Mepay\Logger\LoggerWrite;
 
@@ -84,27 +86,32 @@ class Authorize
         $order = $this->transactionHelper->getOrder($orderId);
         $payment = $order->getPayment();
 
-        //update customer token
-        if ($token) {
-          $customerId = $order->getCustomerId();
-          $this->customerHelper->setCustomerToken($customerId, $token);
+        if ($payment->getCcType() == PaymentSourceMethodDataBuilder::AUTH_CAPTURE) {
+            $capture = Data::getClassInstance('Trans\Mepay\Model\Payment\Status\Capture');
+            $capture->handle($transaction, $inquiryTransaction, $token, true);
+        } else {
+            //update customer token
+            if ($token) {
+                $customerId = $order->getCustomerId();
+                $this->customerHelper->setCustomerToken($customerId, $token);
+            }
+    
+            //close authorize transaction
+            $transactionData->close();
+    
+            //change from inquiry authorize into transaction authorize
+            $transactionAuth = $this->transactionHelper->buildAuthorizeTransaction($payment, $order, $transaction);
+            $transactionAuth->setIsClosed(0);
+            $this->transactionHelper->saveTransaction($transactionAuth);
+    
+            //update payment
+            $payment->setLastTransactionId($transaction->getId());
+            //$payment->addTransactionCommentsToOrder($transactionCapture, $message);
+            //$payment->setAdditionalInformation([Transaction::RAW_DETAILS => $transaction->getData()]);
+    
+            //save detail information
+            $this->transactionHelper->addTransactionData($transactionAuth->getTransactionId(), $inquiryTransaction, $transaction);
         }
-
-        //close authorize transaction
-        $transactionData->close();
-
-        //change from inquiry authorize into transaction authorize
-        $transactionAuth = $this->transactionHelper->buildAuthorizeTransaction($payment, $order, $transaction);
-        $transactionAuth->setIsClosed(0);
-        $this->transactionHelper->saveTransaction($transactionAuth);
-
-        //update payment
-        $payment->setLastTransactionId($transaction->getId());
-        //$payment->addTransactionCommentsToOrder($transactionCapture, $message);
-        //$payment->setAdditionalInformation([Transaction::RAW_DETAILS => $transaction->getData()]);
-
-        //save detail information
-        $this->transactionHelper->addTransactionData($transactionAuth->getTransactionId(), $inquiryTransaction, $transaction);
 
     } catch (InputException $e) {
       $this->logger->log($e->getMessage());
