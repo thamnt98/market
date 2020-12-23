@@ -30,6 +30,8 @@
 
     <preference for="Trans\Integration\Api\IntegrationCommonInterface" type="Trans\Integration\Model\IntegrationCommon" />
 
+    <preference for="Trans\Integration\Api\IntegrationLogToDatabaseInterface" type="Trans\Integration\Model\IntegrationLogToDatabase" />
+
     <preference for="Trans\Integration\Api\IntegrationDatabaseInterface" type="Trans\Integration\Model\IntegrationDatabase" />
     
     <!-- integration table cleaner -->
