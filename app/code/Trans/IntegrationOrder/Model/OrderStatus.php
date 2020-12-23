@@ -673,6 +673,13 @@ class OrderStatus implements OrderStatusInterface {
 					return json_decode($responseOrder, true);
 				}
 
+				/* save to table sales_order_item */
+				if ($fetchData->getSku()) {
+					$saveOrderItem = $this->orderItemFactory->create();
+				}
+				$fetchData->setQtyRefunded((float) $itemData['quantity_allocated']);
+				$this->orderItemRepository->save($fetchData);
+
 				/* save to table integration_oms_refund */
 				$saveRefundData = $this->refundInterface->create();
 				$saveRefundData->setOrderRefNumber($idsOrder->getReferenceNumber());

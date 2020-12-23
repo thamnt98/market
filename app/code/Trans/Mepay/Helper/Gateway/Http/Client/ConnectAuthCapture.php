@@ -111,9 +111,7 @@ class ConnectAuthCapture extends AbstractHelper
   {
     if (isset($this->inquiry['id']) && isset($this->transaction['id'])) {
       $transferBuilder = $this->client->create($this->inquiry['id'], $this->transaction['id'], $this->getBodyParams());
-      $hit = $this->connect->placeRequest($transferBuilder);
-      
-      // $this->authCapture->create($this->inquiry['id'], $this->transaction['id'], $this->getBodyParams());
+      return $this->connect->placeRequest($transferBuilder);
     }
   }
 
@@ -123,7 +121,6 @@ class ConnectAuthCapture extends AbstractHelper
    */
   public function getBodyParams()
   {
-    // var_dump($this->transaction);die();
     try {
       return [
         TransactionInterface::AUTHORIZATION_CODE => $this->transaction[TransactionInterface::AUTHORIZATION_CODE],
