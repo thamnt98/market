@@ -67,4 +67,22 @@
     <preference for="Trans\IntegrationCatalogStock\Api\IntegrationCheckStockInterface" type="Trans\IntegrationCatalogStock\Model\IntegrationCheckStock"/>
     <preference for="Trans\IntegrationCatalogStock\Api\Data\IntegrationCheckStockResponseInterface" type="Trans\IntegrationCatalogStock\Model\IntegrationCheckStockResponse"/>
 
+    <!-- hariadi_wicaksana: add console for checking stock integration functionalities -->
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <!-- check catalog stock -->
+            <argument name="commands" xsi:type="array">
+                 <item name="Trans_IntegrationCatalogStock_Console_Check_Stock" xsi:type="object">Trans\IntegrationCatalogStock\Console\Check\Stock</item>
+            </argument>
+            <!-- get catalog stock -->
+            <argument name="commands" xsi:type="array">
+                 <item name="Trans_IntegrationCatalogStock_Console_Get_Stock" xsi:type="object">Trans\IntegrationCatalogStock\Console\Get\Stock</item>
+            </argument>
+            <!-- save catalog stock -->
+            <argument name="commands" xsi:type="array">
+                 <item name="Trans_IntegrationCatalogStock_Console_Save_Stock" xsi:type="object">Trans\IntegrationCatalogStock\Console\Save\Stock</item>
+            </argument>
+        </arguments>
+    </type>
+4
 </config>

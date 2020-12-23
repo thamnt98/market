@@ -30,7 +30,7 @@
                 <status_pull_format>/inquiries/{{inquiry_id}}/transactions/</status_pull_format>
                 <status_pull_dynamic>{{inquiry_id}}</status_pull_dynamic>
                 <status_capture_init_url>/inquiry/{{inquiry_id}}/payments/{{transaction_id}}/capture</status_capture_init_url>
-                <status_capture_init>{{inqury_id}};{{transaction_id}}</status_capture_init>
+                <status_capture_init>{{inquiry_id}};{{transaction_id}}</status_capture_init>
                 <content_type>application/json</content_type>
                 <debug>1</debug>
             </trans_mepay>

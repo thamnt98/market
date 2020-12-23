@@ -63,4 +63,17 @@ interface IntegrationDataValueRepositoryInterface {
 	 */
 	public function getByDataValueWithStatus($data,$status);
 
+    /**
+     * @param array $inserts
+     * @return int
+     */
+    public function insertBulkUsingRawQuery($inserts);
+
+    /**
+     * @param int $jobId
+     * @param int $status
+     * @return mixed
+     */
+	public function getAllByJobIdStatusUsingRawQuery($jobId, $status);	
+
 }

@@ -50,6 +50,11 @@ class IntegrationDataValueRepository implements IntegrationDataValueRepositoryIn
 	 */
 	protected $interface;
 
+    /**
+     * @var ResourceConnection
+     */
+	protected $dbConnection;
+
 	/**
 	 * IntegrationDataValueRepository constructor.
 	 * @param ResourceModel $resource
@@ -61,13 +66,16 @@ class IntegrationDataValueRepository implements IntegrationDataValueRepositoryIn
 		ResourceModel $resource,
 		CollectionFactory $collectionFactory,
 		IntegrationDataValueSearchResultInterfaceFactory $searchResultFactory,
-		IntegrationDataValueInterfaceFactory $interface
+		IntegrationDataValueInterfaceFactory $interface,
+		\Magento\Framework\App\ResourceConnection $resourceConnection
 	) {
 		$this->resource = $resource;
 
 		$this->collectionFactory   = $collectionFactory;
 		$this->searchResultFactory = $searchResultFactory;
 		$this->interface           = $interface;
+
+		$this->dbConnection = $resourceConnection->getConnection();
 	}
 
 	/**
@@ -174,4 +182,97 @@ class IntegrationDataValueRepository implements IntegrationDataValueRepositoryIn
 		return $collection;
 	}
 
+    /**
+     * @param array $inserts
+     * @return int
+     */
+    public function insertBulkUsingRawQuery($inserts) {
+
+        try {
+
+            if (!is_array($inserts) || empty($inserts)) {
+                throw new StateException(__(
+                    'Parameter Inserts are empty !'
+                ));
+            }
+
+			$columns = array("id" => true, "jb_id" => true, "data_value" => true, "message" => true, "status" => true, "created_at" => true, "updated_at" => true);
+			
+			$bulk = array();
+
+			foreach ($inserts as $insert) {
+
+                $record = array();
+            
+                foreach($insert as $key => $value) {
+                    if (isset($columns[$key])) {
+                        $record[$key] = $value;                        
+                    }
+                }
+    
+                if (empty($record)) {
+                    throw new StateException(__(
+                        'Parameter Inserts are empty !'
+                    ));
+                }
+
+                $bulk[] = $record;
+                                
+            }
+            
+            if (empty($bulk)) {
+                throw new StateException(__(
+                    'Parameter Inserts are empty !'
+                ));
+            }
+    
+            return $this->dbConnection->insertMultiple("integration_catalogstock_data", $bulk);
+
+        }
+        catch (\Exception $ex) {
+            throw new StateException(
+                __($ex->getMessage())
+            );
+        }
+
+    }
+
+
+    /**
+     * @param int $jobId
+     * @param int $status
+     * @return mixed
+     */
+    public function getAllByJobIdStatusUsingRawQuery($jobId, $status)
+    {
+     
+        try {            
+
+            if (empty($jobId)) {
+                throw new StateException(__(
+                    'Parameter Job Id are empty !'
+                ));
+            }
+    
+            if (empty($status)) {
+                throw new StateException(__(
+                    'Parameter Status are empty !'
+                ));
+            }
+            
+            $str = "select `id`, `jb_id`, `data_value`, `message`, `status`, `created_at`, `updated_at` from `integration_catalogstock_data` where `jb_id` = %d and `status` = %d";
+    
+            $sql = sprintf($str, $jobId, $status);
+            
+            return $this->dbConnection->fetchAll($sql);
+
+        } 
+        catch (\Exception $ex) {
+            throw new StateException(__(
+                $ex->getMessage()
+             ));
+        }        
+
+	}
+	
 }

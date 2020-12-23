@@ -235,7 +235,7 @@ class Transaction extends AbstractHelper
     $query->from(
       $table,
       ['*']
-    )->where('order_id = ?', $orderId);
+    )->where('order_id = ?', $orderId)->where('trans_mepay_inquiry IS NOT NULL');
 
     return $connection->fetchRow($query);
   }
@@ -383,7 +383,7 @@ class Transaction extends AbstractHelper
       $query->from(
         $table,
         ['*']
-      )->where('reference_number = ?', $referenceNumber)->where('is_parent = ?', 1);
+      )->where('reference_number = ?', $referenceNumber)->where('is_parent = ?', 0);
 
       return $collection = $connection->fetchRow($query); 
     }

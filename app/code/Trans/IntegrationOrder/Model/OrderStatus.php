@@ -261,6 +261,13 @@ class OrderStatus implements OrderStatusInterface {
 			$saveDataToStatusHistory->setComment($data->getFeStatus() . $data->getFeSubStatus());
 			$saveDataToStatusHistory->setEntityName('order');
 		}
+		if ($loadDataOrder && $data->getFeStatusNo() == $configStatus->getNumberFailedDelivery()) {
+			$loadDataOrder->setStatus($configStatus->getFailedDeliveryStatus());
+			$saveDataToStatusHistory->setParentId($entityIdSalesOrder);
+			$saveDataToStatusHistory->setStatus($configStatus->getFailedDeliveryStatus());
+			$saveDataToStatusHistory->setComment($data->getFeStatus() . $data->getFeSubStatus());
+			$saveDataToStatusHistory->setEntityName('order');
+		}
 
 		$this->orderRepoInterface->save($loadDataOrder);
 		$this->orderStatusHistoryRepoInterface->save($saveDataToStatusHistory);
@@ -368,6 +375,13 @@ class OrderStatus implements OrderStatusInterface {
 			$loadDataOrder->setStatus($configStatus->getInProcessWaitingPickupStatus());
 			$saveDataToStatusHistory->setParentId($entityIdSalesOrder);
 			$saveDataToStatusHistory->setStatus($configStatus->getInProcessWaitingPickupStatus());
+			$saveDataToStatusHistory->setComment($data->getFeStatus() . $data->getFeSubStatus());
+			$saveDataToStatusHistory->setEntityName('order');
+		}
+		if ($loadDataOrder && $data->getFeStatusNo() == $configStatus->getNumberFailedDelivery()) {
+			$loadDataOrder->setStatus($configStatus->getFailedDeliveryStatus());
+			$saveDataToStatusHistory->setParentId($entityIdSalesOrder);
+			$saveDataToStatusHistory->setStatus($configStatus->getFailedDeliveryStatus());
 			$saveDataToStatusHistory->setComment($data->getFeStatus() . $data->getFeSubStatus());
 			$saveDataToStatusHistory->setEntityName('order');
 		}
@@ -512,6 +526,13 @@ class OrderStatus implements OrderStatusInterface {
 			$saveDataToStatusHistory->setComment($data->getFeStatus() . $data->getFeSubStatus());
 			$saveDataToStatusHistory->setEntityName('order');
 		}
+		if ($loadDataOrder && $data->getFeStatusNo() == $configStatus->getNumberFailedDelivery()) {
+			$loadDataOrder->setStatus($configStatus->getFailedDeliveryStatus());
+			$saveDataToStatusHistory->setParentId($entityIdSalesOrder);
+			$saveDataToStatusHistory->setStatus($configStatus->getFailedDeliveryStatus());
+			$saveDataToStatusHistory->setComment($data->getFeStatus() . $data->getFeSubStatus());
+			$saveDataToStatusHistory->setEntityName('order');
+		}
 
 		$this->orderRepoInterface->save($loadDataOrder);
 		$this->orderStatusHistoryRepoInterface->save($saveDataToStatusHistory);
@@ -619,7 +640,8 @@ class OrderStatus implements OrderStatusInterface {
 				$this->eventManager->dispatch(
 					'refund_with_mega_payment',
 					[
-						'order_id' => $refNumber,
+						'order_id' => $orderId,
+						'reference_number' => $refNumber,
 						'amount' => $trxAmount,
 						'new_amount' => $trxAmount - $matrixAdjusmentAmount,
 					]
@@ -650,6 +672,13 @@ class OrderStatus implements OrderStatusInterface {
 				if ($objOrder->code == 200) {
 					return json_decode($responseOrder, true);
 				}
+
+				/* save to table sales_order_item */
+				if ($fetchData->getSku()) {
+					$saveOrderItem = $this->orderItemFactory->create();
+				}
+				$fetchData->setQtyRefunded((float) $itemData['quantity_allocated']);
+				$this->orderItemRepository->save($fetchData);
 
 				/* save to table integration_oms_refund */
 				$saveRefundData = $this->refundInterface->create();
