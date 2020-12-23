@@ -103,17 +103,16 @@ class Listing
             $data[] = [
                 self::START_TIME => str_replace(',', ':', $randomStartTime),
                 self::END_TIME   => str_replace(',', ':', $randomEndTime),
-                self::MESSAGE    => sprintf($randomMessage, $name),
+                self::MESSAGE    => $randomMessage,
                 self::REDIRECT   => null
             ];
-
             $this->cache->save($this->serializer->serialize($data), $cacheKey);
             $cache = $this->cache->load($cacheKey);
-            return $this->serializer->unserialize($cache);
-        } else {
-            $cache = $this->serializer->unserialize($cache);
         }
-
+        $cache = $this->serializer->unserialize($cache);
+        if (isset($cache[1])) {
+            $cache[1][self::MESSAGE] = sprintf($cache[1][self::MESSAGE], $name);
+        }
         return $cache;
     }
 
@@ -135,22 +134,23 @@ class Listing
             $afternoonMessage = $this->messageConfig->getAfternoonSignInMessage();
             $eveningMessage   = $this->messageConfig->getEveningSignInMessage();
             $afterWeekSignIn  = $this->messageConfig->getAfterWeekSignInMessage();
-
             $messageConfig = [
-                self::FIRST_TIME_MESSAGE => sprintf($firstTimeMessage, $name),
-                self::MORNING_MESSAGE    => sprintf($morningMessage, $name),
-                self::AFTERNOON_MESSAGE  => sprintf($afternoonMessage, $name),
-                self::EVENING_MESSAGE    => sprintf($eveningMessage, $name),
-                self::AFTER_WEEK_MESSAGE => sprintf($afterWeekSignIn, $name)
+                self::FIRST_TIME_MESSAGE => $firstTimeMessage,
+                self::MORNING_MESSAGE    => $morningMessage,
+                self::AFTERNOON_MESSAGE  => $afternoonMessage,
+                self::EVENING_MESSAGE    => $eveningMessage,
+                self::AFTER_WEEK_MESSAGE => $afterWeekSignIn
             ];
-
             $messageJson = $this->serializer->serialize($messageConfig);
             $this->cache->save($messageJson, $cacheKey, []);
-
             $cache = $this->cache->load($cacheKey);
-            return $this->serializer->unserialize($cache);
         }
-
-        return $this->serializer->unserialize($cache);
+        $cache = $this->serializer->unserialize($cache);
+        $cache[self::FIRST_TIME_MESSAGE] = sprintf($cache[self::FIRST_TIME_MESSAGE], $name);
+        $cache[self::MORNING_MESSAGE] = sprintf($cache[self::MORNING_MESSAGE], $name);
+        $cache[self::AFTERNOON_MESSAGE] = sprintf($cache[self::AFTERNOON_MESSAGE], $name);
+        $cache[self::EVENING_MESSAGE] = sprintf($cache[self::EVENING_MESSAGE], $name);
+        $cache[self::AFTER_WEEK_MESSAGE] = sprintf($cache[self::AFTER_WEEK_MESSAGE], $name);
+        return $cache;
     }
 }
