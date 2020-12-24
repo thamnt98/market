@@ -2066,7 +2066,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             $conditions = $this->foundProductRuleFactory->create()
                 ->setType('Magento\SalesRule\Model\Rule\Condition\Product')
                 ->setAttribute('quote_item_qty')
-                ->setOperator('>=')
+                ->setOperator('>')
                 ->setValue($dataPass['promo_price_qty']);
             $item_found->addCondition($conditions);
             
