@@ -39,6 +39,8 @@ interface SubOrderDataInterface
     const SHIPPING_PLATE_NUMBER = 'shipping_plate_number';
     const DISCOUNT_AMOUNT = "discount_amount";
     const CANCEL_TYPE = "cancel_type";
+    const CREDITMEMO_ID = "creditmemo_id";
+    const HAS_CREDITMEMO = "has_creditmemo";
 
     /**
      * @return int
@@ -292,4 +294,26 @@ interface SubOrderDataInterface
      * @return $this
      */
     public function setCancelType($value);
+
+    /**
+     * @param int $value
+     * @return $this
+     */
+    public function setCreditmemoId($value);
+
+    /**
+     * @return int
+     */
+    public function getCreditmemoId();
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function setHasCreditmemo($value);
+
+    /**
+     * @return bool
+     */
+    public function hasCreditmemo();
 }

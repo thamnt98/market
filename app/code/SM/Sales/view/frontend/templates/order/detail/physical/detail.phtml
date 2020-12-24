@@ -79,6 +79,15 @@ if ($parentOrder) {
                         $paymentInfoBlock = $block->getChildBlock("sm.sales.order.detail.payment");
                         $paymentInfoBlock->setParentOrder($parentOrder); ?>
                         <?= $paymentInfoBlock->toHtml() ?>
+                        <?php if ($subOrder->hasCreditmemo()): ?>
+                            <div class="refund-container">
+                                <a class="button abs-action-button-as-link" href="<?=
+                                $block->getUrl('sales/creditmemo/requestrefund', ['id' => $subOrder->getCreditmemoId()])
+                                ?>">
+                                    <?= __("Get a Refund")?>
+                                </a>
+                            </div>
+                        <?php endif ?>
                     </div>
                     <!--prodgress-bar status-->
                     <?php
@@ -97,9 +106,9 @@ if ($parentOrder) {
                             <?php if ($isPickUp): ?>
                                 <?php if ($subOrder->getStoreInfo()): ?>
                                     <?php
-                                        /** @var \SM\MobileApi\Api\Data\Catalog\Product\StoreInfoInterface $storeInfo */
-                                        $storeInfo = $subOrder->getStoreInfo();
-                                        $storeAddress = $block->getStoreAddress($storeInfo);
+                                    /** @var \SM\MobileApi\Api\Data\Catalog\Product\StoreInfoInterface $storeInfo */
+                                    $storeInfo = $subOrder->getStoreInfo();
+                                    $storeAddress = $block->getStoreAddress($storeInfo);
                                     ?>
                                     <span
                                         class="delivery-address"><?= $block->escapeHtml(__('Store Information')) ?></span>
@@ -182,11 +191,11 @@ if ($parentOrder) {
                                         <a href="<?= $block->escapeHtml($item->getUrl()) ?>"
                                            class="product-item-name"><?= $block->escapeHtml($item->getProductName()) ?></a>
                                         <dl class="item-options">
-                                            <?php if ($freshHelper->isFreshProduct($item->getFreshProduct())):?>
+                                            <?php if ($freshHelper->isFreshProduct($item->getFreshProduct())): ?>
                                                 <?php /** @var \SM\FreshProduct\Block\Order\Item $freshBlock */
                                                 $freshBlock = $block->getChildBlock('fresh.item');
                                                 $freshBlock->setProduct($item->getFreshProduct());
-                                                $freshBlock->setQty((int)$item->getQuantity())?>
+                                                $freshBlock->setQty((int)$item->getQuantity()) ?>
                                                 <?= $freshBlock->toHtml() ?>
                                             <?php else: ?>
                                                 <?php if ($item->getProductType() == \SM\Sales\Model\ParentOrderRepository::OPTION_TYPE_CONFIGURABLE): ?>
@@ -210,7 +219,7 @@ if ($parentOrder) {
                                                     </dd>
                                                 <?php else: ?>
                                                     <dd><span
-                                                            class="price"><?= $block->escapeHtml(__($qty . (($qty > 1)? " pcs" : " pc"))) ?></span>
+                                                            class="price"><?= $block->escapeHtml(__($qty . (($qty > 1) ? " pcs" : " pc"))) ?></span>
                                                     </dd>
                                                 <?php endif; ?>
                                             <?php endif; ?>
@@ -301,12 +310,12 @@ if ($parentOrder) {
             <div class="order-detail-bottom">
                 <div class="inner">
                     <?php
-                        $statusesToShow = [
-                            \SM\Sales\Model\ParentOrderRepository::STATUS_IN_DELIVERY,
-                            \SM\Sales\Model\ParentOrderRepository::PICK_UP_BY_CUSTOMER,
-                            \SM\Sales\Model\ParentOrderRepository::STATUS_DELIVERED,
-                            \SM\Sales\Model\ParentOrderRepository::STATUS_COMPLETE
-                        ]
+                    $statusesToShow = [
+                        \SM\Sales\Model\ParentOrderRepository::STATUS_IN_DELIVERY,
+                        \SM\Sales\Model\ParentOrderRepository::PICK_UP_BY_CUSTOMER,
+                        \SM\Sales\Model\ParentOrderRepository::STATUS_DELIVERED,
+                        \SM\Sales\Model\ParentOrderRepository::STATUS_COMPLETE
+                    ]
                     ?>
                     <?php if (in_array($parentOrder->getStatus(), $statusesToShow)): ?>
                         <button class="action secondary help-order-form"
@@ -338,6 +347,7 @@ if ($parentOrder) {
         }
     }
 }
+
 
     </script>
     <?php

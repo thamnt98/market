@@ -452,6 +452,8 @@ class SubOrder {
 				->setCreatedAt($subOrder->getCreatedAt())
 				->setTotalPayment($subOrder->getGrandTotal())
 				->setSubtotal($subOrder->getSubtotal())
+                ->setHasCreditmemo($subOrder->hasCreditmemos())
+                ->setCreditmemoId($this->getCreditmemoId($subOrder))
 				->setStoreInfo($this->getStoreInfo($subOrder, $sourceInformation));
 
 			if ($hasInvoice) {
@@ -734,4 +736,20 @@ class SubOrder {
 
 		return null;
 	}
+
+    /**
+     * @param Order $subOrder
+     * @return string
+     */
+    private function getCreditmemoId(Order $subOrder)
+    {
+        if ($subOrder->getId() == 6478) {
+            $a = 1;
+        }
+        foreach ($subOrder->getCreditmemosCollection() as $creditmemo) {
+            return $creditmemo->getId();
+        }
+
+        return '';
+    }
 }

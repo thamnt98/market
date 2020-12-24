@@ -387,4 +387,24 @@ class SubOrderData extends DataObject implements SubOrderDataInterface
     {
         return $this->setData(self::TRACKING_LINK, $value);
     }
+
+    public function setCreditmemoId($value)
+    {
+        return $this->setData(self::CREDITMEMO_ID, $value);
+    }
+
+    public function getCreditmemoId()
+    {
+        return $this->getData(self::CREDITMEMO_ID);
+    }
+
+    public function setHasCreditmemo($value)
+    {
+        return $this->setData(self::HAS_CREDITMEMO, $value);
+    }
+
+    public function hasCreditmemo()
+    {
+        return $this->getData(self::HAS_CREDITMEMO);
+    }
 }
