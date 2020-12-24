@@ -82,7 +82,7 @@ if ($parentOrder) {
                         <?php if ($subOrder->hasCreditmemo()): ?>
                             <div class="refund-container">
                                 <a class="button abs-action-button-as-link" href="<?=
-                                $block->getUrl('sales/creditmemo/requestrefund', ['id' => $subOrder->getCreditmemoId()])
+                                $block->getUrl('sales/creditmemo/requestrefund', ['creditmemo_id' => $subOrder->getCreditmemoId()])
                                 ?>">
                                     <?= __("Get a Refund")?>
                                 </a>
