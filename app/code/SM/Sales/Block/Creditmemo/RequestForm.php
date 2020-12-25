@@ -13,6 +13,7 @@ namespace SM\Sales\Block\Creditmemo;
 
 use Magento\Customer\Model\SessionFactory;
 use Magento\Framework\View\Element\Template;
+use SM\Sales\Api\Data\Creditmemo\FormInformationInterface;
 use SM\Sales\Model\Creditmemo\RequestFormData;
 
 class RequestForm extends Template
@@ -120,7 +121,7 @@ class RequestForm extends Template
      */
     public function isSubmitted(): bool
     {
-        return $this->getCreditmemo()->getCreditmemoStatus() == 2;
+        return $this->getCreditmemo()->getCreditmemoStatus() == FormInformationInterface::SUBMITTED_VALUE;
     }
 
     /**

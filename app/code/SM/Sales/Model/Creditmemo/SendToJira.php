@@ -165,9 +165,9 @@ class SendToJira
     }
 
     /**
-     * @param \Magento\Customer\Model\Customer $customer
+     * @param $customer
      */
-    public function setCustomer(\Magento\Customer\Model\Customer $customer)
+    public function setCustomer($customer)
     {
         $this->customer = $customer;
     }
@@ -175,7 +175,7 @@ class SendToJira
     /**
      * @return \Magento\Customer\Model\Customer
      */
-    public function getCustomer(): \Magento\Customer\Model\Customer
+    public function getCustomer()
     {
         return $this->customer;
     }

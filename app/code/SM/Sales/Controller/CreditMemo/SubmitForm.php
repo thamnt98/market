@@ -14,6 +14,7 @@ namespace SM\Sales\Controller\CreditMemo;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Action\HttpPostActionInterface;
+use SM\Sales\Api\Data\Creditmemo\FormInformationInterface;
 use SM\Sales\Model\Creditmemo\RequestFormData;
 use Magento\Framework\Controller\ResultFactory;
 
@@ -74,7 +75,7 @@ class SubmitForm extends Action implements HttpPostActionInterface
         $params = $this->getRequest()->getParams();
         $setFormData = $this->requestFormData->setFormData($params['creditmemo_id']);
         $creditmemo = $this->requestFormData->getCreditmemo();
-        $isSubmitted = $creditmemo->getCreditmemoStatus() == 2;
+        $isSubmitted = $creditmemo->getCreditmemoStatus() == FormInformationInterface::SUBMITTED_VALUE;
         if ($setFormData && !$isSubmitted) {
             if (!$this->validateCustomer()) {
                 $this->messageManager->addErrorMessage(__('Something went wrong while summiting your request'));

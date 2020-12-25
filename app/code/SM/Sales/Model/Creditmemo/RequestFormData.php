@@ -23,7 +23,6 @@ class RequestFormData
     const ACCOUNT_KEY = 'account_no';
     const ACCOUNT_NAME_KEY = 'account_name';
     const PAYMENT_METHOD_KEY = 'payment_method';
-    const CREDITMEMO_KEY = 'creditmemo';
 
     /**
      * @var array
