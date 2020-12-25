@@ -85,11 +85,17 @@ define([
                             categoryName = lastItemOfPathUrl.indexOf('.html') != -1 ? lastItemOfPathUrl.slice(0, lastItemOfPathUrl.length - 5) : lastItemOfPathUrl,
                             upcaseCategoryName = categoryName.charAt(0).toUpperCase() + categoryName.slice(1),
                             newCatItem = null,
-                            cmsItem = null;
-
+                            cmsItem = null,
+                            isCate = false;
+                        $('.navigation ul li a').each(function () {
+                            if ($(this).attr('href') == categoryUrl) {
+                                isCate = true;
+                                return false;
+                            }
+                        })
                         var cmsUrlArr = cmsPathUrlArray.slice(0, cmsPathUrlArray.length - 1),
                             cmsPathUrlString = cmsUrlArr.join('/');
-                        if(categoryName) {
+                        if(isCate) {
                             newCatItem = {
                                 'name': 'category',
                                 'label': upcaseCategoryName,
