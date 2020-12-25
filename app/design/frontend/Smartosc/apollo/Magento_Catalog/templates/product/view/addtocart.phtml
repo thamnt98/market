@@ -50,7 +50,20 @@
             <?= $block->getChildHtml('', true) ?>
         </div>
     </div>
+<?php else: ?>
+    <div class="fieldset">
+        <div class="actions">
+            <button type="submit"
+                    title="<?= $block->escapeHtmlAttr($buttonTitle) ?>"
+                    class="action primary tocart disabled"
+                    id="product-addtocart-button">
+                <span><?= $block->escapeHtml($buttonTitle) ?></span>
+            </button>
+            <?= $block->getChildHtml('', true) ?>
+        </div>
+    </div>
 <?php endif; ?>
+
 <script type="text/x-magento-init">
     {
         "#product_addtocart_form": {
