@@ -456,15 +456,7 @@ class IntegrationProductAttribute implements IntegrationProductAttributeInterfac
 						}
 						
 						try {
-							$saveAlready = $this->productAttributeRepository->save($queryAttribute[$i]);
-
-							// update source_model
-							if($attrTypeData[$i][IntegrationProductAttributeTypeInterface::PIM_TYPE_CODE] === 'multi_select') 
-							{
-								$connA = $this->eavAttributeResource->getConnection();
-								$queryA = "UPDATE " . $connA->getTableName('eav_attribute') . " SET source_model = 'Magento\\\Eav\\\Model\\\Entity\\\Attribute\\\Source\\\Table' WHERE attribute_id = " . $saveAlready->getId();
-	    						$connA->query($queryA);
-							}
+							$this->productAttributeRepository->save($queryAttribute[$i]);
 						} catch (CouldNotSaveException $e) {
 							$this->logger->info("CouldNotSaveException Error save Attribute Code = " . $pimAttrCode[$i] . ". Message = " . $e->getMessage());
 							$this->saveStatusMessage($data, $$e->getMessage(), IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);		
