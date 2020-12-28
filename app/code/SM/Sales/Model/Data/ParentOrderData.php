@@ -323,4 +323,24 @@ class ParentOrderData extends DataObject implements ParentOrderDataInterface
     {
         return $this->setData(self::TRANSACTION_ID, $value);
     }
+
+    public function setTotalRefund($value)
+    {
+        return $this->setData(self::TOTAL_REFUND, $value);
+    }
+
+    public function getTotalRefund()
+    {
+        return $this->getData(self::TOTAL_REFUND);
+    }
+
+    public function setGrandTotal($value)
+    {
+        return $this->setData(self::GRAND_TOTAL, $value);
+    }
+
+    public function getGrandTotal()
+    {
+        return $this->getData(self::GRAND_TOTAL);
+    }
 }

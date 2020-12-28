@@ -119,11 +119,14 @@ class ParentOrder
     {
         /** @var \Magento\Sales\Api\Data\OrderPaymentInterface $payment */
         $payment = $parentOrder->getPayment();
+        $totalRefund = 0;
 
         foreach ($subOrders as $key => $subOrder) {
             if ($subOrder->getId() == $parentOrder->getEntityId() && count($subOrders) >= 2) {
                 unset($subOrders[$key]);
+                continue;
             }
+            $totalRefund += $subOrder->getTotalRefund();
         }
 
         /** @var ParentOrderDataInterface $parentOrderData */
@@ -137,6 +140,8 @@ class ParentOrder
             ->setTotalShippingAmount($parentOrder->getShippingAmount())
             ->setPaymentMethod($payment != null ? $payment->getMethodInstance()->getTitle() : null)
             ->setTotalPayment($parentOrder->getGrandTotal())
+            ->setTotalRefund($totalRefund)
+            ->setGrandTotal($parentOrder->getTotalInvoiced() - $totalRefund)
             ->setSubTotal($parentOrder->getSubtotal())
             ->setInvoiceNumber($parentOrder->getReferenceInvoiceNumber())
             ->setSubOrders($subOrders)
