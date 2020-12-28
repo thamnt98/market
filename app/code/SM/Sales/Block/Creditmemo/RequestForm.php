@@ -12,6 +12,7 @@
 namespace SM\Sales\Block\Creditmemo;
 
 use Magento\Customer\Model\SessionFactory;
+use Magento\Framework\Pricing\Helper\Data;
 use Magento\Framework\View\Element\Template;
 use SM\Sales\Api\Data\Creditmemo\FormInformationInterface;
 use SM\Sales\Model\Creditmemo\RequestFormData;
@@ -27,22 +28,26 @@ class RequestForm extends Template
      * @var SessionFactory
      */
     private $sessionFactory;
+    private $priceHelper;
 
     /**
      * RequestForm constructor.
      * @param Template\Context $context
      * @param SessionFactory $sessionFactory
      * @param RequestFormData $requestFormData
+     * @param Data $priceHelper
      * @param array $data
      */
     public function __construct(
         Template\Context $context,
         SessionFactory $sessionFactory,
         RequestFormData $requestFormData,
+        Data $priceHelper,
         array $data = []
     ) {
         $this->requestFormData = $requestFormData;
         $this->sessionFactory = $sessionFactory;
+        $this->priceHelper = $priceHelper;
         parent::__construct($context, $data);
     }
 
@@ -131,10 +136,19 @@ class RequestForm extends Template
     {
         $order = $this->requestFormData->getOrder();
         if ($order->getIsVirtual()) {
-            $orderDetailRouter = 'sales/order_digital/detail';
+            $orderDetailRouter = 'sales/order/digital';
         } else {
-            $orderDetailRouter = 'sales/order_physical/detail';
+            $orderDetailRouter = 'sales/order/physical';
         }
-        return $this->getUrl($orderDetailRouter, ['id' => $order->getId()]);
+        return $this->getUrl($orderDetailRouter, ['id' => $order->getData('parent_order')]);
+    }
+
+    /**
+     * @param $value
+     * @return float|string
+     */
+    public function formatCurrency($value)
+    {
+        return $this->priceHelper->currency($value, true, false);
     }
 }

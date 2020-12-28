@@ -12,14 +12,6 @@ if ($parentOrder) {
             <a href="<?= $block->getUrl("*/*/history") ?>"
                class="back-orderlist"><?= $block->escapeHtml(__('Back to order list')) ?></a>
         </div>
-
-        <div class="weighing-message" style="display: none">
-            <i class="notification-icon"></i>
-            <span><?= $block->escapeHtml(__('There is an adjustment after weighing your fresh products.')) ?></span>
-            <span><?= $block->escapeHtml(__("Don't worry, this adjustment amount won't be charged to your card.")) ?></span>
-            <span><?= $block->escapeHtml(__("Total adjustment: Rp 10000")) ?></span>
-        </div>
-
         <?php if ($parentOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::STATUS_ORDER_CANCELED): ?>
             <div class="error-message">
                 <span class="icon icon-error"></span>
@@ -65,6 +57,28 @@ if ($parentOrder) {
             foreach ($parentOrder->getSubOrders() as $subOrder) :?>
                 <?php $isPickUp = $subOrder->getShippingMethodCode() == "store_pickup_store_pickup" ?>
                 <div class="order-detail-content">
+                    <?php if ($subOrder->getHasCreditmemo()): ?>
+                        <div class="weighing-message">
+                            <i class="notification-icon"></i>
+                            <?php if ($subOrder->getShowRefundButton()): ?>
+                                <p><?= $subOrder->getRefundMessage() ?></p>
+                                <p>
+                                    <span>
+                                    <?= __('Total refund %1', $block->currencyFormat($subOrder->getTotalRefund())) ?>
+                                    </span>
+                                    <button
+                                        <?php if(!$subOrder->getEnableRefundButton()) { echo 'disabled'; } ?>
+                                        onclick="document.location.href='<?= $block->getUrl('sales/creditmemo/requestrefund',
+                                            [
+                                                'creditmemo_id' => $subOrder->getCreditmemoId()
+                                            ]) ?>'"
+                                        class="action primary">
+                                        <?= __("Get a Refund") ?>
+                                    </button>
+                                </p>
+                            <?php endif ?>
+                        </div>
+                    <?php endif ?>
                     <div class="dis-flex order-detail-ct-top">
                         <div class="order-id">
                             <span class="order-id-info"><?= $block->escapeHtml(__('Order ID')) ?></span>
@@ -79,15 +93,6 @@ if ($parentOrder) {
                         $paymentInfoBlock = $block->getChildBlock("sm.sales.order.detail.payment");
                         $paymentInfoBlock->setParentOrder($parentOrder); ?>
                         <?= $paymentInfoBlock->toHtml() ?>
-                        <?php if ($subOrder->hasCreditmemo()): ?>
-                            <div class="refund-container">
-                                <a class="button abs-action-button-as-link" href="<?=
-                                $block->getUrl('sales/creditmemo/requestrefund', ['creditmemo_id' => $subOrder->getCreditmemoId()])
-                                ?>">
-                                    <?= __("Get a Refund")?>
-                                </a>
-                            </div>
-                        <?php endif ?>
                     </div>
                     <!--prodgress-bar status-->
                     <?php
@@ -180,7 +185,7 @@ if ($parentOrder) {
                                     <a href="<?= $block->escapeHtml($item->getUrl()) ?>"
                                        title="<?= $block->escapeHtml($item->getProductName()) ?>"
                                        class="product-item-photo">
-                                        <?php if ($subOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::STATUS_ORDER_CANCELED): ?>
+                                        <?php if (!$item->getIsAvailable()): ?>
                                             <div class="image-canceled">
                                                 <span><?= $block->escapeHtml(__("Not Available")) ?></span></div>
                                         <?php endif; ?>
@@ -202,11 +207,11 @@ if ($parentOrder) {
                                                     <?php $i = 0; ?>
                                                     <?php foreach ($item->getOptions() as $key => $option): ?>
                                                         <?php
-                                                            if ($option->getOptionValue() == '' || !(bool)$option->getOptionValue()) {
-                                                                continue;
-                                                            }
-                                                            $char = ($i == 0) ? '' : ', ';
-                                                            $i++;
+                                                        if ($option->getOptionValue() == '' || !(bool)$option->getOptionValue()) {
+                                                            continue;
+                                                        }
+                                                        $char = ($i == 0) ? '' : ', ';
+                                                        $i++;
                                                         ?>
                                                         <span><?= $char . $block->escapeHtml($option->getOptionValue()) ?></span>
                                                     <?php endforeach; ?>
@@ -286,7 +291,7 @@ if ($parentOrder) {
             <!--End order-detail content-->
 
             <!-- shopping summary-->
-            <div class="shopping-summary">
+            <div class="shopping-summary  <?= !$parentOrder->getHasCreditmemo() ?: "refunded" ?>: ?>">
                 <h5 class="tl-summary"><?= $block->escapeHtml(__('Shopping Summary')) ?></h5>
                 <div class="dis-flex subtotal">
                     <h4><?= $block->escapeHtml(__('Subtotal')) ?></h4>
@@ -305,6 +310,16 @@ if ($parentOrder) {
                     <h4><?= $block->escapeHtml(__('Total')) ?></h4>
                     <h4 class="price"><?= $block->escapeHtml($block->currencyFormat($parentOrder->getTotalPayment())) ?></h4>
                 </div>
+                <?php if ($parentOrder->getHasCreditmemo()): ?>
+                    <div class="dis-flex refund">
+                        <h4><?= $block->escapeHtml(__('Total Refund')) ?></h4>
+                        <h4 class="price"><?= $block->escapeHtml($block->currencyFormat($parentOrder->getTotalRefund())) ?></h4>
+                    </div>
+                    <div class="dis-flex total grand-total">
+                        <h4><?= $block->escapeHtml(__('Grand Total (Adjusted)')) ?></h4>
+                        <h4 class="price"><?= $block->escapeHtml($block->currencyFormat($parentOrder->getGrandTotal())) ?></h4>
+                    </div>
+                <?php endif ?>
             </div>
             <!--end shopping summary-->
             <div class="order-detail-bottom">
@@ -347,6 +362,7 @@ if ($parentOrder) {
         }
     }
 }
+
 
 
     </script>

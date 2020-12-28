@@ -53,7 +53,7 @@
             <div class="field">
                 <label class="label">
                     <?= __('Total Refund') ?>
-                    <span class="total-number"><?= $block->getTotalRefund() ?></span>
+                    <span class="total-number"><?= $block->formatCurrency($block->getTotalRefund()) ?></span>
                 </label>
                 <div class="control">
                     <input type="hidden" name="creditmemo_id" value="<?= $block->getCreditmemoId() ?>">

@@ -92,6 +92,7 @@ class CreditmemoRepository implements \SM\Sales\Api\CreditmemoRepositoryInterfac
             $creditmemo = $this->creditmemoRepository->get($creditmemoId);
             $formData->setData(FormInformationInterface::TOTAL_REFUND, $creditmemo->getGrandTotal())
                 ->setData(FormInformationInterface::ORDER_ID, $creditmemo->getOrderId())
+                ->setData(FormInformationInterface::PARENT_ORDER_ID, $creditmemo->getOrder()->getData('parent_order'))
                 ->setData(
                     FormInformationInterface::REFERENCE_NUMBER,
                     $creditmemo->getOrder()->getData('reference_number')

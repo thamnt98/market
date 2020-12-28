@@ -21,6 +21,8 @@ interface ParentOrderDataInterface
     const ORDER_DATE = "order_date";
     const TOTAL_PAYMENT = "total_payment";
     const TOTAL_REFUND = "total_refund";
+    const HAS_CREDITMEMO = 'has_creditmemo';
+    const REFUND_MESSAGE = 'refund_message';
     const GRAND_TOTAL = "grand_total";
     const SUB_ORDERS = "sub_orders";
     const PAYMENT_METHOD = 'payment_method';
@@ -268,5 +270,27 @@ interface ParentOrderDataInterface
      * @return int
      */
     public function getGrandTotal();
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function setHasCreditmemo($value);
+
+    /**
+     * @return bool
+     */
+    public function getHasCreditmemo();
+
+    /**
+     * @param string $param
+     * @return $this
+     */
+    public function setRefundMessage($param);
+
+    /**
+     * @return string
+     */
+    public function getRefundMessage();
 
 }

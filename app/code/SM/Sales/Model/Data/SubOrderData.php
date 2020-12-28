@@ -447,4 +447,14 @@ class SubOrderData extends DataObject implements SubOrderDataInterface
     {
         return $this->getData(self::GRAND_TOTAL);
     }
+
+    public function setRefundMessage($value)
+    {
+        return $this->setData(self::REFUND_MESSAGE, $value);
+    }
+
+    public function getRefundMessage()
+    {
+        return $this->getData(self::REFUND_MESSAGE);
+    }
 }

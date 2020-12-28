@@ -463,22 +463,31 @@ class SubOrder {
 				->setSubtotal($subOrder->getSubtotal())
                 ->setHasCreditmemo($subOrder->hasCreditmemos())
                 ->setCreditmemoId($this->getCreditmemoId($subOrder))
-                ->setShowRefundButton(
-                    \SM\Sales\Model\Order\IsPaymentMethod::isVirtualAccount($subOrder->getPayment()->getMethod())
-                )
+                ->setStoreInfo($this->getStoreInfo($subOrder, $sourceInformation));
 
-				->setStoreInfo($this->getStoreInfo($subOrder, $sourceInformation));
+            $subOrderData->setShowRefundButton(
+                $subOrderData->getHasCreditmemo()
+                    && \SM\Sales\Model\Order\IsPaymentMethod::isVirtualAccount($subOrder->getPayment()->getMethod())
+            );
 
-			if ($this->currentCreditemo) {
+
+            if ($this->currentCreditemo) {
                 $subOrderData->setEnableRefundButton(
                     !($this->currentCreditemo->getCreditmemoStatus() == FormInformationInterface::SUBMITTED_VALUE)
                 );
             } else {
                 $subOrderData->setEnableRefundButton(false);
             }
-			if ($hasInvoice) {
-				$subOrderData->setInvoiceLink($this->getInvoiceLink($subOrder->getParentOrder()));
-			}
+
+            $subOrderData->setRefundMessage(
+                $subOrderData->getShowRefundButton()
+                    ? __('Some products in your order are not available. Get a refund with a few easy steps.')
+                    : __('Some products in your order are not available. Your card will not be charged for these products.')
+            );
+
+            if ($hasInvoice) {
+                $subOrderData->setInvoiceLink($this->getInvoiceLink($subOrder->getParentOrder()));
+            }
 
 			if (!$subOrder->getIsVirtual()) {
 				$this->setDeliveryData($subOrder, $subOrderData);

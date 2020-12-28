@@ -343,4 +343,24 @@ class ParentOrderData extends DataObject implements ParentOrderDataInterface
     {
         return $this->getData(self::GRAND_TOTAL);
     }
+
+    public function setHasCreditmemo($value)
+    {
+        return $this->setData(self::HAS_CREDITMEMO, $value);
+    }
+
+    public function getHasCreditmemo()
+    {
+        return $this->getData(self::HAS_CREDITMEMO);
+    }
+
+    public function setRefundMessage($value)
+    {
+        return $this->setData(self::REFUND_MESSAGE, $value);
+    }
+
+    public function getRefundMessage()
+    {
+        return $this->getData(self::REFUND_MESSAGE);
+    }
 }

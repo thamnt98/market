@@ -21,6 +21,7 @@ interface FormInformationInterface
     const TOTAL_REFUND = RequestFormData::TOTAL_REFUND_KEY;
     const REFERENCE_NUMBER = RequestFormData::ORDER_REFERENCE_NUMBER_KEY;
     const ORDER_ID = 'order_id';
+    const PARENT_ORDER_ID = 'parent_order_id';
 
     /**
      * @return \SM\Sales\Api\Data\Creditmemo\BankInterface[]
@@ -46,4 +47,9 @@ interface FormInformationInterface
      * @return int
      */
     public function getOrderId();
+
+    /**
+     * @return int
+     */
+    public function getParentOrderId();
 }

@@ -55,4 +55,12 @@ class FormInformation extends AbstractSimpleObject implements FormInformationInt
     {
         return $this->_get(self::ORDER_ID);
     }
+
+    /**
+     * @inheridoc
+     */
+    public function getParentOrderId()
+    {
+        return $this->_get(self::PARENT_ORDER_ID);
+    }
 }

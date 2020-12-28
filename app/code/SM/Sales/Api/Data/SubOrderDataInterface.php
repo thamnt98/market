@@ -29,6 +29,7 @@ interface SubOrderDataInterface
     const SUBTOTAL = "subtotal";
     const TOTAL_PAYMENT = "total_payment";
     const TOTAL_REFUND = "total_refund";
+    const REFUND_MESSAGE = "refund_message";
     const GRAND_TOTAL = "grand_total";
     const CREATED_AT = "created_at";
     const STATUS_HISTORY = "status_history";
@@ -364,4 +365,15 @@ interface SubOrderDataInterface
      * @return int
      */
     public function getGrandTotal();
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setRefundMessage($value);
+
+    /**
+     * @return string
+     */
+    public function getRefundMessage();
 }
