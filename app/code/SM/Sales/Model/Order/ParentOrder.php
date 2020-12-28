@@ -141,7 +141,7 @@ class ParentOrder
             ->setPaymentMethod($payment != null ? $payment->getMethodInstance()->getTitle() : null)
             ->setTotalPayment($parentOrder->getGrandTotal())
             ->setTotalRefund($totalRefund)
-            ->setGrandTotal($parentOrder->getTotalInvoiced() - $totalRefund)
+            ->setGrandTotal($parentOrder->getTotalInvoiced() - abs($totalRefund))
             ->setSubTotal($parentOrder->getSubtotal())
             ->setInvoiceNumber($parentOrder->getReferenceInvoiceNumber())
             ->setSubOrders($subOrders)
