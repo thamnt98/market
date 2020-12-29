@@ -33,6 +33,10 @@
                 <open_time>10AM</open_time>
                 <close_time>9PM</close_time>
             </available_store_pickup>
+            <limit_store_pickup>
+                <active>1</active>
+                <store_code_list>10019</store_code_list>
+            </limit_store_pickup>
         </trans_catalog>
     </default>
 </config>
