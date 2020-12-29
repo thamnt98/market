@@ -136,6 +136,7 @@ class TransmartPaymentMethods extends PaymentMethods
     public function getMethodsAvailable($quote, $customerId)
     {
         $this->methods = $this->getPaymentMethods($quote);
+        //\var_dump($this->methods);
         return [
             $this->setVirtualMethod(),
             $this->setCreditMethod($customerId, $quote),
@@ -168,12 +169,120 @@ class TransmartPaymentMethods extends PaymentMethods
             ->setDescription($this->scopeConfig->getValue('payment/sprint/sprint_cc_payment/description'))
             ->setMethods([
                 $this->methodInterfaceFactory
-                    ->create()->setBanks($debitMethods)
+                    ->create()
+                    ->setBanks($debitMethods)
                     ->setMinimumAmount($this->paymentHelper->getMinimumAmountCC())
-                    ->setTitle('Full payment')->setDescription(__('Pay your order in full amount'))->setType('debit_full_payment'),
+                    ->setTitle('Full payment')
+                    ->setDescription(__('Pay your order in full amount'))
+                    ->setType('debit_full_payment'),
             ])
             ->setCardType('debit_card')
         ;
+    }
+
+    /**
+     * Set Virtual
+     */
+    protected function setVirtualMethod()
+    {
+        $virtualMethods = [];
+
+        foreach ($this->paymentHelper->getVirtualAccountMethods() as $methodCode) {
+            //\var_dump($this->paymentHelper->getVirtualAccountMethods());die();
+            if ($this->checkIsSprintMethod($methodCode)) {
+                $virtualMethods[] = $this->bankInterfaceFactory
+                    ->create()
+                    ->setCode($methodCode)
+                    ->setLogo($this->paymentHelper->getLogoPayment($methodCode,true))
+                    ->setContent($this->paymentHelper->getBlockPaymentNote($methodCode,true))
+                    ->setTitle($this->methods[$methodCode]['title'])
+                    ->setDescription($this->scopeConfig->getValue('payment/sprint/sprint_channel/'.$methodCode.'/description'))
+                    ->setMinimumAmount($this->paymentHelper->getMinimumAmountVA());
+            }
+        }
+        return $this->paymentMethodFactory->create()
+            ->setTitle('Virtual Account')
+            ->setMinimumAmount($this->paymentHelper->getMinimumAmountVA())
+            ->setDescription($this->scopeConfig->getValue('payment/sprint/sprint_channel/description'))
+            ->setMethods([
+                $this->methodInterfaceFactory->create()
+                ->setBanks($virtualMethods)
+                ->setTitle('Virtual Account Full Payment')
+                ->setDescription(__('Pay your order in full amount'))
+                ->setType('virtual_account_number')
+            ])
+            ->setCardType('virtual_account');
+    }
+
+    /**
+     * Set Credit Card
+     * @param $customerId
+     * @param $quote
+     */
+    protected function setCreditMethod($customerId, $quote)
+    {
+        $creditMethods = $installmentMethods = [];
+
+        foreach ($this->paymentHelper->getCreditMethods() as $methodCode) {
+            if ($this->checkIsSprintMethod($methodCode)) {
+                $creditMethods[] = $this->bankInterfaceFactory
+                    ->create()
+                    ->setCode($methodCode)
+                    ->setLogo($this->paymentHelper->getLogoPayment($methodCode,true))
+                    ->setDescription($this->scopeConfig->getValue('payment/sprint/sprint_cc_payment/'.$methodCode.'/description'))
+                    ->setTitle($this->methods[$methodCode]['title']);
+            }
+        }
+        foreach ($this->paymentHelper->getInstallmentMethods() as $methodCode) {
+            if ($this->checkIsSprintMethod($methodCode)) {
+
+                $terms = $this->installmentPayment->getInstalmentTerm(
+                    $customerId,
+                    $methodCode,
+                    $quote
+                );
+                $termData = [];
+
+                foreach ($terms as $term) {
+                    $termData[] =
+                        $this->installmentTermFactory->create()
+                            ->setValue($term['value'])
+                            ->setLabel($term['label'])
+                            ->setServiceFee($term['serviceFee'])
+                            ->setServiceFeeAmount($term['serviceFeeAmount'])
+                            ->setServiceFeeValue($term['serviceFeeValue'])
+                            ->setTotalFee($term['totalFee'])
+                            ->setTotalFeePerMonth($term['totalFeePerMonth'])
+                        ;
+                }
+
+                $installmentMethods[] = $this->bankInterfaceFactory
+                    ->create()
+                    ->setCode($methodCode)
+                    ->setTitle($this->methods[$methodCode]['title'])
+                    ->setLogo($this->paymentHelper->getLogoPayment($methodCode,true))
+                    ->setDescription($this->scopeConfig->getValue('payment/sprint/sprint_cc_payment/'.$methodCode.'/description'))
+                    ->setTerms($termData);
+            }
+        }
+        return $this->paymentMethodFactory->create()
+            ->setTitle('Credit Card')
+            ->setDescription($this->scopeConfig->getValue('payment/sprint/sprint_cc_payment/description'))
+            ->setMethods([
+                $this->methodInterfaceFactory->create()
+                    ->setBanks($creditMethods)
+                    ->setMinimumAmount($this->paymentHelper->getMinimumAmountCC())
+                    ->setTitle('Full payment')
+                    ->setDescription(__('Pay your order in full amount'))
+                    ->setType('cc_full_payment')
+                ,
+                $this->methodInterfaceFactory->create()
+                ->setBanks($installmentMethods)
+                ->setMinimumAmount($this->paymentHelper->getMinimumAmountCC())
+                ->setTitle('Installment')
+                ->setDescription(__('Select preferred installment type & tenure'))
+                ->setType('cc_installment')
+            ])->setCardType('credit_card');
     }
 
     /**
