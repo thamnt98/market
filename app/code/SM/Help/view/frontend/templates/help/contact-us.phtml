@@ -125,8 +125,10 @@
                             <span><?= $block->escapeHtml(__('Select Store')) ?></span>
                         </span>
                             <ul id="store" data-role="store" class="dropdown">
-                                <?php foreach ($block->getStoreLocation() as $store):?>
-                                    <li data-value="<?= $store->getName() ?>"><?= $block->escapeHtml(__($store->getName()))?></li>
+                                <?php foreach ($block->getStoreLocation() as $code => $store):?>
+                                    <li data-value="<?= $code ?>">
+                                        <?= $block->escapeHtml(__($store->getName()))?>
+                                    </li>
                                 <?php endforeach; ?>
                             </ul>
                             <input type="hidden" name="store" value="">

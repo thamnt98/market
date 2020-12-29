@@ -14,6 +14,7 @@ namespace SM\JiraService\Model;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Sales\Model\ResourceModel\Order\Item\Collection;
 use Magento\Store\Model\ScopeInterface;
 
 class JiraRepository implements \SM\JiraService\Api\JiraRepositoryInterface
@@ -72,6 +73,16 @@ class JiraRepository implements \SM\JiraService\Api\JiraRepositoryInterface
     private $storeManager;
 
     /**
+     * @var \Trans\IntegrationOrder\Api\ReturnStatusInterface
+     */
+    private $returnStatus;
+
+    /**
+     * @var array
+     */
+    private $submitItems;
+
+    /**
      * JiraRepository constructor.
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\HTTP\Client\Curl $curl
@@ -85,6 +96,7 @@ class JiraRepository implements \SM\JiraService\Api\JiraRepositoryInterface
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
      * @param \Magento\Framework\Locale\ResolverInterface $resolver
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Trans\IntegrationOrder\Api\ReturnStatusInterface $returnStatus
      */
     public function __construct(
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
@@ -98,7 +110,8 @@ class JiraRepository implements \SM\JiraService\Api\JiraRepositoryInterface
         \Magento\Sales\Model\OrderRepository $orderRepository,
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
         \Magento\Framework\Locale\ResolverInterface $resolver,
-        \Magento\Store\Model\StoreManagerInterface $storeManager
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Trans\IntegrationOrder\Api\ReturnStatusInterface $returnStatus
     ) {
         $this->scopeConfig = $scopeConfig;
         $this->curl = $curl;
@@ -112,6 +125,7 @@ class JiraRepository implements \SM\JiraService\Api\JiraRepositoryInterface
         $this->timezone = $timezone;
         $this->resolver = $resolver;
         $this->storeManager = $storeManager;
+        $this->returnStatus = $returnStatus;
     }
 
     /**
@@ -255,15 +269,15 @@ class JiraRepository implements \SM\JiraService\Api\JiraRepositoryInterface
         $path = $this->directoryList->getPath('media') . DIRECTORY_SEPARATOR . 'sm/help/contactus/uploads' . $file;
 
         if (function_exists('curl_file_create')) {
-                $args['file'] = curl_file_create(
-                    $path,
-                    mime_content_type($path)
-                );
-                curl_setopt($curl, CURLOPT_POSTFIELDS, $args);
+            $args['file'] = curl_file_create(
+                $path,
+                mime_content_type($path)
+            );
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $args);
         } else {
-                curl_setopt($curl, CURLOPT_POSTFIELDS, [
-                    $args['file'] => '@' . $path,
-                ]);
+            curl_setopt($curl, CURLOPT_POSTFIELDS, [
+                $args['file'] => '@' . $path,
+            ]);
         }
 
         curl_setopt($curl, CURLOPT_POSTFIELDS, $args);
@@ -289,6 +303,7 @@ class JiraRepository implements \SM\JiraService\Api\JiraRepositoryInterface
      * @throws InputException
      * @throws LocalizedException
      * @throws NoSuchEntityException
+     * @throws \Exception
      */
     protected function generatePostData($typeName, $data, $customerId = null, $customer = null)
     {
@@ -299,10 +314,14 @@ class JiraRepository implements \SM\JiraService\Api\JiraRepositoryInterface
         if (!$customer) {
             $customer = $this->customerRepository->getById($customerId);
         }
-        $requestData = ['requestParticipants' => [$this->getJiraCustomerId(
-            $customer->getLastname(),
-            $customer->getEmail()
-        )]];
+        $requestData = [
+            'requestParticipants' => [
+                $this->getJiraCustomerId(
+                    $customer->getLastname(),
+                    $customer->getEmail()
+                )
+            ]
+        ];
 
         $requestData['serviceDeskId'] = $serviceDeskId;
 
@@ -328,7 +347,7 @@ class JiraRepository implements \SM\JiraService\Api\JiraRepositoryInterface
                     $requestData['requestFieldValues']['customfield_10048'] = 'None';
                 }
 
-                /** @var \Magento\Sales\Model\ResourceModel\Order\Item\Collection $orderItemCollection */
+                /** @var Collection $orderItemCollection */
                 $orderItemCollection = $this->itemCollectionFactory->create();
                 $orderItemCollection->addFieldToFilter('order_id', $data['order_id']);
                 $order = $this->orderRepository->get($data['order_id']);
@@ -352,6 +371,11 @@ class JiraRepository implements \SM\JiraService\Api\JiraRepositoryInterface
                 }
                 // Field Received
                 $requestData['requestFieldValues']['customfield_10054'] = $data['is_received'];
+
+                // Sent to OMS and create RMA
+                if ($data['is_received'] == 'return') {
+                    $this->sendReturn($data, $order->getData('reference_order_id'));
+                }
             }
         } elseif ($data['category'] == $this->getMyOrderId()) {
             $requestData['requestTypeId'] = $generalRequest;
@@ -366,7 +390,7 @@ class JiraRepository implements \SM\JiraService\Api\JiraRepositoryInterface
                 // Field Order ID
                 $requestData['requestFieldValues']['customfield_10037'] = $data['order_increment_id'];
 
-                /** @var \Magento\Sales\Model\ResourceModel\Order\Item\Collection $orderItemCollection */
+                /** @var Collection $orderItemCollection */
                 $orderItemCollection = $this->itemCollectionFactory->create();
                 $orderItemCollection->addFieldToFilter('order_id', $data['order_id']);
 
@@ -411,7 +435,7 @@ class JiraRepository implements \SM\JiraService\Api\JiraRepositoryInterface
         $params =
             [
                 'displayName' => $name,
-                'email'       => $email
+                'email' => $email
             ];
         $this->curl->post($requestUrl, $this->jsonHelper->jsonEncode($params));
 
@@ -535,8 +559,10 @@ class JiraRepository implements \SM\JiraService\Api\JiraRepositoryInterface
         foreach ($orderCollection as $item) {
             if (in_array($item->getProductId(), $productIds)) {
                 $content .= $identify++ . $this->getContent($item);
+                $this->submitItems[] = $item;
             } elseif (in_array($item->getItemId(), $productIds)) {
                 $content .= $identify++ . $this->getContent($item);
+                $this->submitItems[] = $item;
             }
         }
         return $content;
@@ -545,8 +571,38 @@ class JiraRepository implements \SM\JiraService\Api\JiraRepositoryInterface
     protected function getContent($item)
     {
         return
-              '. Product SKU: ' . $item->getSku()
+            '. Product SKU: ' . $item->getSku()
             . ', Product Name: ' . $item->getName()
             . ', Quantity: ' . (int)$item->getQtyOrdered() . '   ';
+    }
+
+    /**
+     * @param $data
+     * @throws \Exception
+     */
+    protected function sendReturn($data, $orderId)
+    {
+        $itemOrder = [];
+        /**
+         * @var \Magento\Sales\Model\Order\Item $item
+         */
+        foreach ($this->submitItems as $item) {
+            $itemOrder[] = [
+                "sku" => $item->getSku(),
+                "item_name" => $item->getName(),
+                "quantity" => (int) $item->getQtyOrdered(),
+                "item_paid_price" => (int) $item->getRowTotal(),
+                "item_disc_price" => (int) $item->getDiscountAmount(),
+                "item_sub_total" => (int) $item->getPrice()
+            ];
+        }
+
+        $sentResult = json_decode(
+            $this->returnStatus->sendReturn($orderId, $data['store_code'], $itemOrder, $data['description'], 1)
+        );
+
+        if (!($sentResult->code >= 200 && $sentResult->code < 300)) {
+            throw new \Exception($sentResult->message);
+        }
     }
 }

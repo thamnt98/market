@@ -257,10 +257,11 @@ class ContactUs extends \Magento\Framework\View\Element\Template
             $from = strtotime('-90 days', strtotime($to));
             $from = date('Y-m-d h:i:s', $from); // 24 hours before
             $sortOrder = $this->sortOrderBuilder->setField(ParentOrderRepository::SORT_LATEST)->setDirection('DESC')->create();
-
+            $allowStatus = ParentOrderRepository::STATUS_DELIVERED .','. ParentOrderRepository::STATUS_COMPLETE;
             $customerId = $this->customerSession->getCustomerId();
             $searchCriteria = $this->searchCriteriaBuilder
                 ->addFilter('created_at', $from, 'gteq')
+                ->addFilter('status', $allowStatus, 'in')
                 ->setPageSize(10)
                 ->setSortOrders([$sortOrder])
                 ->create();
