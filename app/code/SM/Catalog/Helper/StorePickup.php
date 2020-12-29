@@ -331,12 +331,16 @@ class StorePickup
      */
     public function getListDataBySourceCode(array $resultSourceCode)
     {
+        $isEnableLimitStorePickUp = $this->isEnableLimitStorePickUp();
+        if ($isEnableLimitStorePickUp) {
+            $limitStoreCodeList = $this->getEnableCodeList();
+            $resultSourceCode = array_intersect($resultSourceCode, $limitStoreCodeList);
+        }
         $sourceListData = [];
         $sourceCriteria = $this->searchCriteriaBuilder
             ->addFilter(SourceInterface::ENABLED, 1)
             ->addFilter(SourceInterface::SOURCE_CODE, [$resultSourceCode], 'in')
             ->create();
-
         try {
             $sourceData = $this->sourceRepository->getList($sourceCriteria)->getItems();
             if (is_array($sourceData) && !empty($sourceData)) {
@@ -585,5 +589,28 @@ class StorePickup
                 cos($latFrom) * cos($latTo) * pow(sin($lonDelta / 2), 2)));
 
         return $angle * $earthRadius;
+    }
+
+    /**
+     * @return false|string[]
+     */
+    protected function getEnableCodeList()
+    {
+        $storeCodeList = $this->_scopeConfig->getValue(
+            'trans_catalog/limit_store_pickup/store_code_list',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        return explode(',', $storeCodeList);
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function isEnableLimitStorePickUp()
+    {
+        return $this->_scopeConfig->getValue(
+            'trans_catalog/limit_store_pickup/active',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
     }
 }
