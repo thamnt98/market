@@ -296,6 +296,9 @@ class SubOrder {
 				} else {
 					$itemOptionData->setOptionType(ParentOrderRepository::OPTION_TYPE_CONFIGURABLE);
 					$itemOptionData->setOptionValue($option["value"]);
+					if ($option["value"] == '' || !(bool)$option["value"]) {
+					    continue;
+                    }
 				}
 				$itemOptions[] = $itemOptionData;
 			}

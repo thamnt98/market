@@ -244,6 +244,10 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
         $this->resourceConnection = $resourceConnection;
         $this->indexerRegistry = $indexerRegistry;
         $this->productCollectionFactory = $productCollectionFactory;
+
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_promotion.log');
+        $logger = new \Zend\Log\Logger();
+        $this->logger = $logger->addWriter($writer);
     }
 
 
@@ -562,7 +566,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                             } catch (\Exception $exception) {
                                 $msgP = "Error Save to Magento table ".__FUNCTION__." : ".$exception->getMessage();
                                 $this->updateDataValueStatus($row['data_id'], IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE, $msgP);
-                                $this->logger->error($msgP);
+                                $this->logger->info($msgP);
                                 continue;
                             }
                         }
@@ -573,7 +577,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                     foreach ($data as $valueX) {
                         $msgPp = "Error Save to Magento table ".__FUNCTION__." : ".$exception->getMessage();
                         $this->updateDataValueStatus($valueX['data_id'], IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE, $msgPp);
-                        $this->logger->error($msgPp);
+                        $this->logger->info($msgPp);
                     }
 
                     continue;
@@ -737,7 +741,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             // if promo id not exist
             if ($dataPass['target_group'] == 0) {
                 // $checkIntPromoId = $this->checkIntegrationPromoByPromoId($dataPass['promotion_id']);
-                $checkIntPromoId = $this->checkIntegrationPromoSkuAndPromoType($dataPass);
+                $checkIntPromoId = $this->checkIntegrationPromoByPromoIdStoreCode($dataPass);
 
                 // Nested switch discount type
                 // data start time
@@ -761,48 +765,79 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                     'store_code' => $dataPass['store_code']
                 ];
                 
-                switch ($dataPass['discount_type']) {
-                    // promotype = 1 , disctype = 1
-                    case 1:
-                        // data name and desc
-                        $name = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['promo_selling_price'].' fixed price ('.$dataPass['sku'].')';
-                        $desc = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['promo_selling_price'].' fixed price ('.$dataPass['sku'].')';
+                // check if end date less than now
+                if ($endTime > $startTime) {
+                    switch ($dataPass['discount_type']) {
+                        // promotype = 1 , disctype = 1
+                        case 1:
+                            // data name and desc
+                            $name = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['promo_selling_price'].' fixed price ('.$dataPass['sku'].')';
+                            $desc = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['promo_selling_price'].' fixed price ('.$dataPass['sku'].')';
 
-                        $savePromoPriceStoreStatus = $this->savePromoPriceStore($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode, $attributeInterfaces);
-                        break;
+                            $savePromoPriceStoreStatus = $this->savePromoPriceStore($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode, $attributeInterfaces);
+                            break;
 
-                    // promotype = 1 , disctype = 2
-                    case 2:
-                        // data name and desc
-                        $name = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price '.$dataPass['percent_disc'].' % Off ('.$dataPass['sku'].')';
-                        $desc = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price '.$dataPass['percent_disc'].' % Off ('.$dataPass['sku'].')';
-                        
-                        $savePromoPriceStoreStatus = $this->savePromoPriceStore($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode, $attributeInterfaces);
-                        break;
+                        // promotype = 1 , disctype = 2
+                        case 2:
+                            // data name and desc
+                            $name = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price '.$dataPass['percent_disc'].' % Off ('.$dataPass['sku'].')';
+                            $desc = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price '.$dataPass['percent_disc'].' % Off ('.$dataPass['sku'].')';
+                            
+                            $savePromoPriceStoreStatus = $this->savePromoPriceStore($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode, $attributeInterfaces);
+                            break;
 
-                    // promotype = 1 , disctype = 3
-                    case 3:
-                        // data name and desc
-                        $name = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['amount_off'].' Off ('.$dataPass['sku'].')';
-                        $desc = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['amount_off'].' Off ('.$dataPass['sku'].')';
+                        // promotype = 1 , disctype = 3
+                        case 3:
+                            // data name and desc
+                            $name = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['amount_off'].' Off ('.$dataPass['sku'].')';
+                            $desc = $dataPass['promotion_id'].':'.$dataPass['promotion_type'].' - Markdown Price Rp '.$dataPass['amount_off'].' Off ('.$dataPass['sku'].')';
 
-                        $savePromoPriceStoreStatus = $this->savePromoPriceStore($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode, $attributeInterfaces);
-                        break;
+                            $savePromoPriceStoreStatus = $this->savePromoPriceStore($startTime, $endTime, $name, $desc, $isCampaign, $isRollback, $dataStoreCode, $attributeInterfaces);
+                            break;
+                    }
+
+                    // save to integration prom price table
+                    $dataPass['name'] = $name;
+                    $dataPass['from_date'] = $startTime;
+                    $dataPass['to_date'] = $endTime;
+                    if ($savePromoPriceStoreStatus) {
+                        if (!$checkIntPromoId) {
+                            $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
+                        }
+                        else {
+                            // update end date
+                            $checkIntPromoId->setStartDate($startTime);
+                            $checkIntPromoId->setEndDate($endTime);
+                            if (!empty($dataPass['promo_selling_price'])) {
+                                $checkIntPromoId->setPromoSellingPrice($dataPass['promo_selling_price']);
+                            }
+                            if (!empty($dataPass['percent_disc'])) {
+                                $checkIntPromoId->setPercentDisc($dataPass['percent_disc']);
+                            }
+                            if (!empty($dataPass['amount_off'])) {
+                                $checkIntPromoId->setAmountOff($dataPass['amount_off']);
+                            }
+                            $this->promotionPriceRepositoryInterface->save($checkIntPromoId);
+                        }
+                    }
+
+                    return $savePromoPriceStoreStatus;
                 }
+                else {
+                    if ($checkIntPromoId) {
+                        $savePromoPriceStoreStatus = $this->savePromoPriceStoreEndDate($dataStoreCode, $attributeInterfaces);
 
-                // save to integration prom price table
-                $dataPass['name'] = $name;
-                if ($savePromoPriceStoreStatus) {
-                    if (!$checkIntPromoId) {
-                        $saveDataIntPromo = $this->saveIntegrationPromo($dataPass);
+                        // update end date
+                        $checkIntPromoId->setEndDate($endTime);
+                        $this->promotionPriceRepositoryInterface->save($checkIntPromoId);
+
+                        return $savePromoPriceStoreStatus;
                     }
                 }
-
-                return $savePromoPriceStoreStatus;
             }
             // --------------
         } catch (\Exception $e) {
-            $this->logger->error("error saved markdown --->".print_r($dataPass['sku'], true));
+            $this->logger->info("error saved markdown --->".print_r($dataPass['sku'], true));
             throw new StateException(
                 __($e->getMessage())
             );
@@ -922,7 +957,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             }
             // --------------
         } catch (\Exception $e) {
-            $this->logger->error("error saved promo type 4 --->".print_r($dataPass['sku'], true));
+            $this->logger->info("error saved promo type 4 --->".print_r($dataPass['sku'], true));
             throw new StateException(
                 __($e->getMessage())
             );
@@ -995,7 +1030,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             // }
             // --------------
         } catch (\Exception $e) {
-            $this->logger->error("error saved promo type 7 --->".print_r($dataPass['sku'], true));
+            $this->logger->info("error saved promo type 7 --->".print_r($dataPass['sku'], true));
             throw new StateException(
                 __($e->getMessage())
             );
@@ -1047,7 +1082,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                         try {
                             $checkIntPromoTwoFixed = $this->promotionPriceRepositoryInterface->loadDataPromoTypeTwoBySameRuleFixed($dataPass);
                         } catch (\Exception $e) {
-                            $this->logger->error("<=End " .$e->getMessage());
+                            $this->logger->info("<=End " .$e->getMessage());
                             throw new StateException(
                                 __(__FUNCTION__." - ".$e->getMessage())
                             );
@@ -1077,7 +1112,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                         try {
                             $checkIntPromoTwoPercentage = $this->promotionPriceRepositoryInterface->loadDataPromoTypeTwoBySameRulePercentage($dataPass);
                         } catch (\Exception $e) {
-                            $this->logger->error("<=End " .$e->getMessage());
+                            $this->logger->info("<=End " .$e->getMessage());
                             throw new StateException(
                                 __(__FUNCTION__." - ".$e->getMessage())
                             );
@@ -1107,7 +1142,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                         try {
                             $checkIntPromoTwoFixed = $this->promotionPriceRepositoryInterface->loadDataPromoTypeTwoBySameRuleAmount($dataPass);
                         } catch (\Exception $e) {
-                            $this->logger->error("<=End " .$e->getMessage());
+                            $this->logger->info("<=End " .$e->getMessage());
                             throw new StateException(
                                 __(__FUNCTION__." - ".$e->getMessage())
                             );
@@ -1188,7 +1223,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             }
             // --------------
         } catch (\Exception $e) {
-            $this->logger->error("error saved promo type 2 --->".print_r($dataPass['sku'], true));
+            $this->logger->info("error saved promo type 2 --->".print_r($dataPass['sku'], true));
             throw new StateException(
                 __($e->getMessage())
             );
@@ -1362,7 +1397,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             }
             // --------------
         } catch (\Exception $e) {
-            $this->logger->error("error saved promo type 8 --->".print_r($dataPass['sku'], true));
+            $this->logger->info("error saved promo type 8 --->".print_r($dataPass['sku'], true));
             throw new StateException(
                 __($e->getMessage())
             );
@@ -1573,7 +1608,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             // }
             // --------------
         } catch (\Exception $e) {
-            $this->logger->error("error saved promo type 5 --->".print_r($dataPass['sku'], true));
+            $this->logger->info("error saved promo type 5 --->".print_r($dataPass['sku'], true));
             throw new StateException(
                 __($e->getMessage())
             );
@@ -1659,13 +1694,23 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                     $query->setEndDate($data['to_date']);
                 }
             }
+
+            if ($data['promotion_type'] == 1) {
+                if (!empty($data['from_date'])) {
+                    $query->setStartDate($data['from_date']);
+                }
+
+                if (!empty($data['to_date'])) {
+                    $query->setEndDate($data['to_date']);
+                }
+            }
             
 
             $result = $this->promotionPriceRepositoryInterface->save($query);
 
             $this->logger->info("saveIntegrationPromo saved [" . $data['name'] ."]");
         } catch (\Exception $e) {
-            $this->logger->error("<=End saveIntegrationPromo" .$e->getMessage());
+            $this->logger->info("<=End saveIntegrationPromo" .$e->getMessage());
             throw new StateException(
                 __(__FUNCTION__." - ".$e->getMessage())
             );
@@ -1685,7 +1730,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
         try {
             $query = $this->promotionPriceRepositoryInterface->loadDataPromoByPromoId($data);
         } catch (Exception $e) {
-            $this->logger->error("<=End checkIntegrationPromo" .$e->getMessage());
+            $this->logger->info("<=End checkIntegrationPromo" .$e->getMessage());
             throw new StateException(
                 __(__FUNCTION__." - ".$e->getMessage())
             );
@@ -1705,7 +1750,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
         try {
             $query = $this->promotionPriceRepositoryInterface->loadDataPromoByPromoIdStoreCode($data);
         } catch (Exception $e) {
-            $this->logger->error("<=End checkIntegrationPromo" .$e->getMessage());
+            $this->logger->info("<=End checkIntegrationPromo" .$e->getMessage());
             throw new StateException(
                 __(__FUNCTION__." - ".$e->getMessage())
             );
@@ -1725,7 +1770,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
         try {
             $query = $this->promotionPriceRepositoryInterface->loadDataPromoFive($data);
         } catch (\Exception $e) {
-            $this->logger->error("<=End checkIntegrationPromo" .$e->getMessage());
+            $this->logger->info("<=End checkIntegrationPromo" .$e->getMessage());
             throw new StateException(
                 __(__FUNCTION__." - ".$e->getMessage())
             );
@@ -1745,7 +1790,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
         try {
             $query = $this->promotionPriceRepositoryInterface->loadDataPromoFiveItemTwo($data);
         } catch (\Exception $e) {
-            $this->logger->error("<=End checkIntegrationPromo" .$e->getMessage());
+            $this->logger->info("<=End checkIntegrationPromo" .$e->getMessage());
             throw new StateException(
                 __(__FUNCTION__." - ".$e->getMessage())
             );
@@ -1765,7 +1810,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
         try {
             $query = $this->promotionPriceRepositoryInterface->loadDataPromoFiveItemOne($data);
         } catch (\Exception $e) {
-            $this->logger->error("<=End checkIntegrationPromo" .$e->getMessage());
+            $this->logger->info("<=End checkIntegrationPromo" .$e->getMessage());
             throw new StateException(
                 __(__FUNCTION__." - ".$e->getMessage())
             );
@@ -1785,7 +1830,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
         try {
             $query = $this->promotionPriceRepositoryInterface->loadDataPromoFiveCheck($data);
         } catch (\Exception $e) {
-            $this->logger->error("<=End checkIntegrationPromoSku" .$e->getMessage());
+            $this->logger->info("<=End checkIntegrationPromoSku" .$e->getMessage());
             throw new StateException(
                 __(__FUNCTION__." - ".$e->getMessage())
             );
@@ -1805,7 +1850,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
         try {
             $query = $this->promotionPriceRepositoryInterface->loadDataPromoBySkuPromoType($data);
         } catch (\Exception $e) {
-            $this->logger->error("<=End checkIntegrationPromoSku" .$e->getMessage());
+            $this->logger->info("<=End checkIntegrationPromoSku" .$e->getMessage());
             throw new StateException(
                 __(__FUNCTION__." - ".$e->getMessage())
             );
@@ -1836,7 +1881,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
 
             $this->logger->info("promo price saved [" . $name ."]");
         } catch (\Exception $e) {
-            $this->logger->error("<=End promo price" .$e->getMessage());
+            $this->logger->info("<=End promo price" .$e->getMessage());
             throw new StateException(
                 __(__FUNCTION__." - ".$e->getMessage())
             );
@@ -1889,11 +1934,45 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             // $this->productRepositoryInterface->save($product);
 
             if ($attributeIdarray[$specialPriceCode]['attribute_id']) {
-                $this->logger->info($productPriceBySku);
                 $dataMarkdown =
                     [
                         "attribute_id"=>"".$attributeIdarray[$specialPriceCode]['attribute_id'][0]."",
                         "value"=>"".$specialPrice."",
+                        "row_id"=>"".$product->getRowId().""
+                    ];
+
+            }
+            else {
+                return false;
+            }
+
+            return $dataMarkdown;
+        } catch (\Exception $exception) {
+            throw new StateException(
+                __(__FUNCTION__." - ".$exception->getMessage())
+            );
+        }
+    }
+
+    /**
+     * delete promo price by store
+     * @param $dataStoreCode mixed
+     * @param $attributeIdarray array
+     * @return $data mixed
+     * @throw logger error
+     */
+    protected function savePromoPriceStoreEndDate($dataStoreCode, $attributeIdarray)
+    {
+        try {
+            // save to special price
+            $product = $this->productRepositoryInterface->get($dataStoreCode['sku']);
+            $specialPriceCode = PromotionPriceLogicInterface::PRODUCT_ATTR_PROMO_PRICE.$dataStoreCode['store_code'];
+            
+            if ($attributeIdarray[$specialPriceCode]['attribute_id']) {
+                $dataMarkdown =
+                    [
+                        "attribute_id"=>"".$attributeIdarray[$specialPriceCode]['attribute_id'][0]."",
+                        "value"=> 0,
                         "row_id"=>"".$product->getRowId().""
                     ];
 
@@ -1982,7 +2061,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                 ];
             }
         } catch (\Exception $e) {
-            $this->logger->error("<=End salesrule" .$e->getMessage());
+            $this->logger->info("<=End salesrule" .$e->getMessage());
             throw new StateException(
                 __(__FUNCTION__." - ".$e->getMessage())
             );
@@ -2359,7 +2438,6 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
 
                 if ($ruleData) {
                     if ($dataPass['same_rule'] == 1) {
-                        $this->logger->info('true');
                         if (isset($ruleDataArray['conditions'])) {
                             $conditions = $ruleDataArray['conditions'];
                             foreach ($conditions as $key => $condition) {
@@ -2452,7 +2530,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             }
             // --------------
         } catch (\Exception $e) {
-            $this->logger->error("<=End update salesrule" .$e->getMessage());
+            $this->logger->info("<=End update salesrule" .$e->getMessage());
             throw new StateException(
                 __(__FUNCTION__." - ".$e->getMessage())
             );
@@ -2501,7 +2579,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             }
             // --------------
         } catch (\Exception $e) {
-            $this->logger->error("<=End update salesrule" .$e->getMessage());
+            $this->logger->info("<=End update salesrule" .$e->getMessage());
             throw new StateException(
                 __(__FUNCTION__." - ".$e->getMessage())
             );
@@ -2550,7 +2628,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
 
             $this->logger->info("amasty_amrules_rule saved [" . $dataPass ."]");
         } catch (\Exception $e) {
-            $this->logger->error("<=End amasty_amrules_rule" .$e->getMessage());
+            $this->logger->info("<=End amasty_amrules_rule" .$e->getMessage());
             throw new StateException(
                 __(__FUNCTION__." - ".$e->getMessage())
             );
@@ -2598,7 +2676,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
 
             $this->logger->info("amasty_amrules_rule update");
         } catch (\Exception $e) {
-            $this->logger->error("<=End amasty_amrules_rule" .$e->getMessage());
+            $this->logger->info("<=End amasty_amrules_rule" .$e->getMessage());
             throw new StateException(
                 __(__FUNCTION__." - ".$e->getMessage())
             );
@@ -2649,7 +2727,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
 
             $this->logger->info("amasty_ampromo_rule update");
         } catch (\Exception $e) {
-            $this->logger->error("<=End amasty_ampromo_rule" .$e->getMessage());
+            $this->logger->info("<=End amasty_ampromo_rule" .$e->getMessage());
             throw new StateException(
                 __(__FUNCTION__." - ".$e->getMessage())
             );
