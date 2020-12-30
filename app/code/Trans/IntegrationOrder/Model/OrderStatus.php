@@ -553,7 +553,7 @@ class OrderStatus implements OrderStatusInterface {
 		 * preparing data for refund PG
 		 */
 		$refNumber         = $idsOrder->getReferenceNumber();
-		$parentIdFetch     = $this->transactionMegaHelper->getSalesOrderArray($refNumber);
+		$parentIdFetch     = $this->transactionMegaHelper->getSalesOrderArrayParent($refNumber);
 		$parentEntityId    = $parentIdFetch['entity_id'];
 		$paymentMethod     = $loadDataOrder->getPayment()->getMethod();
 		$channelId         = $this->configPg->getPaymentChannelId($paymentMethod);
@@ -672,6 +672,13 @@ class OrderStatus implements OrderStatusInterface {
 				if ($objOrder->code == 200) {
 					return json_decode($responseOrder, true);
 				}
+
+				/* save to table sales_order_item */
+				if ($fetchData->getSku()) {
+					$saveOrderItem = $this->orderItemFactory->create();
+				}
+				$fetchData->setQtyRefunded((float) $itemData['quantity_allocated']);
+				$this->orderItemRepository->save($fetchData);
 
 				/* save to table integration_oms_refund */
 				$saveRefundData = $this->refundInterface->create();

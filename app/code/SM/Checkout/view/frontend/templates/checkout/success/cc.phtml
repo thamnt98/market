@@ -179,6 +179,9 @@ $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
                                                 if ($orderItem->getProduct()->getTypeId()==\Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
                                                     if (!empty($options['attributes_info'])) {
                                                         foreach ($options['attributes_info'] as $attribute) {
+                                                            if ($attribute['value'] == '' || !(bool)$attribute['value']) {
+                                                                continue;
+                                                            }
                                                             echo '<br>';
                                                             echo '<span>'.$attribute['label'].': '.$attribute['value'].'</span>';
                                                         }
@@ -193,6 +196,9 @@ $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
                                                         if ($childrenItem->getProduct()->getTypeId()==\Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
                                                             if (!empty($option['attributes_info'])) {
                                                                 foreach ($option['attributes_info'] as $attribute) {
+                                                                    if ($attribute['value'] == '' || !(bool)$attribute['value']) {
+                                                                        continue;
+                                                                    }
                                                                     echo '<br>';
                                                                     echo '<span>'.$attribute['label'].': '.$attribute['value'].'</span>';
                                                                 }
@@ -286,6 +292,9 @@ $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
                                                     if ($orderItem->getProduct()->getTypeId()==\Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
                                                         if (!empty($options['attributes_info'])) {
                                                             foreach ($options['attributes_info'] as $attribute) {
+                                                                if ($attribute['value'] == '' || !(bool)$attribute['value']) {
+                                                                    continue;
+                                                                }
                                                                 echo '<br>';
                                                                 echo '<span>'.$attribute['label'].': '.$attribute['value'].'</span>';
                                                             }
@@ -300,6 +309,9 @@ $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
                                                             if ($childrenItem->getProduct()->getTypeId()==\Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
                                                                 if (!empty($option['attributes_info'])) {
                                                                     foreach ($option['attributes_info'] as $attribute) {
+                                                                        if ($attribute['value'] == '' || !(bool)$attribute['value']) {
+                                                                            continue;
+                                                                        }
                                                                         echo '<br>';
                                                                         echo '<span>'.$attribute['label'].': '.$attribute['value'].'</span>';
                                                                     }

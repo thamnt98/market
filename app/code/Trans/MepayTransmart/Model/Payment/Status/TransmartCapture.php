@@ -54,11 +54,14 @@ class TransmartCapture extends Capture
    * @param  \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\Collection $inquiryTransaction
    * @return void
    */
-  public function handle($transaction, $inquiryTransaction, $token = null)
+  public function handle($transaction, $inquiryTransaction, $token = null, $isPreAuth = false)
   {
     try {
         //init related data
         $transactionData = $this->transactionHelper->getTxnByTxnId($transaction->getId());
+        if (!$transactionData->getSize() && $isPreAuth) {
+            $transactionData = $this->transactionHelper->getTxnByTxnId($inquiryTransaction->getId());
+        }
         foreach ($transactionData as $key => $value) {
             $orderId = $value->getOrderId();
             $this->logger->log('== {{order_id:'.$orderId.'}} ==');
@@ -133,24 +136,29 @@ class TransmartCapture extends Capture
    * @param $orderId
    * @return void
    */
-  public function updateChildStatusHistory($connection, $orderId)
+  public function updateChildStatusHistory($orderId)
   {
+    $connection = Data::getConnection();
     $table = $connection->getTableName('sales_order_status_history');
-    $query = "INSERT INTO ".$table." (parent_id, status, entity_name) VALUES ('".$orderId."','in_process','order')";
-    $connection->query($query);
+    $query = "SELECT entity_id FROM ".$table." WHERE parent_id = '".$orderId."' and status = 'in_process'";
+    $exist = $connection->fetchAll($query);
+    if (!count($exist)) {
+        $this->logger->log('{{ Update sales order status history start }}');
+        $query = "INSERT INTO ".$table." (parent_id, status, entity_name) VALUES ('".$orderId."','in_process','order')";
+        $connection->query($query);
+        $this->logger->log('{{ Update sales order status history end }}');
+    }
   }
 
   public function createOrderInvoiceParentAndChild($initOrder, $transaction)
   {
-      $connection = Data::getConnection();
         if ($initOrder->getIsParent()) {
             $invoice = $this->invoice->create($initOrder, $transaction);
             $this->invoice->send($invoice);
         }
-      $initOrder->setState('in_process');
-      $initOrder->setStatus('in_process');
-      $this->transactionHelper->saveOrder($initOrder);
-      $this->updateChildStatusHistory($connection, $initOrder->getId());
-
+        $initOrder->setState('in_process');
+        $initOrder->setStatus('in_process');
+        $this->transactionHelper->saveOrder($initOrder);
+        $this->updateChildStatusHistory($initOrder->getId());
   }
 }

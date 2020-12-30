@@ -1260,7 +1260,7 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                     foreach ($rowData['list_attributes'] as $listVal) {
                         $checkAttribute = $this->config->getAttribute(IntegrationProductInterface::ENTITY_TYPE_CODE, $listVal['attribute_code']);
 
-                        if($checkAttribute->getFrontendInput() != 'multiselect') {
+                        if($checkAttribute->getFrontendInput() != 'select') {
                             $rowData[$listVal['attribute_code']] = $listVal['attribute_value'];
                         } else {
                             $attrVal = $this->saveAttributeDataByType($listVal['attribute_code'], strtolower($listVal['attribute_value']));
@@ -1550,7 +1550,7 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                         try {
                             $attributeSetCode = $this->attributeSet->getAttributeSetCodeByPimId($pimId);
                             $attributeSetId = $this->attributeSet->getAttributeSetIdByPimId($pimId);
-                            if($attributeSet) {
+                            if($attributeSetId) {
                                 $result['attribute_set_id'] = $attributeSetId;
                                 $result['attribute_set_code'] = $attributeSetCode;
                                 break;

@@ -23,4 +23,16 @@
       <column name="row_id"/>
     </constraint>
   </table>
+
+  <table name="trans_mepay_auth_capture" resource="default" engine="innodb" comment="Trans Mepay Auth Capture Tracking">
+    <column xsi:type="int" name="id" padding="6" unsigned="true" nullable="false" identity="true" comment="ID"/>
+    <column xsi:type="varchar" length="50" name="reference_number" nullable="false" comment="reference number"/>
+    <column xsi:type="varchar" length="50" name="reference_order_id" nullable="false" comment="reference order id"/>
+    <column xsi:type="tinyint" name="status" padding="6" unsigned="true" default="1" nullable="false" comment="status"/>
+    <column xsi:type="timestamp" name="created_at" comment="created at"/>
+    <column xsi:type="timestamp" name="updated_at" comment="updated at"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="id"/>
+    </constraint>
+  </table>
 </schema>
