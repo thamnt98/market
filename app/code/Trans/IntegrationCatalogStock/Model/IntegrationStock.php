@@ -250,19 +250,18 @@ class IntegrationStock implements IntegrationStockInterface {
 			$skus = array_keys($stockData);
 			$productsCollection = $this->getProductByMultipleSkuAndAttributeCodes($skus, $attributeCodes);
 
-			foreach($productsCollection as $productCollection){
-				$rowId = $productCollection->getRowId();
+			foreach($productsCollection as $productCollection) {
 				$productSku = $productCollection->getSku();
 
+				$productSku = $this->validateSku($productSku, $stockData);
+				if ($productSku === null) {
+					continue;
+				}
+
+				// $rowId = $productCollection->getRowId();
 				$isFresh = $productCollection->getData('is_fresh');
 				$weight = $productCollection->getData('weight');
 				$soldIn = $productCollection->getData('sold_in');
-
-				$productSku = $this->validateSku($productSku, $stockData);
-
-				if (!isset($stockData[$productSku])) {
-					continue;
-				}
 
 				$checkSource = $stockData[$productSku]['checkSource'];
 				$locationCode = $stockData[$productSku]['locationCode'];
@@ -381,17 +380,23 @@ class IntegrationStock implements IntegrationStockInterface {
 	
 	protected function validateSku($productSku, $stockData) {
 		
-		$productSkuUpperCase = strtoupper($productSku);
-		if (isset($stockData[$productSkuUpperCase])) {
-			return $productSkuUpperCase;
-		}
-		
-		$productSkuLowerCase = strtoupper($productSku);
-		if (isset($stockData[$productSkuLowerCase])) {
-			return $productSkuLowerCase;
+		if ($productSku !== null) {
+			if (isset($stockData[$productSku])) {
+				return $productSku;
+			}
+			
+			$productSkuUpperCase = strtoupper($productSku);
+			if (isset($stockData[$productSkuUpperCase])) {
+				return $productSkuUpperCase;
+			}
+			
+			$productSkuLowerCase = strtoupper($productSku);
+			if (isset($stockData[$productSkuLowerCase])) {
+				return $productSkuLowerCase;
+			}	
 		}
 
-		return $productSku;
+		return null;
 
 	}	
 
@@ -632,9 +637,11 @@ class IntegrationStock implements IntegrationStockInterface {
 					$productSku = $theStockValue[IntegrationStockInterface::IMS_PRODUCT_SKU];
 				}
 				
-				$quantity = 0;
+				$quantityFloat = 0;
+				$quantity = 0;				
 				if (isset($theStockValue[IntegrationStockInterface::IMS_QUANTITY])) {
-					$quantity = (float) $theStockValue[IntegrationStockInterface::IMS_QUANTITY];
+					$quantityFloat = (float) $theStockValue[IntegrationStockInterface::IMS_QUANTITY];
+					$quantity = (int) floor($quantityFloat);
 					if ($quantity < 0) {
 						$quantity = 0;
 					}
@@ -662,6 +669,7 @@ class IntegrationStock implements IntegrationStockInterface {
 					$stockCandidate = array(
 						"source_code" => $locationCode,
 						"sku" => $productSku,
+						"quantity_float" => $quantityFloat,
 						"quantity" => $quantity,
 						"status" => ($quantity > 0 ? 1 : 0)
 					);					
@@ -677,24 +685,18 @@ class IntegrationStock implements IntegrationStockInterface {
 
 				$attributeCodes = ['is_fresh', 'weight', 'sold_in'];
 				$productsCollection = $this->getProductByMultipleSkuAndAttributeCodes($skuList, $attributeCodes);
-	
+
 				foreach ($productsCollection as $productCollection) {
 					$productSku = $productCollection->getSku();
 					$this->logger->info($label . "sku-by-magento = {$productSku}");
 
-					if ($productSku === NULL) {
-						$this->logger->info($label . "sku-by-magento is null then skipped");
-						continue;
-					}
-
 					$productSku = $this->validateSku($productSku, $stockCandidatePointerList);
 					$this->logger->info($label . "sku-by-magento-validated = {$productSku}");
 
-					if (!isset($stockCandidatePointerList[$productSku])) {
-						$this->logger->info($label . "ssku-by-magento-validated not-found-in-api-response = {$productSku} then skipped");
-						continue;
+					if ($productSku === null) {
+						$this->logger->info($label . "sku-by-magento-validated invalid = {$productSku} then skipped");
 					}
-	
+
 					$isFresh = $productCollection->getData('is_fresh');
 					$soldIn = $productCollection->getData('sold_in');
 					$weight = $productCollection->getData('weight');
@@ -702,15 +704,14 @@ class IntegrationStock implements IntegrationStockInterface {
 					foreach ($stockCandidatePointerList[$productSku] as $idx) {
 						if ($isFresh == 1) {
 							if ($soldIn == 'kg' || $soldIn == 'Kg' || $soldIn == 'KG') {				
-								$newQuantity = floor(($stockCandidateList[$idx]['quantity'] * 1000) / $weight);
+								$newQuantity = (int) floor(($stockCandidateList[$idx]['quantity_float'] * 1000) / $weight);
 								$stockCandidateList[$idx]['quantity'] = $newQuantity;
 								$this->logger->info($label . "sku-quantity-new-calc = " . $stockCandidateList[$idx]['quantity']);
 								$stockCandidateList[$idx]['status'] = ($newQuantity > 0 ? 1 : 0);
 								$this->logger->info($label . "sku-status-new = " . $stockCandidateList[$idx]['status']);
 							}
 						}						
-					}
-	
+					}	
 				}
 
 				$this->dbConnection->beginTransaction();
