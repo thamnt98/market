@@ -169,8 +169,7 @@ class Generate
 
     /**
      * @param \Magento\Customer\Api\Data\CustomerInterface $customer
-     *
-     * @return \SM\Notification\Model\Notification
+     * @return \SM\Notification\Model\Notification|void
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function haveCoupon(\Magento\Customer\Api\Data\CustomerInterface $customer)
@@ -183,12 +182,15 @@ class Generate
             $customer->getLastname();
 
         $this->startEmulator($store);
-        if ($this->ruleRepository->getVoucherCollection($customer)->getSize()) {
+        $voucherCount = $this->ruleRepository->getVoucherCollection($customer)->getSize();
+        if ($voucherCount && $voucherCount > 1) {
             $title = "%1, you've got new vouchers.";
             $message = 'Check them out and shop now!';
-        } else {
+        } elseif ($voucherCount && $voucherCount == 1) {
             $title = '%1, we have a voucher for you.';
-            $message = 'Find it on My Voucher!';
+            $message = 'Check them out and shop now!';
+        } else {
+            return;
         }
 
         $params = [
