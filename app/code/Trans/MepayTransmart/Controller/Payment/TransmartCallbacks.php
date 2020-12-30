@@ -39,6 +39,9 @@ class TransmartCallbacks extends Callbacks
       $order = $this->transaction->getOrder($orderId);
       if ($this->checkOrderCreated($order)) {
         $txn = $this->transaction->getLastOrderTransaction($orderId);
+        if(\is_object($txn)) {
+          $txn = $txn->getData();
+        }
         if ($txn['txn_type'] == 'authorization') {
           return $resultRedirect->setPath(''); 
         }
@@ -71,7 +74,6 @@ class TransmartCallbacks extends Callbacks
    */
   public function calbacksMobile($incrementId)
   {
-
     $resultRedirect = $this->resultFactory->create(ResultFactory::TYPE_REDIRECT);
     $order = $this->transaction->getOrderByIncrementId($incrementId);
     if ($orderId = $order->getId()) {

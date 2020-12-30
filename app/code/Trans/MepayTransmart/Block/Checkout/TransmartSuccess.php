@@ -139,6 +139,10 @@ class TransmartSuccess extends Success
           return $this->isCaptured();
         }
 
+        if ($paymentMethod == 'trans_mepay_debit') {
+          return $this->isCaptured();
+        }
+
         return $this->paymentHelper->isCredit($paymentMethod) || $this->paymentHelper->isInstallment($paymentMethod) || ($this->paymentHelper->isVirtualAccount($paymentMethod) && $this->isPaid());
     }
 
