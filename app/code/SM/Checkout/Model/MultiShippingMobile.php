@@ -700,6 +700,9 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         }
         $previewOrderProcess = $this->multiShippingHandle->getPreviewOrderData($checkoutSession->getQuote(), false, $dataHandle['data'], $dataHandle['mobile-items-format'], $dataHandle['child-items']);
         $quoteItems = $previewOrderProcess['quote_item_data'];
+        if (empty($quoteItems)) {
+            $this->cartEmpty = true;
+        }
         $this->disablePickUp = $previewOrderProcess['disable_store_pickup'];
         $skuList = $previewOrderProcess['sku-list'];
         $isStoreFulFill = (empty($this->msiFullFill->getMsiFullFill($skuList))) ? false : true;
