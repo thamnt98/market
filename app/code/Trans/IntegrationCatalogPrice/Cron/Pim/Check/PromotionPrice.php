@@ -45,6 +45,9 @@ class PromotionPrice {
         $this->commonRepository=$commonRepository;
         $this->checkUpdates=$checkUpdates;
 
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_promotion.log');
+        $logger = new \Zend\Log\Logger();
+        $this->logger = $logger->addWriter($writer);
     }
 
    /**
@@ -84,7 +87,7 @@ class PromotionPrice {
 
         } catch (\Exception $ex) {
 
-            $this->logger->error("<=End ".$class." ".$ex->getMessage());
+            $this->logger->info("<=End ".$class." ".$ex->getMessage());
         }
         $this->logger->info("<=End ".$class);
     }

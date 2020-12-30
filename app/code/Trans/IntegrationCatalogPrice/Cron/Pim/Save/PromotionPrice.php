@@ -61,6 +61,9 @@ class PromotionPrice {
 		$this->checkUpdates                     = $checkUpdates;
 		$this->promotionPriceLogicInterface 		= $promotionPriceLogicInterface;
 
+		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_promotion.log');
+        $logger = new \Zend\Log\Logger();
+        $this->logger = $logger->addWriter($writer);
 	}
 
 	/**
@@ -91,7 +94,7 @@ class PromotionPrice {
 			$response = $this->promotionPriceLogicInterface->save($jobs,$dataProduct);
 		} catch (\Exception $ex) {
 
-			$this->logger->error("<=".$class." ".$ex->getMessage());
+			$this->logger->info("<=".$class." ".$ex->getMessage());
 		}
 		$this->logger->info("<=".$class );
 	}

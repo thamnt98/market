@@ -59,6 +59,9 @@ class PromotionPrice {
 		$this->checkUpdates     = $checkUpdates;
 		$this->timezone			= $timezone;
 
+		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_promotion.log');
+        $logger = new \Zend\Log\Logger();
+        $this->logger = $logger->addWriter($writer);
 	}
 
 	/**
@@ -99,7 +102,7 @@ class PromotionPrice {
 
 		} catch (\Exception $ex) {
 
-			$this->logger->error("<=".$class." ".$ex->getMessage());
+			$this->logger->info("<=".$class." ".$ex->getMessage());
 		}
 		$this->logger->info("<=".$class);
 	}
