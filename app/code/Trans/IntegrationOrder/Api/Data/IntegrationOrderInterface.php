@@ -84,6 +84,7 @@ interface IntegrationOrderInterface {
 	const WAREHOUSE_CODE   = 'warehouse_code';
 	const CODE_NAME        = 'code_name';
 	const TIME_SLOT        = 'time_slot';
+    const GRAND_TOTAL      = 'grand_total';
 
 	/**
 	 * Get Oms Order Id
@@ -753,4 +754,15 @@ interface IntegrationOrderInterface {
 	 * @return string
 	 */
 	public function setTimeSlot($timeSlot);
+
+    /**
+     * @return int
+     */
+    public function getGrandTotal();
+
+    /**
+     * @param int $grandTotal
+     * @return int
+     */
+    public function setGrandTotal($grandTotal);
 }

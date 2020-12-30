@@ -454,6 +454,7 @@ class SendOMS
         $interface->setShippingFee($shippingFee);
         $interface->setPromotionValue($discount);
         $interface->setPromotionType($order->getAppliedRuleIds());
+        $interface->setGrandTotal((int)$order->getGrandTotal());
         return $interface;
     }
 
