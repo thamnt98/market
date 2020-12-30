@@ -643,10 +643,10 @@ class IntegrationStock implements IntegrationStockInterface {
 				$quantity = 0;				
 				if (isset($theStockValue[IntegrationStockInterface::IMS_QUANTITY])) {
 					$quantityFloat = (float) $theStockValue[IntegrationStockInterface::IMS_QUANTITY];
-					$quantity = (int) floor($quantityFloat);
-					if ($quantity < 0) {
-						$quantity = 0;
+					if ($quantityFloat < 0) {
+						$quantityFloat = 0;
 					}
+					$quantity = (int) floor($quantityFloat);
 				}
 
 				if (empty($locationCode) || empty($productSku)) {
