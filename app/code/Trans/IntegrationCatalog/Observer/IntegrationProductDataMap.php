@@ -90,6 +90,7 @@ class IntegrationProductDataMap implements ObserverInterface
                 $product = $this->getCatalogProduct($sku);
 
                 if($product) {
+                    $map = array();
                     $map['integration_data_id'] = $rowData['data_value_id'];
                     $map['magento_entity_id'] = $product['entity_id'];
 
