@@ -49,6 +49,7 @@
     <tr>
         <td>
             {{if additional_data.is_va}}
+            {{depend additional_data.is_va_bca}}
             <p>
                 {{trans "Thank you for
                 shopping at Transmart.
@@ -58,9 +59,20 @@
                 {{trans '%expire_time' expire_time=$additional_data.expire_time }},
                 {{trans '%expire_time_string' expire_time_string=$additional_data.expire_time_string }}.
             </p>
+            {{/depend}}
+            {{depend additional_data.is_va_mega}}
+            <p>
+                {{trans "Thank you for
+                shopping at Transmart.
+                We have received your
+                order with %payment_method_title payment. Please
+                complete your payment using %payment_method_title before " payment_method_title=$additional_data.payment_method_title}}
+                {{trans '%expire_time_string' expire_time_string=$additional_data.expire_time_string }}.
+            </p>
+            {{/depend}}
             <p>
                 {{trans "Reference Number: %order_increment" order_increment=$additional_data.order_increment}}
-            </p
+            </p>
             {{else}}
             <p>
                 {{trans "Thank you for shopping at Transmart. We are currently preparing your order with reference number: %order_increment to be delivered to your address/picked up at the selected store." order_increment=$additional_data.order_increment}}
@@ -78,12 +90,22 @@
                 {{trans "Payment Method: %payment_method_title" payment_method_title=$additional_data.payment_method_title}}
             </p>
             {{/if}}
+
+            {{if additional_data.virtual_account_number}}
+            {{else}}
+            {{depend additional_data.is_va_mega}}
+            <p>
+                {{trans "Total: %order_total" order_total=$additional_data.order_total}}
+            </p>
+            {{/depend}}
+            {{/if}}
         </td>
     </tr>
 </table>
 <table class="list-deliver">
     <tbody>
-    {{if additional_data.is_va}}
+
+    {{if additional_data.is_va_bca}}
     <tr>
         <td class="virtual-column">
             <p>
@@ -105,6 +127,32 @@
         </td>
     </tr>
     {{/if}}
+
+    {{if additional_data.is_va_mega}}
+    {{depend additional_data.virtual_account_number}}
+    <tr>
+        <td class="virtual-column">
+            <p>
+                {{trans "Virtual Account number"}}
+            </p>
+            <h3>
+                {{trans "%va_number" va_number=$additional_data.virtual_account_number}}
+            </h3>
+        </td>
+    </tr>
+    <tr>
+        <td class="total-column">
+            <p class="column-heading">
+                {{trans "Total"}}
+            </p>
+            <p class="column-text">
+                {{trans "%order_total" order_total=$additional_data.order_total}}
+            </p>
+        </td>
+    </tr>
+    {{/depend}}
+    {{/if}}
+
     </tbody>
 </table>
 <!--End Message Email 2-->
@@ -175,17 +223,17 @@
     <tr>
         <td>
             <p>
-            {{trans
-            'To see your order status, please go to <a href="%order_url" class="blue">My Order</a>'
+                {{trans
+                'To see your order status, please go to <a href="%order_url" class="blue">My Order</a>'
 
-            order_url="$additional_data.order_url"
-            |raw}}
+                order_url="$additional_data.order_url"
+                |raw}}
             </p>
         </td>
     </tr>
 </table>
 <!--End Message Email-->
-{{depend additional_data.is_va}}
+{{if additional_data.is_va_bca}}
 <table class="how-to-pay">
     <tr>
         <td>
@@ -274,7 +322,90 @@
         </td>
     </tr>
 </table>
+{{/if}}
+{{if additional_data.is_va_mega}}
+{{depend additional_data.virtual_account_number}}
+<table class="how-to-pay">
+    <tr>
+        <td>
+            <p class="h2">
+                {{trans "How to Pay with Bank Mega Virtual Account"}}
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td class="guide">
+            <table>
+                <tr>
+                    <td class="title-guide">
+                        <p>
+                            {{trans "Bank Mega ATM"}}
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="content-guide">
+                        <p>{{trans "1. Insert your card and enter your PIN."}}</p>
+                        <p>{{trans "2. Choose Transaksi Lainnya."}}</p>
+                        <p>{{trans "3. Choose Pembayaran."}}</p>
+                        <p>{{trans "4. Choose Pembayaran Lainnya/VA."}}</p>
+                        <p>{{trans "5. Enter Bank Mega Virtual Account Number shown during payment process."}}</p>
+                        <p>{{trans "6. Continue with choosing Benar."}}</p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td class="guide">
+            <table>
+                <tr>
+                    <td class="title-guide">
+                        <p>
+                            {{trans "Mega Mobile App"}}
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="content-guide">
+                        <p>{{trans "1. Log in to Mega Mobile."}}</p>
+                        <p>{{trans "2. Choose Pembayaran."}}</p>
+                        <p>{{trans "3. Choose your payment account."}}</p>
+                        <p>{{trans "4. In "Daftar Produk" menu, choose Virtual Account."}}</p>
+                        <p>{{trans "5. In "No Pelanggan" menu, choose Input No Pelanggan."}}</p>
+                        <p>{{trans "6. Enter Bank Mega Virtual Account Number shown during payment process."}}</p>
+                        <p>{{trans "7. Choose Kirim."}}</p>
+                        <p>{{trans "8. Follow verification steps by SMS to finish this process."}}</p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td class="guide">
+            <table>
+                <tr>
+                    <td class="title-guide">
+                        <p>
+                            {{trans "Mega Internet Banking"}}
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="content-guide">
+                        <p>{{trans "1. Log in on Mega Internet."}}</p>
+                        <p>{{trans "2. Choose Transfer."}}</p>
+                        <p>{{trans "3. Choose ke Rekening Bank Mega."}}</p>
+                        <p>{{trans "4. Complete the information and enter Bank Mega Virtual Account number in beneficiary account number field."}}</p>
+                        <p>{{trans "5. Click Konfirmasi and continue your transaction as instructed."}}</p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
 {{/depend}}
+{{/if}}
 <!--End How To Pay-->
 <table class="sincerely" width="100%">
     <tr>
