@@ -60,16 +60,14 @@ class IntegrationTableCleaner
         $datetime = $this->timezone->date();
         $hour = $datetime->format('H:i');
         
-        if($hour >= self::START_TIME && $hour <= self::END_TIME) {
-            $tables = ['integration_catalogstock_job', 'integration_catalogstock_data', 'integration_catalogprice_job', 'integration_catalogprice_data', 'integration_catalog_job', 'integration_catalog_data', 'integration_brand_job', 'integration_brand_data', 'integration_category_job', 'integration_category_data', 'integration_entity_job', 'integration_entity_data'];
+        $tables = ['integration_catalogstock_job', 'integration_catalogstock_data', 'integration_catalogprice_job', 'integration_catalogprice_data', 'integration_catalog_job', 'integration_catalog_data', 'integration_brand_job', 'integration_brand_data', 'integration_category_job', 'integration_category_data', 'integration_entity_job', 'integration_entity_data'];
 
-            foreach($tables as $table) {
-                try {
-                    $this->integrationCleaner->cleanTableByStatus($table, [50,35,5,7,20,10,11,12]);
-                } catch (\Exception $e) {
-                    $this->logger->info('Error integration cleaner table ' . $table . '. Message : ' . $e->getMessage());
-                    continue;
-                }
+        foreach($tables as $table) {
+            try {
+                $this->integrationCleaner->cleanTableByStatus($table, [50,35,5,7,20,10,11,12]);
+            } catch (\Exception $e) {
+                $this->logger->info('Error integration cleaner table ' . $table . '. Message : ' . $e->getMessage());
+                continue;
             }
         }
     }

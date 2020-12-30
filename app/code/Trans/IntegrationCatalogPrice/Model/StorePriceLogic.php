@@ -733,7 +733,7 @@ class StorePriceLogic implements StorePriceLogicInterface
         $attributeIdMap = [];
         foreach ($productInterfaces as $index => $product) {
             $productPriceAttributes = [];
-            $sku = $this->validateSku($product->getSku());
+            $sku = $this->validateSku($product->getSku(), $productPriceAttributes);
 
             if(!isset($productDecimalAttributes[$sku])){
                 continue;

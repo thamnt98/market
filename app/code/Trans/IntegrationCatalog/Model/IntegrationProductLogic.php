@@ -356,16 +356,20 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		}
 		try{
 			$jobs      = $channel['jobs'];
-			$jobId     = $jobs->getFirstItem()->getId();
-			$jobStatus = $jobs->getFirstItem()->getStatus();
-			
-			$status    = IntegrationProductInterface::STATUS_JOB;
-			
-			$result = $this->integrationDataValueRepositoryInterface->getByJobIdWithStatus($jobId, $status);
-			if ($result->getSize() < 1) {
+			if($jobs->getFirstItem()){
+				$jobId     = $jobs->getFirstItem()->getId();
+				$jobStatus = $jobs->getFirstItem()->getStatus();
+				
+				$status    = IntegrationProductInterface::STATUS_JOB;
+				
+				$result = $this->integrationDataValueRepositoryInterface->getByJobIdWithStatus($jobId, $status);
+				if ($result->getSize() < 1) {
+					throw new NoSuchEntityException(__('Result Data Value Are Empty!!'));
+				}
+			}
+			else{
 				throw new NoSuchEntityException(__('Result Data Value Are Empty!!'));
 			}
-			
 		} catch (\Exception $exception) {
 			$this->logger->info(__FUNCTION__."------ ERROR ".$exception->getMessage());
 			throw new StateException(__($exception->getMessage()));
@@ -1256,18 +1260,21 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 				$dataValue = [];
 				
 				foreach($query as $row) {
-					$result[$i]['sku'] = $row->getPimSku();
-					$result[$i]['map_id'] = $row->getId();
-					$result[$i]['product_configurable']	= $row;
-					$queryDataValue[$i] = $this->integrationDataValueRepositoryInterface->getById($row->getIntegrationDataId());
-					
-					if ($queryDataValue[$i]) {
-						$dataValue[$i] = json_decode($queryDataValue[$i]->getDataValue());
-						$result[$i]['last_simple_product_data']=$dataValue[$i];
-						$result[$i]['simple_products'] = $this->getSimpleProductBySkuConfigurable($row->getPimSku());
+					try{
+						$result[$i]['sku'] = $row->getPimSku();
+						$result[$i]['map_id'] = $row->getId();
+						$result[$i]['product_configurable']	= $row;
+						$queryDataValue[$i] = $this->integrationDataValueRepositoryInterface->getById($row->getIntegrationDataId());					
+						if ($queryDataValue[$i]) {
+							$dataValue[$i] = json_decode($queryDataValue[$i]->getDataValue());
+							$result[$i]['last_simple_product_data']=$dataValue[$i];
+							$result[$i]['simple_products'] = $this->getSimpleProductBySkuConfigurable($row->getPimSku());
+						}
+						
+						$i++;
+					}catch(Exception $e){
+						continue;
 					}
-					
-					$i++;
 				}
 			}
 		} catch (\Exception $ex) {
@@ -1488,11 +1495,11 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			$product = $this->productInterfaceFactory->create();
 			$product->setSku($sku);
 
-			$urlKey = $this->changeUrlKeyChildProduct($simpleProducts['default_product_name'] , $sku);
-			$this->checkUrlKey($urlKey, $sku);
+			// $urlKey = $this->changeUrlKeyChildProduct($simpleProducts['default_product_name'] , $sku);
+			// $this->checkUrlKey($urlKey, $sku);
 
-			$product->setUrlKey($urlKey);
-			$this->logger->info(__FUNCTION__."---- Create New Product");
+			// $product->setUrlKey($urlKey);
+			// $this->logger->info(__FUNCTION__."---- Create New Product");
 		}
 		
 		$product->setAttributeSetId($attributeSetId);
