@@ -73,23 +73,38 @@ class Product {
 		$this->logger->info('===========================================');
 		$this->logger->info('Start ' . $class . ' ' . date('H:i:s'));
 		try {
-			$this->logger->info("=>".$class." Get Channel Data");
+			$this->logger->info("=>".$class." Get Channel Data" . ' ' . date('H:i:s'));
+			$start_time = microtime(true);
 			$channel = $this->commonRepository->prepareChannel('product');
+			$end_time = microtime(true);
+			$this->logger->info("prepareChannel time : " . ($end_time - $start_time));		
 			
-			$this->logger->info("=".$class." Check Onprogress Jobs (Save Product)");
+			$this->logger->info("=".$class." Check Onprogress Jobs (Save Product)" . ' ' . date('H:i:s'));
+			$start_time = microtime(true);
 			$channel = $this->checkUpdates->checkSaveOnProgressJob($channel);
+			$end_time = microtime(true);
+			$this->logger->info("checkSaveOnProgressJob time : " . ($end_time - $start_time));
 
-			$this->logger->info("=".$class." Check Complete Jobs");
+			$this->logger->info("=".$class." Check Complete Jobs" . ' ' . date('H:i:s'));
+			$start_time = microtime(true);
 			$channel = $this->checkUpdates->checkReadyJobs($channel);
-			
-			$this->logger->info("=".$class." Prepare Data");
+			$end_time = microtime(true);
+			$this->logger->info("checkReadyJobs time : " . ($end_time - $start_time));
+
+			$this->logger->info("=".$class." Prepare Data" . ' ' . date('H:i:s'));
+			$start_time = microtime(true);
 			$data = $this->integrationProductSync->prepareData($channel);
+			$end_time = microtime(true);
+			$this->logger->info("prepareData time : " . ($end_time - $start_time));
 			
-			$this->logger->info("=".$class." Save Data");
+			$this->logger->info("=".$class." Save Data" . ' ' . date('H:i:s'));
+			$start_time = microtime(true);
 			$response = $this->integrationProductSync->saveProduct($data, $channel['jobs']);
-			
+			$end_time = microtime(true);
+			$this->logger->info("saveProduct time : " . ($end_time - $start_time));
 		} catch (\Exception $ex) {
 			$this->logger->info("<=err".$class." ".$ex->getMessage());
+			$this->logger->info($ex->getTraceAsString());
 		}
 
 		$this->logger->info('End ' . $class . ' ' . date('H:i:s'));

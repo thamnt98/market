@@ -92,7 +92,7 @@ class IntegrationProductSync
 		$this->attrGroupGeneralInfoId = IntegrationProductInterface::ATTRIBUTE_SET_ID;
 		$this->attrGroupProductDetailId = $this->integrationAttributeRepository->getAttributeGroupId(IntegrationProductAttributeInterface::ATTRIBUTE_GROUP_CODE_PRODUCT);
 
-		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_product.log');
+		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_product_import.log');
         $logger = new \Zend\Log\Logger();
         $this->logger = $logger->addWriter($writer);
 	}
@@ -141,6 +141,7 @@ class IntegrationProductSync
 	 */
 	public function prepareData($channel = [])
 	{
+		try{
 		if (empty($channel)) {
 			throw new StateException(__(
 				'Parameter Channel are empty !'
@@ -149,9 +150,12 @@ class IntegrationProductSync
 
 		$job = $channel['jobs'];
 		$jobId = $job->getId();
+
+                //$this->logger->info("channel: ".json_encode($channel));
+        	$this->logger->info("job_id: $jobId");
 		// $jobId     = 26053;
 		
-		try{	
+		//try{	
 			$status    = IntegrationProductInterface::STATUS_JOB;
 			
 			$result = $this->integrationDataValueRepositoryInterface->getByJobIdWithStatus($jobId, $status);
@@ -162,6 +166,7 @@ class IntegrationProductSync
 		} catch (\Exception $exception) {
 			$msg = __FUNCTION__ . "------ " . $exception->getMessage() . ' $jobId: ' . $jobId;
 			$this->logger->info($msg);
+			$this->logger->info($exception->getTraceAsString());
 
 			if($job->getStatus() == IntegrationJobInterface::STATUS_READY) {
 				$this->updateJobData($jobId, IntegrationJobInterface::STATUS_PROGRES_UPDATE_FAIL, $msg);
@@ -205,6 +210,7 @@ class IntegrationProductSync
 		} catch (\Exception $exception) {
 			$msg = __FUNCTION__." ERROR : ".$exception->getMessage();
 			$this->logger->info($msg);
+			$this->logger->info($exception->getTraceAsString());
 			$this->updateJobData($jobId,IntegrationJobInterface::STATUS_PROGRES_UPDATE_FAIL);
 			
 			throw new StateException(__($exception->getMessage()));
