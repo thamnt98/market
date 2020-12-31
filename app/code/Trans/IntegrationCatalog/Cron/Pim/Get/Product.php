@@ -102,7 +102,7 @@ class Product {
 
 		} catch (\Exception $ex) {
 
-			$this->logger->error("<=".$class." ".$ex->getMessage());
+			$this->logger->info("<=".$class." ".$ex->getMessage());
 		}
 		$this->logger->info("<=".$class);
 	}

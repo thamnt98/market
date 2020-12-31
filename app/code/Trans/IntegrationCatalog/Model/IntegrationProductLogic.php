@@ -1494,13 +1494,13 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		} catch (NoSuchEntityException $e) {
 			$product = $this->productInterfaceFactory->create();
 			$product->setSku($sku);
-
-			// $urlKey = $this->changeUrlKeyChildProduct($simpleProducts['default_product_name'] , $sku);
-			// $this->checkUrlKey($urlKey, $sku);
-
-			// $product->setUrlKey($urlKey);
-			// $this->logger->info(__FUNCTION__."---- Create New Product");
 		}
+
+		$urlKey = $this->changeUrlKeyChildProduct($simpleProducts['default_product_name'] , $sku);
+		$this->checkUrlKey($urlKey, $sku);
+
+		$product->setUrlKey($urlKey);
+		$this->logger->info(__FUNCTION__."---- Create New Product");
 		
 		$product->setAttributeSetId($attributeSetId);
 		$product->setTypeId(IntegrationProductInterface::PRODUCT_TYPE_CONFIGURABLE);
@@ -1685,7 +1685,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			['*']
 		)->where('request_path like "%' . $urlKey . '.%"');
 
-		$collection = $query->fetchAll($query);
+		$collection = $connection->fetchAll($query);
 
 		if($collection) {
 			$skus = [];
