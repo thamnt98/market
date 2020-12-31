@@ -20,6 +20,7 @@ use SM\Notification\Model\Email as Model;
 class Email extends AbstractConsumer
 {
     const EMAIL_PARAM_ORDER_KEY = 'order';
+    const EMAIL_PARAM_CONTACT_US_LINK = 'contact_us';
 
     /**
      * @var \SM\Notification\Helper\Generate\Email
@@ -133,7 +134,7 @@ class Email extends AbstractConsumer
     protected function getAllowEmailParamModel()
     {
         return [
-            self::EMAIL_PARAM_ORDER_KEY,
+            self::EMAIL_PARAM_ORDER_KEY
         ];
     }
 
