@@ -380,20 +380,25 @@ class IntegrationStock implements IntegrationStockInterface {
 	
 	protected function validateSku($productSku, $stockData) {
 		
-		if ($productSku !== null) {
+		$this->logger->info("sku-by-magento-is-being-validated");
+
+		if ($productSku !== null) {				
 			if (isset($stockData[$productSku])) {
-				return $productSku;
+					$this->logger->info("sku-by-magento-validating-samecase = {$productSku}");
+					return $productSku;
 			}
-			
+
 			$productSkuUpperCase = strtoupper($productSku);
 			if (isset($stockData[$productSkuUpperCase])) {
-				return $productSkuUpperCase;
+					$this->logger->info("sku-by-magento-validating-uppercase = {$productSkuUpperCase}");
+					return $productSkuUpperCase;
 			}
-			
-			$productSkuLowerCase = strtoupper($productSku);
+
+			$productSkuLowerCase = strtolower($productSku);
 			if (isset($stockData[$productSkuLowerCase])) {
-				return $productSkuLowerCase;
-			}	
+					$this->logger->info("sku-by-magento-validating-lowercase = {$productSkuLowerCase}");
+					return $productSkuLowerCase;
+			}
 		}
 
 		return null;
@@ -697,7 +702,7 @@ class IntegrationStock implements IntegrationStockInterface {
 					$this->logger->info($label . "sku-by-magento-validated = {$productSku}");
 
 					if ($productSku === null) {
-						$this->logger->info($label . "sku-by-magento-validated invalid = {$productSku} then skipped");
+						$this->logger->info($label . "sku-by-magento-validated is invalid then skipped");
 					}
 
 					$isFresh = $productCollection->getData('is_fresh');
