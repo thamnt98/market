@@ -59,10 +59,9 @@ if ($parentOrder) {
                 <div class="order-detail-content">
                     <?php if ($subOrder->getHasCreditmemo()): ?>
                         <div class="weighing-message">
-                            <i class="notification-icon"></i>
                             <?php if ($subOrder->getShowRefundButton()): ?>
-                                <p><?= $subOrder->getRefundMessage() ?></p>
-                                <p>
+                                <p><i class="notification-icon"></i><?= $subOrder->getRefundMessage() ?></p>
+                                <p class="notifi-refund">
                                     <span>
                                     <?= __('Total refund %1', $block->currencyFormat($subOrder->getTotalRefund())) ?>
                                     </span>
