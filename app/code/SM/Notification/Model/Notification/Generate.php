@@ -182,7 +182,7 @@ class Generate
             $customer->getLastname();
 
         $this->startEmulator($store);
-        $voucherCount = $this->ruleRepository->getVoucherCollection($customer)->getSize();
+        $voucherCount = count($this->ruleRepository->getVoucherByCustomer($customer->getId()));
         if ($voucherCount && $voucherCount > 1) {
             $title = "%1, you've got new vouchers.";
             $message = 'Check them out and shop now!';
