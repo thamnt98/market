@@ -65,16 +65,27 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
     protected $emulation;
 
     /**
+     * @var \SM\Notification\Helper\Generate\Email
+     */
+    protected $emailHelper;
+
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
      * SaveAfter constructor.
-     *
-     * @param Helper                                            $helper
-     * @param \Magento\Store\Model\App\Emulation                $emulation
-     * @param \SM\Sales\Helper\Data                             $orderHelper
-     * @param \SM\Notification\Model\EventSetting               $setting
-     * @param \SM\Notification\Model\TriggerEventFactory        $triggerEventFactory
-     * @param \SM\Notification\Model\NotificationFactory        $notifyFactory
+     * @param Helper $helper
+     * @param \Magento\Store\Model\App\Emulation $emulation
+     * @param \SM\Sales\Helper\Data $orderHelper
+     * @param \SM\Notification\Model\EventSetting $setting
+     * @param \SM\Notification\Model\TriggerEventFactory $triggerEventFactory
+     * @param \SM\Notification\Model\NotificationFactory $notifyFactory
      * @param \SM\Notification\Model\ResourceModel\Notification $notificationResource
-     * @param \Magento\Framework\Logger\Monolog|null            $logger
+     * @param \SM\Notification\Helper\Generate\Email $emailHelper
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Framework\Logger\Monolog|null $logger
      */
     public function __construct(
         Helper $helper,
@@ -84,6 +95,8 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
         \SM\Notification\Model\TriggerEventFactory $triggerEventFactory,
         \SM\Notification\Model\NotificationFactory $notifyFactory,
         \SM\Notification\Model\ResourceModel\Notification $notificationResource,
+        \SM\Notification\Helper\Generate\Email $emailHelper,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\Logger\Monolog $logger = null
     ) {
         $this->notifyFactory = $notifyFactory;
@@ -93,6 +106,8 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
         $this->notificationResource = $notificationResource;
         $this->helper = $helper;
         $this->setting = $setting;
+        $this->emailHelper = $emailHelper;
+        $this->storeManager = $storeManager;
         $this->emulation = $emulation;
     }
 
@@ -134,9 +149,9 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
                 case $this->orderHelper->getInDeliveryStatus():
                     $notifyId = $this->generateInDeliveryData($order);
                     break;
-//            case $this->orderHelper->getInProcessStatus():
-//                $notifyId = this->generateInProcessData($order);
-//                break;
+                case $this->orderHelper->getFailedDeliveryStatus():
+                    $notifyId = $this->generateFailedDeliveredData($order);
+                    break;
                 default:
                     $notifyId = 0;
             }
@@ -346,6 +361,37 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
      * @return int
      * @throws \Magento\Framework\Exception\AlreadyExistsException
      */
+    public function generateFailedDeliveredData($order)
+    {
+        $title = 'Sorry, we had to cancel order %1.';
+        $content = 'Your order delivery is unsuccessful. Find more info here.';
+        $params = [
+            'title'   => [
+                $order->getData('reference_order_id')
+            ]
+        ];
+
+        $notify = $this->initNotification($order);
+        $notify->setTitle($title)
+            ->setContent($content)
+            ->setImage($this->helper->getMediaPathImage(Helper::XML_IMAGE_ORDER_STATUS_DELIVERED, $order->getStoreId()))
+            ->setParams($params);
+        $this->addNotificationAdditional(
+            $notify,
+            $order,
+            $this->emailHelper->getFailedDeliveryTemplateId($order->getStoreId())
+        );
+        $this->notificationResource->save($notify);
+
+        return $notify->getId();
+    }
+
+    /**
+     * @param \Magento\Sales\Model\Order $order
+     *
+     * @return int
+     * @throws \Magento\Framework\Exception\AlreadyExistsException
+     */
     public function createNotifyForDigital($order)
     {
         if (!$order->getData('digital_transaction_fail') ||
@@ -426,6 +472,7 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
             $notify->setEmailTemplate($email)
                 ->setEmailParams([
                     \SM\Notification\Model\Notification\Consumer\Email::EMAIL_PARAM_ORDER_KEY => $order->getId(),
+                    \SM\Notification\Model\Notification\Consumer\Email::EMAIL_PARAM_CONTACT_US_LINK => $this->storeManager->getStore()->getUrl('help/contactus')
                 ]);
         }
 
