@@ -369,9 +369,24 @@ class MultiShippingHandle
                         $shippingListFromQuoteAddress[] = $preShippingMethod;
                     }
                 }
+            } else {
+                if ($this->mobile) {
+                    foreach ($_address->getAllVisibleItems() as $item) {
+                        if ($item instanceof \Magento\Quote\Model\Quote\Address\Item) {
+                            $quoteItemId = $item->getQuoteItemId();
+                        } else {
+                            $quoteItemId = $item->getId();
+                        }
+                        $itemsValidMethod[$quoteItemId] = [
+                          self::DEFAULT_METHOD,
+                          self::SAME_DAY,
+                          self::SCHEDULE,
+                          self::NEXT_DAY
+                        ];
+                    }
+                }
             }
         }
-
         if (count($shippingListFromQuoteAddress) > 1) {
             $showEachItems = true;
         }
