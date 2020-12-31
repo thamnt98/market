@@ -85,11 +85,17 @@ define([
                             categoryName = lastItemOfPathUrl.indexOf('.html') != -1 ? lastItemOfPathUrl.slice(0, lastItemOfPathUrl.length - 5) : lastItemOfPathUrl,
                             upcaseCategoryName = categoryName.charAt(0).toUpperCase() + categoryName.slice(1),
                             newCatItem = null,
-                            cmsItem = null;
-
+                            cmsItem = null,
+                            isCate = false;
+                        $('.navigation ul li a').each(function () {
+                            if ($(this).attr('href') == categoryUrl) {
+                                isCate = true;
+                                return false;
+                            }
+                        })
                         var cmsUrlArr = cmsPathUrlArray.slice(0, cmsPathUrlArray.length - 1),
                             cmsPathUrlString = cmsUrlArr.join('/');
-                        if(categoryName) {
+                        if(isCate) {
                             newCatItem = {
                                 'name': 'category',
                                 'label': upcaseCategoryName,
@@ -102,7 +108,7 @@ define([
                         if (cmsPathUrlArray.length > 4 && cmsPathUrl != '') {
                             var cmsPathUrlName = cmsPathUrl.charAt(0).toUpperCase() + cmsPathUrl.slice(1);
                             var page = cmsPathUrlArray.find(element => (element == 'order' || element == 'review' || element == 'product_compare' || element == 'shoppinglist' || element == 'cart'));
-                            if (page) {
+                            if (typeof page !== "undefined") {
                                 switch (page) {
                                     case 'order': {
                                         cmsPathUrlName = $.mage.__('My Orders');
@@ -120,17 +126,17 @@ define([
                                         cmsPathUrlName = $.mage.__('Shopping Cart');
                                     } break;
                                 }
+                                cmsItem = {
+                                    'name': 'cms-category',
+                                    'label': cmsPathUrlName,
+                                    'link': cmsPathUrlString,
+                                    'title': cmsPathUrlName
+                                };
+                                categoryCrumbs.unshift(cmsItem);
                             }
-                            cmsItem = {
-                                'name': 'cms-category',
-                                'label': cmsPathUrlName,
-                                'link': cmsPathUrlString,
-                                'title': cmsPathUrlName
-                            };
-                            categoryCrumbs.unshift(cmsItem);
+
                         }
                     }
-
                 }
 
                 return categoryCrumbs;
@@ -215,12 +221,12 @@ define([
                     categoryMenuItem = null;
 
                 if (categoryUrl && menu.length) {
-                     menu.find(
+                    menu.find(
                         this.options.categoryItemSelector +
                         ' > a[href="' + categoryUrl + '"]'
                     ).each(function (){
-                         categoryMenuItem = $(this);
-                     });
+                        categoryMenuItem = $(this);
+                    });
 
                 }
 

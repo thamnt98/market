@@ -724,4 +724,18 @@ IntegrationOrderInterface {
 	public function setTimeSlot($timeSlot) {
 		return $this->setData(IntegrationOrderInterface::TIME_SLOT, $timeSlot);
 	}
+
+    /**
+     * @inheritdoc
+     */
+    public function getGrandTotal() {
+        return $this->getData(IntegrationOrderInterface::GRAND_TOTAL);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setGrandTotal($grandTotal) {
+        return $this->setData(IntegrationOrderInterface::GRAND_TOTAL, $grandTotal);
+    }
 }
