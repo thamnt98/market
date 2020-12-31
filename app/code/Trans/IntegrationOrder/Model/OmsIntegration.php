@@ -303,7 +303,8 @@ class OmsIntegration implements OmsIntegrationInterface {
 			$flagSpo       = $dataOrder['flag_spo'];
 
 			$shippingFee = $dataOrder['shipping_fee'];
-			$grandTotal  = $paidPrice + $shippingFee;
+			//$grandTotal  = $paidPrice + $shippingFee;
+            $grandTotal = $dataOrder['grand_total'];
 
 			$payRefNumber  = $payment['pay_ref_number1'];
 			$splitPayment  = IntegrationOrderInterface::SPLIT_PAYMENTS;
