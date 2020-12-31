@@ -24,7 +24,7 @@
   <preference for="SM\Checkout\Model\MultiShipping" type="Trans\MepayTransmart\Model\TransmartMultishipping" />
   <preference for="SM\Sales\Model\Order\ParentOrder" type="Trans\MepayTransmart\Model\Order\TransmartParentOrder" />
   <preference for="SM\Checkout\Helper\OrderReferenceNumber" type="Trans\MepayTransmart\Helper\TransmartOrderReferenceNumber" />
-  <!-- <preference for="SM\Sales\Observer\SetEmailNewOrderData" type="Trans\MepayTransmart\Observer\TransmartSetEmailNewOrderData" /> -->
+  <preference for="SM\Sales\Observer\SetEmailNewOrderData" type="Trans\MepayTransmart\Observer\TransmartSetEmailNewOrderData" />
   <preference for="SM\Sales\Model\ParentOrderRepository" type="Trans\MepayTransmart\Model\TransmartParentOrderRepository" />
   <preference for="SM\Checkout\Helper\Payment" type="Trans\MepayTransmart\Helper\TransmartPayment" />
   <preference for="SM\Sales\Block\Order\Physical\Detail" type="Trans\MepayTransmart\Block\Order\Physical\Detail" />
@@ -45,5 +45,8 @@
     </type>
     <type name="Trans\Mepay\Gateway\Http\Client\Connect">
       <plugin name="TransMepayTransmartPluginTransMepayGatewayHttpClientTransmartConnect" type="Trans\MepayTransmart\Plugin\Trans\Mepay\Gateway\Http\Client\TransmartConnect" />
+    </type>
+    <type name="Trans\Mepay\Model\Webhook">
+      <plugin name="TransMepayTransmartPluginTransMepayModelTransmartWebhook" type="Trans\MepayTransmart\Plugin\Trans\Mepay\Model\TransmartWebhook" />
     </type>
 </config>
