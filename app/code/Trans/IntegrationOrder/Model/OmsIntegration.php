@@ -260,7 +260,7 @@ class OmsIntegration implements OmsIntegrationInterface {
 			}
 			foreach ($dataOrder['payment'] as $payment) {
 				$modelPayment                      = $this->orderIntPaymentInterfaceFactory->create();
-				$dataPayment['master_payment_id1'] = $payment['master_payment_id1'];
+				$dataPayment['master_payment_id1'] = (string) $payment['master_payment_id1'];
 				$dataPayment['pay_ref_number1']    = $payment['pay_ref_number1'];
 				$dataPayment['amount']             = $payment['amount'];
 				$dataPayment['split_payment']      = 0;
@@ -304,7 +304,7 @@ class OmsIntegration implements OmsIntegrationInterface {
 
 			$shippingFee = $dataOrder['shipping_fee'];
 			//$grandTotal  = $paidPrice + $shippingFee;
-            $grandTotal = $dataOrder['grand_total'];
+			$grandTotal = $dataOrder['grand_total'];
 
 			$payRefNumber  = $payment['pay_ref_number1'];
 			$splitPayment  = IntegrationOrderInterface::SPLIT_PAYMENTS;
