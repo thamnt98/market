@@ -477,7 +477,7 @@ class OrderStatus implements OrderStatusInterface {
 			}
 		}
 
-		if($skusRefunded and $refunded) {
+		if(!empty($skusRefunded) and !empty($refunded)) {
 			$salesOrderItemsChild = $this->getSalesOrderItems($skusRefunded, $childOrder->getEntityId());
 			$salesOrderItems = $this->getSalesOrderItems($skusRefunded, $parentEntityId);
 
@@ -767,23 +767,32 @@ class OrderStatus implements OrderStatusInterface {
 					return json_decode($responseOrder, true);
 				}
 
-				/* save to table sales_order_item */
-				if ($fetchData->getSku()) {
-					$saveOrderItem = $this->orderItemFactory->create();
+				if(!empty($skusRefunded) and !empty($refunded)) {
+					/* save to table sales_order_item */
+					if ($fetchData->getSku()) {
+						$saveOrderItem = $this->orderItemFactory->create();
+					}
+					// $fetchData->setQtyRefunded((float) $itemData['quantity_allocated']);
+					// $this->orderItemRepository->save($fetchData);
+
+					foreach($refunded as $sku => $refundedItem) {
+						try {
+							/* save to table integration_oms_refund */
+							$saveRefundData = $this->refundInterface->create();
+							$saveRefundData->setOrderRefNumber($orderData->getReferenceNumber());
+							$saveRefundData->setRefundTrxNumber($refTrxNumber);
+							$saveRefundData->setOrderId($orderId);
+							// $saveRefundData->setSku($item['sku']);
+							$saveRefundData->setSku($sku);
+							$saveRefundData->setQtyRefund($refundedItem['quantity_allocated']);
+							$saveRefundData->setAmountRefundOrder($matrixAdjusmentAmount);
+
+							$this->refundRepository->save($saveRefundData);
+						} catch (\Exception $e) {
+							continue;
+						}
+					}
 				}
-				$fetchData->setQtyRefunded((float) $itemData['quantity_allocated']);
-				$this->orderItemRepository->save($fetchData);
-
-				/* save to table integration_oms_refund */
-				$saveRefundData = $this->refundInterface->create();
-				$saveRefundData->setOrderRefNumber($orderData->getReferenceNumber());
-				$saveRefundData->setRefundTrxNumber($refTrxNumber);
-				$saveRefundData->setOrderId($orderId);
-				$saveRefundData->setSku($item['sku']);
-				$saveRefundData->setQtyRefund($itemData['quantity_allocated']);
-				$saveRefundData->setAmountRefundOrder($matrixAdjusmentAmount);
-
-				$this->refundRepository->save($saveRefundData);
 			}
 		}
 
@@ -1053,7 +1062,6 @@ class OrderStatus implements OrderStatusInterface {
 
 		$creditMemoData = [];
 		$creditMemoData['do_offline'] = 1;
-		$creditMemoData['shipping_amount'] = 0;
 		$creditMemoData['adjustment_positive'] = 0;
 		$creditMemoData['adjustment_negative'] = 0;
 		$creditMemoData['comment_text'] = 'Refund';
@@ -1064,6 +1072,18 @@ class OrderStatus implements OrderStatusInterface {
 			$itemToCredit[$item['item_id']] = ['qty' => $item['qty']];
             $qty = $item['qty'];
             $totalQty += $qty;
+		}
+
+		$orderItems = $order->getAllItems();
+		$totalQtyOrder = 0;
+		
+		foreach ($orderItems as $orderItem)
+		{
+		  	$totalQtyOrder = $totalQtyOrder + $orderItem->getQtyOrdered();
+		}
+
+		if($totalQtyOrder != $totalQty) {
+			$creditMemoData['shipping_amount'] = 0;
 		}
 		
 		$creditMemoData['items'] = $itemToCredit;
