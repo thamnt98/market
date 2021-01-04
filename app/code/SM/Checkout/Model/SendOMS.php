@@ -301,10 +301,10 @@ class SendOMS
             $paymentCode[$master->getPaymentMethod()] = $master->getPaymentId();
         }
 
-        $masterId = (isset($paymentCode[$paymentData->getMethod()])) ? $paymentCode[$paymentData->getMethod()] : 0;
+        $masterId = (isset($paymentCode[$paymentData->getMethod()])) ? $paymentCode[$paymentData->getMethod()] : "";
         $payment = [
             [
-                'master_payment_id1' => (int)$masterId,
+                'master_payment_id1' => (string)$masterId,
                 'pay_ref_number1' => $mainOrder->getReferencePaymentNumber(),
                 'amount' => (int)$paymentData->getAmountOrdered(),
                 'split_payment' => 0,
