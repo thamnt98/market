@@ -350,7 +350,7 @@ class OmsIntegration implements OmsIntegrationInterface {
 				"code_name" => $codeName, //new
 				"merchant_code" => $merchantCode,
 				"logistic_courier_name" => 'SAP Express', // new parameter request
-				"logistic_courier_type" => 1, // new parameter request
+				"logistic_courier" => 1, // new parameter request
 				"reference_number" => $referenceNumber,
 				"promotion_type" => $promoType,
 				"promotion_value" => $promoValue,
