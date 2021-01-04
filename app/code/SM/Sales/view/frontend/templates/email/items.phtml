@@ -54,7 +54,7 @@
                             <tr>
                                 <td class="pl-10 text-center"><?= $position ++ ?></td>
                                 <td class="item-info">
-                                    <img src="<?php echo $block->getImage($_item->getProduct())?>"/>
+                                    <img src="<?php echo $block->getImage($_item->getProduct(), 100)?>"/>
                                     <br>
                                     <p class="product-name"><?= $block->escapeHtml($_item->getName()) ?></p>
                                     <p class="product-name"><?= $block->escapeHtml(__('Notes:')) ?></p>
