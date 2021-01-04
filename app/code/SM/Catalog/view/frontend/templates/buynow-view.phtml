@@ -10,13 +10,14 @@
  * @copyright 2020 Copyright (c) SmartOSC. All rights reserved.
  * @url http://www.smartosc.com/
  */
-
+/** @var $block \Magento\Catalog\Block\Product\View */
 ?>
+<?php $_product = $block->getProduct(); ?>
 <div class="buynow-button">
     <button type="submit"
             title="<?= /* @escapeNotVerified */ __('Buy Now') ?>"
             id="product-buy-now"
-            class="action primary tocart disabled"
+            class="action primary tocart<?php if (!$_product->isSaleable()) {echo ' disabled';} ?>"
             data-mage-init='
             {
                 "SM_Catalog/js/buy-now": {

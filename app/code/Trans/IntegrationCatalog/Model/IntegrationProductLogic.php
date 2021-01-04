@@ -780,8 +780,12 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 								break;
 							}
 						} catch (StateException $e) {
+							$msg = __FUNCTION__." Error : ".$e->getMessage();
+							$this->logger->info($msg);
 							continue;
 						} catch (\Exception $e) {
+							$msg = __FUNCTION__." Error : ".$e->getMessage();
+							$this->logger->info($msg);
 							continue;
 						}
 					}
@@ -796,6 +800,8 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 							$product = $this->productRepositoryInterface->getById($child);
 						} catch (NoSuchEntityException $e) {
 							$product = null;
+							$msg = __FUNCTION__." Error : ".$e->getMessage();
+							$this->logger->info($msg);
 							continue;
 						}
 
@@ -1273,6 +1279,8 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 						
 						$i++;
 					}catch(Exception $e){
+						$msg = __FUNCTION__." Error : ".$e->getMessage();
+						$this->logger->info($msg);
 						continue;
 					}
 				}
@@ -1359,7 +1367,8 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 								$this->integrationProductRepositoryInterface->changeProductVisibility($sku, $visibility);
 							}
 						} catch (\Exception $e) {
-							$this->logger->info($e->getMessage());
+							$msg = __FUNCTION__." Error : ".$e->getMessage();
+							$this->logger->info($msg);
 							continue;
 						}
 					}
@@ -1456,6 +1465,8 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 					}
 					$i++;
 				} catch (\Exception $e) {
+					$msg = __FUNCTION__." Error : ".$e->getMessage();
+					$this->logger->info($msg);
 					continue;
 				}
 			}
@@ -1494,13 +1505,13 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		} catch (NoSuchEntityException $e) {
 			$product = $this->productInterfaceFactory->create();
 			$product->setSku($sku);
-
-			// $urlKey = $this->changeUrlKeyChildProduct($simpleProducts['default_product_name'] , $sku);
-			// $this->checkUrlKey($urlKey, $sku);
-
-			// $product->setUrlKey($urlKey);
-			// $this->logger->info(__FUNCTION__."---- Create New Product");
 		}
+
+		$urlKey = $this->changeUrlKeyChildProduct($simpleProducts['default_product_name'] , $sku);
+		$this->checkUrlKey($urlKey, $sku);
+
+		$product->setUrlKey($urlKey);
+		$this->logger->info(__FUNCTION__."---- Create New Product");
 		
 		$product->setAttributeSetId($attributeSetId);
 		$product->setTypeId(IntegrationProductInterface::PRODUCT_TYPE_CONFIGURABLE);
@@ -1590,6 +1601,8 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	                    $units[] = $sellingUnit;
 	                }
 				} catch (NoSuchEntityException $e) {
+					$msg = __FUNCTION__." Error : ".$e->getMessage();
+					$this->logger->info($msg);
 					continue;
 				}
 			}
@@ -1685,7 +1698,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			['*']
 		)->where('request_path like "%' . $urlKey . '.%"');
 
-		$collection = $query->fetchAll($query);
+		$collection = $connection->fetchAll($query);
 
 		if($collection) {
 			$skus = [];

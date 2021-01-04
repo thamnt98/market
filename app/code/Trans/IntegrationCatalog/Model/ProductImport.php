@@ -1203,14 +1203,14 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                     $rowData['data_value_id'] = $dataValueId;
                 }
                 
-                // $rowData[self::URL_KEY] = null;
+                $rowData[self::URL_KEY] = null;
 
                 // reset category processor's failed categories array
                 $this->categoryProcessor->clearFailedCategories();
 
                 $rowScope = $this->getRowScope($rowData);
 
-                // $urlKey = $this->getUrlKey($rowData);
+                $urlKey = $this->getUrlKey($rowData);
 
                 $attributeSet = $this->prepareAttributeSet($rowData);
 
@@ -1232,10 +1232,10 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                     $rowData['short_description'] = $rowData['short_desc'];
                 }
 
-                // $rowData['url_key'] = $this->changeUrlKeyChildProduct(
-                //     $rowData['name'], 
-                //     $rowData['sku']
-                // );
+                $rowData['url_key'] = $this->changeUrlKeyChildProduct(
+                    $rowData['name'], 
+                    $rowData['sku']
+                );
 
                 $productBrand = $this->prepareBrand($rowData);
 
@@ -1290,15 +1290,15 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                     // unset($rowData['list_attributes']);
                 }
 
-                // if (!empty($rowData[self::URL_KEY])) {
-                //     // If url_key column and its value were in the CSV file
-                //     $rowData[self::URL_KEY] = $urlKey;
-                // } elseif ($this->isNeedToChangeUrlKey($rowData)) {
-                //     // If url_key column was empty or even not declared in the CSV file but by the rules it is need to
-                //     // be setteed. In case when url_key is generating from name column we have to ensure that the bunch
-                //     // of products will pass for the event with url_key column.
-                //     $bunch[$rowNum][self::URL_KEY] = $rowData[self::URL_KEY] = $urlKey;
-                // }
+                if (!empty($rowData[self::URL_KEY])) {
+                    // If url_key column and its value were in the CSV file
+                    $rowData[self::URL_KEY] = $urlKey;
+                } elseif ($this->isNeedToChangeUrlKey($rowData)) {
+                    // If url_key column was empty or even not declared in the CSV file but by the rules it is need to
+                    // be setteed. In case when url_key is generating from name column we have to ensure that the bunch
+                    // of products will pass for the event with url_key column.
+                    $bunch[$rowNum][self::URL_KEY] = $rowData[self::URL_KEY] = $urlKey;
+                }
 
                 $rowSku = $rowData[self::COL_SKU];
 
@@ -2336,38 +2336,38 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
         // validate custom options
         $this->getOptionEntity()->validateRow($rowData, $rowNum);
 
-        // if ($this->isNeedToValidateUrlKey($rowData)) {
-        //     $urlKey = strtolower($this->getUrlKey($rowData));
-        //     $storeCodes = empty($rowData[self::COL_STORE_VIEW_CODE])
-        //         ? array_flip($this->storeResolver->getStoreCodeToId())
-        //         : explode($this->getMultipleValueSeparator(), $rowData[self::COL_STORE_VIEW_CODE]);
-        //     foreach ($storeCodes as $storeCode) {
-        //         $storeId = $this->storeResolver->getStoreCodeToId($storeCode);
-        //         $productUrlSuffix = $this->getProductUrlSuffix($storeId);
-        //         $urlPath = $urlKey . $productUrlSuffix;
-        //         if (empty($this->urlKeys[$storeId][$urlPath])
-        //             || ($this->urlKeys[$storeId][$urlPath] == $sku)
-        //         ) {
-        //             $this->urlKeys[$storeId][$urlPath] = $sku;
-        //             $this->rowNumbers[$storeId][$urlPath] = $rowNum;
-        //         } else {
-        //             $message = sprintf(
-        //                 $this->retrieveMessageTemplate(ValidatorInterface::ERROR_DUPLICATE_URL_KEY),
-        //                 $urlKey,
-        //                 $this->urlKeys[$storeId][$urlPath]
-        //             );
-        //             $this->addRowError(
-        //                 ValidatorInterface::ERROR_DUPLICATE_URL_KEY,
-        //                 $rowNum,
-        //                 $rowData[self::COL_NAME],
-        //                 $message,
-        //                 $errorLevel
-        //             )
-        //                 ->getErrorAggregator()
-        //                 ->addRowToSkip($rowNum);
-        //         }
-        //     }
-        // }
+        if ($this->isNeedToValidateUrlKey($rowData)) {
+            $urlKey = strtolower($this->getUrlKey($rowData));
+            $storeCodes = empty($rowData[self::COL_STORE_VIEW_CODE])
+                ? array_flip($this->storeResolver->getStoreCodeToId())
+                : explode($this->getMultipleValueSeparator(), $rowData[self::COL_STORE_VIEW_CODE]);
+            foreach ($storeCodes as $storeCode) {
+                $storeId = $this->storeResolver->getStoreCodeToId($storeCode);
+                $productUrlSuffix = $this->getProductUrlSuffix($storeId);
+                $urlPath = $urlKey . $productUrlSuffix;
+                if (empty($this->urlKeys[$storeId][$urlPath])
+                    || ($this->urlKeys[$storeId][$urlPath] == $sku)
+                ) {
+                    $this->urlKeys[$storeId][$urlPath] = $sku;
+                    $this->rowNumbers[$storeId][$urlPath] = $rowNum;
+                } else {
+                    $message = sprintf(
+                        $this->retrieveMessageTemplate(ValidatorInterface::ERROR_DUPLICATE_URL_KEY),
+                        $urlKey,
+                        $this->urlKeys[$storeId][$urlPath]
+                    );
+                    $this->addRowError(
+                        ValidatorInterface::ERROR_DUPLICATE_URL_KEY,
+                        $rowNum,
+                        $rowData[self::COL_NAME],
+                        $message,
+                        $errorLevel
+                    )
+                        ->getErrorAggregator()
+                        ->addRowToSkip($rowNum);
+                }
+            }
+        }
 
         if (!empty($rowData['new_from_date']) && !empty($rowData['new_to_date'])
         ) {
@@ -2649,7 +2649,7 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
 
             $source->next();
         }
-        // $this->checkUrlKeyDuplicates();
+        $this->checkUrlKeyDuplicates();
         $this->getOptionEntity()->validateAmbiguousData();
         return parent::_saveValidatedBunches();
     }

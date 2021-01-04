@@ -260,7 +260,7 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
          */
 
         list($attributesToUnset, $attributesRequireForNewCustomer) = $this->getListDisableAttributes();
-
+        $currentCustomer = $this->customerRepositoryInterface->getById($customer->getId());
         $customAttributes = $customer->getCustomAttributes();
         $customerData = $customer->__toArray();
         $customerToSave = $this->customerFactory->create();
@@ -277,7 +277,13 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
             }
 
             if (array_key_exists($attribute, $customAttributes)) {
-                unset($customAttributes[$attribute]);
+                if ($attribute == 'is_verified_email') {
+                    $isVerifiedEmailAttr = $currentCustomer->getCustomAttribute('is_verified_email');
+                    $isVerifiedEmail = ($isVerifiedEmailAttr) ? $isVerifiedEmailAttr->getValue() : 0;
+                    $customAttributes[$attribute]->setValue($isVerifiedEmail);
+                } else {
+                    unset($customAttributes[$attribute]);
+                }
             }
         }
 
@@ -638,9 +644,10 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
     {
         $telephone = preg_replace("/^(^\+628|^628|^08|^8)/", '08', $telephone);
         if (!$this->customerResourceModel->checkTelephoneIsVerified($telephone)) {
-            $this->throwException();
+            if (!$this->customerResourceModel->checkTelephoneIsVerifiedTestMode($telephone)) {
+                $this->throwException();
+            }
         }
-
         return true;
     }
 

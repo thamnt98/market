@@ -204,7 +204,13 @@ class MultiShippingHandle
                 asort($shippingMethodList);
                 $shippingMethodList = array_values($shippingMethodList);
                 if (!in_array($preShippingMethod, $shippingMethodList) && !empty($shippingMethodList)) {
-                    $preShippingMethod = $shippingMethodList[0];
+                    if ($shippingMethodList[0] == self::DEFAULT_METHOD && in_array(self::DC, $shippingMethodList)) {
+                        $preShippingMethod = self::DC;
+                    } elseif ($shippingMethodList[0] == self::SAME_DAY && in_array(self::TRANS_COURIER, $shippingMethodList)) {
+                        $preShippingMethod = self::TRANS_COURIER;
+                    } else {
+                        $preShippingMethod = $shippingMethodList[0];
+                    }
                     $addressShippingMethod[$_address->getId()] = $preShippingMethod;
                 }
                 if (empty($shippingMethodListFake)) {
@@ -653,6 +659,9 @@ class MultiShippingHandle
                     }
                     if ($qty > 0) {
                         $shippingList = $itemFromOAR['shipping_list'];
+                        if (!in_array($itemData['shipping_method'], $shippingList) && !empty($shippingList)) {
+                            $itemData['shipping_method'] = $shippingList[0];
+                        }
                         if ($this->countArray($shippingList) == 1 && in_array(self::DC, $shippingList)) {
                             // is_spo
                             $this->hasSpo = true;
@@ -670,9 +679,7 @@ class MultiShippingHandle
                         } else {
                             $this->hasNormal = true;
                         }
-                        if (!in_array($itemData['shipping_method'], $shippingList) && !empty($shippingList)) {
-                            $itemData['shipping_method'] = $shippingList[0];
-                        }
+
                         $itemAddToQuoteAddress = [
                             'qty' => $qty,
                             'address' => $itemData['shipping_address'],
@@ -714,6 +721,9 @@ class MultiShippingHandle
                         $childSku     = $childItem->getSku();
                         $itemFromOAR  = $splitOrderWithSku[$childSku];
                         $shippingList = $itemFromOAR['shipping_list'];
+                        if (!in_array($itemAddToQuoteAddress['shipping_method'], $shippingList) && !empty($shippingList)) {
+                            $itemAddToQuoteAddress['shipping_method'] = $shippingList[0];
+                        }
                         if ($this->countArray($shippingList) == 1 && in_array(self::DC, $shippingList)) {
                             // is_spo
                             $this->hasSpo = true;
@@ -730,9 +740,6 @@ class MultiShippingHandle
                             $this->hasFresh = true;
                         } else {
                             $this->hasNormal = true;
-                        }
-                        if (!in_array($itemAddToQuoteAddress['shipping_method'], $shippingList) && !empty($shippingList)) {
-                            $itemAddToQuoteAddress['shipping_method'] = $shippingList[0];
                         }
                         $childItemTotalQty = (int) $childItem->getQty() * $itemAddToQuoteAddress['qty'];
                         if ($childItemTotalQty <= (int) $itemFromOAR['quantity_allocated']) {

@@ -88,7 +88,7 @@ class Product {
 
         } catch (\Exception $ex) {
 
-            $this->logger->error("<=End ".$class." ".$ex->getMessage());
+            $this->logger->info("<=End ".$class." ".$ex->getMessage());
         }
         $this->logger->info("<=End ".$class);
     }

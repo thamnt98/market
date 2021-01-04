@@ -61,21 +61,23 @@
 
     <preference for="Trans\IntegrationCatalogPrice\Api\OnlinePriceLogicInterface"
                 type="Trans\IntegrationCatalogPrice\Model\OnlinePriceLogic" />
-     <!-- @anan.fauzi: add console for checking price integration functionalities-->
+
+    <!-- @anan.fauzi: add console for checking price integration functionalities
     <type name="Magento\Framework\Console\CommandList">
         <arguments>
-            <!-- pim check product price console-->
+            pim check product price console
             <argument name="commands" xsi:type="array">
                  <item name="TransIntegrationCatalogPriceConsolePimCheckPrice" xsi:type="object">Trans\IntegrationCatalogPrice\Console\Pim\Check\Price</item>
             </argument>
-            <!-- pim get product price console-->
+            pim get product price console
             <argument name="commands" xsi:type="array">
                <item name="TransIntegrationCatalogPriceConsolePimGetPrice" xsi:type="object">Trans\IntegrationCatalogPrice\Console\Pim\Get\Price</item>
             </argument>
-            <!-- pim save product price console-->
+            pim save product price console
             <argument name="commands" xsi:type="array">
                  <item name="TransIntegrationCatalogPriceConsolePimSavePrice" xsi:type="object">Trans\IntegrationCatalogPrice\Console\Pim\Save\Price</item>
             </argument>
         </arguments>
     </type>
+    -->
 </config>
