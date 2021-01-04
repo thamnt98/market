@@ -313,7 +313,7 @@ class ParentOrderData extends DataObject implements ParentOrderDataInterface
      */
     public function getTransactionId()
     {
-        return $this->getData(self::CANCEL_MESSAGE);
+        return $this->getData(self::TRANSACTION_ID);
     }
 
     /**
@@ -321,6 +321,6 @@ class ParentOrderData extends DataObject implements ParentOrderDataInterface
      */
     public function setTransactionId($value)
     {
-        return $this->setData(self::CANCEL_MESSAGE, $value);
+        return $this->setData(self::TRANSACTION_ID, $value);
     }
 }

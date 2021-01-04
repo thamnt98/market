@@ -644,9 +644,10 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
     {
         $telephone = preg_replace("/^(^\+628|^628|^08|^8)/", '08', $telephone);
         if (!$this->customerResourceModel->checkTelephoneIsVerified($telephone)) {
-            $this->throwException();
+            if (!$this->customerResourceModel->checkTelephoneIsVerifiedTestMode($telephone)) {
+                $this->throwException();
+            }
         }
-
         return true;
     }
 
