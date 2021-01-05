@@ -54,7 +54,9 @@ class Collection extends \Magento\Sales\Model\ResourceModel\Order\Collection
             "reference_invoice_number",
             "is_virtual",
             "voucher_detail",
-            "discount_amount"
+            "discount_amount",
+            "total_refunded",
+            "total_invoiced"
         ]);
 
         $this->addFieldToFilter("is_parent", ["eq" => 1]);
@@ -87,7 +89,9 @@ class Collection extends \Magento\Sales\Model\ResourceModel\Order\Collection
             "store_pick_up_time",
             "date",
             "time",
-            "reference_invoice_number"
+            "reference_invoice_number",
+            'total_refunded',
+            'total_invoiced'
         ]);
 
         $this->getSelect()->joinLeft(

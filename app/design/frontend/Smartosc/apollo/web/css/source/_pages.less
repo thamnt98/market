@@ -8,6 +8,68 @@
 //  _____________________________________________
 
 & when (@media-common = true) {
+   /* refund page*/
+
+    .refund-request-form {
+        .block-subtitle {
+            font-size:12px;
+            margin: 10px 0;
+            &.bottom {
+                margin:0;
+            }
+        }
+        .fieldset>.label {
+            font-size:12px;
+            color:#777;
+        }
+    }
+    .request-form-header {
+        .left, .right {
+            display:inline-block;
+        }
+        .right {
+            margin-left:25px;
+            a {
+                font-size:12px;
+            }
+        }
+        .left {
+            .label, span {
+                display: block;
+            }
+            .label {
+                color: #777;
+
+            }
+            span {
+                font-weight:600;
+                color: #2f2f2f;
+                margin-top:3px;
+            }
+        }
+    }
+    .sales-creditmemo-requestsuccess {
+        .page-title-wrapper {
+            display: none;
+        }
+    }
+    .refund-submitted {
+        max-width: 400px;
+        margin: 20px auto 0;
+        text-align: center;
+        p {
+            max-width:300px;
+            text-align:center;
+            margin:15px auto;
+            font-size:16px;
+            color: #777;
+        }
+        .action primary {
+            min-width: 287px;
+            margin-top:10px;
+        }
+    }
+
     .pages {
         .lib-pager();
 
@@ -32,6 +94,21 @@
 //
 //  Mobile
 //  _____________________________________________
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .refund-request-form {
+        .fieldset .action.primary {
+            width:100%;
+        }
+    }
+    .sales-creditmemo-requestrefund {
+        .page-title-wrapper {
+            .page-title {
+                text-transform:uppercase;
+                marin-top:20px;
+            }
+        }
+    }
+}
 
 .media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__s) {
     .pages {
@@ -58,3 +135,54 @@
         }
     }
 }
+.media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .sales-creditmemo-requestrefund {
+        .page-main {
+            max-width: 606px;
+            background: @color-white;
+            box-shadow: 0px 2px 4px rgba(128,127,127,0.6);
+            margin: 40px auto;
+            border-radius: 5px;
+            padding:0;
+        }
+        .page-title-wrapper {
+            .page-title {
+                background: @c-tsm-grey17;
+                padding: 36px 30px 25px;
+                .lib-font-size(20);
+
+            }
+        }
+    }
+    .refund-request-form {
+        padding:0 30px;
+        .lib-font-size(16);
+
+        .field {
+            .label {
+                span.total-number {
+                    display:block;
+                    .lib-font-size(18);
+                    color:@c-tsm-grey6;
+                    font-weight:600;
+                    margin-bottom:30px;
+                }
+            }
+        }
+
+        .fieldset .action.primary {
+            float:right;
+            margin: 20px 0 40px;
+            min-width:277px;
+        }
+    }
+    .request-form-header {
+        .left {
+            span {
+                .lib-font-size(18);
+            }
+        }
+    }
+
+}
+
