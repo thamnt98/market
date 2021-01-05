@@ -119,10 +119,17 @@ class ParentOrder
     {
         /** @var \Magento\Sales\Api\Data\OrderPaymentInterface $payment */
         $payment = $parentOrder->getPayment();
+        $totalRefund = 0;
+        $hasCreditmemo = false;
 
         foreach ($subOrders as $key => $subOrder) {
             if ($subOrder->getId() == $parentOrder->getEntityId() && count($subOrders) >= 2) {
                 unset($subOrders[$key]);
+                continue;
+            }
+            $totalRefund += $subOrder->getTotalRefund();
+            if ($subOrder->getHasCreditmemo()) {
+                $hasCreditmemo = true;
             }
         }
 
@@ -137,10 +144,15 @@ class ParentOrder
             ->setTotalShippingAmount($parentOrder->getShippingAmount())
             ->setPaymentMethod($payment != null ? $payment->getMethodInstance()->getTitle() : null)
             ->setTotalPayment($parentOrder->getGrandTotal())
+            ->setTotalRefund($totalRefund)
+            ->setHasCreditmemo($hasCreditmemo)
+            ->setRefundMessage(!$hasCreditmemo ?: __("Some of your ordered items are not available"))
+            ->setGrandTotal($parentOrder->getTotalInvoiced() - abs($totalRefund))
             ->setSubTotal($parentOrder->getSubtotal())
             ->setInvoiceNumber($parentOrder->getReferenceInvoiceNumber())
             ->setSubOrders($subOrders)
             ->setConvertDate($this->convertDate($parentOrder->getCreatedAt()));
+
 
         if ($parentOrder->getReferenceInvoiceNumber()) {
             $parentOrderData->setInvoiceLink(current($subOrders)->getInvoiceLink());

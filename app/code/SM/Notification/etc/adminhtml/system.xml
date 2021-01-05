@@ -247,6 +247,16 @@
                         <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
                     </field>
                 </group>
+                <group id="order_status_group" translate="label" type="text" sortOrder="0"
+                       showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Order Status</label>
+                    <field id="failed_delivery" translate="label" type="select" sortOrder="10"
+                           canRestore="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Failed Delivery</label>
+                        <config_path>sm_notification/email/failed_delivery</config_path>
+                        <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                    </field>
+                </group>
             </group>
             <group id="image" translate="label" type="text" sortOrder="40"
                    showInDefault="1" showInWebsite="1" showInStore="1">

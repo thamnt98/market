@@ -1,0 +1,11 @@
+<?php
+/**
+ * @var \Magento\Framework\View\Element\Template $block
+ */
+?>
+<div class="refund-submitted">
+    <img src='<?php echo $this->getViewFileUrl('images/form-return.png'); ?>' alt=""  />
+    <h3><?= __('Refund Form Submitted') ?></h3>
+    <p><?= __('Thank you. Your refund process will begin soon and we will make sure to keep you updated.') ?></p>
+    <a href="<?= $block->getUrl() ?>"><?= __('Back to Transmart') ?></a>
+</div>
