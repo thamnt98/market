@@ -260,7 +260,16 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
          */
 
         list($attributesToUnset, $attributesRequireForNewCustomer) = $this->getListDisableAttributes();
-        $currentCustomer = $this->customerRepositoryInterface->getById($customer->getId());
+        if ($customer->getId()) {
+            try {
+                $currentCustomer = $this->customerRepositoryInterface->getById($customer->getId());
+            } catch (\Exception $e) {
+                $currentCustomer = false;
+            }
+        } else {
+            $currentCustomer = false;
+        }
+
         $customAttributes = $customer->getCustomAttributes();
         $customerData = $customer->__toArray();
         $customerToSave = $this->customerFactory->create();
@@ -277,7 +286,7 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
             }
 
             if (array_key_exists($attribute, $customAttributes)) {
-                if ($attribute == 'is_verified_email') {
+                if ($currentCustomer && $attribute == 'is_verified_email') {
                     $isVerifiedEmailAttr = $currentCustomer->getCustomAttribute('is_verified_email');
                     $isVerifiedEmail = ($isVerifiedEmailAttr) ? $isVerifiedEmailAttr->getValue() : 0;
                     $customAttributes[$attribute]->setValue($isVerifiedEmail);
