@@ -59,10 +59,29 @@ class Invoice
   public function create($order, $transaction)
   {
     $invoice = $this->invoiceService->prepareInvoice($order);
+
+    $invoice->setShippingAmount($order->getData('shipping_amount'));
+    $invoice->setSubtotal($order->getData('subtotal'));
+    $invoice->setBaseSubtotal($order->getData('base_subtotal'));
     $invoice->setGrandTotal($transaction->getAmount());
     $invoice->setBaseGrandTotal($transaction->getAmount());
     $invoice->register();
+    $invoice->pay();
     $this->invoiceRepo->save($invoice);
+
+    /**
+     * Allow forced creditmemo just in case if it wasn't defined before
+     */
+    if (!$order->hasForcedCanCreditmemo()) {
+      if(!$order->getTotalPaid()) {
+        $order->setTotalPaid($order->getData('grand_total'));
+        $order->setBaseTotalPaid($order->getData('grand_total'));
+      }
+
+        $order->setForcedCanCreditmemo(true);
+        $order->save();
+    }
+    
     return $invoice; 
   }
 
