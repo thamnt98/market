@@ -463,69 +463,71 @@ class OrderStatus implements OrderStatusInterface {
 			throw new \Magento\Framework\Webapi\Exception(__('Order ID doesn\'t exist, please make sure again.'));
 		}
 		
-		$orderItem = [];
-		$refunded = [];
-		$skusRefunded = [];
-		foreach ($orderItems as $itemData) {
-			$allocatedQty = $itemData['quantity_allocated'];
+		if ($status == 2 && $action == 2 && $subAction == 7 || $status == 2 && $action == 99 && $subAction == 0) {
+			$orderItem = [];
+			$refunded = [];
+			$skusRefunded = [];
+			foreach ($orderItems as $itemData) {
+				$allocatedQty = $itemData['quantity_allocated'];
 
-			$orderItem[] = $itemData;
+				$orderItem[] = $itemData;
 
-			if($itemData['quantity_allocated'] < $itemData['quantity']) {
-				$refunded[$itemData['sku']] = $itemData;
-				$skusRefunded[] = $itemData['sku'];
-			}
-		}
-
-		if(!empty($skusRefunded) and !empty($refunded)) {
-			$salesOrderItemsChild = $this->getSalesOrderItems($skusRefunded, $childOrder->getEntityId());
-			$salesOrderItems = $this->getSalesOrderItems($skusRefunded, $parentEntityId);
-
-			$itemIds = [];
-			foreach($salesOrderItems as $item) {
-				$dataItem['item_id'] = $item['item_id'];
-				$dataItem['qty'] = $refunded[$item['sku']]['quantity'] - $refunded[$item['sku']]['quantity_allocated'];
-				$itemIds[] = $dataItem;
+				if($itemData['quantity_allocated'] < $itemData['quantity']) {
+					$refunded[$itemData['sku']] = $itemData;
+					$skusRefunded[] = $itemData['sku'];
+				}
 			}
 
-			$itemIdsChild = [];
-			foreach($salesOrderItemsChild as $item) {
-				$dataItem['item_id'] = $item['item_id'];
-				$dataItem['qty'] = $refunded[$item['sku']]['quantity'] - $refunded[$item['sku']]['quantity_allocated'];
-				$itemIdsChild[] = $dataItem;
-			}
+			if(!empty($skusRefunded) and !empty($refunded)) {
+				$salesOrderItemsChild = $this->getSalesOrderItems($skusRefunded, $childOrder->getEntityId());
+				$salesOrderItems = $this->getSalesOrderItems($skusRefunded, $parentEntityId);
 
-			if(!empty($itemIds)) {
-				$this->loggerOrder->info('===== Credit Memo ===== Start');
-
-				try {
-					$this->loggerOrder->info('parent credit memo');
-					$parentOrder = $this->orderRepository->get($parentEntityId);
-					$credit = $this->creditMemos($parentEntityId, $itemIds);
-					$creditEncode = json_encode($credit);
-					$this->loggerOrder->info('parent $creditEncode : ' . $creditEncode);
-				} catch (\Exception $e) {
-					$this->loggerOrder->info('parent credit memo : ' . $e->getMessage());
+				$itemIds = [];
+				foreach($salesOrderItems as $item) {
+					$dataItem['item_id'] = $item['item_id'];
+					$dataItem['qty'] = $refunded[$item['sku']]['quantity'] - $refunded[$item['sku']]['quantity_allocated'];
+					$itemIds[] = $dataItem;
 				}
 
-				// if($this->checkInvoiceData($childOrder->getId())) {
-				try {
-					$this->createInvoice($childOrder); //invoice for child order
-				} catch (\Exception $e) {
-					$this->loggerOrder->info('invoice child order fail : ' . $e->getMessage());
+				$itemIdsChild = [];
+				foreach($salesOrderItemsChild as $item) {
+					$dataItem['item_id'] = $item['item_id'];
+					$dataItem['qty'] = $refunded[$item['sku']]['quantity'] - $refunded[$item['sku']]['quantity_allocated'];
+					$itemIdsChild[] = $dataItem;
 				}
-				// }
 
-				try {
-					$this->loggerOrder->info('child credit memo');
-					$childmemo = $this->creditMemos($childOrder->getId(), $itemIdsChild);
-					$childCreditEncode = json_encode($childmemo);
-					$this->loggerOrder->info('child $creditEncode : ' . $childCreditEncode);
-				} catch (\Exception $e) {
-					$this->loggerOrder->info('child $creditEncode : ' . $e->getMessage());
+				if(!empty($itemIds)) {
+					$this->loggerOrder->info('===== Credit Memo ===== Start');
+
+					try {
+						$this->loggerOrder->info('parent credit memo');
+						$parentOrder = $this->orderRepository->get($parentEntityId);
+						$credit = $this->creditMemos($parentEntityId, $itemIds);
+						$creditEncode = json_encode($credit);
+						$this->loggerOrder->info('parent $creditEncode : ' . $creditEncode);
+					} catch (\Exception $e) {
+						$this->loggerOrder->info('parent credit memo : ' . $e->getMessage());
+					}
+
+					// if($this->checkInvoiceData($childOrder->getId())) {
+					try {
+						$this->createInvoice($childOrder); //invoice for child order
+					} catch (\Exception $e) {
+						$this->loggerOrder->info('invoice child order fail : ' . $e->getMessage());
+					}
+					// }
+
+					try {
+						$this->loggerOrder->info('child credit memo');
+						$childmemo = $this->creditMemos($childOrder->getId(), $itemIdsChild);
+						$childCreditEncode = json_encode($childmemo);
+						$this->loggerOrder->info('child $creditEncode : ' . $childCreditEncode);
+					} catch (\Exception $e) {
+						$this->loggerOrder->info('child $creditEncode : ' . $e->getMessage());
+					}
+					
+					$this->loggerOrder->info('===== Credit Memo ===== End');
 				}
-				
-				$this->loggerOrder->info('===== Credit Memo ===== End');
 			}
 		}
 
