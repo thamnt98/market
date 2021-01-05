@@ -829,12 +829,22 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                             'store_id' => $storeId,
                             'value' => $storeValue,
                         ];
+
+                        // $this->logger->info('SKU : ' . $sku);
+                        // if($attributeId == '4204'){
+                        //     $this->logger->info("Table name : $tableName \n");
+                        //     $this->logger->info('Material : ' . $storeValue);
+                        // }
+
+                        // if($attributeId == '1799'){
+                        //     $this->logger->info("Table name : $tableName \n");
+                        //     $this->logger->info('Product Size : ' . $storeValue);
+                        // }
                     }
                 }
             }
-            $this->logger->info("Table name : $tableName \n");
-            $this->logger->info("Table data : \n");
-            $this->logger->info(print_r($tableData,true));
+            // $this->logger->info("Table data : \n");
+            // $this->logger->info(print_r($tableData,true));
             
             $this->_connection->insertOnDuplicate($tableName, $tableData, ['value']);
         }
@@ -1210,8 +1220,6 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
 
                 $rowScope = $this->getRowScope($rowData);
 
-                $urlKey = $this->getUrlKey($rowData);
-
                 $attributeSet = $this->prepareAttributeSet($rowData);
 
                 $rowData['name'] = $rowData['product_name'];
@@ -1224,6 +1232,14 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                 $rowData['status'] = $rowData['is_active'];
                 $rowData['description'] = $rowData['long_description'];
 
+                $rowData['url_key'] = $this->changeUrlKeyChildProduct(
+                    $rowData['name'], 
+                    $rowData['sku']
+                );
+                
+                $urlKey = $this->getUrlKey($rowData);
+
+
                 if(isset($rowData['long_desc'])){
                     $rowData['description'] = $rowData['long_desc'];
                 }
@@ -1232,10 +1248,7 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                     $rowData['short_description'] = $rowData['short_desc'];
                 }
 
-                $rowData['url_key'] = $this->changeUrlKeyChildProduct(
-                    $rowData['name'], 
-                    $rowData['sku']
-                );
+                // $this->logger->info('URL Key : ' . $rowData['url_key']);
 
                 $productBrand = $this->prepareBrand($rowData);
 
@@ -1290,6 +1303,7 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                     // unset($rowData['list_attributes']);
                 }
 
+                // $this->logger->info('URL Key before : ' . $rowData['url_key'] . ' ' . $urlKey);
                 if (!empty($rowData[self::URL_KEY])) {
                     // If url_key column and its value were in the CSV file
                     $rowData[self::URL_KEY] = $urlKey;
@@ -1299,6 +1313,7 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                     // of products will pass for the event with url_key column.
                     $bunch[$rowNum][self::URL_KEY] = $rowData[self::URL_KEY] = $urlKey;
                 }
+                // $this->logger->info('URL Key after : ' . $rowData['url_key']);
 
                 $rowSku = $rowData[self::COL_SKU];
 
@@ -1446,7 +1461,13 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                     );
                     $product = $this->_proxyProdFactory->create(['data' => $rowData]);
 
+                    // $this->logger->info('Loop row data');
                     foreach ($rowData as $attrCode => $attrValue) {
+                        // $this->logger->info('Attribute code : ' . $attrCode);
+                        // $this->logger->info('Attribute value : ' . $attrValue);
+
+                        // $this->logger->info('---');
+
                         $attribute = $this->retrieveAttributeByCode($attrCode);
 
                         if ('multiselect' != $attribute->getFrontendInput() && self::SCOPE_NULL == $rowScope) {
