@@ -142,20 +142,20 @@ class IntegrationProductSync
 	public function prepareData($channel = [])
 	{
 		try{
-		if (empty($channel)) {
-			throw new StateException(__(
-				'Parameter Channel are empty !'
-			));
-		}
+			if (empty($channel)) {
+				throw new StateException(__(
+					'Parameter Channel are empty !'
+				));
+			}
 
-		$job = $channel['jobs'];
-		$jobId = $job->getId();
+			$job = $channel['jobs'];
+			$jobId = $job->getId();
 
-                //$this->logger->info("channel: ".json_encode($channel));
+			//$this->logger->info("channel: ".json_encode($channel));
         	$this->logger->info("job_id: $jobId");
-		// $jobId     = 26053;
+			// $jobId     = 26053;
 		
-		//try{	
+			//try{	
 			$status    = IntegrationProductInterface::STATUS_JOB;
 			
 			$result = $this->integrationDataValueRepositoryInterface->getByJobIdWithStatus($jobId, $status);

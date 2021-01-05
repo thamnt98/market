@@ -98,6 +98,9 @@ class IntegrationProductRepository implements IntegrationProductRepositoryInterf
 		$this->interface = $interface;
 		$this->dataHelper = $dataHelper;
 
+		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_product_repository.log');
+        $logger = new \Zend\Log\Logger();
+        $this->logger = $logger->addWriter($writer);
 	}
 
 	/**
@@ -138,6 +141,7 @@ class IntegrationProductRepository implements IntegrationProductRepositoryInterf
 	public function save(IntegrationProductInterface $data) {
 		/** @var IntegrationProductInterface|\Magento\Framework\Model\AbstractModel $data */
 		try {
+			$this->logger->info(print_r($data->getData(), true));
 			$this->resource->save($data);
 		} catch (\Exception $exception) {
 			throw new CouldNotSaveException(__(
@@ -273,6 +277,10 @@ class IntegrationProductRepository implements IntegrationProductRepositoryInterf
 		$collection->addFieldToFilter(IntegrationProductInterface::STATUS_CONFIGURABLE, 0);
 		$collection->addFieldToFilter(IntegrationProductInterface::PIM_SKU, ['neq' => $sku]);
 		
+		$this->logger->info('Configurable size : ' . $collection->getSize());
+		$this->logger->info('Item ID : ' . $itemId);
+		$this->logger->info('SKU : ' . $sku);
+
 		if($collection->getSize()) {
 			if($changeVisibility) {
 				if($collection->getSize() == 1) {
@@ -281,6 +289,8 @@ class IntegrationProductRepository implements IntegrationProductRepositoryInterf
 					try {
 						$this->changeProductVisibility($sku, IntegrationProductInterface::VISIBILITY_NOT_VISIBLE);
 					} catch (\Exception $e) {
+						$this->logger->info($e->getMessage());
+						$this->logger->info($e->getTraceAsString());
 					}
 				}
 			}

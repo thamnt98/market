@@ -22,6 +22,31 @@ use Trans\Sprint\Helper\Config;
 class OrderStatus implements OrderStatusInterface {
 
 	/**
+	 * @var \Magento\Framework\App\ResourceConnection
+	 */
+	protected $resource;
+
+	/**
+	 * @var \Magento\Sales\Model\OrderRepository
+	 */
+	protected $orderRepository;
+
+	/**
+	 * @var \Magento\Sales\Model\Service\InvoiceService
+	 */
+	protected $invoiceService;
+
+	/**
+	 * @var \Magento\Framework\DB\Transaction
+	 */
+	protected $transaction;
+
+	/**
+	 * @var \Magento\Framework\Registry
+	 */
+	protected $registry;
+
+	/**
 	 * @var \Trans\Core\Helper\Data
 	 */
 	protected $coreHelper;
@@ -43,8 +68,10 @@ class OrderStatus implements OrderStatusInterface {
 
 	/**
 	 * Order Status Construct Data
+	 * @param \Magento\Framework\App\ResourceConnection $resource
 	 * @param \Magento\Framework\Event\ManagerInterface $eventManager
 	 * @param \Magento\Sales\Model\Convert\OrderFactory $orderConvert
+	 * @param \Magento\Sales\Model\OrderRepository $orderRepository
 	 * @param \Magento\Framework\HTTP\Client\Curl $curl
 	 * @param \Magento\InventoryApi\Api\GetSourceItemsBySkuInterface $sourceItemsBySku
 	 * @param \Magento\Shipping\Model\ShipmentNotifierFactory $shipmentNotify
@@ -52,6 +79,9 @@ class OrderStatus implements OrderStatusInterface {
 	 * @param \Magento\Sales\Api\OrderRepositoryInterface $orderRepoInterface
 	 * @param \Magento\Sales\Api\Data\ShipmentTrackInterfaceFactory $trackInterface
 	 * @param \Magento\Sales\Api\Data\OrderItemInterfaceFactory $orderItemFactory
+	 * @param \Magento\Sales\Model\Service\InvoiceService $invoiceService
+	 * @param \Magento\Framework\DB\Transaction $transaction
+	 * @param \Magento\Framework\Registry $registry
 	 * @param \Trans\Core\Helper\Data $coreHelper
 	 * @param \Trans\IntegrationOrder\Helper\Config $orderConfig
 	 * @param \Trans\IntegrationOrder\Helper\Data $helperData
@@ -65,8 +95,10 @@ class OrderStatus implements OrderStatusInterface {
 	 */
 
 	public function __construct(
+		\Magento\Framework\App\ResourceConnection $resource,
 		\Magento\Framework\Event\ManagerInterface $eventManager,
 		\Magento\Sales\Model\Order $order,
+		\Magento\Sales\Model\OrderRepository $orderRepository,
 		\Magento\Sales\Model\Convert\OrderFactory $orderConvert,
 		\Magento\Framework\HTTP\Client\Curl $curl,
 		\Magento\InventoryApi\Api\GetSourceItemsBySkuInterface $sourceItemsBySku,
@@ -87,7 +119,10 @@ class OrderStatus implements OrderStatusInterface {
 		\Magento\Sales\Model\RefundOrder $refundOrder,
 		\Magento\Sales\Model\Order\Creditmemo\ItemCreationFactory $itemCreationFactory,
 		\Magento\Sales\Model\Order\Invoice $invoice,
+		\Magento\Sales\Model\Service\InvoiceService $invoiceService,
 		\Magento\Sales\Model\Order\InvoiceRepositoryFactory $invoiceFactory,
+		\Magento\Framework\DB\Transaction $transaction,
+		\Magento\Framework\Registry $registry,
 		\Trans\Core\Helper\Data $coreHelper,
 		\Trans\IntegrationOrder\Helper\Integration $integrationHelper,
 		\Trans\IntegrationOrder\Helper\Config $orderConfig,
@@ -103,6 +138,7 @@ class OrderStatus implements OrderStatusInterface {
 	) {
 		$this->eventManager                       = $eventManager;
 		$this->order                              = $order;
+		$this->orderRepository = $orderRepository;
 		$this->orderConvert                       = $orderConvert;
 		$this->curl                               = $curl;
 		$this->integrationHelper                  = $integrationHelper;
@@ -135,6 +171,10 @@ class OrderStatus implements OrderStatusInterface {
 		$this->invoice                            = $invoice;
 		$this->invoiceFactory                     = $invoiceFactory;
 		$this->transactionMegaHelper              = $transactionMegaHelper;
+		$this->invoiceService = $invoiceService;
+		$this->resource = $resource;
+		$this->transaction = $transaction;
+		$this->registry = $registry;
 
 		$this->loggerOrder = $helperData->getLogger();
 	}
@@ -410,23 +450,87 @@ class OrderStatus implements OrderStatusInterface {
 	 * @param int $subAction
 	 * @param string $orderItems
 	 */
-	public function statusOrderItems($orderId, $status, $action, $subAction, $orderItems) {
-		$idsOrder = $this->statusRepo->loadByOrderIds($orderId);
-		$data     = $this->statusRepo->loadByIdSubAction($status, $action, $subAction);
-		if (!$idsOrder->getOrderId()) {
+	public function statusOrderItems($orderId, $status, $action, $subAction, $orderItems) 
+	{
+		$childOrder = $this->order->loadByAttribute('reference_order_id', $orderId);
+		$orderData = $this->statusRepo->loadByOrderIds($orderId);
+		$refNumber = $orderData->getReferenceNumber();
+		$parentIdFetch = $this->transactionMegaHelper->getSalesOrderArrayParent($refNumber);
+		$parentEntityId = $parentIdFetch['entity_id'];
+		$data = $this->statusRepo->loadByIdSubAction($status, $action, $subAction);
+
+		if (!$orderData->getOrderId()) {
 			throw new \Magento\Framework\Webapi\Exception(__('Order ID doesn\'t exist, please make sure again.'));
 		}
-		$orderItem = [];
-		foreach ($orderItems as $itemData) {
-			$item['sku']                = $itemData['sku'];
-			$item['quantity']           = $itemData['quantity'];
-			$item['quantity_allocated'] = $itemData['quantity_allocated'];
-			$item['item_status']        = $itemData['item_status'];
+		
+		if ($status == 2 && $action == 2 && $subAction == 7 || $status == 2 && $action == 99 && $subAction == 0) {
+			$orderItem = [];
+			$refunded = [];
+			$skusRefunded = [];
+			foreach ($orderItems as $itemData) {
+				$allocatedQty = $itemData['quantity_allocated'];
 
-			$allocatedQty = $itemData['quantity_allocated'];
+				$orderItem[] = $itemData;
 
-			$orderItem[] = $item;
+				if($itemData['quantity_allocated'] < $itemData['quantity']) {
+					$refunded[$itemData['sku']] = $itemData;
+					$skusRefunded[] = $itemData['sku'];
+				}
+			}
+
+			if(!empty($skusRefunded) and !empty($refunded)) {
+				$salesOrderItemsChild = $this->getSalesOrderItems($skusRefunded, $childOrder->getEntityId());
+				$salesOrderItems = $this->getSalesOrderItems($skusRefunded, $parentEntityId);
+
+				$itemIds = [];
+				foreach($salesOrderItems as $item) {
+					$dataItem['item_id'] = $item['item_id'];
+					$dataItem['qty'] = $refunded[$item['sku']]['quantity'] - $refunded[$item['sku']]['quantity_allocated'];
+					$itemIds[] = $dataItem;
+				}
+
+				$itemIdsChild = [];
+				foreach($salesOrderItemsChild as $item) {
+					$dataItem['item_id'] = $item['item_id'];
+					$dataItem['qty'] = $refunded[$item['sku']]['quantity'] - $refunded[$item['sku']]['quantity_allocated'];
+					$itemIdsChild[] = $dataItem;
+				}
+
+				if(!empty($itemIds)) {
+					$this->loggerOrder->info('===== Credit Memo ===== Start');
+
+					try {
+						$this->loggerOrder->info('parent credit memo');
+						$parentOrder = $this->orderRepository->get($parentEntityId);
+						$credit = $this->creditMemos($parentEntityId, $itemIds);
+						$creditEncode = json_encode($credit);
+						$this->loggerOrder->info('parent $creditEncode : ' . $creditEncode);
+					} catch (\Exception $e) {
+						$this->loggerOrder->info('parent credit memo : ' . $e->getMessage());
+					}
+
+					// if($this->checkInvoiceData($childOrder->getId())) {
+					try {
+						$this->createInvoice($childOrder); //invoice for child order
+					} catch (\Exception $e) {
+						$this->loggerOrder->info('invoice child order fail : ' . $e->getMessage());
+					}
+					// }
+
+					try {
+						$this->loggerOrder->info('child credit memo');
+						$childmemo = $this->creditMemos($childOrder->getId(), $itemIdsChild);
+						$childCreditEncode = json_encode($childmemo);
+						$this->loggerOrder->info('child $creditEncode : ' . $childCreditEncode);
+					} catch (\Exception $e) {
+						$this->loggerOrder->info('child $creditEncode : ' . $e->getMessage());
+					}
+					
+					$this->loggerOrder->info('===== Credit Memo ===== End');
+				}
+			}
 		}
+
 		$request = array(
 			'order_id' => $orderId,
 			'status' => $status,
@@ -435,7 +539,7 @@ class OrderStatus implements OrderStatusInterface {
 			'order_items' => $orderItem,
 		);
 
-		$orderIds = $idsOrder->getOrderId();
+		$orderIds = $orderData->getOrderId();
 		$stat     = $data->getStatusOms();
 		$act      = $data->getActionOms();
 		$subAct   = $data->getSubActionOms();
@@ -465,8 +569,8 @@ class OrderStatus implements OrderStatusInterface {
 			// if ($itemOrder->getQty() != $qtyOrdered) {
 			//  throw new \Magento\Framework\Webapi\Exception(__('Invalid quantity order. Please checking again.'), 400);
 			// }
-			if ($item['quantity_allocated'] > $itemOrder->getQty()) {
-				throw new \Magento\Framework\Webapi\Exception(__('Quantity allocated is greater than quantity order. Please checking again.'), 400);
+			if ($allocatedItems['quantity_allocated'] > $itemOrder->getQty()) {
+				throw new \Magento\Framework\Webapi\Exception(__('Quantity allocated is greater than quantity order. Please check again.'), 400);
 			}
 		}
 
@@ -539,7 +643,7 @@ class OrderStatus implements OrderStatusInterface {
 
 		if ($orderIds) {
 			$model = $this->historyInterface->create();
-			$model->setReferenceNumber($idsOrder->getReferenceNumber());
+			$model->setReferenceNumber($orderData->getReferenceNumber());
 			$model->setOrderId($orderIds);
 			$model->setFeStatusNo($data->getFeStatusNo());
 			$model->setFeSubStatusNo($data->getFeSubStatusNo());
@@ -552,14 +656,12 @@ class OrderStatus implements OrderStatusInterface {
 		/**
 		 * preparing data for refund PG
 		 */
-		$refNumber         = $idsOrder->getReferenceNumber();
-		$parentIdFetch     = $this->transactionMegaHelper->getSalesOrderArrayParent($refNumber);
-		$parentEntityId    = $parentIdFetch['entity_id'];
 		$paymentMethod     = $loadDataOrder->getPayment()->getMethod();
 		$channelId         = $this->configPg->getPaymentChannelId($paymentMethod);
 		$serviceCode       = $this->configPg->getPaymentChannelRefundServicecode($paymentMethod);
 		$urlPg             = $this->configPg->getApiBaseUrl($paymentMethod) . '/' . Config::REFUND_POST_URL;
 		$loadItemByOrderId = $this->statusRepo->loadByOrderId($orderId);
+
 		$trxAmount         = (int) $loadDataOrder->getGrandTotal();
 		/** Load Item By Order Id */
 		$fetchData = $this->statusRepo->loadItemByOrderIds($entityIdSalesOrder);
@@ -579,15 +681,16 @@ class OrderStatus implements OrderStatusInterface {
 
 					$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
 
-					$this->loggerOrder->info('===== Credit Memo ===== Start');
+					// $this->loggerOrder->info('===== Credit Memo ===== Start');
 
-					$credit       = $this->creditMemos($parentEntityId, $itemId, $qtyAllocated);
-					$creditEncode = json_encode($credit);
+					// $credit       = $this->creditMemos($parentEntityId, $itemId, $qtyAllocated);
+					// $creditEncode = json_encode($credit);
 
-					$this->loggerOrder->info('$creditEncode : ' . $creditEncode);
-					$this->loggerOrder->info('===== Credit Memo ===== End');
+					// $this->loggerOrder->info('$creditEncode : ' . $creditEncode);
+					// $this->loggerOrder->info('===== Credit Memo ===== End');
 
 				}
+
 				/* update quantity adjusment */
 				$url            = $this->orderConfig->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
 				$headers        = $this->getHeader();
@@ -628,15 +731,8 @@ class OrderStatus implements OrderStatusInterface {
 					$amount         = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 
 					$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
-
-					$this->loggerOrder->info('===== Credit Memo ===== Start');
-
-					$credit       = $this->creditMemos($parentEntityId, $itemId, $qtyAllocated);
-					$creditEncode = json_encode($credit);
-
-					$this->loggerOrder->info('$creditEncode : ' . $creditEncode);
-					$this->loggerOrder->info('===== Credit Memo ===== End');
 				}
+				
 				$this->eventManager->dispatch(
 					'refund_with_mega_payment',
 					[
@@ -673,23 +769,32 @@ class OrderStatus implements OrderStatusInterface {
 					return json_decode($responseOrder, true);
 				}
 
-				/* save to table sales_order_item */
-				if ($fetchData->getSku()) {
-					$saveOrderItem = $this->orderItemFactory->create();
+				if(!empty($skusRefunded) and !empty($refunded)) {
+					/* save to table sales_order_item */
+					if ($fetchData->getSku()) {
+						$saveOrderItem = $this->orderItemFactory->create();
+					}
+					// $fetchData->setQtyRefunded((float) $itemData['quantity_allocated']);
+					// $this->orderItemRepository->save($fetchData);
+
+					foreach($refunded as $sku => $refundedItem) {
+						try {
+							/* save to table integration_oms_refund */
+							$saveRefundData = $this->refundInterface->create();
+							$saveRefundData->setOrderRefNumber($orderData->getReferenceNumber());
+							$saveRefundData->setRefundTrxNumber($refTrxNumber);
+							$saveRefundData->setOrderId($orderId);
+							// $saveRefundData->setSku($item['sku']);
+							$saveRefundData->setSku($sku);
+							$saveRefundData->setQtyRefund($refundedItem['quantity_allocated']);
+							$saveRefundData->setAmountRefundOrder($matrixAdjusmentAmount);
+
+							$this->refundRepository->save($saveRefundData);
+						} catch (\Exception $e) {
+							continue;
+						}
+					}
 				}
-				$fetchData->setQtyRefunded((float) $itemData['quantity_allocated']);
-				$this->orderItemRepository->save($fetchData);
-
-				/* save to table integration_oms_refund */
-				$saveRefundData = $this->refundInterface->create();
-				$saveRefundData->setOrderRefNumber($idsOrder->getReferenceNumber());
-				$saveRefundData->setRefundTrxNumber($refTrxNumber);
-				$saveRefundData->setOrderId($orderId);
-				$saveRefundData->setSku($item['sku']);
-				$saveRefundData->setQtyRefund($itemData['quantity_allocated']);
-				$saveRefundData->setAmountRefundOrder($matrixAdjusmentAmount);
-
-				$this->refundRepository->save($saveRefundData);
 			}
 		}
 
@@ -946,27 +1051,55 @@ class OrderStatus implements OrderStatusInterface {
 	/**
 	 * Prepare store data for Credit Memo
 	 *
-	 * @param string $orderId
+	 * @param Magento\Sales\Model\Order $order
 	 * @param string $orderItemId
-	 * @param string $orderQty
-	 *
 	 */
-	protected function creditMemos($orderId, $orderItemId, $orderQty) {
-		$creditMemoData                        = [];
-		$creditMemoData['do_offline']          = 1;
-		$creditMemoData['shipping_amount']     = 0;
+	protected function creditMemos($orderId, $orderItemIds)
+	{
+		$order = $this->orderRepository->get($orderId);
+
+		if($order instanceof \Magento\Sales\Model\Order == false) {
+			return false;
+		}
+
+		$creditMemoData = [];
+		$creditMemoData['do_offline'] = 1;
 		$creditMemoData['adjustment_positive'] = 0;
 		$creditMemoData['adjustment_negative'] = 0;
-		$creditMemoData['comment_text']        = 'Pengembalian Refund';
-		$creditMemoData['send_email']          = 1;
-		$itemToCredit[$orderItemId]            = ['qty' => $orderQty];
-		$creditMemoData['items']               = $itemToCredit;
+		$creditMemoData['comment_text'] = 'Refund';
+		$creditMemoData['send_email'] = 1;
+		
+		$totalQty = 0;
+		foreach($orderItemIds as $item) {
+			$itemToCredit[$item['item_id']] = ['qty' => $item['qty']];
+            $qty = $item['qty'];
+            $totalQty += $qty;
+		}
+
+		$orderItems = $order->getAllItems();
+		$totalQtyOrder = 0;
+		
+		foreach ($orderItems as $orderItem)
+		{
+		  	$totalQtyOrder = $totalQtyOrder + $orderItem->getQtyOrdered();
+		}
+
+		if($totalQtyOrder != $totalQty) {
+			$creditMemoData['shipping_amount'] = 0;
+		}
+		
+		$creditMemoData['items'] = $itemToCredit;
+
+		$this->loggerOrder->info('Credit memo param = ' . print_r($creditMemoData, true));
 		try {
-			$this->creditmemoLoader->setOrderId($orderId); //pass order id
+			$this->creditmemoLoader->setOrderId($order->getId()); //pass order id
 			$this->creditmemoLoader->setCreditmemo($creditMemoData);
 
 			$creditmemo = $this->creditmemoLoader->load();
-			if ($creditmemo) {
+			
+			$creditmemo->setTotalQty($totalQty);
+
+	        if ($creditmemo) {
 				if (!$creditmemo->isValidGrandTotal()) {
 					throw new \Magento\Framework\Exception\LocalizedException(
 						__('The credit memo\'s total must be positive.')
@@ -984,19 +1117,159 @@ class OrderStatus implements OrderStatusInterface {
 					$creditmemo->setCustomerNoteNotify(isset($creditMemoData['comment_customer_notify']));
 				}
 
-				$creditmemoManagement = $this->creditMemoInterfaceFactory->create();
 				$creditmemo->getOrder()->setCustomerNoteNotify(!empty($creditMemoData['send_email']));
+				$creditmemo->getOrder()->setCustomerNoteNotify(!empty($creditMemoData['send_email']));
+
+				// $creditmemo->setInvoice($invoiceobj);
+	        	
+				$creditmemoManagement = $this->creditMemoInterfaceFactory->create();
 				$creditmemoManagement->refund($creditmemo, (bool) $creditMemoData['do_offline']);
 
 				if (!empty($creditMemoData['send_email'])) {
 					$this->creditmemoSender->send($creditmemo);
 				}
 				$this->loggerOrder->info('You created the credit memo.');
-			}
+		    }
 		} catch (\Exception $e) {
-			$this->loggerOrder->info('Credit memo check = ' . $e->getMessage());
+		   	$this->loggerOrder->info('Credit memo check = ' . $e->getMessage());
 		}
 
+		$this->registry->unregister('current_creditmemo');
 		return $creditMemoData;
+	}
+
+	/**
+     * Save invoice
+     *
+     * @param \Magento\Sales\Api\Data\OrderInterface $order
+     * @return \Magento\Sales\Model\Order\Invoice|bool
+     */
+    protected function createInvoice($order)
+    {
+    	$this->loggerOrder->info('****** start create invoice ******');
+        if ($order instanceof \Magento\Sales\Api\Data\OrderInterface) {
+            try {
+            	$invoiceItem = [];
+                foreach($order->getAllItems() as $item) {
+                	$invoiceItem[$item->getId()] = (int)$item->getQtyOrdered();
+                }
+
+                $items = $invoiceItem;
+
+                $invoice = $this->invoiceService->prepareInvoice($order, $items);
+
+                $invoice->setShippingAmount($order->getData('shipping_amount'));
+	            $invoice->setSubtotal($order->getData('subtotal'));
+	            $invoice->setBaseSubtotal($order->getData('base_subtotal'));
+                $invoice->setGrandTotal($order->getData('grand_total'));
+                $invoice->setBaseGrandTotal($order->getData('base_grand_total'));
+                $invoice->register();
+                $invoice->pay();
+
+                $invoice->getOrder()->setIsInProcess(true);
+
+                $invoice->save();
+
+                $transactionSave = $this->transaction->addObject(
+	                $invoice
+	            )->addObject(
+	                $invoice->getOrder()
+	            );
+	            $transactionSave->save();
+				
+				/**
+		         * Allow forced creditmemo just in case if it wasn't defined before
+		         */
+		        if (!$order->hasForcedCanCreditmemo()) {
+		        	if(!$order->getTotalPaid()) {
+		        		$order->setTotalPaid($order->getData('grand_total'));
+        				$order->setBaseTotalPaid($order->getData('grand_total'));
+		        	}
+
+		            $order->setForcedCanCreditmemo(true);
+		            $order->save();
+		        }
+
+        		$this->loggerOrder->info('****** end create invoice ******');
+                return $invoice;
+            } catch (\Exception $e) {
+            	$this->loggerOrder->info('Error ' . __FUNCTION__ . ' ' . $e->getMessage());
+            } catch (LocalizedException $e) {
+            	$this->loggerOrder->info('Error ' . __FUNCTION__ . ' ' . $e->getMessage());
+            }
+        }
+
+        $this->loggerOrder->info('****** end create invoice ******');
+        return false;
+    }
+
+	/**
+	 * get sales order items
+	 *
+	 * @param array $skus
+	 * @param int $orderId
+	 */
+	protected function getSalesOrderItems($skus, $orderId)
+	{
+		$connection = $this->resource->getConnection();
+		$table = $connection->getTableName('sales_order_item');
+
+		$query = $connection->select();
+		$query->from(
+			$table,
+			['*']
+		)->where('order_id = ?', $orderId)->where('sku in (?)', $skus);
+
+		$collection = $connection->fetchAll($query);
+
+		return $collection;
+	}
+
+	/**
+	 * get sales order item
+	 *
+	 * @param array $skus
+	 * @param int $orderId
+	 */
+	protected function getSalesOrderItem($sku, $orderId)
+	{
+		$connection = $this->resource->getConnection();
+		$table = $connection->getTableName('sales_order_item');
+
+		$query = $connection->select();
+		$query->from(
+			$table,
+			['*']
+		)->where('order_id = ?', $orderId)->where('sku = ?', $sku);
+
+		$collection = $connection->fetchRow($query);
+
+		return $collection;
+	}
+
+	/**
+	 * get sales order item
+	 *
+	 * @param int $orderId
+	 * @return bool
+	 */
+	protected function checkInvoiceData($orderId)
+	{
+		$connection = $this->resource->getConnection();
+		$table = $connection->getTableName('sales_invoice');
+
+		$query = $connection->select();
+		$query->from(
+			$table,
+			['*']
+		)->where('order_id = ?', $orderId);
+
+		$collection = $connection->fetchRow($query);
+
+		if($collection) {
+			return true;
+		}
+
+		return false;
 	}
 }
