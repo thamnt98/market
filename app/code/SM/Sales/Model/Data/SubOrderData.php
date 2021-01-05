@@ -387,4 +387,74 @@ class SubOrderData extends DataObject implements SubOrderDataInterface
     {
         return $this->setData(self::TRACKING_LINK, $value);
     }
+
+    public function setCreditmemoId($value)
+    {
+        return $this->setData(self::CREDITMEMO_ID, $value);
+    }
+
+    public function getCreditmemoId()
+    {
+        return $this->getData(self::CREDITMEMO_ID);
+    }
+
+    public function setHasCreditmemo($value)
+    {
+        return $this->setData(self::HAS_CREDITMEMO, $value);
+    }
+
+    public function getHasCreditmemo()
+    {
+        return $this->getData(self::HAS_CREDITMEMO);
+    }
+
+    public function setTotalRefund($value)
+    {
+        return $this->setData(self::TOTAL_REFUND, $value);
+    }
+
+    public function getTotalRefund()
+    {
+        return $this->getData(self::TOTAL_REFUND);
+    }
+
+    public function setShowRefundButton($value)
+    {
+        return $this->setData(self::SHOW_REFUND_BUTTON, $value);
+    }
+
+    public function getShowRefundButton()
+    {
+        return $this->getData(self::SHOW_REFUND_BUTTON);
+    }
+
+    public function getEnableRefundButton()
+    {
+        return $this->getData(self::ENABLE_REFUND_BUTTON);
+    }
+
+    public function setEnableRefundButton($value)
+    {
+        return $this->setData(self::ENABLE_REFUND_BUTTON, $value);
+    }
+
+    public function setGrandTotal($value)
+    {
+        return $this->setData(self::GRAND_TOTAL, $value);
+    }
+
+    public function getGrandTotal()
+    {
+        return $this->getData(self::GRAND_TOTAL);
+    }
+
+    public function setRefundMessage($value)
+    {
+        return $this->setData(self::REFUND_MESSAGE, $value);
+    }
+
+    public function getRefundMessage()
+    {
+        return $this->getData(self::REFUND_MESSAGE);
+    }
 }

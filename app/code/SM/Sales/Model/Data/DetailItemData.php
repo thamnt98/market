@@ -250,4 +250,21 @@ class DetailItemData extends DataObject implements \SM\Sales\Api\Data\DetailItem
     {
         return $this->getData(self::FRESH_PRODUCT);
     }
+
+
+    /**
+     * @inheritDoc
+     */
+    public function setIsAvailable($value)
+    {
+        return $this->setData(self::IS_AVAILABLE, $value);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getIsAvailable()
+    {
+        return $this->getData(self::IS_AVAILABLE);
+    }
 }
