@@ -122,21 +122,30 @@ class IntegrationProductDataMap implements ObserverInterface
 
                     $mapData = array_merge($rowData, $map);
                     
-                    $simple[] = $map;
+                    $simple = $map;
 
                     // $this->productLogic->saveDataToIntegrationProduct($product['entity_id'], $rowData);
 
+                    if(!empty($simple)) {
+                        $connection = $this->productResource->getConnection();
+                        $tableName = $connection->getTableName('integration_catalog_product');
+                        $connection->insertOnDuplicate($tableName, $simple, ['pim_sku']);
+                    }
+
                     if($this->integrationProdRepository->checkPosibilityConfigurable($sku, false)) {
                         $config[] = ['rowData' => $mapData, 'dataValue' => $dataValue];
+                        $this->logger->info($sku . ' is configurable');
+                    }else{
+                        $this->logger->info($sku . ' is not configurable');
                     }
                 }
             }
 
-            if(!empty($simple)) {
-                $connection = $this->productResource->getConnection();
-                $tableName = $connection->getTableName('integration_catalog_product');
-                $connection->insertOnDuplicate($tableName, $simple, ['pim_sku']);
-            }
+            // if(!empty($simple)) {
+            //     $connection = $this->productResource->getConnection();
+            //     $tableName = $connection->getTableName('integration_catalog_product');
+            //     $connection->insertOnDuplicate($tableName, $simple, ['pim_sku']);
+            // }
 
             if(!empty($config)) {
                 foreach ($config as $value) {
