@@ -6,6 +6,7 @@
  *
  *
  * @author   Imam Kusuma <imam.kusuma@transdigital.co.id>
+ * @author   Edi Suryadu <edi.suryadi@ctcorpdigital.com>
  *
  * Copyright © 2019 PT Trans Digital. All rights reserved.
  * http://www.ctcorpora.com
@@ -86,6 +87,11 @@ class Authorization extends \Magento\Framework\App\Action\Action implements Csrf
 	protected $orderHelper;
 
 	/**
+	 * @var \Magento\Sales\Model\Order\Email\Sender\OrderSender
+	 */
+	protected $orderSender;
+
+	/**
 	 * @param \Magento\Framework\App\Action\Context
 	 * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
 	 * @param \Magento\Sales\Model\Order $salesOrder
@@ -110,7 +116,8 @@ class Authorization extends \Magento\Framework\App\Action\Action implements Csrf
 		\Trans\Sprint\Api\SprintResponseRepositoryInterface $sprintRepository,
 		\Trans\Sprint\Model\ResourceModel\SprintResponse $sprintResource,
 		\Trans\Sprint\Helper\SalesOrder $orderHelper,
-		\Magento\Payment\Model\Config $paymentConfig
+		\Magento\Payment\Model\Config $paymentConfig,
+		\Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
 	) {
 		parent::__construct($context);
 
@@ -125,6 +132,7 @@ class Authorization extends \Magento\Framework\App\Action\Action implements Csrf
 		$this->sprintResource = $sprintResource;
 		$this->paymentConfig     = $paymentConfig;
 		$this->orderHelper       = $orderHelper;
+		$this->orderSender = $orderSender;
 
 		$this->config     = $this->dataHelper->getConfigHelper();
 		$this->logger     = $this->dataHelper->getLogger();
@@ -236,6 +244,10 @@ class Authorization extends \Magento\Framework\App\Action\Action implements Csrf
 				$this->session->setIsRedirectedToSprint(true);
 			}
 			$this->saveResponse($order, $dataPayment, $hit);
+
+			if($paymentMethod == 'sprint_bca_va' && $dataPayment['customerAccount'] && $dataPayment['transactionExpire']){
+				$this->orderSender->send($order, true);
+			}
 		}
 
 		$this->logger->info('===== Authorization Controller ===== End');
