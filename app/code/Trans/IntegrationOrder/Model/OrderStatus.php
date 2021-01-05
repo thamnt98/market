@@ -450,7 +450,8 @@ class OrderStatus implements OrderStatusInterface {
 	 * @param int $subAction
 	 * @param string $orderItems
 	 */
-	public function statusOrderItems($orderId, $status, $action, $subAction, $orderItems) {
+	public function statusOrderItems($orderId, $status, $action, $subAction, $orderItems)
+	{
 		$childOrder     = $this->order->loadByAttribute('reference_order_id', $orderId);
 		$orderData      = $this->statusRepo->loadByOrderIds($orderId);
 		$refNumber      = $orderData->getReferenceNumber();
@@ -462,71 +463,17 @@ class OrderStatus implements OrderStatusInterface {
 			throw new \Magento\Framework\Webapi\Exception(__('Order ID doesn\'t exist, please make sure again.'));
 		}
 
-		if ($status == 2 && $action == 2 && $subAction == 7 || $status == 2 && $action == 99 && $subAction == 0) {
-			$orderItem    = [];
-			$refunded     = [];
-			$skusRefunded = [];
-			foreach ($orderItems as $itemData) {
-				$allocatedQty = $itemData['quantity_allocated'];
+		$orderItem = [];
+		$refunded = [];
+		$skusRefunded = [];
+		foreach ($orderItems as $itemData) {
+			$allocatedQty = $itemData['quantity_allocated'];
 
-				$orderItem[] = $itemData;
+			$orderItem[] = $itemData;
 
-				if ($itemData['quantity_allocated'] < $itemData['quantity']) {
-					$refunded[$itemData['sku']] = $itemData;
-					$skusRefunded[]             = $itemData['sku'];
-				}
-			}
-
-			if (!empty($skusRefunded) and !empty($refunded)) {
-				$salesOrderItemsChild = $this->getSalesOrderItems($skusRefunded, $childOrder->getEntityId());
-				$salesOrderItems      = $this->getSalesOrderItems($skusRefunded, $parentEntityId);
-
-				$itemIds = [];
-				foreach ($salesOrderItems as $item) {
-					$dataItem['item_id'] = $item['item_id'];
-					$dataItem['qty']     = $refunded[$item['sku']]['quantity'] - $refunded[$item['sku']]['quantity_allocated'];
-					$itemIds[]           = $dataItem;
-				}
-
-				$itemIdsChild = [];
-				foreach ($salesOrderItemsChild as $item) {
-					$dataItem['item_id'] = $item['item_id'];
-					$dataItem['qty']     = $refunded[$item['sku']]['quantity'] - $refunded[$item['sku']]['quantity_allocated'];
-					$itemIdsChild[]      = $dataItem;
-				}
-
-				if (!empty($itemIds)) {
-					$this->loggerOrder->info('===== Credit Memo ===== Start');
-
-					try {
-						$this->loggerOrder->info('parent credit memo');
-						$parentOrder  = $this->orderRepository->get($parentEntityId);
-						$credit       = $this->creditMemos($parentEntityId, $itemIds);
-						$creditEncode = json_encode($credit);
-						$this->loggerOrder->info('parent $creditEncode : ' . $creditEncode);
-					} catch (\Exception $e) {
-						$this->loggerOrder->info('parent credit memo : ' . $e->getMessage());
-					}
-
-					// if($this->checkInvoiceData($childOrder->getId())) {
-					try {
-						$this->createInvoice($childOrder); //invoice for child order
-					} catch (\Exception $e) {
-						$this->loggerOrder->info('invoice child order fail : ' . $e->getMessage());
-					}
-					// }
-
-					try {
-						$this->loggerOrder->info('child credit memo');
-						$childmemo         = $this->creditMemos($childOrder->getId(), $itemIdsChild);
-						$childCreditEncode = json_encode($childmemo);
-						$this->loggerOrder->info('child $creditEncode : ' . $childCreditEncode);
-					} catch (\Exception $e) {
-						$this->loggerOrder->info('child $creditEncode : ' . $e->getMessage());
-					}
-
-					$this->loggerOrder->info('===== Credit Memo ===== End');
-				}
+			if ($itemData['quantity_allocated'] < $itemData['quantity']) {
+				$refunded[$itemData['sku']] = $itemData;
+				$skusRefunded[] = $itemData['sku'];
 			}
 		}
 
@@ -639,6 +586,60 @@ class OrderStatus implements OrderStatusInterface {
 
 		$this->orderRepoInterface->save($loadDataOrder);
 		$this->orderStatusHistoryRepoInterface->save($saveDataToStatusHistory);
+
+		if ($status == 2 && $action == 2 && $subAction == 7 || $status == 2 && $action == 99 && $subAction == 0) {
+			if (!empty($skusRefunded) and !empty($refunded)) {
+				$salesOrderItemsChild = $this->getSalesOrderItems($skusRefunded, $childOrder->getEntityId());
+				$salesOrderItems      = $this->getSalesOrderItems($skusRefunded, $parentEntityId);
+
+				$itemIds = [];
+				foreach ($salesOrderItems as $item) {
+					$dataItem['item_id'] = $item['item_id'];
+					$dataItem['qty']     = $refunded[$item['sku']]['quantity'] - $refunded[$item['sku']]['quantity_allocated'];
+					$itemIds[]           = $dataItem;
+				}
+
+				$itemIdsChild = [];
+				foreach ($salesOrderItemsChild as $item) {
+					$dataItem['item_id'] = $item['item_id'];
+					$dataItem['qty']     = $refunded[$item['sku']]['quantity'] - $refunded[$item['sku']]['quantity_allocated'];
+					$itemIdsChild[]      = $dataItem;
+				}
+
+				if (!empty($itemIds)) {
+					$this->loggerOrder->info('===== Credit Memo ===== Start');
+
+					try {
+						$this->loggerOrder->info('parent credit memo');
+						$parentOrder  = $this->orderRepository->get($parentEntityId);
+						$credit       = $this->creditMemos($parentEntityId, $itemIds, $orderId);
+						$creditEncode = json_encode($credit);
+						$this->loggerOrder->info('parent $creditEncode : ' . $creditEncode);
+					} catch (\Exception $e) {
+						$this->loggerOrder->info('parent credit memo : ' . $e->getMessage());
+					}
+
+					// if($this->checkInvoiceData($childOrder->getId())) {
+					try {
+						$this->createInvoice($childOrder); //invoice for child order
+					} catch (\Exception $e) {
+						$this->loggerOrder->info('invoice child order fail : ' . $e->getMessage());
+					}
+					// }
+
+					try {
+						$this->loggerOrder->info('child credit memo');
+						$childmemo         = $this->creditMemos($childOrder->getId(), $itemIdsChild);
+						$childCreditEncode = json_encode($childmemo);
+						$this->loggerOrder->info('child $creditEncode : ' . $childCreditEncode);
+					} catch (\Exception $e) {
+						$this->loggerOrder->info('child $creditEncode : ' . $e->getMessage());
+					}
+
+					$this->loggerOrder->info('===== Credit Memo ===== End');
+				}
+			}
+		}
 
 		if ($orderIds) {
 			$model = $this->historyInterface->create();
@@ -1054,8 +1055,9 @@ class OrderStatus implements OrderStatusInterface {
 	 *
 	 * @param Magento\Sales\Model\Order $order
 	 * @param string $orderItemId
+	 * @param string|null $refOrderId
 	 */
-	protected function creditMemos($orderId, $orderItemIds) {
+	protected function creditMemos($orderId, $orderItemIds, $refOrderId = null) {
 		$order = $this->orderRepository->get($orderId);
 
 		if ($order instanceof \Magento\Sales\Model\Order == false) {
@@ -1087,9 +1089,26 @@ class OrderStatus implements OrderStatusInterface {
 			$creditMemoData['shipping_amount'] = 0;
 		}
 
+		if($order->getData('is_parent') && $refOrderId != null) {
+			$childOrder = $this->order->loadByAttribute('reference_order_id', $refOrderId);
+
+			$childOrderItems = $childOrder->getAllItems();
+			$totalQtyChildOrder = 0;
+			
+			foreach ($childOrderItems as $childOrderItem)
+			{
+			  	$totalQtyChildOrder = $totalQtyChildOrder + $childOrderItem->getQtyOrdered();
+			}
+
+			if($totalQty == $totalQtyChildOrder) {
+				$creditMemoData['shipping_amount'] = $childOrder->getData('shipping_amount');
+			}
+		}
+
 		$creditMemoData['items'] = $itemToCredit;
 
 		$this->loggerOrder->info('Credit memo param = ' . print_r($creditMemoData, true));
+		
 		try {
 			$this->creditmemoLoader->setOrderId($order->getId()); //pass order id
 			$this->creditmemoLoader->setCreditmemo($creditMemoData);
