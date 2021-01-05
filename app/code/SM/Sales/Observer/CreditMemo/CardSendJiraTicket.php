@@ -50,9 +50,8 @@ class CardSendJiraTicket implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        /* @var $creditmemo \Magento\Sales\Model\Order\Creditmemo */
         $this->creditmemo = $observer->getEvent()->getCreditmemo();
-        $this->order = $creditmemo->getOrder();
+        $this->order = $this->creditmemo->getOrder();
         $paymentMethod = $this->order->getPayment()->getMethod();
 
         if (IsPaymentMethod::isCard($paymentMethod)) {
