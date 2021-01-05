@@ -6,6 +6,7 @@
  *
  *
  * @author   Anan Fauzi <anan.fauzi@transdigital.co.id>
+ * @author   Edi Suryadu <edi.suryadi@ctcorpdigital.com>
  *
  * Copyright © 2020 PT CT Corp Digital. All rights reserved.
  * http://www.ctcorpora.com
@@ -102,7 +103,7 @@ class TransmartSetEmailNewOrderData extends SetEmailNewOrderData
             $additionalData = [
                 "order_increment" => $order->getReferenceNumber(),
                 "order_total" => $this->getPrice($order->getGrandTotal()),
-                "virtual_account_number" => $this->getBankMegaVaNumber($payment->getLastTransId()),
+                "virtual_account_number" => '',
                 "payment_method_title" => $paymentMethodTitle,
                 "order_url" => $orderUrl,
                 "is_va" => $this->verifyPayment($paymentMethod, "va"),
@@ -116,6 +117,7 @@ class TransmartSetEmailNewOrderData extends SetEmailNewOrderData
             ];
 
             if($paymentMethod == 'trans_mepay_va'){
+                $additionalData['virtual_account_number'] = $this->getBankMegaVaNumber($payment->getLastTransId());
                 $expireTime = $this->getBankMegaVaExpireTime($payment->getLastTransId());
                 $expireTime = str_replace('T',' ', $expireTime);
                 $expireTime = substr($expireTime, 0, strpos($expireTime, "."));
@@ -137,17 +139,55 @@ class TransmartSetEmailNewOrderData extends SetEmailNewOrderData
                 "is_cc" => $this->verifyPayment($paymentMethod, "cc"),
                 "is_store_pick_up" => $order->getShippingMethod() == "store_pickup_store_pickup",
                 "delivery_method" => $this->getDeliveryMethod($order->getShippingMethod(), $order->getShippingDescription()),
-                "expire_time" => date("l", $this->getExpireTime($order->getQuoteId())),
-                "expire_time_string" => $this->getExpireTimeString($order->getQuoteId()),
+                "expire_time" => '',
+                "expire_time_string" => '',
                 "is_va_mega" => false,
                 "is_va_bca" => ($paymentMethod == 'sprint_bca_va')? true : false
             ];
-        }
 
+            if($paymentMethod == 'sprint_bca_va') {
+                $expireTime = $this->getExpireTime($order->getQuoteId());
+                $additionalData['expire_time'] = (($expireTime && $expireTime > 0) ? date("l", $expireTime) : '');
+                $additionalData['expire_time_string'] = $this->getExpireTimeString($order->getQuoteId());
+
+            }
+        }
 
         $transportObject->setData("additional_data", $additionalData);
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExpireTime($quoteId)
+    {
+        try {
+            $sprintOrder = $this->getSprintOrder($quoteId);
+            if ($sprintOrder && $sprintOrder->getId()) {
+                return $this->date->timestamp($sprintOrder->getExpireDate());
+            }
+        } catch (\Exception $e) {
+        }
+
+        return 0;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExpireTimeString($quoteId)
+    {
+        try {
+            $sprintOrder = $this->getSprintOrder($quoteId);
+            if ($sprintOrder && $sprintOrder->getId()) {
+                return date('d F Y h:i A', strtotime($sprintOrder->getExpireDate()));
+            }
+        } catch (\Exception $e) {
+        }
+
+        return '';
     }
 
     /**

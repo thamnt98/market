@@ -11,32 +11,18 @@
 
 namespace SM\Sales\Model\Data\Invoice;
 
-use Magento\Authorization\Model\UserContextInterface;
 use Magento\Customer\Model\Session;
-use Magento\Framework\App\ObjectManager;
 use Magento\Integration\Model\Oauth\Token;
 use Magento\Integration\Model\Oauth\TokenFactory;
-use Magento\Integration\Api\IntegrationServiceInterface;
-use Magento\Framework\Webapi\Request;
 use Magento\Framework\Stdlib\DateTime\DateTime as Date;
 use Magento\Integration\Helper\Oauth\Data as OauthHelper;
 
-class AuthInvoiceLink
+class AuthInvoiceLink extends \SM\Sales\Model\AuthorizationToken
 {
     /**
      * @var Token
      */
     protected $tokenFactory;
-
-    /**
-     * @var Date
-     */
-    private $date;
-
-    /**
-     * @var OauthHelper
-     */
-    private $oauthHelper;
 
     /**
      * @var Session
@@ -46,9 +32,9 @@ class AuthInvoiceLink
     /**
      * AuthInvoiceLink constructor.
      * @param TokenFactory $tokenFactory
-     * @param Session $customerSession
      * @param Date|null $date
      * @param OauthHelper|null $oauthHelper
+     * @param Session $customerSession
      */
     public function __construct(
         TokenFactory $tokenFactory,
@@ -56,20 +42,20 @@ class AuthInvoiceLink
         Date $date = null,
         OauthHelper $oauthHelper = null
     ) {
-        $this->tokenFactory = $tokenFactory;
         $this->customerSession = $customerSession;
-        $this->date = $date ?: ObjectManager::getInstance()->get(
-            Date::class
-        );
-        $this->oauthHelper = $oauthHelper ?: ObjectManager::getInstance()->get(
-            OauthHelper::class
+        parent::__construct(
+            $tokenFactory,
+            $date,
+            $oauthHelper
         );
     }
 
     /**
+     * @param $request
+     * @param null $tokenTtl
      * @return bool
      */
-    public function authorization($request)
+    public function authorization($request, $tokenTtl = null): bool
     {
         if ($tokenKey = $request->getParam('token')) {
             $token = $this->tokenFactory->create()->loadByToken($tokenKey);
@@ -80,33 +66,5 @@ class AuthInvoiceLink
         }
 
         return true;
-    }
-
-    /**
-     * Check if token is expired.
-     *
-     * @param Token $token
-     * @return bool
-     */
-    private function isTokenExpired(Token $token): bool
-    {
-        if ($token->getUserType() == UserContextInterface::USER_TYPE_ADMIN) {
-            $tokenTtl = $this->oauthHelper->getAdminTokenLifetime();
-        } elseif ($token->getUserType() == UserContextInterface::USER_TYPE_CUSTOMER) {
-            $tokenTtl = $this->oauthHelper->getCustomerTokenLifetime();
-        } else {
-            // other user-type tokens are considered always valid
-            return false;
-        }
-
-        if (empty($tokenTtl)) {
-            return false;
-        }
-
-        if (strtotime($token->getCreatedAt()) < ($this->date->gmtTimestamp() - $tokenTtl * 3600)) {
-            return true;
-        }
-
-        return false;
     }
 }

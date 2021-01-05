@@ -109,4 +109,23 @@
             <resource ref="self" />
         </resources>
     </route>
+    <!--  API for Refund  -->
+    <route url="/V1/order/creditmemo/form/:creditmemo_id" method="GET">
+        <service class="\SM\Sales\Api\CreditmemoRepositoryInterface" method="getFormInfo"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
+    <route url="/V1/order/creditmemo/request" method="POST">
+        <service class="\SM\Sales\Api\CreditmemoRepositoryInterface" method="submitRequest"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="customerId" force="true">%customer_id%</parameter>
+        </data>
+    </route>
 </routes>

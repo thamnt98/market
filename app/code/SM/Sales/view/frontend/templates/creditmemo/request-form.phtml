@@ -1,0 +1,74 @@
+<?php
+/**
+ * @var \SM\Sales\Block\Creditmemo\RequestForm $block
+ */
+?>
+<div class="refund-request-form">
+    <div class="request-form-header">
+        <div class="left">
+            <label class="label">
+                <?= __('Reference Number') ?>
+                <span><?= $block->getReferenceNumber() ?></span>
+            </label>
+        </div>
+        <div class="right">
+            <a href="<?= $block->getOrderUrl() ?>"><?= __('See details') ?></a>
+        </div
+    </div>
+    <p class="block-subtitle">
+        <?= __('We are very sorry to cancel the out-of-stock items. To proceed with refund, please complete the information below.') ?>
+    </p>
+    <form action="<?= $block->getFormActionUrl() ?>" method="POST" data-mage-init='{"validation": {}}'>
+        <div class="fieldset">
+            <div class="field">
+                <label class="label">
+                    <span><?= __('Bank Name') ?></span>
+                </label>
+                <div class="control">
+                    <select name="bank" data-validate="{required:true}">
+                        <option value=""><?= __('Select Bank Name') ?></option>
+                        <option value="Bank Mega">Bank Mega</option>
+                    </select>
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">
+                    <span><?= __('Account Holder\'s Name') ?></span>
+                </label>
+                <div class="control">
+                    <input type="text" name="account_name" class="input-text required-entry" value=""
+                           data-validate="{required:true}" placeholder="<?= __('Enter Account Holder\'s Name') ?>"/>
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">
+                    <span><?= __('Account Number') ?></span>
+                </label>
+                <div class="control">
+                    <input type="text" name="account_number" class="input-text required-entry" value=""
+                           data-validate="{'required':true, 'validate-digits': true}"
+                           placeholder="<?= __('Enter Account Number') ?>"/>
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">
+                    <?= __('Total Refund') ?>
+                    <span class="total-number"><?= $block->formatCurrency($block->getTotalRefund()) ?></span>
+                </label>
+                <div class="control">
+                    <input type="hidden" name="creditmemo_id" value="<?= $block->getCreditmemoId() ?>">
+                </div>
+            </div>
+            <label class="label">
+                <span><?= __('Note') ?></span>
+            </label>
+            <p class="block-subtitle bottom">
+                <?= __('This process may take a few days. We will notify you with the refund updates through email.') ?>
+            </p>
+            <button type="submit" class="action primary" title="<?= __('Submit') ?>"
+                <?= !$block->isSubmitted() ?: 'disabled' ?>>
+                <?=__('Submit') ?>
+            </button>
+        </div>
+    </form>
+</div>

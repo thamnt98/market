@@ -18,6 +18,7 @@
             <ticket>
                 <domain>https://ctcd.atlassian.net</domain>
                 <project>CSJSD</project>
+                <refund>10007</refund>
             </ticket>
         </sm_jira>
     </default>
