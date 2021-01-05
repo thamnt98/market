@@ -423,11 +423,29 @@ class PaymentNotify implements \Trans\Sprint\Api\PaymentNotifyInterface
         if ($mainOrder instanceof \Magento\Sales\Api\Data\OrderInterface) {
             try {
                 $invoice = $this->invoiceService->prepareInvoice($mainOrder);
-                $invoice->setGrandTotal($mainOrder->getData('grand_total'));
-                $invoice->setBaseGrandTotal($mainOrder->getData('base_grand_total'));
+                
+                $invoice->setShippingAmount($mainOrder->getData('shipping_amount'));
+                $invoice->setSubtotal($mainOrder->getData('subtotal'));
+                $invoice->setBaseSubtotal($mainOrder->getData('base_subtotal'));
+                $invoice->setGrandTotal($transaction->getAmount());
+                $invoice->setBaseGrandTotal($transaction->getAmount());
                 $invoice->register();
-
+                $invoice->pay();
+                
                 $invoice->save();
+
+                /**
+                 * Allow forced creditmemo just in case if it wasn't defined before
+                 */
+                if (!$mainOrder->hasForcedCanCreditmemo()) {
+                  if(!$mainOrder->getTotalPaid()) {
+                    $mainOrder->setTotalPaid($mainOrder->getData('grand_total'));
+                    $mainOrder->setBaseTotalPaid($mainOrder->getData('grand_total'));
+                  }
+
+                    $mainOrder->setForcedCanCreditmemo(true);
+                    $mainOrder->save();
+                }
 
                 // send invoice
                 $this->logger->info('****** send invoice ******');
