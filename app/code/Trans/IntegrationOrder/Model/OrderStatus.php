@@ -1205,10 +1205,8 @@ class OrderStatus implements OrderStatusInterface {
 				 * Allow forced creditmemo just in case if it wasn't defined before
 				 */
 				if (!$order->hasForcedCanCreditmemo()) {
-					if (!$order->getTotalPaid()) {
-						$order->setTotalPaid($order->getData('grand_total'));
-						$order->setBaseTotalPaid($order->getData('grand_total'));
-					}
+					$order->setTotalPaid($order->getData('grand_total'));
+					$order->setBaseTotalPaid($order->getData('grand_total'));
 
 					$order->setForcedCanCreditmemo(true);
 					$order->save();
