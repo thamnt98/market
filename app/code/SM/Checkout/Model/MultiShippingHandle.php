@@ -377,12 +377,20 @@ class MultiShippingHandle
                         } else {
                             $quoteItemId = $item->getId();
                         }
-                        $itemsValidMethod[$quoteItemId] = [
-                          self::DEFAULT_METHOD,
-                          self::SAME_DAY,
-                          self::SCHEDULE,
-                          self::NEXT_DAY
-                        ];
+                        if (isset($this->mobileItemsFormat[$quoteItemId])) {
+                            foreach ($this->mobileItemsFormat[$quoteItemId]->getShippingMethod() as $method) {
+                                if (!$method->getDisabled()) {
+                                    $itemsValidMethod[$quoteItemId][] = $method->getValue();
+                                }
+                            }
+                        } else {
+                            $itemsValidMethod[$quoteItemId] = [
+                                self::DEFAULT_METHOD,
+                                self::SAME_DAY,
+                                self::SCHEDULE,
+                                self::NEXT_DAY
+                            ];
+                        }
                     }
                 }
             }
@@ -1332,6 +1340,7 @@ class MultiShippingHandle
                         }
                     }
                 }
+                $shippingMethodList = [];
                 $quoteItemModel = $this->initItems[$quoteItemId];
                 if (!$shippingMethod || $shippingMethod == '') {
                     $shippingMethod = self::NOT_AVAILABLE;
@@ -1339,12 +1348,11 @@ class MultiShippingHandle
                 if ($shippingMethod == self::STORE_PICK_UP) {
                     $quoteItemModel->setShippingAddressId(0);
                 }
-                $shippingMethodList = [];
                 foreach ($this->split->getListMethodFakeName() as $value => $label) {
                     $shippingCode = 'transshipping_transshipping' . $value;
                     $shippingMethodObj = $this->shippingMethodInterfaceFactory->create();
                     $shippingMethodObj->setValue($shippingCode)->setLabel($label)->setDisabled(true);
-                    if ($shippingMethod == self::STORE_PICK_UP || in_array($shippingCode, $invalidShippingList[$quoteItemId])) {
+                    if (in_array($shippingCode, $invalidShippingList[$quoteItemId])) {
                         $shippingMethodObj->setDisabled(false);
                     }
                     $shippingMethodList[] = $shippingMethodObj;
