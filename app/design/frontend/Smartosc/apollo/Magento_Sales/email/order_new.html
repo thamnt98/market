@@ -234,6 +234,7 @@
 </table>
 <!--End Message Email-->
 {{if additional_data.is_va_bca}}
+{{depend additional_data.expire_time_string}}
 <table class="how-to-pay">
     <tr>
         <td>
@@ -322,6 +323,7 @@
         </td>
     </tr>
 </table>
+{{/depend}}
 {{/if}}
 {{if additional_data.is_va_mega}}
 {{depend additional_data.virtual_account_number}}
