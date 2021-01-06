@@ -1210,6 +1210,8 @@ class OrderStatus implements OrderStatusInterface {
 
 					$order->setForcedCanCreditmemo(true);
 					$order->save();
+
+					$this->payOrder($order);
 				}
 
 				$this->loggerOrder->info('****** end create invoice ******');
@@ -1290,5 +1292,22 @@ class OrderStatus implements OrderStatusInterface {
 		}
 
 		return false;
+	}
+
+	/**
+	 * update sales order data
+	 *
+	 * @param \Magento\Sales\Api\Data\OrderInterface $order
+	 * @return void
+	 */
+	protected function payOrder($order)
+	{
+		$connection = $this->resource->getConnection();
+		$table = $connection->getTableName('sales_order');
+
+		$data = ["total_paid" => $order->getData('grand_total'), "base_total_paid" => $order->getData('grand_total')]; // Key_Value Pair
+		$where = ['entity_id = ?' => $order->getId()];
+
+		$connection->update($table, $data, $where);
 	}
 }
