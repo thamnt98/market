@@ -159,7 +159,9 @@ class SprintResponseRepository implements SprintResponseRepositoryInterface {
 			$data = $this->sprintResCollection->create($quoteId, null, $storeId)
 			->setPageSize(1);
 			if (!$data->getSize()) {
-				throw new NoSuchEntityException(__('Requested Item doesn\'t exist'));
+				$message = 'Requested Item doesn\'t exist -> $quoteId: '.$quoteId.', $storeId: '.$storeId;
+				throw new NoSuchEntityException(__($message));
+//				throw new NoSuchEntityException(__('Requested Item doesn\'t exist'));
 			}
 
 			$data = $data->getFirstItem();
