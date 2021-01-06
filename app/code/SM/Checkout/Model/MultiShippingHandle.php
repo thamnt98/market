@@ -770,7 +770,8 @@ class MultiShippingHandle
                                 'warehouse' => $orderDetail['warehouse'],
                                 'store_name' => $orderDetail['store']['store_name'],
                                 'spo_detail' => $orderDetail['warehouse'],
-                                'store' => $orderDetail['store']
+                                'store' => $orderDetail['store'],
+                                'shipping_list' => $orderDetail['shipping_list']
                             ],
                         ];
                     }

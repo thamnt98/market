@@ -349,8 +349,8 @@ class OmsIntegration implements OmsIntegrationInterface {
 				"warehouse" => json_decode($warehouse), //new
 				"code_name" => $codeName, //new
 				"merchant_code" => $merchantCode,
-				"logistic_courier_name" => 'SAP Express', // new parameter request
-				"logistic_courier" => 1, // new parameter request
+                "logistic_courier" => $dataOrder->getLogisticCourier(), // smartosc custom
+                "logistic_courier_name" => $dataOrder->getLogisticCourierName(), // smartosc custom
 				"reference_number" => $referenceNumber,
 				"promotion_type" => $promoType,
 				"promotion_value" => $promoValue,

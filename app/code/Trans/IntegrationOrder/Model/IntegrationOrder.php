@@ -738,4 +738,32 @@ IntegrationOrderInterface {
     public function setGrandTotal($grandTotal) {
         return $this->setData(IntegrationOrderInterface::GRAND_TOTAL, $grandTotal);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getLogisticCourierName() {
+        return $this->getData(IntegrationOrderInterface::LOGISTIC_COURIER_NAME);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setLogisticCourierName($logisticCourierName) {
+        return $this->setData(IntegrationOrderInterface::LOGISTIC_COURIER_NAME, $logisticCourierName);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getLogisticCourier() {
+        return $this->getData(IntegrationOrderInterface::LOGISTIC_COURIER);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setLogisticCourier($logisticCourier) {
+        return $this->setData(IntegrationOrderInterface::LOGISTIC_COURIER, $logisticCourier);
+    }
 }
