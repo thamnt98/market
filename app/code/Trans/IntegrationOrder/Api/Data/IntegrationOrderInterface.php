@@ -85,6 +85,8 @@ interface IntegrationOrderInterface {
 	const CODE_NAME        = 'code_name';
 	const TIME_SLOT        = 'time_slot';
     const GRAND_TOTAL      = 'grand_total';
+    const LOGISTIC_COURIER_NAME = 'logistic_courier_name';
+    const LOGISTIC_COURIER = 'LOGISTIC_COURIER';
 
 	/**
 	 * Get Oms Order Id
@@ -765,4 +767,26 @@ interface IntegrationOrderInterface {
      * @return int
      */
     public function setGrandTotal($grandTotal);
+
+    /**
+     * @return string
+     */
+    public function getLogisticCourierName();
+
+    /**
+     * @param string $logisticCourierName
+     * @return string
+     */
+    public function setLogisticCourierName($logisticCourierName);
+
+    /**
+     * @return int
+     */
+    public function getLogisticCourier();
+
+    /**
+     * @param int $logisticCourier
+     * @return int
+     */
+    public function setLogisticCourier($logisticCourier);
 }

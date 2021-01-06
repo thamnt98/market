@@ -2,10 +2,19 @@
 
 namespace SM\Notification\Controller\Index;
 
-use Magento\Review\Controller\Customer as CustomerController;
 
-class Test extends CustomerController
+class Test extends \Magento\Framework\App\Action\Action
 {
+    public function __construct(
+        \Magento\Framework\App\Action\Context $context,
+        \Magento\Framework\View\Result\PageFactory $pageFactory,
+        \Magento\Sales\Model\OrderFactory $orderFactory
+    ) {
+        $this->_pageFactory = $pageFactory;
+        $this->orderFactory = $orderFactory;
+        return parent::__construct($context);
+    }
+
     /**
      * Render notifications
      *
@@ -14,9 +23,9 @@ class Test extends CustomerController
     public function execute()
     {
         $params = $this->getRequest()->getParams();
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $order = $objectManager->create('\Magento\Sales\Model\Order') ->load($params['order_id']);
-        $order->setStatus('failed_delivery');
+        $order = $this->orderFactory->create()->load($params['order_id']);
+        /** @var \Magento\Quote\Model\Order $order */
+        $order->setStatus($params['status']);
         $order->save();
     }
 }
