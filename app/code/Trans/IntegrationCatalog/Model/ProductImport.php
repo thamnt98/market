@@ -1455,10 +1455,17 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                         $rowData = $productTypeModel->clearEmptyData($rowData);
                     }
 
+                    // $this->logger->info('Before prepare attributes');
+                    // $this->logger->info(print_r($rowData, true));
+
                     $rowData = $productTypeModel->prepareAttributesWithDefaultValueForSave(
                         $rowData,
                         !$this->isSkuExist($rowSku)
                     );
+
+                    // $this->logger->info('After prepare attributes');
+                    // $this->logger->info(print_r($rowData, true));
+
                     $product = $this->_proxyProdFactory->create(['data' => $rowData]);
 
                     // $this->logger->info('Loop row data');
