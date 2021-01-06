@@ -19,6 +19,11 @@
             <general>
                 <enable>1</enable>
             </general>
+            <email>
+                <sender>sales</sender>
+                <receiver>operation.omni@ctcorpdigital.com</receiver>
+                <template>installation_email_template</template>
+            </email>
         </installation>
     </default>
 </config>

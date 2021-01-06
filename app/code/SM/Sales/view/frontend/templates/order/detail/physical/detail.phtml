@@ -134,8 +134,6 @@ if ($parentOrder) {
                             <?php endif; ?>
                         </div>
                         <div class="tracking-order">
-                            <?php if (!$isPickUp): ?>
-
                                 <a href="#" class="track-order"
                                    data-trigger="track-order-<?= $subOrder->getId() ?>"
                                    data-gtm-event="track_order_click"
@@ -170,7 +168,6 @@ if ($parentOrder) {
                                         </div>
                                     </div>
                                 </div>
-                            <?php endif; ?>
                         </div>
                     </div>
                     <ul class="list-items-review">

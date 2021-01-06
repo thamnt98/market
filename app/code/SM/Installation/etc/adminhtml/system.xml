@@ -33,6 +33,25 @@
                     <label>Tooltip</label>
                 </field>
             </group>
+            <group id="email" translate="label" sortOrder="100" showInDefault="1" showInWebsite="1"
+                   showInStore="1">
+                <label>Order With Installation</label>
+                <field id="receiver" translate="label" type="text" sortOrder="0" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Warehouse representative</label>
+                    <validate>required-entry validate-email</validate>
+                </field>
+                <field id="template" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Email Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="sender" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Sender</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
+            </group>
         </section>
     </system>
 </config>
