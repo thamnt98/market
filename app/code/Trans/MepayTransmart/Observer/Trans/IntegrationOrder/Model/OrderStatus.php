@@ -87,24 +87,28 @@ class OrderStatus implements ObserverInterface
       $orderId = $observer->getData('order_id');
       $refNumber = $observer->getData('reference_number');
       $newAmount = $observer->getData('new_amount');
+      $adjAmount = $observer->getData('adjustment_amount');
       $amount = $observer->getData('amount');
 
       $check = $this->checkOrderCapture($refNumber);
-
+      
       if($check) {
         $this->logger->info('== {{Auth Capture Start}} ==');
 
         $this->logger->info('Data order_id = ' . $orderId);
         $this->logger->info('Data reference_number = ' . $refNumber);
         $this->logger->info('Data new_amount = ' . $newAmount);
+        $this->logger->info('Data adjustment_amount = ' . $adjAmount);
         $this->logger->info('Data amount = ' . $amount);
 
         $this->clientHelper->setAmount($amount);
+        $this->clientHelper->setReferenceNumber($refNumber);
+        $this->clientHelper->setAdjustmentAmount($amount);
         $this->clientHelper->setNewAmount($newAmount);
         $this->clientHelper->setTxnByOrderId($refNumber);
         $send = $this->clientHelper->send();
 
-        $this->logger->info('$send ' . json_encode($send));
+        $this->logger->info('$send ' . print_r($send, true));
         
         $this->saveCaptureTrack($send, $observer);
       } else {

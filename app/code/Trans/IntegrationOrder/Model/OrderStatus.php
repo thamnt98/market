@@ -741,6 +741,7 @@ class OrderStatus implements OrderStatusInterface {
 						'reference_number' => $refNumber,
 						'amount' => $trxAmount,
 						'new_amount' => $trxAmount - $matrixAdjusmentAmount,
+						'adjustment_amount' => $matrixAdjusmentAmount,
 					]
 				);
 
@@ -1114,6 +1115,12 @@ class OrderStatus implements OrderStatusInterface {
 			$this->creditmemoLoader->setCreditmemo($creditMemoData);
 
 			$creditmemo = $this->creditmemoLoader->load();
+
+			if(!$creditmemo) {
+				$this->loggerOrder->info('Credit memo fail to load.');
+				$this->registry->unregister('current_creditmemo');
+				return $creditMemoData;
+			}
 
 			$creditmemo->setTotalQty($totalQty);
 
