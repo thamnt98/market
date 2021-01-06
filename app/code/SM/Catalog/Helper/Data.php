@@ -563,9 +563,11 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
         $countDescription = strlen($description);
         $valueAccept = null;
         if ($countDescription > 1000) {
-            $valueAccept = substr($description, 0, 1000);
+            
+            // $valueAccept = substr($description, 0, 1000);
 
-            return $valueAccept;
+            // return $valueAccept;
+            return $description;
         } else {
             return $description;
         }
