@@ -36,7 +36,7 @@
     <route url="/V1/blog/post/:postId" method="GET">
         <service class="SM\InspireMe\Api\PostRepositoryInterface" method="getById"/>
         <resources>
-            <resource ref="self"/>
+            <resource ref="anonymous"/>
         </resources>
     </route>
     <route url="/V1/blog/addSelectedToCart" method="POST">

@@ -49,13 +49,19 @@ class HomePage implements HomeInterface
     protected $greetingMessage;
 
     /**
+     * @var \Magento\Authorization\Model\UserContextInterface
+     */
+    protected $tokenUserContext;
+
+    /**
      * HomePage constructor.
      * @param HomeSliderFactory $homeSliderFactory
      * @param ScopeConfigInterface $scopeConfig
      * @param ProductInterface $product
      * @param CollectionFactory $categoryCollection
      * @param Banner $banner
-     * @param HomepageMessage $homepageMessage
+     * @param \SM\MobileApi\Model\HomepageMessage $homepageMessage
+     * @param \Magento\Authorization\Model\UserContextInterface $tokenUserContext
      */
     public function __construct(
         HomeSliderFactory $homeSliderFactory,
@@ -63,7 +69,8 @@ class HomePage implements HomeInterface
         ProductInterface $product,
         CollectionFactory $categoryCollection,
         Banner $banner,
-        HomepageMessage $homepageMessage
+        HomepageMessage $homepageMessage,
+        \Magento\Authorization\Model\UserContextInterface $tokenUserContext
     ) {
         $this->homeSlider         = $homeSliderFactory;
         $this->scopeConfig        = $scopeConfig;
@@ -71,6 +78,7 @@ class HomePage implements HomeInterface
         $this->categoryCollection = $categoryCollection;
         $this->banner             = $banner;
         $this->greetingMessage    = $homepageMessage;
+        $this->tokenUserContext  = $tokenUserContext;
     }
 
     /**
@@ -94,15 +102,15 @@ class HomePage implements HomeInterface
         if (!$category_id && $categoryCollection->getSize() == 0) {
             return [];
         }
-
-        return $this->productInterface->getList($category_id, 12, 1, false);
+        $customerId = $this->tokenUserContext->getUserId();
+        return $this->productInterface->getList($category_id, 12, 1, false, $customerId);
     }
 
     /**
      * @inheritDoc
      */
-    public function getGreetingMessage($customerId)
+    public function getGreetingMessage()
     {
-        return $this->greetingMessage->getMessage($customerId);
+        return $this->greetingMessage->getMessage();
     }
 }

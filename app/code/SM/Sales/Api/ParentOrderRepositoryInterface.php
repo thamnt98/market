@@ -44,8 +44,7 @@ interface ParentOrderRepositoryInterface
     public function getById($customerId, $orderId);
 
     /**
-     * @param int $customerId
      * @return \SM\Sales\Api\Data\ReorderQuickly\OrderDataInterface[]
      */
-    public function getListReorderQuickly($customerId);
+    public function getListReorderQuickly();
 }

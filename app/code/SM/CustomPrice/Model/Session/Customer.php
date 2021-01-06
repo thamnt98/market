@@ -117,10 +117,11 @@ class Customer extends Session
      */
     public function getOmniStoreId()
     {
-        if (!$this->isLoggedIn()&&!$this->isLoggedInByAPI()) {
-            return null;
+        $isLoginByAPI = $this->isLoggedInByAPI();
+        if (!$this->isLoggedIn() && !$isLoginByAPI) {
+            return $this->getDefaultOmniStoreCode();
         }
-        if ($this->isLoggedInByAPI()) {
+        if ($isLoginByAPI) {
             $customerId = $this->smartTokenUserContext->getUserId();
             $customer   = $this->customerRepository->getById($customerId);
             if (!empty($customer)) {
@@ -135,16 +136,25 @@ class Customer extends Session
         return $this->getDefaultOmniStoreCode();
     }
 
+    /**
+     * @return mixed
+     */
     public function getDefaultOmniStoreCode()
     {
         $customer = $this->getCustomer();
         return $customer->getDefaultOmniStoreCode();
     }
 
+    /**
+     * @return bool
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Webapi\Exception
+     */
     public function isLoggedInByAPI()
     {
         if ($this->state->getAreaCode() == Area::AREA_WEBAPI_REST && (bool)$this->smartTokenUserContext->getUserId()) {
             return true;
         }
+        return false;
     }
 }

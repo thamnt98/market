@@ -13,7 +13,7 @@
     <route url="/V1/homepage/getMostPopular" method="GET">
         <service class="SM\MobileApi\Api\HomeInterface" method="getMostPopular"/>
         <resources>
-            <resource ref="self"/>
+            <resource ref="anonymous"/>
         </resources>
     </route>
 
@@ -27,11 +27,8 @@
     <route url="/V1/homepage/message" method="GET">
         <service class="SM\MobileApi\Api\HomeInterface" method="getGreetingMessage"/>
         <resources>
-            <resource ref="self"/>
+            <resource ref="anonymous"/>
         </resources>
-        <data>
-            <parameter name="customerId" force="true">%customer_id%</parameter>
-        </data>
     </route>
 
     <!-- Product -->

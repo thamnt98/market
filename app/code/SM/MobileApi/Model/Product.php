@@ -82,14 +82,15 @@ class Product implements \SM\MobileApi\Api\ProductInterface
     }
 
     /**
-     * @param int     $category_id
-     * @param int     $customerId
-     * @param boolean $layer
-     *
+     * @param int $category_id
+     * @param int $limit
+     * @param int $p
+     * @param bool $layer
+     * @param int $customerId
      * @return \SM\MobileApi\Api\Data\Product\ListInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getList($category_id, $customerId, $layer = true)
+    public function getList($category_id, $limit = 12, $p = 1, $layer = true, $customerId)
     {
         $this->initCustomerSession($customerId);
         //Init category and apply filter
@@ -167,7 +168,7 @@ class Product implements \SM\MobileApi\Api\ProductInterface
      */
     protected function initCustomerSession($customerId)
     {
-        if ($this->session->isLoggedIn() || !$customerId) {
+        if ($this->session->isLoggedIn() || !$customerId || $customerId == 0) {
             return;
         }
 
