@@ -366,15 +366,15 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
         try {
             $orderId = $this->cartManagement->placeOrder($cartId);
             $mainOrder = $this->orderRepository->get($orderId);
-            $quote = $this->quoteRepository->get($cartId);
         } catch (\Exception $e) {
             $response->setError(true);
             $response->setMessage($e->getMessage());
             return $response;
         }
-        $suborderIds = $this->orderCollectionFactory->create()->addAttributeToSelect('entity_id')
-            ->addFieldToFilter('parent_order', $orderId)->getAllIds();
         $pg = $this->authorization->sendOrderToPaymentGateway($orderId);
+        $suborderCollection = $this->orderCollectionFactory->create()->addAttributeToSelect('*')
+            ->addFieldToFilter('parent_order', $orderId);
+        $suborderIds = $suborderCollection->getAllIds();
         $orderIds = $orderId . ',' . implode(",", $suborderIds);
         $response->setOrderIds($orderIds);
         $paymentMethod = $mainOrder->getPayment()->getMethod();
@@ -409,7 +409,7 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
         $response->setError($error)
             ->setPayment($payment);
 
-        $this->getGTMData($mainOrder, $response, $quote);
+        $response = $this->getGTMData($suborderCollection, $mainOrder, $response);
 
         $response->setBasketValue($mainOrder->getGrandTotal());
         $customerId = $mainOrder->getCustomerId();
@@ -431,38 +431,38 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
         return $response;
     }
 
-    public function getGTMData($order, $response, $quote)
+    /**
+     * @param $suborderCollection
+     * @param $mainOrder
+     * @param $response
+     * @return mixed
+     */
+    public function getGTMData($suborderCollection, $mainOrder, $response)
     {
         $gtmData = [];
         $totalQty = 0;
-        $checkoutSession = $this->multiShipping;
-        $checkoutSession->setQuote($quote);
-        $previewOrderProcess = $this->multiShippingHandle->getPreviewOrderData($checkoutSession->getQuote(), false);
-        $shippingMethodSelected = $previewOrderProcess['shipping_method_selected'];
-        $previewOrder = $previewOrderProcess['preview_order'];
-        $addressId = $quote->getShippingAddress()->getId();
-        $shippingDateTime = [];
-        foreach ($previewOrder as $preview) {
-            $shippingDateTime['date'] = $preview->getDate();
-            $shippingDateTime['time'] = $preview->getTime();
-        }
-        foreach ($order->getAllItems() as $item) {
-            if ($item instanceof \Magento\Quote\Model\Quote\Address\Item) {
-                $quoteAddressId = $item->getQuoteAddressId();
-            } else {
-                $quoteAddressId = $addressId;
+        $shippingDateTime = ['date' => '', 'time' => ''];
+        foreach ($suborderCollection as $subOrder) {
+            $shippingMethod = $subOrder->getShippingMethod();
+            foreach ($subOrder->getAllItems() as $item) {
+                $item->setData('shipping_method', $shippingMethod);
+                $data = $this->getGTM($item, $mainOrder);
+                $gtmData[] = $data;
+                $totalQty += $item->getQtyOrdered();
             }
-            $dataShipping = $shippingMethodSelected[$quoteAddressId];
-            $shippingMethod = $dataShipping['shipping_method'];
-            $item->setData('shipping_method', $shippingMethod);
-            $data = $this->getGTM($item, $order);
-            $gtmData[] = $data;
-            $totalQty += $item->getQtyOrdered();
+            if ($shippingDateTime['date'] != '' && $shippingMethod == \SM\Checkout\Model\MultiShippingHandle::STORE_PICK_UP) {
+                $shippingDateTime['date'] = $subOrder->getStorePickUpDate();
+                $shippingDateTime['time'] = $subOrder->getStorePickUpTime();
+            } elseif ($shippingDateTime['date'] != '' && $shippingMethod == \SM\Checkout\Model\MultiShippingHandle::SCHEDULE) {
+                $shippingDateTime['date'] = $subOrder->getDate();
+                $shippingDateTime['time'] = $subOrder->getTime();
+            }
         }
         $response->setBasketQty($totalQty);
         $response->setGtmData($gtmData);
         $response->setShippingDate(($shippingDateTime['date'] && $shippingDateTime['date'] != '') ? $shippingDateTime['date'] : 'Not Available');
         $response->setShippingTime(($shippingDateTime['time'] && $shippingDateTime['time'] != '') ? $shippingDateTime['time'] : 'Not Available');
+        return $response;
     }
 
     protected function getGTM($item, $order)
