@@ -48,7 +48,7 @@ if ($_attributeType && $_attributeType == 'text') {
 <?php if($_className === 'description'): ?>
 <?php if ($_attributeValue) :?>
     <!--limit description 1000 character-->
-<div class="product attribute <?= $block->escapeHtmlAttr($_className) ?>">
+<div style="white-space:pre-wrap;" class="product attribute <?= $block->escapeHtmlAttr($_className) ?>">
     <?php if ($renderLabel) :?>
         <strong class="type"><?= $block->escapeHtml($_attributeLabel) ?></strong>
     <?php endif; ?>
