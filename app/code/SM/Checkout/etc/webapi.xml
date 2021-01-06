@@ -22,15 +22,6 @@
             <resource ref="self"/>
         </resources>
     </route>
-    <route url="/V1/trans-checkout/me/placeorder" method="POST">
-        <service class="SM\Checkout\Api\MultiShippingInterface" method="placeOrder"/>
-        <resources>
-            <resource ref="self"/>
-        </resources>
-        <data>
-            <parameter name="customerId" force="true">%customer_id%</parameter>
-        </data>
-    </route>
     <route url="/V1/trans-checkout/mobile/placeorder" method="POST">
         <service class="SM\Checkout\Api\MultiShippingInterface" method="placeOrderMobile"/>
         <resources>

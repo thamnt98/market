@@ -354,54 +354,6 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
     }
 
     /**
-     * @param int $customerId
-     * @return false|string
-     */
-    public function placeOrder($customerId)
-    {
-        $data = [
-            'error' => true,
-            'message' => '',
-            'url' => $this->urlInterface->getUrl('transcheckout')
-        ];
-
-        $customerSession = $this->multiShipping->getCustomerSession();
-        if (!$this->multiShipping->validateMinimumAmount() || $customerSession->getId() != $customerId) {
-            $data['message'] = __('Amount or customer invalid!');
-            return json_encode($data);
-        }
-
-        try {
-            $quote = $this->checkoutSession->getQuote();
-            $orderId = $this->cartManagement->placeOrder($quote->getId());
-            $mainOrder = $this->orderRepository->get($orderId);
-            $this->multiShipping->createSuborders($mainOrder, $quote, false);
-            $suborderIds = $this->multiShipping->getOrderIds();
-            if (!$quote->isVirtual()) {
-                $this->sendOMS->sendOMS($mainOrder, $suborderIds, $quote);
-            }
-
-            $data['message'] = __('Place order success!');
-            $data['error'] = false;
-            $data['orderId'] = $orderId;
-            $data['url'] = $this->urlInterface->getUrl('transcheckout/index/success');
-            return json_encode($data);
-        } catch (\Exception $e) {
-            $this->checkoutHelperData->sendPaymentFailedEmail(
-                $this->multiShipping->getQuote(),
-                $e->getMessage(),
-                'multi-shipping'
-            );
-            $data['message'] = $e->getMessage();
-            $data['error'] = true;
-            $data['url'] = $this->urlInterface->getUrl('checkout/cart');
-            return json_encode($data);
-        }
-
-        return json_encode($data);
-    }
-
-    /**
      * @param $cartId
      * @return int|string
      * @throws \Magento\Framework\Exception\CouldNotSaveException
