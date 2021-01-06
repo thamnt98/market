@@ -24,8 +24,6 @@ class MultiShippingHandle
     protected $itemsUpdate = [];
 
     protected $addressEachItems = false;
-
-    protected $inputItemsFormat;
     protected $inputItemsFormatAfterHandle;
     protected $outStockByMagento = [];
     protected $lowStockByMagento = [];
@@ -33,6 +31,10 @@ class MultiShippingHandle
     protected $lowStockByOar = [];
     protected $mobile = false;
     protected $mobileItemsFormat = [];
+    protected $initItems = [];
+    protected $disablePickUp = false;
+    protected $child = [];
+    protected $skuList = [];
 
     /**
      * @var bool
@@ -95,6 +97,80 @@ class MultiShippingHandle
     protected $addressCollectionFactory;
 
     /**
+     * @var Price
+     */
+    protected $price;
+
+    /**
+     * @var \SM\FreshProductApi\Helper\Fresh
+     */
+    protected $fresh;
+
+    /**
+     * @var \SM\Checkout\Api\Data\Checkout\ShippingMethodInterfaceFactory
+     */
+    protected $shippingMethodInterfaceFactory;
+
+    /**
+     * @var \SM\Checkout\Api\Data\Checkout\QuoteItems\ItemInterfaceFactory
+     */
+    protected $itemInterfaceMobileFactory;
+
+    /**
+     * @var \Magento\Catalog\Api\ProductRepositoryInterface
+     */
+    protected $productRepository;
+
+    /**
+     * @var \SM\GTM\Block\Product\ListProduct
+     */
+    protected $productGtm;
+
+    /**
+     * @var \SM\MobileApi\Api\Data\GTM\GTMCartInterfaceFactory
+     */
+    protected $gtmCart;
+
+    /**
+     * @var \SM\Checkout\Api\Data\Checkout\Estimate\ItemAdditionalInfo\Delivery\DeliveryInterfaceFactory
+     */
+    protected $deliveryInterfaceFactory;
+
+    /**
+     * @var \SM\Checkout\Api\Data\CartItem\InstallationInterfaceFactory
+     */
+    protected $installationInterfaceFactory;
+
+    /**
+     * @var \SM\MobileApi\Model\Product\Common\Installation
+     */
+    protected $productInstallation;
+
+    /**
+     * @var \Magento\Store\Model\App\Emulation
+     */
+    protected $appEmulation;
+
+    /**
+     * @var \Magento\Catalog\Helper\Image
+     */
+    protected $imageHelper;
+
+    /**
+     * @var \SM\Checkout\Api\Data\Checkout\Estimate\ItemAdditionalInfo\AdditionalInfoInterfaceFactory
+     */
+    protected $itemAdditionalInfoInterfaceFactory;
+
+    /**
+     * @var \Magento\Catalog\Helper\Product\ConfigurationPool
+     */
+    protected $configurationPool;
+
+    /**
+     * @var \SM\Checkout\Api\Data\Checkout\QuoteItems\ProductOptions\ProductOptionsInterfaceFactory
+     */
+    protected $productOptionsInterfaceFactory;
+    /**
      * MultiShippingHandle constructor.
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
      * @param \Magento\InventoryApi\Api\SourceRepositoryInterface $sourceRepository
@@ -105,6 +181,21 @@ class MultiShippingHandle
      * @param \SM\Checkout\Api\Data\CheckoutWeb\ItemsValidMethod\ItemInterfaceFactory $itemInterfaceFactory
      * @param \SM\Checkout\Api\Data\CheckoutWeb\ItemsValidMethod\MethodInterfaceFactory $methodInterfaceFactory
      * @param \Magento\Customer\Model\ResourceModel\Address\CollectionFactory $addressCollectionFactory
+     * @param Price $price
+     * @param \SM\FreshProductApi\Helper\Fresh $fresh
+     * @param \SM\Checkout\Api\Data\Checkout\ShippingMethodInterfaceFactory $shippingMethodInterfaceFactory
+     * @param \SM\Checkout\Api\Data\Checkout\QuoteItems\ItemInterfaceFactory $itemInterfaceMobileFactory
+     * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+     * @param \SM\GTM\Block\Product\ListProduct $productGtm
+     * @param \SM\MobileApi\Api\Data\GTM\GTMCartInterfaceFactory $gtmCart
+     * @param \SM\Checkout\Api\Data\Checkout\Estimate\ItemAdditionalInfo\Delivery\DeliveryInterfaceFactory $deliveryInterfaceFactory
+     * @param \SM\Checkout\Api\Data\CartItem\InstallationInterfaceFactory $installationInterfaceFactory
+     * @param \SM\MobileApi\Model\Product\Common\Installation $productInstallation
+     * @param \Magento\Store\Model\App\Emulation $appEmulation
+     * @param \Magento\Catalog\Helper\Image $imageHelper
+     * @param \SM\Checkout\Api\Data\Checkout\Estimate\ItemAdditionalInfo\AdditionalInfoInterfaceFactory $itemAdditionalInfoInterfaceFactory
+     * @param \Magento\Catalog\Helper\Product\ConfigurationPool $configurationPool
+     * @param \SM\Checkout\Api\Data\Checkout\QuoteItems\ProductOptions\ProductOptionsInterfaceFactory $productOptionsInterfaceFactory
      */
     public function __construct(
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
@@ -115,7 +206,22 @@ class MultiShippingHandle
         \SM\Checkout\Helper\Config $helperConfig,
         \SM\Checkout\Api\Data\CheckoutWeb\ItemsValidMethod\ItemInterfaceFactory $itemInterfaceFactory,
         \SM\Checkout\Api\Data\CheckoutWeb\ItemsValidMethod\MethodInterfaceFactory $methodInterfaceFactory,
-        \Magento\Customer\Model\ResourceModel\Address\CollectionFactory  $addressCollectionFactory
+        \Magento\Customer\Model\ResourceModel\Address\CollectionFactory  $addressCollectionFactory,
+        \SM\Checkout\Model\Price $price,
+        \SM\FreshProductApi\Helper\Fresh $fresh,
+        \SM\Checkout\Api\Data\Checkout\ShippingMethodInterfaceFactory $shippingMethodInterfaceFactory,
+        \SM\Checkout\Api\Data\Checkout\QuoteItems\ItemInterfaceFactory $itemInterfaceMobileFactory,
+        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
+        \SM\GTM\Block\Product\ListProduct $productGtm,
+        \SM\MobileApi\Api\Data\GTM\GTMCartInterfaceFactory $gtmCart,
+        \SM\Checkout\Api\Data\Checkout\Estimate\ItemAdditionalInfo\Delivery\DeliveryInterfaceFactory $deliveryInterfaceFactory,
+        \SM\Checkout\Api\Data\CartItem\InstallationInterfaceFactory $installationInterfaceFactory,
+        \SM\MobileApi\Model\Product\Common\Installation $productInstallation,
+        \Magento\Store\Model\App\Emulation $appEmulation,
+        \Magento\Catalog\Helper\Image $imageHelper,
+        \SM\Checkout\Api\Data\Checkout\Estimate\ItemAdditionalInfo\AdditionalInfoInterfaceFactory $itemAdditionalInfoInterfaceFactory,
+        \Magento\Catalog\Helper\Product\ConfigurationPool $configurationPool,
+        \SM\Checkout\Api\Data\Checkout\QuoteItems\ProductOptions\ProductOptionsInterfaceFactory $productOptionsInterfaceFactory
     ) {
         $this->timezone                     = $timezone;
         $this->sourceRepository             = $sourceRepository;
@@ -126,6 +232,21 @@ class MultiShippingHandle
         $this->itemInterfaceFactory = $itemInterfaceFactory;
         $this->methodInterfaceFactory = $methodInterfaceFactory;
         $this->addressCollectionFactory = $addressCollectionFactory;
+        $this->price = $price;
+        $this->fresh = $fresh;
+        $this->shippingMethodInterfaceFactory = $shippingMethodInterfaceFactory;
+        $this->itemInterfaceMobileFactory = $itemInterfaceMobileFactory;
+        $this->productRepository = $productRepository;
+        $this->productGtm = $productGtm;
+        $this->gtmCart = $gtmCart;
+        $this->deliveryInterfaceFactory = $deliveryInterfaceFactory;
+        $this->installationInterfaceFactory = $installationInterfaceFactory;
+        $this->productInstallation = $productInstallation;
+        $this->appEmulation = $appEmulation;
+        $this->imageHelper = $imageHelper;
+        $this->itemAdditionalInfoInterfaceFactory = $itemAdditionalInfoInterfaceFactory;
+        $this->configurationPool = $configurationPool;
+        $this->productOptionsInterfaceFactory = $productOptionsInterfaceFactory;
     }
 
     /**
@@ -148,7 +269,11 @@ class MultiShippingHandle
         }
         $data['error']  = $splitOrderData['error'];
         $data['split']  = $this->orderIsSplit;
+        $message = 'SM\Checkout\Model\MultiShippingHandle. Thoi gian tap quote address - quoteID ' . $checkoutSession->getQuote()->getId() . ': ';
+        $dateStart = microtime(true); // log_time
         $this->reBuildQuoteAddress($splitOrderData['data'], $checkoutSession);
+        $dateEnd = microtime(true); // log_time
+        $this->writeTimeLog($dateEnd, $dateStart, $message);
         $addressShippingMethod = [];
         $itemsValidMethod    = [];
         $showEachItems = false;
@@ -212,6 +337,9 @@ class MultiShippingHandle
                         $preShippingMethod = $shippingMethodList[0];
                     }
                     $addressShippingMethod[$_address->getId()] = $preShippingMethod;
+                } elseif (empty($shippingMethodList)) {
+                    $preShippingMethod = '';
+                    $addressShippingMethod[$_address->getId()] = $preShippingMethod;
                 }
                 if (empty($shippingMethodListFake)) {
                     $shippingMethodListFake[] = self::NOT_AVAILABLE;
@@ -241,9 +369,24 @@ class MultiShippingHandle
                         $shippingListFromQuoteAddress[] = $preShippingMethod;
                     }
                 }
+            } else {
+                if ($this->mobile) {
+                    foreach ($_address->getAllVisibleItems() as $item) {
+                        if ($item instanceof \Magento\Quote\Model\Quote\Address\Item) {
+                            $quoteItemId = $item->getQuoteItemId();
+                        } else {
+                            $quoteItemId = $item->getId();
+                        }
+                        $itemsValidMethod[$quoteItemId] = [
+                          self::DEFAULT_METHOD,
+                          self::SAME_DAY,
+                          self::SCHEDULE,
+                          self::NEXT_DAY
+                        ];
+                    }
+                }
             }
         }
-
         if (count($shippingListFromQuoteAddress) > 1) {
             $showEachItems = true;
         }
@@ -261,8 +404,13 @@ class MultiShippingHandle
         }
         $billing = $checkoutSession->getCustomer()->getDefaultBilling();
         $checkoutSession->setQuoteCustomerBillingAddress($billing);
+        $message = 'SM\Checkout\Model\MultiShippingHandle. Thoi gian set shipping method - quoteID ' . $checkoutSession->getQuote()->getId() . ': ';
+        $dateStart = microtime(true); // log_time
         $checkoutSession->setShippingMethods($addressShippingMethod);
+        $dateEnd = microtime(true); // log_time
+        $this->writeTimeLog($dateEnd, $dateStart, $message);
         $data['mobile-items-format'] = $this->mobileItemsFormat;
+        $data['child-items'] = $this->child;
         return $data;
     }
 
@@ -321,6 +469,8 @@ class MultiShippingHandle
      */
     protected function getSplitOrderData($items, $storePickUp, $customer, $checkoutSession)
     {
+        $message = 'SM\Checkout\Model\MultiShippingHandle. Thoi gian xu ly check out stock cho quoteID ' . $checkoutSession->getQuote()->getId() . ': ';
+        $dateStart = microtime(true); // log_time
         $data                   = ['reload' => false, 'error' => false, 'data' => [], 'split' => false];
         $defaultShippingAddress = $customer->getDefaultShippingAddress()->getId();
         $quoteItemIdSku         = [];
@@ -331,17 +481,16 @@ class MultiShippingHandle
         /** @var \Magento\Quote\Model\Quote\Item[] $allItems */
         $allItems         = $quote->getAllItems();
         $storePickupOrder = [];
-        $child            = [];
         $listMethod       = $this->split->getListMethodName();
         $currentParentItems = [];
         foreach ($allItems as $item) {
             if ($item->getParentItemId() && $item->getParentItemId() != null) {
-                $child[$item->getParentItemId()][] = $item;
+                $this->child[$item->getParentItemId()][] = $item;
             } else {
                 $currentParentItems[$item->getId()] = $item->getId();
                 $product = $item->getProduct();
-                $isOutOfStock = $this->updateStockItem->isOutStock($product->getId());
-                if (!$isOutOfStock) {
+                $isInOfStock = $this->updateStockItem->isOutStock($product->getId());
+                if (!$isInOfStock) {
                     $this->outStockByMagento[] = $item->getId();
                 } else {
                     switch ($product->getTypeId()) {
@@ -362,36 +511,14 @@ class MultiShippingHandle
             }
             $quoteItemIdSku[$item->getId()] = $item;
         }
+        $dateEnd = microtime(true); // log_time
+        $this->writeTimeLog($dateEnd, $dateStart, $message);
         foreach ($items as $item) {
             $quoteItemId = $item->getItemId();
             $shippingMethodSelected = $item->getShippingMethodSelected();
             $addressIdSelected = $item->getShippingAddressId();
             if ($this->mobile) {
-                if ($item->getDisable()) {
-                    continue;
-                }
-                if ($item->getAdditionalInfo()) {
-                    $additionalInfo = $item->getAdditionalInfo()->getDelivery();
-                    $this->mobileItemsFormat[$quoteItemId] = [
-                        'shipping_method' => $shippingMethodSelected,
-                        'shipping_address' => $addressIdSelected,
-                        'qty' => $item->getQty(),
-                        'delivery' => [
-                            'date' => $additionalInfo->getDate(),
-                            'time' => $additionalInfo->getTime()
-                        ]
-                    ];
-                } else {
-                    $this->mobileItemsFormat[$quoteItemId] = [
-                        'shipping_method' => $shippingMethodSelected,
-                        'shipping_address' => $addressIdSelected,
-                        'qty' => $item->getQty(),
-                        'delivery' => [
-                            'date' => null,
-                            'time' => null
-                        ]
-                    ];
-                }
+                $this->mobileItemsFormat[$quoteItemId] = $item;
             }
             if (isset($currentParentItems[$quoteItemId])) {
                 unset($currentParentItems[$quoteItemId]);
@@ -444,8 +571,8 @@ class MultiShippingHandle
                     'child' => [],
                     'sku' => $quoteItemIdSku[$quoteItemId]->getSku()
                 ];
-                if (isset($child[$quoteItemId])) {
-                    $this->inputItemsFormatAfterHandle[$quoteItemId]['child']   = $child[$quoteItemId];
+                if (isset($this->child[$quoteItemId])) {
+                    $this->inputItemsFormatAfterHandle[$quoteItemId]['child']   = $this->child[$quoteItemId];
                 }
             }
         }
@@ -499,9 +626,9 @@ class MultiShippingHandle
                         $itemData    = $quoteItemIdSku[$quoteItemId];
                         $rowTotal    = (int) $itemData->getRowTotal();
                         $totalPrice += $rowTotal;
-                        if (isset($child[$quoteItemId])) {
+                        if (isset($this->child[$quoteItemId])) {
                             // parent quote item id
-                            foreach ($child[$quoteItemId] as $itemData) {
+                            foreach ($this->child[$quoteItemId] as $itemData) {
                                 $product    = $itemData->getProduct();
                                 $ownCourier = (bool)$product->getData('own_courier');
                                 $sku      = $itemData->getSku();
@@ -574,7 +701,16 @@ class MultiShippingHandle
                     }
                 }
             }
+            $message = 'SM\Checkout\Model\MultiShippingHandle. Thoi gian xu ly lay data send to OAR de split order - quoteID ' . $checkoutSession->getQuote()->getId() . ': ';
+            $dateEnd = microtime(true); // log_time
+            $this->writeTimeLog($dateEnd, $dateStart, $message);
+
+            $message = 'SM\Checkout\Model\MultiShippingHandle. Thoi gian OAR tra ve de split order - quoteID ' . $checkoutSession->getQuote()->getId() . ': ';
+            $dateStart = microtime(true); // log_time
             $splitOrder = $this->split->getOarResponse($dataSendToOar);
+            $dateEnd = microtime(true); // log_time
+            $this->writeTimeLog($dateEnd, $dateStart, $message);
+
             if (is_array($splitOrder)
                 && !isset($splitOrder['error'])
                 && isset($splitOrder['content'])
@@ -931,19 +1067,22 @@ class MultiShippingHandle
     /**
      * @param $quote
      * @param bool $web
-     * @return array[]
+     * @param array $invalidShippingList
+     * @return array
      */
-    public function getPreviewOrderData($quote, $web = true)
+    public function getPreviewOrderData($quote, $web = true, $invalidShippingList = [], $items = [], $childItems = [])
     {
+        $this->initItems = $items;
+        $quoteItemData = [];
         $previewOrderData       = [];
-        $shippingMethodSelected = [];
         $shippingAddress        = $quote->getAllShippingAddresses();
+        if (!$web && !empty($invalidShippingList)) {
+            $weightUnit = $this->helperConfig->getWeightUnit();
+            $currencySymbol = trim($this->helperConfig->getCurrencySymbol());
+            $storeId = $quote->getStoreId();
+            $voucher = $quote->getApplyVoucher();
+        }
         foreach ($shippingAddress as $address) {
-            $shippingMethodSelected[$address->getId()] = [
-                'shipping_method' => $address->getShippingMethod(),
-                'customer_address_id' => $address->getCustomerAddressId(),
-            ];
-
             $date           = $time           = "";
             $previewOrder   = $this->previewOrderInterfaceFactory->create();
             $shippingMethod = $address->getShippingMethod();
@@ -957,13 +1096,22 @@ class MultiShippingHandle
             } else {
                 $title                     = __('Delivery Address');
                 $listMethod                = $this->split->getListMethodName();
-                $shippingMethodServiceType = str_replace("transshipping_transshipping", "", $shippingMethod);
-                $shippingMethodTitle       = (isset($listMethod[$shippingMethodServiceType])) ? $listMethod[$shippingMethodServiceType] : __('Shipping Method not available');
-                $addressId                 = $address->getCustomerAddressId();
-                if ($shippingMethod == \SM\Checkout\Model\MultiShippingHandle::SCHEDULE) {
+                if ($shippingMethod == self::TRANS_COURIER) {
+                    $shippingMethod = self::SAME_DAY;
+                } elseif ($shippingMethod == self::DC) {
+                    $shippingMethod = self::DEFAULT_METHOD;
+                } elseif ($shippingMethod == self::SCHEDULE) {
                     $date = $address->getDate();
                     $time = $address->getTime();
                 }
+                $shippingMethodServiceType = str_replace("transshipping_transshipping", "", $shippingMethod);
+                if (isset($listMethod[$shippingMethodServiceType])) {
+                    $shippingMethodTitle = $listMethod[$shippingMethodServiceType];
+                } else {
+                    $shippingMethodTitle = __('Shipping Method not available');
+                    $shippingMethod = self::NOT_AVAILABLE;
+                }
+                $addressId                 = $address->getCustomerAddressId();
                 if ($address->getFreeShipping() == 1) {
                     $previewOrder->setShippingFeeNotDiscount($address->getShippingDiscountAmount());
                     $previewOrder->setShippingFee($address->getShippingInclTax());
@@ -993,12 +1141,15 @@ class MultiShippingHandle
                 }
                 $itemList[] = $quoteItemId;
                 $itemTotal  = $itemTotal + (int) $item->getQty();
+                if (!$web && !empty($invalidShippingList)) {
+                    $quoteItemData[$quoteItemId] = $this->buildQuoteItemForMobile($item, $shippingMethod, $invalidShippingList, $weightUnit, $currencySymbol, $storeId, $addressId, $voucher, false, $childItems);
+                }
             }
             $previewOrder->setItems($itemList);
             $previewOrder->setItemTotal($itemTotal);
             $previewOrderData[] = $previewOrder;
         }
-        return ['preview_order' => $previewOrderData, 'shipping_method_selected' => $shippingMethodSelected];
+        return ['preview_order' => $previewOrderData, 'quote_item_data' => $quoteItemData, 'out_stock' => $this->initItems, 'disable_store_pickup' => $this->disablePickUp, 'sku-list' => $this->skuList];
     }
 
     /**
@@ -1133,4 +1284,259 @@ class MultiShippingHandle
     {
         return $this->split->checkShippingPostCode($postCode);
     }
+
+    /**
+     * @param $quoteItem
+     * @param $shippingMethod
+     * @param $invalidShippingList
+     * @param $weightUnit
+     * @param $currencySymbol
+     * @param $storeId
+     * @param $addressId
+     * @param $voucher
+     * @param false $init
+     * @return mixed|\SM\Checkout\Api\Data\Checkout\QuoteItems\ItemInterface
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Zend_Json_Exception
+     */
+    public function buildQuoteItemForMobile($quoteItem, $shippingMethod, $invalidShippingList, $weightUnit, $currencySymbol, $storeId, $addressId, $voucher, $init = false, $childItems = [])
+    {
+        if ($quoteItem instanceof \Magento\Quote\Model\Quote\Address\Item) {
+            $quoteItemId = $quoteItem->getQuoteItemId();
+        } else {
+            $quoteItemId = $quoteItem->getId();
+        }
+        if (!$init) {
+            if (isset($this->initItems[$quoteItemId])) {
+                $product = $quoteItem->getProduct();
+                if ((bool)$product->getIsWarehouse()) {
+                    $this->disablePickUp = true;
+                } else {
+                    if (isset($childItems[$quoteItemId])) {
+                        $parentQty = $quoteItem->getQty();
+                        foreach ($childItems[$quoteItemId] as $child) {
+                            $childSku = $child->getProduct()->getSku();
+                            $childQty = $parentQty * $child->getQty();
+                            if (isset($this->skuList[$childSku])) {
+                                $this->skuList[$childSku] += $childQty;
+                            } else {
+                                $this->skuList[$childSku] = $childQty;
+                            }
+                        }
+                    } else {
+                        $sku = $product->getSku();
+                        if (isset($this->skuList[$sku])) {
+                            $this->skuList[$sku] += $quoteItem->getQty();
+                        } else {
+                            $this->skuList[$sku] = $quoteItem->getQty();
+                        }
+                    }
+                }
+                $quoteItemModel = $this->initItems[$quoteItemId];
+                if (!$shippingMethod || $shippingMethod == '') {
+                    $shippingMethod = self::NOT_AVAILABLE;
+                }
+                if ($shippingMethod == self::STORE_PICK_UP) {
+                    $quoteItemModel->setShippingAddressId(0);
+                }
+                $shippingMethodList = [];
+                foreach ($this->split->getListMethodFakeName() as $value => $label) {
+                    $shippingCode = 'transshipping_transshipping' . $value;
+                    $shippingMethodObj = $this->shippingMethodInterfaceFactory->create();
+                    $shippingMethodObj->setValue($shippingCode)->setLabel($label)->setDisabled(true);
+                    if ($shippingMethod == self::STORE_PICK_UP || in_array($shippingCode, $invalidShippingList[$quoteItemId])) {
+                        $shippingMethodObj->setDisabled(false);
+                    }
+                    $shippingMethodList[] = $shippingMethodObj;
+                }
+                $quoteItemModel->setShippingMethodSelected($shippingMethod);
+                $quoteItemModel->setShippingMethod($shippingMethodList);
+                if ($quoteItem->getQty() < $quoteItemModel->getQty()) {
+                    $quoteItemModel->setQty($quoteItem->getQty());
+                    $quoteItemModel->setMessage(__('Quantity has been adjusted.'));
+                }
+                unset($this->initItems[$quoteItemId]);
+                return $quoteItemModel;
+            }
+        }
+        /** @var \SM\Checkout\Api\Data\Checkout\QuoteItems\ItemInterface $quoteItemModel */
+        $quoteItemModel = $this->itemInterfaceMobileFactory->create();
+        $product = $quoteItem->getProduct();
+        $regularPrice = $this->price->getRegularPrice($product);
+        $productType = $product->getTypeId();
+        $quoteItemModel->setItemId($quoteItemId);
+        $quoteItemModel->setSku($product->getData('sku'));
+        $quoteItemModel->setName($quoteItem->getName());
+        $quoteItemModel->setProductType($productType);
+        $quoteItemModel->setProductOption($this->getFormattedOptionValue($quoteItem));
+        $quoteItemModel->setUrl($product->getProductUrl());
+        $weight = $quoteItem->getQty() * $product->getWeight();
+        $quoteItemModel->setWeight(round($weight, 2));
+        $quoteItemModel->setWeightUnit($weightUnit);
+        $quoteItemModel->setQty($quoteItem->getQty());
+        $quoteItemModel->setThumbnail($this->getImageUrl($product, $storeId));
+        $quoteItemModel->setRowTotal($quoteItem->getRowTotal());
+        $quoteItemModel->setDisableStorePickUp((bool)$product->getIsWarehouse());
+        $product = $this->productRepository->getById($product->getId());
+        $model = $this->gtmCart->create();
+        $data = $this->productGtm->getGtm($product);
+        $data = \Zend_Json_Decoder::decode($data);
+        $model->setProductName($data['name']);
+        $model->setProductId($data['id']);
+        $model->setProductPrice($data['price']);
+        $model->setProductBrand($data['brand']);
+        $model->setProductCategory($data['category']);
+        $model->setProductSize($data['product_size']);
+        $model->setProductVolume($data['product_volume']);
+        $model->setProductWeight($data['product_weight']);
+        $model->setProductVariant($data['variant']);
+        $model->setDiscountPrice($data['initialPrice'] - $data['price']);
+        $model->setProductList($data['list']);
+        $model->setInitialPrice($data['initialPrice']);
+        $model->setDiscountRate($data['discountRate']);
+        $model->setProductType($product->getTypeId());
+        $model->setProductRating($data['rating']);
+        $model->setProductBundle($data['productBundle']);
+        $model->setSalePrice($data['initialPrice'] - $data['price']);
+        $model->setProductQty($quoteItem->getQty());
+        if ($data['salePrice'] && $data['salePrice'] > 0) {
+            $model->setProductOnSale(__('Yes'));
+        } else {
+            $model->setProductOnSale(__('Not on sale'));
+        }
+        if ($voucher != null && $voucher != '') {
+            $model->setApplyVoucher(__('Yes'));
+            $model->setVoucherId($voucher);
+        } else {
+            $model->setApplyVoucher(__('No'));
+            $model->setVoucherId('');
+        }
+        $quoteItemModel->setGtmData($model);
+        $quoteItemModel->setBaseRowTotalByLocation($regularPrice * $quoteItem->getQty());
+        $quoteItemModel->setCurrencySymbol($currencySymbol);
+        $quoteItemModel->setFreshProduct($this->fresh->populateObject($product));
+        $quoteItemModel->setShippingAddressId($addressId);
+        $quoteItemModel->setShippingMethodSelected($shippingMethod);
+        $quoteItemModel->setShippingMethod($this->getFullShippingList());
+        $delivery = $this->deliveryInterfaceFactory->create()->setDate('')->setTime('');
+        $installationInfo = $this->getInstallationProduct($quoteItem);
+        $additionalInfo = $this->itemAdditionalInfoInterfaceFactory->create();
+        $additionalInfo->setDelivery($delivery);
+        $additionalInfo->setInstallationInfo($installationInfo);
+        $quoteItemModel->setAdditionalInfo($additionalInfo);
+        $quoteItemModel->setDisable(false);
+        $quoteItemModel->setMessage('');
+        return $quoteItemModel;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getFullShippingList()
+    {
+        $shippingMethodList = [];
+        foreach ($this->split->getListMethodFakeName() as $value => $label) {
+            $shippingMethodObj = $this->shippingMethodInterfaceFactory->create();
+            $shippingMethodObj->setValue('transshipping_transshipping' . $value)->setLabel($label)->setDisabled(false);
+            $shippingMethodList[] = $shippingMethodObj;
+        }
+        return $shippingMethodList;
+    }
+
+    /**
+     * @param $product
+     * @param $storeId
+     * @return string
+     */
+    protected function getImageUrl($product, $storeId)
+    {
+        try {
+            $this->appEmulation->startEnvironmentEmulation($storeId, \Magento\Framework\App\Area::AREA_FRONTEND, true);
+            $imageUrl = $this->imageHelper->init($product, 'product_thumbnail_image')->getUrl();
+            $this->appEmulation->stopEnvironmentEmulation();
+            return $imageUrl;
+        } catch (\Exception $e) {
+            return '';
+        }
+    }
+
+    /**
+     * @param \Magento\Quote\Model\Quote\Item $item
+     * @return \SM\Checkout\Api\Data\CartItem\InstallationInterface
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    protected function getInstallationProduct($item)
+    {
+        $installationInfo    = $this->installationInterfaceFactory->create();
+        $buyRequest          = $item->getOptionByCode('info_buyRequest');
+        $allowInstallation   = $item->getProduct()->getData(\SM\Installation\Helper\Data::PRODUCT_ATTRIBUTE);
+        $installationTooltip = $this->productInstallation->getTooltipMessage();
+        $installationFee     = 0;
+        $isInstallationFee   = 0;
+        $installationNote    = '';
+
+        if ($allowInstallation == null || $allowInstallation == "") {
+            $allowInstallation = false;
+        }
+
+        if ($buyRequest) {
+            $installationService = json_decode(
+                $buyRequest->getValue(),
+                true
+            )[\SM\Installation\Helper\Data::QUOTE_OPTION_KEY] ?? null;
+            if ($installationService) {
+                $installationFee = $installationService['installation_fee'] ?? 0;
+                $isInstallationFee = $installationService['is_installation'] ?? 0;
+                $installationNote = $installationService['installation_note'] ?? '';
+            }
+        }
+        $installationInfo->setAllowInstallation($allowInstallation);
+        $installationInfo->setInstallationFee($installationFee);
+        $installationInfo->setIsInstallation($isInstallationFee);
+        $installationInfo->setInstallationNote($installationNote);
+        $installationInfo->setTooltipMessage($installationTooltip);
+        return $installationInfo;
+    }
+
+    /**
+     * @param $item
+     * @return array
+     */
+    protected function getFormattedOptionValue($item)
+    {
+        $optionsData = [];
+        $options = $this->configurationPool->getByProductType($item->getProductType())->getOptions($item);
+        foreach ($options as $index => $optionValue) {
+            /* @var $helper \Magento\Catalog\Helper\Product\Configuration */
+            $helper = $this->configurationPool->getByProductType('default');
+            $option = $helper->getFormattedOptionValue($optionValue, []);
+            $option = explode('<span>', $option['value']);
+            $optionFormat = [];
+            foreach ($option as $a) {
+                if (strip_tags($a) != '') {
+                    $value = strip_tags($a);
+                    $value = explode(': ', $value);
+                    $value = end($value);
+                    $optionFormat[] = $value;
+                }
+            }
+            $optionsData[$index] = $this->productOptionsInterfaceFactory->create()->setLabel($optionValue['label'])->setValue(implode(', ', $optionFormat));
+        }
+        return $optionsData;
+    }
+
+    /**
+     * @param $dateEnd
+     * @param $dateStart
+     * @param $message
+     */
+    protected function writeTimeLog($dateEnd, $dateStart, $message)
+    {
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/checkout-log-time.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+        $timeDiff = round($dateEnd - $dateStart, 4);
+        $logger->info($message . $timeDiff . 's');
+    }
+
 }
