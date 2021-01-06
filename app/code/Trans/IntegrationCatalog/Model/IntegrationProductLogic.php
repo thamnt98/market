@@ -1694,6 +1694,19 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			]
 		);
 
+		if(isset($simpleProduct)){
+			// Set configurable product weight
+			$weight = $simpleProduct->getWeight();
+			$product->setWeight($weight);
+
+			// Set configurable product brand
+			$brandAttributeCode = $this->dataHelper->getBrandAttributeCode();
+			if($simpleProduct->getCustomAttribute($brandAttributeCode)) {
+				$attrValue = $simpleProduct->getCustomAttribute($brandAttributeCode)->getValue();
+				$product->setData($brandAttributeCode,$attrValue);
+			}
+		}
+
 		try {
 			//Save Product Configurable
 			$productSave = $this->productRepositoryInterface->save($product);
@@ -1762,7 +1775,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		$connection = $this->resource->getConnection();
 		$table = $connection->getTableName('catalog_product_entity_varchar');
 		$newUrlKey = $urlKey . '-' . $sku;
-		$query = 'UPDATE INTO ' . $table . ' set value = ' . $newUrlKey . ' where value = ' . $urlKey . ' and attribute_id = ' . $attributeId;
+		$query = 'UPDATE ' . $table . ' set value = ' . $connection->quote($newUrlKey) . ' where value = ' . $connection->quote($urlKey) . ' and attribute_id = ' . $connection->quote($attributeId);
 
 		$connection->query($query);
 	}
@@ -1772,7 +1785,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		$connection = $this->resource->getConnection();
 		$table = $connection->getTableName('url_rewrite');
 
-		$query = 'UPDATE ' . $table . ' set request_path = \'' . $requestPath . '\' where url_rewrite_id = ' . $urlRewriteId;
+		$query = 'UPDATE ' . $table . ' set request_path = ' . $connection->quote($requestPath) . ' where url_rewrite_id = ' . $connection->quote($urlRewriteId);
 		$connection->query($query);
 
 		$this->resource->closeConnection();
@@ -1817,17 +1830,25 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 				foreach ($attributeList as $attr) {
 					$code = $attr['attribute_code'];
 					if ($this->dataHelper->isSwatchAttr($code) && !in_array($code, $swatch)) {
-						$attrData[$row->getMagentoEntityId()][] = $code;
 						$swatch[(int) $row->getMagentoEntityId()][] = $code;
+					}
+
+					if (!in_array($code, $attrData)) {
+						$attrData[$row->getMagentoEntityId()][] = $code;
 					}
 				}
 
 				if(empty($swatch)) {
 					$swatch = [(int)  $row->getMagentoEntityId() => []];
 				}
+
+				if(empty($attrData)) {
+					$attrData = [(int)  $row->getMagentoEntityId() => []];
+				}
 			}
 		}
-		
+
+		// return $attrData;
 		return $swatch;
 	}
 
