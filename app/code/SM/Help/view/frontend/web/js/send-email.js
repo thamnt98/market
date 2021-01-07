@@ -51,7 +51,7 @@ define(
             } else {
                 helpTextarea.removeClass('mage-error');
                 $("#help-textarea-error").remove();
-                if (typeof dataLayerSourceObjects !== 'undefined') {
+                if (typeof dataLayerSourceObjects !== 'undefined' && dataLayerSourceObjects.customer.loginType !== "null") {
                     window.dataLayer = window.dataLayer || [];
                     window.dataLayer.push({
                         'event': 'submit_help_form',
