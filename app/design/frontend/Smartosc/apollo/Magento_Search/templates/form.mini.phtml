@@ -11,6 +11,7 @@
 /** @var $helper \Magento\Search\Helper\Data */
 $helper = $this->helper(\Magento\Search\Helper\Data::class);
 ?>
+<?php $isLogin = $block->isLoggedIn(); ?>
 <?php $selectedCategory = $block->getSelectedCategory() ?>
 <div class="block block-search navbar-search">
     <div class="block block-content navbar-search-group">
@@ -57,6 +58,7 @@ $helper = $this->helper(\Magento\Search\Helper\Data::class);
                            aria-expanded="false"/>
                     <div id="search_autocomplete" class="search-autocomplete"></div>
                     <div class="search-additional-wrap">
+                        <?php if ($isLogin): ?>
                         <div class="latest-search">
                             <div class="head-wrap">
                                 <label><?= __('Latest Search') ?></label>
@@ -67,18 +69,21 @@ $helper = $this->helper(\Magento\Search\Helper\Data::class);
                             </div>
                             <div class="content-wrap"></div>
                         </div>
+                        <?php endif; ?>
                         <div class="popular-search">
                             <div class="head-wrap">
                                 <label><?= __('Popular Search') ?></label>
                             </div>
                             <div class="content-wrap"></div>
                         </div>
+                        <?php if ($isLogin): ?>
                         <div class="latest-viewed-product products-grid">
                             <div class="head-wrap suggestion-products__title">
                                 <label><?= __('Recommendations for You') ?></label>
                             </div>
                             <div class="content-wrap suggestion-products__content cart"></div>
                         </div>
+                        <?php endif; ?>
                     </div>
                     <?= $block->getChildHtml() ?>
                 </div>
@@ -102,7 +107,7 @@ $helper = $this->helper(\Magento\Search\Helper\Data::class);
             'SearchMiniForm'
         ], function( SearchMiniForm) {
             window.addEventListener("load", function() {
-                SearchMiniForm.init();
+                SearchMiniForm.init(<?= $isLogin; ?>);
             });
         });
 

@@ -6,9 +6,11 @@ define(
     function ($) {
         "use strict";
 
-        let mod = {};
+        let mod = {},
+            isLogin = false;
 
-        mod.init = function () {
+        mod.init = function (login) {
+            isLogin = login;
             mod.initElements();
             mod.initEvents();
             mod.updateValueForInputCat();
@@ -84,7 +86,7 @@ define(
         mod.initEvents = function () {
             mod.initInputEvent();
             mod.initDropdownEvent();
-            if (mod.isLoggedIn()) {
+            if (isLogin) {
                 mod.loadLatestSearch();
                 mod.initLatestSearchEvent();
                 mod.loadLatestViewedProduct();
