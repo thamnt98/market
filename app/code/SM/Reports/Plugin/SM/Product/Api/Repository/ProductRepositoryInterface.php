@@ -73,12 +73,10 @@ class ProductRepositoryInterface
         bool $forceReload = false
     ): ProductInterface {
         try {
-            if (!$this->reportStatus->isReportEnabled((string) Event::EVENT_PRODUCT_VIEW)) {
+            if (!$this->reportStatus->isReportEnabled((string) Event::EVENT_PRODUCT_VIEW) || $customerId == 0) {
                 return $result;
             }
-
             $productId = (int) $result->getId();
-
             $this->reportViewedProductCreator->create($productId, $customerId);
             $this->reportEventCreator->create(Event::EVENT_PRODUCT_VIEW, $productId, $customerId);
         } catch (\Exception $exception) {

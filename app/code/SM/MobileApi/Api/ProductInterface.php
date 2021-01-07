@@ -19,7 +19,7 @@ interface ProductInterface
      *
      * @return \SM\MobileApi\Api\Data\Product\ListInterface
      */
-    public function getList($category_id, $limit = 12, $p = 1, $layer = true, $customerId);
+    public function getList($category_id, $limit = 12, $p = 1, $layer = true, $customerId = 0);
 
     /**
      * Get product details
@@ -34,11 +34,9 @@ interface ProductInterface
      * Get product details
      *
      * @param string $sku
-     *
-     * @param int $customerId
      * @return \SM\MobileApi\Api\Data\Product\ProductInterface
      */
-    public function getDetailsBySKU($sku, $customerId);
+    public function getDetailsBySKU($sku);
 
     /**
      * Get product related products
