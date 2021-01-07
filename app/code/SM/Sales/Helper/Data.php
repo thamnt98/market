@@ -144,6 +144,14 @@ class Data extends AbstractHelper
     }
 
     /**
+     * @return string
+     */
+    public function getInProcessWaitingForPickUpStatus()
+    {
+        return 'in_process_waiting_for_pickup';
+    }
+
+    /**
      * @param $id
      *
      * @return \Magento\Sales\Api\Data\OrderInterface|null

@@ -132,10 +132,10 @@ class TransmartMultishipping extends MultiShipping
         if (MainHelper::isMegaMethod($mainOrder->getPayment()->getMethod())) {
           return $this->processByBankMegaPayment($cartId, $response, $mainOrder, $quote);
         }
-
-        $suborderIds = $this->orderCollectionFactory->create()->addAttributeToSelect('entity_id')
-            ->addFieldToFilter('parent_order', $orderId)->getAllIds();
         $pg = $this->authorization->sendOrderToPaymentGateway($orderId);
+        $suborderCollection = $this->orderCollectionFactory->create()->addAttributeToSelect('*')
+            ->addFieldToFilter('parent_order', $orderId);
+        $suborderIds = $suborderCollection->getAllIds();
         $orderIds = $orderId . ',' . implode(",", $suborderIds);
         $response->setOrderIds($orderIds);
         $paymentMethod = $mainOrder->getPayment()->getMethod();
@@ -169,7 +169,7 @@ class TransmartMultishipping extends MultiShipping
         $response->setError($error)
             ->setPayment($payment);
 
-        $this->getGTMData($mainOrder, $response, $quote);
+        $response = $this->getGTMData($suborderCollection, $mainOrder, $response);
 
         $response->setBasketValue($mainOrder->getGrandTotal());
         $customerId = $mainOrder->getCustomerId();
@@ -201,8 +201,9 @@ class TransmartMultishipping extends MultiShipping
      */
     public function processByBankMegaPayment($cartId, $response, $mainOrder, $quote)
     {
-        $suborderIds = $this->orderCollectionFactory->create()->addAttributeToSelect('entity_id')
-            ->addFieldToFilter('parent_order', $mainOrder->getId())->getAllIds();
+        $suborderCollection = $this->orderCollectionFactory->create()->addAttributeToSelect('*')
+            ->addFieldToFilter('parent_order', $mainOrder->getId());
+        $suborderIds = $suborderCollection->getAllIds();
         $orderIds = $mainOrder->getId() . ',' . implode(",", $suborderIds);
         $response->setOrderIds($orderIds);
         $paymentMethod = $mainOrder->getPayment()->getMethod();
@@ -218,7 +219,7 @@ class TransmartMultishipping extends MultiShipping
         $response->setError($error)
             ->setPayment($payment);
 
-        $this->getGTMData($mainOrder, $response, $quote);
+        $response = $this->getGTMData($suborderCollection, $mainOrder, $response);
 
         $response->setBasketValue($mainOrder->getGrandTotal());
         $customerId = $mainOrder->getCustomerId();
