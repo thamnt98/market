@@ -47,14 +47,14 @@
                     <a href="#" id="button-order-track" class="button-order-track"><?= $block->escapeHtml(__('Choose Order…'))?></a>
                     <?php
                     echo $this->getLayout()
-                        ->createBlock('\Magento\Framework\View\Element\Template')
+                        ->createBlock('SM\Help\Block\ContactUs\ContactUs')
                         ->setTemplate('SM_Help::help/orders.phtml')
                         ->setData(['order' => $_orders, 'type' => 'order'])
                         ->toHtml();
                     ?>
                     <?php
                     echo $this->getLayout()
-                        ->createBlock('\Magento\Framework\View\Element\Template')
+                        ->createBlock('SM\Help\Block\ContactUs\ContactUs')
                         ->setTemplate('SM_Help::help/orders.phtml')
                         ->setData(['order' => $_ordersReturn, 'type' => 'refund'])
                         ->toHtml();

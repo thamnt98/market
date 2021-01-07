@@ -49,8 +49,10 @@ define(
         btnSelectProduct.on('click',function () {
             let is_received = $('[name="is_received"]:checked').val();
             if (is_received == "return") {
+                //helpOrderListPopup.closeModal();
                 helpOrderListPopupReturn.openModal();
             } else {
+                //helpOrderListPopupReturn.closeModal();
                 helpOrderListPopup.openModal();
             }
         });
@@ -79,6 +81,7 @@ define(
                         returnRefundProduct.html(data.output);
                         returnRefundProduct.trigger("processStop");
                         helpOrderListPopup.closeModal();
+                        helpOrderListPopupReturn.closeModal();
                         returnRefundOrderPopup.openModal();
                         $("#back-save").on('click',function () {
                             if ($('input[name="selected-product"]').is(":checked") === false) {
