@@ -61,16 +61,21 @@ class CustomerMessageRepository implements \SM\Notification\Api\CustomerMessageR
     protected $emulation;
 
     /**
+     * @var \Magento\Webapi\Model\Authorization\TokenUserContext
+     */
+    protected $tokenUserContext;
+
+    /**
      * CustomerMessageRepository constructor.
-     *
-     * @param \Magento\Store\Model\App\Emulation                                 $emulation
-     * @param \SM\Notification\Api\Data\NotificationTypeInterfaceFactory         $notificationTypeFactory
-     * @param \Magento\Framework\Stdlib\DateTime\DateTime                        $dateTime
-     * @param \SM\Notification\Api\CustomerMessageResultInterfaceFactory         $searchResultsFactory
+     * @param \Magento\Store\Model\App\Emulation $emulation
+     * @param \SM\Notification\Api\Data\NotificationTypeInterfaceFactory $notificationTypeFactory
+     * @param \Magento\Framework\Stdlib\DateTime\DateTime $dateTime
+     * @param \SM\Notification\Api\CustomerMessageResultInterfaceFactory $searchResultsFactory
      * @param \Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface $collectionProcessor
-     * @param \SM\Notification\Helper\Data                                       $helper
-     * @param ResourceModel\CustomerMessage                                      $resourceModel
-     * @param ResourceModel\CustomerMessage\CollectionFactory                    $collectionFactory
+     * @param \SM\Notification\Helper\Data $helper
+     * @param ResourceModel\CustomerMessage $resourceModel
+     * @param ResourceModel\CustomerMessage\CollectionFactory $collectionFactory
+     * @param \Magento\Webapi\Model\Authorization\TokenUserContext $tokenUserContext
      */
     public function __construct(
         \Magento\Store\Model\App\Emulation $emulation,
@@ -80,7 +85,8 @@ class CustomerMessageRepository implements \SM\Notification\Api\CustomerMessageR
         \Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface $collectionProcessor,
         \SM\Notification\Helper\Data $helper,
         \SM\Notification\Model\ResourceModel\CustomerMessage $resourceModel,
-        \SM\Notification\Model\ResourceModel\CustomerMessage\CollectionFactory $collectionFactory
+        \SM\Notification\Model\ResourceModel\CustomerMessage\CollectionFactory $collectionFactory,
+        \Magento\Webapi\Model\Authorization\TokenUserContext $tokenUserContext
     ) {
         $this->resourceModel = $resourceModel;
         $this->collectionFactory = $collectionFactory;
@@ -90,6 +96,7 @@ class CustomerMessageRepository implements \SM\Notification\Api\CustomerMessageR
         $this->helper = $helper;
         $this->notificationTypeFactory = $notificationTypeFactory;
         $this->emulation = $emulation;
+        $this->tokenUserContext = $tokenUserContext;
     }
 
     /**
@@ -148,6 +155,23 @@ class CustomerMessageRepository implements \SM\Notification\Api\CustomerMessageR
             default:
                 return 0;
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getMobileList(\Magento\Framework\Api\SearchCriteriaInterface $searchCriteria)
+    {
+        $customerId = $this->tokenUserContext->getUserId();
+        if (!$customerId || $customerId == 0) {
+            /** @var \SM\Notification\Api\CustomerMessageResultInterface $searchResult */
+            $searchResult = $this->searchResultsFactory->create();
+            $searchResult->setSearchCriteria($searchCriteria);
+            $searchResult->setTotalCount(0);
+            $searchResult->setItems([]);
+            return $searchResult;
+        }
+        return $this->getList($customerId, $searchCriteria, 1);
     }
 
     /**
@@ -255,13 +279,16 @@ class CustomerMessageRepository implements \SM\Notification\Api\CustomerMessageR
     }
 
     /**
-     * @param int                                                 $customerId
      * @param \Magento\Framework\Api\SearchCriteriaInterface|null $searchCriteria
      *
      * @return int
      */
-    public function getCountUnread($customerId, \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria = null)
+    public function getCountUnread(\Magento\Framework\Api\SearchCriteriaInterface $searchCriteria = null)
     {
+        $customerId = $this->tokenUserContext->getUserId();
+        if (!$customerId || $customerId == 0) {
+            return 0;
+        }
         $coll = $this->getCollection($searchCriteria);
         $coll->addFieldToFilter('customer_id', $customerId)
             ->addFieldToFilter('is_read', ['neq' => 1]);
