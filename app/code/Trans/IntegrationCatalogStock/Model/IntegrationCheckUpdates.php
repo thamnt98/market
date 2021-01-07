@@ -90,8 +90,7 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
         ,IntegrationJobInterfaceFactory $jobFactory
         ,IntegrationCommonInterface $commonRepository
         ,IntegrationDataValueRepositoryInterface $datavalueRepository
-
-
+        ,\Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
     ) {
         $this->curl=$curl;
         $this->channelRepository=$channelRepository;
@@ -100,7 +99,7 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
         $this->jobFactory=$jobFactory;
         $this->commonRepository=$commonRepository;
         $this->datavalueRepository=$datavalueRepository;
-
+        $this->timezone = $timezone;
 
     }
 
