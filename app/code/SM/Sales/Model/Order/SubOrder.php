@@ -36,6 +36,7 @@ use SM\DigitalProduct\Api\Data\Order\DigitalProductInterfaceFactory;
 use SM\Installation\Api\Data\InstallationServiceInterface;
 use SM\Installation\Api\Data\InstallationServiceInterfaceFactory;
 use SM\MobileApi\Model\Data\Catalog\Product\StoreInfoFactory;
+use SM\Sales\Api\Data\Creditmemo\FormInformationInterface;
 use SM\Sales\Api\Data\DeliveryAddressDataInterface;
 use SM\Sales\Api\Data\DeliveryAddressDataInterfaceFactory;
 use SM\Sales\Api\Data\DetailItemDataInterface;
@@ -169,7 +170,12 @@ class SubOrder {
 	 */
 	protected $orderUpdater;
 
-	/**
+    /**
+     * @var mixed
+     */
+    private $currentCreditemo;
+
+    /**
 	 * SubOrder constructor.
 	 * @param ItemOptionDataInterfaceFactory $itemOptionDataFactory
 	 * @param Emulation $appEmulation
@@ -442,6 +448,7 @@ class SubOrder {
 		/** @var Order $subOrder */
 		foreach ($orderCollection as $subOrder) {
 			/** @var SubOrderDataInterface $subOrderData */
+            $this->currentCreditemo = null;
 			$subOrderData = $this->subOrderDataFactory
 				->create()
 				->setId($subOrder->getEntityId())
@@ -451,12 +458,36 @@ class SubOrder {
 				->setStatusLabel($subOrder->getStatusLabel())
 				->setCreatedAt($subOrder->getCreatedAt())
 				->setTotalPayment($subOrder->getGrandTotal())
+				->setTotalRefund((int) -$subOrder->getTotalRefunded())
+				->setGrandTotal((int) ($subOrder->getTotalInvoiced() - $subOrder->getTotalRefunded()))
 				->setSubtotal($subOrder->getSubtotal())
-				->setStoreInfo($this->getStoreInfo($subOrder, $sourceInformation));
+                ->setHasCreditmemo($subOrder->hasCreditmemos())
+                ->setCreditmemoId($this->getCreditmemoId($subOrder))
+                ->setStoreInfo($this->getStoreInfo($subOrder, $sourceInformation));
 
-			if ($hasInvoice) {
-				$subOrderData->setInvoiceLink($this->getInvoiceLink($subOrder->getParentOrder()));
-			}
+            $subOrderData->setShowRefundButton(
+                $subOrderData->getHasCreditmemo()
+                    && \SM\Sales\Model\Order\IsPaymentMethod::isVirtualAccount($subOrder->getPayment()->getMethod())
+            );
+
+
+            if ($this->currentCreditemo) {
+                $subOrderData->setEnableRefundButton(
+                    !($this->currentCreditemo->getCreditmemoStatus() == FormInformationInterface::SUBMITTED_VALUE)
+                );
+            } else {
+                $subOrderData->setEnableRefundButton(false);
+            }
+
+            $subOrderData->setRefundMessage(
+                $subOrderData->getShowRefundButton()
+                    ? __('Some products in your order are not available. Get a refund with a few easy steps.')
+                    : __('Some products in your order are not available. Your card will not be charged for these products.')
+            );
+
+            if ($hasInvoice) {
+                $subOrderData->setInvoiceLink($this->getInvoiceLink($subOrder->getParentOrder()));
+            }
 
 			if (!$subOrder->getIsVirtual()) {
 				$this->setDeliveryData($subOrder, $subOrderData);
@@ -578,7 +609,8 @@ class SubOrder {
 					->setProductName($orderItem->getProduct()->getName())
 					->setQuantity($orderItem->getQtyOrdered())
 					->setPrice($orderItem->getBasePrice())
-					->setUrl($orderItem->getProduct()->getProductUrl());
+					->setUrl($orderItem->getProduct()->getProductUrl())
+					->setIsAvailable($this->getIsItemIsAvailable($subOrderModel, $orderItem));
 
 				$itemData->setImageUrl(
 					$this->imageHelper->init($orderItem->getProduct(), 'product_base_image')->getUrl()
@@ -734,4 +766,31 @@ class SubOrder {
 
 		return null;
 	}
+
+    /**
+     * @param Order $subOrder
+     * @return string
+     */
+    private function getCreditmemoId(Order $subOrder)
+    {
+        foreach ($subOrder->getCreditmemosCollection() as $creditmemo) {
+            $this->currentCreditemo = $creditmemo;
+            return $creditmemo->getId();
+        }
+
+        return '';
+    }
+
+    /**
+     * @param Order $subOrderModel
+     * @param Item $orderItem
+     * @return bool
+     */
+    private function getIsItemIsAvailable($subOrderModel, $orderItem)
+    {
+        if ($subOrderModel->getStatus() == \SM\Sales\Api\ParentOrderRepositoryInterface::STATUS_ORDER_CANCELED) {
+            return false;
+        }
+        return !($orderItem->getQtyRefunded() > 0 && ($orderItem->getQtyRefunded() == $orderItem->getQtyInvoiced()));
+    }
 }

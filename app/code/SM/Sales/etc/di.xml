@@ -53,6 +53,10 @@
     <preference for="SM\Sales\Api\Data\Invoice\InvoiceInterface" type="SM\Sales\Model\Data\Invoice\Invoice"/>
     <preference for="SM\Sales\Api\Data\Invoice\SubInvoiceInterface" type="SM\Sales\Model\Data\Invoice\SubInvoice"/>
     <preference for="SM\Sales\Api\Data\Invoice\SubInvoiceItemInterface" type="SM\Sales\Model\Data\Invoice\SubInvoiceItem"/>
+    <preference for="SM\Sales\Api\CreditmemoRepositoryInterface" type="SM\Sales\Model\Creditmemo\CreditmemoRepository"/>
+    <preference for="SM\Sales\Api\Data\Creditmemo\FormInformationInterface" type="SM\Sales\Model\Creditmemo\Data\FormInformation"/>
+    <preference for="SM\Sales\Api\Data\Creditmemo\BankInterface" type="SM\Sales\Model\Creditmemo\Data\Bank"/>
+    <preference for="SM\Sales\Api\Data\Creditmemo\FormInterface" type="SM\Sales\Model\Creditmemo\Data\Form"/>
 
     <type name="\Magento\Sales\Model\Order">
         <plugin name="sm_sales_model_order" type="\SM\Sales\Plugin\Model\Order" sortOrder="50" />

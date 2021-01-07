@@ -198,15 +198,18 @@ class ProductAssociationLogic implements ProductAssociationLogicInterface
         }
         try{
             $jobs       = $channel['jobs'];
-            $jobId      = $jobs->getFirstItem()->getId();
-            $jobStatus  = $jobs->getFirstItem()->getStatus();
-            $status     = IntegrationProductInterface::STATUS_JOB;
-
-            $result = $this->integrationDataValueRepositoryInterface->getByJobIdWithStatus($jobId, $status);
-            if ($result->getSize() < 1){
-                throw new NoSuchEntityException(__('Result Data Value Are Empty!!'));
+            if($jobs->getFirstItem()){
+              $jobId      = $jobs->getFirstItem()->getId();
+              $jobStatus  = $jobs->getFirstItem()->getStatus();
+              $status     = IntegrationProductInterface::STATUS_JOB;
+  
+              $result = $this->integrationDataValueRepositoryInterface->getByJobIdWithStatus($jobId, $status);
+              if ($result->getSize() < 1){
+                  throw new NoSuchEntityException(__('Result Data Value Are Empty!!'));
+              }
+            }else{
+              throw new NoSuchEntityException(__('Result Data Value Are Empty!!'));
             }
-
         }
         catch(\Exception $exception){
             $this->logger->error(__FUNCTION__ . "------ ERROR " . $exception->getMessage());

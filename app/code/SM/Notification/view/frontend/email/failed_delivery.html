@@ -1,0 +1,34 @@
+<!--
+ * SMCommerce
+ *
+ * @category  SM
+ * @package   SM_Notification
+ *
+ * Date: June, 17 2020
+ * Time: 11:36 AM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ -->
+<!--@subject {{trans "Sorry, we had to cancel order (Reference number: %order_id)" order_id=$order.getIncrementId()}} @-->
+
+{{template config_path="design/email/header_template"}}
+<table class="greeting" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "Dear %customer_name" customer_name=$order.getCustomerName()}},
+            </p>
+            <p>
+                {{trans "We are very sorry to inform you that we had to cancel order %order_id. Our courier failed to deliver your oder."  order_id=$order.getIncrementId()}}
+                {{trans "Please find more information about this order by contacting <a href='%contact_us'>Transmart Customer Service</a>. Thank you so much for your understanding." contact_us=$contact_us|raw}}
+            </p>
+            <p>
+                {{trans "Sincerely"}},
+                Transmart
+            </p>
+        </td>
+    </tr>
+</table>
+{{template config_path="design/email/footer_template"}}

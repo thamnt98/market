@@ -780,8 +780,12 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 								break;
 							}
 						} catch (StateException $e) {
+							$msg = __FUNCTION__." Error : ".$e->getMessage();
+							$this->logger->info($msg);
 							continue;
 						} catch (\Exception $e) {
+							$msg = __FUNCTION__." Error : ".$e->getMessage();
+							$this->logger->info($msg);
 							continue;
 						}
 					}
@@ -796,6 +800,8 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 							$product = $this->productRepositoryInterface->getById($child);
 						} catch (NoSuchEntityException $e) {
 							$product = null;
+							$msg = __FUNCTION__." Error : ".$e->getMessage();
+							$this->logger->info($msg);
 							continue;
 						}
 
@@ -1172,14 +1178,29 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	 * Save Product COnfigurable to Integration Mapping Data Product
 	 */
 	public function createIntegrationProductMapConfigurable($dataProduct,$integrationDataValue = null) {
-		
 		try {
+			$this->logger->info("Data Product : ");
+			$this->logger->info(print_r($dataProduct, true));
+
+			$this->logger->info("Integration Data Value : ");
+			if(isset($integrationDataValue)){
+				$this->logger->info($integrationDataValue->getId());
+				$this->logger->info(print_r($integrationDataValue->getData(), true));
+			}else{
+				$this->logger->info("Integration Data Value is null");
+			}
+
 			$integrationProduct = $this->integrationProductRepositoryInterface->loadDataByPimSku(
 				$dataProduct['item_id']
 			);
+
+			$this->logger->info('Integration Product : ');
+			if(isset($integrationProduct)){
+				$this->logger->info(print_r($integrationProduct->getData(), true));
+			}
+			
 			
 			if ($integrationProduct) {
-			
 				if($integrationProduct->getStatusConfigurable()<1){
 					return "IS NOT CONFIGURABLE";
 				}
@@ -1273,6 +1294,9 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 						
 						$i++;
 					}catch(Exception $e){
+						$msg = __FUNCTION__." Error : ".$e->getMessage();
+						$this->logger->info($msg);
+						$this->logger->info($e->getTraceAsString());
 						continue;
 					}
 				}
@@ -1280,6 +1304,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		} catch (\Exception $ex) {
 			$msg = __FUNCTION__." Error Preparing Data : ".$ex->getMessage();
 			$this->logger->info($msg);
+			$this->logger->info($ex->getTraceAsString());
 			throw new StateException(__($msg));
 		}
 		
@@ -1359,18 +1384,19 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 								$this->integrationProductRepositoryInterface->changeProductVisibility($sku, $visibility);
 							}
 						} catch (\Exception $e) {
-							$this->logger->info($e->getMessage());
+							$msg = __FUNCTION__." Error : ".$e->getMessage();
+							$this->logger->info($msg);
 							continue;
 						}
 					}
-					$msg = __FUNCTION__." Error Saving Data : ".$ex->getMessage();
+					$msg = __FUNCTION__." Error Saving Data 1 idx $i : ".$ex->getMessage();
 					$this->updateMapByConfigureProduct($row['product_configurable'],IntegrationProductInterface::STATUS_CONFIGURABLE_FAIL_UPDATE);
 					$this->logger->info($msg);
 					continue;
 				}
 			}
 		} catch (\Exception $ex) {
-			$msg = __FUNCTION__." Error Saving Data : ".$ex->getMessage();
+			$msg = __FUNCTION__." Error Saving Data 2 idx $i : ".$ex->getMessage();
 			$this->logger->info($msg);
 			throw new StateException(__($msg));
 		}
@@ -1416,8 +1442,12 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			foreach($dataSimpleProducts as $row){
 				try {
 					if($row->getMagentoEntityId() > 0){
+						$this->logger->info("Magento Entity ID : " . $row->getMagentoEntityId());
 						$magentoIds[$i] = $row->getMagentoEntityId();
+
+						$this->logger->info("SKU : " . $row->getPimSku());
 						$skus[$i] = $row->getPimSku();
+
 						$productData[$i] = $this->productRepositoryInterface->getById($row->getMagentoEntityId());
 						$productData[$i]->setVisibility(IntegrationProductInterface::VISIBILITY_NOT_VISIBLE);
 						$saveProductData[$i] = $this->productRepositoryInterface->save($productData[$i]);
@@ -1438,6 +1468,8 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 							'attribute_value'  => $attributeOptionValues[$i]
 						];
 
+
+
 						$attrCode=$productDataAttr[$i]->getAttributeCode();
 						$attrId=$productDataAttr[$i]->getId();
 						$productName=$saveProductData[$i]->getName();
@@ -1456,21 +1488,28 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 					}
 					$i++;
 				} catch (\Exception $e) {
+					$msg = __FUNCTION__." Error : ".$e->getMessage();
+					$this->logger->info($msg);
 					continue;
 				}
 			}
-			$result = [
-				"product_map_data" => $dataSimpleProducts,
-				"magento_entity_ids" => $magentoIds,
-				"skus" => $skus,
-				"attr_value_index" => $attributeValueData,
-				"attr_code" => $attrCode,
-				"attr_id" => $attrId,
-				"default_product_name" => $productName,
-				"simple_active" => $isActive,
-				"simple_category_ids" => array_unique($categoryIds),
-				"simple_data_attr" => $getAttributeDatas
-			];
+
+			if(!empty($productName)){
+				$result = [
+					"product_map_data" => $dataSimpleProducts,
+					"magento_entity_ids" => $magentoIds,
+					"skus" => $skus,
+					"attr_value_index" => $attributeValueData,
+					"attr_code" => $attrCode,
+					"attr_id" => $attrId,
+					"default_product_name" => $productName,
+					"simple_active" => $isActive,
+					"simple_category_ids" => array_unique($categoryIds),
+					"simple_data_attr" => $getAttributeDatas
+				];
+			}else{
+				$result = [];
+			}
 		} catch (\Exception $ex) {
 			$msg = __FUNCTION__." Error : ".$ex->getMessage();
 			$this->logger->info($msg);
@@ -1494,13 +1533,13 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		} catch (NoSuchEntityException $e) {
 			$product = $this->productInterfaceFactory->create();
 			$product->setSku($sku);
-
-			// $urlKey = $this->changeUrlKeyChildProduct($simpleProducts['default_product_name'] , $sku);
-			// $this->checkUrlKey($urlKey, $sku);
-
-			// $product->setUrlKey($urlKey);
-			// $this->logger->info(__FUNCTION__."---- Create New Product");
 		}
+
+		$urlKey = $this->changeUrlKeyChildProduct($simpleProducts['default_product_name'] , $sku);
+		$this->checkUrlKey($urlKey, $sku);
+
+		$product->setUrlKey($urlKey);
+		$this->logger->info(__FUNCTION__."---- Create New Product");
 		
 		$product->setAttributeSetId($attributeSetId);
 		$product->setTypeId(IntegrationProductInterface::PRODUCT_TYPE_CONFIGURABLE);
@@ -1590,6 +1629,8 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	                    $units[] = $sellingUnit;
 	                }
 				} catch (NoSuchEntityException $e) {
+					$msg = __FUNCTION__." Error : ".$e->getMessage();
+					$this->logger->info($msg);
 					continue;
 				}
 			}
@@ -1653,6 +1694,19 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			]
 		);
 
+		if(isset($simpleProduct)){
+			// Set configurable product weight
+			$weight = $simpleProduct->getWeight();
+			$product->setWeight($weight);
+
+			// Set configurable product brand
+			$brandAttributeCode = $this->dataHelper->getBrandAttributeCode();
+			if($simpleProduct->getCustomAttribute($brandAttributeCode)) {
+				$attrValue = $simpleProduct->getCustomAttribute($brandAttributeCode)->getValue();
+				$product->setData($brandAttributeCode,$attrValue);
+			}
+		}
+
 		try {
 			//Save Product Configurable
 			$productSave = $this->productRepositoryInterface->save($product);
@@ -1685,11 +1739,12 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			['*']
 		)->where('request_path like "%' . $urlKey . '.%"');
 
-		$collection = $query->fetchAll($query);
+		$collection = $connection->fetchAll($query);
 
 		if($collection) {
 			$skus = [];
 			foreach($collection as $data) {
+				$this->logger->info(print_r($data, true));
 				$product = $this->getProductDataRaw($data['entity_id']);
 
 				if(!in_array($product['sku'], $skus)) {
@@ -1702,7 +1757,9 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 				$this->updateUrlRewrite($data['url_rewrite_id'], $newReqPath);
 			}
 
-			$attribute = $this->attributeRepository->get(ProductModel::ENTITY, 'url_key');
+			// $attribute = $this->resource->getAttribute('url_key');
+			// $attribute = $this->attributeRepository->get(ProductModel::ENTITY, 'url_key');
+			$attribute = $this->attributeRepo->get(ProductModel::ENTITY, 'url_key');
         	$attributeId = $attribute->getAttributeId();
 
         	if(!empty($skus)) {
@@ -1718,7 +1775,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		$connection = $this->resource->getConnection();
 		$table = $connection->getTableName('catalog_product_entity_varchar');
 		$newUrlKey = $urlKey . '-' . $sku;
-		$query = 'UPDATE INTO ' . $table . ' set value = ' . $newUrlKey . ' where value = ' . $urlKey . ' and attribute_id = ' . $attributeId;
+		$query = 'UPDATE ' . $table . ' set value = ' . $connection->quote($newUrlKey) . ' where value = ' . $connection->quote($urlKey) . ' and attribute_id = ' . $connection->quote($attributeId);
 
 		$connection->query($query);
 	}
@@ -1728,7 +1785,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		$connection = $this->resource->getConnection();
 		$table = $connection->getTableName('url_rewrite');
 
-		$query = 'UPDATE INTO ' . $table . ' set request_path = ' . $requestPath . ' where url_rewrite_id = ' . $urlRewriteId;
+		$query = 'UPDATE ' . $table . ' set request_path = ' . $connection->quote($requestPath) . ' where url_rewrite_id = ' . $connection->quote($urlRewriteId);
 		$connection->query($query);
 
 		$this->resource->closeConnection();
@@ -1736,7 +1793,8 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 
 	protected function getProductDataRaw($entityId)
 	{
-		$connection = $this->getConnection();
+		// $connection = $this->getConnection(); old code
+		$connection = $this->resource->getConnection();
 		$table = $connection->getTableName('catalog_product_entity');
 
 		$query = $connection->select();
@@ -1772,17 +1830,25 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 				foreach ($attributeList as $attr) {
 					$code = $attr['attribute_code'];
 					if ($this->dataHelper->isSwatchAttr($code) && !in_array($code, $swatch)) {
-						$attrData[$row->getMagentoEntityId()][] = $code;
 						$swatch[(int) $row->getMagentoEntityId()][] = $code;
+					}
+
+					if (!in_array($code, $attrData)) {
+						$attrData[$row->getMagentoEntityId()][] = $code;
 					}
 				}
 
 				if(empty($swatch)) {
 					$swatch = [(int)  $row->getMagentoEntityId() => []];
 				}
+
+				if(empty($attrData)) {
+					$attrData = [(int)  $row->getMagentoEntityId() => []];
+				}
 			}
 		}
-		
+
+		// return $attrData;
 		return $swatch;
 	}
 

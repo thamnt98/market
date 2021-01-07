@@ -171,7 +171,7 @@ class JiraRepository implements \SM\JiraService\Api\JiraRepositoryInterface
      * @param $data
      * @return \SM\JiraService\Api\Data\CreateTicketResponseInterface
      */
-    protected function send($data)
+    public function send($data)
     {
         $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/jira_create_ticket.log');
         $logger = new \Zend\Log\Logger();
@@ -398,7 +398,7 @@ class JiraRepository implements \SM\JiraService\Api\JiraRepositoryInterface
      * @param $email
      * @return string
      */
-    protected function getJiraCustomerId($name, $email)
+    public function getJiraCustomerId($name, $email)
     {
         $username = $this->scopeConfig->getValue('sm_jira/account/username');
         $requestUrl = $this->scopeConfig->getValue('sm_jira/ticket/domain') . self::URL_CREATE_JIRA_CUSTOMER;

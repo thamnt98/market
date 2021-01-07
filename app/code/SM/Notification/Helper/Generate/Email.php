@@ -30,6 +30,7 @@ class Email extends \Magento\Framework\App\Helper\AbstractHelper
     const EMAIL_TEMPLATE_PAYMENT_SUCCESS_DIGITAL_PLN_BILL        = 'payment_success_pln_bill';
     const EMAIL_TEMPLATE_PAYMENT_SUCCESS_DIGITAL_MOBILE_POSTPAID = 'payment_success_mobile_postpaid';
     const EMAIL_TEMPLATE_PAYMENT_SUCCESS_PHYSICAL                = 'payment_success_physical';
+    const EMAIL_TEMPLATE_FAILED_DELIVERY                         = 'failed_delivery';
 
     /**
      * @var \Magento\Email\Model\TemplateFactory
@@ -184,5 +185,15 @@ class Email extends \Magento\Framework\App\Helper\AbstractHelper
         } else {
             return null;
         }
+    }
+
+    /**
+     * @param $store
+     *
+     * @return mixed
+     */
+    public function getFailedDeliveryTemplateId($store = null)
+    {
+        return $this->getConfigEmailTemplateID(self::EMAIL_TEMPLATE_FAILED_DELIVERY, $store);
     }
 }

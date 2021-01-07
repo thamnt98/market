@@ -322,6 +322,11 @@ class HandleOrderStatusHistory
     private function getHistoryThree()
     {
         if ($history = $this->getHistoryByTwoStatus(
+            Statuses::STATUS_FAILED_DELIVERY,
+            Statuses::STATUS_IN_DELIVERY
+        )) {
+            return $history;
+        } elseif ($history = $this->getHistoryByTwoStatus(
             Statuses::STATUS_IN_DELIVERY,
             Statuses::PICK_UP_BY_CUSTOMER
         )) {

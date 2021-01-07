@@ -360,11 +360,16 @@ class ProductsList extends WidgetProductListDefault
         $priceGTM = $this->getPriceGTM($product);
         $initPrice = $this->getGTMInitialProductPrice($product);
         $price = $priceGTM['sale_price'] != 'Not in sale' ? $priceGTM['sale_price'] : $initPrice;
+        if (is_numeric($initPrice) && is_numeric($price)) {
+            $salePrice = $initPrice - $price;
+        } else {
+            $salePrice =  'Not in sale';
+        }
         return Zend_Json_Encoder::encode([
             "product_size" => $this->getGTMProductSize($product),
             "product_volume" => $this->getGTMProductVolume($product),
             "product_weight" => $this->getGTMProductWeight($product),
-            "salePrice" => $initPrice - $price,
+            "salePrice" => $salePrice,
             "discountRate" => $priceGTM['discount_rate'],
             "rating" => $this->getGTMProductRating($productBase),
             "type" => $this->getGTMProductType($productBase),

@@ -301,10 +301,10 @@ class SendOMS
             $paymentCode[$master->getPaymentMethod()] = $master->getPaymentId();
         }
 
-        $masterId = (isset($paymentCode[$paymentData->getMethod()])) ? $paymentCode[$paymentData->getMethod()] : 0;
+        $masterId = (isset($paymentCode[$paymentData->getMethod()])) ? $paymentCode[$paymentData->getMethod()] : "";
         $payment = [
             [
-                'master_payment_id1' => (int)$masterId,
+                'master_payment_id1' => (string)$masterId,
                 'pay_ref_number1' => $mainOrder->getReferencePaymentNumber(),
                 'amount' => (int)$paymentData->getAmountOrdered(),
                 'split_payment' => 0,
@@ -313,6 +313,7 @@ class SendOMS
             ],
         ];
         $storeCode = ($order->getShippingMethod() == \SM\Checkout\Model\MultiShippingHandle::STORE_PICK_UP) ? $order->getStorePickUp() : $order->getSplitStoreCode();
+        /** @var \Trans\IntegrationOrder\Api\Data\IntegrationOrderInterface $interface */
         $interface = $this->integrationOrder->create();
         $interface->setReferenceNumber($mainOrder->getReferenceNumber());
         $interface->setAccountEmail($order->getCustomerEmail());
@@ -455,6 +456,26 @@ class SendOMS
         $interface->setPromotionValue($discount);
         $interface->setPromotionType($order->getAppliedRuleIds());
         $interface->setGrandTotal((int)$order->getGrandTotal());
+        $logisticCourierName = '';
+        $logisticCourier = 0;
+        if ($logisticType == 0) {
+            $logisticCourierName = __('Store Pick Up');
+        } else {
+            if (isset($oarData['shipping_list'])) {
+                foreach ($oarData['shipping_list'] as $shippingMethodOAR) {
+                    if (isset($shippingMethodOAR['service_type']) &&
+                        $logisticType == $shippingMethodOAR['service_type'] &&
+                        isset($shippingMethodOAR['courier'])
+                    ) {
+                        $logisticCourierName = $shippingMethodOAR['courier']['name'];
+                        $logisticCourier = (int)$shippingMethodOAR['courier']['id'];
+                        break;
+                    }
+                }
+            }
+        }
+        $interface->setLogisticCourierName($logisticCourierName);
+        $interface->setLogisticCourier($logisticCourier);
         return $interface;
     }
 
