@@ -131,6 +131,27 @@ class Data extends AbstractHelper
     }
 
     /**
+     * @return string
+     */
+    public function getFailedDeliveryStatus()
+    {
+        $result = $this->tranConfig->getFailedDeliveryStatus();
+        if (empty($result)) {
+            $result = 'failed_delivery';
+        }
+
+        return $result;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInProcessWaitingForPickUpStatus()
+    {
+        return 'in_process_waiting_for_pickup';
+    }
+
+    /**
      * @param $id
      *
      * @return \Magento\Sales\Api\Data\OrderInterface|null

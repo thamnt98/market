@@ -28,6 +28,9 @@ interface SubOrderDataInterface
     const DELIVERY_FEE = "delivery_fee";
     const SUBTOTAL = "subtotal";
     const TOTAL_PAYMENT = "total_payment";
+    const TOTAL_REFUND = "total_refund";
+    const REFUND_MESSAGE = "refund_message";
+    const GRAND_TOTAL = "grand_total";
     const CREATED_AT = "created_at";
     const STATUS_HISTORY = "status_history";
     const STATUS_LABEL = "status_label";
@@ -39,6 +42,10 @@ interface SubOrderDataInterface
     const SHIPPING_PLATE_NUMBER = 'shipping_plate_number';
     const DISCOUNT_AMOUNT = "discount_amount";
     const CANCEL_TYPE = "cancel_type";
+    const CREDITMEMO_ID = "creditmemo_id";
+    const HAS_CREDITMEMO = "has_creditmemo";
+    const SHOW_REFUND_BUTTON = "show_refund_button";
+    const ENABLE_REFUND_BUTTON = "enable_refund_button";
 
     /**
      * @return int
@@ -292,4 +299,81 @@ interface SubOrderDataInterface
      * @return $this
      */
     public function setCancelType($value);
+
+    /**
+     * @param int $value
+     * @return $this
+     */
+    public function setCreditmemoId($value);
+
+    /**
+     * @return int
+     */
+    public function getCreditmemoId();
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function setHasCreditmemo($value);
+
+    /**
+     * @return bool
+     */
+    public function getHasCreditmemo();
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function setShowRefundButton($value);
+
+    /**
+     * @return bool
+     */
+    public function getShowRefundButton();
+
+    /**
+     * @return bool
+     */
+    public function getEnableRefundButton();
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function setEnableRefundButton($value);
+
+     /**
+     * @param int $value
+     * @return $this
+     */
+    public function setTotalRefund($value);
+
+    /**
+     * @return int
+     */
+    public function getTotalRefund();
+
+    /**
+     * @param int $value
+     * @return $this
+     */
+    public function setGrandTotal($value);
+
+    /**
+     * @return int
+     */
+    public function getGrandTotal();
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setRefundMessage($value);
+
+    /**
+     * @return string
+     */
+    public function getRefundMessage();
 }

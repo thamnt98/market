@@ -8,12 +8,17 @@ if ($parentOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::STATUS_C
 }
 ?>
 <div class="table-product">
-    <?php if ($parentOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::STATUS_ORDER_CANCELED): ?>
+    <?php if ($parentOrder->getHasCreditmemo()): ?>
+        <div class="error-message">
+            <span class="icon icon-error"></span>
+            <span class="error"><?= $parentOrder->getRefundMessage() ?></span>
+        </div>
+    <?php elseif ($parentOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::STATUS_ORDER_CANCELED): ?>
         <div class="error-message">
             <span class="icon icon-error"></span>
             <span class="error"><?= $parentOrder->getCancelMessage() ?></span>
         </div>
-    <?php endif; ?>
+    <?php endif ?>
     <div class="tpr-top">
         <div class="tpr-top-left">
             <span class="tl-invoice-number"><?= $block->escapeHtml(__('Reference Number')) ?></span>
@@ -53,7 +58,7 @@ if ($parentOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::STATUS_C
                 <div class="item-info">
                     <a href="<?= $block->escapeHtml($item->getUrl()) ?>"
                        title="<?= $block->escapeHtml($item->getProductName()) ?>" class="product-item-photo">
-                        <?php if ($subOrder->getStatus() == \SM\Sales\Api\ParentOrderRepositoryInterface::STATUS_CANCELED): ?>
+                        <?php if (!$item->getIsAvailable()): ?>
                             <div class="image-canceled"><span><?= $block->escapeHtml(__("Not Available")) ?></span>
                             </div>
                         <?php endif; ?>

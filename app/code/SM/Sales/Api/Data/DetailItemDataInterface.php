@@ -22,6 +22,7 @@ interface DetailItemDataInterface
     const PRODUCT_OPTION = "product_option";
     const PRODUCT_TYPE = "product_type";
     const FRESH_PRODUCT = "fresh_product";
+    const IS_AVAILABLE = "is_available";
 
     /**
      * @param int $value
@@ -181,4 +182,16 @@ interface DetailItemDataInterface
      * @return \SM\FreshProductApi\Api\Data\FreshProductInterface
      */
     public function getFreshProduct();
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function setIsAvailable($value);
+
+
+    /**
+     * @return bool
+     */
+    public function getIsAvailable();
 }

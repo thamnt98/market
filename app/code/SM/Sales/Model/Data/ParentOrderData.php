@@ -313,7 +313,7 @@ class ParentOrderData extends DataObject implements ParentOrderDataInterface
      */
     public function getTransactionId()
     {
-        return $this->getData(self::CANCEL_MESSAGE);
+        return $this->getData(self::TRANSACTION_ID);
     }
 
     /**
@@ -321,6 +321,46 @@ class ParentOrderData extends DataObject implements ParentOrderDataInterface
      */
     public function setTransactionId($value)
     {
-        return $this->setData(self::CANCEL_MESSAGE, $value);
+        return $this->setData(self::TRANSACTION_ID, $value);
+    }
+
+    public function setTotalRefund($value)
+    {
+        return $this->setData(self::TOTAL_REFUND, $value);
+    }
+
+    public function getTotalRefund()
+    {
+        return $this->getData(self::TOTAL_REFUND);
+    }
+
+    public function setGrandTotal($value)
+    {
+        return $this->setData(self::GRAND_TOTAL, $value);
+    }
+
+    public function getGrandTotal()
+    {
+        return $this->getData(self::GRAND_TOTAL);
+    }
+
+    public function setHasCreditmemo($value)
+    {
+        return $this->setData(self::HAS_CREDITMEMO, $value);
+    }
+
+    public function getHasCreditmemo()
+    {
+        return $this->getData(self::HAS_CREDITMEMO);
+    }
+
+    public function setRefundMessage($value)
+    {
+        return $this->setData(self::REFUND_MESSAGE, $value);
+    }
+
+    public function getRefundMessage()
+    {
+        return $this->getData(self::REFUND_MESSAGE);
     }
 }
