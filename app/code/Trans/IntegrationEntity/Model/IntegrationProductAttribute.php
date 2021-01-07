@@ -441,7 +441,7 @@ class IntegrationProductAttribute implements IntegrationProductAttributeInterfac
 						}
 						
 						if ((int) $attrTypeData[$i][IntegrationProductAttributeTypeInterface::IS_SWATCH] == 1) {
-							$queryAttribute[$i]->setSwatchInputType($attrTypeData[$i][IntegrationProductAttributeTypeInterface::BACKEND_CODE]);
+							$queryAttribute[$i]->setSwatchInputType('text');
 						}
 
 						if($queryAttribute[$i] instanceof AttributeInterface && $queryAttribute[$i]->getId()) {
