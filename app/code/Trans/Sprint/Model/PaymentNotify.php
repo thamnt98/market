@@ -427,8 +427,8 @@ class PaymentNotify implements \Trans\Sprint\Api\PaymentNotifyInterface
                 $invoice->setShippingAmount($mainOrder->getData('shipping_amount'));
                 $invoice->setSubtotal($mainOrder->getData('subtotal'));
                 $invoice->setBaseSubtotal($mainOrder->getData('base_subtotal'));
-                $invoice->setGrandTotal($transaction->getAmount());
-                $invoice->setBaseGrandTotal($transaction->getAmount());
+                $invoice->setGrandTotal($mainOrder->getData('grand_total'));
+                $invoice->setBaseGrandTotal($mainOrder->getData('grand_total'));
                 $invoice->register();
                 $invoice->pay();
                 
