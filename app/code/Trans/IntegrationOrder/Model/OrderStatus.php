@@ -610,23 +610,11 @@ class OrderStatus implements OrderStatusInterface {
 					$this->loggerOrder->info('===== Credit Memo ===== Start');
 
 					try {
-						$this->loggerOrder->info('parent credit memo');
-						$parentOrder  = $this->orderRepository->get($parentEntityId);
-						$credit       = $this->creditMemos($parentEntityId, $itemIds, $orderId);
-						$creditEncode = json_encode($credit);
-						$this->loggerOrder->info('parent $creditEncode : ' . $creditEncode);
-					} catch (\Exception $e) {
-						$this->loggerOrder->info('parent credit memo : ' . $e->getMessage());
-					}
-
-					// if($this->checkInvoiceData($childOrder->getId())) {
-					try {
 						$this->createInvoice($childOrder); //invoice for child order
 					} catch (\Exception $e) {
 						$this->loggerOrder->info('invoice child order fail : ' . $e->getMessage());
 					}
-					// }
-
+					
 					try {
 						$this->loggerOrder->info('child credit memo');
 						$childmemo         = $this->creditMemos($childOrder->getId(), $itemIdsChild);
@@ -634,6 +622,16 @@ class OrderStatus implements OrderStatusInterface {
 						$this->loggerOrder->info('child $creditEncode : ' . $childCreditEncode);
 					} catch (\Exception $e) {
 						$this->loggerOrder->info('child $creditEncode : ' . $e->getMessage());
+					}
+
+					try {
+						$this->loggerOrder->info('parent credit memo');
+						$parentOrder  = $this->orderRepository->get($parentEntityId);
+						$credit       = $this->creditMemos($parentEntityId, $itemIds, $orderId);
+						$creditEncode = json_encode($credit);
+						$this->loggerOrder->info('parent $creditEncode : ' . $creditEncode);
+					} catch (\Exception $e) {
+						$this->loggerOrder->info('parent credit memo : ' . $e->getMessage());
 					}
 
 					$this->loggerOrder->info('===== Credit Memo ===== End');
@@ -1058,11 +1056,17 @@ class OrderStatus implements OrderStatusInterface {
 	 * @param string $orderItemId
 	 * @param string|null $refOrderId
 	 */
-	protected function creditMemos($orderId, $orderItemIds, $refOrderId = null) {
+	protected function creditMemos($orderId, $orderItemIds, $refOrderId = null)
+	{
+		$this->loggerOrder->info(__FUNCTION__ . ' start.');
 		$order = $this->orderRepository->get($orderId);
 
 		if ($order instanceof \Magento\Sales\Model\Order == false) {
 			return false;
+		}
+
+		if($order->getData('is_parent')) {
+			$this->updateOrderStatus($orderId, 'in_process', 'processing');
 		}
 
 		$creditMemoData                        = [];
@@ -1114,6 +1118,8 @@ class OrderStatus implements OrderStatusInterface {
 			$this->creditmemoLoader->setOrderId($order->getId()); //pass order id
 			$this->creditmemoLoader->setCreditmemo($creditMemoData);
 
+			$this->loggerOrder->info('$orderId = ' . $order->getId());
+			
 			$creditmemo = $this->creditmemoLoader->load();
 
 			if(!$creditmemo) {
@@ -1155,11 +1161,14 @@ class OrderStatus implements OrderStatusInterface {
 				}
 				$this->loggerOrder->info('You created the credit memo.');
 			}
+
+			$this->checkOrderItemStatus($order);
 		} catch (\Exception $e) {
 			$this->loggerOrder->info('Credit memo check = ' . $e->getMessage());
 		}
 
 		$this->registry->unregister('current_creditmemo');
+		$this->loggerOrder->info(__FUNCTION__ . ' end.');
 		return $creditMemoData;
 	}
 
@@ -1314,9 +1323,100 @@ class OrderStatus implements OrderStatusInterface {
 		$connection = $this->resource->getConnection();
 		$table = $connection->getTableName('sales_order');
 
-		$data = ["status" => "in_process", "state" => \Magento\Sales\Model\Order::STATE_PROCESSING, "total_paid" => $order->getData('grand_total'), "base_total_paid" => $order->getData('grand_total')]; // Key_Value Pair
+		$data = ["status" => "in_process", "state" => \Magento\Sales\Model\Order::STATE_PROCESSING, "total_paid" => $order->getData('grand_total'), "base_total_paid" => $order->getData('grand_total')];
 		$where = ['entity_id = ?' => $order->getId()];
 
 		$connection->update($table, $data, $where);
+	}
+
+	/**
+	 * check order item status
+	 *
+	 * @param \Magento\Sales\Api\Data\Order $order
+	 * @return void|bool
+	 */
+	protected function checkOrderItemStatus($order)
+	{
+		$connection = $this->resource->getConnection();
+		$table = $connection->getTableName('sales_order_item');
+
+		$query = $connection->select();
+		$query->from(
+			$table,
+			['*']
+		)->where('order_id = ?', $order->getId());
+
+		$collection = $connection->fetchAll($query);
+		if($collection) {
+			$ordered = 0;
+			$refunded = 0;
+			foreach($collection as $row) {
+				$ordered = $ordered + (int)$row['qty_ordered'];
+				$refunded = $refunded + (int)$row['qty_refunded'];
+			}
+
+			$check = $ordered - $refunded;
+			
+			$status = 'in_process';
+			$state = 'processing';
+			if($check == 0) {
+				$status = 'order_canceled';
+				$state = 'canceled';
+			}
+
+			$this->updateOrderStatus($order->getId(), $status, $state);
+			$this->updateOrderStatusHistory($order->getId(), $status);
+		}
+	}
+
+	protected function updateStatuses($order, $status, $state)
+	{
+		$refNumber = $order->getData('reference_number');
+		$parentOrder = $this->transactionMegaHelper->getSalesOrderArrayParent($refNumber);
+
+		$this->updateOrderStatus($order->getId(), $status, $state);
+		$this->updateOrderStatusHistory($order->getId(), $status);
+
+		if($parentOrder) {
+			$this->updateOrderStatus($parentOrder['entity_id'], $status, $state);
+			$this->updateOrderStatusHistory($parentOrder['entity_id'], $status);			
+		}
+	}
+
+	/**
+	 * update order status
+	 *
+	 * @param int $orderId
+	 * @param string $status
+	 * @param string $state
+	 * @return void
+	 */
+	protected function updateOrderStatus($orderId, $status, $state)
+	{
+		$connection = $this->resource->getConnection();
+		$table = $connection->getTableName('sales_order');
+
+		$data = ["status" => $status, "state" => $state];
+		$where = ['entity_id = ?' => $orderId];
+
+		$connection->update($table, $data, $where);	
+	}
+
+	/**
+	 * update order status history
+	 *
+	 * @param int $orderId
+	 * @param string $status
+	 * @return void
+	 */
+	protected function updateOrderStatusHistory($orderId, $status)
+	{
+		$connection = $this->resource->getConnection();
+		$table = $connection->getTableName('sales_order_status_history');
+
+		$data = ["status" => $status];
+		$where = ['parent_id = ?' => $orderId, 'entity_name = ?' => 'creditmemo'];
+
+		$connection->update($table, $data, $where);	
 	}
 }
