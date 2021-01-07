@@ -1210,12 +1210,17 @@ class OrderStatus implements OrderStatusInterface {
 						$order->setBaseTotalPaid($order->getData('grand_total'));
 
 						$order->setForcedCanCreditmemo(true);
+						$order->setIsInProcess(true);
+						$order->setState(\Magento\Sales\Model\Order::STATE_PROCESSING);
+						$order->setStatus('in_process');
 						$order->save();
 					} catch (\Exception $e) {
 						$this->loggerOrder->info($e->getTraceAsString());
 					}
 
-					$this->payOrder($order);
+					if($order->getData('grand_total') != null || $order->getData('grand_total') == 0) {
+						$this->payOrder($order);
+					}
 				}
 
 				$this->loggerOrder->info('****** end create invoice ******');
@@ -1309,7 +1314,7 @@ class OrderStatus implements OrderStatusInterface {
 		$connection = $this->resource->getConnection();
 		$table = $connection->getTableName('sales_order');
 
-		$data = ["total_paid" => $order->getData('grand_total'), "base_total_paid" => $order->getData('grand_total')]; // Key_Value Pair
+		$data = ["status" => "in_process", "state" => \Magento\Sales\Model\Order::STATE_PROCESSING, "total_paid" => $order->getData('grand_total'), "base_total_paid" => $order->getData('grand_total')]; // Key_Value Pair
 		$where = ['entity_id = ?' => $order->getId()];
 
 		$connection->update($table, $data, $where);
