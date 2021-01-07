@@ -75,6 +75,11 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
     protected $storeManager;
 
     /**
+     * @var \SM\Sales\Model\OrderInstallation
+     */
+    protected $orderInstallation;
+
+    /**
      * SaveAfter constructor.
      * @param Helper $helper
      * @param \Magento\Store\Model\App\Emulation $emulation
@@ -85,6 +90,7 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
      * @param \SM\Notification\Model\ResourceModel\Notification $notificationResource
      * @param \SM\Notification\Helper\Generate\Email $emailHelper
      * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \SM\Sales\Model\OrderInstallation $orderInstallation
      * @param \Magento\Framework\Logger\Monolog|null $logger
      */
     public function __construct(
@@ -97,6 +103,7 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
         \SM\Notification\Model\ResourceModel\Notification $notificationResource,
         \SM\Notification\Helper\Generate\Email $emailHelper,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \SM\Sales\Model\OrderInstallation $orderInstallation,
         \Magento\Framework\Logger\Monolog $logger = null
     ) {
         $this->notifyFactory = $notifyFactory;
@@ -108,6 +115,7 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
         $this->setting = $setting;
         $this->emailHelper = $emailHelper;
         $this->storeManager = $storeManager;
+        $this->orderInstallation = $orderInstallation;
         $this->emulation = $emulation;
     }
 
@@ -151,6 +159,9 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
                     break;
                 case $this->orderHelper->getFailedDeliveryStatus():
                     $notifyId = $this->generateFailedDeliveredData($order);
+                    break;
+                case $this->orderHelper->getInProcessWaitingForPickUpStatus():
+                    $notifyId = $this->generateInProcessWaitingForPickUpData($order);
                     break;
                 default:
                     $notifyId = 0;
@@ -384,6 +395,17 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
         $this->notificationResource->save($notify);
 
         return $notify->getId();
+    }
+
+    /**
+     * @param $order
+     */
+    public function generateInProcessWaitingForPickUpData($order)
+    {
+        try {
+            $this->orderInstallation->sendMail($order);
+        } catch (\Exception $e) {
+        }
     }
 
     /**
