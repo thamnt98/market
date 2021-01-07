@@ -51,7 +51,17 @@ class ConnectAuthCapture extends AbstractHelper
   /**
    * @var string
    */
+  protected $adjustmentAmount;
+
+  /**
+   * @var string
+   */
   protected $amount;
+
+  /**
+   * @var string
+   */
+  protected $refNumber;
 
   /**
    * @var Json
@@ -122,11 +132,13 @@ class ConnectAuthCapture extends AbstractHelper
   public function getBodyParams()
   {
     try {
+      $params = $this->prepareParam();
+
       return [
         TransactionInterface::AUTHORIZATION_CODE => $this->transaction[TransactionInterface::AUTHORIZATION_CODE],
         // TransactionInterface::AMOUNT => $this->transaction[TransactionInterface::AMOUNT],
-        TransactionInterface::AMOUNT => $this->getAmount(),
-        self::NEW_AMOUNT => $this->getNewAmount()
+        TransactionInterface::AMOUNT => $params['amount'],
+        self::NEW_AMOUNT => $params['new_amount']
       ];
     } catch (\Exception $e) {
       throw $e;
@@ -152,6 +164,24 @@ class ConnectAuthCapture extends AbstractHelper
   }
 
   /**
+   * Set new amount
+   * @param $input
+   */
+  public function setAdjustmentAmount($input)
+  {
+    $this->adjustmentAmount = $input;
+  }
+
+  /**
+   * Set new amount
+   * @param $input
+   */
+  public function getAdjustmentAmount()
+  {
+    return $this->adjustmentAmount;
+  }
+
+  /**
    * Get amount
    * @return string
    */
@@ -170,6 +200,24 @@ class ConnectAuthCapture extends AbstractHelper
   }
 
   /**
+   * Set reference number
+   * @param $input
+   */
+  public function setReferenceNumber($input)
+  {
+    $this->refNumber = $input;
+  }
+
+  /**
+   * get reference number
+   * @param $input
+   */
+  public function getReferenceNumber()
+  {
+    return $this->refNumber;
+  }
+
+  /**
    * Set transaction by order id
    * @param  $orderId 
    */
@@ -181,11 +229,35 @@ class ConnectAuthCapture extends AbstractHelper
     // $txn = $this->transactionHelper->getLastOrderTransaction($orderId);
     $txn = $this->transactionHelper->getSalesPaymentTransactionByOrderId($orderId);
     
-    if ($txn) {
+    if (isset($txn['trans_mepay_inquiry'])) {
       $this->inquiry = $this->json->unserialize($txn['trans_mepay_inquiry']);
     }
     if (isset($txn['trans_mepay_transaction'])) {
       $this->transaction = $this->json->unserialize($txn['trans_mepay_transaction']);
     }
+  }
+
+  /**
+   * prepare param
+   *
+   * @return array
+   */
+  protected function prepareParam()
+  {
+    $result['amount'] = 0;
+    $result['new_amount'] = 0;
+    
+    $adjAmount = $this->getAdjustmentAmount();
+    $refNumber = $this->getReferenceNumber();
+    $order = $this->transactionHelper->getSalesOrderArrayParent($refNumber);
+    
+    if(!empty($order)) {
+      $grandTotal = $order['grand_total'];
+
+      $result['amount'] = (int) $grandTotal;
+      $result['new_amount'] = (int) $grandTotal - (int) $adjAmount;
+    }
+
+    return $result;
   }
 }

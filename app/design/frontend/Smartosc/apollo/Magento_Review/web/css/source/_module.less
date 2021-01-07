@@ -237,7 +237,7 @@
         border-radius: @border-radius-8;
         border:1px solid @color-gray90;
 
-        .dis-flex.voucher {
+        .dis-flex.grand-total {
             .price {
                 color: @c-tsm-green;
             }
@@ -1353,6 +1353,26 @@
 //  _____________________________________________
 
 & when (@media-common = true) {
+    .order-detail {
+        .weighing-message {
+            display: block;
+            p {
+                display:flex;
+            }
+            .notifi-refund {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom:0;
+                span {
+                    color: @color-black;
+                    display:inline-block;
+                }
+
+            }
+
+        }
+    }
 
     .customer-review {
         .product-details {
@@ -1451,6 +1471,28 @@
 //  _____________________________________________
 
 .media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    .order-detail {
+        #btn-reorder-all {
+            margin-bottom:10px;
+        }
+        .weighing-message {
+            margin: -10px -10px 20px;
+            border-radius: 3px 3px 0 0;
+            padding:10px;
+            display: block;
+            font-size:12px;
+            .notifi-refund {
+                span {
+                    margin-left:30px;
+                    font-size:14px;
+                }
+            }
+
+            .notification-icon {
+                padding: 0 10px 0 0;
+            }
+        }
+    }
     .tpr-top-right {
         form {
             display: block;
@@ -1898,7 +1940,9 @@
             }
         }
     }
+
     /*---my order-detail----*/
+
 
     .order-detail-content, .shopping-summary {
         margin: @indent__s;
@@ -1916,8 +1960,13 @@
                 padding-top: @indent__l;
                 padding-bottom: 0;
                 .price {
-                    color:@c-tsm-orange;
+                    /*color:@c-tsm-orange;*/
                     .lib-font-size(25);
+                }
+            }
+            &.refund {
+                .price {
+                    color:@c-tsm-orange;
                 }
             }
         }
@@ -2026,6 +2075,25 @@
 //  _____________________________________________
 
 .media-width(@extremum, @break) when (@extremum = 'min') and (@break = @screen__m) {
+    .order-detail {
+        .weighing-message {
+            margin:-30px -30px 15px;
+            border-radius:3px 3px 0 0;
+            display:block;
+
+            .notifi-refund {
+                span {
+                    margin-left:40px;
+                }
+                .action.primary {
+                    min-width:160px;
+                }
+            }
+            .notification-icon {
+                padding: 0 20px 0 0;
+            }
+        }
+    }
     .product-reviews-summary {
         margin-bottom: @indent__s + @indent__xs;
 

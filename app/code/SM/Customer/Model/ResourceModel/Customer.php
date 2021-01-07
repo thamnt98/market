@@ -105,4 +105,24 @@ class Customer extends BaseResourceModel
 
         return (bool) $connection->fetchOne($query) ?? false;
     }
+
+    /**
+     * @param $telephone
+     * @return bool
+     */
+    public function checkTelephoneIsVerifiedTestMode($telephone)
+    {
+        $connection = $this->getConnection();
+        $table = "testmode_andromeda_sms_verification";
+        $query = $connection->select()
+            ->from(
+                $connection->getTableName($table),
+                'verification_id'
+            )->where('phone_number = ?', $telephone);
+        $result = $connection->fetchOne($query);
+        if (empty($result)) {
+            return false;
+        }
+        return true;
+    }
 }

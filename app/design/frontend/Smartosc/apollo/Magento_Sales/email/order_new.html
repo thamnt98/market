@@ -28,6 +28,8 @@
 "var additional_data.payment_method_title":"Payment Method Title",
 "var additional_data.order_url":"Order Url",
 "var additional_data.is_va":"Is Virtual Account",
+"var additional_data.is_va_bca":"Is Virtual Account BCA",
+"var additional_data.is_va_mega":"Is Virtual Account MEGA",
 "var additional_data.is_cc":"Is Credit Card",
 "var additional_data.is_store_pick_up":"Is Store Pick Up",
 "var additional_data.delivery_method":"Delivery Method"
@@ -49,27 +51,17 @@
     <tr>
         <td>
             {{if additional_data.is_va}}
-            {{depend additional_data.is_va_bca}}
             <p>
                 {{trans "Thank you for
                 shopping at Transmart.
                 We have received your
-                order with %payment_method_title payment. Please
-                complete your payment using %payment_method_title before " payment_method_title=$additional_data.payment_method_title}}
-                {{trans '%expire_time' expire_time=$additional_data.expire_time }},
-                {{trans '%expire_time_string' expire_time_string=$additional_data.expire_time_string }}.
-            </p>
-            {{/depend}}
-            {{depend additional_data.is_va_mega}}
-            <p>
-                {{trans "Thank you for
-                shopping at Transmart.
-                We have received your
-                order with %payment_method_title payment. Please
+                order with %payment_method_title payment. " payment_method_title=$additional_data.payment_method_title}}
+                {{depend additional_data.expire_time_string}}
+                {{trans "Please
                 complete your payment using %payment_method_title before " payment_method_title=$additional_data.payment_method_title}}
                 {{trans '%expire_time_string' expire_time_string=$additional_data.expire_time_string }}.
+                {{/depend}}
             </p>
-            {{/depend}}
             <p>
                 {{trans "Reference Number: %order_increment" order_increment=$additional_data.order_increment}}
             </p>
@@ -77,15 +69,12 @@
             <p>
                 {{trans "Thank you for shopping at Transmart. We are currently preparing your order with reference number: %order_increment to be delivered to your address/picked up at the selected store." order_increment=$additional_data.order_increment}}
             </p>
-
             <p>
                 {{trans "Reference Number: %order_increment" order_increment=$additional_data.order_increment}}
             </p>
-
             <p>
                 {{trans "Total: %order_total" order_total=$additional_data.order_total}}
             </p>
-
             <p>
                 {{trans "Payment Method: %payment_method_title" payment_method_title=$additional_data.payment_method_title}}
             </p>
@@ -99,6 +88,15 @@
             </p>
             {{/depend}}
             {{/if}}
+
+            {{if additional_data.expire_time_string}}
+            {{else}}
+            {{depend additional_data.is_va_bca}}
+            <p>
+                {{trans "Total: %order_total" order_total=$additional_data.order_total}}
+            </p>
+            {{/depend}}
+            {{/if}}
         </td>
     </tr>
 </table>
@@ -106,6 +104,7 @@
     <tbody>
 
     {{if additional_data.is_va_bca}}
+    {{depend additional_data.expire_time_string}}
     <tr>
         <td class="virtual-column">
             <p>
@@ -126,6 +125,7 @@
             </p>
         </td>
     </tr>
+    {{/depend}}
     {{/if}}
 
     {{if additional_data.is_va_mega}}
@@ -234,6 +234,7 @@
 </table>
 <!--End Message Email-->
 {{if additional_data.is_va_bca}}
+{{depend additional_data.expire_time_string}}
 <table class="how-to-pay">
     <tr>
         <td>
@@ -322,6 +323,7 @@
         </td>
     </tr>
 </table>
+{{/depend}}
 {{/if}}
 {{if additional_data.is_va_mega}}
 {{depend additional_data.virtual_account_number}}
