@@ -48,6 +48,7 @@ class Collection extends \Magento\Sales\Model\ResourceModel\Order\Item\Collectio
             ParentOrderRepository::STATUS_PENDING_PAYMENT,
             ParentOrderRepository::STATUS_IN_PROCESS,
             ParentOrderRepository::STATUS_IN_DELIVERY,
+            ParentOrderRepository::STATUS_FAILED_DELIVERY,
             ParentOrderRepository::STATUS_DELIVERED,
             ParentOrderRepository::STATUS_COMPLETE,
             ParentOrderRepository::STATUS_ORDER_CANCELED,
