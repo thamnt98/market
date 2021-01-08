@@ -79,7 +79,7 @@ class Connect implements ClientInterface
           'request_uri' => $transferObject->getUri()
       ];
       
-      $this->logger->loggingGatewayHttpClientConnect('placeRequest',['log' => $log]);
+      $this->logger->log('request_uri ' . $transferObject->getUri());
 
       $result = [];
 
