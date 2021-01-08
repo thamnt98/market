@@ -580,6 +580,7 @@ class IntegrationStock implements IntegrationStockInterface {
 		$startTime = microtime(true);
 
 		$stockPersisted = -1;
+		$catalogInventoryStockPersisted = -1;
 		
 		$locationCodeList = array();
 		$skuList = array();
@@ -735,6 +736,75 @@ class IntegrationStock implements IntegrationStockInterface {
 						" where `id` in (" . implode(",", $stockListValid) . ")";
 				$this->dbConnection->exec($sql);
 
+				$sql =
+					" insert into cataloginventory_stock_item "
+					. " ( "
+					. " product_id, "
+					. " stock_id, "
+					. " qty, "
+					. " min_qty, "
+					. " use_config_min_qty, "
+					. " is_qty_decimal, "
+					. " backorders, "
+					. " use_config_backorders, "
+					. " min_sale_qty, "
+					. " use_config_min_sale_qty, "
+					. " max_sale_qty, "
+					. " use_config_max_sale_qty, "
+					. " is_in_stock, "
+					. " low_stock_date, "
+					. " notify_stock_qty, "
+					. " use_config_notify_stock_qty, "
+					. " manage_stock, "
+					. " use_config_manage_stock, "
+					. " stock_status_changed_auto, "
+					. " use_config_qty_increments, "
+					. " qty_increments, "
+					. " use_config_enable_qty_inc, "
+					. " enable_qty_increments, "
+					. " is_decimal_divided, "
+					. " website_id, "
+					. " deferred_stock_update, "
+					. " use_config_deferred_stock_update "
+					. " ) "
+					. " select "
+						. " entity_id as product_id, "
+						. " 1 as stock_id, "
+						. " 1.0000 as qty, "
+						. " 0.0000 as min_qty, "
+						. " 1 as use_config_min_qty, "
+						. " 0 as is_qty_decimal, "
+						. " 0 as backorders, "
+						. " 1 as use_config_backorders, "
+						. " 1.0000 as min_sale_qty, "
+						. " 1 as use_config_min_sale_qty, "
+						. " 99.0000 as max_sale_qty, "
+						. " 1 as use_config_max_sale_qty, "
+						. " 1 as is_in_stock, "
+						. " null as low_stock_date, "
+						. " 1.0000 as notify_stock_qty, "
+						. " 1 as use_config_notify_stock_qty, "
+						. " 1 as manage_stock, "
+						. " 1 as use_config_manage_stock, "
+						. " 0 as stock_status_changed_auto, "
+						. " 1 as use_config_qty_increments, "
+						. " 1.0000 as qty_increments, "
+						. " 1 as use_config_enable_qty_inc, "
+						. " 0 as enable_qty_increments, "
+						. " 0 as is_decimal_divided, "
+						. " 0 as website_id, "
+						. " 0 as deferred_stock_update, "
+						. " 1 as use_config_deferred_stock_update "
+					. " from "
+					. " catalog_product_entity "
+					. " where "
+						. " sku in ( "
+							. "'" . implode("','", $skuList) . "'"
+						. " ) "
+					. " on duplicate key update manage_stock = 1, use_config_manage_stock = 1 "
+					;
+				$catalogInventoryStockPersisted = $this->dbConnection->exec($sql);
+
 				if (!empty($stockListInvalid)) {
 					$sql =	" update `integration_catalogstock_data` " . 
 							" set " .
@@ -871,8 +941,10 @@ class IntegrationStock implements IntegrationStockInterface {
 			$this->logger->info($label . "failed executing monitoring-stock query");
 		}		
 
-
+		
+		$this->logger->info($label . "catalog-inventory-stock persisted = {$catalogInventoryStockPersisted}");
 		$this->logger->info($label . "stock-data persisted = {$stockPersisted}");
+
 		$this->logger->info($label . "finish " . (microtime(true) - $startTime) . " second");
 
 
