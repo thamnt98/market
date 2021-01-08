@@ -232,7 +232,7 @@
     <route method="POST" url="/V1/customer/device/save">
         <service class="SM\Customer\Api\CustomerDeviceRepositoryInterface" method="save" />
         <resources>
-            <resource ref="self" />
+            <resource ref="anonymous" />
         </resources>
     </route>
     <route method="PUT" url="/V1/customer/device/save">

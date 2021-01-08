@@ -67,17 +67,28 @@ class CustomerDeviceRepository implements \SM\Customer\Api\CustomerDeviceReposit
     protected $logger;
 
     /**
+     * @var \Magento\Webapi\Model\Authorization\TokenUserContext
+     */
+    protected $tokenUserContext;
+
+    /**
+     * @var \SM\Customer\Api\Data\CustomerDeviceInterfaceFactory
+     */
+    protected $customerDeviceInterfaceFactory;
+
+    /**
      * CustomerDeviceRepository constructor.
-     *
-     * @param CustomerDeviceFactory                                              $modelFactory
-     * @param ResourceModel\CustomerDevice                                       $resource
-     * @param \Magento\Framework\Logger\Monolog                                  $logger
-     * @param \Magento\Framework\Api\DataObjectHelper                            $dataObjectHelper
-     * @param ResourceModel\CustomerDevice\CollectionFactory                     $collectionFactory
-     * @param \SM\Customer\Api\Data\CustomerDeviceInterfaceFactory               $dataModelFactory
-     * @param \Magento\Framework\Api\ExtensibleDataObjectConverter               $extensibleDataObjectConverter
-     * @param \SM\Customer\Api\Data\CustomerDeviceSearchResultInterfaceFactory   $searchResultFactory
+     * @param CustomerDeviceFactory $modelFactory
+     * @param ResourceModel\CustomerDevice $resource
+     * @param \Magento\Framework\Logger\Monolog $logger
+     * @param \Magento\Framework\Api\DataObjectHelper $dataObjectHelper
+     * @param ResourceModel\CustomerDevice\CollectionFactory $collectionFactory
+     * @param \SM\Customer\Api\Data\CustomerDeviceInterfaceFactory $dataModelFactory
+     * @param \Magento\Framework\Api\ExtensibleDataObjectConverter $extensibleDataObjectConverter
+     * @param \SM\Customer\Api\Data\CustomerDeviceSearchResultInterfaceFactory $searchResultFactory
      * @param \Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface $collectionProcessor
+     * @param \Magento\Webapi\Model\Authorization\TokenUserContext $tokenUserContext
+     * @param \SM\Customer\Api\Data\CustomerDeviceInterfaceFactory $customerDeviceInterfaceFactory
      */
     public function __construct(
         CustomerDeviceFactory $modelFactory,
@@ -88,7 +99,9 @@ class CustomerDeviceRepository implements \SM\Customer\Api\CustomerDeviceReposit
         \SM\Customer\Api\Data\CustomerDeviceInterfaceFactory $dataModelFactory,
         \Magento\Framework\Api\ExtensibleDataObjectConverter $extensibleDataObjectConverter,
         \SM\Customer\Api\Data\CustomerDeviceSearchResultInterfaceFactory $searchResultFactory,
-        \Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface $collectionProcessor
+        \Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface $collectionProcessor,
+        \Magento\Webapi\Model\Authorization\TokenUserContext $tokenUserContext,
+        \SM\Customer\Api\Data\CustomerDeviceInterfaceFactory $customerDeviceInterfaceFactory
     ) {
         $this->resource = $resource;
         $this->modelFactory = $modelFactory;
@@ -99,6 +112,8 @@ class CustomerDeviceRepository implements \SM\Customer\Api\CustomerDeviceReposit
         $this->collectionFactory = $collectionFactory;
         $this->searchResultFactory = $searchResultFactory;
         $this->logger = $logger;
+        $this->tokenUserContext = $tokenUserContext;
+        $this->customerDeviceInterfaceFactory = $customerDeviceInterfaceFactory;
     }
 
     /**
@@ -109,6 +124,10 @@ class CustomerDeviceRepository implements \SM\Customer\Api\CustomerDeviceReposit
      */
     public function save(\SM\Customer\Api\Data\CustomerDeviceInterface $device)
     {
+        $customerId = $this->tokenUserContext->getUserId();
+        if (!$customerId || $customerId == 0) {
+            return $this->customerDeviceInterfaceFactory->create();
+        }
         $this->logger->info('--- Register device -----------------');
         /** @var CustomerDevice $model */
         $model = $this->modelFactory->create();
