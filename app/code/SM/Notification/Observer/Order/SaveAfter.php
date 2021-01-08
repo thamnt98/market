@@ -399,6 +399,8 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
 
     /**
      * @param $order
+     *
+     * @return boolean
      */
     public function generateInProcessWaitingForPickUpData($order)
     {
@@ -406,6 +408,8 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
             $this->orderInstallation->sendMail($order);
         } catch (\Exception $e) {
         }
+        
+        return true;
     }
 
     /**
