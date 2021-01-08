@@ -741,6 +741,7 @@ class OrderStatus implements OrderStatusInterface {
 						'reference_number' => $refNumber,
 						'amount' => $trxAmount,
 						'new_amount' => $trxAmount - $matrixAdjusmentAmount,
+						'adjustment_amount' => $matrixAdjusmentAmount,
 					]
 				);
 
@@ -1115,6 +1116,12 @@ class OrderStatus implements OrderStatusInterface {
 
 			$creditmemo = $this->creditmemoLoader->load();
 
+			if(!$creditmemo) {
+				$this->loggerOrder->info('Credit memo fail to load.');
+				$this->registry->unregister('current_creditmemo');
+				return $creditMemoData;
+			}
+
 			$creditmemo->setTotalQty($totalQty);
 
 			if ($creditmemo) {
@@ -1198,13 +1205,22 @@ class OrderStatus implements OrderStatusInterface {
 				 * Allow forced creditmemo just in case if it wasn't defined before
 				 */
 				if (!$order->hasForcedCanCreditmemo()) {
-					if (!$order->getTotalPaid()) {
+					try {
 						$order->setTotalPaid($order->getData('grand_total'));
 						$order->setBaseTotalPaid($order->getData('grand_total'));
+
+						$order->setForcedCanCreditmemo(true);
+						$order->setIsInProcess(true);
+						$order->setState(\Magento\Sales\Model\Order::STATE_PROCESSING);
+						$order->setStatus('in_process');
+						$order->save();
+					} catch (\Exception $e) {
+						$this->loggerOrder->info($e->getTraceAsString());
 					}
 
-					$order->setForcedCanCreditmemo(true);
-					$order->save();
+					if($order->getData('grand_total') != null || $order->getData('grand_total') == 0) {
+						$this->payOrder($order);
+					}
 				}
 
 				$this->loggerOrder->info('****** end create invoice ******');
@@ -1285,5 +1301,22 @@ class OrderStatus implements OrderStatusInterface {
 		}
 
 		return false;
+	}
+
+	/**
+	 * update sales order data
+	 *
+	 * @param \Magento\Sales\Api\Data\OrderInterface $order
+	 * @return void
+	 */
+	protected function payOrder($order)
+	{
+		$connection = $this->resource->getConnection();
+		$table = $connection->getTableName('sales_order');
+
+		$data = ["status" => "in_process", "state" => \Magento\Sales\Model\Order::STATE_PROCESSING, "total_paid" => $order->getData('grand_total'), "base_total_paid" => $order->getData('grand_total')]; // Key_Value Pair
+		$where = ['entity_id = ?' => $order->getId()];
+
+		$connection->update($table, $data, $where);
 	}
 }
