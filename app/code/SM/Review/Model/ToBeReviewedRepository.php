@@ -182,6 +182,8 @@ class ToBeReviewedRepository implements ToBeReviewedRepositoryInterface
         $checkResult->setIsAllow(0);
         $itemCollection = $this->joinItemCollectionToSearch();
         $itemCollection->addOrder("main_table.created_at", "DESC");
+        $itemCollection->addFieldToFilter("main_order.customer_id", $customerId);
+        $itemCollection->addFieldToFilter("product_id", $productId);
 
         /** @var Item $item */
         $item = $itemCollection->getFirstItem();
