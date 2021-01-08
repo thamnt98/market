@@ -93,24 +93,28 @@ class OrderStatus implements ObserverInterface
       $check = $this->checkOrderCapture($refNumber);
       
       if($check) {
-        $this->logger->info('== {{Auth Capture Start}} ==');
+        try {
+          $this->logger->info('== {{Auth Capture Start}} ==');
 
-        $this->logger->info('Data order_id = ' . $orderId);
-        $this->logger->info('Data reference_number = ' . $refNumber);
-        $this->logger->info('Data new_amount = ' . $newAmount);
-        $this->logger->info('Data adjustment_amount = ' . $adjAmount);
-        $this->logger->info('Data amount = ' . $amount);
+          $this->logger->info('Data order_id = ' . $orderId);
+          $this->logger->info('Data reference_number = ' . $refNumber);
+          $this->logger->info('Data new_amount = ' . $newAmount);
+          $this->logger->info('Data adjustment_amount = ' . $adjAmount);
+          $this->logger->info('Data amount = ' . $amount);
 
-        $this->clientHelper->setAmount($amount);
-        $this->clientHelper->setReferenceNumber($refNumber);
-        $this->clientHelper->setAdjustmentAmount($amount);
-        $this->clientHelper->setNewAmount($newAmount);
-        $this->clientHelper->setTxnByOrderId($refNumber);
-        $send = $this->clientHelper->send();
+          $this->clientHelper->setAmount($amount);
+          $this->clientHelper->setReferenceNumber($refNumber);
+          $this->clientHelper->setAdjustmentAmount($amount);
+          $this->clientHelper->setNewAmount($newAmount);
+          $this->clientHelper->setTxnByOrderId($refNumber);
+          $send = $this->clientHelper->send();
 
-        $this->logger->info('$send ' . print_r($send, true));
-        
-        $this->saveCaptureTrack($send, $observer);
+          $this->logger->info('$send ' . print_r($send, true));
+          
+          $this->saveCaptureTrack($send, $observer);
+        } catch (\Exception $e) {
+          $this->logger->info('== {{Auth Capture Error}} == ' . $e->getMessage());
+        }
       } else {
         $this->logger->info('== {{Order with reference number ' . $refNumber . ' Captured already}} ==');
       }
