@@ -30,7 +30,14 @@ class Customer extends Session
      */
     protected $smartTokenUserContext;
 
+    /**
+     * @var \Magento\Eav\Model\Config
+     */
+    protected $eavConfig;
+
+
     public function __construct(
+        \Magento\Eav\Model\Config $eavConfig,
         \Magento\Framework\App\Request\Http $request,
         \Magento\Framework\Session\SidResolverInterface $sidResolver,
         \Magento\Framework\Session\Config\ConfigInterface $sessionConfig,
@@ -86,6 +93,7 @@ class Customer extends Session
         $this->state                 = $state;
         $this->customerRepository    = $customerRepository;
         $this->smartTokenUserContext = $smartTokenUserContext;
+        $this->eavConfig = $eavConfig;
     }
 
     /**
@@ -118,20 +126,23 @@ class Customer extends Session
     public function getOmniStoreId()
     {
         $isLoginByAPI = $this->isLoggedInByAPI();
-        if (!$this->isLoggedIn() && !$isLoginByAPI) {
-            return $this->getDefaultOmniStoreCode();
-        }
         if ($isLoginByAPI) {
             $customerId = $this->smartTokenUserContext->getUserId();
             $customer   = $this->customerRepository->getById($customerId);
             if (!empty($customer)) {
                 $omni_store_id = $customer->getCustomAttribute(\SM\CustomPrice\Model\Customer::OMNI_STORE_ID);
             }
-        } else {
+        } elseif ($this->isLoggedIn()) {
             $omni_store_id = $this->getCustomerData()->getCustomAttribute(\SM\CustomPrice\Model\Customer::OMNI_STORE_ID);
+        } else {
+            return $this->getDefaultOmniStoreCode();
         }
         if (!empty($omni_store_id)) {
-            return $omni_store_id->getValue();
+            $basePriceCode = \SM\CustomPrice\Model\Customer::PREFIX_OMNI_NORMAL_PRICE . $omni_store_id->getValue();
+            $basePriceAttr = $this->eavConfig->getAttribute(\Magento\Catalog\Model\Product::ENTITY, $basePriceCode);
+            if ($basePriceAttr && $basePriceAttr->getId()) {
+                return $omni_store_id->getValue();
+            }
         }
         return $this->getDefaultOmniStoreCode();
     }

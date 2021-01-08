@@ -131,13 +131,10 @@ class DataProvider extends \Magento\Elasticsearch\SearchAdapter\Dynamic\DataProv
         $this->customerSession         = $session;
         $this->eavConfig = $eavConfig;
         $this->currentAttribute = 'price';
-        if ($session->isLoggedIn()) {
-            $this->currentAttribute = $session->getOmniFinalPriceAttributeCode();
-            $productAttribute = $this->eavConfig->getAttribute('catalog_product',$this->currentAttribute);
-            if (!$productAttribute||!$productAttribute->getAttributeId()) {
-                $this->currentAttribute = 'price';
-            }
-
+        $this->currentAttribute = $session->getOmniFinalPriceAttributeCode();
+        $productAttribute = $this->eavConfig->getAttribute('catalog_product',$this->currentAttribute);
+        if (!$productAttribute||!$productAttribute->getAttributeId()) {
+            $this->currentAttribute = 'price';
         }
     }
 
