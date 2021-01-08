@@ -451,6 +451,14 @@ class OrderStatus implements OrderStatusInterface {
 	 * @param string $orderItems
 	 */
 	public function statusOrderItems($orderId, $status, $action, $subAction, $orderItems) {
+		$this->loggerOrder->info(__FUNCTION__ . ' start');
+
+		$this->loggerOrder->info('$orderId = ' . $orderId);
+		$this->loggerOrder->info('$status = ' . $status);
+		$this->loggerOrder->info('$action = ' . $action);
+		$this->loggerOrder->info('$subAction = ' . $subAction);
+		$this->loggerOrder->info('$orderItems = ' . print_r($orderItems, true));
+
 		$childOrder     = $this->order->loadByAttribute('reference_order_id', $orderId);
 		$orderData      = $this->statusRepo->loadByOrderIds($orderId);
 		$refNumber      = $orderData->getReferenceNumber();
@@ -525,6 +533,8 @@ class OrderStatus implements OrderStatusInterface {
 		$loadDataOrderStatusHistory = $this->statusRepo->loadDataByParentOrderId($entityIdSalesOrder);
 		$saveDataToStatusHistory    = $this->orderStatusHistoryInterfaceFactory->create();
 
+		$this->loggerOrder->info('=========== prepare order history ===========');
+
 		/* Updating data status order in core magento table */
 		if ($loadDataOrder && $data->getFeStatusNo() == $configStatus->getNumberInProcess()) {
 			$loadDataOrder->setStatus($configStatus->getInProcessOrderStatus());
@@ -582,9 +592,15 @@ class OrderStatus implements OrderStatusInterface {
 			$saveDataToStatusHistory->setComment($data->getFeStatus() . $data->getFeSubStatus());
 			$saveDataToStatusHistory->setEntityName('order');
 		}
+		$this->loggerOrder->info('=========== prepare order history end ===========');
 
+		$this->loggerOrder->info('=========== update state & status sales order start ===========');
 		$this->orderRepoInterface->save($loadDataOrder);
+		$this->loggerOrder->info('=========== update state & status sales order end ===========');
+
+		$this->loggerOrder->info('=========== save data order history magento start ===========');
 		$this->orderStatusHistoryRepoInterface->save($saveDataToStatusHistory);
+		$this->loggerOrder->info('=========== save data order history magento end ===========');
 
 		if ($status == 2 && $action == 2 && $subAction == 7 || $status == 2 && $action == 99 && $subAction == 0) {
 			if (!empty($skusRefunded) and !empty($refunded)) {
@@ -639,6 +655,7 @@ class OrderStatus implements OrderStatusInterface {
 		}
 
 		if ($orderIds) {
+			$this->loggerOrder->info('=========== save data order history oms start ===========');
 			$model = $this->historyInterface->create();
 			$model->setReferenceNumber($orderData->getReferenceNumber());
 			$model->setOrderId($orderIds);
@@ -646,8 +663,10 @@ class OrderStatus implements OrderStatusInterface {
 			$model->setFeSubStatusNo($data->getFeSubStatusNo());
 
 			$this->statusRepo->saveHistory($model);
+			$this->loggerOrder->info('=========== save data order history oms end ===========');
 		}
 
+		$this->loggerOrder->info('=========== custom capture refund start ===========');
 		/* =================== START CAPTURE REFUND =======================*/
 
 		/**
@@ -670,6 +689,7 @@ class OrderStatus implements OrderStatusInterface {
 		$matrixAdjusmentAmount = 0;
 		if ($status == 2 && $action == 2 && $subAction == 7 || $status == 2 && $action == 99 && $subAction == 0) {
 			if ($paymentMethod === 'sprint_bca_va' || $paymentMethod === 'sprint_permata_va' || $paymentMethod === 'trans_mepay_va') {
+				$this->loggerOrder->info('=========== refund VA start ===========');
 				foreach ($loadItemByOrderId as $itemOrder) {
 					$paidPriceOrder = $itemOrder->getPaidPrice();
 					$qtyOrder       = $itemOrder->getQty();
@@ -701,23 +721,29 @@ class OrderStatus implements OrderStatusInterface {
 				$dataJson = json_encode($dataAdjustment);
 				$this->loggerOrder->info($dataJson);
 
+				$this->loggerOrder->info('=========== refund VA start ===========');
+
 				$this->curl->setOption(CURLOPT_RETURNTRANSFER, true);
 				$this->curl->setOption(CURLOPT_CUSTOMREQUEST, 'PATCH');
 				$this->curl->setHeaders($headers);
 				$this->curl->post($url, $dataJson);
 				$responseOrder = $this->curl->getBody();
+				$this->loggerOrder->info('$url : ' . $url);
 				$this->loggerOrder->info('$headers : ' . json_encode($headers));
 				$this->loggerOrder->info('$responseOrder : ' . $responseOrder);
 				$objOrder = json_decode($responseOrder);
 				$this->loggerOrder->info('Body: ' . $dataJson . '. Response: ' . $responseOrder);
 				$json_string = stripcslashes($responseOrder);
-				if ($objOrder->code == 200) {
-					return $result;
-				}
+				// if ($objOrder->code == 200) {
+				// 	return $result;
+				// }
+				$this->loggerOrder->info('response = ' . $json_string);
+				$this->loggerOrder->info('=========== refund VA end ===========');
 			}
 			/* End Non CC*/
 
 			if ($paymentMethod === 'sprint_mega_cc' || $paymentMethod === 'sprint_allbankfull_cc' || $paymentMethod === 'sprint_mega_debit' || $paymentMethod === 'trans_mepay_cc') {
+				$this->loggerOrder->info('=========== refund CC DEBIT start ===========');
 				/**
 				 * prepare data array refund send to PG
 				 */
@@ -757,11 +783,14 @@ class OrderStatus implements OrderStatusInterface {
 				$dataJson = json_encode($dataAdjustment);
 				$this->loggerOrder->info($dataJson);
 
+				$this->loggerOrder->info('=========== refund CC DEBIT start ===========');
+
 				$this->curl->setOption(CURLOPT_RETURNTRANSFER, true);
 				$this->curl->setOption(CURLOPT_CUSTOMREQUEST, 'PATCH');
 				$this->curl->setHeaders($headers);
 				$this->curl->post($url, $dataJson);
 				$responseOrder = $this->curl->getBody();
+				$this->loggerOrder->info('$url = ' . $url);
 				$this->loggerOrder->info('$headers : ' . json_encode($headers));
 				$this->loggerOrder->info('$responseOrder : ' . $responseOrder);
 				$objOrder = json_decode($responseOrder);
@@ -797,9 +826,12 @@ class OrderStatus implements OrderStatusInterface {
 						}
 					}
 				}
+				
+				$this->loggerOrder->info('=========== refund CC DEBIT end ===========');
 			}
 		}
 
+		$this->loggerOrder->info(__FUNCTION__ . ' end');
 		/* =================== END CAPTURE REFUND =======================*/
 		return $result;
 	}
