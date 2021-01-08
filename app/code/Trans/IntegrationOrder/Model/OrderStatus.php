@@ -732,16 +732,18 @@ class OrderStatus implements OrderStatusInterface {
 					$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
 				}
 
-				$this->eventManager->dispatch(
-					'refund_with_mega_payment',
-					[
-						'order_id' => $orderId,
-						'reference_number' => $refNumber,
-						'amount' => $trxAmount,
-						'new_amount' => $trxAmount - $matrixAdjusmentAmount,
-						'adjustment_amount' => $matrixAdjusmentAmount,
-					]
-				);
+				if($paymentMethod === 'trans_mepay_cc') {
+					$this->eventManager->dispatch(
+						'refund_with_mega_payment',
+						[
+							'order_id' => $orderId,
+							'reference_number' => $refNumber,
+							'amount' => $trxAmount,
+							'new_amount' => $trxAmount - $matrixAdjusmentAmount,
+							'adjustment_amount' => $matrixAdjusmentAmount,
+						]
+					);
+				}
 
 				/* update quantity adjusment */
 				$url            = $this->orderConfig->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
