@@ -223,7 +223,7 @@ class ConnectAuthCapture extends AbstractHelper
    */
   public function setTxnByOrderId($refNumber)
   {
-    $order = $this->transactionHelper->getSalesOrderArray($refNumber);
+    $order = $this->transactionHelper->getSalesOrderArrayParent($refNumber);
     $orderId = $order['entity_id'];
     
     // $txn = $this->transactionHelper->getLastOrderTransaction($orderId);

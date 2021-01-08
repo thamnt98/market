@@ -38,4 +38,7 @@
 !pub/media/lookbook/
 !pub/media/lookbook/default
 !pub/media/lookbook/default/**
+!pub/media/email/
+!pub/media/email/images/
+!pub/media/email/images/**
 .DS_Store
