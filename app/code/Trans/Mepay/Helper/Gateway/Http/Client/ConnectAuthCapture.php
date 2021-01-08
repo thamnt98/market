@@ -126,6 +126,8 @@ class ConnectAuthCapture extends AbstractHelper
   public function send()
   {
     if (isset($this->inquiry['id']) && isset($this->transaction['id'])) {
+      $this->logger->info('$this->inquiry = ' . print_r($this->inquiry, true));
+      $this->logger->info('$this->transaction = ' . print_r($this->transaction, true));
       $transferBuilder = $this->client->create($this->inquiry['id'], $this->transaction['id'], $this->getBodyParams());
       return $this->connect->placeRequest($transferBuilder);
     }
