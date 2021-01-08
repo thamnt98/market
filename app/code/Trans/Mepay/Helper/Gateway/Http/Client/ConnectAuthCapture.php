@@ -87,6 +87,8 @@ class ConnectAuthCapture extends AbstractHelper
    * @var \Trans\Mepay\Gateway\Http\Client\Connect
    */
   protected $connect;
+  
+  protected $logger;
 
   /**
    * Constructor
@@ -111,6 +113,10 @@ class ConnectAuthCapture extends AbstractHelper
     $this->authCapture = $authCapture;
     $this->connect = $connect;
     parent::__construct($context);
+
+    $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/trans_mepay.log');
+    $logger = new \Zend\Log\Logger();
+    $this->logger = $logger->addWriter($writer);
   }
 
   /**
@@ -223,18 +229,24 @@ class ConnectAuthCapture extends AbstractHelper
    */
   public function setTxnByOrderId($refNumber)
   {
+    $this->logger->info(__FUNCTION__ . ' start');
     $order = $this->transactionHelper->getSalesOrderArrayParent($refNumber);
     $orderId = $order['entity_id'];
+    $this->logger->info('$orderId = ' . $orderId);
+    $this->logger->info('$refNumber = ' . $refNumber);
     
     // $txn = $this->transactionHelper->getLastOrderTransaction($orderId);
     $txn = $this->transactionHelper->getSalesPaymentTransactionByOrderId($orderId);
     
+    $this->logger->info('sales_payment_transaction data = ' . print_r($txn, true));
+
     if (isset($txn['trans_mepay_inquiry'])) {
       $this->inquiry = $this->json->unserialize($txn['trans_mepay_inquiry']);
     }
     if (isset($txn['trans_mepay_transaction'])) {
       $this->transaction = $this->json->unserialize($txn['trans_mepay_transaction']);
     }
+    $this->logger->info(__FUNCTION__ . ' end');
   }
 
   /**
