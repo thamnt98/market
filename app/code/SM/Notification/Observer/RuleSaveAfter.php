@@ -111,7 +111,9 @@ class RuleSaveAfter implements \Magento\Framework\Event\ObserverInterface
                         ->setData('entity_id', $customer->getId());
                     if ($this->validation->validateCustomer($rule, $customer)) {
                         try {
-                            $this->resource->save($this->generate->haveCoupon($customer->getDataModel()));
+                            if ($model = $this->generate->haveCoupon($customer->getDataModel())) {
+                                $this->resource->save($model);
+                            }
                         } catch (\Exception $e) {
                             $this->logger->error("Have Coupon: \n\t" . $e->getMessage(), $e->getTrace());
                         }
