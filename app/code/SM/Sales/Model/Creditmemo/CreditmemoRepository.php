@@ -67,7 +67,6 @@ class CreditmemoRepository implements \SM\Sales\Api\CreditmemoRepositoryInterfac
     ) {
         $this->formInformationFactory = $formInformationFactory;
         $this->creditmemoRepository = $creditmemoRepository;
-        $this->creditmemoRepository = $creditmemoRepository;
         $this->bankFactory = $bankFactory;
         $this->sendToJira = $sendToJira;
         $this->requestFormData = $requestFormData;

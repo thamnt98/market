@@ -120,7 +120,8 @@ class ParentOrder
         /** @var \Magento\Sales\Api\Data\OrderPaymentInterface $payment */
         $payment = $parentOrder->getPayment();
         $totalRefund = 0;
-        $hasCreditmemo = false;
+        $hasCreditmemo = $canCreditmemo = false;
+
 
         foreach ($subOrders as $key => $subOrder) {
             if ($subOrder->getId() == $parentOrder->getEntityId() && count($subOrders) >= 2) {
@@ -131,7 +132,12 @@ class ParentOrder
             if ($subOrder->getHasCreditmemo()) {
                 $hasCreditmemo = true;
             }
+
+            if ($subOrder->getCanCreditMemo()) {
+                $canCreditmemo = true;
+            }
         }
+
 
         /** @var ParentOrderDataInterface $parentOrderData */
         $parentOrderData = $this->parentOrderDataFactory->create();
@@ -146,7 +152,7 @@ class ParentOrder
             ->setTotalPayment($parentOrder->getGrandTotal())
             ->setTotalRefund($totalRefund)
             ->setHasCreditmemo($hasCreditmemo)
-            ->setRefundMessage(!$hasCreditmemo ?: __("Some of your ordered items are not available"))
+            ->setRefundMessage($this->getRefundMessage($hasCreditmemo, $canCreditmemo))
             ->setGrandTotal($parentOrder->getTotalInvoiced() - abs($totalRefund))
             ->setSubTotal($parentOrder->getSubtotal())
             ->setInvoiceNumber($parentOrder->getReferenceInvoiceNumber())
@@ -351,5 +357,24 @@ class ParentOrder
     public function getUrl($path, $params = null)
     {
         return  $this->urlInterface->getUrl($path, $params);
+    }
+
+    /**
+     * @param bool $hasCreditmemo
+     * @param bool $canCreditmemo
+     * @return \Magento\Framework\Phrase|string
+     */
+    private function getRefundMessage(bool $hasCreditmemo, bool $canCreditmemo)
+    {
+        $message = '';
+        if ($hasCreditmemo) {
+            if ($canCreditmemo) {
+                $message = __("Some of your ordered items are not available.");
+            } else {
+                $message = __("All of your ordered items are not available.");
+            }
+        }
+
+        return $message;
     }
 }

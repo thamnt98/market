@@ -54,121 +54,122 @@ use SM\Sales\Model\ResourceModel\Order\Collection as OrderCollection;
  * Class SubOrder
  * @package SM\Sales\Model\Order
  */
-class SubOrder {
-	/**
-	 * @var ItemOptionDataInterfaceFactory
-	 */
-	protected $itemOptionDataFactory;
+class SubOrder
+{
+    /**
+     * @var ItemOptionDataInterfaceFactory
+     */
+    protected $itemOptionDataFactory;
 
-	/**
-	 * @var Emulation
-	 */
-	protected $appEmulation;
-	/**
-	 * @var Image
-	 */
-	protected $imageHelper;
+    /**
+     * @var Emulation
+     */
+    protected $appEmulation;
+    /**
+     * @var Image
+     */
+    protected $imageHelper;
 
-	/**
-	 * @var SubOrderDataInterfaceFactory
-	 */
-	protected $subOrderDataFactory;
-	/**
-	 * @var DetailItemDataInterfaceFactory
-	 */
-	protected $orderItemDataFactory;
+    /**
+     * @var SubOrderDataInterfaceFactory
+     */
+    protected $subOrderDataFactory;
+    /**
+     * @var DetailItemDataInterfaceFactory
+     */
+    protected $orderItemDataFactory;
 
-	/**
-	 * @var InstallationServiceInterfaceFactory
-	 */
-	protected $installationServiceFactory;
-	/**
-	 * @var OrderRepository
-	 */
-	protected $orderRepository;
-	/**
-	 * @var DeliveryAddressDataInterfaceFactory
-	 */
-	protected $deliveryDataFactory;
+    /**
+     * @var InstallationServiceInterfaceFactory
+     */
+    protected $installationServiceFactory;
+    /**
+     * @var OrderRepository
+     */
+    protected $orderRepository;
+    /**
+     * @var DeliveryAddressDataInterfaceFactory
+     */
+    protected $deliveryDataFactory;
 
-	/**
-	 * @var DataObjectHelper
-	 */
-	protected $dataObjectHelper;
+    /**
+     * @var DataObjectHelper
+     */
+    protected $dataObjectHelper;
 
-	/**
-	 * @var ProductOptionInterfaceFactory
-	 */
-	protected $productOptionDataFactory;
+    /**
+     * @var ProductOptionInterfaceFactory
+     */
+    protected $productOptionDataFactory;
 
-	/**
-	 * @var DigitalProductInterfaceFactory
-	 */
-	protected $digitalDataFactory;
+    /**
+     * @var DigitalProductInterfaceFactory
+     */
+    protected $digitalDataFactory;
 
-	/**
-	 * @var StoreManagerInterface
-	 */
-	protected $storeManager;
+    /**
+     * @var StoreManagerInterface
+     */
+    protected $storeManager;
 
-	/**
-	 * @var StatusState
-	 */
-	protected $stateHelper;
+    /**
+     * @var StatusState
+     */
+    protected $stateHelper;
 
-	/**
-	 * @var OrderAddressRepositoryInterface
-	 */
-	protected $orderAddressRepository;
+    /**
+     * @var OrderAddressRepositoryInterface
+     */
+    protected $orderAddressRepository;
 
-	/**
-	 * @var SourceRepositoryInterface
-	 */
-	protected $sourceRepoInterface;
+    /**
+     * @var SourceRepositoryInterface
+     */
+    protected $sourceRepoInterface;
 
-	/**
-	 * @var StoreInfoFactory
-	 */
-	protected $storeInfoFactory;
+    /**
+     * @var StoreInfoFactory
+     */
+    protected $storeInfoFactory;
 
-	/**
-	 * @var SourceCollectionFactory
-	 */
-	protected $sourceCollectionFactory;
+    /**
+     * @var SourceCollectionFactory
+     */
+    protected $sourceCollectionFactory;
 
-	/**
-	 * @var \Magento\Framework\UrlInterface
-	 */
-	protected $urlInterface;
+    /**
+     * @var \Magento\Framework\UrlInterface
+     */
+    protected $urlInterface;
 
-	/**
-	 * @var \SM\Sales\Model\Data\HandleOrderStatusHistory
-	 */
-	private $history;
+    /**
+     * @var \SM\Sales\Model\Data\HandleOrderStatusHistory
+     */
+    private $history;
 
-	/**
-	 * @var \Magento\Catalog\Api\ProductRepositoryInterface
-	 */
-	protected $productRepository;
-	/**
-	 * @var DataObjectFactory
-	 */
-	protected $dataObjectFactory;
+    /**
+     * @var \Magento\Catalog\Api\ProductRepositoryInterface
+     */
+    protected $productRepository;
+    /**
+     * @var DataObjectFactory
+     */
+    protected $dataObjectFactory;
 
-	/**
-	 * @var \SM\FreshProductApi\Helper\Fresh
-	 */
-	protected $fresh;
+    /**
+     * @var \SM\FreshProductApi\Helper\Fresh
+     */
+    protected $fresh;
 
-	/**
-	 * @var string
-	 */
-	private $currentCustomerToken;
+    /**
+     * @var string
+     */
+    private $currentCustomerToken;
 
-	/**
-	 * @var \SM\Sales\Model\Order\Updater
-	 */
-	protected $orderUpdater;
+    /**
+     * @var \SM\Sales\Model\Order\Updater
+     */
+    protected $orderUpdater;
 
     /**
      * @var mixed
@@ -176,237 +177,241 @@ class SubOrder {
     private $currentCreditemo;
 
     /**
-	 * SubOrder constructor.
-	 * @param ItemOptionDataInterfaceFactory $itemOptionDataFactory
-	 * @param Emulation $appEmulation
-	 * @param Image $imageHelper
-	 * @param SubOrderDataInterfaceFactory $subOrderDataFactory
-	 * @param DetailItemDataInterfaceFactory $orderItemDataFactory
-	 * @param InstallationServiceInterfaceFactory $installationServiceFactory
-	 * @param OrderRepository $orderRepository
-	 * @param DeliveryAddressDataInterfaceFactory $deliveryDataFactory
-	 * @param DataObjectHelper $dataObjectHelper
-	 * @param ProductOptionInterfaceFactory $productOptionDataFactory
-	 * @param DigitalProductInterfaceFactory $digitalDataFactory
-	 * @param StoreManagerInterface $storeManager
-	 * @param StatusState $stateHelper
-	 * @param OrderAddressRepositoryInterface $orderAddressRepository
-	 * @param SourceRepositoryInterface $sourceRepoInterface
-	 * @param StoreInfoFactory $storeInfoFactory
-	 * @param SourceCollectionFactory $sourceCollectionFactory
-	 * @param \Magento\Framework\UrlInterface $urlInterface
-	 * @param \SM\Sales\Model\Data\HandleOrderStatusHistory $history
-	 * @param DataObjectFactory $dataObjectFactory
-	 * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
-	 * @param \SM\FreshProductApi\Helper\Fresh $fresh
-	 * @param Request $request
-	 * @param \SM\Sales\Model\Order\Updater $updater
-	 */
-	public function __construct(
-		ItemOptionDataInterfaceFactory $itemOptionDataFactory,
-		Emulation $appEmulation,
-		Image $imageHelper,
-		SubOrderDataInterfaceFactory $subOrderDataFactory,
-		DetailItemDataInterfaceFactory $orderItemDataFactory,
-		InstallationServiceInterfaceFactory $installationServiceFactory,
-		OrderRepository $orderRepository,
-		DeliveryAddressDataInterfaceFactory $deliveryDataFactory,
-		DataObjectHelper $dataObjectHelper,
-		ProductOptionInterfaceFactory $productOptionDataFactory,
-		DigitalProductInterfaceFactory $digitalDataFactory,
-		StoreManagerInterface $storeManager,
-		StatusState $stateHelper,
-		OrderAddressRepositoryInterface $orderAddressRepository,
-		SourceRepositoryInterface $sourceRepoInterface,
-		StoreInfoFactory $storeInfoFactory,
-		SourceCollectionFactory $sourceCollectionFactory,
-		\Magento\Framework\UrlInterface $urlInterface,
-		\SM\Sales\Model\Data\HandleOrderStatusHistory $history,
-		DataObjectFactory $dataObjectFactory,
-		\Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
-		\SM\FreshProductApi\Helper\Fresh $fresh,
-		Request $request,
-		Updater $updater
-	) {
-		$this->dataObjectFactory          = $dataObjectFactory;
-		$this->fresh                      = $fresh;
-		$this->sourceCollectionFactory    = $sourceCollectionFactory;
-		$this->stateHelper                = $stateHelper;
-		$this->storeManager               = $storeManager;
-		$this->digitalDataFactory         = $digitalDataFactory;
-		$this->productOptionDataFactory   = $productOptionDataFactory;
-		$this->dataObjectHelper           = $dataObjectHelper;
-		$this->deliveryDataFactory        = $deliveryDataFactory;
-		$this->orderRepository            = $orderRepository;
-		$this->subOrderDataFactory        = $subOrderDataFactory;
-		$this->orderItemDataFactory       = $orderItemDataFactory;
-		$this->installationServiceFactory = $installationServiceFactory;
-		$this->appEmulation               = $appEmulation;
-		$this->imageHelper                = $imageHelper;
-		$this->itemOptionDataFactory      = $itemOptionDataFactory;
-		$this->orderAddressRepository     = $orderAddressRepository;
-		$this->sourceRepoInterface        = $sourceRepoInterface;
-		$this->storeInfoFactory           = $storeInfoFactory;
-		$this->urlInterface               = $urlInterface;
-		$this->history                    = $history;
-		$this->productRepository          = $productRepository;
-		$this->request                    = $request;
-		$this->orderUpdater               = $updater;
-	}
+     * SubOrder constructor.
+     * @param ItemOptionDataInterfaceFactory $itemOptionDataFactory
+     * @param Emulation $appEmulation
+     * @param Image $imageHelper
+     * @param SubOrderDataInterfaceFactory $subOrderDataFactory
+     * @param DetailItemDataInterfaceFactory $orderItemDataFactory
+     * @param InstallationServiceInterfaceFactory $installationServiceFactory
+     * @param OrderRepository $orderRepository
+     * @param DeliveryAddressDataInterfaceFactory $deliveryDataFactory
+     * @param DataObjectHelper $dataObjectHelper
+     * @param ProductOptionInterfaceFactory $productOptionDataFactory
+     * @param DigitalProductInterfaceFactory $digitalDataFactory
+     * @param StoreManagerInterface $storeManager
+     * @param StatusState $stateHelper
+     * @param OrderAddressRepositoryInterface $orderAddressRepository
+     * @param SourceRepositoryInterface $sourceRepoInterface
+     * @param StoreInfoFactory $storeInfoFactory
+     * @param SourceCollectionFactory $sourceCollectionFactory
+     * @param \Magento\Framework\UrlInterface $urlInterface
+     * @param \SM\Sales\Model\Data\HandleOrderStatusHistory $history
+     * @param DataObjectFactory $dataObjectFactory
+     * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+     * @param \SM\FreshProductApi\Helper\Fresh $fresh
+     * @param Request $request
+     * @param \SM\Sales\Model\Order\Updater $updater
+     */
+    public function __construct(
+        ItemOptionDataInterfaceFactory $itemOptionDataFactory,
+        Emulation $appEmulation,
+        Image $imageHelper,
+        SubOrderDataInterfaceFactory $subOrderDataFactory,
+        DetailItemDataInterfaceFactory $orderItemDataFactory,
+        InstallationServiceInterfaceFactory $installationServiceFactory,
+        OrderRepository $orderRepository,
+        DeliveryAddressDataInterfaceFactory $deliveryDataFactory,
+        DataObjectHelper $dataObjectHelper,
+        ProductOptionInterfaceFactory $productOptionDataFactory,
+        DigitalProductInterfaceFactory $digitalDataFactory,
+        StoreManagerInterface $storeManager,
+        StatusState $stateHelper,
+        OrderAddressRepositoryInterface $orderAddressRepository,
+        SourceRepositoryInterface $sourceRepoInterface,
+        StoreInfoFactory $storeInfoFactory,
+        SourceCollectionFactory $sourceCollectionFactory,
+        \Magento\Framework\UrlInterface $urlInterface,
+        \SM\Sales\Model\Data\HandleOrderStatusHistory $history,
+        DataObjectFactory $dataObjectFactory,
+        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
+        \SM\FreshProductApi\Helper\Fresh $fresh,
+        Request $request,
+        Updater $updater
+    ) {
+        $this->dataObjectFactory          = $dataObjectFactory;
+        $this->fresh                      = $fresh;
+        $this->sourceCollectionFactory    = $sourceCollectionFactory;
+        $this->stateHelper                = $stateHelper;
+        $this->storeManager               = $storeManager;
+        $this->digitalDataFactory         = $digitalDataFactory;
+        $this->productOptionDataFactory   = $productOptionDataFactory;
+        $this->dataObjectHelper           = $dataObjectHelper;
+        $this->deliveryDataFactory        = $deliveryDataFactory;
+        $this->orderRepository            = $orderRepository;
+        $this->subOrderDataFactory        = $subOrderDataFactory;
+        $this->orderItemDataFactory       = $orderItemDataFactory;
+        $this->installationServiceFactory = $installationServiceFactory;
+        $this->appEmulation               = $appEmulation;
+        $this->imageHelper                = $imageHelper;
+        $this->itemOptionDataFactory      = $itemOptionDataFactory;
+        $this->orderAddressRepository     = $orderAddressRepository;
+        $this->sourceRepoInterface        = $sourceRepoInterface;
+        $this->storeInfoFactory           = $storeInfoFactory;
+        $this->urlInterface               = $urlInterface;
+        $this->history                    = $history;
+        $this->productRepository          = $productRepository;
+        $this->request                    = $request;
+        $this->orderUpdater               = $updater;
+    }
 
-	/**
-	 * @param OrderItemInterface $orderItem
-	 * @return array|bool
-	 */
-	public function getItemOptions($orderItem) {
-		$result  = [];
-		$options = $orderItem->getProductOptions();
+    /**
+     * @param OrderItemInterface $orderItem
+     * @return array|bool
+     */
+    public function getItemOptions($orderItem)
+    {
+        $result  = [];
+        $options = $orderItem->getProductOptions();
 
-		if ($options) {
-			if (isset($options['options'])) {
-				$result = array_merge($result, $options['options']);
-			}
-			if (isset($options['additional_options'])) {
-				$result = array_merge($result, $options['additional_options']);
-			}
-			if (isset($options['attributes_info'])) {
-				$result = array_merge($result, $options['attributes_info']);
-			}
-			if (isset($options["bundle_options"])) {
-				$result = array_merge($result, $options["bundle_options"]);
-			}
-		}
-		if ($result) {
-			$itemOptions = [];
-			$key         = 1;
-			foreach ($result as $option) {
-				/** @var ItemOptionDataInterface $itemOptionData */
-				$itemOptionData = $this->itemOptionDataFactory->create();
-				$itemOptionData->setOptionLabel($option["label"]);
+        if ($options) {
+            if (isset($options['options'])) {
+                $result = array_merge($result, $options['options']);
+            }
+            if (isset($options['additional_options'])) {
+                $result = array_merge($result, $options['additional_options']);
+            }
+            if (isset($options['attributes_info'])) {
+                $result = array_merge($result, $options['attributes_info']);
+            }
+            if (isset($options["bundle_options"])) {
+                $result = array_merge($result, $options["bundle_options"]);
+            }
+        }
+        if ($result) {
+            $itemOptions = [];
+            $key         = 1;
+            foreach ($result as $option) {
+                /** @var ItemOptionDataInterface $itemOptionData */
+                $itemOptionData = $this->itemOptionDataFactory->create();
+                $itemOptionData->setOptionLabel($option["label"]);
 
-				if (is_array($option["value"])) {
-					$itemOptionData->setOptionType(ParentOrderRepository::OPTION_TYPE_BUNDLE);
-					$itemOptionData->setOptionValue(json_encode($this->formatBundleOptions($option["value"], $key)));
-					$product             = $this->productRepository->getById($orderItem->getProductId());
-					$productTypeInstance = $product->getTypeInstance();
-					$productOption       = $productTypeInstance
-						->getSelectionsCollection($productTypeInstance->getOptionsIds($product), $product)
-						->getItems();
+                if (is_array($option["value"])) {
+                    $itemOptionData->setOptionType(ParentOrderRepository::OPTION_TYPE_BUNDLE);
+                    $itemOptionData->setOptionValue(json_encode($this->formatBundleOptions($option["value"], $key)));
+                    $product             = $this->productRepository->getById($orderItem->getProductId());
+                    $productTypeInstance = $product->getTypeInstance();
+                    $productOption       = $productTypeInstance
+                        ->getSelectionsCollection($productTypeInstance->getOptionsIds($product), $product)
+                        ->getItems();
 
-					$selectOption = $this->getSelectedProduct($productOption, $options);
+                    $selectOption = $this->getSelectedProduct($productOption, $options);
 
-					if (isset($selectOption[$option['option_id']])) {
-						$itemOptionData->setOptionSelection($selectOption[$option['option_id']]);
-					}
-					$key++;
-				} else {
-					$itemOptionData->setOptionType(ParentOrderRepository::OPTION_TYPE_CONFIGURABLE);
-					$itemOptionData->setOptionValue($option["value"]);
-					if ($option["value"] == '' || !(bool)$option["value"]) {
-					    continue;
+                    if (isset($selectOption[$option['option_id']])) {
+                        $itemOptionData->setOptionSelection($selectOption[$option['option_id']]);
                     }
-				}
-				$itemOptions[] = $itemOptionData;
-			}
-			return $itemOptions;
-		} else {
-			return false;
-		}
-	}
+                    $key++;
+                } else {
+                    $itemOptionData->setOptionType(ParentOrderRepository::OPTION_TYPE_CONFIGURABLE);
+                    $itemOptionData->setOptionValue($option["value"]);
+                    if ($option["value"] == '' || !(bool)$option["value"]) {
+                        continue;
+                    }
+                }
+                $itemOptions[] = $itemOptionData;
+            }
+            return $itemOptions;
+        } else {
+            return false;
+        }
+    }
 
-	public function formatBundleOptions($values, $key) {
-		foreach ($values as &$value) {
-			$value["title"] = __("Bundle ") . $key;
-		}
+    public function formatBundleOptions($values, $key)
+    {
+        foreach ($values as &$value) {
+            $value["title"] = __("Bundle ") . $key;
+        }
 
-		return $values;
-	}
+        return $values;
+    }
 
-	/**
-	 * @param $productOption
-	 * @param $option
-	 * @return array
-	 */
-	public function getSelectedProduct($productOption, $option) {
-		$optionSelected = [];
-		$selectOption   = [];
-		$infoBuyRequest = $option['info_buyRequest'];
-		$bundleOption   = $infoBuyRequest['bundle_option'];
-		foreach ($productOption as $optionId => $productOpt) {
-			foreach ($bundleOption as $opt) {
-				if (is_array($opt)) {
-					if (in_array($productOpt->getSelectionId(), $opt)) {
-						$optionSelected[] = $productOpt;
-						if ($productOpt->getTypeId() == Configurable::TYPE_CODE) {
-							if (!empty($infoBuyRequest['super_attribute'])) {
-								$supperAttributes = $infoBuyRequest['super_attribute'];
-								$attrOpt          = 0;
-								foreach ($bundleOption as $k => $v) {
-									if (in_array($productOpt->getSelectionId(), $v)) {
-										$attrOpt = $k;
-									}
-								}
-								$attributes        = $productOpt->getTypeInstance()->getConfigurableAttributesAsArray($productOpt);
-								$attributeId       = head(array_keys($supperAttributes[$attrOpt][$productOpt->getSelectionId()]));
-								$attributeSelected = head(array_values($supperAttributes[$attrOpt][$productOpt->getSelectionId()]));
-								$attrbute_code     = $attributes[$attributeId]['attribute_code'];
+    /**
+     * @param $productOption
+     * @param $option
+     * @return array
+     */
+    public function getSelectedProduct($productOption, $option)
+    {
+        $optionSelected = [];
+        $selectOption   = [];
+        $infoBuyRequest = $option['info_buyRequest'];
+        $bundleOption   = $infoBuyRequest['bundle_option'];
+        foreach ($productOption as $optionId => $productOpt) {
+            foreach ($bundleOption as $opt) {
+                if (is_array($opt)) {
+                    if (in_array($productOpt->getSelectionId(), $opt)) {
+                        $optionSelected[] = $productOpt;
+                        if ($productOpt->getTypeId() == Configurable::TYPE_CODE) {
+                            if (!empty($infoBuyRequest['super_attribute'])) {
+                                $supperAttributes = $infoBuyRequest['super_attribute'];
+                                $attrOpt          = 0;
+                                foreach ($bundleOption as $k => $v) {
+                                    if (in_array($productOpt->getSelectionId(), $v)) {
+                                        $attrOpt = $k;
+                                    }
+                                }
+                                $attributes        = $productOpt->getTypeInstance()->getConfigurableAttributesAsArray($productOpt);
+                                $attributeId       = head(array_keys($supperAttributes[$attrOpt][$productOpt->getSelectionId()]));
+                                $attributeSelected = head(array_values($supperAttributes[$attrOpt][$productOpt->getSelectionId()]));
+                                $attrbute_code     = $attributes[$attributeId]['attribute_code'];
 
-								foreach ($attributes[$attributeId]['values'] as $value) {
-									if ($value["value_index"] == $attributeSelected) {
-										$selectOption[$productOpt->getOptionId()] = $value["store_label"];
-									}
-								}
-							}
-						} else {
-							$selectOption[$productOpt->getData("option_id")] = $productOpt->getData("name");
-						}
-					}
-				} else {
-					if ($productOpt->getSelectionId() == $opt) {
-						$optionSelected[] = $productOpt;
-						if ($productOpt->getTypeId() == Configurable::TYPE_CODE) {
-							if (!empty($infoBuyRequest['super_attribute'])) {
-								$supperAttributes = $infoBuyRequest['super_attribute'];
-								$attrOpt          = 0;
-								foreach ($bundleOption as $k => $v) {
-									if ($productOpt->getSelectionId() == $v) {
-										$attrOpt = $k;
-									}
-								}
-								$attributes        = $productOpt->getTypeInstance()->getConfigurableAttributesAsArray($productOpt);
-								$attributeId       = head(array_keys($supperAttributes[$attrOpt][$productOpt->getSelectionId()]));
-								$attributeSelected = head(array_values($supperAttributes[$attrOpt][$productOpt->getSelectionId()]));
-								$attrbute_code     = $attributes[$attributeId]['attribute_code'];
+                                foreach ($attributes[$attributeId]['values'] as $value) {
+                                    if ($value["value_index"] == $attributeSelected) {
+                                        $selectOption[$productOpt->getOptionId()] = $value["store_label"];
+                                    }
+                                }
+                            }
+                        } else {
+                            $selectOption[$productOpt->getData("option_id")] = $productOpt->getData("name");
+                        }
+                    }
+                } else {
+                    if ($productOpt->getSelectionId() == $opt) {
+                        $optionSelected[] = $productOpt;
+                        if ($productOpt->getTypeId() == Configurable::TYPE_CODE) {
+                            if (!empty($infoBuyRequest['super_attribute'])) {
+                                $supperAttributes = $infoBuyRequest['super_attribute'];
+                                $attrOpt          = 0;
+                                foreach ($bundleOption as $k => $v) {
+                                    if ($productOpt->getSelectionId() == $v) {
+                                        $attrOpt = $k;
+                                    }
+                                }
+                                $attributes        = $productOpt->getTypeInstance()->getConfigurableAttributesAsArray($productOpt);
+                                $attributeId       = head(array_keys($supperAttributes[$attrOpt][$productOpt->getSelectionId()]));
+                                $attributeSelected = head(array_values($supperAttributes[$attrOpt][$productOpt->getSelectionId()]));
+                                $attrbute_code     = $attributes[$attributeId]['attribute_code'];
 
-								foreach ($attributes[$attributeId]['values'] as $value) {
-									if ($value["value_index"] == $attributeSelected) {
-										$selectOption[$productOpt->getOptionId()] = $value["store_label"];
-									}
-								}
-							}
-						} else {
-							$selectOption[$productOpt->getData("option_id")] = $productOpt->getData("name");
-						}
-					}
-				}
-			}
-		}
+                                foreach ($attributes[$attributeId]['values'] as $value) {
+                                    if ($value["value_index"] == $attributeSelected) {
+                                        $selectOption[$productOpt->getOptionId()] = $value["store_label"];
+                                    }
+                                }
+                            }
+                        } else {
+                            $selectOption[$productOpt->getData("option_id")] = $productOpt->getData("name");
+                        }
+                    }
+                }
+            }
+        }
 
-		return $selectOption;
-	}
+        return $selectOption;
+    }
 
-	/**
-	 * @param $itemResults
-	 * @return int[]
-	 */
-	public function itemProcess($itemResults) {
-		$parentOrderIds = [];
-		/** @var Item $orderItem */
-		foreach ($itemResults as $orderItem) {
-			$parentOrderIds[] = $orderItem->getData("parent_entity_id");
-		}
-		return $parentOrderIds;
-	}
+    /**
+     * @param $itemResults
+     * @return int[]
+     */
+    public function itemProcess($itemResults)
+    {
+        $parentOrderIds = [];
+        /** @var Item $orderItem */
+        foreach ($itemResults as $orderItem) {
+            $parentOrderIds[] = $orderItem->getData("parent_entity_id");
+        }
+        return $parentOrderIds;
+    }
 
     /**
      * @param int $subOrderId
@@ -426,41 +431,42 @@ class SubOrder {
         }
     }
 
-	/**
-	 * @param OrderCollection $orderCollection
-	 * @param $cancelType
-	 * @param bool $hasInvoice
-	 * @return DataObject
-	 * @throws NoSuchEntityException
-	 * @throws \Magento\Framework\Exception\LocalizedException
-	 */
-	public function handleSubOrders($orderCollection, &$cancelType, $hasInvoice = false) {
-		$result = $this->dataObjectFactory->create();
-		$this->appEmulation->startEnvironmentEmulation(
-			$this->storeManager->getStore()->getId(),
-			Area::AREA_FRONTEND,
-			true
-		);
+    /**
+     * @param OrderCollection $orderCollection
+     * @param $cancelType
+     * @param bool $hasInvoice
+     * @return DataObject
+     * @throws NoSuchEntityException
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    public function handleSubOrders($orderCollection, &$cancelType, $hasInvoice = false)
+    {
+        $result = $this->dataObjectFactory->create();
+        $this->appEmulation->startEnvironmentEmulation(
+            $this->storeManager->getStore()->getId(),
+            Area::AREA_FRONTEND,
+            true
+        );
 
-		$sourceInformation = $this->getStoreInformation($orderCollection);
+        $sourceInformation = $this->getStoreInformation($orderCollection);
 
-		$subOrders = [];
-		/** @var Order $subOrder */
-		foreach ($orderCollection as $subOrder) {
-			/** @var SubOrderDataInterface $subOrderData */
+        $subOrders = [];
+        /** @var Order $subOrder */
+        foreach ($orderCollection as $subOrder) {
+            /** @var SubOrderDataInterface $subOrderData */
             $this->currentCreditemo = null;
-			$subOrderData = $this->subOrderDataFactory
-				->create()
-				->setId($subOrder->getEntityId())
-				->setSubOrderId($subOrder->getData("reference_order_id"))
-				->setParentOrder($subOrder->getData("parent_order"))
-				->setStatus($subOrder->getStatus())
-				->setStatusLabel($subOrder->getStatusLabel())
-				->setCreatedAt($subOrder->getCreatedAt())
-				->setTotalPayment($subOrder->getGrandTotal())
-				->setTotalRefund((int) -$subOrder->getTotalRefunded())
-				->setGrandTotal((int) ($subOrder->getTotalInvoiced() - $subOrder->getTotalRefunded()))
-				->setSubtotal($subOrder->getSubtotal())
+            $subOrderData = $this->subOrderDataFactory
+                ->create()
+                ->setId($subOrder->getEntityId())
+                ->setSubOrderId($subOrder->getData("reference_order_id"))
+                ->setParentOrder($subOrder->getData("parent_order"))
+                ->setStatus($subOrder->getStatus())
+                ->setStatusLabel($subOrder->getStatusLabel())
+                ->setCreatedAt($subOrder->getCreatedAt())
+                ->setTotalPayment($subOrder->getGrandTotal())
+                ->setTotalRefund((int) $subOrder->getTotalRefunded())
+                ->setGrandTotal((int) ($subOrder->getTotalInvoiced() - $subOrder->getTotalRefunded()))
+                ->setSubtotal($subOrder->getSubtotal())
                 ->setHasCreditmemo($subOrder->hasCreditmemos())
                 ->setCreditmemoId($this->getCreditmemoId($subOrder))
                 ->setStoreInfo($this->getStoreInfo($subOrder, $sourceInformation));
@@ -479,293 +485,303 @@ class SubOrder {
                 $subOrderData->setEnableRefundButton(false);
             }
 
+            $subOrderData->setCanCreditmemo($this->getCanCreditmemo($subOrder));
             $subOrderData->setRefundMessage(
-                $subOrderData->getShowRefundButton()
-                    ? __('Some products in your order are not available. Get a refund with a few easy steps.')
-                    : __('Some products in your order are not available. Your card will not be charged for these products.')
+                $this->getRefundMessage($subOrderData->getShowRefundButton(), $subOrderData->getCanCreditmemo())
             );
 
             if ($hasInvoice) {
                 $subOrderData->setInvoiceLink($this->getInvoiceLink($subOrder->getParentOrder()));
             }
 
-			if (!$subOrder->getIsVirtual()) {
-				$this->setDeliveryData($subOrder, $subOrderData);
-				$this->setStatusHistoriesData($subOrder, $subOrderData);
-				$cancelType[] = $this->history->getCancelType();
-			}
+            if (!$subOrder->getIsVirtual()) {
+                $this->setDeliveryData($subOrder, $subOrderData);
+                $this->setStatusHistoriesData($subOrder, $subOrderData);
+                $cancelType[] = $this->history->getCancelType();
+            }
 
-			$this->setItemsData($subOrder, $subOrderData);
-			$subOrders[$subOrder->getData("parent_order")][] = $subOrderData;
-		}
-		$this->appEmulation->stopEnvironmentEmulation();
-		$result
-			->setData("sub_orders", $subOrders)
-			->setData("has_invoice", $hasInvoice);
-		return $result;
-	}
+            $this->setItemsData($subOrder, $subOrderData);
+            $subOrders[$subOrder->getData("parent_order")][] = $subOrderData;
+        }
+        $this->appEmulation->stopEnvironmentEmulation();
+        $result
+            ->setData("sub_orders", $subOrders)
+            ->setData("has_invoice", $hasInvoice);
+        return $result;
+    }
 
-	/**
-	 * @param Order $subOrder
-	 * @param SubOrderDataInterface $subOrderData
-	 */
-	private function setStatusHistoriesData(Order $subOrder, SubOrderDataInterface $subOrderData) {
-		$subOrderData->setStatusHistory($this->history->getStatusHistory($subOrder));
-		$subOrderData->setStatusHistoryDetails($this->history->getStatusHistoryDetails());
-	}
+    /**
+     * @param Order $subOrder
+     * @param SubOrderDataInterface $subOrderData
+     */
+    private function setStatusHistoriesData(Order $subOrder, SubOrderDataInterface $subOrderData)
+    {
+        $subOrderData->setStatusHistory($this->history->getStatusHistory($subOrder));
+        $subOrderData->setStatusHistoryDetails($this->history->getStatusHistoryDetails());
+    }
 
-	/**
-	 * @param Order $subOrderModel
-	 * @param SubOrderDataInterface $subOrderData
-	 */
-	public function setDeliveryData($subOrderModel, $subOrderData) {
-		$shippingDescription = $subOrderModel->getShippingDescription();
+    /**
+     * @param Order $subOrderModel
+     * @param SubOrderDataInterface $subOrderData
+     */
+    public function setDeliveryData($subOrderModel, $subOrderData)
+    {
+        $shippingDescription = $subOrderModel->getShippingDescription();
 
-		if ($this->isStorePickUp($subOrderModel)) {
-			$subOrderData->setShippingMethod(__("Pick Up in Store"));
-		} else {
-			if (!is_null($shippingDescription)) {
-				$shippingDescription = explode(" - ", $shippingDescription);
-				if (isset($shippingDescription[1])) {
-					$subOrderData->setShippingMethod($shippingDescription[1]);
-				}
-			}
+        if ($this->isStorePickUp($subOrderModel)) {
+            $subOrderData->setShippingMethod(__("Pick Up in Store"));
+        } else {
+            if (!is_null($shippingDescription)) {
+                $shippingDescription = explode(" - ", $shippingDescription);
+                if (isset($shippingDescription[1])) {
+                    $subOrderData->setShippingMethod($shippingDescription[1]);
+                }
+            }
 
-			$addressDetails = "";
-			$address        = "";
+            $addressDetails = "";
+            $address        = "";
 
-			$street = $subOrderModel->getData("street");
-			if ($street) {
-				$street = explode(PHP_EOL, $street);
-				if (isset($street[0])) {
-					$address = $street[0];
-				}
+            $street = $subOrderModel->getData("street");
+            if ($street) {
+                $street = explode(PHP_EOL, $street);
+                if (isset($street[0])) {
+                    $address = $street[0];
+                }
 
-				if (isset($street[1])) {
-					$addressDetails = $street[1];
-				}
-			}
+                if (isset($street[1])) {
+                    $addressDetails = $street[1];
+                }
+            }
 
-			/** @var DeliveryAddressDataInterface $deliveryData */
-			$deliveryData = $this->deliveryDataFactory->create();
-			$deliveryData
-				->setFullName($this->getFullName($subOrderModel))
-				->setAddress($address)
-				->setProvince($subOrderModel->getData("region"))
-				->setStreet($addressDetails)
-				->setCountry($subOrderModel->getData("district"))
-				->setDistrict($subOrderModel->getData("district"))
-				->setCity($subOrderModel->getData("city"))
-				->setTelephone($subOrderModel->getData("telephone"))
-				->setPostcode($subOrderModel->getData("postcode"))
-				->setAddressName($subOrderModel->getData("address_tag"));
-			$subOrderData->setDeliveryAddress($deliveryData);
-		}
+            /** @var DeliveryAddressDataInterface $deliveryData */
+            $deliveryData = $this->deliveryDataFactory->create();
+            $deliveryData
+                ->setFullName($this->getFullName($subOrderModel))
+                ->setAddress($address)
+                ->setProvince($subOrderModel->getData("region"))
+                ->setStreet($addressDetails)
+                ->setCountry($subOrderModel->getData("district"))
+                ->setDistrict($subOrderModel->getData("district"))
+                ->setCity($subOrderModel->getData("city"))
+                ->setTelephone($subOrderModel->getData("telephone"))
+                ->setPostcode($subOrderModel->getData("postcode"))
+                ->setAddressName($subOrderModel->getData("address_tag"));
+            $subOrderData->setDeliveryAddress($deliveryData);
+        }
 
-		$subOrderData
-			->setShippingMethodCode($subOrderModel->getShippingMethod())
-			->setTrackingNumber(implode(", ", $subOrderModel->getTrackingNumbers()))
-			->setDeliveryFee($subOrderModel->getShippingAmount());
-	}
+        $subOrderData
+            ->setShippingMethodCode($subOrderModel->getShippingMethod())
+            ->setTrackingNumber(implode(", ", $subOrderModel->getTrackingNumbers()))
+            ->setDeliveryFee($subOrderModel->getShippingAmount());
+    }
 
-	/**
-	 * @param Order $subOrderModel
-	 * @return string
-	 */
-	public function getFullName($subOrderModel) {
-		$name = '';
-		$name .= $subOrderModel->getData("firstname");
-		if ($subOrderModel->getData("middlename")) {
-			$name .= ' ' . $subOrderModel->getData("middlename");
-		}
-		$name .= ' ' . $subOrderModel->getData("lastname");
-		return $name;
-	}
+    /**
+     * @param Order $subOrderModel
+     * @return string
+     */
+    public function getFullName($subOrderModel)
+    {
+        $name = '';
+        $name .= $subOrderModel->getData("firstname");
+        if ($subOrderModel->getData("middlename")) {
+            $name .= ' ' . $subOrderModel->getData("middlename");
+        }
+        $name .= ' ' . $subOrderModel->getData("lastname");
+        return $name;
+    }
 
-	/**
-	 * @param Order $subOrderModel
-	 * @param SubOrderDataInterface $subOrderData
-	 */
-	private function setItemsData($subOrderModel, $subOrderData) {
-		$items      = [];
-		$childItems = [];
-		$totalPrice = 0;
-		$isDigital  = $subOrderModel->getIsVirtual();
-		/** @var Item $orderItem */
-		foreach ($subOrderModel->getItemsCollection() as $orderItem) {
-			if ($orderItem->getParentItemId()) {
-				$childItems[$orderItem->getParentItemId()][] = $orderItem;
-				continue;
-			}
-			if ($orderItem->getProduct()) {
-				/** @var DetailItemDataInterface $itemData */
-				$itemData = $this->orderItemDataFactory
-					->create()
-					->setItemId($orderItem->getItemId())
-					->setTotal(
-						$orderItem->getBasePrice() * (int) $orderItem->getQtyOrdered()
-					)
-					->setSku($orderItem->getProduct()->getSku())
-					->setProductName($orderItem->getProduct()->getName())
-					->setQuantity($orderItem->getQtyOrdered())
-					->setPrice($orderItem->getBasePrice())
-					->setUrl($orderItem->getProduct()->getProductUrl())
-					->setIsAvailable($this->getIsItemIsAvailable($subOrderModel, $orderItem));
+    /**
+     * @param Order $subOrderModel
+     * @param SubOrderDataInterface $subOrderData
+     */
+    private function setItemsData($subOrderModel, $subOrderData)
+    {
+        $items      = [];
+        $childItems = [];
+        $totalPrice = 0;
+        $isDigital  = $subOrderModel->getIsVirtual();
+        /** @var Item $orderItem */
+        foreach ($subOrderModel->getItemsCollection() as $orderItem) {
+            if ($orderItem->getParentItemId()) {
+                $childItems[$orderItem->getParentItemId()][] = $orderItem;
+                continue;
+            }
+            if ($orderItem->getProduct()) {
+                /** @var DetailItemDataInterface $itemData */
+                $itemData = $this->orderItemDataFactory
+                    ->create()
+                    ->setItemId($orderItem->getItemId())
+                    ->setTotal(
+                        $orderItem->getBasePrice() * (int) $orderItem->getQtyOrdered()
+                    )
+                    ->setSku($orderItem->getProduct()->getSku())
+                    ->setProductName($orderItem->getProduct()->getName())
+                    ->setQuantity($orderItem->getQtyOrdered())
+                    ->setPrice($orderItem->getBasePrice())
+                    ->setUrl($orderItem->getProduct()->getProductUrl())
+                    ->setIsAvailable($this->getIsItemIsAvailable($subOrderModel, $orderItem));
 
-				$itemData->setImageUrl(
-					$this->imageHelper->init($orderItem->getProduct(), 'product_base_image')->getUrl()
-				);
-				$itemData->setProductType($orderItem->getProduct()->getTypeId());
-				$this->setAdditionalItemData($orderItem, $itemData, $orderItem->getProduct());
-				$options = $this->getItemOptions($orderItem);
-				if ($options != false) {
-					$itemData
-						->setHasOptions(1)
-						->setOptions($options);
-				} else {
-					$itemData
-						->setHasOptions(0);
-				}
-				$itemData->setFreshProduct($this->fresh->populateObject($orderItem->getProduct()));
-				$items[$orderItem->getId()] = $itemData;
-			}
-			$totalPrice += $orderItem->getBasePrice() * (int) $orderItem->getQtyOrdered();
-		}
+                $itemData->setImageUrl(
+                    $this->imageHelper->init($orderItem->getProduct(), 'product_base_image')->getUrl()
+                );
+                $itemData->setProductType($orderItem->getProduct()->getTypeId());
+                $this->setAdditionalItemData($orderItem, $itemData, $orderItem->getProduct());
+                $options = $this->getItemOptions($orderItem);
+                if ($options != false) {
+                    $itemData
+                        ->setHasOptions(1)
+                        ->setOptions($options);
+                } else {
+                    $itemData
+                        ->setHasOptions(0);
+                }
+                $itemData->setFreshProduct($this->fresh->populateObject($orderItem->getProduct()));
+                $items[$orderItem->getId()] = $itemData;
+            }
+            $totalPrice += $orderItem->getBasePrice() * (int) $orderItem->getQtyOrdered();
+        }
 
-		if ($subOrderModel->getData("parent_order") && $subOrderModel->getSubtotal() <= 0) {
-			$subOrderData->setSubtotal($totalPrice);
-		}
+        if ($subOrderModel->getData("parent_order") && $subOrderModel->getSubtotal() <= 0) {
+            $subOrderData->setSubtotal($totalPrice);
+        }
 
-		$subOrderData->setItems($items);
-	}
+        $subOrderData->setItems($items);
+    }
 
-	/**
-	 * @param Order $order
-	 * @param SourceInterface[] $inventorySource
-	 * @return \SM\MobileApi\Model\Data\Catalog\Product\StoreInfo
-	 */
-	public function getStoreInfo($order, $inventorySource) {
-		if ($this->isStorePickUp($order) && isset($inventorySource[$order->getStorePickUp()])) {
-			$source    = $inventorySource[$order->getStorePickUp()];
-			$storeInfo = $this->storeInfoFactory->create();
-			$storeInfo->setName($source->getName());
-			$storeInfo->setCity($source->getCity());
-			$storeInfo->setStreet($source->getStreet());
-			$storeInfo->setPostcode($source->getPostcode());
-			$storeInfo->setRegion($source->getRegion());
-			$storeInfo->setPickUpTime($order->getStorePickUpDelivery());
-			$storeInfo->setPickUpDate($order->getStorePickUpTime());
-			return $storeInfo;
-		}
+    /**
+     * @param Order $order
+     * @param SourceInterface[] $inventorySource
+     * @return \SM\MobileApi\Model\Data\Catalog\Product\StoreInfo
+     */
+    public function getStoreInfo($order, $inventorySource)
+    {
+        if ($this->isStorePickUp($order) && isset($inventorySource[$order->getStorePickUp()])) {
+            $source    = $inventorySource[$order->getStorePickUp()];
+            $storeInfo = $this->storeInfoFactory->create();
+            $storeInfo->setName($source->getName());
+            $storeInfo->setCity($source->getCity());
+            $storeInfo->setStreet($source->getStreet());
+            $storeInfo->setPostcode($source->getPostcode());
+            $storeInfo->setRegion($source->getRegion());
+            $storeInfo->setPickUpTime($order->getStorePickUpDelivery());
+            $storeInfo->setPickUpDate($order->getStorePickUpTime());
+            return $storeInfo;
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	/**
-	 * @param Item $itemModel
-	 * @param DetailItemDataInterface $itemData
-	 * @param $product
-	 */
-	private function setAdditionalItemData($itemModel, $itemData, $product) {
-		$itemBuyRequest = $itemModel->getProductOptionByCode('info_buyRequest') ?? [];
-		if ($itemModel->getProductType() == "virtual") {
-			$productOption = $itemModel->getProductOption();
-			if ($productOption->getExtensionAttributes()
-				&& $productOption->getExtensionAttributes()->getDigitalData()) {
-				$productOption->getExtensionAttributes()
-					->getDigitalData()
-					->getDigital()
-					->setServiceType($this->getServiceType($product));
-			}
-			$itemData->setProductOption($productOption);
-			$itemData->setBuyRequest(json_encode($itemBuyRequest));
-		}
+    /**
+     * @param Item $itemModel
+     * @param DetailItemDataInterface $itemData
+     * @param $product
+     */
+    private function setAdditionalItemData($itemModel, $itemData, $product)
+    {
+        $itemBuyRequest = $itemModel->getProductOptionByCode('info_buyRequest') ?? [];
+        if ($itemModel->getProductType() == "virtual") {
+            $productOption = $itemModel->getProductOption();
+            if ($productOption->getExtensionAttributes()
+                && $productOption->getExtensionAttributes()->getDigitalData()) {
+                $productOption->getExtensionAttributes()
+                    ->getDigitalData()
+                    ->getDigital()
+                    ->setServiceType($this->getServiceType($product));
+            }
+            $itemData->setProductOption($productOption);
+            $itemData->setBuyRequest(json_encode($itemBuyRequest));
+        }
 
-		if (isset($itemBuyRequest[\SM\Installation\Helper\Data::QUOTE_OPTION_KEY])) {
-			/** @var InstallationServiceInterface $installationService */
-			$installationService = $this->installationServiceFactory->create();
-			$installationService->setData($itemBuyRequest[\SM\Installation\Helper\Data::QUOTE_OPTION_KEY]);
-			$itemData->setInstallationService($installationService);
-		}
-	}
+        if (isset($itemBuyRequest[\SM\Installation\Helper\Data::QUOTE_OPTION_KEY])) {
+            /** @var InstallationServiceInterface $installationService */
+            $installationService = $this->installationServiceFactory->create();
+            $installationService->setData($itemBuyRequest[\SM\Installation\Helper\Data::QUOTE_OPTION_KEY]);
+            $itemData->setInstallationService($installationService);
+        }
+    }
 
-	/**
-	 * @param $product
-	 * @return string
-	 */
-	private function getServiceType($product) {
-		$category = $product->getCategoryCollection()->addAttributeToSelect('name')->getFirstItem();
-		return $category->getName();
-	}
+    /**
+     * @param $product
+     * @return string
+     */
+    private function getServiceType($product)
+    {
+        $category = $product->getCategoryCollection()->addAttributeToSelect('name')->getFirstItem();
+        return $category->getName();
+    }
 
-	/**
-	 * @param OrderCollection $orderCollection
-	 * @return \Magento\Framework\DataObject[]|SourceInterface[]
-	 */
-	public function getStoreInformation($orderCollection) {
-		$sourceCode = [];
+    /**
+     * @param OrderCollection $orderCollection
+     * @return \Magento\Framework\DataObject[]|SourceInterface[]
+     */
+    public function getStoreInformation($orderCollection)
+    {
+        $sourceCode = [];
 
-		/** @var Order $subOrder */
-		foreach ($orderCollection as $subOrder) {
-			array_push($sourceCode, $subOrder->getStorePickUp());
-		}
-		$sourceCode = array_unique($sourceCode);
+        /** @var Order $subOrder */
+        foreach ($orderCollection as $subOrder) {
+            array_push($sourceCode, $subOrder->getStorePickUp());
+        }
+        $sourceCode = array_unique($sourceCode);
 
-		/** @var SourceCollection $sourceCollection */
-		$sourceCollection = $this->sourceCollectionFactory->create()
-			->addFieldToFilter("source_code", ["in" => $sourceCode]);
+        /** @var SourceCollection $sourceCollection */
+        $sourceCollection = $this->sourceCollectionFactory->create()
+            ->addFieldToFilter("source_code", ["in" => $sourceCode]);
 
-		$sourceInformation = [];
-		/** @var SourceInterface $source */
-		foreach ($sourceCollection as $source) {
-			$sourceInformation[$source->getSourceCode()] = $source;
-		}
-		return $sourceInformation;
-	}
+        $sourceInformation = [];
+        /** @var SourceInterface $source */
+        foreach ($sourceCollection as $source) {
+            $sourceInformation[$source->getSourceCode()] = $source;
+        }
+        return $sourceInformation;
+    }
 
-	public function isStorePickUp($order) {
-		return $order->getShippingMethod() == "store_pickup_store_pickup";
-	}
+    public function isStorePickUp($order)
+    {
+        return $order->getShippingMethod() == "store_pickup_store_pickup";
+    }
 
-	/**
-	 * @return string|void
-	 */
-	public function getCurrentCustomerToken() {
-		if (empty($this->currentCustomerToken)) {
-			$authorizationHeaderValue = $this->request->getHeader('Authorization');
-			if (!$authorizationHeaderValue) {
-				return;
-			}
+    /**
+     * @return string|void
+     */
+    public function getCurrentCustomerToken()
+    {
+        if (empty($this->currentCustomerToken)) {
+            $authorizationHeaderValue = $this->request->getHeader('Authorization');
+            if (!$authorizationHeaderValue) {
+                return;
+            }
 
-			$headerPieces = explode(" ", $authorizationHeaderValue);
-			if (count($headerPieces) !== 2) {
-				return;
-			}
+            $headerPieces = explode(" ", $authorizationHeaderValue);
+            if (count($headerPieces) !== 2) {
+                return;
+            }
 
-			$tokenType = strtolower($headerPieces[0]);
-			if ($tokenType !== 'bearer') {
-				return;
-			}
-			$this->currentCustomerToken = $headerPieces[1] ?? '';
-		}
+            $tokenType = strtolower($headerPieces[0]);
+            if ($tokenType !== 'bearer') {
+                return;
+            }
+            $this->currentCustomerToken = $headerPieces[1] ?? '';
+        }
 
-		return $this->currentCustomerToken;
-	}
+        return $this->currentCustomerToken;
+    }
 
-	/**
-	 * @param $orderId
-	 * @return string|null
-	 */
-	public function getInvoiceLink($orderId) {
-		if ($token = $this->getCurrentCustomerToken()) {
-			return $this->urlInterface->getUrl(
-				'sales/invoice/mobileview',
-				['id' => $orderId, 'token' => $token]
-			);
-		}
+    /**
+     * @param $orderId
+     * @return string|null
+     */
+    public function getInvoiceLink($orderId)
+    {
+        if ($token = $this->getCurrentCustomerToken()) {
+            return $this->urlInterface->getUrl(
+                'sales/invoice/mobileview',
+                ['id' => $orderId, 'token' => $token]
+            );
+        }
 
-		return null;
-	}
+        return null;
+    }
 
     /**
      * @param Order $subOrder
@@ -792,5 +808,32 @@ class SubOrder {
             return false;
         }
         return !($orderItem->getQtyRefunded() > 0 && ($orderItem->getQtyRefunded() == $orderItem->getQtyInvoiced()));
+    }
+
+    /**
+     * @param $showRefundButton
+     * @param $canCreditmemo
+     * @return string
+     */
+    private function getRefundMessage($showRefundButton, $canCreditmemo)
+    {
+        if (!$canCreditmemo) {
+            return $showRefundButton
+                ? __('All of your ordered items are not available. Get a refund with a few easy steps.')
+                : __('All of your ordered items are not available. Your card will not be charged for these products.');
+        } else {
+            return $showRefundButton
+                ? __('Some products in your order are not available. Get a refund with a few easy steps.')
+                : __('Some products in your order are not available. Your card will not be charged for these products.');
+        }
+    }
+
+    private function getCanCreditmemo($subOrderModel)
+    {
+        if ($subOrderModel->getStatus() == \SM\Sales\Api\ParentOrderRepositoryInterface::STATUS_ORDER_CANCELED) {
+            return false;
+        }
+
+        return true;
     }
 }

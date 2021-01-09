@@ -57,7 +57,7 @@ class RequestRefund extends Action
         $request = $this->getRequest();
 
         if ($request->getParam('creditmemo_id')) {
-            $resultPage->getConfig()->getTitle()->set(__('Request Refund'));
+            $resultPage->getConfig()->getTitle()->set(__('Refund Form'));
             return $resultPage;
         }
 
