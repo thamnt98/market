@@ -44,6 +44,7 @@ interface SubOrderDataInterface
     const CANCEL_TYPE = "cancel_type";
     const CREDITMEMO_ID = "creditmemo_id";
     const HAS_CREDITMEMO = "has_creditmemo";
+    const CAN_CREDITMEMO = "can_creditmemo";
     const SHOW_REFUND_BUTTON = "show_refund_button";
     const ENABLE_REFUND_BUTTON = "enable_refund_button";
 
@@ -321,6 +322,17 @@ interface SubOrderDataInterface
      * @return bool
      */
     public function getHasCreditmemo();
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function setCanCreditmemo($value);
+
+    /**
+     * @return bool
+     */
+    public function getCanCreditmemo();
 
     /**
      * @param bool $value

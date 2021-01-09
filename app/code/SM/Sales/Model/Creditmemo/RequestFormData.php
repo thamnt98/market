@@ -69,7 +69,7 @@ class RequestFormData
             $this->order = $order = $creditmemo->getOrder();
 
             $this->formData =  [
-                self::ORDER_REFERENCE_NUMBER_KEY => $order->getData('reference_number'),
+                self::ORDER_REFERENCE_NUMBER_KEY => $order->getData('reference_order_id'),
                 self::TOTAL_REFUND_KEY => $creditmemo->getGrandTotal(),
                 self::CUSTOMER_ID_KEY => $order->getCustomerId(),
                 self::CREDITMEMO_ID_KEY => $creditmemoId,

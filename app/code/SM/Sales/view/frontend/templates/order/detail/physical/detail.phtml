@@ -54,6 +54,7 @@ if ($parentOrder) {
             <!-- order-detail content -->
             <?php
             /** @var \SM\Sales\Api\Data\SubOrderDataInterface $subOrder */
+
             foreach ($parentOrder->getSubOrders() as $subOrder) :?>
                 <?php $isPickUp = $subOrder->getShippingMethodCode() == "store_pickup_store_pickup" ?>
                 <div class="order-detail-content">
@@ -63,7 +64,7 @@ if ($parentOrder) {
                                 <p><i class="notification-icon"></i><?= $subOrder->getRefundMessage() ?></p>
                                 <p class="notifi-refund">
                                     <span>
-                                    <?= __('Total refund %1', $block->currencyFormat($subOrder->getTotalRefund())) ?>
+                                    <?= __('Total Refund: %1', $block->currencyFormat($subOrder->getTotalRefund())) ?>
                                     </span>
                                     <button
                                         <?php if(!$subOrder->getEnableRefundButton()) { echo 'disabled'; } ?>
@@ -72,9 +73,11 @@ if ($parentOrder) {
                                                 'creditmemo_id' => $subOrder->getCreditmemoId()
                                             ]) ?>'"
                                         class="action primary">
-                                        <?= __("Get a Refund") ?>
+                                        <?= __("Request a Refund") ?>
                                     </button>
                                 </p>
+                            <?php else: ?>
+                                <p><i class="notification-icon"></i><?= $subOrder->getRefundMessage() ?></p>
                             <?php endif ?>
                         </div>
                     <?php endif ?>
