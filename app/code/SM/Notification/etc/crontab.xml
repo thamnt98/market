@@ -54,7 +54,13 @@
         <!-- Generate message remind pickup -->
         <job name="sm_notification_remind_pickup"
              instance="SM\Notification\Cron\Order\RemindPickup" method="execute">
-            <config_path>sm_notification/sync/remind_pickup</config_path>
+            <config_path>sm_notification/generate/remind_pickup</config_path>
+        </job>
+
+        <!-- Generate message pickup expired -->
+        <job name="sm_notification_pickup_expired"
+             instance="SM\Notification\Cron\Order\PickupExpired" method="execute">
+            <config_path>sm_notification/generate/pickup_expired</config_path>
         </job>
     </group>
 </config>

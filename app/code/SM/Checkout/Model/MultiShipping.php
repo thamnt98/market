@@ -188,6 +188,16 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
     private $basketFactory;
 
     /**
+     * @var \Magento\Quote\Api\PaymentMethodManagementInterface
+     */
+    protected $paymentMethodManagement;
+
+    /**
+     * @var \Magento\Quote\Api\Data\PaymentInterfaceFactory
+     */
+    protected $corePaymentInterfaceFactory;
+
+    /**
      * MultiShipping constructor.
      * @param \Magento\Customer\Model\Session $customerSession
      * @param \Magento\Checkout\Model\Session $checkoutSession
@@ -226,6 +236,8 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
      * @param \SM\MobileApi\Api\Data\GTM\BasketInterfaceFactory $basketInterfaceFactory
      * @param \SM\GTM\Model\ResourceModel\Basket\CollectionFactory $basketCollectionFactory
      * @param BasketFactory $basketFactory
+     * @param \Magento\Quote\Api\PaymentMethodManagementInterface $paymentMethodManagement
+     * @param \Magento\Quote\Api\Data\PaymentInterfaceFactory $corePaymentInterfaceFactory
      */
     public function __construct(
         \Magento\Customer\Model\Session $customerSession,
@@ -264,7 +276,9 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
         \SM\MobileApi\Api\Data\GTM\BasketInterfaceFactory $basketInterfaceFactory,
         \SM\GTM\Model\ResourceModel\Basket\CollectionFactory $basketCollectionFactory,
-        BasketFactory $basketFactory
+        BasketFactory $basketFactory,
+        \Magento\Quote\Api\PaymentMethodManagementInterface $paymentMethodManagement,
+        \Magento\Quote\Api\Data\PaymentInterfaceFactory $corePaymentInterfaceFactory
     ) {
         $this->customerSession = $customerSession;
         $this->checkoutSession = $checkoutSession;
@@ -302,6 +316,8 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
         $this->productRepository = $productRepository;
         $this->basketCollectionFactory = $basketCollectionFactory;
         $this->basketFactory = $basketFactory;
+        $this->paymentMethodManagement = $paymentMethodManagement;
+        $this->corePaymentInterfaceFactory = $corePaymentInterfaceFactory;
     }
 
     /**
@@ -364,6 +380,10 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
         $response = $this->responsePlaceOrderFactory->create();
         $this->checkoutSession->setArea(\SM\Checkout\Helper\OrderReferenceNumber::AREA_APP);
         try {
+            $quote = $this->quoteRepository->get($cartId);
+            $paymentMethod = $quote->getPayment()->getMethod();
+            $payment = $this->corePaymentInterfaceFactory->create()->setMethod($paymentMethod);
+            $this->paymentMethodManagement->set($cartId, $payment);
             $orderId = $this->cartManagement->placeOrder($cartId);
             $mainOrder = $this->orderRepository->get($orderId);
         } catch (\Exception $e) {
