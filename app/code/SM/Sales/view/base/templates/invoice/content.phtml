@@ -207,7 +207,7 @@ $invoice = $block->getInvoice();
                     <td class="col id"></td>
                     <td class="col subtotal-text">
                         <?= $block->escapeHtml(__('Delivery Fee Subtotal')) ?>
-                        <span><?= $block->escapeHtml(__('Regular Shipping Method')) ?></span>
+                        <span><?= $block->escapeHtml($subInvoice->getShippingMethod()) ?></span>
                     </td>
                     <td class="col subtotal"><?= $block->escapeHtml($PSshipping[0])?></td>
                     <td class="col subtotal"><?= $block->escapeHtml($PSshipping[1])?></td>

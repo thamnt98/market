@@ -144,16 +144,18 @@ class LimitStock extends AbstractGenerate
             ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_PDP)
             ->setRedirectId($product->getSku())
             ->setParams($params);
-
+        
+        $this->eventSetting->init($data['customer_id'], \SM\Notification\Model\Notification::EVENT_UPDATE);
         if (isset($data['store_id'])) {
             // Emulation store view
             $this->emulation->startEnvironmentEmulation(
-                $data['store_id'],
-                \Magento\Framework\App\Area::AREA_FRONTEND
+                $data['store_id']
             );
 
-            $notification->setPushTitle(__($title, $params['title'])->__toString())
-                ->setPushContent(__($message)->__toString());
+            if ($this->eventSetting->isPush()) {
+                $notification->setPushTitle(__($title, $params['title'])->__toString())
+                    ->setPushContent(__($message)->__toString());
+            }
 
             $this->emulation->stopEnvironmentEmulation(); // End Emulation
         }

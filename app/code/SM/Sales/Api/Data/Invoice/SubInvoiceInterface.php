@@ -19,6 +19,7 @@ interface SubInvoiceInterface
     const DELIVERY_ADDRESS = "delivery_address";
     const STORE_INFO = "store_info";
     const ITEMS = "items";
+    const SHIPPING_METHOD = "shipping_method";
 
     /**
      * @return string
@@ -129,4 +130,15 @@ interface SubInvoiceInterface
      * @return $this
      */
     public function setItems($value);
+
+    /**
+     * @param string $shippingMethod
+     * @return string
+     */
+    public function setShippingMethod($shippingMethod);
+
+    /**
+     * @return string
+     */
+    public function getShippingMethod();
 }

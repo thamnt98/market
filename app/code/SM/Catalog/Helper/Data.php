@@ -411,9 +411,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
             $countChildren = $count = 0;
 
             foreach ($children as $item) {
-                if (!$item->isSaleable()) {
-                    continue;
-                }
                 if ($item->getTypeId() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
                     $count = 0;
                     $item = $this->getMinConfigurable($item, $count);
