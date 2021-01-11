@@ -60,9 +60,15 @@ class JiraCreateTicket implements \Magento\Framework\Event\ObserverInterface
         } else {
             $dataPost = $data['data'];
         }
-        $store = $this->sourceRepository->get($dataPost['store']);
-        $dataPost['store_code'] = $dataPost['store'];
-        $dataPost['store'] = $store->getName();
+
+        if ($dataPost['store']) {
+            try {
+                $store = $this->sourceRepository->get($dataPost['store']);
+                $dataPost['store_code'] = $dataPost['store'];
+                $dataPost['store'] = $store->getName();
+            } catch (\Exception $e) {
+            }
+        }
 
         if ($dataPost['category'] && is_numeric($dataPost['category'])) {
             $topic = $this->topicCollectionFactory->create()

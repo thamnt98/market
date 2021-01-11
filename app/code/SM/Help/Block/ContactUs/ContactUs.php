@@ -289,7 +289,7 @@ class ContactUs extends \Magento\Framework\View\Element\Template
             $customerId = $this->customerSession->getCustomerId();
             $searchCriteriaBuilder = $this->searchCriteriaBuilder
                 ->addFilter('created_at', $from, 'gteq')
-                ->setPageSize(100)
+                ->setPageSize(500)
                 ->setSortOrders([$sortOrder]);
 
             if (!empty($status)) {

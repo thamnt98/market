@@ -373,7 +373,9 @@ class JiraRepository implements \SM\JiraService\Api\JiraRepositoryInterface
                 $requestData['requestFieldValues']['customfield_10054'] = $data['is_received'];
 
                 // Sent to OMS and create RMA
-                if ($data['is_received'] == 'return') {
+                if ($data['is_received'] == 'return'
+                    && $data['product_ids']
+                    && $requestData['requestFieldValues']['customfield_10046']) {
                     $this->sendReturn($data, $order->getData('reference_order_id'));
                 }
             }
@@ -596,10 +598,11 @@ class JiraRepository implements \SM\JiraService\Api\JiraRepositoryInterface
                 "item_sub_total" => (int) $item->getPrice()
             ];
         }
+        $sentResult = $this->returnStatus->sendReturn($orderId, $data['store_code'], $itemOrder, $data['description'], 1);
 
-        $sentResult = json_decode(
-            $this->returnStatus->sendReturn($orderId, $data['store_code'], $itemOrder, $data['description'], 1)
-        );
+        if (is_array($sentResult)) {
+            $sentResult = (object) $sentResult;
+        }
 
         if (!($sentResult->code >= 200 && $sentResult->code < 300)) {
             throw new \Exception($sentResult->message);
