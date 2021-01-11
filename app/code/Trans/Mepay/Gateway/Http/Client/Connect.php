@@ -78,6 +78,8 @@ class Connect implements ClientInterface
           'request' => $transferObject->getBody(),
           'request_uri' => $transferObject->getUri()
       ];
+      
+      $this->logger->log('request_uri ' . $transferObject->getUri());
 
       $result = [];
 

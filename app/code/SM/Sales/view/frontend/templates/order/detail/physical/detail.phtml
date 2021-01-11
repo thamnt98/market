@@ -141,6 +141,7 @@ if ($parentOrder) {
                                    data-trigger="track-order-<?= $subOrder->getId() ?>"
                                    data-gtm-event="track_order_click"
                                    data-gtm="<?= $block->escapeHtml($parentOrder->getParentOrderId()) ?>"><?= $block->escapeHtml(__('Order Updates')) ?></a>
+                            <div class="no-display">
                                 <div data-bind="mageInit: {
                             'Magento_Ui/js/modal/modal':{
                             'type': 'popup',
@@ -171,6 +172,7 @@ if ($parentOrder) {
                                         </div>
                                     </div>
                                 </div>
+                            </div>
                         </div>
                     </div>
                     <ul class="list-items-review">
@@ -229,6 +231,12 @@ if ($parentOrder) {
                                             <?php endif; ?>
                                         </dl>
                                         <?= $block->getInstallationHtml($item) ?>
+                                        <?php if (!$item->getIsAvailable()): ?>
+                                            <div class="error-message">
+                                                <span class="icon icon-error"></span>
+                                                <span class="error"><?= $item->getMessage() ?></span>
+                                            </div>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                                 <div class="total-product-price">

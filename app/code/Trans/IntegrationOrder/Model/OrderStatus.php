@@ -450,8 +450,15 @@ class OrderStatus implements OrderStatusInterface {
 	 * @param int $subAction
 	 * @param string $orderItems
 	 */
-	public function statusOrderItems($orderId, $status, $action, $subAction, $orderItems)
-	{
+	public function statusOrderItems($orderId, $status, $action, $subAction, $orderItems) {
+		$this->loggerOrder->info(__FUNCTION__ . ' start');
+
+		$this->loggerOrder->info('$orderId = ' . $orderId);
+		$this->loggerOrder->info('$status = ' . $status);
+		$this->loggerOrder->info('$action = ' . $action);
+		$this->loggerOrder->info('$subAction = ' . $subAction);
+		$this->loggerOrder->info('$orderItems = ' . print_r($orderItems, true));
+
 		$childOrder     = $this->order->loadByAttribute('reference_order_id', $orderId);
 		$orderData      = $this->statusRepo->loadByOrderIds($orderId);
 		$refNumber      = $orderData->getReferenceNumber();
@@ -463,8 +470,8 @@ class OrderStatus implements OrderStatusInterface {
 			throw new \Magento\Framework\Webapi\Exception(__('Order ID doesn\'t exist, please make sure again.'));
 		}
 
-		$orderItem = [];
-		$refunded = [];
+		$orderItem    = [];
+		$refunded     = [];
 		$skusRefunded = [];
 		foreach ($orderItems as $itemData) {
 			$allocatedQty = $itemData['quantity_allocated'];
@@ -473,7 +480,7 @@ class OrderStatus implements OrderStatusInterface {
 
 			if ($itemData['quantity_allocated'] < $itemData['quantity']) {
 				$refunded[$itemData['sku']] = $itemData;
-				$skusRefunded[] = $itemData['sku'];
+				$skusRefunded[]             = $itemData['sku'];
 			}
 		}
 
@@ -525,6 +532,8 @@ class OrderStatus implements OrderStatusInterface {
 		$entityIdSalesOrder         = $loadDataOrder->getEntityId();
 		$loadDataOrderStatusHistory = $this->statusRepo->loadDataByParentOrderId($entityIdSalesOrder);
 		$saveDataToStatusHistory    = $this->orderStatusHistoryInterfaceFactory->create();
+
+		$this->loggerOrder->info('=========== prepare order history ===========');
 
 		/* Updating data status order in core magento table */
 		if ($loadDataOrder && $data->getFeStatusNo() == $configStatus->getNumberInProcess()) {
@@ -583,9 +592,15 @@ class OrderStatus implements OrderStatusInterface {
 			$saveDataToStatusHistory->setComment($data->getFeStatus() . $data->getFeSubStatus());
 			$saveDataToStatusHistory->setEntityName('order');
 		}
+		$this->loggerOrder->info('=========== prepare order history end ===========');
 
+		$this->loggerOrder->info('=========== update state & status sales order start ===========');
 		$this->orderRepoInterface->save($loadDataOrder);
+		$this->loggerOrder->info('=========== update state & status sales order end ===========');
+
+		$this->loggerOrder->info('=========== save data order history magento start ===========');
 		$this->orderStatusHistoryRepoInterface->save($saveDataToStatusHistory);
+		$this->loggerOrder->info('=========== save data order history magento end ===========');
 
 		if ($status == 2 && $action == 2 && $subAction == 7 || $status == 2 && $action == 99 && $subAction == 0) {
 			if (!empty($skusRefunded) and !empty($refunded)) {
@@ -614,7 +629,7 @@ class OrderStatus implements OrderStatusInterface {
 					} catch (\Exception $e) {
 						$this->loggerOrder->info('invoice child order fail : ' . $e->getMessage());
 					}
-					
+
 					try {
 						$this->loggerOrder->info('child credit memo');
 						$childmemo         = $this->creditMemos($childOrder->getId(), $itemIdsChild);
@@ -640,6 +655,7 @@ class OrderStatus implements OrderStatusInterface {
 		}
 
 		if ($orderIds) {
+			$this->loggerOrder->info('=========== save data order history oms start ===========');
 			$model = $this->historyInterface->create();
 			$model->setReferenceNumber($orderData->getReferenceNumber());
 			$model->setOrderId($orderIds);
@@ -647,8 +663,10 @@ class OrderStatus implements OrderStatusInterface {
 			$model->setFeSubStatusNo($data->getFeSubStatusNo());
 
 			$this->statusRepo->saveHistory($model);
+			$this->loggerOrder->info('=========== save data order history oms end ===========');
 		}
 
+		$this->loggerOrder->info('=========== custom capture refund start ===========');
 		/* =================== START CAPTURE REFUND =======================*/
 
 		/**
@@ -671,6 +689,7 @@ class OrderStatus implements OrderStatusInterface {
 		$matrixAdjusmentAmount = 0;
 		if ($status == 2 && $action == 2 && $subAction == 7 || $status == 2 && $action == 99 && $subAction == 0) {
 			if ($paymentMethod === 'sprint_bca_va' || $paymentMethod === 'sprint_permata_va' || $paymentMethod === 'trans_mepay_va') {
+				$this->loggerOrder->info('=========== refund VA start ===========');
 				foreach ($loadItemByOrderId as $itemOrder) {
 					$paidPriceOrder = $itemOrder->getPaidPrice();
 					$qtyOrder       = $itemOrder->getQty();
@@ -702,23 +721,29 @@ class OrderStatus implements OrderStatusInterface {
 				$dataJson = json_encode($dataAdjustment);
 				$this->loggerOrder->info($dataJson);
 
+				$this->loggerOrder->info('=========== refund VA start ===========');
+
 				$this->curl->setOption(CURLOPT_RETURNTRANSFER, true);
 				$this->curl->setOption(CURLOPT_CUSTOMREQUEST, 'PATCH');
 				$this->curl->setHeaders($headers);
 				$this->curl->post($url, $dataJson);
 				$responseOrder = $this->curl->getBody();
+				$this->loggerOrder->info('$url : ' . $url);
 				$this->loggerOrder->info('$headers : ' . json_encode($headers));
 				$this->loggerOrder->info('$responseOrder : ' . $responseOrder);
 				$objOrder = json_decode($responseOrder);
 				$this->loggerOrder->info('Body: ' . $dataJson . '. Response: ' . $responseOrder);
 				$json_string = stripcslashes($responseOrder);
-				if ($objOrder->code == 200) {
-					return $result;
-				}
+				// if ($objOrder->code == 200) {
+				// 	return $result;
+				// }
+				$this->loggerOrder->info('response = ' . $json_string);
+				$this->loggerOrder->info('=========== refund VA end ===========');
 			}
 			/* End Non CC*/
 
 			if ($paymentMethod === 'sprint_mega_cc' || $paymentMethod === 'sprint_allbankfull_cc' || $paymentMethod === 'sprint_mega_debit' || $paymentMethod === 'trans_mepay_cc') {
+				$this->loggerOrder->info('=========== refund CC DEBIT start ===========');
 				/**
 				 * prepare data array refund send to PG
 				 */
@@ -732,16 +757,18 @@ class OrderStatus implements OrderStatusInterface {
 					$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
 				}
 
-				$this->eventManager->dispatch(
-					'refund_with_mega_payment',
-					[
-						'order_id' => $orderId,
-						'reference_number' => $refNumber,
-						'amount' => $trxAmount,
-						'new_amount' => $trxAmount - $matrixAdjusmentAmount,
-						'adjustment_amount' => $matrixAdjusmentAmount,
-					]
-				);
+				if ($paymentMethod === 'trans_mepay_cc') {
+					$this->eventManager->dispatch(
+						'refund_with_mega_payment',
+						[
+							'order_id' => $orderId,
+							'reference_number' => $refNumber,
+							'amount' => $trxAmount,
+							'new_amount' => $trxAmount - $matrixAdjusmentAmount,
+							'adjustment_amount' => $matrixAdjusmentAmount,
+						]
+					);
+				}
 
 				/* update quantity adjusment */
 				$url            = $this->orderConfig->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
@@ -756,19 +783,22 @@ class OrderStatus implements OrderStatusInterface {
 				$dataJson = json_encode($dataAdjustment);
 				$this->loggerOrder->info($dataJson);
 
+				$this->loggerOrder->info('=========== refund CC DEBIT start ===========');
+
 				$this->curl->setOption(CURLOPT_RETURNTRANSFER, true);
 				$this->curl->setOption(CURLOPT_CUSTOMREQUEST, 'PATCH');
 				$this->curl->setHeaders($headers);
 				$this->curl->post($url, $dataJson);
 				$responseOrder = $this->curl->getBody();
+				$this->loggerOrder->info('$url = ' . $url);
 				$this->loggerOrder->info('$headers : ' . json_encode($headers));
 				$this->loggerOrder->info('$responseOrder : ' . $responseOrder);
 				$objOrder = json_decode($responseOrder);
 				$this->loggerOrder->info('Body: ' . $dataJson . '. Response: ' . $responseOrder);
-				$json_string = stripcslashes($responseOrder);
-				if ($objOrder->code == 200) {
-					return json_decode($responseOrder, true);
-				}
+				// $json_string = stripcslashes($responseOrder);
+				// if ($objOrder->code == 200) {
+				// 	return json_decode($responseOrder, true);
+				// }
 
 				if (!empty($skusRefunded) and !empty($refunded)) {
 					/* save to table sales_order_item */
@@ -796,9 +826,12 @@ class OrderStatus implements OrderStatusInterface {
 						}
 					}
 				}
+				
+				$this->loggerOrder->info('=========== refund CC DEBIT end ===========');
 			}
 		}
 
+		$this->loggerOrder->info(__FUNCTION__ . ' end');
 		/* =================== END CAPTURE REFUND =======================*/
 		return $result;
 	}
@@ -1056,8 +1089,7 @@ class OrderStatus implements OrderStatusInterface {
 	 * @param string $orderItemId
 	 * @param string|null $refOrderId
 	 */
-	protected function creditMemos($orderId, $orderItemIds, $refOrderId = null)
-	{
+	protected function creditMemos($orderId, $orderItemIds, $refOrderId = null) {
 		$this->loggerOrder->info(__FUNCTION__ . ' start.');
 		$order = $this->orderRepository->get($orderId);
 
@@ -1065,7 +1097,7 @@ class OrderStatus implements OrderStatusInterface {
 			return false;
 		}
 
-		if($order->getData('is_parent')) {
+		if ($order->getData('is_parent')) {
 			$this->updateOrderStatus($orderId, 'in_process', 'processing');
 		}
 
@@ -1094,18 +1126,17 @@ class OrderStatus implements OrderStatusInterface {
 			$creditMemoData['shipping_amount'] = 0;
 		}
 
-		if($order->getData('is_parent') && $refOrderId != null) {
+		if ($order->getData('is_parent') && $refOrderId != null) {
 			$childOrder = $this->order->loadByAttribute('reference_order_id', $refOrderId);
 
-			$childOrderItems = $childOrder->getAllItems();
+			$childOrderItems    = $childOrder->getAllItems();
 			$totalQtyChildOrder = 0;
-			
-			foreach ($childOrderItems as $childOrderItem)
-			{
-			  	$totalQtyChildOrder = $totalQtyChildOrder + $childOrderItem->getQtyOrdered();
+
+			foreach ($childOrderItems as $childOrderItem) {
+				$totalQtyChildOrder = $totalQtyChildOrder + $childOrderItem->getQtyOrdered();
 			}
 
-			if($totalQty == $totalQtyChildOrder) {
+			if ($totalQty == $totalQtyChildOrder) {
 				$creditMemoData['shipping_amount'] = $childOrder->getData('shipping_amount');
 			}
 		}
@@ -1113,16 +1144,16 @@ class OrderStatus implements OrderStatusInterface {
 		$creditMemoData['items'] = $itemToCredit;
 
 		$this->loggerOrder->info('Credit memo param = ' . print_r($creditMemoData, true));
-		
+
 		try {
 			$this->creditmemoLoader->setOrderId($order->getId()); //pass order id
 			$this->creditmemoLoader->setCreditmemo($creditMemoData);
 
 			$this->loggerOrder->info('$orderId = ' . $order->getId());
-			
+
 			$creditmemo = $this->creditmemoLoader->load();
 
-			if(!$creditmemo) {
+			if (!$creditmemo) {
 				$this->loggerOrder->info('Credit memo fail to load.');
 				$this->registry->unregister('current_creditmemo');
 				return $creditMemoData;
@@ -1227,7 +1258,7 @@ class OrderStatus implements OrderStatusInterface {
 						$this->loggerOrder->info($e->getTraceAsString());
 					}
 
-					if($order->getData('grand_total') != null || $order->getData('grand_total') == 0) {
+					if ($order->getData('grand_total') != null || $order->getData('grand_total') == 0) {
 						$this->payOrder($order);
 					}
 				}
@@ -1318,12 +1349,11 @@ class OrderStatus implements OrderStatusInterface {
 	 * @param \Magento\Sales\Api\Data\OrderInterface $order
 	 * @return void
 	 */
-	protected function payOrder($order)
-	{
+	protected function payOrder($order) {
 		$connection = $this->resource->getConnection();
-		$table = $connection->getTableName('sales_order');
+		$table      = $connection->getTableName('sales_order');
 
-		$data = ["status" => "in_process", "state" => \Magento\Sales\Model\Order::STATE_PROCESSING, "total_paid" => $order->getData('grand_total'), "base_total_paid" => $order->getData('grand_total')];
+		$data  = ["status" => "in_process", "state" => \Magento\Sales\Model\Order::STATE_PROCESSING, "total_paid" => $order->getData('grand_total'), "base_total_paid" => $order->getData('grand_total')];
 		$where = ['entity_id = ?' => $order->getId()];
 
 		$connection->update($table, $data, $where);
@@ -1335,10 +1365,9 @@ class OrderStatus implements OrderStatusInterface {
 	 * @param \Magento\Sales\Api\Data\Order $order
 	 * @return void|bool
 	 */
-	protected function checkOrderItemStatus($order)
-	{
+	protected function checkOrderItemStatus($order) {
 		$connection = $this->resource->getConnection();
-		$table = $connection->getTableName('sales_order_item');
+		$table      = $connection->getTableName('sales_order_item');
 
 		$query = $connection->select();
 		$query->from(
@@ -1347,21 +1376,21 @@ class OrderStatus implements OrderStatusInterface {
 		)->where('order_id = ?', $order->getId());
 
 		$collection = $connection->fetchAll($query);
-		if($collection) {
-			$ordered = 0;
+		if ($collection) {
+			$ordered  = 0;
 			$refunded = 0;
-			foreach($collection as $row) {
-				$ordered = $ordered + (int)$row['qty_ordered'];
-				$refunded = $refunded + (int)$row['qty_refunded'];
+			foreach ($collection as $row) {
+				$ordered  = $ordered + (int) $row['qty_ordered'];
+				$refunded = $refunded + (int) $row['qty_refunded'];
 			}
 
 			$check = $ordered - $refunded;
-			
+
 			$status = 'in_process';
-			$state = 'processing';
-			if($check == 0) {
+			$state  = 'processing';
+			if ($check == 0) {
 				$status = 'order_canceled';
-				$state = 'canceled';
+				$state  = 'canceled';
 			}
 
 			$this->updateOrderStatus($order->getId(), $status, $state);
@@ -1369,17 +1398,16 @@ class OrderStatus implements OrderStatusInterface {
 		}
 	}
 
-	protected function updateStatuses($order, $status, $state)
-	{
-		$refNumber = $order->getData('reference_number');
+	protected function updateStatuses($order, $status, $state) {
+		$refNumber   = $order->getData('reference_number');
 		$parentOrder = $this->transactionMegaHelper->getSalesOrderArrayParent($refNumber);
 
 		$this->updateOrderStatus($order->getId(), $status, $state);
 		$this->updateOrderStatusHistory($order->getId(), $status);
 
-		if($parentOrder) {
+		if ($parentOrder) {
 			$this->updateOrderStatus($parentOrder['entity_id'], $status, $state);
-			$this->updateOrderStatusHistory($parentOrder['entity_id'], $status);			
+			$this->updateOrderStatusHistory($parentOrder['entity_id'], $status);
 		}
 	}
 
@@ -1391,15 +1419,14 @@ class OrderStatus implements OrderStatusInterface {
 	 * @param string $state
 	 * @return void
 	 */
-	protected function updateOrderStatus($orderId, $status, $state)
-	{
+	protected function updateOrderStatus($orderId, $status, $state) {
 		$connection = $this->resource->getConnection();
-		$table = $connection->getTableName('sales_order');
+		$table      = $connection->getTableName('sales_order');
 
-		$data = ["status" => $status, "state" => $state];
+		$data  = ["status" => $status, "state" => $state];
 		$where = ['entity_id = ?' => $orderId];
 
-		$connection->update($table, $data, $where);	
+		$connection->update($table, $data, $where);
 	}
 
 	/**
@@ -1409,14 +1436,13 @@ class OrderStatus implements OrderStatusInterface {
 	 * @param string $status
 	 * @return void
 	 */
-	protected function updateOrderStatusHistory($orderId, $status)
-	{
+	protected function updateOrderStatusHistory($orderId, $status) {
 		$connection = $this->resource->getConnection();
-		$table = $connection->getTableName('sales_order_status_history');
+		$table      = $connection->getTableName('sales_order_status_history');
 
-		$data = ["status" => $status];
+		$data  = ["status" => $status];
 		$where = ['parent_id = ?' => $orderId, 'entity_name = ?' => 'creditmemo'];
 
-		$connection->update($table, $data, $where);	
+		$connection->update($table, $data, $where);
 	}
 }
