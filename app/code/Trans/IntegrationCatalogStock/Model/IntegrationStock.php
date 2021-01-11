@@ -36,6 +36,11 @@ use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory as ProductColl
 use Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory as AttributeCollectionFactory;
 use Magento\InventoryIndexer\Indexer\SourceItem\IndexDataBySkuListProvider;
 
+use Trans\Integration\Exception\WarningException;
+use Trans\Integration\Exception\ErrorException;
+use Trans\Integration\Exception\FatalException;
+
+
 /**
  * @inheritdoc
  */
@@ -132,6 +137,12 @@ class IntegrationStock implements IntegrationStockInterface {
 	protected $dbConnection;
 
 	/**
+	 * @var \Trans\IntegrationCatalogStock\Logger\Logger
+	 */
+	protected $loggerfile;
+
+
+	/**
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param SourceItemsSaveInterface $sourceItemSave
      * @param SourceItemInterfaceFactory $sourceItem
@@ -164,7 +175,8 @@ class IntegrationStock implements IntegrationStockInterface {
 		\Magento\Framework\Indexer\IndexerRegistry $indexerRegistry,
 		ProductCollectionFactory $productCollectionFactory,
 		AttributeCollectionFactory $attributeCollectionFactory,
-		IndexDataBySkuListProvider $indexDataBySkuListProvider
+		IndexDataBySkuListProvider $indexDataBySkuListProvider,
+		\Trans\IntegrationCatalogStock\Logger\Logger $loggerfile
 	) {	
 
         $this->sourceItem 							   = $sourceItem;
@@ -184,12 +196,12 @@ class IntegrationStock implements IntegrationStockInterface {
 		$this->productCollectionFactory 			   = $productCollectionFactory;
 		$this->attributeCollectionFactory 			   = $attributeCollectionFactory;
 		$this->indexDataBySkuListProvider			   = $indexDataBySkuListProvider;
-
+        $this->loggerfile							   = $loggerfile;
 		$this->dbConnection = $resourceConnection->getConnection();
 
-		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_catalog_stock_model.log');
-        $logger = new \Zend\Log\Logger();
-        $this->logger = $logger->addWriter($writer);
+		// $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/integration_catalog_stock_model.log');
+        // $logger = new \Zend\Log\Logger();
+        // $this->logger = $logger->addWriter($writer);
 	}
 
 	/**
@@ -202,8 +214,8 @@ class IntegrationStock implements IntegrationStockInterface {
 		$productIds = [];
 		$dataStockList = [];
 		
-		$monitoringStockSql = "update monitoring_stock set has_processed = 1, processed_at = current_timestamp() where writer_id in ";
-		$monitoringStockLabelKey = "writer_id";
+		$monitoringStockSql = "update monitoring_stock set processed_at = sysdate(6) where stock_id in ";
+		$monitoringStockLabelKey = "stock_id";
 		$monitoringStockIds = [];
 
 		$messageValue = '';
@@ -257,8 +269,7 @@ class IntegrationStock implements IntegrationStockInterface {
 				if ($productSku === null) {
 					continue;
 				}
-
-				// $rowId = $productCollection->getRowId();
+				
 				$isFresh = $productCollection->getData('is_fresh');
 				$weight = $productCollection->getData('weight');
 				$soldIn = $productCollection->getData('sold_in');
@@ -291,11 +302,11 @@ class IntegrationStock implements IntegrationStockInterface {
 							"status"=> ($quantity > 0 ? "1" : "0")
 						];
 
-					$this->logger->info("success data");
+					$this->loggerfile->info("success data");
 					$this->saveStatusMessage($data, $messageValue, IntegrationDataValueInterface::STATUS_DATA_SUCCESS);
 				}
 				else {
-					$this->logger->info("failed no store data");
+					$this->loggerfile->info("failed no store data");
 					$this->saveStatusMessage($data, IntegrationStockInterface::MSG_NO_STORE, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
 				}				
 			}
@@ -304,8 +315,8 @@ class IntegrationStock implements IntegrationStockInterface {
 			$this->reindexByStockIdAndProductsId(1, $skus);
 			$this->reindexByStockIdAndProductsId(2, $skus);			
 
-		} catch(Exception $exception){
-			$this->logger->info("error : " . $exception->getMessage());
+		} catch(\Exception $exception){
+			$this->loggerfile->info("error : " . $exception->getMessage());
 			if ($dataJobs) {
 				$dataJobs->setMessage($exception->getMessage());
 				
@@ -333,28 +344,22 @@ class IntegrationStock implements IntegrationStockInterface {
 
 
 		try {
-
 			if (!empty($monitoringStockIds)) {
-
-				$monitoringStockSql .= "(" . implode(",", $monitoringStockIds) . ")";
-				$this->logger->info("monitoring_stock query: " . $monitoringStockSql);
+				$monitoringStockSql .= "(" . "'" . implode("','", $monitoringStockIds) . "'" . ")";
+				$this->loggerfile->info("monitoring_stock query: " . $monitoringStockSql);
 				
-				$this->logger->info("start executing monitoring_stock query");
+				$this->loggerfile->info("start executing monitoring_stock query");
 				
 				$startTime = microtime(true);				
 				$monitoringQueryResult = $this->dbConnection->exec($monitoringStockSql);
 
-				$this->logger->info("finish executing monitoring_stock query" . 
+				$this->loggerfile->info("finish executing monitoring_stock query" . 
 					" - result: " . $monitoringQueryResult .
-					" - duration: " . (microtime(true) - $startTime) . " second");
-				
+					" - duration: " . (microtime(true) - $startTime) . " second");				
 			}
-
 		}
-		catch (Exception $exception) {
-
-			$this->logger->info("failed executing monitoring_stock query");
-
+		catch (\Exception $exception) {
+			$this->loggerfile->info("failed executing monitoring_stock query");
 		}
 
 
@@ -380,24 +385,24 @@ class IntegrationStock implements IntegrationStockInterface {
 	
 	protected function validateSku($productSku, $stockData) {
 		
-		$this->logger->info("sku-by-magento-is-being-validated");
+		$this->loggerfile->info("sku-by-magento-is-being-validated");
 
 		if ($productSku !== null) {				
 			if (isset($stockData[$productSku])) {
-					$this->logger->info("sku-by-magento-validating-samecase = {$productSku}");
-					return $productSku;
+				$this->loggerfile->info("sku-by-magento-validating-samecase = {$productSku}");
+				return $productSku;
 			}
 
 			$productSkuUpperCase = strtoupper($productSku);
 			if (isset($stockData[$productSkuUpperCase])) {
-					$this->logger->info("sku-by-magento-validating-uppercase = {$productSkuUpperCase}");
-					return $productSkuUpperCase;
+				$this->loggerfile->info("sku-by-magento-validating-uppercase = {$productSkuUpperCase}");
+				return $productSkuUpperCase;
 			}
 
 			$productSkuLowerCase = strtolower($productSku);
 			if (isset($stockData[$productSkuLowerCase])) {
-					$this->logger->info("sku-by-magento-validating-lowercase = {$productSkuLowerCase}");
-					return $productSkuLowerCase;
+				$this->loggerfile->info("sku-by-magento-validating-lowercase = {$productSkuLowerCase}");
+				return $productSkuLowerCase;
 			}
 		}
 
@@ -489,11 +494,11 @@ class IntegrationStock implements IntegrationStockInterface {
     {
         $result = [];
         if (empty($skuList) == false) {
-            $this->logger->info('Before get product ' . date('d-M-Y H:i:s'));
+            $this->loggerfile->info('Before get product ' . date('d-M-Y H:i:s'));
             $collection = $this->productCollectionFactory->create()->addFieldToFilter('sku', ['in'=>$skuList]);
             $collection->getSelect()->reset(\Zend_Db_Select::COLUMNS)->columns(['entity_id','sku','row_id','type_id']);
             $result = $collection->getItems();
-            $this->logger->info('After get product ' . date('d-M-Y H:i:s'));
+            $this->loggerfile->info('After get product ' . date('d-M-Y H:i:s'));
         }
         return $result;
 	}
@@ -507,14 +512,14 @@ class IntegrationStock implements IntegrationStockInterface {
 
         if (!empty($skuList)) {
 			
-			$this->logger->info('Before get product ' . date('d-M-Y H:i:s'));
+			$this->loggerfile->info('Before get product ' . date('d-M-Y H:i:s'));
 			$startTime = microtime(true);
 			
 			$collection = $this->productCollectionFactory->create()->addFieldToFilter('sku', ['in' => $skuList])->addAttributeToSelect($attributeCodes);
             $collection->getSelect()->reset(\Zend_Db_Select::COLUMNS)->columns(['entity_id','sku','row_id','type_id']);
             $result = $collection->getItems();
 			
-			$this->logger->info('After get product ' . date('d-M-Y H:i:s')
+			$this->loggerfile->info('After get product ' . date('d-M-Y H:i:s')
 				. " - duration: " . (microtime(true) - $startTime) . " second");
 
 		}
@@ -536,9 +541,7 @@ class IntegrationStock implements IntegrationStockInterface {
         try {            
 
             if (empty($channel['first_data_ready_job'])) {
-                throw new StateException(
-                    __(IntegrationCommonInterface::MSG_JOB_NOTAVAILABLE)
-                );
+				throw new WarningException('first-data-ready-job in IntegrationStock.prepareStockDataUsingRawQuery is empty !');
 			}
 			
 			$stockData = $this->integrationDataValueRepositoryInterface->getAllByJobIdStatusUsingRawQuery(
@@ -546,25 +549,30 @@ class IntegrationStock implements IntegrationStockInterface {
 				IntegrationStockInterface::STATUS_JOB
 			);
 
-			if (empty($stockData)) {
-		
-				$updates = array();
+			if (empty($stockData)) {		
+				$updates = [];
 				$updates['message'] = IntegrationJobInterface::MSG_DATA_NOTAVAILABLE;
 				$updates['status'] = IntegrationJobInterface::STATUS_PROGRESS_FAIL;
 				$this->integrationJobRepositoryInterface->updateUsingRawQuery($channel['first_data_ready_job']['id'], $updates);
 
-				throw new NoSuchEntityException(__(IntegrationJobInterface::MSG_DATA_NOTAVAILABLE));
-
+				throw new ErrorException('data in IntegrationStock.prepareStockDataUsingRawQuery is empty !');
 			}
 	
             return $stockData;
 
+		}
+        catch (WarningException $ex) {
+            throw $ex;
         }
+        catch (ErrorException $ex) {
+            throw $ex;
+        }
+        catch (FatalException $ex) {
+            throw $ex;
+        }        
         catch (\Exception $ex) {
-            throw new StateException(
-                __($ex->getMessage())
-            );
-        }
+            throw $ex;
+        }		
 
 	}
 
@@ -582,43 +590,45 @@ class IntegrationStock implements IntegrationStockInterface {
 		$stockPersisted = -1;
 		$catalogInventoryStockPersisted = -1;
 		
-		$locationCodeList = array();
-		$skuList = array();
+		$locationCodeList = [];
+		$skuList = [];
 				
-		$stockListInvalid = array();
+		$stockListInvalid = [];
 
-		$stockListValid = array();		
+		$stockListValid = [];		
 		
 		$stockCandidateIndex = -1;
-		$stockCandidateList = array();
-		$stockCandidatePointerList = array();
+		$stockCandidateList = [];
+		$stockCandidatePointerList = [];
 
-		$stockCandidateQuantityFloatList = array();
+		$stockCandidateQuantityFloatList = [];
 
-		$monitoringLabel = "writer_id";
-		$monitoringIdList = [];
+		$monitoringLabel = "stock_id";
+		$monitoringSql = "";
 
-		$label = "upsert-stock";
-		$label .= " --> ";
+		$label = "upsert-stock --> ";
 
-		$this->logger->info($label . "start");
+		$this->loggerfile->info($label . "start");
 
 		if (empty($channel['first_data_ready_job'])) {
-			$this->logger->info($label . "error = " . IntegrationJobInterface::MSG_JOB_NOTAVAILABLE);
-			$this->logger->info($label . "finish " . (microtime(true) - $startTime) . " second");
+			$this->loggerfile->info($label . "error = " . IntegrationJobInterface::MSG_JOB_NOTAVAILABLE);
+			$this->loggerfile->info($label . "finish in = " . (microtime(true) - $startTime) . " second");
 
-			throw new StateException(
-				__(IntegrationCommonInterface::MSG_JOB_NOTAVAILABLE)
-			);			
+			throw new WarningException('first-data-ready-job in IntegrationStock.insertStockDataUsingRawQuery is empty !');
 		}
 
 		if (empty($data)) {
-			$this->logger->info($label . "error = " . IntegrationJobInterface::MSG_DATA_NOTAVAILABLE);
-			$this->logger->info($label . "finish " . (microtime(true) - $startTime) . " second");
 
-			throw new StateException(
-				__(IntegrationCheckUpdatesInterface::MSG_DATA_NOTAVAILABLE)
-			);
+			$updates = [];
+			$updates['message'] = IntegrationJobInterface::MSG_DATA_NOTAVAILABLE;
+			$updates['status'] = IntegrationJobInterface::STATUS_PROGRESS_FAIL;
+			$this->integrationJobRepositoryInterface->updateUsingRawQuery($channel['first_data_ready_job']['id'], $updates);
+
+			$this->loggerfile->info($label . "error = " . IntegrationJobInterface::MSG_DATA_NOTAVAILABLE);
+			$this->loggerfile->info($label . "finish in = " . (microtime(true) - $startTime) . " second");
+
+			throw new ErrorException('data in IntegrationStock.insertStockDataUsingRawQuery is empty !');
+
 		}
 
 		$tryHit = (int) $channel['first_data_ready_job']['hit'];			
@@ -626,11 +636,12 @@ class IntegrationStock implements IntegrationStockInterface {
 
         try {
 				
-			$updates = array();            
+			$updates = [];            
 			$updates['status'] = IntegrationJobInterface::STATUS_PROGRESS_CATEGORY;
 			$updates['message'] = null;
 			$this->integrationJobRepositoryInterface->updateUsingRawQuery($channel['first_data_ready_job']['id'], $updates);
 			
+
 			foreach ($data as $dataRecord) {
 
 				$theStockValue = $this->curl->jsonToArray($dataRecord['data_value']);
@@ -662,7 +673,7 @@ class IntegrationStock implements IntegrationStockInterface {
 					$stockListValid[] = $dataRecord['id'];
 
 					if (isset($theStockValue[$monitoringLabel])) {
-						$monitoringIdList[] = $theStockValue[$monitoringLabel];	
+						$monitoringSql .= ",'" . $theStockValue[$monitoringLabel] . "'";	
 					}
 
 					if (!isset($locationCodeList[$locationCode])) {
@@ -670,7 +681,7 @@ class IntegrationStock implements IntegrationStockInterface {
 					}
 				
 					if (!isset($stockCandidatePointerList[$productSku])) {
-						$stockCandidatePointerList[$productSku] = array();
+						$stockCandidatePointerList[$productSku] = [];
 						$skuList[] = $productSku;
 					}
 					
@@ -697,15 +708,16 @@ class IntegrationStock implements IntegrationStockInterface {
 
 				foreach ($productsCollection as $productCollection) {
 					$productSku = $productCollection->getSku();
-					$this->logger->info($label . "sku-by-magento = {$productSku}");
+					$this->loggerfile->info($label . "sku-by-magento = {$productSku}");
 
 					$productSku = $this->validateSku($productSku, $stockCandidatePointerList);
-					$this->logger->info($label . "sku-by-magento-validated = {$productSku}");
+					$this->loggerfile->info($label . "sku-by-magento-validated = {$productSku}");
 
 					if ($productSku === null) {
-						$this->logger->info($label . "sku-by-magento-validated is invalid then skipped");
+						$this->loggerfile->info($label . "sku-by-magento-validated is invalid then skipped");
+						continue;
 					}
-
+	
 					$isFresh = $productCollection->getData('is_fresh');
 					$soldIn = $productCollection->getData('sold_in');
 					$weight = $productCollection->getData('weight');
@@ -715,95 +727,99 @@ class IntegrationStock implements IntegrationStockInterface {
 							if ($soldIn == 'kg' || $soldIn == 'Kg' || $soldIn == 'KG') {				
 								$newQuantity = (int) floor(($stockCandidateQuantityFloatList[$idx] * 1000) / $weight);
 								$stockCandidateList[$idx]['quantity'] = $newQuantity;
-								$this->logger->info($label . "sku-quantity-new-calc = " . $stockCandidateList[$idx]['quantity']);
-								$stockCandidateList[$idx]['status'] = ($newQuantity > 0 ? 1 : 0);
-								$this->logger->info($label . "sku-status-new = " . $stockCandidateList[$idx]['status']);
+								$this->loggerfile->info($label . "sku-quantity-new-calc = " . $stockCandidateList[$idx]['quantity']);
+								$stockCandidateList[$idx]['status'] = ($stockCandidateList[$idx]['quantity'] > 0 ? 1 : 0);
+								$this->loggerfile->info($label . "sku-status-new = " . $stockCandidateList[$idx]['status']);
 							}
 						}						
 					}	
 				}
 
+				$res1 = null; $res2 = null; $res3 = null; $res4 = null; $res5 = null; $res6 = null;
+
 				$this->dbConnection->beginTransaction();
 
-				$sql = "insert ignore into `inventory_source` (`source_code`, `name`, `enabled`, `country_id`, `postcode`, `use_default_carrier_config`) values " . implode(",", $locationCodeList);
-				$this->dbConnection->exec($sql);
+				if (!empty($locationCodeList)) {
+					$sql = "insert ignore into `inventory_source` (`source_code`, `name`, `enabled`, `country_id`, `postcode`, `use_default_carrier_config`) values " . implode(",", $locationCodeList);
+					$res1 = $this->dbConnection->exec($sql);					
+				}
 
-				$this->dbConnection->insertOnDuplicate("inventory_source_item", $stockCandidateList, ['quantity', 'status']);
+				$res2 = $this->dbConnection->insertOnDuplicate("inventory_source_item", $stockCandidateList, ['quantity', 'status']);
+	
+				$sql =
+					" insert into `cataloginventory_stock_item` "
+					. " ( "
+					. " `product_id`, "
+					. " `stock_id`, "
+					. " `qty`, "
+					. " `min_qty`, "
+					. " `use_config_min_qty`, "
+					. " `is_qty_decimal`, "
+					. " `backorders`, "
+					. " `use_config_backorders`, "
+					. " `min_sale_qty`, "
+					. " `use_config_min_sale_qty`, "
+					. " `max_sale_qty`, "
+					. " `use_config_max_sale_qty`, "
+					. " `is_in_stock`, "
+					. " `low_stock_date`, "
+					. " `notify_stock_qty`, "
+					. " `use_config_notify_stock_qty`, "
+					. " `manage_stock`, "
+					. " `use_config_manage_stock`, "
+					. " `stock_status_changed_auto`, "
+					. " `use_config_qty_increments`, "
+					. " `qty_increments`, "
+					. " `use_config_enable_qty_inc`, "
+					. " `enable_qty_increments`, "
+					. " `is_decimal_divided`, "
+					. " `website_id`, "
+					. " `deferred_stock_update`, "
+					. " `use_config_deferred_stock_update` "
+					. " ) "
+					. " select "
+						. " `entity_id` as `product_id`, "
+						. " 1 as `stock_id`, "
+						. " 1.0000 as `qty`, "
+						. " 0.0000 as `min_qty`, "
+						. " 1 as `use_config_min_qty`, "
+						. " 0 as `is_qty_decimal`, "
+						. " 0 as `backorders`, "
+						. " 1 as `use_config_backorders`, "
+						. " 1.0000 as `min_sale_qty`, "
+						. " 1 as `use_config_min_sale_qty`, "
+						. " 99.0000 as `max_sale_qty`, "
+						. " 1 as `use_config_max_sale_qty`, "
+						. " 1 as `is_in_stock`, "
+						. " null as `low_stock_date`, "
+						. " 1.0000 as `notify_stock_qty`, "
+						. " 1 as `use_config_notify_stock_qty`, "
+						. " 1 as `manage_stock`, "
+						. " 1 as `use_config_manage_stock`, "
+						. " 0 as `stock_status_changed_auto`, "
+						. " 1 as `use_config_qty_increments`, "
+						. " 1.0000 as `qty_increments`, "
+						. " 1 as `use_config_enable_qty_inc`, "
+						. " 0 as `enable_qty_increments`, "
+						. " 0 as `is_decimal_divided`, "
+						. " 0 as `website_id`, "
+						. " 0 as `deferred_stock_update`, "
+						. " 1 as `use_config_deferred_stock_update` "
+					. " from "
+					. " `catalog_product_entity` "
+					. " where "
+						. " `sku` in ( "
+							. "'" . implode("','", $skuList) . "'"
+						. " ) "
+					. " on duplicate key update `manage_stock` = 1, `use_config_manage_stock` = 1 "
+					;
+				$catalogInventoryStockPersisted = $this->dbConnection->exec($sql);				
 
 				$sql =	" update `integration_catalogstock_data` " . 
 						" set " .
 						" `status` = " . IntegrationDataValueInterface::STATUS_DATA_SUCCESS .
 						" where `id` in (" . implode(",", $stockListValid) . ")";
-				$this->dbConnection->exec($sql);
-
-				$sql =
-					" insert into cataloginventory_stock_item "
-					. " ( "
-					. " product_id, "
-					. " stock_id, "
-					. " qty, "
-					. " min_qty, "
-					. " use_config_min_qty, "
-					. " is_qty_decimal, "
-					. " backorders, "
-					. " use_config_backorders, "
-					. " min_sale_qty, "
-					. " use_config_min_sale_qty, "
-					. " max_sale_qty, "
-					. " use_config_max_sale_qty, "
-					. " is_in_stock, "
-					. " low_stock_date, "
-					. " notify_stock_qty, "
-					. " use_config_notify_stock_qty, "
-					. " manage_stock, "
-					. " use_config_manage_stock, "
-					. " stock_status_changed_auto, "
-					. " use_config_qty_increments, "
-					. " qty_increments, "
-					. " use_config_enable_qty_inc, "
-					. " enable_qty_increments, "
-					. " is_decimal_divided, "
-					. " website_id, "
-					. " deferred_stock_update, "
-					. " use_config_deferred_stock_update "
-					. " ) "
-					. " select "
-						. " entity_id as product_id, "
-						. " 1 as stock_id, "
-						. " 1.0000 as qty, "
-						. " 0.0000 as min_qty, "
-						. " 1 as use_config_min_qty, "
-						. " 0 as is_qty_decimal, "
-						. " 0 as backorders, "
-						. " 1 as use_config_backorders, "
-						. " 1.0000 as min_sale_qty, "
-						. " 1 as use_config_min_sale_qty, "
-						. " 99.0000 as max_sale_qty, "
-						. " 1 as use_config_max_sale_qty, "
-						. " 1 as is_in_stock, "
-						. " null as low_stock_date, "
-						. " 1.0000 as notify_stock_qty, "
-						. " 1 as use_config_notify_stock_qty, "
-						. " 1 as manage_stock, "
-						. " 1 as use_config_manage_stock, "
-						. " 0 as stock_status_changed_auto, "
-						. " 1 as use_config_qty_increments, "
-						. " 1.0000 as qty_increments, "
-						. " 1 as use_config_enable_qty_inc, "
-						. " 0 as enable_qty_increments, "
-						. " 0 as is_decimal_divided, "
-						. " 0 as website_id, "
-						. " 0 as deferred_stock_update, "
-						. " 1 as use_config_deferred_stock_update "
-					. " from "
-					. " catalog_product_entity "
-					. " where "
-						. " sku in ( "
-							. "'" . implode("','", $skuList) . "'"
-						. " ) "
-					. " on duplicate key update manage_stock = 1, use_config_manage_stock = 1 "
-					;
-				$catalogInventoryStockPersisted = $this->dbConnection->exec($sql);
+				$res3 = $this->dbConnection->exec($sql);				
 
 				if (!empty($stockListInvalid)) {
 					$sql =	" update `integration_catalogstock_data` " . 
@@ -811,14 +827,14 @@ class IntegrationStock implements IntegrationStockInterface {
 							" `status` = " . IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE . ", " . 
 							" `message` = '" . IntegrationStockInterface::MSG_DATA_STOCK_NULL . "' " .
 							" where `id` in (" . implode(",", $stockListInvalid) . ")";
-					$this->dbConnection->exec($sql);
+					$res4 = $this->dbConnection->exec($sql);					
 
 					$sql =	" update `integration_catalogstock_job` " . 
 							" set " .
 							" `status` = " . IntegrationJobInterface::STATUS_PARTIAL_COMPLETE . ", " . 
 							" `message` = '" . IntegrationJobInterface::MSG_DATA_PARTIALLY_AVAILABLE . "' " .
 							" where `id` = " . $channel['first_data_ready_job']['id'];
-					$this->dbConnection->exec($sql);
+					$res5 = $this->dbConnection->exec($sql);					
 				}
 				else {
 					$sql =	" update `integration_catalogstock_job` " . 
@@ -826,18 +842,49 @@ class IntegrationStock implements IntegrationStockInterface {
 							" `status` = " . IntegrationJobInterface::STATUS_COMPLETE . ", " . 
 							" `message` = null" .
 							" where `id` = " . $channel['first_data_ready_job']['id'];
-					$this->dbConnection->exec($sql);
+					$res6 = $this->dbConnection->exec($sql);					
 				}
 
 				$this->dbConnection->commit();
 
+				if ($res1 != null) {
+					$this->loggerfile->info($label . "insert-ignore inventory_source result = " . $res1);
+				}
+				
+				if ($res2 != null) {
+					$this->loggerfile->info($label . "insert-on-duplicate inventory_source_item result = " . $res2);
+				}
+				
+				$this->loggerfile->info($label . "insert-ignore cataloginventory_stock_item result = " . $catalogInventoryStockPersisted);
+				
+				if ($res3 != null) {
+					$this->loggerfile->info($label . "update-success-status integration_catalogstock_data result = " . $res3);    
+				}
+				
+				if ($res4 != null) {
+					$this->loggerfile->info($label . "update-invalid-status integration_catalogstock_data result = " . $res4);
+				}
+				
+				if ($res5 != null) {
+					$this->loggerfile->info($label . "update-partial-success-status integration_catalogstock_job result = " . $res5);
+				}
+				
+				if ($res6 != null) {
+					$this->loggerfile->info($label . "update-complete-status integration_catalogstock_job result = " . $res6);
+				}				
+
 				$this->reindexByStockIdAndProductsId(1, $skuList);
+				$this->loggerfile->info($label . "reindexByStockIdAndProductsId-1");
+				
 				$this->reindexByStockIdAndProductsId(2, $skuList);
+				$this->loggerfile->info($label . "reindexByStockIdAndProductsId-2");
 
 				$stockPersisted = $stockCandidateIndex + 1;
 				
 			}
 			else {
+
+				$res1 = null; $res2 = null;
 
 				$this->dbConnection->beginTransaction();
 
@@ -846,43 +893,52 @@ class IntegrationStock implements IntegrationStockInterface {
 						" `status` = " . IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE . ", " . 
 						" `message` = '" . IntegrationStockInterface::MSG_DATA_STOCK_NULL . "' " .
 						" where `id` in (" . implode(",", $stockListInvalid) . ")";
-				$this->dbConnection->exec($sql);
+				$res1 = $this->dbConnection->exec($sql);
 
 				$sql =	" update `integration_catalogstock_job` " . 
 						" set " .
 						" `status` = " . IntegrationJobInterface::STATUS_PROGRESS_FAIL . ", " . 
 						" `message` = '" . IntegrationJobInterface::MSG_DATA_NOTAVAILABLE . "' " .
 						" where `id` = " . $channel['first_data_ready_job']['id'];
-				$this->dbConnection->exec($sql);
+				$res2 = $this->dbConnection->exec($sql);
 
 				$this->dbConnection->commit();
+
+				if ($res1 != null) {
+					$this->loggerfile->info($label . "update-fail-status integration_catalogstock_data result: " . $res1);
+				}
+				
+				if ($res2 != null) {
+					$this->loggerfile->info($label . "update-fail-status integration_catalogstock_job result: " . $res2);
+				}				
 
 			}
 
         }
 		catch (\Exception $ex) {
 
+			$this->loggerfile->info($label . "exception = " . $ex->getMessage());
+
 			if ($tryHit >= IntegrationStockInterface::MAX_TRY_HIT) {
 
 				try {
 
-					$updates = array();            
+					$updates = [];            
 					$updates['status'] = IntegrationJobInterface::STATUS_PROGRESS_FAIL;
 					$updates['hit'] = $tryHit;
 					$this->integrationJobRepositoryInterface->updateUsingRawQuery($channel['first_data_ready_job']['id'], $updates);
 
-					$this->logger->info($label . "job-exceeding-max-try-hit = " . IntegrationStockInterface::MAX_TRY_HIT);
-					$this->logger->info($label . "job-hit = {$tryHit}");
-					$this->logger->info($label . "job = " . print_r($channel['first_data_ready_job'], true));					
+					$this->loggerfile->info($label . "job-exceeding-max-try-hit = " . IntegrationStockInterface::MAX_TRY_HIT);
+					$this->loggerfile->info($label . "job-hit = {$tryHit}");
+					$this->loggerfile->info($label . "job = " . print_r($channel['first_data_ready_job'], true));					
 		
 				}
 				catch (\Exception $ex1) {
 
-					$this->logger->info($label . "finish " . (microtime(true) - $startTime) . " second");
+					$this->loggerfile->info($label . "exception updating fail-job-status exceed max-try-hit = " . $ex1->getMessage());
+					$this->loggerfile->info($label . "finish in = " . (microtime(true) - $startTime) . " second");
 
-					throw new StateException(
-						__($ex1->getMessage())
-					);
+					throw $ex1;
 
 				}
 
@@ -891,61 +947,72 @@ class IntegrationStock implements IntegrationStockInterface {
 
 				try {
 
-					$updates = array();
+					$updates = [];
 					$updates['status'] = IntegrationJobInterface::STATUS_READY;
 					$updates['hit'] = $tryHit;
 					$this->integrationJobRepositoryInterface->updateUsingRawQuery($channel['first_data_ready_job']['id'], $updates);
 
-					$this->logger->info($label . "job-increasing-hit");
-					$this->logger->info($label . "job-hit = {$tryHit}");
-					$this->logger->info($label . "job = " . print_r($channel['first_data_ready_job'], true));					
+					$this->loggerfile->info($label . "job-increasing-hit");
+					$this->loggerfile->info($label . "job-hit = {$tryHit}");
+					$this->loggerfile->info($label . "job = " . print_r($channel['first_data_ready_job'], true));					
 		
 				}
 				catch (\Exception $ex2) {
 
-					$this->logger->info($label . "finish " . (microtime(true) - $startTime) . " second");
+					$this->loggerfile->info($label . "exception updating ready-job-status again = " . $ex2->getMessage());
+					$this->loggerfile->info($label . "finish in = " . (microtime(true) - $startTime) . " second");
 
-					throw new StateException(
-						__($ex2->getMessage())
-					);
+					throw $ex2;
 
 				}
 
 			}
 
 
-			$this->logger->info($label . "finish " . (microtime(true) - $startTime) . " second");
+			$this->loggerfile->info($label . "finish in = " . (microtime(true) - $startTime) . " second");
 
-			throw new StateException(
-				__($ex->getMessage())
-			);
+			throw $ex;
 
-		}		
-
-
-		try {
-			if (!empty($monitoringIdList)) {
-				$sql = "update monitoring_stock set has_processed = 1, processed_at = current_timestamp() where writer_id in (" . implode(",", $monitoringIdList) . ")";
-				
-				$this->logger->info($label . "start executing monitoring-stock query");				
-				$st = microtime(true);
-
-				$res = $this->dbConnection->exec($sql);
-
-				$this->logger->info($label . "finish executing monitoring-stock query" . 
-					" - result: " . $res .
-					" - duration: " . (microtime(true) - $st) . " second");				
-			}
 		}
-		catch (\Exception $exmon) {
-			$this->logger->info($label . "failed executing monitoring-stock query");
-		}		
 
-		
-		$this->logger->info($label . "catalog-inventory-stock persisted = {$catalogInventoryStockPersisted}");
-		$this->logger->info($label . "stock-data persisted = {$stockPersisted}");
 
-		$this->logger->info($label . "finish " . (microtime(true) - $startTime) . " second");
+		$startTimeMonstock = microtime(true);
+
+        try {			
+
+			$this->loggerfile->info($label . "monitoring-stock start");
+
+			if ($monitoringSql != "") {				
+
+				$monitoringSql = substr($monitoringSql, 1);
+				
+				$sql = "update monitoring_stock set `processed_at` = sysdate(6) where `stock_id` in (" . $monitoringSql . ")";
+				$res = $this->dbConnection->exec($sql);
+				$this->loggerfile->info($label . "monitoring-stock update monitoring_stock result = " . $res);
+				
+				$sql = "insert ignore into `monitoring_stock_when_watcher_temp` (`id`, `when_at`, `when_type`, `store_code`, `sku`, `stock_id`) select sysdate(6), `processed_at`, 'processed', `store_code`, `sku`, `stock_id` from `monitoring_stock` where `stock_id` in (" . $monitoringSql . ")";
+				$res = $this->dbConnection->exec($sql);
+				$this->loggerfile->info($label . "monitoring-stock insert-ignore monitoring_stock_when_watcher_temp result = " . $res);
+
+			}
+			else {
+				$this->loggerfile->info($label . "monitoring-stock queries are empty");
+			}
+
+			$this->loggerfile->info($label . "monitoring-stock finish in = " . (microtime(true) - $startTimeMonstock) . " second");
+
+        }
+        catch (\Exception $ex) {
+
+			$this->loggerfile->info($label . "monitoring-stock exception = " . $ex->getMessage());
+			$this->loggerfile->info($label . "monitoring-stock finish in = " . (microtime(true) - $startTimeMonstock) . " second");
+
+        }
+
+
+		$this->loggerfile->info($label . "catalog-inventory-stock persisted = {$catalogInventoryStockPersisted}");
+		$this->loggerfile->info($label . "stock-data persisted = {$stockPersisted}");
+		$this->loggerfile->info($label . "finish in = " . (microtime(true) - $startTime) . " second");
 
 
 		return $stockPersisted;

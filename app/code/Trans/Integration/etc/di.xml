@@ -19,7 +19,7 @@
     <preference for="Trans\Integration\Api\Data\IntegrationChannelInterface"
                 type="Trans\Integration\Model\IntegrationChannel" />
     <preference for="Trans\Integration\Api\Data\IntegrationChannelSearchResultInterface"
-                type="Trans\Integration\Model\IntegrationChannelSearchResult" />\
+                type="Trans\Integration\Model\IntegrationChannelSearchResult" />
 
     <preference for="Trans\Integration\Api\IntegrationChannelMethodRepositoryInterface"
                 type="Trans\Integration\Model\IntegrationChannelMethodRepository" />
@@ -29,8 +29,6 @@
                 type="Trans\Integration\Model\IntegrationChannelMethodSearchResult" />
 
     <preference for="Trans\Integration\Api\IntegrationCommonInterface" type="Trans\Integration\Model\IntegrationCommon" />
-
-    <preference for="Trans\Integration\Api\IntegrationLogToDatabaseInterface" type="Trans\Integration\Model\IntegrationLogToDatabase" />
 
     <preference for="Trans\Integration\Api\IntegrationDatabaseInterface" type="Trans\Integration\Model\IntegrationDatabase" />
     
@@ -92,14 +90,12 @@
     <!-- integration_channel_method grid -->
     <!-- end admin grid -->
 
-    <!--
     <type name="Magento\Framework\Console\CommandList">
         <arguments>
-            clean integration table console
+            <!-- clean integration table console-->
             <argument name="commands" xsi:type="array">
                  <item name="Trans_Integration_Console_Clean_Table" xsi:type="object">Trans\Integration\Console\IntegrationTableCleaner</item>
             </argument>
         </arguments>
     </type>
-    -->
 </config>

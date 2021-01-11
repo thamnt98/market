@@ -32,6 +32,11 @@ use \Trans\IntegrationCatalogStock\Model\ResourceModel\IntegrationJob\Collection
 use \Trans\IntegrationCatalogStock\Model\ResourceModel\IntegrationJob\Collection;
 use \Trans\IntegrationCatalogStock\Model\ResourceModel\IntegrationJob as ResourceModel;
 
+use Trans\Integration\Exception\WarningException;
+use Trans\Integration\Exception\ErrorException;
+use Trans\Integration\Exception\FatalException;
+
+
 class IntegrationJobRepository implements IntegrationJobRepositoryInterface
 {
     /**
@@ -54,7 +59,7 @@ class IntegrationJobRepository implements IntegrationJobRepositoryInterface
      */
     private $searchResultFactory;
 
-     /**
+    /**
      * @var integrationJobInterface
      */
     protected $interface;
@@ -62,7 +67,7 @@ class IntegrationJobRepository implements IntegrationJobRepositoryInterface
     /**
      * @var ResourceConnection
      */
-	protected $dbConnection;
+    protected $dbConnection;
     
     /**
      * @param integrationJobInterfaceFactory $integrationJobInterface
@@ -389,15 +394,11 @@ class IntegrationJobRepository implements IntegrationJobRepositoryInterface
         try {
 
             if (empty($mdId)) {
-                throw new StateException(__(
-                    'Parameter MD are empty !'
-                ));
+                throw new ErrorException('parameter md-id in IntegrationJobRepository.getAnyByMdIdMultiStatusUsingRawQuery is empty !');
             }
     
             if (!is_array($status) || empty($status)) {
-                throw new StateException(__(
-                    'Parameter Status are empty !'
-                ));
+                throw new ErrorException('parameter status in IntegrationJobRepository.getAnyByMdIdMultiStatusUsingRawQuery is empty !');
             }
 
 
@@ -413,9 +414,7 @@ class IntegrationJobRepository implements IntegrationJobRepositoryInterface
             }
 
             if ($strStatus == "") {
-                throw new StateException(__(
-                    'Parameter Status are empty !'
-                ));
+                throw new ErrorException('parameter status in IntegrationJobRepository.getAnyByMdIdMultiStatusUsingRawQuery is empty !');
             }
 
             $sql .= " and `status` in (" . substr($strStatus, 1) . ") limit 1";    
@@ -423,10 +422,17 @@ class IntegrationJobRepository implements IntegrationJobRepositoryInterface
             return $this->dbConnection->fetchRow($sql);
 
         } 
+        catch (WarningException $ex) {
+            throw $ex;
+        }
+        catch (ErrorException $ex) {
+            throw $ex;
+        }
+        catch (FatalException $ex) {
+            throw $ex;
+        }        
         catch (\Exception $ex) {
-            throw new StateException(__(
-                $ex->getMessage()
-             ));
+            throw $ex;
         }
         
     }
@@ -442,15 +448,11 @@ class IntegrationJobRepository implements IntegrationJobRepositoryInterface
         try  {
 
             if (empty($mdId)) {
-                throw new StateException(__(
-                    'Parameter MD are empty !'
-                ));
+                throw new ErrorException('parameter md-id in IntegrationJobRepository.getFirstByMdIdStatusUsingRawQuery is empty !');
             }
 
             if (empty($status)) {
-                throw new StateException(__(
-                    'Parameter Status are empty !'
-                ));
+                throw new ErrorException('parameter status in IntegrationJobRepository.getFirstByMdIdStatusUsingRawQuery is empty !');
             }
             
             $str = "select `id`, `md_id`, `batch_id`, `last_updated`, `total_data`, `limit`, `offset`, `start_job`, `end_job`, `message`, `hit`, `last_jb_id`, `status`, `created_at`, `updated_at`, `created_by`, `updated_by`
@@ -461,10 +463,17 @@ class IntegrationJobRepository implements IntegrationJobRepositoryInterface
             return $this->dbConnection->fetchRow($sql);
 
         } 
+        catch (WarningException $ex) {
+            throw $ex;
+        }
+        catch (ErrorException $ex) {
+            throw $ex;
+        }
+        catch (FatalException $ex) {
+            throw $ex;
+        }        
         catch (\Exception $ex) {
-            throw new StateException(__(
-                $ex->getMessage()
-             ));
+            throw $ex;
         }
         
     }    
@@ -480,15 +489,11 @@ class IntegrationJobRepository implements IntegrationJobRepositoryInterface
         try {            
 
             if (empty($mdId)) {
-                throw new StateException(__(
-                    'Parameter MD are empty !'
-                ));
+                throw new ErrorException('parameter md-id in IntegrationJobRepository.getLastByMdIdStatusUsingRawQuery is empty !');
             }
 
             if (empty($status)) {
-                throw new StateException(__(
-                    'Parameter Status are empty !'
-                ));
+                throw new ErrorException('parameter status in IntegrationJobRepository.getLastByMdIdStatusUsingRawQuery is empty !');
             }
             
             $str = "select `id`, `md_id`, `batch_id`, `last_updated`, `total_data`, `limit`, `offset`, `start_job`, `end_job`, `message`, `hit`, `last_jb_id`, `status`, `created_at`, `updated_at`, `created_by`, `updated_by`
@@ -499,10 +504,17 @@ class IntegrationJobRepository implements IntegrationJobRepositoryInterface
             return $this->dbConnection->fetchRow($sql);
 
         } 
-        catch (NoSuchEntityException $ex) {
-            throw new StateException(__(
-                $ex->getMessage()
-             ));
+        catch (WarningException $ex) {
+            throw $ex;
+        }
+        catch (ErrorException $ex) {
+            throw $ex;
+        }
+        catch (FatalException $ex) {
+            throw $ex;
+        }        
+        catch (\Exception $ex) {
+            throw $ex;
         }
 
     }    
@@ -516,9 +528,7 @@ class IntegrationJobRepository implements IntegrationJobRepositoryInterface
         try {
 
             if (!is_array($inserts) || empty($inserts)) {
-                throw new StateException(__(
-                    'Parameter Inserts are empty !'
-                ));
+                throw new ErrorException('parameter insert in IntegrationJobRepository.insertBulkUsingRawQuery is empty !');
             }
 
             $columns = array("id" => true, "md_id" => true, "batch_id" => true, "last_updated" => true, "total_data" => true, "limit" => true, "offset" => true, "start_job" => true, "end_job" => true, "message" => true, "hit" => true, "last_jb_id" => true, "status" => true, "created_at" => true, "updated_at" => true, "created_by" => true, "updated_by" => true);
@@ -536,9 +546,7 @@ class IntegrationJobRepository implements IntegrationJobRepositoryInterface
                 }
     
                 if (empty($record)) {
-                    throw new StateException(__(
-                        'Parameter Inserts are empty !'
-                    ));
+                    throw new ErrorException('parameter insert in IntegrationJobRepository.insertBulkUsingRawQuery is empty !');
                 }
 
                 $bulk[] = $record;
@@ -546,18 +554,23 @@ class IntegrationJobRepository implements IntegrationJobRepositoryInterface
             }
             
             if (empty($bulk)) {
-                throw new StateException(__(
-                    'Parameter Inserts are empty !'
-                ));
+                throw new ErrorException('parameter insert in IntegrationJobRepository.insertBulkUsingRawQuery is empty !');
             }
     
             return $this->dbConnection->insertMultiple("integration_catalogstock_job", $bulk);
 
         }
+        catch (WarningException $ex) {
+            throw $ex;
+        }
+        catch (ErrorException $ex) {
+            throw $ex;
+        }
+        catch (FatalException $ex) {
+            throw $ex;
+        }        
         catch (\Exception $ex) {
-            throw new StateException(
-                __($ex->getMessage())
-            );
+            throw $ex;
         }
 
     }
@@ -575,21 +588,15 @@ class IntegrationJobRepository implements IntegrationJobRepositoryInterface
         try {            
 
             if (empty($id)) {
-                throw new StateException(__(
-                    'Parameter ID are empty !'
-                ));
+                throw new ErrorException('parameter id in IntegrationJobRepository.getByIdMdIdStatusUsingRawQuery is empty !');
             }
     
             if (empty($mdId)) {
-                throw new StateException(__(
-                    'Parameter MD are empty !'
-                ));
+                throw new ErrorException('parameter md-id in IntegrationJobRepository.getByIdMdIdStatusUsingRawQuery is empty !');
             }
 
             if (empty($status)) {
-                throw new StateException(__(
-                    'Parameter Status are empty !'
-                ));
+                throw new ErrorException('parameter status in IntegrationJobRepository.getByIdMdIdStatusUsingRawQuery is empty !');
             }
             
             $str = "select `id`, `md_id`, `batch_id`, `last_updated`, `total_data`, `limit`, `offset`, `start_job`, `end_job`, `message`, `hit`, `last_jb_id`, `status`, `created_at`, `updated_at`, `created_by`, `updated_by`
@@ -600,11 +607,18 @@ class IntegrationJobRepository implements IntegrationJobRepositoryInterface
             return $this->dbConnection->fetchRow($sql);
 
         } 
-        catch (\Exception $ex) {
-            throw new StateException(__(
-                $ex->getMessage()
-             ));
+        catch (WarningException $ex) {
+            throw $ex;
+        }
+        catch (ErrorException $ex) {
+            throw $ex;
+        }
+        catch (FatalException $ex) {
+            throw $ex;
         }        
+        catch (\Exception $ex) {
+            throw $ex;
+        }
 
     }
 
@@ -618,15 +632,11 @@ class IntegrationJobRepository implements IntegrationJobRepositoryInterface
         try {
 
             if (empty($id)) {
-                throw new StateException(__(
-                    'Parameter ID are empty !'
-                ));    
+                throw new ErrorException('parameter id in IntegrationJobRepository.updateUsingRawQuery is empty !');
             }
 
             if (!is_array($updates) || empty(($updates))) {
-                throw new StateException(__(
-                    'Parameter Updates are empty !'
-                ));
+                throw new ErrorException('parameter update in IntegrationJobRepository.updateUsingRawQuery is empty !');
             }
 
             $columns = array("md_id" => true, "batch_id" => true, "last_updated" => true, "total_data" => true, "limit" => true, "offset" => true, "start_job" => true, "end_job" => true, "message" => true, "hit" => true, "last_jb_id" => true, "status" => true, "created_at" => true, "updated_at" => true, "created_by" => true, "updated_by" => true);
@@ -649,9 +659,7 @@ class IntegrationJobRepository implements IntegrationJobRepositoryInterface
             }
 
             if ($clause == "") {
-                throw new StateException(__(
-                    'Parameter Updates are empty !'
-                ));
+                throw new ErrorException('parameter update in IntegrationJobRepository.updateUsingRawQuery is empty !');
             }
             
             $sql = sprintf("update `integration_catalogstock_job` set " . substr($clause, 1) . " where `id` = %d", $id);
@@ -659,10 +667,17 @@ class IntegrationJobRepository implements IntegrationJobRepositoryInterface
             return $this->dbConnection->exec($sql);
 
         }
+        catch (WarningException $ex) {
+            throw $ex;
+        }
+        catch (ErrorException $ex) {
+            throw $ex;
+        }
+        catch (FatalException $ex) {
+            throw $ex;
+        }        
         catch (\Exception $ex) {
-            throw new StateException(
-                __($ex->getMessage())
-            );
+            throw $ex;
         }
 
     }    
