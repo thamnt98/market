@@ -154,6 +154,14 @@
                             <![CDATA[The value of 0 then turn off.<br />"Ready to collect" reminder notification X day(s) after the order can "Ready to be picked up".]]>
                         </comment>
                     </field>
+                    <field id="pickup_expired" translate="label" type="text" sortOrder="20" canRestore="1"
+                           showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Cron Reminder Order Picked Up</label>
+                        <config_path>sm_notification/generate/pickup_expired</config_path>
+                        <comment>
+                            <![CDATA[Default: At every hour.<br> Value format: &lt;minute&gt; &lt;hour&gt; &lt;number day in month&gt; &lt;month&gt; &lt;number day in week&gt;<br /> (*) : every]]>
+                        </comment>
+                    </field>
                 </group>
 
                 <group id="policy_group" translate="label" type="text" sortOrder="40"

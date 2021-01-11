@@ -156,16 +156,19 @@ class VaPaymentExpiringSoon extends AbstractGenerate
             ->setRedirectId($order->getData('parent_order') ? $order->getData('parent_order') : $order->getEntityId())
             ->setParams($params);
 
-        // Emulation store view
-        $this->emulation->startEnvironmentEmulation(
-            $order->getStoreId(),
-            \Magento\Framework\App\Area::AREA_FRONTEND
-        );
+        $this->eventSetting->init($order->getCustomerId(), \SM\Notification\Model\Notification::EVENT_ORDER_STATUS);
+        if ($this->eventSetting->isPush()) {
+            // Emulation store view
+            $this->emulation->startEnvironmentEmulation(
+                $order->getStoreId(),
+                \Magento\Framework\App\Area::AREA_FRONTEND
+            );
 
-        $notification->setPushTitle(__($title)->__toString())
-            ->setPushContent(__($message, $params['content'])->__toString());
+            $notification->setPushTitle(__($title)->__toString())
+                ->setPushContent(__($message, $params['content'])->__toString());
 
-        $this->emulation->stopEnvironmentEmulation(); // End Emulation
+            $this->emulation->stopEnvironmentEmulation(); // End Emulation
+        }
 
         $this->notificationResource->save($notification);
 

@@ -73,8 +73,11 @@ class SendToJira
             $ticket = $this->jiraRepository->send($data);
             if (!$ticket->getIsError()) {
                 $this->updateCreditmemo($params[RequestFormData::CREDITMEMO_ID_KEY]);
+                return true;
+            } else {
+                $this->logger->critical($ticket->getMessage());
+                return false;
             }
-            return true;
         } catch (\Exception $e) {
             $this->logger->critical(json_encode($e));
             return false;
@@ -131,7 +134,7 @@ class SendToJira
                 'customfield_10061' => (int) $data[RequestFormData::TOTAL_REFUND_KEY],
                 'customfield_10043' => $data[RequestFormData::BANK_KEY],
                 'customfield_10060' => $data[RequestFormData::ACCOUNT_NAME_KEY],
-                'customfield_10051' => (int) $data[RequestFormData::ACCOUNT_KEY],
+                'customfield_10062' => $data[RequestFormData::ACCOUNT_KEY],
             ];
         }
 

@@ -100,7 +100,7 @@ interface IntegrationCheckUpdatesInterface
     public function prepareJobsDataImsStockUpdate($channel,$response);
 
     /**
-     * @param $$dataValue
+     * @param $dataValue
      * @return mixed
      */
     public function checkDataValue($dataValue);

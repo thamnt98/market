@@ -144,7 +144,7 @@ class SubmitForm extends Action implements HttpPostActionInterface
         return [
             RequestFormData::BANK_KEY => $params['bank'],
             RequestFormData::ACCOUNT_NAME_KEY => $params['account_name'],
-            RequestFormData::ACCOUNT_KEY => (int)$params['account_number'],
+            RequestFormData::ACCOUNT_KEY => $params['account_number'],
             RequestFormData::ORDER_REFERENCE_NUMBER_KEY =>  $this->requestFormData->getReferenceNumber(),
             RequestFormData::PAYMENT_NUMBER_KEY  => $this->requestFormData->getPaymentNumber(),
             RequestFormData::TOTAL_REFUND_KEY => (int) $this->requestFormData->getTotalRefund(),

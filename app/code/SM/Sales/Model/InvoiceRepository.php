@@ -335,13 +335,19 @@ class InvoiceRepository implements \SM\Sales\Api\InvoiceRepositoryInterface
         /** @var  $order */
         foreach ($orderCollection as $order) {
             $subInvoiceData = $this->populateSubInvoice($order, $orderItems);
-
+            $shippingMethodTitle = '';
             if ($this->subOrder->isStorePickUp($order)) {
                 $subInvoiceData->setStoreInfo($this->subOrder->getStoreInfo($order, $sourceInformation));
+                $shippingMethodTitle = __('Pick Up in Store');
             } else {
                 $subInvoiceData->setDeliveryAddress($this->getDeliveryData($order));
+                $shippingDescription = $order->getShippingDescription();
+                $shippingDescription = explode(" - ", $shippingDescription);
+                if (isset($shippingDescription[1])) {
+                    $shippingMethodTitle = $shippingDescription[1];
+                }
             }
-
+            $subInvoiceData->setShippingMethod($shippingMethodTitle);
             $invoices[] = $subInvoiceData;
         }
         return $invoices;

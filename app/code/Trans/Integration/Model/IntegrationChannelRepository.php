@@ -16,6 +16,7 @@ namespace Trans\Integration\Model;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Exception\StateException;
 
 use \Trans\Integration\Api\Data\IntegrationChannelInterface;
 use \Trans\Integration\Api\Data\IntegrationChannelInterfaceFactory;
@@ -25,6 +26,11 @@ use \Trans\Integration\Api\IntegrationChannelRepositoryInterface;
 use \Trans\Integration\Model\ResourceModel\IntegrationChannel\CollectionFactory as IntegrationChannelCollectionFactory;
 use \Trans\Integration\Model\ResourceModel\IntegrationChannel\Collection;
 use \Trans\Integration\Model\ResourceModel\IntegrationChannel as ResourceModel;
+
+use Trans\Integration\Exception\WarningException;
+use Trans\Integration\Exception\ErrorException;
+use Trans\Integration\Exception\FatalException;
+
 
 class IntegrationChannelRepository implements IntegrationChannelRepositoryInterface
 {
@@ -63,6 +69,7 @@ class IntegrationChannelRepository implements IntegrationChannelRepositoryInterf
     */
     protected $dbConnection;
 
+
     /**
      * IntegrationChannelRepository constructor.
      * @param ResourceModel $resource
@@ -85,7 +92,7 @@ class IntegrationChannelRepository implements IntegrationChannelRepositoryInterf
         $this->integrationChannelCollectionFactory = $integrationChannelCollectionFactory;
         $this->searchResultFactory = $integrationChannelSearchResultInterfaceFactory;
         $this->integrationChannelInterface = $integrationChannelInterface;
-        
+
         $this->dbConnection = $resourceConnection->getConnection();
     }
 
@@ -172,24 +179,27 @@ class IntegrationChannelRepository implements IntegrationChannelRepositoryInterf
         try {
 
             if (empty($id)) {
-                throw new StateException(__(
-                    'Parameter ID are empty !'
-                ));
+                throw new ErrorException('parameter id in IntegrationChannelRepository.getByIdUsingRawQuery empty !');
             }
 
             $str = "select `id`, `name`, `code`, `url`, `env`, `status`, `created_at`, `updated_at`, `created_by`, `updated_by` from `integration_channel` where `id` = %d limit 1";
     
             $sql = sprintf($str, $id);
     
-            $result = $this->dbConnection->fetchRow($sql);
+            return $this->dbConnection->fetchRow($sql);
 
-        } 
-        catch (\Exception $ex) {
-            throw new StateException(__(
-                $ex->getMessage()
-             ));
         }
-
-        return $result;        
+        catch (WarningException $ex) {
+            throw $ex;
+        }
+        catch (ErrorException $ex) {
+            throw $ex;
+        }
+        catch (FatalException $ex) {
+            throw $ex;
+        }
+        catch (\Exception $ex) {
+            throw $ex;
+        }
     }    
 }
