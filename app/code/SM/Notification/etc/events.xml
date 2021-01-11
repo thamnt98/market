@@ -34,4 +34,7 @@
         <observer name="SM_Notification::HelpQuestionSaveAfter"
                   instance="SM\Notification\Observer\HelpQuestionSaveAfter" />
     </event>
+    <event name="sales_order_payment_refund">
+        <observer name="SM_Notification::RefundPayment" instance="SM\Notification\Observer\PaymentRefund"/>
+    </event>
 </config>

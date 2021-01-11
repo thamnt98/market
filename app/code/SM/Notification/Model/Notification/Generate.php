@@ -15,6 +15,13 @@
 
 namespace SM\Notification\Model\Notification;
 
+/**
+ * Class Generate
+ *
+ * @package SM\Notification\Model\Notification
+ * Generate step
+ *   initNotification -> prepare[Event] -> <setNotificationTranslation> -> <setNotificationEmail>
+ */
 class Generate
 {
     /**
@@ -36,6 +43,11 @@ class Generate
      * @var \SM\Notification\Model\NotificationFactory
      */
     protected $modelFactory;
+
+    /**
+     * @var \SM\Notification\Model\Notification
+     */
+    protected $notify;
 
     /**
      * @var \Magento\Store\Model\StoreManagerInterface
@@ -134,49 +146,24 @@ class Generate
      */
     public function loginOtherDevice($customerId)
     {
-        /** @var \SM\Notification\Model\Notification $notify */
-        $notify = $this->modelFactory->create();
         $title = 'Someone just signed in to your account on other device.';
         $message = 'Not you? Consider changing your password.';
 
-        $notify->setTitle($title)
-            ->setContent($message)
-            ->setEvent(\SM\Notification\Model\Notification::EVENT_SERVICE)
-            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_UNKNOWN_DEVICE)
-            ->setCustomerIds([$customerId])
-            ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_HOME);
+        $this->initNotification([$customerId], $title, $message)
+            ->prepareUnknownDevice()
+            ->setNotificationTranslation();
 
-        $this->startEmulator();
-        $this->eventSetting->init($customerId, \SM\Notification\Model\Notification::EVENT_UNKNOWN_DEVICE);
-
-        if ($this->eventSetting->isPush()) {
-            $notify->setPushTitle(__($title)->__toString())
-                ->setPushContent(__($message)->__toString());
-        }
-
-        if ($this->eventSetting->isEmail()) {
-            // Set email
-        }
-
-        if ($this->eventSetting->isSms()) {
-            // Set sms
-        }
-
-        $this->stopEmulator();
-
-        return $notify;
+        return $this->notify;
     }
 
     /**
      * @param \Magento\Customer\Api\Data\CustomerInterface $customer
      * @return \SM\Notification\Model\Notification|void
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Exception
      */
     public function haveCoupon(\Magento\Customer\Api\Data\CustomerInterface $customer)
     {
         $store = $this->stateCode === \Magento\Framework\App\Area::AREA_FRONTEND ? null : $customer->getStoreId();
-        /** @var \SM\Notification\Model\Notification $notify */
-        $notify = $this->modelFactory->create();
         $customerName = $customer->getFirstname() . ' ' .
             ($customer->getMiddlename() ? $customer->getMiddlename() . ' ' : '') .
             $customer->getLastname();
@@ -199,32 +186,12 @@ class Generate
             ],
         ];
 
-        $notify->setTitle($title)
-            ->setContent($message)
-            ->setEvent(\SM\Notification\Model\Notification::EVENT_UPDATE)
-            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_PROMO_AND_EVENT)
-            ->setCustomerIds([$customer->getId()])
-            ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_VOUCHER_LIST)
-            ->setParams($params);
+        $this
+            ->initNotification([$customer->getId()], $title, $message, $params)
+            ->preparePromo()
+            ->setNotificationTranslation(null, $store);
 
-        $this->eventSetting->init($customer->getId(), \SM\Notification\Model\Notification::EVENT_PROMO_AND_EVENT);
-
-        if ($this->eventSetting->isPush()) {
-            $notify->setPushTitle(__($title, $params['title'])->__toString())
-                ->setPushContent(__($message)->__toString());
-        }
-
-        if ($this->eventSetting->isEmail()) {
-            // Set email
-        }
-
-        if ($this->eventSetting->isSms()) {
-            // Set sms
-        }
-
-        $this->stopEmulator();
-
-        return $notify;
+        return $this->notify;
     }
 
     /**
@@ -235,24 +202,238 @@ class Generate
      */
     public function termAndPolicy($helpId, $storeId)
     {
-        /** @var \SM\Notification\Model\Notification $notify */
-        $notify = $this->modelFactory->create();
         $title = 'There is something new for you.';
         $message = 'Check out the new T&C/policy from Transmart';
 
-        $notify->setTitle($title)
-            ->setContent($message)
-            ->setEvent(\SM\Notification\Model\Notification::EVENT_UPDATE)
-            ->setSubEvent(\SM\Notification\Model\Notification::EVENT_INFO)
-            ->setRedirectId($helpId)
-            ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_HELP_PAGE)
-            ->setData('admin_type', \SM\Notification\Model\Source\CustomerType::TYPE_ALL);
+        $this
+            ->initNotification([], $title, $message)
+            ->prepareInformation(\SM\Notification\Model\Source\RedirectType::TYPE_HELP_PAGE, $helpId)
+            ->setNotificationTranslation(null, $storeId);
 
-        $this->startEmulator($storeId);
-        $notify->setPushTitle(__($title)->__toString());
-        $notify->setPushContent(__($message)->__toString());
-        $this->stopEmulator();
+        return $this->notify;
+    }
 
-        return $notify;
+    /**
+     * @param \Magento\Sales\Model\Order $order
+     * @param bool                       $isAll
+     *
+     * @return \SM\Notification\Model\Notification
+     */
+    public function refundOrder($order, $isAll = false)
+    {
+        $orderPayment = $order->getPayment()->getMethod();
+        $vaPayments   = $this->configHelper->getVaPaymentList($order->getStoreId());
+        $cardPayments = $this->configHelper->getCardPaymentList($order->getStoreId());
+
+        $title   = '%1, we are sorry...';
+        $params  = [
+            'title' => [
+                $order->getCustomerName(),
+            ],
+        ];
+
+        if (in_array($orderPayment, $vaPayments)) {
+            if ($isAll) {
+                $message = 'We found unavailable item(s) in your order. Tap here to see the list & request a refund.';
+            } else {
+                $message = 'Some products in your order are not available. '
+                    . 'Tap to see the details & get a refund with a few easy steps.';
+            }
+        } elseif (in_array($orderPayment, $cardPayments)) {
+            if ($isAll) {
+                $message = 'We found unavailable item(s) in your order. '
+                    . 'Your card will not be charged for this transaction.';
+            } else {
+                $message = 'Some products in your order are not available. '
+                    . 'Your card will not be charged for these products.';
+            }
+        } else {
+            return null;
+        }
+
+        $this->initNotification([$order->getCustomerId()], $title, $message, $params);
+        $this
+            ->prepareOrder($order->getData('parent_order'))
+            ->setNotificationTranslation(null, $order->getStoreId());
+
+        return $this->notify;
+    }
+
+    /**
+     * @param int[]  $customerIds
+     * @param string $title
+     * @param string $message
+     * @param array  $params
+     *
+     * @return Generate
+     */
+    protected function initNotification($customerIds, $title, $message, $params = [])
+    {
+        $this->notify = $this->modelFactory->create()
+            ->setTitle($title)
+            ->setContent($message);
+
+        if (count($params)) {
+            $this->notify->setParams($params);
+        }
+
+        if (empty($customerIds)) {
+            $this->notify->setAdminType(\SM\Notification\Model\Source\CustomerType::TYPE_ALL);
+        } else {
+            $this->notify->setCustomerIds($customerIds);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param int $orderId
+     *
+     * @return Generate
+     */
+    protected function prepareOrder($orderId)
+    {
+        if ($this->notify) {
+            if (count($this->notify->getCustomerIds()) == 1) {
+                $this->eventSetting->init(
+                    $this->notify->getCustomerIds()[0],
+                    \SM\Notification\Model\Notification::EVENT_ORDER_STATUS
+                );
+            }
+
+            $this->notify->setEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
+                ->setSubEvent(\SM\Notification\Model\Notification::EVENT_ORDER_STATUS)
+                ->setRedirectId($orderId)
+                ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_ORDER_DETAIL);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Generate
+     */
+    protected function prepareUnknownDevice()
+    {
+        if ($this->notify) {
+            if (count($this->notify->getCustomerIds()) == 1) {
+                $this->eventSetting->init(
+                    $this->notify->getCustomerIds()[0],
+                    \SM\Notification\Model\Notification::EVENT_UNKNOWN_DEVICE
+                );
+            }
+
+            $this->notify
+                ->setEvent(\SM\Notification\Model\Notification::EVENT_SERVICE)
+                ->setSubEvent(\SM\Notification\Model\Notification::EVENT_UNKNOWN_DEVICE)
+                ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_HOME);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param $redirectType
+     * @param $redirectId
+     *
+     * @return Generate
+     */
+    protected function prepareInformation($redirectType, $redirectId)
+    {
+        if ($this->notify) {
+            if (count($this->notify->getCustomerIds()) == 1) {
+                $this->eventSetting->init(
+                    $this->notify->getCustomerIds()[0],
+                    \SM\Notification\Model\Notification::EVENT_INFO
+                );
+            }
+
+            $this->notify
+                ->setEvent(\SM\Notification\Model\Notification::EVENT_UPDATE)
+                ->setSubEvent(\SM\Notification\Model\Notification::EVENT_INFO);
+            if ($redirectType) {
+                $this->notify->setRedirectType($redirectType);
+                if ($redirectId) {
+                    $this->notify->setRedirectId($redirectId);
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param int|null $ruleId
+     *
+     * @return Generate
+     */
+    protected function preparePromo($ruleId = null)
+    {
+        if ($this->notify) {
+            if (count($this->notify->getCustomerIds()) == 1) {
+                $this->eventSetting->init(
+                    $this->notify->getCustomerIds()[0],
+                    \SM\Notification\Model\Notification::EVENT_UNKNOWN_DEVICE
+                );
+            }
+
+            $this->notify
+                ->setEvent(\SM\Notification\Model\Notification::EVENT_UPDATE)
+                ->setSubEvent(\SM\Notification\Model\Notification::EVENT_PROMO_AND_EVENT);
+
+            if (!$ruleId) {
+                $this->notify->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_VOUCHER_LIST);
+            } else {
+                $this->notify
+                    ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_VOUCHER_DETAIL)
+                    ->setRedirectId($ruleId);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param int|string $templateId
+     * @param array      $params
+     *
+     * @return Generate
+     */
+    protected function setNotificationEmail($templateId, $params)
+    {
+        if ($this->notify && (!$this->eventSetting->isInit() || $this->eventSetting->isEmail())) {
+            $this->notify
+                ->setEmailTemplate($templateId)
+                ->setEmailParams($params);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string   $sms
+     * @param int|null $storeId
+     *
+     * @return Generate
+     */
+    protected function setNotificationTranslation($sms = null, $storeId = null)
+    {
+        if ($this->notify) {
+            $this->startEmulator($storeId);
+            if ($sms && (!$this->eventSetting->isInit() || $this->eventSetting->isSms())) {
+                $this->notify->setSms(__($sms)->__toString());
+            }
+
+            if (!$this->eventSetting->isInit() || $this->eventSetting->isPush()) {
+                $this->notify->setPushTitle(
+                    __($this->notify->getTitle(), $this->notify->getParams()['title'] ?? [])->__toString()
+                )->setPushContent(
+                    __($this->notify->getContent(), $this->notify->getParams()['content'] ?? [])->__toString()
+                );
+            }
+            $this->stopEmulator();
+        }
+
+        return $this;
     }
 }

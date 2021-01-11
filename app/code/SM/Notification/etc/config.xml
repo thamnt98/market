@@ -28,6 +28,7 @@
                 <abandoned_cart_repeat_time>3</abandoned_cart_repeat_time>
                 <abandoned_cart_repeat>*/10 * * * *</abandoned_cart_repeat>
                 <va_payment>sprint_bca_va</va_payment>
+                <card_payment>sprint_mega_cc,sprint_mega_debit,sprint_allbankfull_cc,sprint_allbank_debit,trans_mepay_cc,trans_mepay_debit</card_payment>
                 <payment_expiring_soon_time>5</payment_expiring_soon_time>
                 <payment_expiring_soon_time_cron>* * * * *</payment_expiring_soon_time_cron>
                 <payment_expired>*/5 * * * *</payment_expired>
