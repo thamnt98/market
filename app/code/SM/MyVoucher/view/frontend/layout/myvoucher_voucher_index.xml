@@ -19,7 +19,7 @@
             </arguments>
         </referenceBlock>
         <referenceBlock name="content">
-            <block class="SM\MyVoucher\Block\Customer\MyVoucher" name="customer.voucher.info" template="SM_MyVoucher::customer/voucher/info.phtml"/>
+            <block class="SM\MyVoucher\Block\Customer\MyVoucher" name="customer.voucher.info" template="SM_MyVoucher::customer/voucher/info.phtml" cacheable="false" />
         </referenceBlock>
         <referenceBlock name="breadcrumbs">
             <action method="addCrumb">
