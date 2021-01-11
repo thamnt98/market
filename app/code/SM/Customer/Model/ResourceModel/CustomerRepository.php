@@ -217,7 +217,7 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
     public function createCustomer(CustomerInterface $customer, $passwordHash = null, $password = null)
     {
         if ($customer->getId()) {
-             $this->throwException();
+            $this->throwException();
         }
 
         if (!$customer->getCustomAttribute('telephone') || !$customer->getEmail()) {
@@ -290,6 +290,10 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
                     $isVerifiedEmailAttr = $currentCustomer->getCustomAttribute('is_verified_email');
                     $isVerifiedEmail = ($isVerifiedEmailAttr) ? $isVerifiedEmailAttr->getValue() : 0;
                     $customAttributes[$attribute]->setValue($isVerifiedEmail);
+                } elseif ($currentCustomer && $attribute == 'is_edit_address') {
+                    $isEditAddressAttr = $currentCustomer->getCustomAttribute('is_edit_address');
+                    $isEditAddress = ($isEditAddressAttr) ? $isEditAddressAttr->getValue() : 0;
+                    $customAttributes[$attribute]->setValue($isEditAddress);
                 } else {
                     unset($customAttributes[$attribute]);
                 }
@@ -317,7 +321,6 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
     {
         $attributesToUnset = [
             'group_id',
-            'is_edit_address',
             'created_in',
             'store_id',
             'website_id',
