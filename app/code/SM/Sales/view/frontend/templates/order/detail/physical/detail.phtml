@@ -78,6 +78,11 @@ if ($parentOrder) {
                                 </p>
                             <?php else: ?>
                                 <p><i class="notification-icon"></i><?= $subOrder->getRefundMessage() ?></p>
+                                <p class="notifi-refund">
+                                    <span>
+                                    <?= __('Total Refund: %1', $block->currencyFormat($subOrder->getTotalRefund())) ?>
+                                    </span>
+                                </p>
                             <?php endif ?>
                         </div>
                     <?php endif ?>
