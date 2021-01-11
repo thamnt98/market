@@ -32,6 +32,7 @@
                 <payment_expiring_soon_time_cron>* * * * *</payment_expiring_soon_time_cron>
                 <payment_expired>*/5 * * * *</payment_expired>
                 <remind_pickup_cron>0 * * * *</remind_pickup_cron>
+                <pickup_expired>0 * * * *</pickup_expired>
                 <remind_pickup>5</remind_pickup>
                 <remind_pickup_expired>2</remind_pickup_expired>
             </generate>

@@ -67,7 +67,7 @@ class RemindPickup extends AbstractGenerate
         $this->orderHelper = $orderHelper;
     }
 
-    public function process()
+    protected function process()
     {
         $this->create(self::EVENT_NAME_AFTER_READY);
         $this->create(self::EVENT_NAME_BEFORE_LIMIT);
@@ -136,6 +136,7 @@ class RemindPickup extends AbstractGenerate
                 $data['expired'] ?? '',
             ],
         ];
+        
         /** @var \SM\Notification\Model\Notification $notification */
         $notification = $this->notificationFactory->create();
         $notification->setTitle($title)
@@ -146,17 +147,19 @@ class RemindPickup extends AbstractGenerate
             ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_ORDER_DETAIL)
             ->setRedirectId($order->getData('parent_order') ? $order->getData('parent_order') : $order->getEntityId())
             ->setParams($params);
+        
+        $this->eventSetting->init($data['customer_id'], \SM\Notification\Model\Notification::EVENT_ORDER_STATUS);
+        if ($this->eventSetting->isPush()) {
+            // Emulation store view
+            $this->emulation->startEnvironmentEmulation(
+                $order->getStoreId()
+            );
 
-        // Emulation store view
-        $this->emulation->startEnvironmentEmulation(
-            $order->getStoreId(),
-            \Magento\Framework\App\Area::AREA_FRONTEND
-        );
+            $notification->setPushTitle(__($title, $params['title'])->__toString())
+                ->setPushContent(__($message, $params['content'])->__toString());
 
-        $notification->setPushTitle(__($title, $params['title'])->__toString())
-            ->setPushContent(__($message, $params['content'])->__toString());
-
-        $this->emulation->stopEnvironmentEmulation(); // End Emulation
+            $this->emulation->stopEnvironmentEmulation(); // End Emulation
+        }
 
         $this->notificationResource->save($notification);
 

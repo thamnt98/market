@@ -5,6 +5,7 @@
         <referenceContainer name="content">
             <block class="SM\Sales\Block\Creditmemo\RequestForm"
                    name="refund.request.form"
+                   cacheable="false"
                    template="SM_Sales::creditmemo/request-form.phtml"/>
         </referenceContainer>
     </body>
