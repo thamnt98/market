@@ -100,6 +100,12 @@
                         <source_model>SM\Notification\Model\Source\Config\PaymentMethod</source_model>
                         <config_path>sm_notification/generate/va_payment</config_path>
                     </field>
+                    <field id="card_payment" translate="label" type="multiselect" sortOrder="0"
+                           canRestore="1" showInDefault="1" showInWebsite="0" showInStore="0">
+                        <label>Credit/Debit Card Payment</label>
+                        <source_model>SM\Notification\Model\Source\Config\PaymentMethod</source_model>
+                        <config_path>sm_notification/generate/card_payment</config_path>
+                    </field>
                     <field id="payment_expiring_soon_time" translate="label" type="text" sortOrder="10" canRestore="1"
                            showInDefault="1" showInWebsite="0" showInStore="0">
                         <label>VA Expiring Soon Time (minute)</label>
