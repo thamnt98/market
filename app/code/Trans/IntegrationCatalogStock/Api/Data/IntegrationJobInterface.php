@@ -55,6 +55,7 @@ interface IntegrationJobInterface {
 
 	const STATUS_PARTIAL_COMPLETE = 49; // Data partially successfully saved sync
 	const STATUS_COMPLETE = 50; // Data successfully saved sync
+	const STATUS_COMPLETE_BUT_DATA_EMPTY = 59; // Data successfully saved sync
 
 	const STATUS_CANCEL = 60; // cancel
 	const STATUS_CLOSE  = 61; // close
@@ -319,6 +320,5 @@ interface IntegrationJobInterface {
 	 * @return void
 	 */
 	public function setLastJbId($jbid);
-
 
 }
