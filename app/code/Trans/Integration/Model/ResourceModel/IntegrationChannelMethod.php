@@ -45,17 +45,18 @@ class IntegrationChannelMethod extends \Magento\Framework\Model\ResourceModel\Db
      * @param \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
      * @param \Magento\Backend\Model\Auth\Session $authSession
      */
-    public function __construct(
-        \Magento\Framework\Model\ResourceModel\Db\Context $context,
+    public function __construct(        
         LibDateTime $date,
         \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
-        \Magento\Backend\Model\Auth\Session $authSession
+        \Magento\Backend\Model\Auth\Session $authSession,
+        \Magento\Framework\Model\ResourceModel\Db\Context $context,
+        $connectionName = null
     ) {
         $this->date = $date;
         $this->timezone = $timezone;
         $this->authSession = $authSession;
     
-        parent::__construct($context);
+        parent::__construct($context, $connectionName);
     }
     
     /**
