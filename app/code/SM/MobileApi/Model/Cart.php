@@ -1012,12 +1012,12 @@ class Cart implements \SM\MobileApi\Api\CartInterface
     {
         try {
             //Get active quote by customer id
-            $quote = $this->quoteRepository->getActiveForCustomer($this->customerId);
+            $quote = $this->quoteRepository->getActiveForCustomer($customerId);
             $this->quote = $quote;
         } catch (NoSuchEntityException $e) {
             //If quote is not active or customer don't have
             //We will create new quote for customer
-            $quote = $this->quoteManagement->createEmptyCartForCustomer($this->customerId);
+            $quote = $this->quoteManagement->createEmptyCartForCustomer($customerId);
             $this->quote = $quote;
             return (int)$quote;
         } catch (CouldNotSaveException $e) {
