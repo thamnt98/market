@@ -121,13 +121,15 @@ class TransmartCapture extends Capture
    */
   public function sendOrderToOms($order)
   {
-    $this->eventManager->dispatch(
-      'update_payment_oms',
-      [
-        'reference_number' => $order->getReferenceNumber(),
-        'payment_status' => SprintConfig::OMS_SUCCESS_PAYMENT_OPRDER,
-      ]
-    );
+    if ($order->getIsParent()) {
+        $this->eventManager->dispatch(
+            'update_payment_oms',
+            [
+              'reference_number' => $order->getReferenceNumber(),
+              'payment_status' => SprintConfig::OMS_SUCCESS_PAYMENT_OPRDER,
+            ]
+        );
+    }
   }
 
   /**
