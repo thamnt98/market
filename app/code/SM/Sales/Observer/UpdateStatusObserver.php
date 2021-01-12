@@ -56,8 +56,8 @@ class UpdateStatusObserver implements ObserverInterface
             $order = $observer->getEvent()->getOrder();
 
             if ($order->getId()
-                && $order->getData("is_parent"
-                    && $order->getStatus() != ParentOrderRepositoryInterface::STATUS_PENDING_PAYMENT)) {
+                && $order->getData("is_parent")
+                && $order->getStatus() != ParentOrderRepositoryInterface::STATUS_PENDING_PAYMENT) {
                 $this->orderUpdater->updateParentOrderStatus($order);
             }
         }
