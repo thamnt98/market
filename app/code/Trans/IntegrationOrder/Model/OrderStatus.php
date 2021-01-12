@@ -846,6 +846,7 @@ class OrderStatus implements OrderStatusInterface {
 	 * @param string $logisticCourier
 	 */
 	public function updateAWB($orderId, $status, $action, $logisticNumber, $logisticCourier) {
+		$this->loggerOrder->info(__FUNCTION__ . ' start');
 		$idsOrder = $this->statusRepo->loadByOrderIds($orderId);
 		if (!$idsOrder->getOrderId()) {
 			throw new \Magento\Framework\Webapi\Exception(__('Order ID doesn\'t exist, please make sure again.'));
@@ -916,7 +917,9 @@ class OrderStatus implements OrderStatusInterface {
 		$saveDataToStatusHistory    = $this->orderStatusHistoryInterfaceFactory->create();
 
 		/* Updating data status order in core magento table */
+
 		if ($loadDataOrder->getStatus() != $configStatus->getPickupByCustomerStatus()) {
+			$this->loggerOrder->info('=========== prepare salesorder history Pickup ===========');
 			$pickUp = $loadDataOrder->setStatus($configStatus->getPickupByCustomerStatus());
 			$saveDataToStatusHistory->setParentId($entityIdSalesOrder);
 			$saveDataToStatusHistory->setStatus($configStatus->getPickupByCustomerStatus());
@@ -935,8 +938,11 @@ class OrderStatus implements OrderStatusInterface {
 				}
 			}
 			$this->orderStatusHistoryRepoInterface->save($saveDataToStatusHistory);
+			$this->loggerOrder->info('=========== prepare salesorder history end Pickup ===========');
 		}
+
 		if ($orderData->getOrderType() === self::DELIVERY) {
+			$this->loggerOrder->info('=========== prepare salesorder history Delivery start ===========');
 			$deliveries = $loadDataOrder->setStatus($configStatus->getInProcessWaitingPickupStatus());
 			$saveDataToStatusHistory->setParentId($entityIdSalesOrder);
 			$saveDataToStatusHistory->setStatus($configStatus->getInProcessWaitingPickupStatus());
@@ -955,9 +961,12 @@ class OrderStatus implements OrderStatusInterface {
 				}
 			}
 			$this->orderStatusHistoryRepoInterface->save($saveDataToStatusHistory);
+			$this->loggerOrder->info('=========== prepare salesorder history Delivery end ===========');
+
 		}
 
 		$historyOrderUpdated = false;
+		$this->loggerOrder->info('=========== save data order history oms start ===========');
 		if (!$historyOrder->getOrderId() && $orderData->getOrderType() === self::DELIVERY) {
 			$historyOrder->setOrderId($request['order_id']);
 			$historyOrder->setReferenceNumber($idsOrder->getReferenceNumber());
@@ -967,6 +976,7 @@ class OrderStatus implements OrderStatusInterface {
 			$historyOrder->setFeSubStatusNo($loadStatusDelivery->getFeSubStatusNo());
 			$historyOrder->setUpdatedAt($orderDate);
 			$historyOrderUpdated = true;
+
 		} elseif (!$historyOrder->getOrderId() && $orderData->getOrderType() === self::PICK_UP_BY_CUSTOMER) {
 			$historyOrder->setOrderId($request['order_id']);
 			$historyOrder->setReferenceNumber($idsOrder->getReferenceNumber());
@@ -980,12 +990,14 @@ class OrderStatus implements OrderStatusInterface {
 		if ($historyOrderUpdated) {
 			$this->statusRepo->saveHistory($historyOrder);
 		}
+		$this->loggerOrder->info('=========== save data order history oms end ===========');
 
 		/* Updating data to table shipment */
 		$getEntityIds   = $loadDataOrder->getEntityId(); // entity id from sales_order
 		$getCustomerIds = $loadDataOrder->getCustomerId(); // customer id from sales_order
 
 		// Load the order increment ID
+		$this->loggerOrder->info('=========== Do Shipment Start ===========');
 		$order = $this->orderInterfaceFactory->create()->loadByIncrementId($getIncrementId);
 		// Check if order can be shipped or has already shipped
 		if (!$order->canShip()) {
@@ -1058,6 +1070,9 @@ class OrderStatus implements OrderStatusInterface {
 				__($e->getMessage())
 			);
 		}
+		$this->loggerOrder->info('=========== Do Shipment End ===========');
+
+		$this->loggerOrder->info(__FUNCTION__ . ' end');
 		return $result;
 	}
 
