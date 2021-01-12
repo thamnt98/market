@@ -408,7 +408,7 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
             $this->orderInstallation->sendMail($order);
         } catch (\Exception $e) {
         }
-        
+
         return true;
     }
 

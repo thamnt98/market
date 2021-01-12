@@ -144,16 +144,16 @@ class ContactUs extends \Magento\Framework\View\Element\Template
         array $data = []
     ) {
         $this->topicCollectionFactory = $topicCollectionFactory->create();
-        $this->customerSession        = $customerSession;
-        $this->imageHelper            = $imageHelper;
-        $this->orderRepository        = $orderRepository;
-        $this->searchCriteriaBuilder  = $searchCriteriaBuilder;
-        $this->timezone               = $timezone;
-        $this->image                  = $image;
-        $this->scopeConfig            = $scopeConfig;
+        $this->customerSession = $customerSession;
+        $this->imageHelper = $imageHelper;
+        $this->orderRepository = $orderRepository;
+        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
+        $this->timezone = $timezone;
+        $this->image = $image;
+        $this->scopeConfig = $scopeConfig;
         $this->storeCollectionFactory = $storeCollectionFactory;
-        $this->sortOrderBuilder       = $sortOrderBuilder;
-        $this->subOrderRepository     = $subOrderRepository;
+        $this->sortOrderBuilder = $sortOrderBuilder;
+        $this->subOrderRepository = $subOrderRepository;
         parent::__construct($context, $data);
         $this->config = $config;
         $this->sourceRepository = $sourceRepository;
@@ -175,8 +175,8 @@ class ContactUs extends \Magento\Framework\View\Element\Template
     /**
      * Prepare breadcrumbs
      *
-     * @throws \Magento\Framework\Exception\LocalizedException
      * @return void
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     protected function _addBreadcrumbs()
     {
@@ -224,11 +224,18 @@ class ContactUs extends \Magento\Framework\View\Element\Template
                 ScopeInterface::SCOPE_STORE
             );
             $storeIds = explode(',', $storeIds);
-            $searchCriteria = $this->searchCriteriaBuilder->addFilter(SourceItemInterface::SOURCE_CODE, ['in' => $storeIds])
+            $searchCriteria = $this->searchCriteriaBuilder->addFilter(
+                SourceItemInterface::SOURCE_CODE,
+                ['in' => $storeIds]
+            )
                 ->addFilter('enabled', 1)
                 ->create();
         } else {
-            $searchCriteria = $this->searchCriteriaBuilder->addFilter(SourceItemInterface::SOURCE_CODE, 'default', 'neq')
+            $searchCriteria = $this->searchCriteriaBuilder->addFilter(
+                SourceItemInterface::SOURCE_CODE,
+                'default',
+                'neq'
+            )
                 ->addFilter('enabled', 1)
                 ->create();
         }
@@ -252,23 +259,44 @@ class ContactUs extends \Magento\Framework\View\Element\Template
      */
     public function getOrder()
     {
+        if (!$this->orders) {
+            $this->orders = $this->getOrderList();
+        }
+        return $this->orders;
+    }
+
+    /**
+     * @return \Magento\Sales\Model\ResourceModel\Order\Collection
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getOrderForReturn()
+    {
+        $status = ParentOrderRepository::STATUS_DELIVERED . ',' . ParentOrderRepository::STATUS_COMPLETE;
+        return $this->getOrderList($status);
+    }
+
+    /**
+     * @param string $status
+     * @return \Magento\Sales\Model\ResourceModel\Order\Collection|\SM\Sales\Api\Data\SubOrderSearchResultsInterface
+     */
+    protected function getOrderList($status = '')
+    {
         try {
             $to = date("Y-m-d h:i:s"); // current date
             $from = strtotime('-90 days', strtotime($to));
             $from = date('Y-m-d h:i:s', $from); // 24 hours before
             $sortOrder = $this->sortOrderBuilder->setField(ParentOrderRepository::SORT_LATEST)->setDirection('DESC')->create();
-
             $customerId = $this->customerSession->getCustomerId();
-            $searchCriteria = $this->searchCriteriaBuilder
+            $searchCriteriaBuilder = $this->searchCriteriaBuilder
                 ->addFilter('created_at', $from, 'gteq')
-                ->setPageSize(10)
-                ->setSortOrders([$sortOrder])
-                ->create();
+                ->setPageSize(500)
+                ->setSortOrders([$sortOrder]);
 
-            if (!$this->orders) {
-                $this->orders = $this->subOrderRepository->getList($searchCriteria, $customerId);
+            if (!empty($status)) {
+                $searchCriteriaBuilder->addFilter('status', $status, 'in');
             }
-            return $this->orders;
+            $searchCriteria = $searchCriteriaBuilder->create();
+            return $this->subOrderRepository->getList($searchCriteria, $customerId);
         } catch (Exception $e) {
         }
     }
