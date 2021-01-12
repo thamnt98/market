@@ -111,6 +111,13 @@ class AddressManagement implements \SM\Customer\Api\AddressManagementInterface
             $addressModel=$this->addressRepository->save($addressData);
             $customer = $this->customerFactory->create()->load($customerId);
             if ($addressData->isDefaultBilling()||$addressData->isDefaultShipping()) {
+                $customerData  = $customer->getDataModel();
+                $isEditAddress = $customerData->getCustomAttribute('is_edit_address')->getValue();
+                if ($isEditAddress == 0) {
+                    $customer->setData('ignore_validation_flag', true);
+                    $customer->setData('is_edit_address', 1);
+                    $customer->save();
+                }
                 $this->customerHelper->updateDistrictAndOmniStoreForCustomer($customer, $addressData->getCustomAttribute('district')->getValue(), $addressData->getCity());
             }
             return $addressModel;

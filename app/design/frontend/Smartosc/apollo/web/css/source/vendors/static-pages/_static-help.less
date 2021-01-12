@@ -58,7 +58,11 @@
 
 
 & when (@media-common = true) {
-  //  code here
+  .help-contactus-index{
+      .modals-overlay {
+          z-index: 899 !important;
+      }
+  }
   .box-rectangle{
     box-sizing: border-box;
     border: 2px solid @color-border-rectangle;
@@ -1098,6 +1102,11 @@
         }
         .order-track-content {
             padding: @indent__base + @indent__xs @indent__base;
+            .order-track-content__items {
+                img {
+                    max-width: 70px;
+                }
+            }
         }
         .or-track-status {
             font-family: @font-family-SF-UI-Display-Semibold;
@@ -1188,6 +1197,7 @@
         img {
             display: inline-block;
             margin: 0 @indent__s;
+            max-width: 70px;
         }
     }
     .ct-message-sent {

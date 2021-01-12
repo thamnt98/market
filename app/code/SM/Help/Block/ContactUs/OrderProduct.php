@@ -152,7 +152,6 @@ class OrderProduct extends Template
         $customerId = $order->getCustomerId();
         $order = $this->orderRepository->get($order->getId());
         $parentId = $order->getData('parent_order');
-        $orderId = $this->orderRepository->get($parentId)->getEntityId();
-        return $this->parentOrderRepository->getById($customerId, $orderId);
+        return $this->parentOrderRepository->getById($customerId, $parentId);
     }
 }
