@@ -926,7 +926,7 @@ class OrderStatus implements OrderStatusInterface {
 			try {
 				$this->orderRepoInterface->save($pickUp);
 			} catch (Exception $e) {
-				sleep(3);
+				sleep(30);
 
 				try {
 					$this->orderRepoInterface->save($pickUp);
@@ -945,7 +945,7 @@ class OrderStatus implements OrderStatusInterface {
 			try {
 				$this->orderRepoInterface->save($deliveries);
 			} catch (Exception $e) {
-				sleep(3);
+				sleep(30);
 
 				try {
 					$this->orderRepoInterface->save($deliveries);
