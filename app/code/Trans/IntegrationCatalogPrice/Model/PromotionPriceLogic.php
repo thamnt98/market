@@ -748,6 +748,8 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                 $startTime = $this->timezone->date(new \DateTime())->format('Y-m-d H:i:s');
                 $endTime = $dataPass['to_date'].' '.$dataPass['to_time'];
                 $endTime = (new \DateTime($endTime))->format('Y-m-d H:i:s');
+                $dateNow = $this->timezone->date(new \DateTime())->format('Y-m-d');
+                $endDate = (new \DateTime($endTime))->format('Y-m-d');
                 $skuNumber = $dataPass['sku'];
                 
                 // data campaign and rollback
@@ -766,7 +768,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
                 ];
                 
                 // check if end date less than now
-                if ($endTime > $startTime) {
+                if ($endDate >= $dateNow) {
                     switch ($dataPass['discount_type']) {
                         // promotype = 1 , disctype = 1
                         case 1:
