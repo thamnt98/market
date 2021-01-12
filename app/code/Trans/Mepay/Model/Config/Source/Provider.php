@@ -101,7 +101,7 @@
     switch($paymentCode) {
       case Cc::CODE_CC : $source = self::MEGA_CC;
         break;
-      case Debit::CODE : $source = self::MEGA_CC;
+      case Debit::CODE : $source = self::MEGA_DEBIT;
         break;
       case Va::CODE_VA : $source = self::MEGA_VA;
         break;

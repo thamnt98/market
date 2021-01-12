@@ -77,6 +77,9 @@ class PaymentSourceDataBuilder implements BuilderInterface
     $this->code = $code;
     
     $this->logger->info('$code ' . $code);
+    if ( $this->provider->getPaymentSource($code) == Provider::MEGA_DEBIT) {
+      return [self::PAYMENT_SOURCE => Provider::MEGA_CC];
+    }
     return [self::PAYMENT_SOURCE => $this->provider->getPaymentSource($code)];
   }
 

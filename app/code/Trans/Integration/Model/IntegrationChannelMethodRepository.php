@@ -23,7 +23,7 @@ use \Trans\Integration\Api\Data\IntegrationChannelInterface;
 use \Trans\Integration\Api\Data\IntegrationChannelInterfaceFactory;
 
 use \Trans\Integration\Api\Data\IntegrationChannelMethodInterface;
-use \Trans\Integration\Api\Data\IntegrationChannelMethodInterfaceFactory ;
+use \Trans\Integration\Api\Data\IntegrationChannelMethodInterfaceFactory;
 use \Trans\Integration\Api\Data\IntegrationChannelMethodSearchResultInterface;
 use \Trans\Integration\Api\Data\IntegrationChannelMethodSearchResultInterfaceFactory;
 use \Trans\Integration\Api\IntegrationChannelMethodRepositoryInterface;
@@ -31,6 +31,11 @@ use \Trans\Integration\Api\IntegrationChannelMethodRepositoryInterface;
 use \Trans\Integration\Model\ResourceModel\IntegrationChannelMethod\CollectionFactory;
 use \Trans\Integration\Model\ResourceModel\IntegrationChannelMethod\Collection;
 use \Trans\Integration\Model\ResourceModel\IntegrationChannelMethod as ResourceModel;
+
+use Trans\Integration\Exception\WarningException;
+use Trans\Integration\Exception\ErrorException;
+use Trans\Integration\Exception\FatalException;
+
 
 class IntegrationChannelMethodRepository implements IntegrationChannelMethodRepositoryInterface
 {
@@ -62,7 +67,7 @@ class IntegrationChannelMethodRepository implements IntegrationChannelMethodRepo
     /**
      * @var ResourceConnection
      */
-	protected $dbConnection;
+    protected $dbConnection;
 
     /**
      * IntegrationChannelMethodRepository constructor.
@@ -227,9 +232,7 @@ class IntegrationChannelMethodRepository implements IntegrationChannelMethodRepo
         try {
 
             if (empty($tag)) {
-                throw new StateException(__(
-                    'Parameter Tag are empty !'
-                ));
+                throw new ErrorException('parameter tag in IntegrationChannelMethodRepository.getByStatusActiveUsingRawQuery empty !');
             }
 
             $str = "select `id`, `ch_id`, `tag`, `desc`, `method`, `headers`, `query_params`, `body`, `path`, `limit`, `status`, `created_at`, `updated_at`, `created_by`, `updated_by` from `integration_channel_method` where `tag` = '%s' and `status` = %d limit 1";
@@ -238,11 +241,18 @@ class IntegrationChannelMethodRepository implements IntegrationChannelMethodRepo
     
             return $this->dbConnection->fetchRow($sql);
 
-        } 
+        }
+        catch (WarningException $ex) {
+            throw $ex;
+        }
+        catch (ErrorException $ex) {
+            throw $ex;
+        }
+        catch (FatalException $ex) {
+            throw $ex;
+        }
         catch (\Exception $ex) {
-            throw new StateException(__(
-                $ex->getMessage()
-             ));
+            throw $ex;
         }
     }    
 }

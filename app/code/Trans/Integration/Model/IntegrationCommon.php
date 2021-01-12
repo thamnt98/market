@@ -26,12 +26,13 @@ use \Trans\Integration\Api\Data\IntegrationChannelMethodInterface;
 use \Trans\Integration\Api\Data\IntegrationChannelMethodInterfaceFactory;
 use Trans\Integration\Api\IntegrationChannelMethodRepositoryInterface;
 
-//use Trans\Integration\Api\IntegrationJobRepositoryInterface;
-//use Trans\Integration\Api\Data\IntegrationJobInterface;
-//use Trans\Integration\Api\Data\IntegrationJobInterfaceFactory;
-
 use Trans\Integration\Api\IntegrationCommonInterface;
 use Trans\Integration\Helper\Curl;
+
+use Trans\Integration\Exception\WarningException;
+use Trans\Integration\Exception\ErrorException;
+use Trans\Integration\Exception\FatalException;
+
 
 class IntegrationCommon implements IntegrationCommonInterface
 {
@@ -58,14 +59,14 @@ class IntegrationCommon implements IntegrationCommonInterface
      * @param IntegrationChannelRepositoryInterface $channelRepository
      * @param IntegrationChannelMethodRepositoryInterface $methodRepository
      */
-    public function __construct(
-        Curl $curl
-        ,IntegrationChannelRepositoryInterface $channelRepository
-        ,IntegrationChannelMethodRepositoryInterface $methodRepository
+    public function __construct(        
+        Curl $curl,
+        IntegrationChannelRepositoryInterface $channelRepository,
+        IntegrationChannelMethodRepositoryInterface $methodRepository
     ) {
-        $this->curl=$curl;
-        $this->channelRepository=$channelRepository;
-        $this->methodRepository=$methodRepository;
+        $this->curl = $curl;
+        $this->channelRepository = $channelRepository;
+        $this->methodRepository = $methodRepository;
     }
 
     /**
@@ -274,9 +275,7 @@ class IntegrationCommon implements IntegrationCommonInterface
         try {
 
             if (!is_array($data) || empty($data)) {
-                throw new StateException(__(
-                    'Parameter Data are empty !'
-                ));
+                throw new ErrorException('parameter data in IntegrationCommon.doCallUsingRawQuery is empty !');
             }
     
             $response = $this->curl->get(
@@ -288,11 +287,18 @@ class IntegrationCommon implements IntegrationCommonInterface
             return $this->curl->jsonToArray($response);
 
         }
+        catch (WarningException $ex) {
+            throw $ex;
+        }
+        catch (ErrorException $ex) {
+            throw $ex;
+        }
+        catch (FatalException $ex) {
+            throw $ex;
+        }
         catch (\Exception $ex) {
-            throw new StateException(
-                __($ex->getMessage())
-            );
-        }        
+            throw $ex;
+        }
 
     }
 
@@ -307,9 +313,7 @@ class IntegrationCommon implements IntegrationCommonInterface
         try {
 
             if (empty($tag)) {
-                throw new StateException(__(
-                    'Parameter Tag are empty !'
-                ));
+                throw new ErrorException('parameter tag in IntegrationCommon.prepareChannelUsingRawQuery is empty !');
             }
 
             $result = [];
@@ -326,10 +330,17 @@ class IntegrationCommon implements IntegrationCommonInterface
             return $result;
 
         }
-        catch (\Exception $ex) {
-            throw new StateException(
-                __($ex->getMessage())
-            );
+        catch (WarningException $ex) {
+            throw $ex;
+        }
+        catch (ErrorException $ex) {
+            throw $ex;
+        }
+        catch (FatalException $ex) {
+            throw $ex;
+        }        
+        catch (\Exception $ex) {            
+            throw $ex;
         }
 
     }

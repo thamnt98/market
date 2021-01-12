@@ -40,6 +40,13 @@ use Trans\IntegrationCatalogStock\Api\Data\IntegrationDataValueInterfaceFactory;
 
 use Trans\IntegrationCatalogStock\Api\IntegrationGetUpdatesInterface;
 
+use Trans\IntegrationCatalogStock\Api\IntegrationMonitoringStockRepositoryInterface;
+use Trans\IntegrationCatalogStock\Api\IntegrationMonitoringStockRepositoryInterfaceFactory;
+
+use Trans\Integration\Exception\WarningException;
+use Trans\Integration\Exception\ErrorException;
+use Trans\Integration\Exception\FatalException;
+
 
 class IntegrationGetUpdates implements IntegrationGetUpdatesInterface
 {
@@ -88,30 +95,30 @@ class IntegrationGetUpdates implements IntegrationGetUpdatesInterface
      */
     protected $timezone;
 
+
     /**
      * @param integrationJobInterfaceFactory $integrationJobInterface
      */
     public function __construct(
-        Curl $curl
-        ,IntegrationChannelRepositoryInterface $channelRepository
-        ,IntegrationChannelMethodRepositoryInterface $methodRepository
-        ,IntegrationJobRepositoryInterface $jobRepository
-        ,IntegrationJobInterfaceFactory $jobFactory
-        ,IntegrationCommonInterface $commonRepository
-        ,IntegrationDataValueRepositoryInterface $datavalueRepository
-        ,IntegrationDataValueInterfaceFactory $datavalueInterface
-        ,\Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
-
+        Curl $curl,
+        IntegrationChannelRepositoryInterface $channelRepository,
+        IntegrationChannelMethodRepositoryInterface $methodRepository,
+        IntegrationJobRepositoryInterface $jobRepository,
+        IntegrationJobInterfaceFactory $jobFactory,
+        IntegrationCommonInterface $commonRepository,
+        IntegrationDataValueRepositoryInterface $datavalueRepository,
+        IntegrationDataValueInterfaceFactory $datavalueInterface,
+        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
     ) {
-        $this->curl=$curl;
-        $this->channelRepository=$channelRepository;
-        $this->methodRepository=$methodRepository;
-        $this->jobRepository=$jobRepository;
-        $this->jobFactory=$jobFactory;
-        $this->commonRepository=$commonRepository;
-        $this->datavalueRepository=$datavalueRepository;
-        $this->datavalueInterface=$datavalueInterface;
-        $this->timezone			= $timezone;
+        $this->curl = $curl;
+        $this->channelRepository = $channelRepository;
+        $this->methodRepository = $methodRepository;
+        $this->jobRepository = $jobRepository;
+        $this->jobFactory = $jobFactory;
+        $this->commonRepository = $commonRepository;
+        $this->datavalueRepository = $datavalueRepository;
+        $this->datavalueInterface = $datavalueInterface;
+        $this->timezone = $timezone;
     }
 
     /**
@@ -418,9 +425,7 @@ class IntegrationGetUpdates implements IntegrationGetUpdatesInterface
         try {
 
             if (empty($channel['method'])) {
-                throw new StateException(
-                    __(IntegrationCommonInterface::MSG_METHOD_NOTAVAILABLE)
-                );
+                throw new ErrorException('parameter channel method in IntegrationGetUpdates.getFirstWaitingJobUsingRawQuery is empty !');
             }
     
             $job = $this->jobRepository->getFirstByMdIdStatusUsingRawQuery(
@@ -429,9 +434,7 @@ class IntegrationGetUpdates implements IntegrationGetUpdatesInterface
             );
 
             if (empty($job)) {
-                throw new StateException(
-                    __("first-waiting-job not-found then process aborted ...")
-                );
+                throw new WarningException('first-waiting-job not-found then process aborted ...');
             }
 
             $channel['first_waiting_job'] = $job;                
@@ -451,10 +454,17 @@ class IntegrationGetUpdates implements IntegrationGetUpdatesInterface
             return $channel;
 
         }
+        catch (WarningException $ex) {
+            throw $ex;
+        }
+        catch (ErrorException $ex) {
+            throw $ex;
+        }
+        catch (FatalException $ex) {
+            throw $ex;
+        }        
         catch (\Exception $ex) {
-            throw new StateException(
-                __($ex->getMessage())
-            );
+            throw $ex;
         }
 
     }
@@ -469,18 +479,14 @@ class IntegrationGetUpdates implements IntegrationGetUpdatesInterface
         try {
          
             if (empty($channel['method'])) {
-                throw new StateException(
-                    __(IntegrationCommonInterface::MSG_METHOD_NOTAVAILABLE)
-                );
+                throw new ErrorException('parameter channel method in IntegrationGetUpdates.prepareCallUsingRawQuery is empty !');
             }
     
             if (empty($channel['channel'])) {
-                throw new StateException(
-                    __(IntegrationCommonInterface::MSG_CHANNEL_NOTAVAILABLE)
-                );
+                throw new ErrorException('parameter channel in IntegrationGetUpdates.prepareCallUsingRawQuery is empty !');
             }
     
-            $result = array();
+            $result = [];
     
             $result[IntegrationChannelInterface::URL] = $channel['channel']['url'] . $channel['method']['path'];
             $result[IntegrationChannelMethodInterface::HEADERS] = $this->curl->jsonToArray($channel['method']['headers']);
@@ -488,26 +494,38 @@ class IntegrationGetUpdates implements IntegrationGetUpdatesInterface
             $result[IntegrationChannelMethodInterface::QUERY_PARAMS]['_limit'] = $channel['first_waiting_job']['limit'];
             $result[IntegrationChannelMethodInterface::QUERY_PARAMS]['_offset'] = $channel['first_waiting_job']['offset'];
 
-            if (!empty($channel['last_complete_job_from_waiting_job'])) {
-                $modifiedAt = date('Y-m-d H:i:s', strtotime($channel['last_complete_job_from_waiting_job']['last_updated']));
+            // Set _modified_at from last_complete_job_from_waiting_job if exists
+            if (!empty($channel['last_complete_job_from_waiting_job']) && !empty($channel['last_complete_job_from_waiting_job']['last_updated'])) {
+                $dateTime = new \DateTime($channel['last_complete_job_from_waiting_job']['last_updated']);
+                $lastRetrievedAt = $dateTime->format('Y-m-d H:i:s.u');
             }
-            else if (!empty($channel['last_complete_job'])) {                
-                $modifiedAt = date('Y-m-d H:i:s', strtotime($channel['last_complete_job']['last_updated']));
+            // Set _modified_at from last_complete_job if exists
+            else if (!empty($channel['last_complete_job']) && !empty($channel['last_complete_job']['last_updated'])) {
+                $dateTime = new \DateTime($channel['last_complete_job']['last_updated']);
+                $lastRetrievedAt = $dateTime->format('Y-m-d H:i:s.u');
             }
             else {
-                $magentoTime = $this->timezone->date(new \DateTime())->format('Y-m-d H:i:s');
-                $modifiedAt = date('Y-m-d H:i:s', strtotime('-1 day', strtotime($magentoTime)));
+                $dateTime = new \DateTime();
+                $dateTime->modify("-1 day");
+                $lastRetrievedAt = $this->timezone->date($dateTime)->format('Y-m-d H:i:s.u');
             }
 
-            $result[IntegrationChannelMethodInterface::QUERY_PARAMS]['_modified_at'] = $modifiedAt;
+            $result[IntegrationChannelMethodInterface::QUERY_PARAMS]['_modified_at'] = $lastRetrievedAt;
     
             return $result;
 
         }
+        catch (WarningException $ex) {
+            throw $ex;
+        }
+        catch (ErrorException $ex) {
+            throw $ex;
+        }
+        catch (FatalException $ex) {
+            throw $ex;
+        }        
         catch (\Exception $ex) {
-            throw new StateException(
-                __($ex->getMessage())
-            );
+            throw $ex;
         }
 
     }
@@ -523,38 +541,138 @@ class IntegrationGetUpdates implements IntegrationGetUpdatesInterface
         try {   
 
             if (empty($channel['first_waiting_job'])) {
-                throw new StateException(
-                    __(IntegrationCommonInterface::MSG_JOB_NOTAVAILABLE)
-                );
+                throw new WarningException('first-waiting-job in IntegrationGetUpdates.prepareStockDataUsingRawQuery not found then process aborted ...');
             }
     
             if (!is_array($response['data']) || empty($response['data'])) {
-                throw new StateException(
-                    __(IntegrationCommonInterface::MSG_DATA_NOTAVAILABLE)
-                );
-            }
+                $updates = [];
+                $updates['status'] = IntegrationJobInterface::STATUS_COMPLETE_BUT_DATA_EMPTY;
+                $this->jobRepository->updateUsingRawQuery($channel['first_waiting_job']['id'], $updates);
 
-            $i = -1;
+                throw new WarningException('stock-data empty!');
+            }
+            
             $return = [];
-            $result = [];
-    
+
+            $stockData = [];
+            $stockDataCounter = -1;
+
+            $monitoringStockSql = "";
+            $monitoringStockWatcherSql = "";
+
+
             foreach ($response['data'] as $data) {
-                $i++;
-                $result[$i][IntegrationDataValueInterface::JOB_ID] = $channel['first_waiting_job']['id'];
-                $result[$i][IntegrationDataValueInterface::DATA_VALUE] = json_encode($data);                
+
+                $stockDataCounter++;
+
+                $stockData[$stockDataCounter][IntegrationDataValueInterface::JOB_ID] = $channel['first_waiting_job']['id'];
+                $stockData[$stockDataCounter][IntegrationDataValueInterface::DATA_VALUE] = json_encode($data);                            
+
+                //retrieved_at
+                $monitoringStockSql .= ",(sysdate(6)";
+
+                //job_id
+                $monitoringStockSql .= "," . $stockData[$stockDataCounter][IntegrationDataValueInterface::JOB_ID];
+
+                //store_code
+                if (!empty($data['location_code'])) {                    
+                    $monitoringStockSql .= ",'" . $data['location_code'] . "'";
+                }
+                else {                    
+                    $monitoringStockSql .= ",null";
+                }
+
+                //sku
+                if (!empty($data['product_sku'])) {                    
+                    $monitoringStockSql .= ",'" . $data['product_sku'] . "'";
+                }
+                else {                    
+                    $monitoringStockSql .= ",null";
+                }                
+
+                //stock_id
+                if (!empty($data['stock_id'])) {                    
+                    $monitoringStockSql .= ",'" . $data['stock_id'] . "'";
+                    $monitoringStockWatcherSql .= ",'" . $data['stock_id'] . "'";
+                }
+                else {                    
+                    $monitoringStockSql .= ",null";
+                }
+
+                //stock_name
+                if (!empty($data['stock_name'])) {
+                    $monitoringStockSql .= ",'" . $data['stock_name'] . "'";
+                }
+                else {
+                    $monitoringStockSql .= ",null";
+                }
+
+                //stock_filename
+                if (!empty($data['stock_filename'])) {
+                    $monitoringStockSql .= ",'" . $data['stock_filename'] . "'";
+                }
+                else {
+                    $monitoringStockSql .= ",null";
+                }
+
+                //stock_action
+                if (!empty($data['stock_action'])) {
+                    $monitoringStockSql .= ",'" . $data['stock_action'] . "'";
+                }
+                else {
+                    $monitoringStockSql .= ",null";
+                }
+                                
+                $monitoringStockSql .= ")";
+
+            }
+            
+
+            if ($stockDataCounter > -1) {
+
+                $return['stock_data'] = $stockData;
+                
+                if (!empty($response['data'][$stockDataCounter]['updated_time'])) {
+                    $return['stock_data_last_updated'] = $response['data'][$stockDataCounter]['updated_time'];
+                }
+
+                $return['stock_data_job_id'] = $channel['first_waiting_job']['id'];
+
             }
 
-            $return['data'] = $result;
-            $return['last_updated'] = $response['data'][$i]['updated_time'];
+            if ($monitoringStockSql != "") {
+
+                $monitoringStockSql = "insert ignore into `monitoring_stock` (`retrieved_at`, `job_id`, `store_code`, `sku`, `stock_id`, `stock_name`, `stock_filename`, `stock_action`) values " . substr($monitoringStockSql, 1);
+                
+                $monitoringStockWatcherSql = "insert ignore into `monitoring_stock_when_watcher_temp` (`id`, `when_at`, `when_type`, `store_code`, `sku`, `stock_id`) select sysdate(6), `retrieved_at`, 'retrieved', `store_code`, `sku`, `stock_id` from monitoring_stock where `stock_id` in (" . substr($monitoringStockWatcherSql, 1) . ")";
+    
+                $return['monitoring_stock_sql'] = [];
+                $return['monitoring_stock_sql'][] = $monitoringStockSql;
+                $return['monitoring_stock_sql'][] = $monitoringStockWatcherSql;                
+
+            }
+
+
+            unset($stockData);
+            unset($monitoringStockSql);
+            unset($monitoringStockWatcherSql);
+
 
             return $return;
 
         }
+        catch (WarningException $ex) {
+            throw $ex;
+        }
+        catch (ErrorException $ex) {
+            throw $ex;
+        }
+        catch (FatalException $ex) {
+            throw $ex;
+        }        
         catch (\Exception $ex) {
-            throw new StateException(
-                __($ex->getMessage())
-            );
-        }    
+            throw $ex;
+        } 
 
     }
     
@@ -567,57 +685,67 @@ class IntegrationGetUpdates implements IntegrationGetUpdatesInterface
     public function insertStockDataUsingRawQuery($channel, $data) {
 
         if (empty($channel['first_waiting_job'])) {
-            throw new StateException(
-                __(IntegrationCommonInterface::MSG_JOB_NOTAVAILABLE)
-            );
+            throw new WarningException('first-waiting-job in IntegrationGetUpdates.insertStockDataUsingRawQuery not found then process aborted ...');
         }
 
-        if (!is_array($data) || empty($data)) {
-            throw new StateException(
-                __(IntegrationCheckUpdatesInterface::MSG_DATA_NOTAVAILABLE)
-            );
+        if (!is_array($data) || empty($data)) {            
+            throw new ErrorException('parameter data in IntegrationGetUpdates.insertStockDataUsingRawQuery is empty!');
         }
-    
+
     
         try {
 
-            $dataNumber = -1;            
-
-            $updates = array();
+            $updates = [];
             $updates['status'] = IntegrationJobInterface::STATUS_PROGRESS_GET;
-            $updates['start_job'] = $this->timezone->date(new \DateTime())->format('Y-m-d H:i:s');
+            $updates['start_job'] = $this->timezone->date(new \DateTime())->format('Y-m-d H:i:s.u');
             $this->jobRepository->updateUsingRawQuery($channel['first_waiting_job']['id'], $updates);
 
-            $dataNumber = $this->datavalueRepository->insertBulkUsingRawQuery($data['data']);
-
-            $updates = array();
-            $updates['last_updated'] = $data['last_updated'];
-            $updates['status'] = IntegrationJobInterface::STATUS_READY;
-            $updates['end_job'] = $this->timezone->date(new \DateTime())->format('Y-m-d H:i:s');
-            $this->jobRepository->updateUsingRawQuery($channel['first_waiting_job']['id'], $updates);
-
-            return $dataNumber;
+            return $this->datavalueRepository->insertBulkUsingRawQuery($data);
 
         }
-        catch (\Exception $ex) {
-
-            try {
-                
-                $updates = array();            
+        catch (WarningException $ex) {
+            try {                
+                $updates = [];
                 $updates['status'] = IntegrationJobInterface::STATUS_WAITING;
                 $this->jobRepository->updateUsingRawQuery($channel['first_waiting_job']['id'], $updates);
-    
+                throw $ex;
             }
             catch (\Exception $ex1) {
-                throw new StateException(
-                    __($ex1->getMessage())
-                );    
+                throw $ex1;
+            }            
+        }
+        catch (ErrorException $ex) {
+            try {                
+                $updates = [];            
+                $updates['status'] = IntegrationJobInterface::STATUS_WAITING;
+                $this->jobRepository->updateUsingRawQuery($channel['first_waiting_job']['id'], $updates);
+                throw $ex;
             }
-    
-            throw new StateException(
-                __($ex->getMessage())
-            );
-
+            catch (\Exception $ex1) {
+                throw $ex1;
+            }            
+        }
+        catch (FatalException $ex) {
+            try {                
+                $updates = [];            
+                $updates['status'] = IntegrationJobInterface::STATUS_WAITING;
+                $this->jobRepository->updateUsingRawQuery($channel['first_waiting_job']['id'], $updates);
+                throw $ex;
+            }
+            catch (\Exception $ex1) {
+                throw $ex1;
+            }
+        }
+        catch (\Exception $ex) {
+            try {                
+                $updates = [];            
+                $updates['status'] = IntegrationJobInterface::STATUS_WAITING;
+                $this->jobRepository->updateUsingRawQuery($channel['first_waiting_job']['id'], $updates);
+                throw $ex;
+            }
+            catch (\Exception $ex1) {
+                throw $ex1;
+            }
         }
 
     }
