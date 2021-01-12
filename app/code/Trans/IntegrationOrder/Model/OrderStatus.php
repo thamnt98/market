@@ -826,7 +826,7 @@ class OrderStatus implements OrderStatusInterface {
 						}
 					}
 				}
-				
+
 				$this->loggerOrder->info('=========== refund CC DEBIT end ===========');
 			}
 		}
@@ -871,7 +871,8 @@ class OrderStatus implements OrderStatusInterface {
 
 		if ($orderData->getOrderType() === self::PICK_UP_BY_CUSTOMER) {
 			if ($status == $stat && $action == $act) {
-				$result = [
+				$result['code'] = 200;
+				$result['body'] = [
 					"message" => "code : 200",
 					'order_id' => "Order Id : " . $request['order_id'],
 					'log_number' => "Logistic Number : " . $request['order_id'],
@@ -884,7 +885,8 @@ class OrderStatus implements OrderStatusInterface {
 			}
 		} elseif ($orderData->getOrderType() === self::DELIVERY) {
 			if ($status == $stat && $action == $act) {
-				$result = [
+				$result['code'] = 200;
+				$result['body'] = [
 					"message" => "code : 200",
 					'order_id' => "Order Id : " . $request['order_id'],
 					'log_number' => "Logistic Number : " . $request['logistic_number'],
@@ -920,7 +922,14 @@ class OrderStatus implements OrderStatusInterface {
 			$saveDataToStatusHistory->setStatus($configStatus->getPickupByCustomerStatus());
 			$saveDataToStatusHistory->setComment($loadStatusPickByCust->getFeStatus() . $loadStatusPickByCust->getFeSubStatus());
 			$saveDataToStatusHistory->setEntityName('order');
-			$this->orderRepoInterface->save($pickUp);
+
+			try {
+				$this->orderRepoInterface->save($pickUp);
+			} catch (Exception $e) {
+				sleep(3)
+				$this->orderRepoInterface->save($pickUp);
+
+			}
 			$this->orderStatusHistoryRepoInterface->save($saveDataToStatusHistory);
 		}
 		if ($orderData->getOrderType() === self::DELIVERY) {
@@ -929,10 +938,17 @@ class OrderStatus implements OrderStatusInterface {
 			$saveDataToStatusHistory->setStatus($configStatus->getInProcessWaitingPickupStatus());
 			$saveDataToStatusHistory->setComment($loadStatusDelivery->getFeStatus() . $loadStatusDelivery->getFeSubStatus());
 			$saveDataToStatusHistory->setEntityName('order');
-			$this->orderRepoInterface->save($deliveries);
+			try {
+				$this->orderRepoInterface->save($deliveries);
+			} catch (Exception $e) {
+				sleep(3)
+				$this->orderRepoInterface->save($deliveries);
+
+			}
 			$this->orderStatusHistoryRepoInterface->save($saveDataToStatusHistory);
 		}
 
+		$historyOrderUpdated = false;
 		if (!$historyOrder->getOrderId() && $orderData->getOrderType() === self::DELIVERY) {
 			$historyOrder->setOrderId($request['order_id']);
 			$historyOrder->setReferenceNumber($idsOrder->getReferenceNumber());
@@ -941,6 +957,7 @@ class OrderStatus implements OrderStatusInterface {
 			$historyOrder->setFeStatusNo($loadStatusDelivery->getFeStatusNo());
 			$historyOrder->setFeSubStatusNo($loadStatusDelivery->getFeSubStatusNo());
 			$historyOrder->setUpdatedAt($orderDate);
+			$historyOrderUpdated = true;
 		} elseif (!$historyOrder->getOrderId() && $orderData->getOrderType() === self::PICK_UP_BY_CUSTOMER) {
 			$historyOrder->setOrderId($request['order_id']);
 			$historyOrder->setReferenceNumber($idsOrder->getReferenceNumber());
@@ -949,8 +966,11 @@ class OrderStatus implements OrderStatusInterface {
 			$historyOrder->setFeStatusNo($loadStatusPickByCust->getFeStatusNo());
 			$historyOrder->setFeSubStatusNo($loadStatusPickByCust->getFeSubStatusNo());
 			$historyOrder->setUpdatedAt($orderDate);
+			$historyOrderUpdated = true;
 		}
-		$this->statusRepo->saveHistory($historyOrder);
+		if ($historyOrderUpdated) {
+			$this->statusRepo->saveHistory($historyOrder);
+		}
 
 		/* Updating data to table shipment */
 		$getEntityIds   = $loadDataOrder->getEntityId(); // entity id from sales_order
