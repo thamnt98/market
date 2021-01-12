@@ -114,8 +114,8 @@ class Updater
         $saleOrderStatusHistory = $resource->getTableName('sales_order_status_history');
 
         try {
-            $where = ['entity_id = ?' => $order->getEntityId()];
             $connection->beginTransaction();
+            $where = ['entity_id = ?' => $order->getEntityId()];
 
             //Update sale_order
             $connection->update($saleOrder, [
@@ -128,21 +128,25 @@ class Updater
                 'status' => ParentOrderRepositoryInterface::STATUS_COMPLETE
             ], $where);
 
+            $connection->commit();
+
+            $connection->beginTransaction();
             //Insert data to sales_order_status_history table
             $currentTime = $this->dateTime->gmtDate();
             $comment     = __('Order has been Successfully Completed');
             $data =  [
                 'parent_id'            => $order->getEntityId(),
-                'is_customer_notified' => $order->getCustomerNoteNotify(),
+                'is_customer_notified' => null,
                 'is_visible_on_front'  => 0,
                 'comment'              => $comment,
-                'status'               => $order->getStatus(),
+                'status'               => ParentOrderRepositoryInterface::STATUS_COMPLETE,
                 'created_at'           => $currentTime,
                 'entity_name'          => $this->entityType
             ];
 
             $connection->insert($saleOrderStatusHistory, $data);
             $connection->commit();
+
             $this->eventManager->dispatch(
                 'sm_sales_order_status_update',
                 [
