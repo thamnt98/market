@@ -120,7 +120,9 @@ class CartUpdateRepository implements CartUpdateRepositoryInterface
     public function removeIds($cartId, $itemIds)
     {
         try {
-            $this->registry->register("remove_cart_item",true);
+            if (!$this->registry->registry("remove_cart_item")) {
+                $this->registry->register("remove_cart_item", true);
+            }
             $removeIds = isset($itemIds) ? explode(',', $itemIds) : [];
             if (!empty($removeIds)) {
                 foreach ($removeIds as $id) {
@@ -128,9 +130,11 @@ class CartUpdateRepository implements CartUpdateRepositoryInterface
                 }
                 $this->getQuote($cartId)->setTotalsCollectedFlag(false)->collectTotals();
                 $this->quoteRepository->save($this->getQuote($cartId));
+                $this->registry->unregister("remove_cart_item");
                 return true;
             }
         } catch (\Exception $e) {
+            $this->registry->unregister("remove_cart_item");
             throw new \Exception($e->getMessage());
         }
     }
