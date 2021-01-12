@@ -928,12 +928,12 @@ class OrderStatus implements OrderStatusInterface {
 
 			try {
 				$this->orderRepoInterface->save($pickUp);
-			} catch (Exception $e) {
+			} catch (InvalidArgumentException $e) {
 				sleep(30);
 
 				try {
 					$this->orderRepoInterface->save($pickUp);
-				} catch (\Exception $e) {
+				} catch (\InvalidArgumentException $e) {
 					$this->loggerOrder->info('response AWB Error Pickup= ' . $e);
 				}
 			}
@@ -950,12 +950,12 @@ class OrderStatus implements OrderStatusInterface {
 			$saveDataToStatusHistory->setEntityName('order');
 			try {
 				$this->orderRepoInterface->save($deliveries);
-			} catch (Exception $e) {
+			} catch (\InvalidArgumentException $e) {
 				sleep(30);
 
 				try {
 					$this->orderRepoInterface->save($deliveries);
-				} catch (\Exception $e) {
+				} catch (\InvalidArgumentException $e) {
 					$this->loggerOrder->info('response AWB Error Delivery= ' . $e);
 
 				}
