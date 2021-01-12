@@ -1169,7 +1169,14 @@
         }
     }
 }
-
+.media-width(@extremum, @break) when (@extremum = 'max') and (@break = @screen__m) {
+    div.navbar-notification .block-notification{
+        right: -40px;
+    }
+    div.minicart-wrapper .block-minicart{
+        right: -40px;
+    }
+}
 //
 //  Desktop
 //  _____________________________________________
@@ -1789,6 +1796,13 @@
         .customer-welcome .customer-menu ul.header.links {
             display:block;
         }
+        .header.links {
+            .logged-in{
+                min-width: 130px;
+                display: inline-block;
+            }
+        }
+
     }
 
 }
