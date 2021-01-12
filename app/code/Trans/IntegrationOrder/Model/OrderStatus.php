@@ -846,6 +846,10 @@ class OrderStatus implements OrderStatusInterface {
 	 * @param string $logisticCourier
 	 */
 	public function updateAWB($orderId, $status, $action, $logisticNumber, $logisticCourier) {
+		$this->loggerOrder->info(__FUNCTION__ . ' waiting from another func is running');
+		sleep(30);
+		$this->loggerOrder->info(__FUNCTION__ . ' waiting from another func is finished');
+
 		$this->loggerOrder->info(__FUNCTION__ . ' start');
 		$idsOrder = $this->statusRepo->loadByOrderIds($orderId);
 		if (!$idsOrder->getOrderId()) {
