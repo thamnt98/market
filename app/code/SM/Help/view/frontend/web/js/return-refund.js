@@ -33,8 +33,10 @@ define(
                 buttons: [],
         },
             returnRefundOrder = $('#return-refund-order'),
-            helpOrderList = $('.help-order-list'),
+            helpOrderList = $('#help-order-list-order'),
+            helpOrderListReturn = $('#help-order-list-refund'),
             helpOrderListPopup = modal(options, helpOrderList),
+            helpOrderListPopupReturn = modal(options, helpOrderListReturn),
             url = $('#getOrderProduct').text(),
             getProductById = $('#getOrderProductById').text(),
             returnRefundProduct = $("#return-refund-product"),
@@ -45,7 +47,14 @@ define(
 
 
         btnSelectProduct.on('click',function () {
-            helpOrderListPopup.openModal();
+            let is_received = $('[name="is_received"]:checked').val();
+            if (is_received == "return") {
+                //helpOrderListPopup.closeModal();
+                helpOrderListPopupReturn.openModal();
+            } else {
+                //helpOrderListPopupReturn.closeModal();
+                helpOrderListPopup.openModal();
+            }
         });
 
         $(".order-track-box").on('click',function () {
@@ -72,6 +81,7 @@ define(
                         returnRefundProduct.html(data.output);
                         returnRefundProduct.trigger("processStop");
                         helpOrderListPopup.closeModal();
+                        helpOrderListPopupReturn.closeModal();
                         returnRefundOrderPopup.openModal();
                         $("#back-save").on('click',function () {
                             if ($('input[name="selected-product"]').is(":checked") === false) {

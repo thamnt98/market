@@ -149,6 +149,12 @@ class Collection extends \Magento\Sales\Model\ResourceModel\Order\Collection
                         [$filter->getConditionType() => $value]
                     );
                 }
+                if ($filter->getField() == "status" && $filter->getConditionType() == 'in') {
+                    $this->addFieldToFilter(
+                        "main_table.status",
+                        [$filter->getConditionType() => explode(',', $filter->getValue())]
+                    );
+                }
             }
         }
         return $this;
