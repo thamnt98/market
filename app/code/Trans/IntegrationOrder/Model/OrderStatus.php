@@ -927,16 +927,26 @@ class OrderStatus implements OrderStatusInterface {
 			$saveDataToStatusHistory->setEntityName('order');
 
 			try {
+				$this->loggerOrder->info('=========== orderRepoInterface before pickup ===========');
 				$this->orderRepoInterface->save($pickUp);
-			} catch (InvalidArgumentException $e) {
+				$this->loggerOrder->info('=========== orderRepoInterface after pickup ===========');
+
+			} catch (\InvalidArgumentException $e) {
 				sleep(30);
 
 				try {
+					$this->loggerOrder->info('=========== orderRepoInterface before pickup2 ===========');
+
 					$this->orderRepoInterface->save($pickUp);
+					$this->loggerOrder->info('=========== orderRepoInterface after  ===========');
+
 				} catch (\InvalidArgumentException $e) {
 					$this->loggerOrder->info('response AWB Error Pickup= ' . $e);
 				}
+			} catch (\Exception $e) {
+				$this->loggerOrder->info('orderRepoInterface = ' . $e->getMessage());
 			}
+
 			$this->orderStatusHistoryRepoInterface->save($saveDataToStatusHistory);
 			$this->loggerOrder->info('=========== prepare salesorder history end Pickup ===========');
 		}
