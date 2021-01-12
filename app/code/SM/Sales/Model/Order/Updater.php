@@ -188,16 +188,6 @@ class Updater
                         } else {
                             $countComplete++;
                         }
-                    } else {
-                        /** @var Order $firstOrder */
-                        $firstOrder = $orderCollection->getFirstItem();
-                        if ($firstOrder->getStatus() != $parentOrder->getStatus()) {
-                            $this->updateParentStatus(
-                                $this->stateHelper->getState($firstOrder->getStatus()),
-                                $firstOrder->getStatus()
-                            );
-                            return $this;
-                        }
                     }
                 }
 
@@ -213,11 +203,23 @@ class Updater
                             ParentOrderRepository::STATUS_COMPLETE
                         );
                     }
+                } else {
+                    /** @var Order $firstOrder */
+                    $firstOrder = $orderCollection->getFirstItem();
+                    if ($firstOrder->getStatus() != $parentOrder->getStatus()) {
+                        $this->updateParentStatus(
+                            $this->stateHelper->getState($firstOrder->getStatus()),
+                            $firstOrder->getStatus()
+                        );
+                        return $this;
+                    }
                 }
             }
         } catch (\Exception $exception) {
             $this->logger->critical('Error when set status parent order', ['exception' => $exception]);
         }
+
+        return $this;
     }
 
     /**

@@ -619,7 +619,8 @@ class SubOrder
                     ->setQuantity($orderItem->getQtyOrdered())
                     ->setPrice($orderItem->getBasePrice())
                     ->setUrl($orderItem->getProduct()->getProductUrl())
-                    ->setIsAvailable($this->getIsItemIsAvailable($subOrderModel, $orderItem));
+                    ->setIsAvailable($this->getIsItemIsAvailable($subOrderModel, $orderItem))
+                    ->setMessage($this->getItemMessage($orderItem));
 
                 $itemData->setImageUrl(
                     $this->imageHelper->init($orderItem->getProduct(), 'product_base_image')->getUrl()
@@ -828,6 +829,10 @@ class SubOrder
         }
     }
 
+    /**
+     * @param $subOrderModel
+     * @return bool
+     */
     private function getCanCreditmemo($subOrderModel)
     {
         if ($subOrderModel->getStatus() == \SM\Sales\Api\ParentOrderRepositoryInterface::STATUS_ORDER_CANCELED) {
@@ -835,5 +840,20 @@ class SubOrder
         }
 
         return true;
+    }
+
+    /**
+     * @param Item $orderItem
+     * @return \Magento\Framework\Phrase
+     */
+    private function getItemMessage($orderItem)
+    {
+        if ($orderItem->getId() == 6035 || $orderItem->getId() == null) {
+            $a =1 ;
+        }
+        if ($orderItem->canRefund()) {
+            return __('Some items in this order are not available.');
+        }
+        return __('This item is not available.');
     }
 }
