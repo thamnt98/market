@@ -938,8 +938,8 @@ class OrderStatus implements OrderStatusInterface {
 					$this->loggerOrder->info('=========== orderRepoInterface after pickup ===========');
 					$ulang = false;
 				} catch (\Exception $e) {
-					$this->loggerOrder->info('=========== orderRepoInterface Exception ===========');
-					$this->loggerOrder->info('orderRepoInterface = ' . $e->getMessage());
+					$this->loggerOrder->info('=========== orderRepoInterface Exception pickup ===========');
+					$this->loggerOrder->info('orderRepoInterface pickup = ' . $e->getMessage());
 					sleep(10);
 				}
 			}
@@ -955,16 +955,18 @@ class OrderStatus implements OrderStatusInterface {
 			$saveDataToStatusHistory->setStatus($configStatus->getInProcessWaitingPickupStatus());
 			$saveDataToStatusHistory->setComment($loadStatusDelivery->getFeStatus() . $loadStatusDelivery->getFeSubStatus());
 			$saveDataToStatusHistory->setEntityName('order');
-			try {
-				$this->orderRepoInterface->save($deliveries);
-			} catch (\InvalidArgumentException $e) {
-				sleep(30);
 
+			$ulang = true;
+			while ($ulang == true) {
 				try {
+					$this->loggerOrder->info('=========== orderRepoInterface before deliveries ===========');
 					$this->orderRepoInterface->save($deliveries);
-				} catch (\InvalidArgumentException $e) {
-					$this->loggerOrder->info('response AWB Error Delivery= ' . $e);
-
+					$this->loggerOrder->info('=========== orderRepoInterface after deliveries ===========');
+					$ulang = false;
+				} catch (\Exception $e) {
+					$this->loggerOrder->info('=========== orderRepoInterface Exception deliveries ===========');
+					$this->loggerOrder->info('orderRepoInterface deliveries = ' . $e->getMessage());
+					sleep(10);
 				}
 			}
 			$this->orderStatusHistoryRepoInterface->save($saveDataToStatusHistory);
@@ -1068,6 +1070,7 @@ class OrderStatus implements OrderStatusInterface {
 			// Save created shipment and order
 			$shipment->save();
 			$shipment->getOrder()->save();
+			$this->updateOrderStatus($getEntityIds, 'in_process_waiting_for_pickup', 'processing');
 
 			// Send email
 			$this->shipmentNotify->create()->notify($shipment);
