@@ -40,6 +40,20 @@
             <event_type_config>
                 <event_type><![CDATA[[{"event_type":"order_status","name":"Order Status","enable":"1"},{"event_type":"update","name":"Updates","enable":"1"},{"event_type":"service","name":"Services","enable":"1"}]]]></event_type>
             </event_type_config>
+            <email>
+                <payment_expired>sm_notification_email_payment_group_payment_expired</payment_expired>
+                <payment_bank_reject>sm_notification_email_payment_group_payment_bank_reject</payment_bank_reject>
+                <payment_system_failed>sm_notification_email_payment_group_payment_system_failed</payment_system_failed>
+                <payment_system_failed_digital>sm_notification_email_payment_group_payment_system_failed_digital</payment_system_failed_digital>
+                <payment_success_top_up>sm_notification_email_payment_group_payment_success_top_up</payment_success_top_up>
+                <payment_success_mobile_package>sm_notification_email_payment_group_payment_success_mobile_package</payment_success_mobile_package>
+                <payment_success_roaming>sm_notification_email_payment_group_payment_success_roaming</payment_success_roaming>
+                <payment_success_pln_token>sm_notification_email_payment_group_payment_success_pln_token</payment_success_pln_token>
+                <payment_success_pln_bill>sm_notification_email_payment_group_payment_success_pln_bill</payment_success_pln_bill>
+                <payment_success_mobile_postpaid>sm_notification_email_payment_group_payment_success_mobile_postpaid</payment_success_mobile_postpaid>
+                <payment_success_physical>sm_notification_email_payment_group_payment_success_physical</payment_success_physical>
+                <order_failed_delivery>sm_notification_email_order_status_group_order_failed_delivery</order_failed_delivery>
+            </email>
         </sm_notification>
     </default>
 </config>

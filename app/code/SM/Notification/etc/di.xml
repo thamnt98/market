@@ -25,6 +25,11 @@
                 type="SM\Notification\Model\Data\Queue\Sms" />
 
 
+    <!-- Magento Override -->
+    <preference for="Magento\Email\Model\Template"
+                type="SM\Notification\Override\MagentoEmail\Model\Template" />
+
+
 
     <!-- SM Define params -->
     <type name="SM\Notification\Plugin\Trans_Sprint\Model\PaymentNotify">

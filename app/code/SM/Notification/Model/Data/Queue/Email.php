@@ -17,18 +17,6 @@ namespace SM\Notification\Model\Data\Queue;
 
 class Email extends AbstractData implements \SM\Notification\Api\Data\Queue\EmailInterface
 {
-    public function setSubject($subject)
-    {
-        $this->setData('subject', $subject);
-
-        return $this;
-    }
-
-    public function getSubject()
-    {
-        return $this->getData('subject') ?? '';
-    }
-
     public function setTemplateId($id)
     {
         $this->setData('template_id', $id);

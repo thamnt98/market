@@ -42,8 +42,6 @@ namespace SM\Notification\Model;
  * @method string getPushContent()
  * @method Notification setPushTitle($title)
  * @method string getPushTitle()
- * @method Notification setEmailSubject($title)
- * @method string getEmailSubject()
  * @method Notification setEmailTemplate($content)
  * @method string getEmailTemplate()
  * @method Notification setStartDate($date)
