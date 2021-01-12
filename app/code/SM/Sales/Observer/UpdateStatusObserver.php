@@ -13,7 +13,9 @@ namespace SM\Sales\Observer;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Model\Order;
+use SM\Sales\Api\ParentOrderRepositoryInterface;
 use SM\Sales\Model\Order\Updater as OrderUpdater;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 
 /**
  * Class UpdateStatus
@@ -21,16 +23,27 @@ use SM\Sales\Model\Order\Updater as OrderUpdater;
  */
 class UpdateStatusObserver implements ObserverInterface
 {
+    /**
+     * @var OrderUpdater
+     */
     protected $orderUpdater;
+
+    /**
+     * @var ScopeConfigInterface
+     */
+    private $scopeConfig;
 
     /**
      * UpdateStatusObserver constructor.
      * @param OrderUpdater $orderUpdater
+     * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
-        OrderUpdater $orderUpdater
+        OrderUpdater $orderUpdater,
+        ScopeConfigInterface $scopeConfig
     ) {
         $this->orderUpdater = $orderUpdater;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -38,14 +51,15 @@ class UpdateStatusObserver implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        /** @var Order $order */
-        $order = $observer->getEvent()->getOrder();
+        if ($this->scopeConfig->isSetFlag('sm_sale/general/update_main_status_by_event')) {
+            /** @var Order $order */
+            $order = $observer->getEvent()->getOrder();
 
-        if (!$order->getId()) {
-            return $this;
+            if ($order->getId()
+                && $order->getData("is_parent")
+                && $order->getStatus() != ParentOrderRepositoryInterface::STATUS_PENDING_PAYMENT) {
+                $this->orderUpdater->updateParentOrderStatus($order);
+            }
         }
-
-        $this->orderUpdater->updateParentOrderStatus($order);
-        return $this;
     }
 }

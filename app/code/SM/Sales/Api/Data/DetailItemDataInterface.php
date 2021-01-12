@@ -23,6 +23,7 @@ interface DetailItemDataInterface
     const PRODUCT_TYPE = "product_type";
     const FRESH_PRODUCT = "fresh_product";
     const IS_AVAILABLE = "is_available";
+    const MESSAGE = "message";
 
     /**
      * @param int $value
@@ -194,4 +195,16 @@ interface DetailItemDataInterface
      * @return bool
      */
     public function getIsAvailable();
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setMessage($value);
+
+
+    /**
+     * @return string
+     */
+    public function getMessage();
 }

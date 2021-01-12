@@ -167,7 +167,13 @@ define([
                     this.disabledBtnPay();
                 }
             } else if (idElm == 'qris') {
-                $('[data-clickid="payment-method-' + idElm + '"]').trigger('click');
+                $('[data-href="credit-options"]').addClass('hidden');
+                let optSelected = $(element).attr('data-option');
+                if (optSelected) {
+                    this.setPaymentMethod(optSelected);
+                } else {
+                    this.disabledBtnPay();
+                }
             } else {
                 setServiceFee(0);
             }

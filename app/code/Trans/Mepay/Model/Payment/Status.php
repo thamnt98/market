@@ -177,9 +177,12 @@ class Status
          }
       }
 
-      if ($this->isCapture($transaction->getStatus())) {
+      $transactionDatas = $this->transactionHelper->getCaptureByTxnId($transaction->getId());
+      foreach ($transactionDatas as $key => $value) {
+        if ($this->isCapture($transaction->getStatus())) {
           $this->logger->log('== {{capture_operation}} ==');
           $this->capture->handle($transaction, $inquiry, $token);
+        }
       }
 
       if ($this->isFailed($transaction->getStatus())) {
