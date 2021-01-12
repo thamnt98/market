@@ -19,7 +19,7 @@
         </job>
     </group> -->
     <group id="ims_product_stock_update">
-        <job name="integration_ims_check_product_stock_update" instance="Trans\IntegrationCatalogStock\Cron\Ims\Check\StockUpdate" method="execute">
+        <!-- <job name="integration_ims_check_product_stock_update" instance="Trans\IntegrationCatalogStock\Cron\Ims\Check\StockUpdate" method="execute">
             <schedule>* * * * *</schedule>
         </job>
         <job name="integration_ims_get_product_stock_update" instance="Trans\IntegrationCatalogStock\Cron\Ims\Get\StockUpdate" method="execute">
@@ -27,10 +27,10 @@
         </job>
         <job name="integration_ims_save_product_stock" instance="Trans\IntegrationCatalogStock\Cron\Ims\Save\Stock" method="execute">
             <schedule>* * * * *</schedule>
-        </job>
-        <!-- <job name="integration_ims_sync_product_stock" instance="Trans\IntegrationCatalogStock\Cron\Ims\Sync\Stock" method="execute">
+        </job> -->
+        <job name="integration_ims_sync_product_stock" instance="Trans\IntegrationCatalogStock\Cron\Ims\Sync\Stock" method="execute">
             <schedule>* * * * *</schedule>
-        </job>         -->
+        </job>        
     </group>
 
 </config>
