@@ -10,6 +10,7 @@
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
     <module name="SM_JiraService" setup_version="1.0.0">
         <sequence>
+            <module name="Trans_IntegrationOrder"/>
             <module name="SM_Setup"/>
             <module name="SM_Help"/>
         </sequence>
