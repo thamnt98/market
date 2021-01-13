@@ -267,4 +267,20 @@ class DetailItemData extends DataObject implements \SM\Sales\Api\Data\DetailItem
     {
         return $this->getData(self::IS_AVAILABLE);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function setMessage($value)
+    {
+        return $this->setData(self::MESSAGE, $value);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getMessage()
+    {
+        return $this->getData(self::MESSAGE);
+    }
 }

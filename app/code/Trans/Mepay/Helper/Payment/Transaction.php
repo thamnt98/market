@@ -197,6 +197,20 @@ class Transaction extends AbstractHelper {
 	}
 
 	/**
+	 * Get capture transaction by txnid
+	 * @param  string $txnId
+	 * @return \Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\Collection
+	 */
+	public function getCaptureByTxnId($txnId) {
+		$searchCriteria = $this->getSearchCriteria([
+			TransactionInterface::TXN_ID => $txnId,
+			TransactionInterface::IS_CLOSED => 0
+		]);
+		return $this->transactionRepo->getList($searchCriteria);
+
+	}
+
+	/**
 	 * Get transaction by txn id
 	 * @param  int $txnId
 	 * @return Magento\Sales\Model\ResourceModel\Order\Payment\Transaction\Collection

@@ -92,6 +92,12 @@ if ($parentOrder->getStatus() == \SM\Sales\Model\ParentOrderRepository::STATUS_C
                             <p><?= $block->escapeHtml(__("+" . $left . (($left > 1) ? " items" : " item"))) ?></p>
                         <?php endif; ?>
                         <?= $block->getInstallationHtml($item) ?>
+                        <?php if (!$item->getIsAvailable()): ?>
+                            <div class="error-message">
+                                <span class="icon icon-error"></span>
+                                <span class="error"><?= $item->getMessage() ?></span>
+                            </div>
+                        <?php endif; ?>
                     </div>
 
                 </div>

@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+       <sm_sale>
+           <general>
+                <update_main_status_by_event>1</update_main_status_by_event>
+           </general>
+       </sm_sale>
+    </default>
+</config>
