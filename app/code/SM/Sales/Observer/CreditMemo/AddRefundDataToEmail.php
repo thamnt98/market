@@ -62,8 +62,10 @@ class AddRefundDataToEmail implements ObserverInterface
         $additionalData['can_credit_memo'] = $order->canCreditmemo();
         if ($additionalData['can_credit_memo']) {
             $additionalData['items_text'] = '<strong>' . __('some items') . '</strong>';
+            $additionalData['transaction_text'] = __('for the unavailable items.');
         } else {
             $additionalData['items_text'] = '<strong>' . __('all items') . '</strong>';
+            $additionalData['transaction_text'] = __('for this transaction.');
         }
         $additionalData['is_virtual'] = $isVirtual;
         $additionalData['is_card'] = !$isVirtual;
