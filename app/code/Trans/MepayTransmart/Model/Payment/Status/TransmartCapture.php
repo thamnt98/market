@@ -15,6 +15,9 @@ namespace Trans\MepayTransmart\Model\Payment\Status;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Model\Order\Payment\Transaction;
+use Magento\Framework\Event\ManagerInterface as EventManager;
+use Magento\Sales\Api\OrderItemRepositoryInterface;
+use Magento\Sales\Api\Data\OrderItemInterface;
 use Trans\Mepay\Model\Config\Config;
 use Trans\Mepay\Helper\Payment\Transaction as TransactionHelper;
 use Trans\Mepay\Helper\Customer\Customer as CustomerHelper;
@@ -23,20 +26,31 @@ use Trans\Mepay\Logger\LoggerWrite;
 use Trans\Mepay\Model\Payment\Status\Capture;
 use Trans\Sprint\Helper\Config as SprintConfig;
 use Trans\Mepay\Helper\Data;
-use Magento\Framework\Event\ManagerInterface as EventManager;
 
 class TransmartCapture extends Capture
 {
+  /**
+   * @var \Magento\Sales\Api\OrderItemRepositoryInterface
+   */
+  protected $itemRepo;
+  
+  /**
+   * @var \Magento\Framework\Event\ManagerInterface
+   */
   protected $eventManager;
+
   /**
    * Constructor
-   * @param Config            $config            [description]
-   * @param TransactionHelper $transactionHelper [description]
-   * @param CustomerHelper    $customerHelper    [description]
-   * @param Invoice           $invoice           [description]
-   * @param LoggerWrite       $logger            [description]
+   * @param OrderItemRepositoryInterface $itemRepo
+   * @param Config $config
+   * @param TransactionHelper $transactionHelper
+   * @param CustomerHelper $customerHelper
+   * @param Invoice $invoice
+   * @param LoggerWrite $logger
+   * @param EventManager $eventManager
    */
   public function __construct(
+      OrderItemRepositoryInterface $itemRepo,
       Config $config,
       TransactionHelper $transactionHelper,
       CustomerHelper $customerHelper,
@@ -44,6 +58,7 @@ class TransmartCapture extends Capture
       LoggerWrite $logger,
       EventManager $eventManager
     ) {
+      $this->itemRepo = $itemRepo;
       $this->eventManager = $eventManager;
       parent::__construct($config, $transactionHelper, $customerHelper,$invoice,$logger);
     }
@@ -152,15 +167,39 @@ class TransmartCapture extends Capture
     }
   }
 
+  /**
+   * Create Invoice
+   * @param \Magento\Sales\Api\Data\OrderInterface $initOrder
+   * @param \Trans\Mepay\Api\Data\TransactionInterface $transaction
+   * @return void
+   */
   public function createOrderInvoiceParentAndChild($initOrder, $transaction)
   {
-        if ($initOrder->getIsParent()) {
+        if ($initOrder->getIsParent() && $initOrder->canInvoice()) {
             $invoice = $this->invoice->create($initOrder, $transaction);
             $this->invoice->send($invoice);
+            $this->lockedInvoice($initOrder->getAllItems());
         }
         $initOrder->setState('in_process');
         $initOrder->setStatus('in_process');
         $this->transactionHelper->saveOrder($initOrder);
         $this->updateChildStatusHistory($initOrder->getId());
+  }
+  
+  /**
+   * Locked invoice
+   * @param \Magento\Sales\Model\Order\Item[]
+   * @return void
+   */
+  protected function lockedInvoice($items = [])
+  {
+    if (empty($items) == false) {
+        foreach($items as $key => $res) {
+            if ($res instanceof OrderItemInterface) {
+                $res->setLockedDoInvoice(true);
+                $this->itemRepo->save($res);
+            }
+        }
+    }
   }
 }
