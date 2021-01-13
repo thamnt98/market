@@ -38,6 +38,11 @@ class EventSetting
     protected $isEmail = false;
 
     /**
+     * @var bool
+     */
+    protected $isInit = false;
+
+    /**
      * EventSetting constructor.
      *
      * @param \SM\Notification\Helper\CustomerSetting $setting
@@ -64,6 +69,8 @@ class EventSetting
             $this->setting->generateSettingCode($event, 'sms'),
             $setting
         );
+        
+        $this->isInit = true;
 
         return $this;
     }
@@ -93,5 +100,14 @@ class EventSetting
     : bool
     {
         return $this->isEmail;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isInit()
+    : bool
+    {
+        return $this->isInit;
     }
 }

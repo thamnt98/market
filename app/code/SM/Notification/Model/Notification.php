@@ -26,6 +26,8 @@ namespace SM\Notification\Model;
  * @method bool getIsSystem()
  * @method Notification setRedirectType($type)
  * @method string getRedirectType()
+ * @method Notification setAdminType($type)
+ * @method string getAdminType()
  * @method Notification setRedirectId($id)
  * @method string|int getRedirectId()
  * @method Notification setImage($image)
