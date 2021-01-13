@@ -790,6 +790,67 @@ define([
             }
 
             $input.trigger('change');
+            $widget.updateDetails();
+        },
+
+        getChildId: function () {
+            console.log(this.getProduct());
+            let selected = {},
+                result = null;
+
+            $('.' + this.options.classes.attributeClass).each(function (index, element) {
+                let attrId    = $(element).attr('attribute-id'),
+                    attrValue = $(element).attr('option-selected');
+
+                if (!attrId || !attrValue) {
+                    result = 0;
+
+                    return false;
+                } else {
+                    selected[attrId] = attrValue;
+                }
+            });
+
+            if (result === 0) {
+                return 0;
+            }
+
+            for (let id in this.options.jsonConfig.index) {
+                let diff = false;
+                if (!this.options.jsonConfig.index[id]) {
+                    continue;
+                }
+
+                for (let configAttrId in this.options.jsonConfig.index[id]) {
+                    if (selected[configAttrId]
+                        && this.options.jsonConfig.index[id][configAttrId] != selected[configAttrId]
+                    ) {
+                        diff = true;
+                        break;
+                    }
+                }
+
+                if (!diff) {
+                    return id;
+                }
+            }
+
+            return 0;
+        },
+
+        updateDetails: function () {
+            let data = this.options.jsonConfig.details[this.getChildId()];
+
+            if (!data) {
+                return;
+            }
+
+            for (let key in data) {
+                let element = $('#' + key);
+
+                $(element).empty();
+                $(element).append(data[key]);
+            }
         },
 
         /**
