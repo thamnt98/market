@@ -257,6 +257,7 @@ class HandleOrderStatusHistory
                     $this->cancelType = self::CANCEL_BY_PICKUP;
                     break;
                 case Statuses::STATUS_IN_DELIVERY:
+                case Statuses::STATUS_FAILED_DELIVERY:
                     $currentHistory->setIcon($this->getCancelIcon(Statuses::STATUS_IN_DELIVERY));
                     $currentHistory->setIconClass($this->getCancelIconClass(Statuses::STATUS_IN_DELIVERY));
                     $items = [

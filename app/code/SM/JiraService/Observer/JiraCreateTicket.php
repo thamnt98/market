@@ -28,20 +28,29 @@ class JiraCreateTicket implements \Magento\Framework\Event\ObserverInterface
     private $topicCollectionFactory;
 
     /**
+     * @var \Magento\InventoryApi\Api\SourceRepositoryInterface
+     */
+    private $sourceRepository;
+
+    /**
      * JiraCreateTicket constructor.
      * @param \SM\JiraService\Api\JiraRepositoryInterface $jiraRepository
      * @param \SM\Help\Model\ResourceModel\Topic\CollectionFactory $topicCollectionFactory
+     * @param \Magento\InventoryApi\Api\SourceRepositoryInterface $sourceRepository
      */
     public function __construct(
         \SM\JiraService\Api\JiraRepositoryInterface $jiraRepository,
-        \SM\Help\Model\ResourceModel\Topic\CollectionFactory $topicCollectionFactory
+        \SM\Help\Model\ResourceModel\Topic\CollectionFactory $topicCollectionFactory,
+        \Magento\InventoryApi\Api\SourceRepositoryInterface $sourceRepository
     ) {
         $this->jiraRepository = $jiraRepository;
         $this->topicCollectionFactory = $topicCollectionFactory;
+        $this->sourceRepository = $sourceRepository;
     }
 
     /**
      * @param Observer $observer
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function execute(Observer $observer)
     {
@@ -51,6 +60,16 @@ class JiraCreateTicket implements \Magento\Framework\Event\ObserverInterface
         } else {
             $dataPost = $data['data'];
         }
+
+        if ($dataPost['store']) {
+            try {
+                $store = $this->sourceRepository->get($dataPost['store']);
+                $dataPost['store_code'] = $dataPost['store'];
+                $dataPost['store'] = $store->getName();
+            } catch (\Exception $e) {
+            }
+        }
+
         if ($dataPost['category'] && is_numeric($dataPost['category'])) {
             $topic = $this->topicCollectionFactory->create()
                 ->addStoreFilter()

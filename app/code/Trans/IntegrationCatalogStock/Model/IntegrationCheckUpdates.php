@@ -35,9 +35,14 @@ use Trans\IntegrationCatalogStock\Api\Data\IntegrationJobInterface;
 use Trans\IntegrationCatalogStock\Api\Data\IntegrationJobInterfaceFactory;
 use Trans\IntegrationCatalogStock\Api\IntegrationCheckUpdatesInterface;
 
+use Trans\Integration\Exception\WarningException;
+use Trans\Integration\Exception\ErrorException;
+use Trans\Integration\Exception\FatalException;
+
 
 class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
 {
+
     /**
      * @var Curl Zend Client
      */
@@ -73,6 +78,12 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
      */
     protected $datavalueRepository;
 
+     /**
+     * @var TimezoneInterface
+     */
+    protected $timezone;
+
+
     /**
      * IntegrationCheckUpdates constructor.
      * @param Curl $curl
@@ -82,25 +93,24 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
      * @param IntegrationJobInterfaceFactory $jobFactory
      * @param IntegrationCommonInterface $commonRepository
      */
-    public function __construct(
-        Curl $curl
-        ,IntegrationChannelRepositoryInterface $channelRepository
-        ,IntegrationChannelMethodRepositoryInterface $methodRepository
-        ,IntegrationJobRepositoryInterface $jobRepository
-        ,IntegrationJobInterfaceFactory $jobFactory
-        ,IntegrationCommonInterface $commonRepository
-        ,IntegrationDataValueRepositoryInterface $datavalueRepository
-        ,\Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
+    public function __construct(        
+        Curl $curl,
+        IntegrationChannelRepositoryInterface $channelRepository,
+        IntegrationChannelMethodRepositoryInterface $methodRepository,
+        IntegrationJobRepositoryInterface $jobRepository,
+        IntegrationJobInterfaceFactory $jobFactory,
+        IntegrationCommonInterface $commonRepository,
+        IntegrationDataValueRepositoryInterface $datavalueRepository,
+        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
     ) {
-        $this->curl=$curl;
-        $this->channelRepository=$channelRepository;
-        $this->methodRepository=$methodRepository;
-        $this->jobRepository=$jobRepository;
-        $this->jobFactory=$jobFactory;
-        $this->commonRepository=$commonRepository;
-        $this->datavalueRepository=$datavalueRepository;
+        $this->curl = $curl;
+        $this->channelRepository = $channelRepository;
+        $this->methodRepository = $methodRepository;
+        $this->jobRepository = $jobRepository;
+        $this->jobFactory = $jobFactory;
+        $this->commonRepository = $commonRepository;
+        $this->datavalueRepository = $datavalueRepository;
         $this->timezone = $timezone;
-
     }
 
     /**
@@ -625,9 +635,7 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
         try {
 
             if (empty($channel['method'])) {
-                throw new StateException(
-                    __(IntegrationCommonInterface::MSG_METHOD_NOTAVAILABLE)
-                );
+                throw new ErrorException('parameter channel method in IntegrationCheckUpdates.checkOnProgressJobUsingRawQuery is empty !');
             }    
 
             $job = $this->jobRepository->getAnyByMdIdMultiStatusUsingRawQuery(
@@ -640,18 +648,23 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
             );
 
             if (!empty($job)) {
-                throw new StateException(
-                    __("on-progress-job found then process aborted ...")
-                );
+                throw new WarningException("first-waiting-job or first-data-ready-job or on-progress-data-saving-job found from IntegrationCheckUpdates.checkOnProgressJobUsingRawQuery then process aborted ...");
             }
 
             return $channel;
 
         }
+        catch (WarningException $ex) {
+            throw $ex;
+        }
+        catch (ErrorException $ex) {
+            throw $ex;
+        }
+        catch (FatalException $ex) {
+            throw $ex;
+        }        
         catch (\Exception $ex) {
-            throw new StateException(
-                __($ex->getMessage())
-            );
+            throw $ex;
         }
         
     }
@@ -666,9 +679,7 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
         try {
 
             if (empty($channel['method'])) {
-                throw new StateException(
-                    __(IntegrationCommonInterface::MSG_METHOD_NOTAVAILABLE)
-                );
+                throw new ErrorException('parameter channel method in IntegrationCheckUpdates.getLastCompleteJobUsingRawQuery is empty !');
             }
     
             $lastCompleteJob = $this->jobRepository->getLastByMdIdStatusUsingRawQuery(
@@ -683,10 +694,17 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
             return $channel;
 
         }
+        catch (WarningException $ex) {
+            throw $ex;
+        }
+        catch (ErrorException $ex) {
+            throw $ex;
+        }
+        catch (FatalException $ex) {
+            throw $ex;
+        }        
         catch (\Exception $ex) {
-            throw new StateException(
-                __($ex->getMessage())
-            );
+            throw $ex;
         }
 
     }
@@ -701,15 +719,11 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
         try {
 
             if (empty($channel['method'])) {
-                throw new StateException(
-                    __(IntegrationCheckUpdatesInterface::MSG_METHOD_NOTAVAILABLE)
-                );
+                throw new ErrorException('parameter channel method in IntegrationCheckUpdates.prepareCallUsingRawQuery is empty !');
             }
 
             if (empty($channel['channel'])) {
-                throw new StateException(
-                    __(IntegrationCheckUpdatesInterface::MSG_CHANNEL_NOTAVAILABLE)
-                );
+                throw new ErrorException('parameter channel in IntegrationCheckUpdates.prepareCallUsingRawQuery is empty !');
             }
 
             $result = array();
@@ -721,23 +735,32 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
             $result[IntegrationChannelMethodInterface::QUERY_PARAMS]['_count'] = '*';            
             
             // Set _modified_at from last_complete_job if exists
-            if (!empty($channel['last_complete_job'])) {
-                $modifiedAt = date('Y-m-d H:i:s', strtotime($channel['last_complete_job']['last_updated']));                
+            if (!empty($channel['last_complete_job']) && !empty($channel['last_complete_job']['last_updated'])) {
+                $dateTime = new \DateTime($channel['last_complete_job']['last_updated']);
+                $lastRetrievedAt = $dateTime->format('Y-m-d H:i:s.u');
             }
             else {
-                $magentoTime = $this->timezone->date(new \DateTime())->format('Y-m-d H:i:s');
-                $modifiedAt = date('Y-m-d H:i:s', strtotime('-1 day', strtotime($magentoTime)));
+                $dateTime = new \DateTime();
+                $dateTime->modify("-1 day");
+                $lastRetrievedAt = $this->timezone->date($dateTime)->format('Y-m-d H:i:s.u');
             }
 
-            $result[IntegrationChannelMethodInterface::QUERY_PARAMS]['_modified_at'] = $modifiedAt;    
+            $result[IntegrationChannelMethodInterface::QUERY_PARAMS]['_modified_at'] = $lastRetrievedAt;
 
             return $result;
 
         }
+        catch (WarningException $ex) {
+            throw $ex;
+        }
+        catch (ErrorException $ex) {
+            throw $ex;
+        }
+        catch (FatalException $ex) {
+            throw $ex;
+        }        
         catch (\Exception $ex) {
-            throw new StateException(
-                __($ex->getMessage())
-            );
+            throw $ex;
         }
 
     }
@@ -753,21 +776,15 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
         try {
 
             if (empty($channel['method'])) {
-                throw new StateException(
-                    __(IntegrationCheckUpdatesInterface::MSG_METHOD_NOTAVAILABLE)
-                );
+                throw new ErrorException('parameter channel method in IntegrationCheckUpdates.prepareJobCandidatesUsingRawQuery is empty !');
             }
     
             if (empty($response['data'])) {
-                throw new StateException(
-                    __(IntegrationCheckUpdatesInterface::MSG_RESP_NOTAVAILABLE)
-                );
+                throw new ErrorException('parameter data in IntegrationCheckUpdates.prepareJobCandidatesUsingRawQuery is empty !');
             }
         
             if (empty($response['data']['count']) || $response['data']['count'] < 1) {
-                throw new StateException(
-                    __(IntegrationCheckUpdatesInterface::MSG_DATA_NOTAVAILABLE)
-                );
+                throw new ErrorException('stock-data-count empty!');
             }
             
             $result = [];
@@ -793,10 +810,17 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
             return $result;
             
         }
+        catch (WarningException $ex) {
+            throw $ex;
+        }
+        catch (ErrorException $ex) {
+            throw $ex;
+        }
+        catch (FatalException $ex) {
+            throw $ex;
+        }        
         catch (\Exception $ex) {
-            throw new StateException(
-                __($ex->getMessage())
-            );
+            throw $ex;
         }
 
     }
@@ -811,9 +835,7 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
         try {
 
             if (empty($data)) {
-                throw new StateException(
-                    __(IntegrationCheckUpdatesInterface::MSG_DATA_NOTAVAILABLE)
-                );
+                throw new ErrorException('parameter data in IntegrationCheckUpdates.insertJobCandidatesUsingRawQuery is empty !');
             }
 
             $result = [];            
@@ -837,10 +859,17 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
             return $this->jobRepository->insertBulkUsingRawQuery($result);
 
         }
+        catch (WarningException $ex) {
+            throw $ex;
+        }
+        catch (ErrorException $ex) {
+            throw $ex;
+        }
+        catch (FatalException $ex) {
+            throw $ex;
+        }        
         catch (\Exception $ex) {
-            throw new StateException(
-                __($ex->getMessage())
-            );
+            throw $ex;
         }
 
     }
@@ -855,9 +884,7 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
         try {
 
             if (empty($channel['method'])) {
-                throw new StateException(
-                    __(IntegrationCommonInterface::MSG_METHOD_NOTAVAILABLE)
-                );
+                throw new ErrorException('parameter channel method in IntegrationCheckUpdates.checkOnProgressDataSavingJobUsingRawQuery is empty !');
             }    
 
             $job = $this->jobRepository->getAnyByMdIdMultiStatusUsingRawQuery(
@@ -868,18 +895,23 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
             );
 
             if (!empty($job)) {
-                throw new StateException(
-                    __('on-progress-data-saving-job found then process aborted ...')
-                );
+                throw new WarningException('on-progress-data-saving-job found then process aborted ...');
             }
 
             return $channel;
 
         }
+        catch (WarningException $ex) {
+            throw $ex;
+        }
+        catch (ErrorException $ex) {
+            throw $ex;
+        }
+        catch (FatalException $ex) {
+            throw $ex;
+        }        
         catch (\Exception $ex) {
-            throw new StateException(
-                __($ex->getMessage())
-            );
+            throw $ex;
         }
 
     }
@@ -894,9 +926,7 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
         try {
 
             if (empty($channel['method'])) {
-                throw new StateException(
-                    __(IntegrationCommonInterface::MSG_METHOD_NOTAVAILABLE)
-                );
+                throw new ErrorException('parameter channel method in IntegrationCheckUpdates.getFirstDataReadyJobUsingRawQuery is empty !');
             }
     
             $job = $this->jobRepository->getFirstByMdIdStatusUsingRawQuery(
@@ -905,7 +935,7 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
             );
 
             if (empty($job)) {
-                throw new StateException(
+                throw new WarningException(
                     __("first-data-ready-job not-found then process aborted ...")
                 );
             }
@@ -915,10 +945,17 @@ class IntegrationCheckUpdates implements IntegrationCheckUpdatesInterface
             return $channel;
 
         }
+        catch (WarningException $ex) {
+            throw $ex;
+        }
+        catch (ErrorException $ex) {
+            throw $ex;
+        }
+        catch (FatalException $ex) {
+            throw $ex;
+        }        
         catch (\Exception $ex) {
-            throw new StateException(
-                __($ex->getMessage())
-            );
+            throw $ex;
         }
 
     }

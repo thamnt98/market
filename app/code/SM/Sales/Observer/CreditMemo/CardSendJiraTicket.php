@@ -13,8 +13,11 @@ declare(strict_types=1);
 
 namespace SM\Sales\Observer\CreditMemo;
 
+use Magento\Customer\Api\CustomerRepositoryInterface;
+use Magento\Framework\DataObject;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
+use Magento\Sales\Model\Order;
 use SM\Sales\Model\Creditmemo\RequestFormData;
 use SM\Sales\Model\Order\IsPaymentMethod;
 
@@ -36,13 +39,21 @@ class CardSendJiraTicket implements ObserverInterface
     private $sendToJira;
 
     /**
+     * @var CustomerRepositoryInterface
+     */
+    private $customerRepository;
+
+    /**
      * CardSendJiraTicket constructor.
      * @param \SM\Sales\Model\Creditmemo\SendToJira $sendToJira
+     * @param CustomerRepositoryInterface $customerRepository
      */
     public function __construct(
-        \SM\Sales\Model\Creditmemo\SendToJira $sendToJira
+        \SM\Sales\Model\Creditmemo\SendToJira $sendToJira,
+        \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository
     ) {
         $this->sendToJira = $sendToJira;
+        $this->customerRepository = $customerRepository;
     }
 
     /**
@@ -50,12 +61,17 @@ class CardSendJiraTicket implements ObserverInterface
      */
     public function execute(Observer $observer)
     {
-        $this->creditmemo = $observer->getEvent()->getCreditmemo();
-        $this->order = $this->creditmemo->getOrder();
+        /** @var DataObject $transportObject */
+        $transportObject = $observer->getEvent()->getDataByKey('transportObject');
+        /** @var Order $order */
+        $this->order= $transportObject->getData("order");
+        $this->creditmemo = $transportObject->getData("creditmemo");
+
         $paymentMethod = $this->order->getPayment()->getMethod();
 
         if (IsPaymentMethod::isCard($paymentMethod)) {
             $data = $this->prepareParams();
+            $this->sendToJira->setCustomer($this->customerRepository->getById($this->order->getCustomerId()));
             $this->sendToJira->send($data);
         }
     }

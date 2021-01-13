@@ -457,4 +457,14 @@ class SubOrderData extends DataObject implements SubOrderDataInterface
     {
         return $this->getData(self::REFUND_MESSAGE);
     }
+
+    public function setCanCreditmemo($value)
+    {
+        return $this->setData(self::CAN_CREDITMEMO, $value);
+    }
+
+    public function getCanCreditmemo()
+    {
+        return $this->getData(self::CAN_CREDITMEMO);
+    }
 }

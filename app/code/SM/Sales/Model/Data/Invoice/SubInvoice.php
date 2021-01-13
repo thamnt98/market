@@ -177,4 +177,20 @@ class SubInvoice extends DataObject implements SubInvoiceInterface
     {
         return $this->setData(self::DISCOUNT_AMOUNT, $value);
     }
+
+    /**
+     * @inheritDoc
+     */
+    public function getShippingMethod()
+    {
+        return $this->getData(self::SHIPPING_METHOD);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setShippingMethod($shippingMethod)
+    {
+        return $this->setData(self::SHIPPING_METHOD, $shippingMethod);
+    }
 }

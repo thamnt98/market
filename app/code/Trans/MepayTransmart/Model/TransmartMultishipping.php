@@ -66,7 +66,9 @@ class TransmartMultishipping extends MultiShipping
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
         \SM\MobileApi\Api\Data\GTM\BasketInterfaceFactory $basketInterfaceFactory,
         \SM\GTM\Model\ResourceModel\Basket\CollectionFactory $basketCollectionFactory,
-        \SM\GTM\Model\BasketFactory $basketFactory
+        \SM\GTM\Model\BasketFactory $basketFactory,
+        \Magento\Quote\Api\PaymentMethodManagementInterface $paymentMethodManagement,
+        \Magento\Quote\Api\Data\PaymentInterfaceFactory $corePaymentInterfaceFactory
     ) {
         $this->basketCollectionFactory = $basketCollectionFactory;
         $this->basketFactory = $basketFactory;
@@ -107,7 +109,9 @@ class TransmartMultishipping extends MultiShipping
           $productRepository,
           $basketInterfaceFactory,
           $basketCollectionFactory,
-          $basketFactory
+          $basketFactory,
+          $paymentMethodManagement,
+          $corePaymentInterfaceFactory
         );
     }
 
@@ -119,9 +123,13 @@ class TransmartMultishipping extends MultiShipping
         $response = $this->responsePlaceOrderFactory->create();
         $this->checkoutSession->setArea(\SM\Checkout\Helper\OrderReferenceNumber::AREA_APP);
         try {
+            $quote = $this->quoteRepository->get($cartId);
+            $paymentMethod = $quote->getPayment()->getMethod();
+            $payment = $this->corePaymentInterfaceFactory->create()->setMethod($paymentMethod);
+            $this->paymentMethodManagement->set($cartId, $payment);
             $orderId = $this->cartManagement->placeOrder($cartId);
             $mainOrder = $this->orderRepository->get($orderId);
-            $quote = $this->quoteRepository->get($cartId);
+
         } catch (\Exception $e) {
             $response->setError(true);
             $response->setMessage($e->getMessage());

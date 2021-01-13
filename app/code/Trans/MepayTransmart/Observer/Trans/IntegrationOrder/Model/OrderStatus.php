@@ -104,7 +104,7 @@ class OrderStatus implements ObserverInterface
 
           $this->clientHelper->setAmount($amount);
           $this->clientHelper->setReferenceNumber($refNumber);
-          $this->clientHelper->setAdjustmentAmount($amount);
+          $this->clientHelper->setAdjustmentAmount($adjAmount);
           $this->clientHelper->setNewAmount($newAmount);
           $this->clientHelper->setTxnByOrderId($refNumber);
           $send = $this->clientHelper->send();

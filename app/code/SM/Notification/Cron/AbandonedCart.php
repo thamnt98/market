@@ -126,7 +126,8 @@ class AbandonedCart extends AbstractGenerate
             ->setCustomerIds([$rowData['customer_id']])
             ->setRedirectType(\SM\Notification\Model\Source\RedirectType::TYPE_CART);
 
-        if (!empty($rowData['store_id'])) {
+        $this->eventSetting->init($rowData['customer_id'], \SM\Notification\Model\Notification::EVENT_UPDATE);
+        if ($this->eventSetting->isPush()) {
             // Emulation store view
             $this->emulation->startEnvironmentEmulation(
                 $rowData['store_id'],

@@ -54,6 +54,7 @@ if ($parentOrder) {
             <!-- order-detail content -->
             <?php
             /** @var \SM\Sales\Api\Data\SubOrderDataInterface $subOrder */
+
             foreach ($parentOrder->getSubOrders() as $subOrder) :?>
                 <?php $isPickUp = $subOrder->getShippingMethodCode() == "store_pickup_store_pickup" ?>
                 <div class="order-detail-content">
@@ -63,7 +64,7 @@ if ($parentOrder) {
                                 <p><i class="notification-icon"></i><?= $subOrder->getRefundMessage() ?></p>
                                 <p class="notifi-refund">
                                     <span>
-                                    <?= __('Total refund %1', $block->currencyFormat($subOrder->getTotalRefund())) ?>
+                                    <?= __('Total Refund: %1', $block->currencyFormat($subOrder->getTotalRefund())) ?>
                                     </span>
                                     <button
                                         <?php if(!$subOrder->getEnableRefundButton()) { echo 'disabled'; } ?>
@@ -72,8 +73,15 @@ if ($parentOrder) {
                                                 'creditmemo_id' => $subOrder->getCreditmemoId()
                                             ]) ?>'"
                                         class="action primary">
-                                        <?= __("Get a Refund") ?>
+                                        <?= __("Request a Refund") ?>
                                     </button>
+                                </p>
+                            <?php else: ?>
+                                <p><i class="notification-icon"></i><?= $subOrder->getRefundMessage() ?></p>
+                                <p class="notifi-refund">
+                                    <span>
+                                    <?= __('Total Refund: %1', $block->currencyFormat($subOrder->getTotalRefund())) ?>
+                                    </span>
                                 </p>
                             <?php endif ?>
                         </div>
@@ -138,6 +146,7 @@ if ($parentOrder) {
                                    data-trigger="track-order-<?= $subOrder->getId() ?>"
                                    data-gtm-event="track_order_click"
                                    data-gtm="<?= $block->escapeHtml($parentOrder->getParentOrderId()) ?>"><?= $block->escapeHtml(__('Order Updates')) ?></a>
+                            <div class="no-display">
                                 <div data-bind="mageInit: {
                             'Magento_Ui/js/modal/modal':{
                             'type': 'popup',
@@ -168,6 +177,7 @@ if ($parentOrder) {
                                         </div>
                                     </div>
                                 </div>
+                            </div>
                         </div>
                     </div>
                     <ul class="list-items-review">
@@ -226,6 +236,12 @@ if ($parentOrder) {
                                             <?php endif; ?>
                                         </dl>
                                         <?= $block->getInstallationHtml($item) ?>
+                                        <?php if (!$item->getIsAvailable()): ?>
+                                            <div class="error-message">
+                                                <span class="icon icon-error"></span>
+                                                <span class="error"><?= $item->getMessage() ?></span>
+                                            </div>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                                 <div class="total-product-price">

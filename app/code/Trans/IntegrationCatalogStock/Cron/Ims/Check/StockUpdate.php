@@ -25,7 +25,7 @@ class StockUpdate {
 	protected $loggerfile;
 
     /**
-     * @var \Trans\Integration\Api\IntegrationLogToDatabaseInterface
+     * @var \Trans\Integration\Model\IntegrationCronLogToDatabase
      */
     protected $loggerdb;
 
@@ -35,14 +35,29 @@ class StockUpdate {
     protected $commonRepository;
 
     /**
-     * @var
+     * @var IntegrationCheckUpdatesInterface
      */
     protected $checkUpdates;
+
+    /**
+     * @var string
+     */
+    protected $cronType;
+
+    /**
+     * @var string
+     */
+    protected $cronTypeDetail;
+
+    /**
+     * @var string
+     */
+    protected $cronFileLabel;
 
 
     public function __construct(
         \Trans\IntegrationCatalogStock\Logger\Logger $loggerfile,
-        \Trans\Integration\Api\IntegrationLogToDatabaseInterface $loggerdb,
+        \Trans\Integration\Model\IntegrationCronLogToDatabase $loggerdb,
         IntegrationCommonInterface $commonRepository,        
         IntegrationCheckUpdatesInterface $checkUpdates
     ) {
@@ -50,134 +65,153 @@ class StockUpdate {
         $this->loggerdb = $loggerdb;
         $this->commonRepository = $commonRepository;        
         $this->checkUpdates = $checkUpdates;
-    }
 
+        $this->adjustCronLogger();
+    }
+    
+    protected function adjustCronLogger() {
+        $this->cronType = "stock";
+        $this->cronTypeDetail = "check";
+        $this->cronFileLabel = $this->cronType . "-" . $this->cronTypeDetail . " --> ";
+    }    
 
     public function execute() {
 
         $startTime = microtime(true);
 
-        $cronType = "stock";
-        $cronTypeDetail = "check";
-        $cronLabel = $cronType . "-" . $cronTypeDetail . " --> ";
-
         $logMessageTopic = "start";
         $logMessage = "start";
-        $this->loggerfile->info($cronLabel . $logMessage);
-        $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+        $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
+        $this->loggerdb->info($this->cronType, $this->cronTypeDetail, $logMessageTopic, $logMessage);
 
         try {
             
             $logMessageTopic = "prepareChannelUsingRawQuery";
 
             $logMessage = "retrieving channel-integration-metadata";            
-            $this->loggerfile->info($cronLabel . $logMessage);
-            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+            $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
+            $this->loggerdb->info($this->cronType, $this->cronTypeDetail, $logMessageTopic, $logMessage);
 
             $channelIntegrationMetadata = $this->commonRepository->prepareChannelUsingRawQuery("product-stock-update");
 
             $logMessage = "channel-integration-metadata = " . print_r($channelIntegrationMetadata, true);
-            $this->loggerfile->info($cronLabel . $logMessage);
-            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+            $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
+            $this->loggerdb->info($this->cronType, $this->cronTypeDetail, $logMessageTopic, $logMessage);
 
 
             $logMessageTopic = "checkOnProgressJobUsingRawQuery";
 
-            $logMessage = "checking on-progress-job";
-            $this->loggerfile->info($cronLabel . $logMessage);
-            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+            $logMessage = "checking first-waiting-job and first-data-ready-job and on-progress-data-saving-job";
+            $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
+            $this->loggerdb->info($this->cronType, $this->cronTypeDetail, $logMessageTopic, $logMessage);
 
             $this->checkUpdates->checkOnProgressJobUsingRawQuery($channelIntegrationMetadata);
             
-            $logMessage = "on-progress-job not-found then process continued ...";
-            $this->loggerfile->info($cronLabel . $logMessage);
-            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+            $logMessage = "first-waiting-job and first-data-ready-job and on-progress-data-saving-job not-found then process continued ...";
+            $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
+            $this->loggerdb->info($this->cronType, $this->cronTypeDetail, $logMessageTopic, $logMessage);
 
 
             $logMessageTopic = "getLastCompleteJobUsingRawQuery";
 
             $logMessage = "retrieving last-complete-job";
-            $this->loggerfile->info($cronLabel . $logMessage);
-            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+            $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
+            $this->loggerdb->info($this->cronType, $this->cronTypeDetail, $logMessageTopic, $logMessage);
 
             $channelIntegrationMetadata = $this->checkUpdates->getLastCompleteJobUsingRawQuery($channelIntegrationMetadata);
 
             $logMessage = "last-complete-job = " . (isset($channelIntegrationMetadata['last_complete_job']) ? print_r($channelIntegrationMetadata['last_complete_job'], true) : "not-found");
-            $this->loggerfile->info($cronLabel . $logMessage);
-            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+            $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
+            $this->loggerdb->info($this->cronType, $this->cronTypeDetail, $logMessageTopic, $logMessage);
 
 
             $logMessageTopic = "prepareCallUsingRawQuery";
 
             $logMessage = "preparing to call stock-check-api";
-            $this->loggerfile->info($cronLabel . $logMessage);
-            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+            $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
+            $this->loggerdb->info($this->cronType, $this->cronTypeDetail, $logMessageTopic, $logMessage);
 
             $callData = $this->checkUpdates->prepareCallUsingRawQuery($channelIntegrationMetadata);
 
             $logMessage = "call-data = " . print_r($callData, true);
-            $this->loggerfile->info($cronLabel . $logMessage);
-            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+            $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
+            $this->loggerdb->info($this->cronType, $this->cronTypeDetail, $logMessageTopic, $logMessage);
 
 
             $logMessageTopic = "doCallUsingRawQuery";
             
             $logMessage = "calling stock-check-api";
-            $this->loggerfile->info($cronLabel . $logMessage);
-            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+            $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
+            $this->loggerdb->info($this->cronType, $this->cronTypeDetail, $logMessageTopic, $logMessage);
 
             $callResponse = $this->commonRepository->doCallUsingRawQuery($callData);
 
             $logMessage = "call-response = " . print_r($callResponse, true);
-            $this->loggerfile->info($cronLabel . $logMessage);
-            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+            $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
+            $this->loggerdb->info($this->cronType, $this->cronTypeDetail, $logMessageTopic, $logMessage);
 
             
             $logMessageTopic = "prepareJobCandidatesUsingRawQuery";
 
             $logMessage = "preparing job-candidates based on stock-check-api call-response";
-            $this->loggerfile->info($cronLabel . $logMessage);
-            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+            $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
+            $this->loggerdb->info($this->cronType, $this->cronTypeDetail, $logMessageTopic, $logMessage);
 
             $jobCandidates = $this->checkUpdates->prepareJobCandidatesUsingRawQuery($channelIntegrationMetadata, $callResponse);
 
             $logMessage = "job-candidates prepared = " . print_r($jobCandidates, true);
-            $this->loggerfile->info($cronLabel . $logMessage);
-            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+            $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
+            $this->loggerdb->info($this->cronType, $this->cronTypeDetail, $logMessageTopic, $logMessage);
             
 
             $logMessageTopic = "insertJobCandidatesUsingRawQuery";
 
             $logMessage = "persisting job-candidates into job-temporary-table db";
-            $this->loggerfile->info($cronLabel . $logMessage);
-            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+            $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
+            $this->loggerdb->info($this->cronType, $this->cronTypeDetail, $logMessageTopic, $logMessage);
 
             $persistingResult = $this->checkUpdates->insertJobCandidatesUsingRawQuery($jobCandidates);
 
             $logMessage = "job-candidates bulk persisted = " . ($persistingResult > 0 ? "success" : "failed");
-            $this->loggerfile->info($cronLabel . $logMessage);
-            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+            $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
+            $this->loggerdb->info($this->cronType, $this->cronTypeDetail, $logMessageTopic, $logMessage);
 
             
             $logMessageTopic = "complete";
             $logMessage = "complete";
-            $this->loggerfile->info($cronLabel . $logMessage);
-            $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+            $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
+            $this->loggerdb->info($this->cronType, $this->cronTypeDetail, $logMessageTopic, $logMessage);
        
         }
+        catch (\Trans\Integration\Exception\WarningException $ex) {
+            $logMessageTopic = "warning-exception";
+            $logMessage = $ex->getMessage();
+            $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
+            $this->loggerdb->warn($this->cronType, $this->cronTypeDetail, $logMessageTopic, $logMessage);
+        }
+        catch (\Trans\Integration\Exception\ErrorException $ex) {
+            $logMessageTopic = "error-exception";
+            $logMessage = $ex->getMessage();
+            $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
+            $this->loggerdb->error($this->cronType, $this->cronTypeDetail, $logMessageTopic, $logMessage);
+        }
+        catch (\Trans\Integration\Exception\FatalException $ex) {
+            $logMessageTopic = "fatal-exception";
+            $logMessage = $ex->getMessage();
+            $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
+            $this->loggerdb->fatal($this->cronType, $this->cronTypeDetail, $logMessageTopic, $logMessage);
+        }
         catch (\Exception $ex) {
-
-            $logMessageTopic = "exception";
-            $logMessage = "exception = " . $ex->getMessage();
-            $this->loggerfile->info($cronLabel . $logMessage);
-            $this->loggerdb->logCronErrorFatal($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
-
+            $logMessageTopic = "generic-exception";
+            $logMessage = $ex->getMessage();
+            $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
+            $this->loggerdb->fatal($this->cronType, $this->cronTypeDetail, $logMessageTopic, $logMessage);
         }
 
         $logMessageTopic = "finish";
-        $logMessage = "finish " . (microtime(true) - $startTime) . " second";
-        $this->loggerfile->info($cronLabel . $logMessage);
-        $this->loggerdb->logCronInfo($cronType, $cronTypeDetail, $logMessageTopic, $logMessage);
+        $logMessage = "finish in " . (microtime(true) - $startTime) . " second";
+        $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
+        $this->loggerdb->info($this->cronType, $this->cronTypeDetail, $logMessageTopic, $logMessage);
 
     }
     

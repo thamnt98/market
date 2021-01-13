@@ -1,0 +1,69 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+?>
+<?php $_creditmemo = $block->getCreditmemo() ?>
+<?php $_order = $block->getOrder() ?>
+<?php if ($_creditmemo && $_order) : ?>
+    <table class="order-detail">
+        <tr>
+            <td class="title-order-detail">
+                <p>
+                    <?= $block->escapeHtml(__('Unavailable Items')) ?>
+                </p>
+            </td>
+        </tr>
+        <tr>
+            <td class="inner-td">
+                <table class="content-order-detail">
+                    <thead>
+                    <tr>
+                        <td class="title-td-1 title-td">
+                            <p class="pl-10">
+                                <?= $block->escapeHtml(__(' No.')) ?>
+                            </p>
+                        </td>
+                        <td class="title-td-2 title-td item-info">
+                            <p>
+                                <?= $block->escapeHtml(__('Product')) ?>
+                            </p>
+                        </td>
+                        <td class="title-td-3 title-td item-qty">
+                            <p>
+                                <?= $block->escapeHtml(__('Quantity')) ?>
+                            </p>
+                        </td>
+                        <td class="title-td-4 title-td text-right item-price">
+                            <p class="pr-15">
+                                <?= $block->escapeHtml(__('Price')) ?>
+                            </p>
+                        </td>
+                    </tr>
+                    </thead>
+                    <?php $position = 1; ?>
+                    <?php foreach ($_creditmemo->getAllItems() as $_item) : ?>
+                        <?php if (!$_item->getOrderItem()->getParentItem()) : ?>
+                            <tbody>
+                                <tr>
+                                    <td class="pl-10 text-center"><?= $position++ ?></td>
+                                    <?= $block->getItemHtml($_item) ?>
+                                </tr>
+                                <tr>
+                                    <td colspan="4">
+                                        <hr class="hr"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                    <tfoot class="order-totals">
+                    <?= $block->getChildHtml('creditmemo_totals') ?>
+                    </tfoot>
+                </table>
+            </td>
+        </tr>
+    </table>
+<?php endif; ?>

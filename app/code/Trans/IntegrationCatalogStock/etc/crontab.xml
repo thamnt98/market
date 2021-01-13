@@ -28,6 +28,9 @@
         <job name="integration_ims_save_product_stock" instance="Trans\IntegrationCatalogStock\Cron\Ims\Save\Stock" method="execute">
             <schedule>* * * * *</schedule>
         </job>
+        <!-- <job name="integration_ims_sync_product_stock" instance="Trans\IntegrationCatalogStock\Cron\Ims\Sync\Stock" method="execute">
+            <schedule>* * * * *</schedule>
+        </job>         -->
     </group>
 
 </config>

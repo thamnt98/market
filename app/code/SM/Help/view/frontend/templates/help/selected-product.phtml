@@ -15,9 +15,10 @@
     /** @var SM\Sales\Model\Data\SubOrderData $order */
     $order = $block->getOrder($data);
     $productIds = implode(",", $data['data']['productIDs']['productIDs']);
-    $parentIncrementId = $block->getParentOrder($order)->getReferenceNumber();
-    $parentOrderId = $block->getParentOrder($order)->getParentOrderId();
-    $invoiceNumber = $block->getParentOrder($order)->getInvoiceNumber();
+    $parentOrder = $block->getParentOrder($order);
+    $parentIncrementId = $parentOrder->getReferenceNumber();
+    $parentOrderId = $parentOrder->getParentOrderId();
+    $invoiceNumber = $parentOrder->getInvoiceNumber();
 ?>
 
 <?php if ($listProduct): ?>
@@ -81,10 +82,16 @@
     require([
         'jquery',
     ], function ($) {
-        let helpOrderList = $('.help-order-list'),
-            returnRefundOrder = $('#return-refund-order');
+        let helpOrderList = $('#help-order-list-order'),
+            returnRefundOrder = $('#return-refund-order'),
+            helpOrderListReturn = $('#help-order-list-refund');
         $("#return-refund-change-order").on('click',function () {
-            helpOrderList.modal('openModal');
+            let is_received = $('[name="is_received"]:checked').val();
+            if (is_received == "return") {
+                helpOrderListReturn.modal('openModal');
+            } else {
+                helpOrderList.modal('openModal');
+            }
         });
 
         $("#return-refund-remove-order").on('click',function () {

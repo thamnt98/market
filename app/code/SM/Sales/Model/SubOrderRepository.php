@@ -182,7 +182,12 @@ class SubOrderRepository implements SubOrderRepositoryInterface
             foreach ($subOrders as $subOrder) {
                 if ($subOrder->getSubOrderId() != null && $subOrder->getSubOrderId() != '') {
                     /** @var Order $parentOrderModel */
-                    $parentOrderModel = $this->getParentOrder($subOrder->getParentOrder(), $subOrder->getId());
+                    try {
+                        $parentOrderModel = $this->getParentOrder($subOrder->getParentOrder(), $subOrder->getId());
+
+                    } catch (\Exception $e) {
+                        continue;
+                    }
                     if ($parentOrderModel->getReferenceInvoiceNumber()) {
                         $subOrder->setInvoiceLink($this->subOrder->getInvoiceLink($subOrder->getParentOrder()));
                     }
