@@ -69,7 +69,7 @@
     <route url="/V1/blog/getRelatedProducts/:postId" method="GET">
         <service class="SM\InspireMe\Api\PostRepositoryInterface" method="getProducts"/>
         <resources>
-            <resource ref="self"/>
+            <resource ref="anonymous"/>
         </resources>
     </route>
 
