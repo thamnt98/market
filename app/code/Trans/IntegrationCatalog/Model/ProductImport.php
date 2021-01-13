@@ -1700,7 +1700,7 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                     $path = $category->getPath();
                     $categoryIds = explode('/', $path);
                     
-                    $pathCategories = $this->categoryCollection($categoryIds, false);
+                    $pathCategories = $this->magentoCategoryCollection($categoryIds);
                     
                     $pathString = [];
                     if($pathCategories) {
@@ -1717,10 +1717,43 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                 }
             }
 
-            return implode(',', $pathCategoriesArray);
+            return implode(';', $pathCategoriesArray);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage() . ' ' . __FUNCTION__ . ' $pimCategoryIds: ' . print_r($pimCategoryIds, true));
         }
+    }
+
+    /**
+     * get category collection
+     *
+     * @param array $pimIds
+     */
+    protected function magentoCategoryCollection($ids = [])
+    {
+        $nameEavId = $this->getCategoryAttributeId('name');
+        $result = false;
+
+        if(is_array($ids) && !empty($ids)) {
+            $string = implode(',', $ids);
+        }
+
+        if(!empty($string)) {
+            $collection = $this->categoryCollection->create();
+            $collection->getSelect()->join(
+                ['catalog_category_entity_varchar'],
+                'e.row_id = catalog_category_entity_varchar.row_id',
+                []
+            )->columns('catalog_category_entity_varchar.value as name')
+                ->where('attribute_id = '.$nameEavId.' and entity_id in ('.$string.')');
+            $collection->getSelect()->group('e.entity_id');
+
+            //echo $collection->getSelect();
+
+            if($collection->getSize()) {
+                $result = $collection;
+            }
+        }
+        return $result;
     }
 
     /**
@@ -1823,7 +1856,8 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
         if (!empty($categoriesString)) {
             $categoryIds = $this->categoryProcessor->upsertCategories(
                 $categoriesString,
-                $this->getMultipleValueSeparator()
+                // $this->getMultipleValueSeparator()
+                ";"
             );
             foreach ($this->categoryProcessor->getFailedCategories() as $error) {
                 $this->errorAggregator->addError(
