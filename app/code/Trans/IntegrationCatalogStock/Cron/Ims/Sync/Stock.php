@@ -107,8 +107,10 @@ class Stock {
 
 		$limitDataToApi = 0;
 		$totalDataFromApiReceived = 0;
+		$totalDataFromApiReceivedValid = 0;
 		$totalDataFromApiReceivedInvalid = 0;
-        $totalDataFromApiSaved = 0;
+		$totalDataFromApiSaved = 0;
+		$totalDataFromApiUpdatedToMagentoStock = 0;
 
         $monitoringStockJobId = null;
         
@@ -134,7 +136,7 @@ class Stock {
 
             $meta = [];
 
-			$sql = "select `last_id` from `v2_monitoring_stock_last_retrieved` limit 1 for update";
+			$sql = "select `last_id` from `v2_monitoring_stock_last_retrieved` where `only_one`=1 for update";
 			$meta['last_id'] = $this->dbConnection->fetchOne($sql);
 			
 			if (empty($meta['last_id'])) {
@@ -378,7 +380,7 @@ class Stock {
 				unset($sql);
 			}        
 	
-			$mainSql = "insert into `inventory_source_item` (`source_code`, `sku`, `quantity`, `status`) values " . substr($mainSql, 1) . " on duplicate key update `quantity` = values(`quantity`), `status` = values(`status`)";        
+			$mainSql = "insert into `inventory_source_item` (`source_code`, `sku`, `quantity`, `status`) values " . substr($mainSql, 1) . " on duplicate key update `quantity` = values(`quantity`), `status` = values(`status`)";
 			$this->dbConnection->exec($mainSql);
 			unset($mainSql);
 			
@@ -449,7 +451,7 @@ class Stock {
 			unset($skuStr);
 			unset($sql);
 	
-			$sql = "update `v2_monitoring_stock_last_retrieved` set `last_id` = '" . $lastStockId . "'";
+			$sql = "insert into `v2_monitoring_stock_last_retrieved` (`only_one`, `last_id`) values (1, '{$lastStockId}') on duplicate key update `last_id` = values(`last_id`)";
 			$this->dbConnection->exec($sql);
 			$this->loggerfile->info($this->cronFileLabel . "next last-retrieved-stock-id = '" . $lastStockId . "'");
 	
@@ -472,7 +474,10 @@ class Stock {
 			unset($stockValidStr);
 			unset($sql);
 	
-			$sql = "insert ignore into `v2_monitoring_stock_job` (`id`, `memory_usage_megabytes`, `process_duration_seconds`, `api_call_duration_seconds`, `limit_data_to_api`, `total_data_from_api_received`, `total_data_from_api_received_valid`, `total_data_from_api_received_invalid`, `total_data_from_api_saved`, `total_data_from_api_updated_to_magento_stock`, `status`) values (sysdate(6), " . round(memory_get_usage() / 1048576, 2) . "," . (microtime(true) - $startTime) . ", {$apiCallDuration}, {$limitDataToApi}, {$totalDataFromApiReceived}, " . ($totalDataFromApiReceived - $totalDataFromApiReceivedInvalid) . ", {$totalDataFromApiReceivedInvalid}, {$totalDataFromApiSaved}, " . ($totalDataFromApiReceived - $totalDataFromApiReceivedInvalid) . ", 'success')";
+			$totalDataFromApiReceivedValid = ($totalDataFromApiReceived - $totalDataFromApiReceivedInvalid);
+			$totalDataFromApiUpdatedToMagentoStock = $totalDataFromApiReceivedValid;
+
+			$sql = "insert ignore into `v2_monitoring_stock_job` (`id`, `memory_usage_megabytes`, `process_duration_seconds`, `api_call_duration_seconds`, `limit_data_to_api`, `total_data_from_api_received`, `total_data_from_api_received_valid`, `total_data_from_api_received_invalid`, `total_data_from_api_saved`, `total_data_from_api_updated_to_magento_stock`, `status`) values (sysdate(6), " . round(memory_get_usage() / 1048576, 2) . "," . (microtime(true) - $startTime) . ", {$apiCallDuration}, {$limitDataToApi}, {$totalDataFromApiReceived}, {$totalDataFromApiReceivedValid}, {$totalDataFromApiReceivedInvalid}, {$totalDataFromApiSaved}, {$totalDataFromApiUpdatedToMagentoStock}, 'success')";
 			$this->dbConnection->exec($sql);
 
 			$sql = "set session innodb_lock_wait_timeout = @saved_lock_wait";
@@ -531,17 +536,24 @@ class Stock {
                     $this->loggerdb->log($this->cronType, $this->cronTypeDetail, $logLevelInner, $logMessageTopicInner, $logMessageInner);
                 }
 
-                try {					
-                    $sql = "insert ignore into `v2_monitoring_stock_job` (`id`, `memory_usage_megabytes`, `process_duration_seconds`, `api_call_duration_seconds`, `limit_data_to_api`, `total_data_from_api_received`, `total_data_from_api_received_valid`, `total_data_from_api_received_invalid`, `total_data_from_api_saved`, `total_data_from_api_updated_to_magento_stock`, `status`, `message`) values (sysdate(6), " . round(memory_get_usage() / 1048576, 2) . "," . (microtime(true) - $startTime) . ", {$apiCallDuration}, {$limitDataToApi}, {$totalDataFromApiReceived}, " . ($totalDataFromApiReceived - $totalDataFromApiReceivedInvalid) . ", {$totalDataFromApiReceivedInvalid}, {$totalDataFromApiSaved}, " . ($totalDataFromApiReceived - $totalDataFromApiReceivedInvalid) . ", '{$logMessageTopic}', '" . addslashes($logMessage) . "')";
-                    $this->dbConnection->exec($sql);
-                }
-                catch (\Exception $exInner) {
-                    $logMessageTopicInner = "generic-error";
-                    $logMessageInner = $exInner->getMessage();
-                    $logLevelInner = IntegrationCronLogToDatabase::LEVEL_ERROR_GENERIC;
-                    $this->loggerfile->info($this->cronFileLabel . $logMessageTopicInner . " = " . $logMessageInner);
-                    $this->loggerdb->log($this->cronType, $this->cronTypeDetail, $logLevelInner, $logMessageTopicInner, $logMessageInner);
-                }
+		if ($logMessageTopic != "warning") {
+			try {
+
+				$totalDataFromApiReceivedValid = ($totalDataFromApiReceived - $totalDataFromApiReceivedInvalid);
+				$totalDataFromApiSaved = 0;
+				$totalDataFromApiUpdatedToMagentoStock = 0;
+			
+				$sql = "insert ignore into `v2_monitoring_stock_job` (`id`, `memory_usage_megabytes`, `process_duration_seconds`, `api_call_duration_seconds`, `limit_data_to_api`, `total_data_from_api_received`, `total_data_from_api_received_valid`, `total_data_from_api_received_invalid`, `total_data_from_api_saved`, `total_data_from_api_updated_to_magento_stock`, `status`, `message`) values (sysdate(6), " . round(memory_get_usage() / 1048576, 2) . "," . (microtime(true) - $startTime) . ", {$apiCallDuration}, {$limitDataToApi}, {$totalDataFromApiReceived}, {$totalDataFromApiReceivedValid}, {$totalDataFromApiReceivedInvalid}, {$totalDataFromApiSaved}, {$totalDataFromApiUpdatedToMagentoStock}, '{$logMessageTopic}', '" . addslashes($logMessage) . "')";
+				$this->dbConnection->exec($sql);
+			}
+			catch (\Exception $exInner) {
+				$logMessageTopicInner = "generic-error";
+				$logMessageInner = $exInner->getMessage();
+				$logLevelInner = IntegrationCronLogToDatabase::LEVEL_ERROR_GENERIC;
+				$this->loggerfile->info($this->cronFileLabel . $logMessageTopicInner . " = " . $logMessageInner);
+				$this->loggerdb->log($this->cronType, $this->cronTypeDetail, $logLevelInner, $logMessageTopicInner, $logMessageInner);
+			}
+		}
             }            
         }
 
