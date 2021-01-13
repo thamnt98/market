@@ -108,7 +108,6 @@ class Stock {
 		$limitDataToApi = 0;
 		$totalDataFromApiReceived = 0;
 		$totalDataFromApiReceivedInvalid = 0;
-		$totalDataFromApiUpdatedToMagentoStock = 0;
         $totalDataFromApiSaved = 0;
 
         $monitoringStockJobId = null;
@@ -179,9 +178,6 @@ class Stock {
 			$apiPath = $meta['channel']['url'] . $meta['method']['path'];
 			$apiPathFull = sprintf("%s?%s", $apiPath, http_build_query($apiPayload));    
 			$apiHeader = json_decode($meta['method']['headers'], true);
-			// $this->loggerfile->info($this->cronFileLabel . "api-path = " . $apiPath);
-			// $this->loggerfile->info($this->cronFileLabel . "api-payload = " . print_r($apiPayload, true));
-			// $this->loggerfile->info($this->cronFileLabel . "api-header = " . print_r($apiHeader, true));
 			
 			$curlHolder = curl_init();
 			curl_setopt($curlHolder, CURLOPT_URL, $apiPathFull);
@@ -380,13 +376,11 @@ class Stock {
 				unset($locationCodeList);
 				unset($locationCodeStr);
 				unset($sql);
-				// $this->loggerfile->info($this->cronFileLabel . "insert-ignore inventory_source result = " . $res);
 			}        
 	
 			$mainSql = "insert into `inventory_source_item` (`source_code`, `sku`, `quantity`, `status`) values " . substr($mainSql, 1) . " on duplicate key update `quantity` = values(`quantity`), `status` = values(`status`)";        
-			$totalDataFromApiUpdatedToMagentoStock = $this->dbConnection->exec($mainSql);
+			$this->dbConnection->exec($mainSql);
 			unset($mainSql);
-			$this->loggerfile->info($this->cronFileLabel . "total-data-from-api updated to magento-stock = " . $totalDataFromApiUpdatedToMagentoStock);
 			
 			$sql =
 			" insert into `cataloginventory_stock_item` "
@@ -451,19 +445,16 @@ class Stock {
 			. " where `sku` in ( " . $skuStr . " ) "
 			. " on duplicate key update `manage_stock` = 1, `use_config_manage_stock` = 1 "
 			;
-			$res = $this->dbConnection->exec($sql);
+			$this->dbConnection->exec($sql);
 			unset($skuStr);
 			unset($sql);
-			$this->loggerfile->info($this->cronFileLabel . "insert-on-duplicate-update cataloginventory_stock_item result = " . $res);
 	
 			$sql = "update `v2_monitoring_stock_last_retrieved` set `last_id` = '" . $lastStockId . "'";
 			$this->dbConnection->exec($sql);
-			// $this->loggerfile->info($this->cronFileLabel . "update last-retrieved-stock-id result = " . $res);
 			$this->loggerfile->info($this->cronFileLabel . "next last-retrieved-stock-id = '" . $lastStockId . "'");
 	
 			$sql = "select sysdate(6) as t";
 			$monitoringStockJobId = $this->dbConnection->fetchOne($sql);
-			// $this->loggerfile->info($this->cronFileLabel . "monitoring-stock-job-id = '" . $monitoringStockJobId . "'");
 	
 			$sql = "insert ignore into `v2_monitoring_stock` (`retrieved_at`, `processed_at`, `store_code`, `sku`, `stock_id`, `stock_name`, `stock_filename`, `stock_action`, `job_id`) values " . implode(",'{$monitoringStockJobId}'),", $monitoringStockList) . ",'{$monitoringStockJobId}')";
 			$totalDataFromApiSaved = $this->dbConnection->exec($sql);
@@ -475,17 +466,14 @@ class Stock {
 			$sql = "insert ignore into `v2_monitoring_stock_when_watcher_temp` (`id`, `when_at`, `when_type`, `store_code`, `sku`, `stock_id`) select sysdate(6), `retrieved_at`, 'retrieved', `store_code`, `sku`, `stock_id` from `v2_monitoring_stock` where `stock_id` in (" . $stockValidStr . ")";
 			$this->dbConnection->exec($sql);
 			unset($sql);
-			// $this->loggerfile->info($this->cronFileLabel . "insert-ignore retrieved-status result = " . $res);
 	
 			$sql = "insert ignore into `v2_monitoring_stock_when_watcher_temp` (`id`, `when_at`, `when_type`, `store_code`, `sku`, `stock_id`) select sysdate(6), `processed_at`, 'processed', `store_code`, `sku`, `stock_id` from `v2_monitoring_stock` where `stock_id` in (" . $stockValidStr . ")";
 			$this->dbConnection->exec($sql);
 			unset($stockValidStr);
 			unset($sql);
-			// $this->loggerfile->info($this->cronFileLabel . "insert-ignore processed-status result = " . $res);
 	
-			$sql = "insert ignore into `v2_monitoring_stock_job` (`id`, `memory_usage_megabytes`, `process_duration_seconds`, `api_call_duration_seconds`, `limit_data_to_api`, `total_data_from_api_received`, `total_data_from_api_received_valid`, `total_data_from_api_received_invalid`, `total_data_from_api_saved`, `total_data_from_api_updated_to_magento_stock`, `status`) values (sysdate(6), " . round(memory_get_usage() / 1048576, 2) . "," . (microtime(true) - $startTime) . ", {$apiCallDuration}, {$limitDataToApi}, {$totalDataFromApiReceived}, " . ($totalDataFromApiReceived - $totalDataFromApiReceivedInvalid) . ", {$totalDataFromApiReceivedInvalid}, {$totalDataFromApiSaved}, {$totalDataFromApiUpdatedToMagentoStock}, 'success')";
+			$sql = "insert ignore into `v2_monitoring_stock_job` (`id`, `memory_usage_megabytes`, `process_duration_seconds`, `api_call_duration_seconds`, `limit_data_to_api`, `total_data_from_api_received`, `total_data_from_api_received_valid`, `total_data_from_api_received_invalid`, `total_data_from_api_saved`, `total_data_from_api_updated_to_magento_stock`, `status`) values (sysdate(6), " . round(memory_get_usage() / 1048576, 2) . "," . (microtime(true) - $startTime) . ", {$apiCallDuration}, {$limitDataToApi}, {$totalDataFromApiReceived}, " . ($totalDataFromApiReceived - $totalDataFromApiReceivedInvalid) . ", {$totalDataFromApiReceivedInvalid}, {$totalDataFromApiSaved}, " . ($totalDataFromApiReceived - $totalDataFromApiReceivedInvalid) . ", 'success')";
 			$this->dbConnection->exec($sql);
-			// $this->loggerfile->info($this->cronFileLabel . "insert-ignore monitoring-stock-job result = " . $res);
 
 			$sql = "set session innodb_lock_wait_timeout = @saved_lock_wait";
 			$this->dbConnection->exec($sql);
@@ -544,10 +532,8 @@ class Stock {
                 }
 
                 try {					
-                    $sql = "insert ignore into `v2_monitoring_stock_job` (`id`, `memory_usage_megabytes`, `process_duration_seconds`, `api_call_duration_seconds`, `limit_data_to_api`, `total_data_from_api_received`, `total_data_from_api_received_valid`, `total_data_from_api_received_invalid`, `total_data_from_api_saved`, `total_data_from_api_updated_to_magento_stock`, `status`, `message`) values (sysdate(6), " . round(memory_get_usage() / 1048576, 2) . "," . (microtime(true) - $startTime) . ", {$apiCallDuration}, {$limitDataToApi}, {$totalDataFromApiReceived}, " . ($totalDataFromApiReceived - $totalDataFromApiReceivedInvalid) . ", {$totalDataFromApiReceivedInvalid}, {$totalDataFromApiSaved}, {$totalDataFromApiUpdatedToMagentoStock}, '{$logMessageTopic}', '" . addslashes($logMessage) . "')";
+                    $sql = "insert ignore into `v2_monitoring_stock_job` (`id`, `memory_usage_megabytes`, `process_duration_seconds`, `api_call_duration_seconds`, `limit_data_to_api`, `total_data_from_api_received`, `total_data_from_api_received_valid`, `total_data_from_api_received_invalid`, `total_data_from_api_saved`, `total_data_from_api_updated_to_magento_stock`, `status`, `message`) values (sysdate(6), " . round(memory_get_usage() / 1048576, 2) . "," . (microtime(true) - $startTime) . ", {$apiCallDuration}, {$limitDataToApi}, {$totalDataFromApiReceived}, " . ($totalDataFromApiReceived - $totalDataFromApiReceivedInvalid) . ", {$totalDataFromApiReceivedInvalid}, {$totalDataFromApiSaved}, " . ($totalDataFromApiReceived - $totalDataFromApiReceivedInvalid) . ", '{$logMessageTopic}', '" . addslashes($logMessage) . "')";
                     $this->dbConnection->exec($sql);
-                    
-                    // $this->loggerfile->info($this->cronFileLabel . "insert-ignore monitoring-stock-job result = " . $res);
                 }
                 catch (\Exception $exInner) {
                     $logMessageTopicInner = "generic-error";
