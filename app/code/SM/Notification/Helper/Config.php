@@ -32,6 +32,7 @@ class Config extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_PICKUP_LIMIT_DAY                = 'carriers/store_pickup/date_limit';
     const XML_PAYMENT_EXPIRING_MINUTE         = 'sm_notification/generate/payment_expiring_soon_time';
     const XML_VA_PAYMENT_LIST                 = 'sm_notification/generate/va_payment';
+    const XML_CARD_PAYMENT_LIST               = 'sm_notification/generate/card_payment';
     const XML_POLICE_HELP_PAGE                = 'sm_notification/generate/policy_help_id';
     const XML_TERM_CONDITION_HELP_PAGE        = 'sm_notification/generate/term_help_id';
 
@@ -46,6 +47,26 @@ class Config extends \Magento\Framework\App\Helper\AbstractHelper
     {
         $config = $this->scopeConfig->getValue(
             self::XML_VA_PAYMENT_LIST,
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
+            $store
+        );
+
+        if ($config) {
+            return explode(',', $config);
+        } else {
+            return [];
+        }
+    }
+
+    /**
+     * @param int|string|null $store
+     *
+     * @return array
+     */
+    public function getCardPaymentList($store = null)
+    {
+        $config = $this->scopeConfig->getValue(
+            self::XML_CARD_PAYMENT_LIST,
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
             $store
         );

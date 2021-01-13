@@ -54,9 +54,10 @@
             {{if additional_data.is_card}}
             <p>
                 {{trans "We are sorry to inform you that  %items in order #%order_increment are currently
-                unavailable. Don't worry, your credit card won't be charged for this transaction."
+                unavailable. Don't worry, your credit card won't be charged %transaction"
                 items=$additional_data.items_text
                 order_increment=$additional_data.order_increment_id
+                transaction=$additional_data.transaction_text
                 |raw}}
             </p>
             {{/if}}
