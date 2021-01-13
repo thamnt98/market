@@ -101,8 +101,8 @@ class Stock {
 
 
         $tagChannel = 'v2-product-stock-update';        
-        
-        $apiTimeout = 5;
+		$apiTimeout = 60;
+
         $apiCallDuration = -1;
 
 		$limitDataToApi = 0;
@@ -144,7 +144,7 @@ class Stock {
 			
 			$this->loggerfile->info($this->cronFileLabel . "last-retrieved-stock-id = '" . $meta['last_id'] . "'");
 		
-			$sql = "select `ch_id`, `headers`, `query_params`, `path`, `limit` from `integration_channel_method` where `tag` = '" . $tagChannel . "' and `status` = 1 limit 1";
+			$sql = "select `ch_id`, `headers`, `query_params`, `path`, `limit`, `api_timeout` from `integration_channel_method` where `tag` = '" . $tagChannel . "' and `status` = 1 limit 1";
 			$meta['method'] = $this->dbConnection->fetchRow($sql);    
 			
 			if (empty($meta['method'])) {
@@ -170,6 +170,7 @@ class Stock {
 			}
         
 
+			$apiTimeout = $meta['method']['api_timeout'];
 			$limitDataToApi = $meta['method']['limit'];
 			$apiPayload = json_decode($meta['method']['query_params'], true);
 			$apiPayload['_limit'] = $limitDataToApi;
@@ -178,9 +179,9 @@ class Stock {
 			$apiPath = $meta['channel']['url'] . $meta['method']['path'];
 			$apiPathFull = sprintf("%s?%s", $apiPath, http_build_query($apiPayload));    
 			$apiHeader = json_decode($meta['method']['headers'], true);
-			$this->loggerfile->info($this->cronFileLabel . "api-path = " . $apiPath);
-			$this->loggerfile->info($this->cronFileLabel . "api-payload = " . print_r($apiPayload, true));
-			$this->loggerfile->info($this->cronFileLabel . "api-header = " . print_r($apiHeader, true));
+			// $this->loggerfile->info($this->cronFileLabel . "api-path = " . $apiPath);
+			// $this->loggerfile->info($this->cronFileLabel . "api-payload = " . print_r($apiPayload, true));
+			// $this->loggerfile->info($this->cronFileLabel . "api-header = " . print_r($apiHeader, true));
 			
 			$curlHolder = curl_init();
 			curl_setopt($curlHolder, CURLOPT_URL, $apiPathFull);
@@ -317,178 +318,182 @@ class Stock {
 				$monitoringStockList[] = "(sysdate(6),sysdate(6),'" . $locationCode . "','" . $productSku . "','" . $lastStockId . "'" . $stockName . $stockFilename . $stockAction;		
 			}
 		
-			if ($stockCandidateIndex > -1) {
-				$skuStr = substr($skuStr, 1);
-		
-				$sql = "select c.`sku`, (select `value` from `catalog_product_entity_int` where `row_id` = c.`row_id` and `attribute_id` = {$attr['is_fresh']}) as `is_fresh`, (select `value` from `catalog_product_entity_varchar` where `row_id` = c.`row_id` and `attribute_id` = {$attr['sold_in']}) as `sold_in`, (select `value` from `catalog_product_entity_decimal` where `row_id` = c.`row_id` and `attribute_id` = {$attr['weight']}) as `weight`
-				from `catalog_product_entity` c where `sku` in (" . $skuStr . ")";
-				$collections = $this->dbConnection->fetchAll($sql);
-                unset($sql);
 
-				if (!empty($collections)) {
+			if ($stockCandidateIndex < 0) {
+				throw new ErrorException('no stock-data to process');
+			}
 
-					foreach ($collections as $item) {
 
+			$skuStr = substr($skuStr, 1);
+	
+			$sql = "select c.`sku`, (select `value` from `catalog_product_entity_int` where `row_id` = c.`row_id` and `attribute_id` = {$attr['is_fresh']}) as `is_fresh`, (select `value` from `catalog_product_entity_varchar` where `row_id` = c.`row_id` and `attribute_id` = {$attr['sold_in']}) as `sold_in`, (select `value` from `catalog_product_entity_decimal` where `row_id` = c.`row_id` and `attribute_id` = {$attr['weight']}) as `weight`
+			from `catalog_product_entity` c where `sku` in (" . $skuStr . ")";
+			$collections = $this->dbConnection->fetchAll($sql);
+			unset($sql);
+
+			if (!empty($collections)) {
+
+				foreach ($collections as $item) {
+
+					if (!isset($stockCandidatePointerList[$item['sku']])) {
+						$item['sku'] = strtoupper($item['sku']);
 						if (!isset($stockCandidatePointerList[$item['sku']])) {
-							$item['sku'] = strtoupper($item['sku']);
+							$item['sku'] = strtolower($item['sku']);
 							if (!isset($stockCandidatePointerList[$item['sku']])) {
-								$item['sku'] = strtolower($item['sku']);
-								if (!isset($stockCandidatePointerList[$item['sku']])) {
-									continue;
-								}
+								continue;
 							}
 						}
+					}
 
-						foreach ($stockCandidatePointerList[$item['sku']] as $idx) {
-							if ($item['is_fresh'] == 1) {
-								if ($item['sold_in'] == 'kg' || $item['sold_in'] == 'Kg' || $item['sold_in'] == 'KG') {
-									if (!empty($item['weight'])) {
-										$weight = (float) $item['weight'];
-										if ($weight > 0) {
-											$newQuantity = (int) floor(($stockCandidateQuantityFloatList[$idx] * 1000) / $weight);
-											$stockCandidateList[$idx]['quantity'] = $newQuantity;
-											$stockCandidateList[$idx]['status'] = ($newQuantity > 0 ? 1 : 0);    
-										}
+					foreach ($stockCandidatePointerList[$item['sku']] as $idx) {
+						if ($item['is_fresh'] == 1) {
+							if ($item['sold_in'] == 'kg' || $item['sold_in'] == 'Kg' || $item['sold_in'] == 'KG') {
+								if (!empty($item['weight'])) {
+									$weight = (float) $item['weight'];
+									if ($weight > 0) {
+										$newQuantity = (int) floor(($stockCandidateQuantityFloatList[$idx] * 1000) / $weight);
+										$stockCandidateList[$idx]['quantity'] = $newQuantity;
+										$stockCandidateList[$idx]['status'] = ($newQuantity > 0 ? 1 : 0);    
 									}
 								}
-							}	
-						}
-
+							}
+						}	
 					}
 
-				}        
-		
-				$mainSql = "";
-				foreach ($stockCandidateList as $item) {
-					$line = "";
-					foreach ($item as $key => $value) {                
-						$line .= ",'" . $value . "'";                
-					}
-					$mainSql .= ",(" . substr($line, 1) . ")";
 				}
-				unset($stockCandidateList);
-		
-				if ($locationCodeStr != "") {
-					$sql = "insert ignore into `inventory_source` (`source_code`, `name`, `enabled`, `country_id`, `postcode`, `use_default_carrier_config`) values " . substr($locationCodeStr, 1);
-					$res = $this->dbConnection->exec($sql);
-					unset($locationCodeList);
-					unset($locationCodeStr);
-					unset($sql);
-					$this->loggerfile->info($this->cronFileLabel . "insert-ignore inventory_source result = " . $res);
-				}        
-		
-				$mainSql = "insert into `inventory_source_item` (`source_code`, `sku`, `quantity`, `status`) values " . substr($mainSql, 1) . " on duplicate key update `quantity` = values(`quantity`), `status` = values(`status`)";        
-				$totalDataFromApiUpdatedToMagentoStock = $this->dbConnection->exec($mainSql);
-				unset($mainSql);
-				$this->loggerfile->info($this->cronFileLabel . "total-data-from-api updated to magento-stock = " . $totalDataFromApiUpdatedToMagentoStock);
-				
-				$sql =
-				" insert into `cataloginventory_stock_item` "
-				. " ( "
-				. " `product_id`, "
-				. " `stock_id`, "
-				. " `qty`, "
-				. " `min_qty`, "
-				. " `use_config_min_qty`, "
-				. " `is_qty_decimal`, "
-				. " `backorders`, "
-				. " `use_config_backorders`, "
-				. " `min_sale_qty`, "
-				. " `use_config_min_sale_qty`, "
-				. " `max_sale_qty`, "
-				. " `use_config_max_sale_qty`, "
-				. " `is_in_stock`, "
-				. " `low_stock_date`, "
-				. " `notify_stock_qty`, "
-				. " `use_config_notify_stock_qty`, "
-				. " `manage_stock`, "
-				. " `use_config_manage_stock`, "
-				. " `stock_status_changed_auto`, "
-				. " `use_config_qty_increments`, "
-				. " `qty_increments`, "
-				. " `use_config_enable_qty_inc`, "
-				. " `enable_qty_increments`, "
-				. " `is_decimal_divided`, "
-				. " `website_id`, "
-				. " `deferred_stock_update`, "
-				. " `use_config_deferred_stock_update` "
-				. " ) "
-				. " select "
-					. " `entity_id` as `product_id`, "
-					. " 1 as `stock_id`, "
-					. " 1.0000 as `qty`, "
-					. " 0.0000 as `min_qty`, "
-					. " 1 as `use_config_min_qty`, "
-					. " 0 as `is_qty_decimal`, "
-					. " 0 as `backorders`, "
-					. " 1 as `use_config_backorders`, "
-					. " 1.0000 as `min_sale_qty`, "
-					. " 1 as `use_config_min_sale_qty`, "
-					. " 99.0000 as `max_sale_qty`, "
-					. " 1 as `use_config_max_sale_qty`, "
-					. " 1 as `is_in_stock`, "
-					. " null as `low_stock_date`, "
-					. " 1.0000 as `notify_stock_qty`, "
-					. " 1 as `use_config_notify_stock_qty`, "
-					. " 1 as `manage_stock`, "
-					. " 1 as `use_config_manage_stock`, "
-					. " 0 as `stock_status_changed_auto`, "
-					. " 1 as `use_config_qty_increments`, "
-					. " 1.0000 as `qty_increments`, "
-					. " 1 as `use_config_enable_qty_inc`, "
-					. " 0 as `enable_qty_increments`, "
-					. " 0 as `is_decimal_divided`, "
-					. " 0 as `website_id`, "
-					. " 0 as `deferred_stock_update`, "
-					. " 1 as `use_config_deferred_stock_update` "
-				. " from `catalog_product_entity` "
-				. " where `sku` in ( " . $skuStr . " ) "
-				. " on duplicate key update `manage_stock` = 1, `use_config_manage_stock` = 1 "
-				;
-				$res = $this->dbConnection->exec($sql);
-				unset($skuStr);
-				unset($sql);
-				$this->loggerfile->info($this->cronFileLabel . "insert-on-duplicate-update cataloginventory_stock_item result = " . $res);
-		
-				$sql = "update `v2_monitoring_stock_last_retrieved` set `last_id` = '" . $lastStockId . "'";
-				$res = $this->dbConnection->exec($sql);
-				$this->loggerfile->info($this->cronFileLabel . "update last-retrieved-stock-id result = " . $res);
-				$this->loggerfile->info($this->cronFileLabel . "next last-retrieved-stock-id = '" . $lastStockId . "'");
-		
-				$sql = "select sysdate(6) as t";
-				$monitoringStockJobId = $this->dbConnection->fetchOne($sql);
-				$this->loggerfile->info($this->cronFileLabel . "monitoring-stock-job-id = '" . $monitoringStockJobId . "'");
-		
-				$sql = "insert ignore into `v2_monitoring_stock` (`retrieved_at`, `processed_at`, `store_code`, `sku`, `stock_id`, `stock_name`, `stock_filename`, `stock_action`, `job_id`) values " . implode(",'{$monitoringStockJobId}'),", $monitoringStockList) . ",'{$monitoringStockJobId}')";
-				$totalDataFromApiSaved = $this->dbConnection->exec($sql);
-				unset($monitoringStockList);
-				$this->loggerfile->info($this->cronFileLabel . "total-data-from-api saved = " . $totalDataFromApiSaved);
-		
-				$stockValidStr = substr($stockValidStr, 1);
-		
-				$sql = "insert ignore into `v2_monitoring_stock_when_watcher_temp` (`id`, `when_at`, `when_type`, `store_code`, `sku`, `stock_id`) select sysdate(6), `retrieved_at`, 'retrieved', `store_code`, `sku`, `stock_id` from `v2_monitoring_stock` where `stock_id` in (" . $stockValidStr . ")";
-				$res = $this->dbConnection->exec($sql);
-				unset($sql);
-				$this->loggerfile->info($this->cronFileLabel . "insert-ignore retrieved-status result = " . $res);
-		
-				$sql = "insert ignore into `v2_monitoring_stock_when_watcher_temp` (`id`, `when_at`, `when_type`, `store_code`, `sku`, `stock_id`) select sysdate(6), `processed_at`, 'processed', `store_code`, `sku`, `stock_id` from `v2_monitoring_stock` where `stock_id` in (" . $stockValidStr . ")";
-				$res = $this->dbConnection->exec($sql);
-				unset($stockValidStr);
-				unset($sql);
-				$this->loggerfile->info($this->cronFileLabel . "insert-ignore processed-status result = " . $res);
-		
-				$sql = "insert ignore into `v2_monitoring_stock_job` (`id`, `memory_usage_megabytes`, `process_duration_seconds`, `api_call_duration_seconds`, `limit_data_to_api`, `total_data_from_api_received`, `total_data_from_api_received_valid`, `total_data_from_api_received_invalid`, `total_data_from_api_saved`, `total_data_from_api_updated_to_magento_stock`, `status`) values (sysdate(6), " . round(memory_get_usage() / 1048576, 2) . "," . (microtime(true) - $startTime) . ", {$apiCallDuration}, {$limitDataToApi}, {$totalDataFromApiReceived}, " . ($totalDataFromApiReceived - $totalDataFromApiReceivedInvalid) . ", {$totalDataFromApiReceivedInvalid}, {$totalDataFromApiSaved}, {$totalDataFromApiUpdatedToMagentoStock}, 'success')";
-				$res = $this->dbConnection->exec($sql);
-				$this->loggerfile->info($this->cronFileLabel . "insert-ignore monitoring-stock-job result = " . $res);		
+
+			}        
+	
+			$mainSql = "";
+			foreach ($stockCandidateList as $item) {
+				$line = "";
+				foreach ($item as $key => $value) {                
+					$line .= ",'" . $value . "'";                
+				}
+				$mainSql .= ",(" . substr($line, 1) . ")";
 			}
-		
+			unset($stockCandidateList);
+	
+			if ($locationCodeStr != "") {
+				$sql = "insert ignore into `inventory_source` (`source_code`, `name`, `enabled`, `country_id`, `postcode`, `use_default_carrier_config`) values " . substr($locationCodeStr, 1);
+				$this->dbConnection->exec($sql);
+				unset($locationCodeList);
+				unset($locationCodeStr);
+				unset($sql);
+				// $this->loggerfile->info($this->cronFileLabel . "insert-ignore inventory_source result = " . $res);
+			}        
+	
+			$mainSql = "insert into `inventory_source_item` (`source_code`, `sku`, `quantity`, `status`) values " . substr($mainSql, 1) . " on duplicate key update `quantity` = values(`quantity`), `status` = values(`status`)";        
+			$totalDataFromApiUpdatedToMagentoStock = $this->dbConnection->exec($mainSql);
+			unset($mainSql);
+			$this->loggerfile->info($this->cronFileLabel . "total-data-from-api updated to magento-stock = " . $totalDataFromApiUpdatedToMagentoStock);
+			
+			$sql =
+			" insert into `cataloginventory_stock_item` "
+			. " ( "
+			. " `product_id`, "
+			. " `stock_id`, "
+			. " `qty`, "
+			. " `min_qty`, "
+			. " `use_config_min_qty`, "
+			. " `is_qty_decimal`, "
+			. " `backorders`, "
+			. " `use_config_backorders`, "
+			. " `min_sale_qty`, "
+			. " `use_config_min_sale_qty`, "
+			. " `max_sale_qty`, "
+			. " `use_config_max_sale_qty`, "
+			. " `is_in_stock`, "
+			. " `low_stock_date`, "
+			. " `notify_stock_qty`, "
+			. " `use_config_notify_stock_qty`, "
+			. " `manage_stock`, "
+			. " `use_config_manage_stock`, "
+			. " `stock_status_changed_auto`, "
+			. " `use_config_qty_increments`, "
+			. " `qty_increments`, "
+			. " `use_config_enable_qty_inc`, "
+			. " `enable_qty_increments`, "
+			. " `is_decimal_divided`, "
+			. " `website_id`, "
+			. " `deferred_stock_update`, "
+			. " `use_config_deferred_stock_update` "
+			. " ) "
+			. " select "
+				. " `entity_id` as `product_id`, "
+				. " 1 as `stock_id`, "
+				. " 1.0000 as `qty`, "
+				. " 0.0000 as `min_qty`, "
+				. " 1 as `use_config_min_qty`, "
+				. " 0 as `is_qty_decimal`, "
+				. " 0 as `backorders`, "
+				. " 1 as `use_config_backorders`, "
+				. " 1.0000 as `min_sale_qty`, "
+				. " 1 as `use_config_min_sale_qty`, "
+				. " 99.0000 as `max_sale_qty`, "
+				. " 1 as `use_config_max_sale_qty`, "
+				. " 1 as `is_in_stock`, "
+				. " null as `low_stock_date`, "
+				. " 1.0000 as `notify_stock_qty`, "
+				. " 1 as `use_config_notify_stock_qty`, "
+				. " 1 as `manage_stock`, "
+				. " 1 as `use_config_manage_stock`, "
+				. " 0 as `stock_status_changed_auto`, "
+				. " 1 as `use_config_qty_increments`, "
+				. " 1.0000 as `qty_increments`, "
+				. " 1 as `use_config_enable_qty_inc`, "
+				. " 0 as `enable_qty_increments`, "
+				. " 0 as `is_decimal_divided`, "
+				. " 0 as `website_id`, "
+				. " 0 as `deferred_stock_update`, "
+				. " 1 as `use_config_deferred_stock_update` "
+			. " from `catalog_product_entity` "
+			. " where `sku` in ( " . $skuStr . " ) "
+			. " on duplicate key update `manage_stock` = 1, `use_config_manage_stock` = 1 "
+			;
+			$res = $this->dbConnection->exec($sql);
+			unset($skuStr);
+			unset($sql);
+			$this->loggerfile->info($this->cronFileLabel . "insert-on-duplicate-update cataloginventory_stock_item result = " . $res);
+	
+			$sql = "update `v2_monitoring_stock_last_retrieved` set `last_id` = '" . $lastStockId . "'";
+			$this->dbConnection->exec($sql);
+			// $this->loggerfile->info($this->cronFileLabel . "update last-retrieved-stock-id result = " . $res);
+			$this->loggerfile->info($this->cronFileLabel . "next last-retrieved-stock-id = '" . $lastStockId . "'");
+	
+			$sql = "select sysdate(6) as t";
+			$monitoringStockJobId = $this->dbConnection->fetchOne($sql);
+			// $this->loggerfile->info($this->cronFileLabel . "monitoring-stock-job-id = '" . $monitoringStockJobId . "'");
+	
+			$sql = "insert ignore into `v2_monitoring_stock` (`retrieved_at`, `processed_at`, `store_code`, `sku`, `stock_id`, `stock_name`, `stock_filename`, `stock_action`, `job_id`) values " . implode(",'{$monitoringStockJobId}'),", $monitoringStockList) . ",'{$monitoringStockJobId}')";
+			$totalDataFromApiSaved = $this->dbConnection->exec($sql);
+			unset($monitoringStockList);
+			$this->loggerfile->info($this->cronFileLabel . "total-data-from-api saved = " . $totalDataFromApiSaved);
+	
+			$stockValidStr = substr($stockValidStr, 1);
+	
+			$sql = "insert ignore into `v2_monitoring_stock_when_watcher_temp` (`id`, `when_at`, `when_type`, `store_code`, `sku`, `stock_id`) select sysdate(6), `retrieved_at`, 'retrieved', `store_code`, `sku`, `stock_id` from `v2_monitoring_stock` where `stock_id` in (" . $stockValidStr . ")";
+			$this->dbConnection->exec($sql);
+			unset($sql);
+			// $this->loggerfile->info($this->cronFileLabel . "insert-ignore retrieved-status result = " . $res);
+	
+			$sql = "insert ignore into `v2_monitoring_stock_when_watcher_temp` (`id`, `when_at`, `when_type`, `store_code`, `sku`, `stock_id`) select sysdate(6), `processed_at`, 'processed', `store_code`, `sku`, `stock_id` from `v2_monitoring_stock` where `stock_id` in (" . $stockValidStr . ")";
+			$this->dbConnection->exec($sql);
+			unset($stockValidStr);
+			unset($sql);
+			// $this->loggerfile->info($this->cronFileLabel . "insert-ignore processed-status result = " . $res);
+	
+			$sql = "insert ignore into `v2_monitoring_stock_job` (`id`, `memory_usage_megabytes`, `process_duration_seconds`, `api_call_duration_seconds`, `limit_data_to_api`, `total_data_from_api_received`, `total_data_from_api_received_valid`, `total_data_from_api_received_invalid`, `total_data_from_api_saved`, `total_data_from_api_updated_to_magento_stock`, `status`) values (sysdate(6), " . round(memory_get_usage() / 1048576, 2) . "," . (microtime(true) - $startTime) . ", {$apiCallDuration}, {$limitDataToApi}, {$totalDataFromApiReceived}, " . ($totalDataFromApiReceived - $totalDataFromApiReceivedInvalid) . ", {$totalDataFromApiReceivedInvalid}, {$totalDataFromApiSaved}, {$totalDataFromApiUpdatedToMagentoStock}, 'success')";
+			$this->dbConnection->exec($sql);
+			// $this->loggerfile->info($this->cronFileLabel . "insert-ignore monitoring-stock-job result = " . $res);
+
 			$sql = "set session innodb_lock_wait_timeout = @saved_lock_wait";
-            $this->dbConnection->exec($sql);
+			$this->dbConnection->exec($sql);
 			
 			$this->dbConnection->commit();
 			
-			$this->indexDataBySkuListProvider->execute(1, $skuList);
-			$this->indexDataBySkuListProvider->execute(2, $skuList);
+			$this->indexDataBySkuListProvider->execute(1, $skuList);			
+			$this->indexDataBySkuListProvider->execute(2, $skuList);			
 			unset($skuList);
 
 		}
@@ -540,9 +545,9 @@ class Stock {
 
                 try {					
                     $sql = "insert ignore into `v2_monitoring_stock_job` (`id`, `memory_usage_megabytes`, `process_duration_seconds`, `api_call_duration_seconds`, `limit_data_to_api`, `total_data_from_api_received`, `total_data_from_api_received_valid`, `total_data_from_api_received_invalid`, `total_data_from_api_saved`, `total_data_from_api_updated_to_magento_stock`, `status`, `message`) values (sysdate(6), " . round(memory_get_usage() / 1048576, 2) . "," . (microtime(true) - $startTime) . ", {$apiCallDuration}, {$limitDataToApi}, {$totalDataFromApiReceived}, " . ($totalDataFromApiReceived - $totalDataFromApiReceivedInvalid) . ", {$totalDataFromApiReceivedInvalid}, {$totalDataFromApiSaved}, {$totalDataFromApiUpdatedToMagentoStock}, '{$logMessageTopic}', '" . addslashes($logMessage) . "')";
-                    $res = $this->dbConnection->exec($sql);
+                    $this->dbConnection->exec($sql);
                     
-                    $this->loggerfile->info($this->cronFileLabel . "insert-ignore monitoring-stock-job result = " . $res);
+                    // $this->loggerfile->info($this->cronFileLabel . "insert-ignore monitoring-stock-job result = " . $res);
                 }
                 catch (\Exception $exInner) {
                     $logMessageTopicInner = "generic-error";
