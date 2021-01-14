@@ -63,8 +63,10 @@ class Invoice
     $invoice->setShippingAmount($order->getData('shipping_amount'));
     $invoice->setSubtotal($order->getData('subtotal'));
     $invoice->setBaseSubtotal($order->getData('base_subtotal'));
-    $invoice->setGrandTotal($transaction->getAmount());
-    $invoice->setBaseGrandTotal($transaction->getAmount());
+    //$invoice->setGrandTotal($transaction->getAmount());
+    $invoice->setGrandTotal($order->getData('grand_total'));
+    //$invoice->setBaseGrandTotal($transaction->getAmount());
+    $invoice->setBaseGrandTotal($order->getData('base_grand_total'));
     $invoice->register();
     $invoice->pay();
     $this->invoiceRepo->save($invoice);

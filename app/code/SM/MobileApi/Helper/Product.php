@@ -506,7 +506,6 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected function getGTMData($product, $productInfo)
     {
-        $product = $this->productRepository->getById($product->getId());
         $model = $this->gtmFactory->create();
         $data = $this->productGtm->getGtm($product);
         $data = \Zend_Json_Decoder::decode($data);
