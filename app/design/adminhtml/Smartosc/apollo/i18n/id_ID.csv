@@ -5946,7 +5946,7 @@ Gateway URL,URL Gateway
 Title,Judul
 Access ID,Akses. id
 Password,Kata sandi
-Account Number,Nomor akun
+Account Number,Nomor Rekening
 Content Type,Jenis konten
 Calculate Handling Fee,Hitung Biaya Penanganan
 Handling Applied,Penanganan Terapan
@@ -7377,7 +7377,6 @@ Send Order Currency,Kirim Mata Uang Pesanan
 Google API,Google API
 Google Analytics,Google Analytics
 Enable,Memungkinkan
-Account Number,Nomor akun
 Anonymize IP,Anonimkan IP
 Product View Optimization,Optimalisasi Tampilan Produk
 Page View Optimization,Optimal lihat halaman
