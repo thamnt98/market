@@ -17,7 +17,7 @@
 <!--        <referenceBlock name="breadcrumbs" remove="true" />-->
         <referenceContainer name="content">
             <block class="SM\Help\Block\ContactUs\ContactUs"
-                   name="help.contact"
+                   name="help.contact" cacheable="false"
                    template="SM_Help::help/contact-us.phtml" />
         </referenceContainer>
     </body>
