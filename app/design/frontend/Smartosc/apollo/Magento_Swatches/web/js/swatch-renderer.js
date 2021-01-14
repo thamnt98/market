@@ -849,7 +849,12 @@ define([
                 let element = $('#' + key);
 
                 $(element).empty();
-                $(element).append(data[key]);
+                if (data[key]) {
+                    $(element).append(data[key]);
+                    $('#tab-label-' + key).show();
+                } else {
+                    $('#tab-label-' + key).hide();
+                }
             }
         },
 
