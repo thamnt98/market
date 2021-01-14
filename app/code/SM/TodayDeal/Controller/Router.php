@@ -111,7 +111,7 @@ class Router implements \Magento\Framework\App\RouterInterface
             return null;
         }
 
-        if (isset($post["is_redirect_to_plp"]) && $post["is_redirect_to_plp"]) {
+        if (isset($post["is_redirect_to_plp"]) && $post["is_redirect_to_plp"] && $post["category_to_redirect"]) {
             $request->setModuleName('catalog')
                 ->setControllerName('category')
                 ->setActionName('view')

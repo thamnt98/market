@@ -61,4 +61,8 @@
     <type name="\Magento\Sales\Model\Order">
         <plugin name="sm_sales_model_order" type="\SM\Sales\Plugin\Model\Order" sortOrder="50" />
     </type>
+
+    <type name="Magento\Sales\Model\Order\Email\Sender\CreditmemoSender">
+        <plugin name="send_jira_after_send_email" type="\SM\Sales\Plugin\Model\Order\Email\Sender\CreditmemoSender" sortOrder="50"/>
+    </type>
 </config>
