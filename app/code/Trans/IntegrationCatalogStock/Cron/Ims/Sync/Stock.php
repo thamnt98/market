@@ -15,6 +15,7 @@
 namespace Trans\IntegrationCatalogStock\Cron\Ims\Sync;
 
 use Magento\InventoryIndexer\Indexer\SourceItem\IndexDataBySkuListProvider;
+use Magento\Framework\Indexer\IndexerRegistry;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
@@ -34,6 +35,11 @@ class Stock {
 	 * @var \Magento\InventoryIndexer\Indexer\SourceItem\IndexDataBySkuListProvider
 	 */
 	protected $indexDataBySkuListProvider;
+
+    /**
+     * @var \Magento\Framework\Indexer\IndexerRegistry
+     */
+    protected $indexerRegistry;
 	
     /**
      * @var \Magento\Framework\App\ResourceConnection
@@ -71,14 +77,16 @@ class Stock {
     protected $cronFileLabel;
 
 
-    public function __construct(
+    public function __construct(		
 		IndexDataBySkuListProvider $indexDataBySkuListProvider,
+		IndexerRegistry $indexerRegistry,
         ResourceConnection $resourceConnection,
 		TimezoneInterface $timezone,
         Logger $loggerfile,
 		IntegrationCronLogToDatabase $loggerdb
     ) {
 		$this->indexDataBySkuListProvider = $indexDataBySkuListProvider;
+		$this->indexerRegistry = $indexerRegistry;
 		$this->dbConnection = $resourceConnection->getConnection();
 		$this->timezone = $timezone;
         $this->loggerfile = $loggerfile;
@@ -169,7 +177,7 @@ class Stock {
 			if (empty($attr)) {
 				throw new ErrorException('attribute-product not found');
 			}
-        
+ 
 
 			$apiTimeout = $meta['method']['api_timeout'];
 			$limitDataToApi = $meta['method']['limit'];
@@ -180,34 +188,45 @@ class Stock {
 			$apiPath = $meta['channel']['url'] . $meta['method']['path'];
 			$apiPathFull = sprintf("%s?%s", $apiPath, http_build_query($apiPayload));    
 			$apiHeader = json_decode($meta['method']['headers'], true);
+
+			$this->loggerfile->info($this->cronFileLabel . "api-url = " . $apiPath);
+			$this->loggerfile->info($this->cronFileLabel . "api-header = " . print_r($apiHeader, true));
+			$this->loggerfile->info($this->cronFileLabel . "api-payload = " . print_r($apiPayload, true));
 			
 			$curlHolder = curl_init();
 			curl_setopt($curlHolder, CURLOPT_URL, $apiPathFull);
 			curl_setopt($curlHolder, CURLOPT_HTTPHEADER, $apiHeader);
 			curl_setopt($curlHolder, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($curlHolder, CURLOPT_HEADER, false);
+			curl_setopt($curlHolder, CURLOPT_SSL_VERIFYHOST, false);
+			curl_setopt($curlHolder, CURLOPT_SSL_VERIFYPEER, false);
+			curl_setopt($curlHolder, CURLOPT_VERBOSE, true);
 			curl_setopt($curlHolder, CURLOPT_TIMEOUT, $apiTimeout);
 			$curlOutput = curl_exec($curlHolder);
 			$curlInfo = curl_getinfo($curlHolder);
 			$curlErrno = curl_errno($curlHolder);
 			curl_close($curlHolder);
-			
+
 			$apiCallDuration = $curlInfo['total_time'];
 			
 			if (!empty($curlErrno)) {
-				throw new ErrorException("api-call error = " . CurlError::ERROR[(int) $curlErrno]);
-			}    
-			
+				$this->loggerfile->info($this->cronFileLabel . "api-call curl-error-number = " . $curlErrno);
+				throw new ErrorException("api-call curl-error-message = " . CurlError::ERROR[(int) $curlErrno]);
+			}
+			unset($curlErrno);
+					
 			$curlResponse = json_decode($curlOutput, true);
 			unset($curlOutput);
-		
+					
 			if ($curlInfo['http_code'] != 200) {
-				$err = "api-call error";
+				$err = "api-call error http-code = " . $curlInfo['http_code'];
 				if (isset($curlResponse['message'])) {
-					$err .= " = " . $curlResponse['message'];
+					$err .= " - " . $curlResponse['message'];
 				}
+				$this->loggerfile->info($this->cronFileLabel . $err);
 				throw new ErrorException($err);
-			}        
+			}
+			unset($curlInfo);
 		
             if (
                 empty($curlResponse['data']) || 
@@ -324,10 +343,12 @@ class Stock {
 
 			$skuStr = substr($skuStr, 1);
 	
-			$sql = "select c.`sku`, (select `value` from `catalog_product_entity_int` where `row_id` = c.`row_id` and `attribute_id` = {$attr['is_fresh']}) as `is_fresh`, (select `value` from `catalog_product_entity_varchar` where `row_id` = c.`row_id` and `attribute_id` = {$attr['sold_in']}) as `sold_in`, (select `value` from `catalog_product_entity_decimal` where `row_id` = c.`row_id` and `attribute_id` = {$attr['weight']}) as `weight`
+			$sql = "select c.`entity_id`, c.`sku`, (select `value` from `catalog_product_entity_int` where `row_id` = c.`row_id` and `attribute_id` = {$attr['is_fresh']}) as `is_fresh`, (select `value` from `catalog_product_entity_varchar` where `row_id` = c.`row_id` and `attribute_id` = {$attr['sold_in']}) as `sold_in`, (select `value` from `catalog_product_entity_decimal` where `row_id` = c.`row_id` and `attribute_id` = {$attr['weight']}) as `weight`
 			from `catalog_product_entity` c where `sku` in (" . $skuStr . ")";
 			$collections = $this->dbConnection->fetchAll($sql);
 			unset($sql);
+
+			$entityIdList = [];
 
 			if (!empty($collections)) {
 
@@ -342,6 +363,8 @@ class Stock {
 							}
 						}
 					}
+
+					$entityIdList[] = $item['entity_id'];
 
 					foreach ($stockCandidatePointerList[$item['sku']] as $idx) {
 						if ($item['is_fresh'] == 1) {
@@ -359,8 +382,10 @@ class Stock {
 					}
 
 				}
+				
+			}
 
-			}        
+			unset($collections);
 	
 			$mainSql = "";
 			foreach ($stockCandidateList as $item) {
@@ -370,15 +395,16 @@ class Stock {
 				}
 				$mainSql .= ",(" . substr($line, 1) . ")";
 			}
+
 			unset($stockCandidateList);
 	
 			if ($locationCodeStr != "") {
 				$sql = "insert ignore into `inventory_source` (`source_code`, `name`, `enabled`, `country_id`, `postcode`, `use_default_carrier_config`) values " . substr($locationCodeStr, 1);
 				$this->dbConnection->exec($sql);
-				unset($locationCodeList);
-				unset($locationCodeStr);
 				unset($sql);
-			}        
+			}
+			unset($locationCodeList);
+			unset($locationCodeStr);
 	
 			$mainSql = "insert into `inventory_source_item` (`source_code`, `sku`, `quantity`, `status`) values " . substr($mainSql, 1) . " on duplicate key update `quantity` = values(`quantity`), `status` = values(`status`)";
 			$this->dbConnection->exec($mainSql);
@@ -485,9 +511,21 @@ class Stock {
 			
 			$this->dbConnection->commit();
 			
-			$this->indexDataBySkuListProvider->execute(1, $skuList);			
-			$this->indexDataBySkuListProvider->execute(2, $skuList);			
+
+			for ($i = 1; $i <= 2; $i++) {
+				$this->indexDataBySkuListProvider->execute($i, $skuList);
+			}
 			unset($skuList);
+
+			if (!empty($entityIdList)) {
+				foreach (['catalog_product_attribute', 'catalogsearch_fulltext'] as $re) {
+					$ci = $this->indexerRegistry->get($re);
+					if (!empty($ci) && !$ci->isScheduled()) {
+						$ci->reindexList($entityIdList);
+					}
+				}
+			}
+			unset($entityIdList);
 
 		}
 		catch (WarningException $ex) {       
