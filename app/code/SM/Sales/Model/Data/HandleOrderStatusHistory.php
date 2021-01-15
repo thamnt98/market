@@ -125,6 +125,11 @@ class HandleOrderStatusHistory
     private $cancelType;
 
     /**
+     * @var array
+     */
+    private $historyDetails;
+
+    /**
      * HandleOrderStatusHistory constructor.
      * @param StatusCollectionFactory $orderStatusCollectionFactory
      * @param StatusHistoryDataInterfaceFactory $statusHistoryDataFactory
@@ -147,15 +152,12 @@ class HandleOrderStatusHistory
     }
 
     /**
-     * @param $order
      * @return array|StatusHistoryDataInterface[]
      */
-    public function getStatusHistory($order)
+    public function getStatusHistory()
     {
-        $status = $order->getStatus();
+        $status = $this->order->getStatus();
         /** @var \Magento\Sales\Model\Order $order */
-        $this->order = $order;
-        $this->histories = $histories = array_values($order->getStatusHistories());
         if ($status == Statuses::STATUS_ORDER_CANCELED) {
             return $this->getStatusHistoryCanceled();
         } else {
@@ -166,58 +168,66 @@ class HandleOrderStatusHistory
     /**
      * @return array
      */
-    public function getStatusHistoryDetails()
+    public function getStatusHistoryDetails($order)
     {
         $items = [];
         $result = [];
-        foreach ($this->histories as $history) {
-            $items[$history->getStatus()] = $history;
-        }
-        $i = 0;
-        if (isset($items[Statuses::STATUS_PENDING_PAYMENT])) {
-            $result[$i] = $this->buildOrderHistoryDetail($items[Statuses::STATUS_PENDING_PAYMENT]);
-            $i++;
-        }
-        if (isset($items[Statuses::STATUS_IN_PROCESS])) {
-            $result[$i] = $this->buildOrderHistoryDetail($items[Statuses::STATUS_IN_PROCESS]);
-            $i++;
-        }
-        if (isset($items[Statuses::IN_PROCESS_WAITING_FOR_PICKUP])) {
-            $result[$i] = $this->buildOrderHistoryDetail($items[Statuses::IN_PROCESS_WAITING_FOR_PICKUP]);
-            $i++;
-        }
-        if (isset($items[Statuses::PICK_UP_BY_CUSTOMER])) {
-            $result[$i] = $this->buildOrderHistoryDetail($items[Statuses::PICK_UP_BY_CUSTOMER]);
-            $i++;
-        }
-        if (isset($items[Statuses::STATUS_IN_DELIVERY])) {
-            $result[$i] = $this->buildOrderHistoryDetail($items[Statuses::STATUS_IN_DELIVERY]);
-            $i++;
-        }
-        if (isset($items[Statuses::STATUS_FAILED_DELIVERY])) {
-            $result[$i] = $this->buildOrderHistoryDetail($items[Statuses::STATUS_FAILED_DELIVERY]);
-            $i++;
-        }
-        if (isset($items[Statuses::STATUS_DELIVERED])) {
-            $result[$i] = $this->buildOrderHistoryDetail($items[Statuses::STATUS_DELIVERED]);
-            $i++;
-        }
-        if (isset($items[Statuses::STATUS_ORDER_CANCELED])) {
-            $result[$i] = $this->buildOrderHistoryDetail($items[Statuses::STATUS_ORDER_CANCELED]);
-            if (isset($result[$i - 1])) {
-                if ($result[$i - 1]->getStatus() == Statuses::STATUS_FAILED_DELIVERY) {
-                    $result[$i]->setOrderUpdate(self::MAP_STATUS_WITH_LABEL['transmart_order_canceled']);
-                } elseif ($result[$i - 1]->getStatus() == Statuses::STATUS_PENDING_PAYMENT) {
-                    $result[$i]->setOrderUpdate(self::MAP_STATUS_WITH_LABEL['payment_failed_order_canceled']);
-                }
+
+        $this->histories = array_values($order->getStatusHistories());
+        $this->order = $order;
+
+        if (empty($this->historyDetails[$order->getId()])) {
+            foreach ($this->histories as $history) {
+                $items[$history->getStatus()] = $history;
             }
-            $i++;
+            $i = 0;
+            if (isset($items[Statuses::STATUS_PENDING_PAYMENT])) {
+                $result[$i] = $this->buildOrderHistoryDetail($items[Statuses::STATUS_PENDING_PAYMENT]);
+                $i++;
+            }
+            if (isset($items[Statuses::STATUS_IN_PROCESS])) {
+                $result[$i] = $this->buildOrderHistoryDetail($items[Statuses::STATUS_IN_PROCESS]);
+                $i++;
+            }
+            if (isset($items[Statuses::IN_PROCESS_WAITING_FOR_PICKUP])) {
+                $result[$i] = $this->buildOrderHistoryDetail($items[Statuses::IN_PROCESS_WAITING_FOR_PICKUP]);
+                $i++;
+            }
+            if (isset($items[Statuses::PICK_UP_BY_CUSTOMER])) {
+                $result[$i] = $this->buildOrderHistoryDetail($items[Statuses::PICK_UP_BY_CUSTOMER]);
+                $i++;
+            }
+            if (isset($items[Statuses::STATUS_IN_DELIVERY])) {
+                $result[$i] = $this->buildOrderHistoryDetail($items[Statuses::STATUS_IN_DELIVERY]);
+                $i++;
+            }
+            if (isset($items[Statuses::STATUS_FAILED_DELIVERY])) {
+                $result[$i] = $this->buildOrderHistoryDetail($items[Statuses::STATUS_FAILED_DELIVERY]);
+                $i++;
+            }
+            if (isset($items[Statuses::STATUS_DELIVERED])) {
+                $result[$i] = $this->buildOrderHistoryDetail($items[Statuses::STATUS_DELIVERED]);
+                $i++;
+            }
+            if (isset($items[Statuses::STATUS_ORDER_CANCELED])) {
+                $result[$i] = $this->buildOrderHistoryDetail($items[Statuses::STATUS_ORDER_CANCELED]);
+                if (isset($result[$i - 1])) {
+                    if ($result[$i - 1]->getStatus() == Statuses::STATUS_FAILED_DELIVERY) {
+                        $result[$i]->setOrderUpdate(self::MAP_STATUS_WITH_LABEL['transmart_order_canceled']);
+                    } elseif ($result[$i - 1]->getStatus() == Statuses::STATUS_PENDING_PAYMENT) {
+                        $result[$i]->setOrderUpdate(self::MAP_STATUS_WITH_LABEL['payment_failed_order_canceled']);
+                    }
+                }
+                $i++;
+            }
+            if (isset($items[Statuses::STATUS_COMPLETE])) {
+                $result[$i] = $this->buildOrderHistoryDetail($items[Statuses::STATUS_COMPLETE]);
+            }
+            rsort($result);
+
+            $this->historyDetails[$order->getId()] = $result;
         }
-        if (isset($items[Statuses::STATUS_COMPLETE])) {
-            $result[$i] = $this->buildOrderHistoryDetail($items[Statuses::STATUS_COMPLETE]);
-        }
-        rsort($result);
-        return $result;
+        return $this->historyDetails[$order->getId()];
     }
 
     /**
@@ -257,10 +267,11 @@ class HandleOrderStatusHistory
     public function getStatusHistoryCanceled()
     {
         $items = [];
-        $previousHistory = isset($this->histories[1])
-            ? $this->histories[1]
+        $historyDetails = $this->historyDetails[$this->order->getId()];
+        $previousHistory = isset($historyDetails[1])
+            ? $historyDetails[1]
             : null;
-        $statusHistory = current($this->histories);
+        $statusHistory = current($historyDetails);
 
         if ($previousHistory !== null) {
             $currentHistory = $this->statusHistoryDataFactory->create();
@@ -331,14 +342,13 @@ class HandleOrderStatusHistory
     private function getHistoryOne()
     {
         $currentHistory = $this->statusHistoryDataFactory->create();
-        $history = isset($this->histories[count($this->histories) - 1]) ?
-            $this->histories[count($this->histories) - 1]
-            : null;
+        $historyDetails = $this->historyDetails[$this->order->getId()];
+        $history = $historyDetails[count($historyDetails) - 1];
 
         if ($history) {
             $currentHistory->setData([
                 StatusHistoryDataInterface::STATUS => $history->getStatus(),
-                StatusHistoryDataInterface::LABEL => $history->getStatusLabel(),
+                StatusHistoryDataInterface::LABEL => $history->getLabel(),
                 StatusHistoryDataInterface::CREATED_AT => $this->formatDate($history->getCreatedAt()),
                 StatusHistoryDataInterface::ORDER_UPDATE => $history->getComment(),
                 StatusHistoryDataInterface::ICON => $this->getActiveIcon($history->getStatus()),
@@ -404,13 +414,15 @@ class HandleOrderStatusHistory
      */
     private function getHistoryByTwoStatus($status1, $status2)
     {
-        foreach ($this->histories as $history) {
+        $historyDetails = $this->historyDetails[$this->order->getId()];
+
+        foreach ($historyDetails as $history) {
             if ($history->getStatus() == $status1
                 || $history->getStatus() == $status2) {
                 $currentHistory = $this->statusHistoryDataFactory->create();
                 $currentHistory->setData([
                     StatusHistoryDataInterface::STATUS => $history->getStatus(),
-                    StatusHistoryDataInterface::LABEL => $history->getStatusLabel(),
+                    StatusHistoryDataInterface::LABEL => $history->getLabel(),
                     StatusHistoryDataInterface::CREATED_AT => $this->formatDate($history->getCreatedAt()),
                     StatusHistoryDataInterface::ORDER_UPDATE => $history->getComment(),
                     StatusHistoryDataInterface::ICON => $this->getActiveIcon($history->getStatus()),
