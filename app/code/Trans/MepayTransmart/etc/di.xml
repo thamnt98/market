@@ -25,7 +25,7 @@
   <preference for="SM\Sales\Model\Order\ParentOrder" type="Trans\MepayTransmart\Model\Order\TransmartParentOrder" />
   <preference for="SM\Checkout\Helper\OrderReferenceNumber" type="Trans\MepayTransmart\Helper\TransmartOrderReferenceNumber" />
   <preference for="SM\Sales\Observer\SetEmailNewOrderData" type="Trans\MepayTransmart\Observer\TransmartSetEmailNewOrderData" />
-  <preference for="SM\Sales\Model\ParentOrderRepository" type="Trans\MepayTransmart\Model\TransmartParentOrderRepository" />
+<!--  <preference for="SM\Sales\Model\ParentOrderRepository" type="Trans\MepayTransmart\Model\TransmartParentOrderRepository" />-->
   <preference for="SM\Checkout\Helper\Payment" type="Trans\MepayTransmart\Helper\TransmartPayment" />
   <preference for="SM\Sales\Block\Order\Physical\Detail" type="Trans\MepayTransmart\Block\Order\Physical\Detail" />
   <preference for="SM\Checkout\Model\Api\PaymentMethods" type="Trans\MepayTransmart\Model\Api\TransmartPaymentMethods" />
