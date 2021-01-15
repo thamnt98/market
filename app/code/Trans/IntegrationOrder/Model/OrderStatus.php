@@ -482,7 +482,7 @@ class OrderStatus implements OrderStatusInterface {
 		$orderItem    = [];
 		$refunded     = [];
 		$skusRefunded = [];
-		
+
 		foreach ($orderItems as $itemData) {
 			try {
 				$product = $this->productRepository->get($itemData['sku']);
@@ -779,7 +779,7 @@ class OrderStatus implements OrderStatusInterface {
 					$paidPriceOrder = $itemOrder->getPaidPrice();
 					$qtyOrder       = $itemOrder->getQty();
 					$qtyAllocated   = $itemOrder->getQtyAllocated();
-					
+
 					$amount         = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 
 					$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
@@ -1179,16 +1179,19 @@ class OrderStatus implements OrderStatusInterface {
 			return false;
 		}
 
-		if ($order->getData('is_parent')) {
-			$this->updateOrderStatus($orderId, 'in_process', 'processing');
-		}
-
 		$creditMemoData                        = [];
 		$creditMemoData['do_offline']          = 1;
 		$creditMemoData['adjustment_positive'] = 0;
 		$creditMemoData['adjustment_negative'] = 0;
 		$creditMemoData['comment_text']        = 'Refund';
 		$creditMemoData['send_email']          = 1;
+
+        if ($order->getData('is_parent')) {
+            // SOSC - Don't send email for parent order
+            $creditMemoData['send_email'] = 0;
+            // CTCD Update order status
+            $this->updateOrderStatus($orderId, 'in_process', 'processing');
+        }
 
 		$totalQty = 0;
 		foreach ($orderItemIds as $item) {
