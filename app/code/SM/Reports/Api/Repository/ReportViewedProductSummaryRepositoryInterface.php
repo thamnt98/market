@@ -27,4 +27,12 @@ interface ReportViewedProductSummaryRepositoryInterface
      * @return \SM\Reports\Api\Data\Response\ReportViewedProductSummarySearchResultsInterface
      */
     public function getRecommendationProducts(int $customerId): ReportViewedProductSummarySearchResultsInterface;
+
+    /**
+     * @param int $customerId
+     *
+     * @return \Magento\Catalog\Model\ResourceModel\Product\Collection
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getRecommendationCollection(int $customerId);
 }

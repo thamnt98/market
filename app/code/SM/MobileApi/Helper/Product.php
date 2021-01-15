@@ -444,7 +444,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $productInfo->setTypeId($product->getTypeId());
         $productInfo->setProductUrl($this->_getProductUrl($product));
         $productInfo->setCategoryNames($categoryNames);
-        $productInfo->setStock(floor($this->_getProductStockQty($product)));
+        $productInfo->setStock(floor($this->getProductStockQty($product)));
         $productInfo->setIsSaleable($productRepository->isSalable());
         $productInfo->setIsInStock((boolean)$productInfo->getStock());
         $productInfo->setIsAvailable($product->isAvailable());
@@ -453,15 +453,12 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $productInfo->setShortDescription($product->getShortDescription());
         $productInfo->setImage($this->getMainImage($product));
         $productInfo->setConfigChildCount($this->getConfigChildCount($product));
-
-        $productInfo->setGtmData($this->getGTMData($product, $productInfo));
+        $productInfo->setGtmData($this->prepareGTM($product, $productInfo));
 
         /**
          * Product label PLP: Limit offer, Sale, etc...
          */
-        /** @var \SM\MobileApi\Api\Data\ProductLabel\ProductLabelInterface $label */
-        $labels = $this->helperCommon->getProductLabel($product);
-        $productInfo->setProductLabel($labels ? $labels : null);
+        $productInfo->setProductLabel($this->getProductLabel($product));
 
         /**
          * Review data
@@ -504,7 +501,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      * @throws NoSuchEntityException
      * @throws \Zend_Json_Exception
      */
-    protected function getGTMData($product, $productInfo)
+    public function prepareGTM($product, $productInfo)
     {
         $model = $this->gtmFactory->create();
         $data = $this->productGtm->getGtm($product);
@@ -647,7 +644,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $productInfo->setSku($product->getSku());
         $productInfo->setType($product->getTypeId());
         $productInfo->setTypeId($product->getTypeId());
-        $productInfo->setStock(floor($this->_getProductStockQty($product)));
+        $productInfo->setStock(floor($this->getProductStockQty($product)));
         $productInfo->setIsSaleable($product->getIsSalable());
         $productInfo->setIsInStock((boolean)$productInfo->getStock());
         $productInfo->setIsAvailable($product->isAvailable());
@@ -836,7 +833,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Catalog\Model\Product $product
      * @return int
      */
-    protected function _getProductStockQty($product)
+    public function getProductStockQty($product)
     {
         return $this->stock->getStock($product);
     }
@@ -1052,5 +1049,17 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
             'general/locale/weight_unit',
             \Magento\Store\Model\ScopeInterface::SCOPE_STORE
         );
+    }
+
+    /**
+     * @param \Magento\Catalog\Model\Product $product
+     *
+     * @return array|\SM\MobileApi\Api\Data\ProductLabel\ProductLabelInterface|null
+     * @throws LocalizedException
+     * @throws NoSuchEntityException
+     */
+    public function getProductLabel($product)
+    {
+        return $this->helperCommon->getProductLabel($product);
     }
 }

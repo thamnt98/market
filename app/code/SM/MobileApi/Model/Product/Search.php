@@ -105,6 +105,20 @@ class Search implements SearchProductInterface
     protected $registry;
 
     /**
+     * @var \SM\MobileApi\Model\Data\Product\ListItemFactory
+     */
+    protected $productDataFactory;
+
+    /**
+     * @var \SM\Catalog\Helper\Data
+     */
+    protected $helper;
+    /**
+     * @var \SM\MobileApi\Model\Data\Catalog\Product\ReviewFactory
+     */
+    protected $productReviewDataFactory;
+
+    /**
      * Search constructor.
      * @param Searchs $search
      * @param \Magento\Framework\Api\Search\SearchCriteriaInterface $searchCriteria
@@ -125,6 +139,9 @@ class Search implements SearchProductInterface
      * @param \Magento\Framework\Registry $registry
      */
     public function __construct(
+        \SM\Catalog\Helper\Data $helper,
+        \SM\MobileApi\Model\Data\Catalog\Product\ReviewFactory $productReviewDataFactory,
+        \SM\MobileApi\Model\Data\Product\ListItemFactory $productDataFactory,
         Searchs $search,
         \Magento\Framework\Api\Search\SearchCriteriaInterface $searchCriteria,
         \Magento\Framework\Api\Search\FilterGroup $filterGroup,
@@ -160,6 +177,9 @@ class Search implements SearchProductInterface
         $this->mCatalogSearch                       = $mCatalogSearch;
         $this->productListFactory                   = $listFactory;
         $this->registry                             = $registry;
+        $this->productDataFactory = $productDataFactory;
+        $this->helper = $helper;
+        $this->productReviewDataFactory = $productReviewDataFactory;
     }
 
     /**
@@ -244,12 +264,18 @@ class Search implements SearchProductInterface
      */
     public function getRecommendationProducts(int $customerId)
     {
-        /** @var \Magento\Framework\Api\Search\SearchResult $result */
-        $result = $this->reportViewedProductSummaryRepository->getRecommendationProducts($customerId);
+        $coll = $this->reportViewedProductSummaryRepository->getRecommendationCollection($customerId);
 
-        $items      = $result->getProducts();
-        $totalCount = $result->getTotalCount();
-        return $this->_convertProductByIds($items, $totalCount, true);
+        $productsData = [];
+
+        foreach ($coll as $item) {
+            $productsData[] = $this->prepareRecommendData($item);
+        }
+
+        $this->responseInterface->setProducts($productsData);
+        $this->responseInterface->setTotal(count($productsData));
+
+        return $this->responseInterface;
     }
 
     /**
@@ -422,5 +448,55 @@ class Search implements SearchProductInterface
         $this->responseInterface->setTotal($productCollection->getSize());
 
         return $this->responseInterface;
+    }
+
+    /**
+     * @param \Magento\Catalog\Model\Product $product
+     *
+     * @return \SM\MobileApi\Api\Data\Product\ListItemInterface
+     * @throws NoSuchEntityException
+     * @throws \Magento\Framework\Exception\FileSystemException
+     * @throws \Magento\Framework\Exception\LocalizedException|\Zend_Json_Exception
+     */
+    protected function prepareRecommendData($product)
+    {
+        /** @var \SM\MobileApi\Model\Data\Product\ListItem $data */
+        $data = $this->productDataFactory->create();
+        /** @var \SM\MobileApi\Model\Data\Catalog\Product\Review $reviewData */
+        $reviewData = $this->productReviewDataFactory->create();
+
+        $reviewData
+            ->setReviewCounter($product->getData('reviews_count'))
+            ->setPercent($product->getData('rating_summary'));
+
+        if ($product->getTypeId() !== \Magento\Bundle\Model\Product\Type::TYPE_CODE) {
+            $minProduct = $this->helper->getMinProduct($product);
+            $price = $minProduct->getPrice();
+            $final = $minProduct->getFinalPrice();
+            $discountPercent = $this->helper->getDiscountSingle($minProduct);
+        } else {
+            [$final, $price] = $this->helper->getSumPriceMinBundle($product);
+            $discountPercent = $this->helper->getDiscountBundleMin($final, $price);
+        }
+
+        $data
+            ->setId($product->getId())
+            ->setSku($product->getSku())
+            ->setName($product->getName())
+            ->setType($product->getTypeId())
+            ->setTypeId($product->getTypeId())
+            ->setPrice($price)
+            ->setFinalPrice($final)
+            ->setReview($reviewData)
+            ->setIsAvailable($product->isAvailable())
+            ->setIsInStock($product->isInStock())
+            ->setIsSaleable($product->isSaleable())
+            ->setImage($this->productHelper->getMainImage($product))
+            ->setProductLabel($this->productHelper->getProductLabel($product))
+            ->setConfigChildCount($this->helper->getCountChildren($product->getId()))
+            ->setDiscountPercent((int)$discountPercent)
+            ->setGtmData($this->productHelper->prepareGTM($product, $data));
+
+        return $data;
     }
 }
