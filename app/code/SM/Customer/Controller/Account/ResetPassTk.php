@@ -58,7 +58,7 @@ class ResetPassTk extends Action
             $customer = $this->customerSession->getCustomer();
             $customerName = $customer->getName();
             $customerSecure = $this->customerRegistry->retrieveSecureData($customer->getId());
-            $urlRedirect = $this->url->getBaseUrl() . '?recoverytoken=' . $customerSecure->getRpToken() . '&email=' . $customer->getEmail() . '&name=' . $customerName;
+            $urlRedirect = $this->url->getBaseUrl() . '?recoverytoken=' . $customerSecure->getRpToken() . '&email=' . $customer->getEmail() . '&name=' . $customerName . '&account=back';
             $data = ['login' => true, 'url' => $urlRedirect];
         }
         $resultJson->setData($data);
