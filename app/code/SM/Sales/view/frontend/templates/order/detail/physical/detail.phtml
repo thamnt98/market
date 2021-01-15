@@ -166,8 +166,9 @@ if ($parentOrder) {
                                         </div>
                                         <div class="status-history">
                                             <h5 class="tl-status-history"><?= $block->escapeHtml(__('Status History')) ?></h5>
-                                            <?php foreach ($subOrder->getStatusHistoryDetails() as $history): ?>
-                                                <div class="status-history-info status-delivery active">
+                                            <?php $i = 0; ?>
+                                            <?php foreach ($subOrder->getStatusHistoryDetails() as $history): $i++; ?>
+                                                <div class="status-history-info status-delivery<?php if ($i == 1) { echo ' active';}?>">
                                                     <span class="ic-status-bar"></span>
                                                     <h4><?= $block->escapeHtml(__($history->getComment())) ?></h4>
                                                     <span class="date"><?= $history->getCreatedAt() ?></span>

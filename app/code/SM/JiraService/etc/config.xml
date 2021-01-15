@@ -19,6 +19,7 @@
                 <domain>https://ctcd.atlassian.net</domain>
                 <project>CSJSD</project>
                 <refund>10007</refund>
+                <refund_credit_card>10014</refund_credit_card>
             </ticket>
         </sm_jira>
     </default>

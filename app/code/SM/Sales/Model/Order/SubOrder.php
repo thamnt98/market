@@ -516,8 +516,8 @@ class SubOrder
      */
     private function setStatusHistoriesData(Order $subOrder, SubOrderDataInterface $subOrderData)
     {
-        $subOrderData->setStatusHistory($this->history->getStatusHistory($subOrder));
-        $subOrderData->setStatusHistoryDetails($this->history->getStatusHistoryDetails());
+        $subOrderData->setStatusHistoryDetails($this->history->getStatusHistoryDetails($subOrder));
+        $subOrderData->setStatusHistory($this->history->getStatusHistory());
     }
 
     /**
