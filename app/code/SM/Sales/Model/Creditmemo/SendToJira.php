@@ -11,6 +11,7 @@
 
 namespace SM\Sales\Model\Creditmemo;
 
+use SM\Sales\Api\Data\Creditmemo\FormInformationInterface;
 use SM\Sales\Model\Order\IsPaymentMethod;
 
 class SendToJira
@@ -92,7 +93,11 @@ class SendToJira
     {
         $table = $this->creditmemoResource->getMainTable();
         $connection = $this->creditmemoResource->getConnection();
-        $connection->update($table, array('creditmemo_status' => 2), 'entity_id=' . $creditMemoId . '');
+        $connection->update(
+            $table,
+            array('creditmemo_status' => FormInformationInterface::SUBMITTED_VALUE),
+            'entity_id=' . $creditMemoId . ''
+        );
     }
 
     /**
@@ -106,7 +111,6 @@ class SendToJira
         if ($this->validateParams($data, $creditCardType)) {
             $requestData = [
                 'serviceDeskId' => $this->scopeConfig->getValue('sm_jira/ticket/servicedesk'),
-                'requestTypeId' => $this->scopeConfig->getValue('sm_jira/ticket/refund'),
                 'requestParticipants' => [
                     $this->jiraRepository->getJiraCustomerId(
                         $this->getCustomer()->getLastname(),
@@ -116,26 +120,35 @@ class SendToJira
             ];
 
             if ($creditCardType) {
+                $requestData['requestTypeId'] =  $this->scopeConfig->getValue('sm_jira/ticket/refund_credit_card');
                 $summary = __(
                     'Request a refund to credit card for order %1',
                     $data[RequestFormData::ORDER_REFERENCE_NUMBER_KEY]
                 );
+
+                $requestData['requestFieldValues'] = [
+                    'summary' => $summary,
+                    'customfield_10037' => $data[RequestFormData::ORDER_REFERENCE_NUMBER_KEY],
+                    'customfield_10044' => $data[RequestFormData::PAYMENT_NUMBER_KEY],
+                    'customfield_10061' => (int) $data[RequestFormData::TOTAL_REFUND_KEY],
+                ];
             } else {
+                $requestData['requestTypeId'] =  $this->scopeConfig->getValue('sm_jira/ticket/refund');
                 $summary = __(
                     'Request a refund to the virtual account for order %1',
                     $data[RequestFormData::ORDER_REFERENCE_NUMBER_KEY]
                 );
-            }
 
-            $requestData['requestFieldValues'] = [
-                'summary' => $summary,
-                'customfield_10037' =>  $data[RequestFormData::ORDER_REFERENCE_NUMBER_KEY],
-                'customfield_10044' =>  $data[RequestFormData::PAYMENT_NUMBER_KEY],
-                'customfield_10061' => (int) $data[RequestFormData::TOTAL_REFUND_KEY],
-                'customfield_10043' => $data[RequestFormData::BANK_KEY],
-                'customfield_10060' => $data[RequestFormData::ACCOUNT_NAME_KEY],
-                'customfield_10062' => $data[RequestFormData::ACCOUNT_KEY],
-            ];
+                $requestData['requestFieldValues'] = [
+                    'summary' => $summary,
+                    'customfield_10037' => $data[RequestFormData::ORDER_REFERENCE_NUMBER_KEY],
+                    'customfield_10044' => $data[RequestFormData::PAYMENT_NUMBER_KEY],
+                    'customfield_10061' => (int) $data[RequestFormData::TOTAL_REFUND_KEY],
+                    'customfield_10043' => $data[RequestFormData::BANK_KEY],
+                    'customfield_10060' => $data[RequestFormData::ACCOUNT_NAME_KEY],
+                    'customfield_10062' => $data[RequestFormData::ACCOUNT_KEY],
+                ];
+            }
         }
 
         return $requestData;
