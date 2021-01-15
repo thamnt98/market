@@ -1,0 +1,246 @@
+From e699d3feb9514ee73c8c0afc3fdb8b5c03ed18d5 Mon Sep 17 00:00:00 2001
+From: Nikita Shcherbatykh <nikita.shcherbatykh@transoftgroup.com>
+Date: Wed, 11 Mar 2020 15:09:26 +0200
+Subject: [PATCH] MC-32229: Category and other trees not working in Cart Price
+ Rule
+
+---
+ .../Adminhtml/Promo/Quote/NewActionHtml.php   | 29 ++++++
+ .../Promo/Quote/NewConditionHtml.php          | 33 ++++++-
+ .../Promo/Quote/NewActionHtmlTest.php         |  7 ++
+ .../Promo/Quote/NewConditionHtmlTest.php      | 88 +++++++++++++++++++
+ 4 files changed, 155 insertions(+), 2 deletions(-)
+ create mode 100644 dev/tests/integration/testsuite/Magento/SalesRule/Controller/Adminhtml/Promo/Quote/NewConditionHtmlTest.php
+
+diff --git a/vendor/magento/module-sales-rule/Controller/Adminhtml/Promo/Quote/NewActionHtml.php b/vendor/magento/module-sales-rule/Controller/Adminhtml/Promo/Quote/NewActionHtml.php
+index 56c08864c90c..af28547456a9 100644
+--- a/vendor/magento/module-sales-rule/Controller/Adminhtml/Promo/Quote/NewActionHtml.php
++++ b/vendor/magento/module-sales-rule/Controller/Adminhtml/Promo/Quote/NewActionHtml.php
+@@ -47,6 +47,7 @@ public function execute()
+         if ($model instanceof AbstractCondition) {
+             $model->setJsFormObject($formName);
+             $model->setFormName($formName);
++            $this->setJsFormObject($model);
+             $html = $model->asHtmlRecursive();
+         } else {
+             $html = '';
+@@ -54,4 +55,32 @@ public function execute()
+         $this->getResponse()
+             ->setBody($html);
+     }
++
++    /**
++     * Set jsFormObject for the model object
++     *
++     * @return void
++     * @param AbstractCondition $model
++     */
++    private function setJsFormObject(AbstractCondition $model): void
++    {
++        $requestJsFormName = $this->getRequest()->getParam('form');
++        $actualJsFormName = $this->getJsFormObjectName($model->getFormName());
++        if ($requestJsFormName === $actualJsFormName) { //new
++            $model->setJsFormObject($actualJsFormName);
++        } else { //edit
++            $model->setJsFormObject($requestJsFormName);
++        }
++    }
++
++    /**
++     * Get jsFormObject name
++     *
++     * @param string $formName
++     * @return string
++     */
++    private function getJsFormObjectName(string $formName): string
++    {
++        return $formName . 'rule_actions_fieldset_';
++    }
+ }
+diff --git a/vendor/magento/module-sales-rule/Controller/Adminhtml/Promo/Quote/NewConditionHtml.php b/vendor/magento/module-sales-rule/Controller/Adminhtml/Promo/Quote/NewConditionHtml.php
+index 50545fd86486..3646f9592c49 100644
+--- a/vendor/magento/module-sales-rule/Controller/Adminhtml/Promo/Quote/NewConditionHtml.php
++++ b/vendor/magento/module-sales-rule/Controller/Adminhtml/Promo/Quote/NewConditionHtml.php
+@@ -6,11 +6,13 @@
+ namespace Magento\SalesRule\Controller\Adminhtml\Promo\Quote;
+
+ use Magento\Framework\App\Action\HttpPostActionInterface;
++use Magento\Rule\Model\Condition\AbstractCondition;
++use Magento\SalesRule\Controller\Adminhtml\Promo\Quote;
+
+ /**
+  * Controller class NewConditionHtml. Returns condition html
+  */
+-class NewConditionHtml extends \Magento\SalesRule\Controller\Adminhtml\Promo\Quote implements HttpPostActionInterface
++class NewConditionHtml extends Quote implements HttpPostActionInterface
+ {
+     /**
+      * New condition html action
+@@ -39,13 +41,40 @@ public function execute()
+             $model->setAttribute($typeArr[1]);
+         }
+
+-        if ($model instanceof \Magento\Rule\Model\Condition\AbstractCondition) {
++        if ($model instanceof AbstractCondition) {
+             $model->setJsFormObject($this->getRequest()->getParam('form'));
+             $model->setFormName($formName);
++            $this->setJsFormObject($model);
+             $html = $model->asHtmlRecursive();
+         } else {
+             $html = '';
+         }
+         $this->getResponse()->setBody($html);
+     }
++
++    /**
++     * Set jsFormObject for the model object
++     *
++     * @return void
++     * @param AbstractCondition $model
++     */
++    private function setJsFormObject(AbstractCondition $model): void
++    {
++        $requestJsFormName = $this->getRequest()->getParam('form');
++        $actualJsFormName = $this->getJsFormObjectName($model->getFormName());
++        if ($requestJsFormName === $actualJsFormName) { //new
++            $model->setJsFormObject($actualJsFormName);
++        }
++    }
++
++    /**
++     * Get jsFormObject name
++     *
++     * @param string $formName
++     * @return string
++     */
++    private function getJsFormObjectName(string $formName): string
++    {
++        return $formName . 'rule_conditions_fieldset_';
++    }
+ }
+diff --git a/dev/tests/integration/testsuite/Magento/SalesRule/Controller/Adminhtml/Promo/Quote/NewActionHtmlTest.php b/dev/tests/integration/testsuite/Magento/SalesRule/Controller/Adminhtml/Promo/Quote/NewActionHtmlTest.php
+index 82f1c53d8f16..b2fc8365c90e 100644
+--- a/dev/tests/integration/testsuite/Magento/SalesRule/Controller/Adminhtml/Promo/Quote/NewActionHtmlTest.php
++++ b/dev/tests/integration/testsuite/Magento/SalesRule/Controller/Adminhtml/Promo/Quote/NewActionHtmlTest.php
+@@ -12,6 +12,7 @@
+ /**
+  * New action html test
+  *
++ * Verify the request object contains the proper form object for action
+  * @magentoAppArea adminhtml
+  */
+ class NewActionHtmlTest extends AbstractBackendController
+@@ -31,6 +32,11 @@ class NewActionHtmlTest extends AbstractBackendController
+      */
+     private $formName = 'test_form';
+
++    /**
++     * @var string
++     */
++    private $requestFormName = 'rule_actions_fieldset_';
++
+     /**
+      * Test verifies that execute method has the proper data-form-part value in html response
+      *
+@@ -73,6 +79,7 @@ private function prepareRequest(): void
+         $this->getRequest()->setParams(
+             [
+                 'id' => 1,
++                'form' => $this->requestFormName,
+                 'form_namespace' => $this->formName,
+                 'type' => 'Magento\SalesRule\Model\Rule\Condition\Product|quote_item_price',
+             ]
+diff --git a/dev/tests/integration/testsuite/Magento/SalesRule/Controller/Adminhtml/Promo/Quote/NewConditionHtmlTest.php b/dev/tests/integration/testsuite/Magento/SalesRule/Controller/Adminhtml/Promo/Quote/NewConditionHtmlTest.php
+new file mode 100644
+index 000000000000..f15befedfbca
+--- /dev/null
++++ b/dev/tests/integration/testsuite/Magento/SalesRule/Controller/Adminhtml/Promo/Quote/NewConditionHtmlTest.php
+@@ -0,0 +1,88 @@
++<?php
++/**
++ * Copyright © Magento, Inc. All rights reserved.
++ * See COPYING.txt for license details.
++ */
++declare(strict_types=1);
++
++namespace Magento\SalesRule\Controller\Adminhtml\Promo\Quote;
++
++use Magento\TestFramework\TestCase\AbstractBackendController;
++
++/**
++ * New condition html test
++ *
++ * Verify the request object contains the proper form object for condition
++ * @magentoAppArea adminhtml
++ */
++class NewConditionHtmlTest extends AbstractBackendController
++{
++    /**
++     * @var string
++     */
++    protected $resource = 'Magento_SalesRule::quote';
++
++    /**
++     * @var string
++     */
++    protected $uri = 'backend/sales_rule/promo_quote/newConditionHtml';
++
++    /**
++     * @var string
++     */
++    private $formName = 'test_form';
++
++    /**
++     * @var string
++     */
++    private $requestFormName = 'rule_conditions_fieldset_';
++
++    /**
++     * Test verifies that execute method has the proper data-form-part value in html response
++     *
++     * @return void
++     */
++    public function testExecute(): void
++    {
++        $this->prepareRequest();
++        $this->dispatch($this->uri);
++        $html = $this->getResponse()
++            ->getBody();
++        $this->assertContains($this->formName, $html);
++    }
++
++    /**
++     * @inheritdoc
++     */
++    public function testAclHasAccess()
++    {
++        $this->prepareRequest();
++        parent::testAclHasAccess();
++    }
++
++    /**
++     * @inheritdoc
++     */
++    public function testAclNoAccess()
++    {
++        $this->prepareRequest();
++        parent::testAclNoAccess();
++    }
++
++    /**
++     * Prepare request
++     *
++     * @return void
++     */
++    private function prepareRequest(): void
++    {
++        $this->getRequest()->setParams(
++            [
++                'id' => 1,
++                'form' => $this->requestFormName,
++                'form_namespace' => $this->formName,
++                'type' => 'Magento\SalesRule\Model\Rule\Condition\Product|category_ids',
++            ]
++        )->setMethod('POST');
++    }
++}
