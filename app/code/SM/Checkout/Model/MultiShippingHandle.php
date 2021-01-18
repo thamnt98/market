@@ -1014,11 +1014,12 @@ class MultiShippingHandle
     /**
      * @param $deliveryDateTime
      * @param $storeDateTime
+     * @param $store
      * @param $quote
      * @return bool
-     * @throws \Exception
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function handlePreviewOrder($deliveryDateTime, $storeDateTime, $quote)
+    public function handlePreviewOrder($deliveryDateTime, $storeDateTime, $store, $quote)
     {
         $reload          = false;
         $shippingAddress = $quote->getAllShippingAddresses();
@@ -1031,7 +1032,7 @@ class MultiShippingHandle
             } elseif ($shippingMethod == self::STORE_PICK_UP) {
                 $date = $this->timezone->convertConfigTimeToUtc($storeDateTime['date']);
                 $time = $storeDateTime['time'];
-                $this->saveStorePickUpDateTime($address, $date, $time);
+                $this->saveStorePickUpDateTime($address, $date, $time, $store);
             } else {
                 if ($shippingMethod == self::SCHEDULE) {
                     $dateTime = $deliveryDateTime[$address->getCustomerAddressId()];
@@ -1058,10 +1059,11 @@ class MultiShippingHandle
      * @param $address
      * @param $date
      * @param $time
+     * @param $store
      */
-    protected function saveStorePickUpDateTime($address, $date, $time)
+    protected function saveStorePickUpDateTime($address, $date, $time, $store)
     {
-        $address->setStorePickUpTime($date)->setStorePickUpDelivery($time)->save();
+        $address->setStorePickUpTime($date)->setStorePickUpDelivery($time)->setStorePickUp($store)->save();
     }
 
     /**

@@ -101,4 +101,27 @@ class ConnectionDB
         }
         return $this->tableNames[$entity];
     }
+
+    /**
+     * @param $skuList
+     * @return array
+     */
+    public function getMsi($skuList)
+    {
+        $select = $this->readAdapter->select()
+        ->from(
+            ['main_table' => $this->getTableName('inventory_source_item')],
+            ['source_code', 'quantity', 'sku']
+        )
+        ->joinLeft(
+            ['t1' => 'inventory_source'],
+            'main_table.source_code = t1.source_code',
+            ['latitude', 'longitude', 'country_id', 'region', 'city', 'street', 'postcode', 'name']
+        )
+        ->where('main_table.sku IN (' . implode(",", $skuList) . ')')
+        ->where('main_table.status =?', 1)
+        ->where('main_table.quantity > 0')
+        ->where('t1.enabled =?', 1);
+        return $this->readAdapter->fetchAll($select);
+    }
 }
