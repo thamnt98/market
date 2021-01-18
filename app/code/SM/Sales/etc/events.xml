@@ -15,6 +15,5 @@
     </event>
     <event name="email_creditmemo_set_template_vars_before">
         <observer name="add_refund_account_data" instance="SM\Sales\Observer\CreditMemo\AddRefundDataToEmail"/>
-        <observer name="refund_send_jira_ticket" instance="SM\Sales\Observer\CreditMemo\CardSendJiraTicket"/>
     </event>
 </config>

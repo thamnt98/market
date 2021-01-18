@@ -588,10 +588,14 @@ class Cart implements \SM\MobileApi\Api\CartInterface
             );
         }
         try {
-            $this->registry->register("remove_cart_item", true);
+            if (!$this->registry->registry("remove_cart_item")) {
+                $this->registry->register("remove_cart_item", true);
+            }
             $quote->removeItem($id);
             $this->quoteRepository->save($quote);
+            $this->registry->unregister("remove_cart_item");
         } catch (\Exception $e) {
+            $this->registry->unregister("remove_cart_item");
             throw new CouldNotSaveException(__("The item couldn't be removed from the quote."));
         }
 
@@ -666,7 +670,9 @@ class Cart implements \SM\MobileApi\Api\CartInterface
             //Adjust stock of product or remove product if product out of stock
             if ($availableStock <= 0) {
                 $quote->removeItem($item->getItemId());
-                $this->registry->register("remove_cart_item", true);
+                if (!$this->registry->registry("remove_cart_item")) {
+                    $this->registry->register("remove_cart_item", true);
+                }
                 $isRemoveProduct = true;
                 $message = "One of the product is no longer available and we remove it from your cart";
                 $cartMessageFactory->setMessage($message);
@@ -692,7 +698,9 @@ class Cart implements \SM\MobileApi\Api\CartInterface
         if ($isRemoveProduct || $isAdjustQty) {
             $this->quoteRepository->save($quote);
         }
-
+        if ($this->registry->registry("remove_cart_item")) {
+            $this->registry->unregister("remove_cart_item");
+        }
         //Return result
         $cartItem = $this->cartItemFactory->create();
         $cartItem->setId($quote->getId());

@@ -115,6 +115,11 @@ class CreditmemoRepository implements \SM\Sales\Api\CreditmemoRepositoryInterfac
             try {
                 $this->requestFormData->setFormData($data['creditmemo_id']);
                 $creditmemo = $this->requestFormData->getCreditmemo();
+
+                if (!$this->requestFormData->validateCustomer($customerId)) {
+                    throw new \Exception('Something went wrong while summiting your request');
+                }
+
                 $this->sendToJira->setCustomer($this->customerRepository->getById($customerId));
                 $data = $this->prepareParams((array)$data);
                 $isSubmitted = $creditmemo->getCreditmemoStatus() == FormInformationInterface::SUBMITTED_VALUE;
@@ -138,7 +143,7 @@ class CreditmemoRepository implements \SM\Sales\Api\CreditmemoRepositoryInterfac
     /**
      * @param array $params
      * @return array
-     * @throws Exception
+     * @throws \Exception
      */
     protected function prepareParams(array $params): array
     {
@@ -191,7 +196,7 @@ class CreditmemoRepository implements \SM\Sales\Api\CreditmemoRepositoryInterfac
     {
         foreach ($this->getBanks() as $bankObject) {
             if ($bank == $bankObject->getCode()) {
-                return $bank;
+                return $bankObject->getName();
             }
         }
         throw new \Exception('Invalid Bank Name');

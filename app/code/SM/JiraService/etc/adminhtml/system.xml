@@ -50,9 +50,14 @@
                     <label>Request type for Return Refund</label>
                     <source_model>SM\JiraService\Model\Config\Source\RequestType</source_model>
                 </field>
+                <field id="refund_credit_card" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="0"
+                       showInStore="0">
+                    <label>Request type for Refund (Type 1 - Credit/Debit Card)</label>
+                    <source_model>SM\JiraService\Model\Config\Source\RequestType</source_model>
+                </field>
                 <field id="refund" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="0"
                        showInStore="0">
-                    <label>Request type for Refund</label>
+                    <label>Request type for Refund (Type 2 - Virtual Account)</label>
                     <source_model>SM\JiraService\Model\Config\Source\RequestType</source_model>
                 </field>
             </group>

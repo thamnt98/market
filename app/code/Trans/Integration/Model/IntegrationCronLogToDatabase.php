@@ -24,6 +24,7 @@ class IntegrationCronLogToDatabase
     public const LEVEL_WARNING = 2;
     public const LEVEL_ERROR = 3;
     public const LEVEL_ERROR_FATAL = 4;
+    public const LEVEL_ERROR_GENERIC = 5;
 
     /**
      * @var \Magento\Framework\App\ResourceConnection
@@ -47,7 +48,7 @@ class IntegrationCronLogToDatabase
     * @param string $messageDetail
     * @return int
      */
-    protected function log($cronType, $cronTypeDetail, $logLevel, $messageTopic, $messageDetail)
+    public function log($cronType, $cronTypeDetail, $logLevel, $messageTopic, $messageDetail)
     {     
         try {
             

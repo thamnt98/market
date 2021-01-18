@@ -15,4 +15,10 @@
 
     <preference for="Magento\Customer\Model\Metadata\Form" type="SM\Customer\Model\Metadata\Form"/>
     <preference for="Trans\Customer\Block\Address\Edit" type="SM\Customer\Block\Address\Edit" />
+    <preference for="Magento\Store\Controller\Store\SwitchAction" type="SM\Customer\Preference\SwitchAction"/>
+
+    <type name="Magento\Store\Controller\Store\Redirect">
+        <plugin name="sm_store_redirect"
+                type="SM\Customer\Plugin\Store\Redirect" sortOrder="30"/>
+    </type>
 </config>

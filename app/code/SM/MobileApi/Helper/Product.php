@@ -444,7 +444,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $productInfo->setTypeId($product->getTypeId());
         $productInfo->setProductUrl($this->_getProductUrl($product));
         $productInfo->setCategoryNames($categoryNames);
-        $productInfo->setStock($this->_getProductStockQty($product));
+        $productInfo->setStock(floor($this->_getProductStockQty($product)));
         $productInfo->setIsSaleable($productRepository->isSalable());
         $productInfo->setIsInStock((boolean)$productInfo->getStock());
         $productInfo->setIsAvailable($product->isAvailable());
@@ -506,7 +506,6 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected function getGTMData($product, $productInfo)
     {
-        $product = $this->productRepository->getById($product->getId());
         $model = $this->gtmFactory->create();
         $data = $this->productGtm->getGtm($product);
         $data = \Zend_Json_Decoder::decode($data);
@@ -648,7 +647,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $productInfo->setSku($product->getSku());
         $productInfo->setType($product->getTypeId());
         $productInfo->setTypeId($product->getTypeId());
-        $productInfo->setStock($this->_getProductStockQty($product));
+        $productInfo->setStock(floor($this->_getProductStockQty($product)));
         $productInfo->setIsSaleable($product->getIsSalable());
         $productInfo->setIsInStock((boolean)$productInfo->getStock());
         $productInfo->setIsAvailable($product->isAvailable());

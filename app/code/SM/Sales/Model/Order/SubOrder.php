@@ -516,8 +516,8 @@ class SubOrder
      */
     private function setStatusHistoriesData(Order $subOrder, SubOrderDataInterface $subOrderData)
     {
-        $subOrderData->setStatusHistory($this->history->getStatusHistory($subOrder));
-        $subOrderData->setStatusHistoryDetails($this->history->getStatusHistoryDetails());
+        $subOrderData->setStatusHistoryDetails($this->history->getStatusHistoryDetails($subOrder));
+        $subOrderData->setStatusHistory($this->history->getStatusHistory());
     }
 
     /**
@@ -808,7 +808,7 @@ class SubOrder
         if ($subOrderModel->getStatus() == \SM\Sales\Api\ParentOrderRepositoryInterface::STATUS_ORDER_CANCELED) {
             return false;
         }
-        return !($orderItem->getQtyRefunded() > 0 && ($orderItem->getQtyRefunded() == $orderItem->getQtyInvoiced()));
+        return $orderItem->getQtyRefunded() == 0;
     }
 
     /**
@@ -848,9 +848,6 @@ class SubOrder
      */
     private function getItemMessage($orderItem)
     {
-        if ($orderItem->getId() == 6035 || $orderItem->getId() == null) {
-            $a =1 ;
-        }
         if ($orderItem->canRefund()) {
             return __('Some items in this order are not available.');
         }

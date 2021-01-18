@@ -51,7 +51,19 @@ define(
                     $('.drop-down select option').each(function () {
                         var bg = $(this).css('background-image');
                         bg = bg.replace('url("','').replace('")','');
-                        var dataHref = $(this).attr("data-href");
+                        var windowPathParam = '';
+                        var windowPath = window.location.pathname;
+                        var windowPathArray = windowPath.split('/');
+                        $.each(windowPathArray, function( index, value ) {
+                            if (windowPathParam != '') {
+                                windowPathParam += '___';
+                            }
+                            windowPathParam += value;
+                        });
+                        if (windowPathParam == '') {
+                            windowPathParam = 'home';
+                        }
+                        var dataHref = $(this).attr("data-href") + '?transmart-prefer=' + windowPathParam;
                         var isSelect = $(this).attr("data-is-select");
                         $('.select-list').append('' +
                             '<li class="clsAnchor ' + ((isSelect == 1)? 'active' : '') + '">' +
