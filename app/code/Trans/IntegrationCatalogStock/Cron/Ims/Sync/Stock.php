@@ -255,7 +255,7 @@ class Stock {
 			$locationCodeStr = "";
 			$lastStockId = "";
 			$monitoringStockList = [];
-			// $entityIdList = [];
+			$entityIdList = [];
         
 			foreach ($curlResponse['data'] as $data) {
 				if (!empty($data['stock_id'])) {
@@ -369,7 +369,7 @@ class Stock {
 						}
 					}
 
-					// $entityIdList[] = $item['entity_id'];
+					$entityIdList[] = $item['entity_id'];
 
 					foreach ($stockCandidatePointerList[$item['sku']] as $idx) {
 						if ($item['is_fresh'] == 1) {
@@ -521,18 +521,18 @@ class Stock {
 			$this->indexDataBySkuListProvider->execute(2, $skuList);
 			unset($skuList);
 
-			// if (!empty($entityIdList)) {
-			// 	foreach (['cataloginventory_stock', 'catalog_product_attribute', 'catalogsearch_fulltext'] as $re) {
-			// 		$indexer = $this->indexerRegistry->get($re);
-			// 		if (!empty($indexer) && !$indexer->isScheduled()) {
-			// 			$startTimeReindex = microtime(true);
-			// 			$this->loggerfile->info($this->cronFileLabel . "start reindexList for " . $re);
-			// 			$indexer->reindexList($entityIdList);
-			// 			$this->loggerfile->info($this->cronFileLabel . "finish reindexList in " . (microtime(true) - $startTimeReindex) . " seconds");	
-			// 		}
-			// 	}
-			// }
-			// unset($entityIdList);
+			if (!empty($entityIdList)) {
+				foreach (['cataloginventory_stock', 'catalog_product_attribute', 'catalogsearch_fulltext'] as $re) {
+					$indexer = $this->indexerRegistry->get($re);
+					if (!empty($indexer) && !$indexer->isScheduled()) {
+						$startTimeReindex = microtime(true);
+						$this->loggerfile->info($this->cronFileLabel . "start reindexList for " . $re);
+						$indexer->reindexList($entityIdList);
+						$this->loggerfile->info($this->cronFileLabel . "finish reindexList in " . (microtime(true) - $startTimeReindex) . " seconds");	
+					}
+				}
+			}
+			unset($entityIdList);
 
 		}
 		catch (WarningException $ex) {       
