@@ -309,6 +309,7 @@ class PostRepository implements PostRepositoryInterface
         try {
             $popularCategory = $this->categoryRepository->get($popularCategoryId);
             $popularProducts = $popularCategory->getProductCollection()
+                ->addFieldToSelect('*')
                 ->setCurPage(1)
                 ->setPageSize(10)
                 ->getItems();

@@ -1,7 +1,7 @@
 <?php
 /**
- * Class CardSendJiraTicket
- * @package SM\Sales\Observer
+ * Class CreditmemoSender
+ * @package SM\Sales\Plugin\Model\Order\Email\Sender
  * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
  * @author Son Nguyen <sonnn@smartosc.com>
  *
@@ -9,19 +9,15 @@
  * http://www.ctcorpora.com
  */
 
-declare(strict_types=1);
-
-namespace SM\Sales\Observer\CreditMemo;
+namespace SM\Sales\Plugin\Model\Order\Email\Sender;
 
 use Magento\Customer\Api\CustomerRepositoryInterface;
-use Magento\Framework\DataObject;
-use Magento\Framework\Event\Observer;
-use Magento\Framework\Event\ObserverInterface;
 use Magento\Sales\Model\Order;
+use SM\Sales\Api\Data\Creditmemo\FormInformationInterface;
 use SM\Sales\Model\Creditmemo\RequestFormData;
 use SM\Sales\Model\Order\IsPaymentMethod;
 
-class CardSendJiraTicket implements ObserverInterface
+class CreditmemoSender
 {
     /**
      * @var \Magento\Sales\Model\Order\Creditmemo
@@ -57,23 +53,43 @@ class CardSendJiraTicket implements ObserverInterface
     }
 
     /**
-     * @inheritDoc
+     * @param $subject
+     * @param $result
+     * @param $creditmemo
+     * @return bool
      */
-    public function execute(Observer $observer)
+    public function afterSend($subject, $result, $creditmemo)
     {
-        /** @var DataObject $transportObject */
-        $transportObject = $observer->getEvent()->getDataByKey('transportObject');
-        /** @var Order $order */
-        $this->order= $transportObject->getData("order");
-        $this->creditmemo = $transportObject->getData("creditmemo");
-
-        $paymentMethod = $this->order->getPayment()->getMethod();
-
-        if (IsPaymentMethod::isCard($paymentMethod)) {
-            $data = $this->prepareParams();
-            $this->sendToJira->setCustomer($this->customerRepository->getById($this->order->getCustomerId()));
-            $this->sendToJira->send($data);
+        if ($result === true) {
+            return $this->send($creditmemo);
         }
+
+        return $result;
+    }
+
+    /**
+     * @param $creditmemo
+     * @return bool
+     */
+    protected function send($creditmemo)
+    {
+        try {
+            /** @var Order $order */
+            $this->creditmemo = $creditmemo;
+            $this->order = $creditmemo->getOrder();
+
+            $paymentMethod = $this->order->getPayment()->getMethod();
+
+            if (IsPaymentMethod::isCard($paymentMethod)
+                && $creditmemo->getCreditmemoStatus() != FormInformationInterface::SUBMITTED_VALUE) {
+                $data = $this->prepareParams();
+                $this->sendToJira->setCustomer($this->customerRepository->getById($this->order->getCustomerId()));
+                return $this->sendToJira->send($data);
+            }
+        } catch (\Exception $e) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -87,7 +103,7 @@ class CardSendJiraTicket implements ObserverInterface
             RequestFormData::ACCOUNT_KEY => '',
             RequestFormData::ORDER_REFERENCE_NUMBER_KEY => $this->order->getData('reference_order_id'),
             RequestFormData::PAYMENT_NUMBER_KEY => $this->order->getData('reference_payment_number'),
-            RequestFormData::TOTAL_REFUND_KEY => (int) $this->creditmemo->getGrandTotal(),
+            RequestFormData::TOTAL_REFUND_KEY => (int)$this->creditmemo->getGrandTotal(),
             RequestFormData::CREDITMEMO_ID_KEY => (int)$this->creditmemo->getId(),
             RequestFormData::PAYMENT_METHOD_KEY => $this->order->getPayment()->getMethod(),
         ];

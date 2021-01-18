@@ -52,23 +52,15 @@ $invoice = $block->getInvoice();
 
             ?>
 
-            <?php if ($isVA):?>
+            <?php if ($isVA || $isMepay):?>
                 <h3><?= $block->escapeHtml($invoice->getPaymentMethod()); ?></h3>
             <?php elseif ($isCC):?>
                 <?php $paymentInfo = $invoice->getPaymentInfo()?>
-
-                <?php if($isMepay) : ?>
-                  <h3><?= $invoice->getPaymentMethod()?></h3>
-                <?php else: ?>
-
-                  <h3><?= $block->escapeHtml(
-                  $paymentInfo->getCardType() . ": " .
-                      $paymentInfo->getCardBrand() . "(" .
-                      $paymentInfo->getCardNo() . ")"
-                  )?></h3>
-
-                <?php endif; ?>
-
+                <h3><?= $block->escapeHtml(
+                        $paymentInfo->getCardType() . ": " .
+                        $paymentInfo->getCardBrand() . "(" .
+                        $paymentInfo->getCardNo() . ")"
+                    )?></h3>
             <?php endif;?>
         </div>
         <br/>
