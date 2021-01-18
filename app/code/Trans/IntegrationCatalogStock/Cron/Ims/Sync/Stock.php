@@ -521,7 +521,7 @@ class Stock {
 			$this->indexDataBySkuListProvider->execute(2, $skuList);
 			unset($skuList);
 
-			if (!empty($entityIdList)) {
+			if (count($entityIdList) > 0) {
 				foreach (['cataloginventory_stock', 'catalog_product_attribute', 'catalogsearch_fulltext'] as $re) {
 					$indexer = $this->indexerRegistry->get($re);
 					if (!empty($indexer) && !$indexer->isScheduled()) {
