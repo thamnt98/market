@@ -67,6 +67,7 @@ class AddRefundDataToEmail implements ObserverInterface
         }
         $additionalData['is_virtual'] = $isVirtual;
         $additionalData['is_card'] = !$isVirtual;
+        $additionalData['is_preauth'] = IsPaymentMethod::isPreAuth($order->getPayment()->getMethod(), $order);
         $additionalData['order_increment_id'] = '<strong>' . $order->getIncrementId() . '</strong>';
 
         $transportObject->setData("additional_data", $additionalData);
