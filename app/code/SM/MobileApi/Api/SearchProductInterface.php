@@ -33,8 +33,9 @@ interface SearchProductInterface
 
     /**
      * @param string $keyword
-     * @param int $category_id
-     * @return \SM\MobileApi\Api\Data\Product\SearchInterface
+     * @param int    $category_id
+     *
+     * @return \SM\Search\Api\Catalog\SuggestionResultInterface
      */
     public function getSearchSuggestion(string $keyword, $category_id = null);
 
