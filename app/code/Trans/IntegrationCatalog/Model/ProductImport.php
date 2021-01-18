@@ -879,13 +879,14 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                     }
                 }
             }
-            if (Import::BEHAVIOR_APPEND != $this->getBehavior()) {
-                $this->_connection->delete(
-                    $tableName,
-                    $this->_connection->quoteInto('product_id IN (?)', $delProductId)
-                );
-            }
+
             if ($categoriesIn) {
+                if($delProductId){
+                    $this->_connection->delete(
+                        $tableName,
+                        $this->_connection->quoteInto('product_id IN (?)', $delProductId)
+                    );
+                }
                 $this->_connection->insertOnDuplicate($tableName, $categoriesIn, ['product_id', 'category_id']);
             }
         }
@@ -1229,7 +1230,7 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                 $rowData['website_id'] = $websiteId;
                 $rowData['_product_websites'] = $website->getCode();
                 $rowData['product_websites'] = $website->getCode();
-                $rowData['status'] = $rowData['is_active'];
+                $rowData['status'] = $rowData['is_active'] == 1 ? \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED : \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_DISABLED; 
                 $rowData['description'] = $rowData['long_description'];
 
                 $rowData['url_key'] = $this->changeUrlKeyChildProduct(
@@ -1455,9 +1456,6 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                         $rowData = $productTypeModel->clearEmptyData($rowData);
                     }
 
-                    // $this->logger->info('Before prepare attributes');
-                    // $this->logger->info(print_r($rowData, true));
-
                     $rowData = $productTypeModel->prepareAttributesWithDefaultValueForSave(
                         $rowData,
                         !$this->isSkuExist($rowSku)
@@ -1526,6 +1524,7 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                     }
                 } catch (\Exception $e) {
                     var_dump($e->getMessage());
+                    $this->logger->info($e->getMessage());
                     continue;
                 }
             }
@@ -1700,7 +1699,7 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                     $path = $category->getPath();
                     $categoryIds = explode('/', $path);
                     
-                    $pathCategories = $this->categoryCollection($categoryIds, false);
+                    $pathCategories = $this->magentoCategoryCollection($categoryIds);
                     
                     $pathString = [];
                     if($pathCategories) {
@@ -1717,10 +1716,43 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
                 }
             }
 
-            return implode(',', $pathCategoriesArray);
+            return implode(';', $pathCategoriesArray);
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage() . ' ' . __FUNCTION__ . ' $pimCategoryIds: ' . print_r($pimCategoryIds, true));
         }
+    }
+
+    /**
+     * get category collection
+     *
+     * @param array $pimIds
+     */
+    protected function magentoCategoryCollection($ids = [])
+    {
+        $nameEavId = $this->getCategoryAttributeId('name');
+        $result = false;
+
+        if(is_array($ids) && !empty($ids)) {
+            $string = implode(',', $ids);
+        }
+
+        if(!empty($string)) {
+            $collection = $this->categoryCollection->create();
+            $collection->getSelect()->join(
+                ['catalog_category_entity_varchar'],
+                'e.row_id = catalog_category_entity_varchar.row_id',
+                []
+            )->columns('catalog_category_entity_varchar.value as name')
+                ->where('attribute_id = '.$nameEavId.' and entity_id in ('.$string.')');
+            $collection->getSelect()->group('e.entity_id');
+
+            //echo $collection->getSelect();
+
+            if($collection->getSize()) {
+                $result = $collection;
+            }
+        }
+        return $result;
     }
 
     /**
@@ -1823,7 +1855,8 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
         if (!empty($categoriesString)) {
             $categoryIds = $this->categoryProcessor->upsertCategories(
                 $categoriesString,
-                $this->getMultipleValueSeparator()
+                // $this->getMultipleValueSeparator()
+                ";"
             );
             foreach ($this->categoryProcessor->getFailedCategories() as $error) {
                 $this->errorAggregator->addError(
