@@ -50,11 +50,11 @@
             </p>
             {{else}}
             <p>
-                {{trans "We are sorry to inform you that  %items in order #%order_increment are currently
-                unavailable. Don't worry, your credit card won't be charged %transaction"
+                {{trans "We are sorry to inform you that %items in order #%order_increment are currently
+                unavailable.
+                But don't worry, you can get a refund with a few easy steps."
                 items=$additional_data.items_text
                 order_increment=$additional_data.order_increment_id
-                transaction=$additional_data.transaction_text
                 |raw}}
             </p>
             <p>{{trans 'Simply click the button below and fill out the refund form.'}}</p>
