@@ -11,6 +11,8 @@
 
 namespace SM\Sales\Model\Order;
 
+use \Trans\Mepay\Gateway\Request\PaymentSourceMethodDataBuilder as PaymentSource;
+
 class IsPaymentMethod
 {
     const CARD_METHODS = [
@@ -24,6 +26,10 @@ class IsPaymentMethod
         "sprint_bca_va",
         'sprint_mega_cc',
         'trans_mepay_va'
+    ];
+
+    const PREAUTH_METHODS = [
+        'trans_mepay_cc'
     ];
 
     /**
@@ -42,5 +48,21 @@ class IsPaymentMethod
     public static function isCard(string $method): bool
     {
         return in_array($method, self::CARD_METHODS);
+    }
+
+        /**
+     * @param string $method
+     * @param \Magento\Sales\Model\Order $order
+     * @return bool
+     */
+    public static function isPreAuth(string $method, \Magento\Sales\Model\Order $order): bool
+    {
+        if (in_array($method, self::PREAUTH_METHODS)) {
+            $ccType = $order->getPayment()->getCcType();
+            if ($ccType == PaymentSource::AUTH_CAPTURE) {
+                return true;
+            }
+        }
+        return false;
     }
 }
