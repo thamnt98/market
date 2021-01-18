@@ -15,6 +15,7 @@
 namespace Trans\IntegrationCatalogStock\Cron\Ims\Sync;
 
 use Magento\InventoryIndexer\Indexer\SourceItem\IndexDataBySkuListProvider;
+use Magento\Framework\Indexer\IndexerRegistry;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 
@@ -34,6 +35,11 @@ class Stock {
 	 * @var \Magento\InventoryIndexer\Indexer\SourceItem\IndexDataBySkuListProvider
 	 */
 	protected $indexDataBySkuListProvider;
+
+    /**
+     * @var \Magento\Framework\Indexer\IndexerRegistry
+     */
+    protected $indexerRegistry;
 	
     /**
      * @var \Magento\Framework\App\ResourceConnection
@@ -71,14 +77,16 @@ class Stock {
     protected $cronFileLabel;
 
 
-    public function __construct(
+    public function __construct(		
 		IndexDataBySkuListProvider $indexDataBySkuListProvider,
+		IndexerRegistry $indexerRegistry,
         ResourceConnection $resourceConnection,
 		TimezoneInterface $timezone,
         Logger $loggerfile,
 		IntegrationCronLogToDatabase $loggerdb
     ) {
 		$this->indexDataBySkuListProvider = $indexDataBySkuListProvider;
+		$this->indexerRegistry = $indexerRegistry;
 		$this->dbConnection = $resourceConnection->getConnection();
 		$this->timezone = $timezone;
         $this->loggerfile = $loggerfile;
@@ -118,7 +126,8 @@ class Stock {
         $exceptionFound = false;
         $logMessageTopic = "start";
         $logMessage = "memory usage = " . round(memory_get_usage() / 1048576, 2) . " megabytes";
-        $logLevel = IntegrationCronLogToDatabase::LEVEL_INFO;
+		$logLevel = IntegrationCronLogToDatabase::LEVEL_INFO;
+		$logCode = 0;
         $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
         $this->loggerdb->log($this->cronType, $this->cronTypeDetail, $logLevel, $logMessageTopic, $logMessage);
 
@@ -169,7 +178,7 @@ class Stock {
 			if (empty($attr)) {
 				throw new ErrorException('attribute-product not found');
 			}
-        
+ 
 
 			$apiTimeout = $meta['method']['api_timeout'];
 			$limitDataToApi = $meta['method']['limit'];
@@ -178,7 +187,7 @@ class Stock {
 			$apiPayload['_offset'] = 0;
 			$apiPayload['_modified_at'] = $meta['last_id'];
 			$apiPath = $meta['channel']['url'] . $meta['method']['path'];
-			$apiPathFull = sprintf("%s?%s", $apiPath, http_build_query($apiPayload));    
+			$apiPathFull = $apiPath . "?" . http_build_query($apiPayload);
 			$apiHeader = json_decode($meta['method']['headers'], true);
 			
 			$curlHolder = curl_init();
@@ -186,37 +195,53 @@ class Stock {
 			curl_setopt($curlHolder, CURLOPT_HTTPHEADER, $apiHeader);
 			curl_setopt($curlHolder, CURLOPT_RETURNTRANSFER, true);
 			curl_setopt($curlHolder, CURLOPT_HEADER, false);
+			curl_setopt($curlHolder, CURLOPT_SSL_VERIFYHOST, false);
+			curl_setopt($curlHolder, CURLOPT_SSL_VERIFYPEER, false);
+			curl_setopt($curlHolder, CURLOPT_VERBOSE, false);
 			curl_setopt($curlHolder, CURLOPT_TIMEOUT, $apiTimeout);
 			$curlOutput = curl_exec($curlHolder);
 			$curlInfo = curl_getinfo($curlHolder);
 			$curlErrno = curl_errno($curlHolder);
 			curl_close($curlHolder);
-			
+
 			$apiCallDuration = $curlInfo['total_time'];
 			
 			if (!empty($curlErrno)) {
-				throw new ErrorException("api-call error = " . CurlError::ERROR[(int) $curlErrno]);
-			}    
-			
+				$this->loggerfile->info($this->cronFileLabel . "api error curl-error found");
+				$this->loggerfile->info($this->cronFileLabel . "api url = " . $apiPath);
+				$this->loggerfile->info($this->cronFileLabel . "api header = " . print_r($apiHeader, true));
+				$this->loggerfile->info($this->cronFileLabel . "api payload = " . print_r($apiPayload, true));
+				$this->loggerfile->info($this->cronFileLabel . "api curl-info = " . print_r($curlInfo, true));
+				$this->loggerfile->info($this->cronFileLabel . "api curl-error-number = " . $curlErrno);
+				$this->loggerfile->info($this->cronFileLabel . "api curl-error-message = " . CurlError::ERROR[(int) $curlErrno]);
+				throw new ErrorException("api error curl-error-number = " . $curlErrno . " - curl-error-message = " . CurlError::ERROR[(int) $curlErrno]. " - curl-info = " . print_r($curlInfo, true));
+			}
+			unset($curlErrno);
+					
 			$curlResponse = json_decode($curlOutput, true);
 			unset($curlOutput);
-		
+					
 			if ($curlInfo['http_code'] != 200) {
-				$err = "api-call error";
+				$this->loggerfile->info($this->cronFileLabel . "api error http-code != 200");
+				$this->loggerfile->info($this->cronFileLabel . "api url = " . $apiPath);
+				$this->loggerfile->info($this->cronFileLabel . "api header = " . print_r($apiHeader, true));
+				$this->loggerfile->info($this->cronFileLabel . "api payload = " . print_r($apiPayload, true));
+				$this->loggerfile->info($this->cronFileLabel . "api curl-info = " . print_r($curlInfo, true));
 				if (isset($curlResponse['message'])) {
-					$err .= " = " . $curlResponse['message'];
+					$this->loggerfile->info($this->cronFileLabel . "api response-message = " . $curlResponse['message']);
 				}
-				throw new ErrorException($err);
-			}        
+				throw new ErrorException("api error http-code != 200 - response-message = " . $curlResponse['message'] . " - curl-info = " . print_r($curlInfo, true));
+			}
+			unset($curlInfo);
 		
             if (
                 empty($curlResponse['data']) || 
                 !is_array($curlResponse['data']) || 
                 ($totalDataFromApiReceived = count($curlResponse['data'])) == 0) {
-				throw new WarningException("stock-data from api-call empty");
+				throw new WarningException("stock-data-from-api empty");
 			}
 		
-			$this->loggerfile->info($this->cronFileLabel . "total-data-from-api received = " . $totalDataFromApiReceived);
+			$this->loggerfile->info($this->cronFileLabel . "total-data-from-api = " . $totalDataFromApiReceived);
 
 
 			$stockCandidateIndex = -1;
@@ -230,6 +255,7 @@ class Stock {
 			$locationCodeStr = "";
 			$lastStockId = "";
 			$monitoringStockList = [];
+			// $entityIdList = [];
         
 			foreach ($curlResponse['data'] as $data) {
 				if (!empty($data['stock_id'])) {
@@ -324,10 +350,10 @@ class Stock {
 
 			$skuStr = substr($skuStr, 1);
 	
-			$sql = "select c.`sku`, (select `value` from `catalog_product_entity_int` where `row_id` = c.`row_id` and `attribute_id` = {$attr['is_fresh']}) as `is_fresh`, (select `value` from `catalog_product_entity_varchar` where `row_id` = c.`row_id` and `attribute_id` = {$attr['sold_in']}) as `sold_in`, (select `value` from `catalog_product_entity_decimal` where `row_id` = c.`row_id` and `attribute_id` = {$attr['weight']}) as `weight`
+			$sql = "select c.`entity_id`, c.`sku`, (select `value` from `catalog_product_entity_int` where `row_id` = c.`row_id` and `attribute_id` = {$attr['is_fresh']}) as `is_fresh`, (select `value` from `catalog_product_entity_varchar` where `row_id` = c.`row_id` and `attribute_id` = {$attr['sold_in']}) as `sold_in`, (select `value` from `catalog_product_entity_decimal` where `row_id` = c.`row_id` and `attribute_id` = {$attr['weight']}) as `weight`
 			from `catalog_product_entity` c where `sku` in (" . $skuStr . ")";
 			$collections = $this->dbConnection->fetchAll($sql);
-			unset($sql);
+			unset($sql);			
 
 			if (!empty($collections)) {
 
@@ -342,6 +368,8 @@ class Stock {
 							}
 						}
 					}
+
+					// $entityIdList[] = $item['entity_id'];
 
 					foreach ($stockCandidatePointerList[$item['sku']] as $idx) {
 						if ($item['is_fresh'] == 1) {
@@ -359,8 +387,10 @@ class Stock {
 					}
 
 				}
+				
+			}
 
-			}        
+			unset($collections);
 	
 			$mainSql = "";
 			foreach ($stockCandidateList as $item) {
@@ -370,15 +400,16 @@ class Stock {
 				}
 				$mainSql .= ",(" . substr($line, 1) . ")";
 			}
+
 			unset($stockCandidateList);
 	
 			if ($locationCodeStr != "") {
 				$sql = "insert ignore into `inventory_source` (`source_code`, `name`, `enabled`, `country_id`, `postcode`, `use_default_carrier_config`) values " . substr($locationCodeStr, 1);
 				$this->dbConnection->exec($sql);
-				unset($locationCodeList);
-				unset($locationCodeStr);
 				unset($sql);
-			}        
+			}
+			unset($locationCodeList);
+			unset($locationCodeStr);
 	
 			$mainSql = "insert into `inventory_source_item` (`source_code`, `sku`, `quantity`, `status`) values " . substr($mainSql, 1) . " on duplicate key update `quantity` = values(`quantity`), `status` = values(`status`)";
 			$this->dbConnection->exec($mainSql);
@@ -455,63 +486,87 @@ class Stock {
 			$this->dbConnection->exec($sql);
 			$this->loggerfile->info($this->cronFileLabel . "next last-retrieved-stock-id = '" . $lastStockId . "'");
 	
-			$sql = "select sysdate(6) as t";
-			$monitoringStockJobId = $this->dbConnection->fetchOne($sql);
-	
-			$sql = "insert ignore into `v2_monitoring_stock` (`retrieved_at`, `processed_at`, `store_code`, `sku`, `stock_id`, `stock_name`, `stock_filename`, `stock_action`, `job_id`) values " . implode(",'{$monitoringStockJobId}'),", $monitoringStockList) . ",'{$monitoringStockJobId}')";
-			$totalDataFromApiSaved = $this->dbConnection->exec($sql);
-			unset($monitoringStockList);
-			$this->loggerfile->info($this->cronFileLabel . "total-data-from-api saved = " . $totalDataFromApiSaved);
-	
-			$stockValidStr = substr($stockValidStr, 1);
-	
-			$sql = "insert ignore into `v2_monitoring_stock_when_watcher_temp` (`id`, `when_at`, `when_type`, `store_code`, `sku`, `stock_id`) select sysdate(6), `retrieved_at`, 'retrieved', `store_code`, `sku`, `stock_id` from `v2_monitoring_stock` where `stock_id` in (" . $stockValidStr . ")";
-			$this->dbConnection->exec($sql);
-			unset($sql);
-	
-			$sql = "insert ignore into `v2_monitoring_stock_when_watcher_temp` (`id`, `when_at`, `when_type`, `store_code`, `sku`, `stock_id`) select sysdate(6), `processed_at`, 'processed', `store_code`, `sku`, `stock_id` from `v2_monitoring_stock` where `stock_id` in (" . $stockValidStr . ")";
-			$this->dbConnection->exec($sql);
-			unset($stockValidStr);
-			unset($sql);
-	
-			$totalDataFromApiReceivedValid = ($totalDataFromApiReceived - $totalDataFromApiReceivedInvalid);
-			$totalDataFromApiUpdatedToMagentoStock = $totalDataFromApiReceivedValid;
+			$this->loggerfile->info($this->cronFileLabel . "monitoring-stock disabled by Hariadi for Mr. Anand's instructions not to interfere magento database");
 
-			$sql = "insert ignore into `v2_monitoring_stock_job` (`id`, `memory_usage_megabytes`, `process_duration_seconds`, `api_call_duration_seconds`, `limit_data_to_api`, `total_data_from_api_received`, `total_data_from_api_received_valid`, `total_data_from_api_received_invalid`, `total_data_from_api_saved`, `total_data_from_api_updated_to_magento_stock`, `status`) values (sysdate(6), " . round(memory_get_usage() / 1048576, 2) . "," . (microtime(true) - $startTime) . ", {$apiCallDuration}, {$limitDataToApi}, {$totalDataFromApiReceived}, {$totalDataFromApiReceivedValid}, {$totalDataFromApiReceivedInvalid}, {$totalDataFromApiSaved}, {$totalDataFromApiUpdatedToMagentoStock}, 'success')";
-			$this->dbConnection->exec($sql);
+			/** start: disabled by Hariadi for Mr. Anand's instructions not to interfere magento database */
+
+			// $sql = "select sysdate(6) as t";
+			// $monitoringStockJobId = $this->dbConnection->fetchOne($sql);
+	
+			// $sql = "insert ignore into `v2_monitoring_stock` (`retrieved_at`, `processed_at`, `store_code`, `sku`, `stock_id`, `stock_name`, `stock_filename`, `stock_action`, `job_id`) values " . implode(",'{$monitoringStockJobId}'),", $monitoringStockList) . ",'{$monitoringStockJobId}')";
+			// $totalDataFromApiSaved = $this->dbConnection->exec($sql);
+			// unset($monitoringStockList);
+			// $this->loggerfile->info($this->cronFileLabel . "total-data-from-api saved = " . $totalDataFromApiSaved);
+	
+			// $stockValidStr = substr($stockValidStr, 1);
+	
+			// $sql = "insert ignore into `v2_monitoring_stock_when_watcher_temp` (`id`, `when_at`, `when_type`, `store_code`, `sku`, `stock_id`) select sysdate(6), `retrieved_at`, 'retrieved', `store_code`, `sku`, `stock_id` from `v2_monitoring_stock` where `stock_id` in (" . $stockValidStr . ")";
+			// $this->dbConnection->exec($sql);
+			// unset($sql);
+	
+			// $sql = "insert ignore into `v2_monitoring_stock_when_watcher_temp` (`id`, `when_at`, `when_type`, `store_code`, `sku`, `stock_id`) select sysdate(6), `processed_at`, 'processed', `store_code`, `sku`, `stock_id` from `v2_monitoring_stock` where `stock_id` in (" . $stockValidStr . ")";
+			// $this->dbConnection->exec($sql);
+			// unset($stockValidStr);
+			// unset($sql);
+	
+			// $totalDataFromApiReceivedValid = ($totalDataFromApiReceived - $totalDataFromApiReceivedInvalid);
+			// $totalDataFromApiUpdatedToMagentoStock = $totalDataFromApiReceivedValid;
+
+			// $sql = "insert ignore into `v2_monitoring_stock_job` (`id`, `memory_usage_megabytes`, `process_duration_seconds`, `api_call_duration_seconds`, `limit_data_to_api`, `total_data_from_api_received`, `total_data_from_api_received_valid`, `total_data_from_api_received_invalid`, `total_data_from_api_saved`, `total_data_from_api_updated_to_magento_stock`, `status`) values (sysdate(6), " . round(memory_get_usage() / 1048576, 2) . "," . (microtime(true) - $startTime) . ", {$apiCallDuration}, {$limitDataToApi}, {$totalDataFromApiReceived}, {$totalDataFromApiReceivedValid}, {$totalDataFromApiReceivedInvalid}, {$totalDataFromApiSaved}, {$totalDataFromApiUpdatedToMagentoStock}, 'success')";
+			// $this->dbConnection->exec($sql);
+
+			/** end: disabled by Hariadi for Mr. Anand's instructions not to interfere magento database */
 
 			$sql = "set session innodb_lock_wait_timeout = @saved_lock_wait";
 			$this->dbConnection->exec($sql);
 			
 			$this->dbConnection->commit();
 			
-			$this->indexDataBySkuListProvider->execute(1, $skuList);			
-			$this->indexDataBySkuListProvider->execute(2, $skuList);			
+
+			$this->indexDataBySkuListProvider->execute(1, $skuList);
+			$this->indexDataBySkuListProvider->execute(2, $skuList);
 			unset($skuList);
+
+			// if (count($entityIdList) > 0) {
+			// 	foreach (['cataloginventory_stock', 'catalog_product_attribute', 'catalogsearch_fulltext'] as $re) {
+			// 		$indexer = $this->indexerRegistry->get($re);
+			// 		if (!empty($indexer) && !$indexer->isScheduled()) {
+			// 			$startTimeReindex = microtime(true);
+			// 			$this->loggerfile->info($this->cronFileLabel . "start reindexList for " . $re);
+			// 			$indexer->reindexList($entityIdList);
+			// 			$this->loggerfile->info($this->cronFileLabel . "finish reindexList in " . (microtime(true) - $startTimeReindex) . " seconds");	
+			// 		}
+			// 	}
+			// }
+			// unset($entityIdList);
 
 		}
 		catch (WarningException $ex) {       
             $exceptionFound = true;     
             $logMessageTopic = "warning";
-            $logMessage = $ex->getMessage();
+			$logMessage = $ex->getMessage();
+			$logCode = (int) $ex->getCode();
             $logLevel = IntegrationCronLogToDatabase::LEVEL_WARNING;
 		}
 		catch (ErrorException $ex) {        
             $exceptionFound = true;    
             $logMessageTopic = "error";
-            $logMessage = $ex->getMessage();
+			$logMessage = $ex->getMessage();
+			$logCode = (int) $ex->getCode();
             $logLevel = IntegrationCronLogToDatabase::LEVEL_ERROR;
 		}
 		catch (FatalException $ex) {
             $exceptionFound = true;	        
             $logMessageTopic = "fatal-error";
-            $logMessage = $ex->getMessage();
+			$logMessage = $ex->getMessage();
+			$logCode = (int) $ex->getCode();
             $logLevel = IntegrationCronLogToDatabase::LEVEL_ERROR_FATAL;
 		}		
 		catch (\Exception $ex) {
             $exceptionFound = true;    
             $logMessageTopic = "generic-error";
-            $logMessage = $ex->getMessage();
+			$logMessage = $ex->getMessage();
+			$logCode = (int) $ex->getCode();
             $logLevel = IntegrationCronLogToDatabase::LEVEL_ERROR_GENERIC;
         }
         finally {
@@ -522,11 +577,13 @@ class Stock {
                     $sql = "set session innodb_lock_wait_timeout = @saved_lock_wait";
                     $this->dbConnection->exec($sql);
 
-                    $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
+					$this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " code = " . $logCode);
+                    $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " message = " . $logMessage);
                     $this->loggerdb->log($this->cronType, $this->cronTypeDetail, $logLevel, $logMessageTopic, $logMessage);    
                 }
                 catch (\Exception $exInner) {
-                    $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " = " . $logMessage);
+					$this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " code = " . $logCode);
+                    $this->loggerfile->info($this->cronFileLabel . $logMessageTopic . " message = " . $logMessage);
                     $this->loggerdb->log($this->cronType, $this->cronTypeDetail, $logLevel, $logMessageTopic, $logMessage);    
 
                     $logMessageTopicInner = "generic-error";
@@ -534,26 +591,37 @@ class Stock {
                     $logLevelInner = IntegrationCronLogToDatabase::LEVEL_ERROR_GENERIC;
                     $this->loggerfile->info($this->cronFileLabel . $logMessageTopicInner . " = " . $logMessageInner);
                     $this->loggerdb->log($this->cronType, $this->cronTypeDetail, $logLevelInner, $logMessageTopicInner, $logMessageInner);
-                }
+				}
+				
+				if ($logMessageTopic == "warning") {
+				}
+				elseif ($logCode == 1205) {
+				} 
+				else {
 
-		if ($logMessageTopic != "warning") {
-			try {
+					$this->loggerfile->info($this->cronFileLabel . "monitoring-stock disabled by Hariadi for Mr. Anand's instructions not to interfere magento database");
 
-				$totalDataFromApiReceivedValid = ($totalDataFromApiReceived - $totalDataFromApiReceivedInvalid);
-				$totalDataFromApiSaved = 0;
-				$totalDataFromApiUpdatedToMagentoStock = 0;
-			
-				$sql = "insert ignore into `v2_monitoring_stock_job` (`id`, `memory_usage_megabytes`, `process_duration_seconds`, `api_call_duration_seconds`, `limit_data_to_api`, `total_data_from_api_received`, `total_data_from_api_received_valid`, `total_data_from_api_received_invalid`, `total_data_from_api_saved`, `total_data_from_api_updated_to_magento_stock`, `status`, `message`) values (sysdate(6), " . round(memory_get_usage() / 1048576, 2) . "," . (microtime(true) - $startTime) . ", {$apiCallDuration}, {$limitDataToApi}, {$totalDataFromApiReceived}, {$totalDataFromApiReceivedValid}, {$totalDataFromApiReceivedInvalid}, {$totalDataFromApiSaved}, {$totalDataFromApiUpdatedToMagentoStock}, '{$logMessageTopic}', '" . addslashes($logMessage) . "')";
-				$this->dbConnection->exec($sql);
-			}
-			catch (\Exception $exInner) {
-				$logMessageTopicInner = "generic-error";
-				$logMessageInner = $exInner->getMessage();
-				$logLevelInner = IntegrationCronLogToDatabase::LEVEL_ERROR_GENERIC;
-				$this->loggerfile->info($this->cronFileLabel . $logMessageTopicInner . " = " . $logMessageInner);
-				$this->loggerdb->log($this->cronType, $this->cronTypeDetail, $logLevelInner, $logMessageTopicInner, $logMessageInner);
-			}
-		}
+					/** start: disabled by Hariadi for Mr. Anand's instructions not to interfere magento database */
+
+					// try {
+					// 	$totalDataFromApiReceivedValid = ($totalDataFromApiReceived - $totalDataFromApiReceivedInvalid);
+					// 	$totalDataFromApiSaved = 0;
+					// 	$totalDataFromApiUpdatedToMagentoStock = 0;
+				
+					// 	$sql = "insert ignore into `v2_monitoring_stock_job` (`id`, `memory_usage_megabytes`, `process_duration_seconds`, `api_call_duration_seconds`, `limit_data_to_api`, `total_data_from_api_received`, `total_data_from_api_received_valid`, `total_data_from_api_received_invalid`, `total_data_from_api_saved`, `total_data_from_api_updated_to_magento_stock`, `status`, `message`) values (sysdate(6), " . round(memory_get_usage() / 1048576, 2) . "," . (microtime(true) - $startTime) . ", {$apiCallDuration}, {$limitDataToApi}, {$totalDataFromApiReceived}, {$totalDataFromApiReceivedValid}, {$totalDataFromApiReceivedInvalid}, {$totalDataFromApiSaved}, {$totalDataFromApiUpdatedToMagentoStock}, '{$logMessageTopic}', '" . addslashes($logMessage) . "')";
+					// 	$this->dbConnection->exec($sql);
+					// }
+					// catch (\Exception $exInner) {
+					// 	$logMessageTopicInner = "generic-error";
+					// 	$logMessageInner = $exInner->getMessage();
+					// 	$logLevelInner = IntegrationCronLogToDatabase::LEVEL_ERROR_GENERIC;
+					// 	$this->loggerfile->info($this->cronFileLabel . $logMessageTopicInner . " = " . $logMessageInner);
+					// 	$this->loggerdb->log($this->cronType, $this->cronTypeDetail, $logLevelInner, $logMessageTopicInner, $logMessageInner);
+					// }
+
+					/** end: disabled by Hariadi for Mr. Anand's instructions not to interfere magento database */
+
+				}
             }            
         }
 
