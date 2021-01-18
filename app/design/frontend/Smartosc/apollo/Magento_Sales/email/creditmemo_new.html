@@ -40,18 +40,15 @@
 <table class="message-email-2" width="100%">
     <tr>
         <td>
-            {{if additional_data.is_virtual}}
+            {{if additional_data.is_preauth}}
             <p>
-                {{trans "We are sorry to inform you that %items in order #%order_increment are currently
-                unavailable.
-                But don't worry, you can get a refund with a few easy steps."
+                {{trans "We are sorry to inform you that  %items in order #%order_increment are currently
+                unavailable. Don't worry, your credit card won't be charged for this transaction."
                 items=$additional_data.items_text
                 order_increment=$additional_data.order_increment_id
                 |raw}}
             </p>
-            <p>{{trans 'Simply click the button below and fill out the refund form.'}}</p>
-            {{/if}}
-            {{if additional_data.is_card}}
+            {{else}}
             <p>
                 {{trans "We are sorry to inform you that  %items in order #%order_increment are currently
                 unavailable. Don't worry, your credit card won't be charged %transaction"
@@ -60,6 +57,7 @@
                 transaction=$additional_data.transaction_text
                 |raw}}
             </p>
+            <p>{{trans 'Simply click the button below and fill out the refund form.'}}</p>
             {{/if}}
         </td>
     </tr>
