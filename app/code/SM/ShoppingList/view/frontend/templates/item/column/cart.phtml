@@ -21,7 +21,7 @@ $product = $block->getProduct();
             <?php $childrenIds = $product->getTypeInstance()->getChildrenIds($product->getId()); ?>
             <?php if ($childrenIds): ?>
                 <a title="<?= $block->escapeHtmlAttr(__('View Details')) ?>"
-                   href="<?= $block->escapeUrl($product->getProductUrl()) ?>"
+                   href="<?= $block->escapeHtmlAttr($product->getProductUrl()) ?>"
                    class="action view-details primary">
                     <?= $block->escapeHtml(__('View Details')) ?>
                 </a>
