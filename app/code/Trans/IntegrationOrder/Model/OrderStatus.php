@@ -12,6 +12,7 @@
 
 namespace Trans\IntegrationOrder\Model;
 
+use Magento\Framework\Exception\NoSuchEntityException;
 use Trans\IntegrationOrder\Api\Data\RefundInterface;
 use Trans\IntegrationOrder\Api\OrderStatusInterface;
 use Trans\Sprint\Helper\Config;
@@ -30,6 +31,11 @@ class OrderStatus implements OrderStatusInterface {
 	 * @var \Magento\Sales\Model\OrderRepository
 	 */
 	protected $orderRepository;
+
+	/**
+	 * @var \Magento\Catalog\Api\ProductRepositoryInterface
+	 */
+	protected $productRepository;
 
 	/**
 	 * @var \Magento\Sales\Model\Service\InvoiceService
@@ -80,6 +86,7 @@ class OrderStatus implements OrderStatusInterface {
 	 * @param \Magento\Sales\Api\Data\ShipmentTrackInterfaceFactory $trackInterface
 	 * @param \Magento\Sales\Api\Data\OrderItemInterfaceFactory $orderItemFactory
 	 * @param \Magento\Sales\Model\Service\InvoiceService $invoiceService
+	 * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
 	 * @param \Magento\Framework\DB\Transaction $transaction
 	 * @param \Magento\Framework\Registry $registry
 	 * @param \Trans\Core\Helper\Data $coreHelper
@@ -97,6 +104,7 @@ class OrderStatus implements OrderStatusInterface {
 	public function __construct(
 		\Magento\Framework\App\ResourceConnection $resource,
 		\Magento\Framework\Event\ManagerInterface $eventManager,
+		\Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
 		\Magento\Sales\Model\Order $order,
 		\Magento\Sales\Model\OrderRepository $orderRepository,
 		\Magento\Sales\Model\Convert\OrderFactory $orderConvert,
@@ -175,6 +183,7 @@ class OrderStatus implements OrderStatusInterface {
 		$this->resource                           = $resource;
 		$this->transaction                        = $transaction;
 		$this->registry                           = $registry;
+		$this->productRepository = $productRepository;
 
 		$this->loggerOrder = $helperData->getLogger();
 	}
@@ -473,14 +482,31 @@ class OrderStatus implements OrderStatusInterface {
 		$orderItem    = [];
 		$refunded     = [];
 		$skusRefunded = [];
+
 		foreach ($orderItems as $itemData) {
-			$allocatedQty = $itemData['quantity_allocated'];
+			try {
+				$product = $this->productRepository->get($itemData['sku']);
 
-			$orderItem[] = $itemData;
+				$allocatedQty = (float) $itemData['quantity_allocated'];
+				$qty = (float) $itemData['quantity'];
 
-			if ($itemData['quantity_allocated'] < $itemData['quantity']) {
-				$refunded[$itemData['sku']] = $itemData;
-				$skusRefunded[]             = $itemData['sku'];
+				if((int)$product->getData('is_fresh') == 1) {
+					$weight = (float) $product->getWeight('weight');
+					$allocatedQty = (1000 / $weight) *  $allocatedQty;
+					$qty = (1000 / $weight) *  $qty;
+				}
+
+				$itemData['quantity'] = floor($qty);
+				$itemData['quantity_allocated'] = floor($allocatedQty);
+
+				$orderItem[] = $itemData;
+
+				if ($allocatedQty < $qty) {
+					$refunded[$itemData['sku']] = $itemData;
+					$skusRefunded[]             = $itemData['sku'];
+				}
+			} catch (NoSuchEntityException $e) {
+				continue;
 			}
 		}
 
@@ -515,6 +541,7 @@ class OrderStatus implements OrderStatusInterface {
 			foreach ($itemOrders as $itemOrder) {
 				if ($itemOrder->getSKU() === $allocatedItems['sku']) {
 					$itemOrder->setQtyAllocated($allocatedItems['quantity_allocated']);
+					$itemOrder->setQty($allocatedItems['quantity']);
 					$itemOrder->setItemStatus($allocatedItems['item_status']);
 				}
 				$itemOrderSave = $this->statusRepo->saveItem($itemOrder);
@@ -522,7 +549,7 @@ class OrderStatus implements OrderStatusInterface {
 			// if ($itemOrder->getQty() != $qtyOrdered) {
 			//  throw new \Magento\Framework\Webapi\Exception(__('Invalid quantity order. Please checking again.'), 400);
 			// }
-			if ($allocatedItems['quantity_allocated'] > $itemOrder->getQty()) {
+			if ($allocatedItems['quantity_allocated'] > $allocatedItems['quantity']) {
 				throw new \Magento\Framework\Webapi\Exception(__('Quantity allocated is greater than quantity order. Please check again.'), 400);
 			}
 		}
@@ -752,6 +779,7 @@ class OrderStatus implements OrderStatusInterface {
 					$paidPriceOrder = $itemOrder->getPaidPrice();
 					$qtyOrder       = $itemOrder->getQty();
 					$qtyAllocated   = $itemOrder->getQtyAllocated();
+
 					$amount         = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 
 					$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
@@ -1151,16 +1179,19 @@ class OrderStatus implements OrderStatusInterface {
 			return false;
 		}
 
-		if ($order->getData('is_parent')) {
-			$this->updateOrderStatus($orderId, 'in_process', 'processing');
-		}
-
 		$creditMemoData                        = [];
 		$creditMemoData['do_offline']          = 1;
 		$creditMemoData['adjustment_positive'] = 0;
 		$creditMemoData['adjustment_negative'] = 0;
 		$creditMemoData['comment_text']        = 'Refund';
 		$creditMemoData['send_email']          = 1;
+
+        if ($order->getData('is_parent')) {
+            // SOSC - Don't send email for parent order
+            $creditMemoData['send_email'] = 0;
+            // CTCD Update order status
+            $this->updateOrderStatus($orderId, 'in_process', 'processing');
+        }
 
 		$totalQty = 0;
 		foreach ($orderItemIds as $item) {

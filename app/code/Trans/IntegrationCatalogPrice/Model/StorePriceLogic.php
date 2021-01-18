@@ -600,11 +600,24 @@ class StorePriceLogic implements StorePriceLogicInterface
         $result['promo_price_in_kg'] = '';
 
         $isOwnCourier = strtolower($product->getData('own_courier'));
+        $isFresh = strtolower($product->getData('is_fresh'));
         $weight = $product->getWeight();
         $soldIn = strtolower($product->getData('sold_in'));
-        if (($isOwnCourier == 'iya' || $isOwnCourier == 1) && $soldIn == 'kg') {
-            $result['base_price_in_kg'] = $weight * ($result[$baseAttrName] / 1000);
-            $result['promo_price_in_kg'] = $weight * ($result[$promoAttrName] / 1000);
+
+        // if (($isOwnCourier == 'yes' || $isOwnCourier == 1) && $soldIn == 'kg') {
+        //     $result['base_price_in_kg'] = $weight * ($result[$baseAttrName] / 1000);
+        //     $result['promo_price_in_kg'] = $weight * ($result[$promoAttrName] / 1000);
+        // }
+
+        if (($isFresh == 'yes' || $isFresh == 1) && ($soldIn == 'kg' || $soldIn == 'pcs')) {
+            $result['base_price_in_kg'] = $result[$baseAttrName];
+            $result[$baseAttrName] = $weight * ($result[$baseAttrName] / 1000);
+
+            $result['promo_price_in_kg'] = $result[$promoAttrName];
+            $result[$promoAttrName] = $weight * ($result[$promoAttrName] / 1000);
+
+            $arrayPriceFresh = array_map('intval', [$result[$baseAttrName], $result[$promoAttrName]]);
+            $result['price'] = max($arrayPriceFresh);
         }
         return $result;
     }
