@@ -463,7 +463,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         /**
          * Review data
          */
-        $review_enable = $this->_getReviewEnable($product);
+        $review_enable = $this->getReviewEnable($product);
         $productInfo->setReviewEnable($review_enable);
         $productInfo->setReview($this->_getReviewSummary($review_enable, $product));
 
@@ -689,7 +689,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         /**
          * Review data
          */
-        $review_enable = $this->_getReviewEnable($product);
+        $review_enable = $this->getReviewEnable($product);
         $productInfo->setReviewEnable($review_enable);
         $productInfo->setReview($this->_getReviewSummary($review_enable, $product));
         $productInfo->setProductLabel($this->helperCommon->getProductLabel($product));
@@ -780,7 +780,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      *
      * @return bool
      */
-    protected function _getReviewEnable($product)
+    public function getReviewEnable($product = null)
     {
         return $this->japiReviewHelper->isReviewEnable($product);
     }

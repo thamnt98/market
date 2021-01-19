@@ -241,7 +241,13 @@ class Search implements SearchProductInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param int    $customerId
+     * @param string $keyword
+     * @param int    $p
+     * @param int    $limit
+     *
+     * @return \SM\MobileApi\Api\Data\Product\ListInterface
+     * @throws NoSuchEntityException
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function searchV2($customerId, $keyword, $p = 1, $limit = 12)
@@ -257,7 +263,7 @@ class Search implements SearchProductInterface
         $result = $this->productListFactory->create();
         $result->setToolbarInfo($this->mCatalogSearch->getToolbarInfo());
         $result->setFilters($this->mCatalogSearch->getFilters());
-        $result->setProducts($this->mCatalogSearch->getProductsV2());
+        $result->setProducts($this->getLayerProducts($customerId));
 
         return $result;
     }
@@ -282,22 +288,25 @@ class Search implements SearchProductInterface
      *
      * @return array|SearchInterface
      * @throws NoSuchEntityException
-     * @throws \Magento\Framework\Exception\FileSystemException
      * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Zend_Json_Exception
      */
     public function getRecommendationProducts(int $customerId)
     {
-        $coll = $this->reportViewedProductSummaryRepository->getRecommendationCollection($customerId);
-
+        $total = 0;
         $productsData = [];
 
-        foreach ($coll as $item) {
-            $productsData[] = $this->prepareRecommendData($item);
+        if ($customerId) {
+            $enableReview = $this->productHelper->getReviewEnable();
+            $coll = $this->reportViewedProductSummaryRepository->getRecommendationCollection($customerId);
+            foreach ($coll as $item) {
+                $productsData[] = $this->prepareListItemData($item)->setReviewEnable($enableReview);
+            }
+
+            $total = count($productsData);
         }
 
         $this->responseInterface->setProducts($productsData);
-        $this->responseInterface->setTotal(count($productsData));
+        $this->responseInterface->setTotal($total);
 
         return $this->responseInterface;
     }
@@ -485,11 +494,8 @@ class Search implements SearchProductInterface
      * @param \Magento\Catalog\Model\Product $product
      *
      * @return \SM\MobileApi\Api\Data\Product\ListItemInterface
-     * @throws NoSuchEntityException
-     * @throws \Magento\Framework\Exception\FileSystemException
-     * @throws \Magento\Framework\Exception\LocalizedException|\Zend_Json_Exception
      */
-    protected function prepareRecommendData($product)
+    protected function prepareListItemData($product)
     {
         /** @var \SM\MobileApi\Model\Data\Product\ListItem $data */
         $data = $this->productDataFactory->create();
@@ -519,14 +525,29 @@ class Search implements SearchProductInterface
             ->setPrice($price)
             ->setFinalPrice($final)
             ->setReview($reviewData)
+            ->setItemId($product->getData('quote_item_id'))
+            ->setItemQty($product->getData('quote_item_qty'))
             ->setIsAvailable($product->isAvailable())
+            ->setStock($this->productHelper->getProductStockQty($product))
             ->setIsInStock($product->isInStock())
             ->setIsSaleable($product->isSaleable())
-            ->setImage($this->productHelper->getMainImage($product))
-            ->setProductLabel($this->productHelper->getProductLabel($product))
             ->setConfigChildCount($this->helper->getCountChildren($product->getId()))
-            ->setDiscountPercent((int)$discountPercent)
-            ->setGtmData($this->productHelper->prepareGTM($product, $data));
+            ->setDiscountPercent((int)$discountPercent);
+
+        try {
+            $data->setGtmData($this->productHelper->prepareGTM($product, $data));
+        } catch (\Exception $e) {
+        }
+
+        try {
+            $data->setImage($this->productHelper->getMainImage($product));
+        } catch (\Exception $e) {
+        }
+
+        try {
+            $data->setProductLabel($this->productHelper->getProductLabel($product));
+        } catch (\Exception $e) {
+        }
 
         return $data;
     }
@@ -578,5 +599,68 @@ class Search implements SearchProductInterface
         }
 
         return $result;
+    }
+
+    /**
+     * @param int $customerId
+     *
+     * @return array
+     */
+    protected function getLayerProducts($customerId)
+    {
+        $result = [];
+
+        $enableReview = $this->productHelper->getReviewEnable();
+        /** @var \Magento\Catalog\Model\Product $product */
+        foreach ($this->prepareLayerProductCollection($customerId) as $product) {
+            $result[] = $this->prepareListItemData($product)->setReviewEnable($enableReview);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param int $customerId
+     *
+     * @return \Magento\Catalog\Model\ResourceModel\Product\Collection
+     */
+    protected function prepareLayerProductCollection($customerId)
+    {
+        $coll = $this->mCatalogSearch->getProductCollectionWithReview();
+
+        $coll
+            ->addAttributeToSelect('*')
+            ->addAttributeToFilter(
+                [
+                    ["attribute" => "is_tobacco", "null" => true],
+                    ["attribute" => "is_tobacco", "eq" => 0],
+                ]
+            );
+
+        if ($customerId) { // Add quote item data
+            $inCartSelect = $coll->getConnection()->select();
+            $inCartSelect
+                ->from(['qi' => 'quote_item'], [])
+                ->joinInner(['q' => 'quote'], 'q.entity_id = qi.quote_id', [])
+                ->where('qi.product_id = e.entity_id')
+                ->where('qi.parent_item_id IS NULL')
+                ->where('q.is_active = ?', 1)
+                ->where('q.customer_id = ?', $customerId)
+                ->limit(1);
+
+            $itemIdSelect = clone $inCartSelect;
+            $itemIdSelect->columns(['qi.item_id']);
+            $qtySelect = clone $inCartSelect;
+            $qtySelect->columns(['qi.qty']);
+
+            $coll
+                ->getSelect()
+                ->columns([
+                    "({$itemIdSelect->__toString()}) AS quote_item_id",
+                    "({$qtySelect->__toString()}) AS quote_item_qty",
+                ]);
+        }
+
+        return $coll;
     }
 }

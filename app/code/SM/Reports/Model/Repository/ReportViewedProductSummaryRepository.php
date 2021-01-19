@@ -195,6 +195,7 @@ class ReportViewedProductSummaryRepository implements ReportViewedProductSummary
             ->from(['qi' => 'quote_item'], 'item_id')
             ->joinInner(['q' => 'quote'], 'q.entity_id = qi.quote_id', [])
             ->where('qi.product_id = e.entity_id')
+            ->where('qi.parent_item_id IS NULL')
             ->where('q.is_active = ?', 1)
             ->where('q.customer_id = ?', $customerId)
             ->limit(1);

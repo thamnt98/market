@@ -83,7 +83,7 @@
     <route url="/V1/search/products/recommendation" method="GET">
         <service class="SM\MobileApi\Api\SearchProductInterface" method="getRecommendationProducts"/>
         <resources>
-            <resource ref="self" />
+            <resource ref="anonymous" />
         </resources>
         <data>
             <parameter name="customerId" force="true">%customer_id%</parameter>
@@ -93,7 +93,7 @@
     <route url="/V1/search/products/suggestion" method="GET">
         <service class="SM\MobileApi\Api\SearchProductInterface" method="getSearchSuggestion"/>
         <resources>
-            <resource ref="self" />
+            <resource ref="anonymous" />
         </resources>
     </route>
 
