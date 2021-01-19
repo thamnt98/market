@@ -22,7 +22,7 @@ if (!$block->isLoggedIn()) {
         <div class="block-content" aria-labelledby="block-customer-notify-email-heading">
             <fieldset class="fieldset notify-email">
                 <?php if ($login == 'true'): ?>
-                    <div class="txt-reset" selector="title"></div>
+                    <div class="txt-reset" selector="title"><?= __('Hi, %1! Your account is back.', $block->getCustomerName()) ?></div>
                     <p><?= __('We strongly suggest for you to change your password to avoid getting locked again.');?> </p>
                     <button selector="change-password"><?= __('Change Password');?></button>
                     <button selector="next" class="action primary"><?= __('Maybe Next Time');?></button>

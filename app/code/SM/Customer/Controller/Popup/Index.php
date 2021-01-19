@@ -119,10 +119,13 @@ class Index extends Action
             $data['html'] = $block;
         } else {
             if ($this->getRequest()->getParam('type') == 'lock-reset-form') {
+                $customer = $this->customerSession->getCustomer();
                 $block = $resultPage->getLayout()->createBlock(\SM\Customer\Block\Form\Register::class)
+                    ->setCustomerName($customer->getName())
                     ->setTemplate('SM_Customer::form/lock/reset.phtml')
                     ->toHtml();
                 $block .= $resultPage->getLayout()->createBlock(\SM\Customer\Block\Form\ForgotPassword::class)
+                    ->setCustomerEmail($customer->getEmail())
                     ->setTemplate('SM_Customer::form/recovery-password/form.phtml')
                     ->toHtml();
                 $data['html'] = $block;

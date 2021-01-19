@@ -119,6 +119,9 @@ class ForgotPassword extends \Magento\Framework\View\Element\Template
      */
     public function getEmailCustomerRecovery()
     {
+        if ($this->getCustomerEmail()) {
+            return $this->getCustomerEmail();
+        }
         return $this->getRequest()->getParam("email");
     }
 }

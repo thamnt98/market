@@ -45,11 +45,11 @@ define(
                     if (urlParams.has('recoverytoken') && urlParams.has('email') && !urlParams.has('account')) {
                         this.callAjax(urlParams.get('recoverytoken'), urlParams.get('email'));
                     } else if (urlParams.has('account') && urlParams.get('account') == 'back') {
-                        $(self.options.tabLockResetSelector).find('[selector=title]').text($.mage.__('Hi, %1! Your account is back.').replace('%1', urlParams.get('name')));
+                        //$(self.options.tabLockResetSelector).find('[selector=title]').text($.mage.__('Hi, %1! Your account is back.').replace('%1', urlParams.get('name')));
                         $(self.options.tabLockResetSelector).modal('openModal');
                         token = urlParams.get('recoverytoken');
-                        email = urlParams.get('email');
-                        name = urlParams.get('name');
+                        //email = urlParams.get('email');
+                        //name = urlParams.get('name');
                         window.history.replaceState(null, null, window.location.pathname);
                     }
                 },
@@ -62,7 +62,7 @@ define(
                     $(self.options.tabLockResetSelector).find('[selector=change-password]').click(function () {
                         $(self.options.tabLockResetSelector).modal('closeModal');
                         $('#tab-recovery-password').find('#reset-password-token').val(token);
-                        $('#tab-recovery-password').find('#reset-password-email').val(email);
+                        //$('#tab-recovery-password').find('#reset-password-email').val(email);
                         $('#tab-recovery-password').modal('openModal').show();
                     });
                 },
@@ -80,7 +80,7 @@ define(
                         success: function(response) {
                             window.history.replaceState(null, null, window.location.pathname);
                             if (response.status == true) {
-                                window.location.href = baseUrl + '?account=back&name=' + response.name + '&recoverytoken=' + token + '&email=' + email;
+                                window.location.href = baseUrl + '?account=back' + '&recoverytoken=' + token;
                             } else {
                                 $(self.options.tabLockResetSelector).modal('openModal').on('modalclosed', function() {
                                     if (response.status == false) {
