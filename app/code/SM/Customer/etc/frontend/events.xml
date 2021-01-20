@@ -4,9 +4,9 @@
     <event name="checkout_cart_product_add_before">
         <observer name="block_guest_add_to_cart" instance="SM\Customer\Observer\BlockGuestAddToCart"/>
     </event>
-<!--    <event name="controller_action_predispatch">
+    <event name="controller_action_predispatch">
         <observer name="sm_unlock_account" instance="SM\Customer\Observer\Unlock"/>
-    </event>-->
+    </event>
     <event name="send_recovery_email">
         <observer name="sm_customer_send_recovery_email" instance="SM\Customer\Observer\SendRecovery"/>
     </event>

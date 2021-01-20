@@ -12,9 +12,8 @@ define(
     [
         'jquery',
         'Magento_Ui/js/modal/modal',
-        'mage/url',
         'mage/translate'
-    ], function ($, modal, urlBuilder) {
+    ], function ($, modal) {
         'use strict';
 
         var token = '',
