@@ -6,7 +6,7 @@
 *
 * @var $block \SM\GTM\Block\Product\ListProduct
 */
-$positionGTM = 1;
+$positionGTM = ($block->getToolbarBlock()->getCurrentPage() - 1) * 50 + 1;
 $helper = $this->helper('SM\Catalog\Helper\Data');
 $isPopupShowed = false;
 $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
@@ -106,18 +106,15 @@ $category = $block->getLayer()->getCurrentCategory();
     <script>
         require(['jquery', "gtmProduct", 'domReady!'], function ($, gtm) {
             if (typeof dataLayerSourceObjects !== 'undefined') {
-                $(window).load(function () {
-                    let data = $('.product-item-link.<?= $_product->getId() ?>plp').attr("data-gtm-product");
-                    if (data) {
-                        try {
-                            data = JSON.parse(data);
-                            data['position'] = $('.product-item-link.<?= $_product->getId() ?>plp').attr("data-position");
-                            gtm.push("product_view", data);
-                        } catch (e) {
-
-                        }
+                let data = $('.product-item-link.<?= $_product->getId() ?>plp').attr("data-gtm-product");
+                if (data) {
+                    try {
+                        data = JSON.parse(data);
+                        data['position'] = $('.product-item-link.<?= $_product->getId() ?>plp').attr("data-position");
+                        gtm.push("product_view", data);
+                    } catch (e) {
                     }
-                });
+                }
             }
         });
     </script>
