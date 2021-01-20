@@ -11,9 +11,9 @@ define([
     'jquery-ui-modules/widget'
 ], function ($, $t, _, idsResolver) {
     'use strict';
-
+    const $productList =  $('#amasty-shopby-product-list');
     // Start Customize
-    $('.action.increase-qty').on('click', function () {
+    $productList.on('click', '.action.increase-qty',function () {
         var $this = $(this),
             updateContainer = $this.parent('.update-cart-qty'),
             qty = updateContainer.find("[name='item_qty']").stop().val();
@@ -28,7 +28,7 @@ define([
         }
     });
 
-    $('.action.decrease-qty').on('click', function () {
+    $productList.on('click', '.action.decrease-qty', function () {
         var $this = $(this),
             updateContainer = $this.parent('.update-cart-qty'),
             qty = updateContainer.find("[name='item_qty']").stop().val(),
