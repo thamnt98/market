@@ -108,6 +108,9 @@ class ConnectionDB
      */
     public function getMsi($skuList)
     {
+        foreach ($skuList as $key => $sku) {
+            $skuList[$key] = (string)$sku;
+        }
         $select = $this->readAdapter->select()
         ->from(
             ['main_table' => $this->getTableName('inventory_source_item')],
@@ -118,7 +121,7 @@ class ConnectionDB
             'main_table.source_code = t1.source_code',
             ['latitude', 'longitude', 'country_id', 'region', 'city', 'street', 'postcode', 'name']
         )
-        ->where('main_table.sku IN (' . implode(",", $skuList) . ')')
+        ->where('main_table.sku IN (?)', $skuList)
         ->where('main_table.status =?', 1)
         ->where('main_table.quantity > 0')
         ->where('t1.enabled =?', 1);
