@@ -616,8 +616,11 @@ class StorePriceLogic implements StorePriceLogicInterface
             $result['promo_price_in_kg'] = $result[$promoAttrName];
             $result[$promoAttrName] = $weight * ($result[$promoAttrName] / 1000);
 
-            $arrayPriceFresh = array_map('intval', [$result[$baseAttrName], $result[$promoAttrName]]);
-            $result['price'] = max($arrayPriceFresh);
+            if(isset($result[$promoAttrName]) && $result[$promoAttrName] > 0){
+                $result['price'] = $result[$promoAttrName];
+            }else{
+                $result['price'] = $result[$baseAttrName];
+            }
         }
         return $result;
     }
@@ -695,7 +698,7 @@ class StorePriceLogic implements StorePriceLogicInterface
             $productMappingData = $this->saveMultiPriceBulk($multiPrices);
             // $this->updateDataValueStatusBulk($multiPrices, IntegrationDataValueInterface::STATUS_DATA_SUCCESS, null);
             $this->updateDataValueStatusBulk($dataValueList, IntegrationDataValueInterface::STATUS_DATA_SUCCESS, null);
-            $this->reindexByProductsIds($productInterfaces, ['catalog_product_attribute', 'catalogsearch_fulltext']);
+            $this->reindexByProductsIds($productInterfaces, ['catalog_product_attribute', 'catalogsearch_fulltext','catalog_product_price']);
         } catch (\Exception $e) {
             $this->logger->info($e->getMessage() . date('d-M-Y H:i:s'));
             throw $e;

@@ -601,7 +601,7 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
             }
             try {
                 if(!empty($productInterfaces['id'])) {
-                    $this->reindexByProductsIds($productInterfaces['id'], ['catalog_product_attribute', 'catalogsearch_fulltext']);
+                    $this->reindexByProductsIds($productInterfaces['id'], ['catalog_product_attribute', 'catalogsearch_fulltext','catalog_product_price','catalogrule_rule','catalogrule_product']);
                     $this->logger->info('reindex success ' . date('d-M-Y H:i:s')); 
                 }
             } catch (\Exception $e) {
