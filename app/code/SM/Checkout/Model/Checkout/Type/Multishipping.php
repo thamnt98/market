@@ -587,7 +587,7 @@ class Multishipping extends \Magento\Framework\DataObject
                 /**
                  * Require shipping rate recollect
                  */
-                $quoteAddress->setCollectShippingRates((bool)$this->getCollectRatesFlag());
+                $quoteAddress->setCollectShippingRates((bool)$this->getCollectRatesFlag())->setShippingMethod($data['shipping_method']);
             }
         }
         return $this;
