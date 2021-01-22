@@ -18,12 +18,30 @@ class Resolver
     protected $categoryRepository;
 
     /**
-     * Resolver constructor.
-     * @param CategoryRepository $categoryRepository
+     * @var \Magento\Eav\Model\Config
      */
-    public function __construct(CategoryRepository $categoryRepository)
-    {
+    protected $eavConfig;
+
+    /**
+     * @var \Magento\Framework\DB\Adapter\AdapterInterface
+     */
+    protected $connection;
+
+    /**
+     * Resolver constructor.
+     *
+     * @param CategoryRepository                        $categoryRepository
+     * @param \Magento\Eav\Model\Config                 $eavConfig
+     * @param \Magento\Framework\App\ResourceConnection $resource
+     */
+    public function __construct(
+        CategoryRepository $categoryRepository,
+        \Magento\Eav\Model\Config $eavConfig,
+        \Magento\Framework\App\ResourceConnection $resource
+    ) {
         $this->categoryRepository = $categoryRepository;
+        $this->eavConfig = $eavConfig;
+        $this->connection = $resource->getConnection();
     }
 
     /**
@@ -38,10 +56,26 @@ class Resolver
         if (empty($categoryIds)) {
             return '';
         }
-        $categories = $this->categoryRepository->getCategoriesByIds($categoryIds);
 
-        foreach ($categories as $category) {
-            $names[] = $category->getName();
+        try {
+            $nameAttr = $this->eavConfig->getAttribute(
+                \Magento\Catalog\Model\Category::ENTITY,
+                'name'
+            );
+
+            $select = $this->connection
+                ->select()
+                ->from(['v' => $nameAttr->getBackendTable()], 'value')
+                ->joinInner(['cce' => 'catalog_category_entity'], 'cce.row_id = v.row_id', [])
+                ->where('attribute_id = ?', $nameAttr->getId())
+                ->where('cce.entity_id in (' . implode(',', $categoryIds) . ')');
+
+            $names = array_unique($this->connection->fetchCol($select));
+        } catch (\Exception $e) {
+            $categories = $this->categoryRepository->getCategoriesByIds($categoryIds);
+            foreach ($categories as $category) {
+                $names[] = $category->getName();
+            }
         }
 
         return implode(' | ', $names);
