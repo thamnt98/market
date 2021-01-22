@@ -107,6 +107,7 @@
                 <item name="store" xsi:type="object">SM\GTM\Model\Data\Collectors\StoreInformation</item>
                 <item name="cms" xsi:type="object">SM\GTM\Model\Data\Collectors\Cms</item>
                 <item name="category" xsi:type="object">SM\GTM\Model\Data\Collectors\Category</item>
+                <item name="quote" xsi:type="object">SM\GTM\Model\Data\Collectors\Quote</item>
             </argument>
             <argument name="logger" xsi:type="object">SMGoogleTagManagerLogger</argument>
         </arguments>
