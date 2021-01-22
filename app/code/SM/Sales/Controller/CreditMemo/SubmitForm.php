@@ -46,24 +46,32 @@ class SubmitForm extends Action implements HttpPostActionInterface
     private $sendToJira;
 
     /**
+     * @var \SM\Sales\Model\Creditmemo\BankRepository
+     */
+    private $bankRepository;
+
+    /**
      * SubmitForm constructor.
      * @param Context $context
      * @param \Magento\Customer\Model\SessionFactory $sessionFactory
      * @param \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository
      * @param RequestFormData $requestFormData
      * @param \SM\Sales\Model\Creditmemo\SendToJira $sendToJira
+     * @param \SM\Sales\Model\Creditmemo\BankRepository $bankRepository
      */
     public function __construct(
         Context $context,
         \Magento\Customer\Model\SessionFactory $sessionFactory,
         \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository,
         \SM\Sales\Model\Creditmemo\RequestFormData $requestFormData,
-        \SM\Sales\Model\Creditmemo\SendToJira $sendToJira
+        \SM\Sales\Model\Creditmemo\SendToJira $sendToJira,
+        \SM\Sales\Model\Creditmemo\BankRepository $bankRepository
     ) {
         $this->creditmemoRepository = $creditmemoRepository;
         $this->sessionFactory = $sessionFactory;
         $this->requestFormData = $requestFormData;
         $this->sendToJira = $sendToJira;
+        $this->bankRepository = $bankRepository;
         parent::__construct($context);
     }
 
@@ -138,11 +146,12 @@ class SubmitForm extends Action implements HttpPostActionInterface
     /**
      * @param array $params
      * @return array
+     * @throws \Exception
      */
     protected function prepareParams(array $params): array
     {
         return [
-            RequestFormData::BANK_KEY => $params['bank'],
+            RequestFormData::BANK_KEY => $this->prepareBankName($params),
             RequestFormData::ACCOUNT_NAME_KEY => $params['account_name'],
             RequestFormData::ACCOUNT_KEY => $params['account_number'],
             RequestFormData::ORDER_REFERENCE_NUMBER_KEY =>  $this->requestFormData->getReferenceNumber(),
@@ -151,5 +160,25 @@ class SubmitForm extends Action implements HttpPostActionInterface
             RequestFormData::CREDITMEMO_ID_KEY => (int)$this->requestFormData->getCreditmemoId(),
             RequestFormData::PAYMENT_METHOD_KEY => $this->requestFormData->getOrder()->getPayment()->getMethod()
         ];
+    }
+
+    /**
+     * @param $params
+     * @return mixed
+     * @throws \Exception
+     */
+    private function prepareBankName($params)
+    {
+        if ($params['bank'] == \SM\Sales\Model\Creditmemo\BankRepository::BANK_INSERT_BY_TEXT_KEY) {
+            return $params[\SM\Sales\Model\Creditmemo\BankRepository::BANK_INSERT_KEY];
+        }
+
+        foreach ($this->bankRepository->getList() as $bank) {
+            if ($params['bank'] == $bank->getCode()) {
+                return $bank->getName();
+            }
+        }
+
+        throw new \Exception('Invalid Bank Name');
     }
 }
