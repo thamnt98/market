@@ -112,7 +112,11 @@ class Toolbar extends \Magento\Catalog\Block\Product\ProductList\Toolbar
                     try {
                         $searchTbl = $this->_collection->getSelect()->getPart('from')['search_result'] ?? null;
                         if ($searchTbl) {
-                            $this->_collection->getSelect()->order('search_result.score DESC');
+                            $order = $this->_collection->getSelect()->getPart('order') ?: [];
+                            $this->_collection->getSelect()->setPart(
+                                'order',
+                                array_merge([['search_result.score', 'DESC']], $order)
+                            );
                         }
                     } catch (\Exception $e) {
                     }
