@@ -179,8 +179,11 @@ class SendOMS
                 $order = $this->orderFactory->create()->load($id);
                 $data[] = $this->prepareData($order, $mainOrder);
             }
-            $this->omsIntegration->createOrderOms($data);
-
+            $resultCreateOms = $this->omsIntegration->createOrderOms($data);
+            if (!isset($resultCreateOms['code']) || $resultCreateOms['code'] != 200) {
+                $this->payment->paymentFailed($mainOrder, true);
+                throw new \Exception(__('Something went wrong. Please try again later!'));
+            }
             return;
         } catch (\Exception $e) {
             $this->payment->paymentFailed($mainOrder, true);
