@@ -164,6 +164,7 @@ class TransShipping extends AbstractCarrier implements CarrierInterface
         // get data from quote address
         $data = $this->prepareOrderMultiAllocation($request);
         if (!$data
+            || empty($data[0]['items'])
             || $data[0]['destination']['district'] == ''
             || !$this->split->checkShippingPostCode($this->postCode)
             || $data[0]['destination']['latitude'] == 0
