@@ -176,6 +176,12 @@ class TransShipping extends AbstractCarrier implements CarrierInterface
             return false;
         }
         foreach ($response['content'] as $data) {
+            if (!isset($data['data'])) {
+                continue;
+            }
+            if (!isset($data['data']['shipping_list'])) {
+                continue;
+            }
             foreach ($data['data']['shipping_list'] as $shipping) {
                 if (
                     isset($shipping['courier']['reason']) && $shipping['courier']['fee']['base'] == 0

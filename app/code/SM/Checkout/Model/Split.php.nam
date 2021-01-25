@@ -235,9 +235,9 @@ class Split
     {
         //Bypass OAR because it is painful to get data from it
         $isTestMode = $this->scopeConfig->getValue('sm_checkout/checkout_oar/oar_active');
-        if ($isTestMode) {
+        //if ($isTestMode) {
             return $this->byPassOar($data);
-        }
+        //}
         return $this->sendOAR($data);
     }
 
@@ -405,25 +405,47 @@ class Split
             //'total_qty' => 0,
             //'is_warehouse' => ''
         ];
-
+;
         $sampleResponse = [
             'content' => []
         ];
         //Assign correct sku to fake data
         $total = count($data);
+        $test = false;
         for ($i = 0; $i < $total; $i++) {
-            $order = $sampleOrder;
+            $order1 = $sampleOrder;
+            $order2 = $sampleOrder;
+            $order2['data']['order_id'] = 248.1;
+            $a = 0;
             foreach ($data[$i]['items'] as $item) {
-                $order['data']['items'][] =
-                    [
-                        'sku' => $item['sku'],
-                        'sku_basic' => $item['sku'],
-                        'price' => $item['price'],
-                        'weight' => $item['weight'],
-                        'quantity' => $item['quantity'],
-                        'is_spo' => false,
-                        'is_own_courier' => false
-                    ];
+                if ($item['sku'] == '15221036001001') {
+                    $test = true;
+                }
+                $a++;
+                if ($a <= 50) {
+                    $order1['data']['items'][] =
+                        [
+                            'sku' => $item['sku'],
+                            'sku_basic' => $item['sku'],
+                            'price' => $item['price'],
+                            'weight' => $item['weight'],
+                            'quantity' => $item['quantity'],
+                            'is_spo' => false,
+                            'is_own_courier' => false
+                        ];
+                } else {
+                    $order2['data']['items'][] =
+                        [
+                            'sku' => $item['sku'],
+                            'sku_basic' => $item['sku'],
+                            'price' => $item['price'],
+                            'weight' => $item['weight'],
+                            'quantity' => $item['quantity'],
+                            'is_spo' => false,
+                            'is_own_courier' => false
+                        ];
+                }
+
                 //$order['total_weight'] += $item['weight'];
                 //$order['total_price'] += $item['price'];
                 //$order['total_qty'] += $item['quantity'];
@@ -449,7 +471,26 @@ class Split
                 $order['data']['store']['store_code'] += $j;
                 $sampleResponse['content'][] = $order;*/
             }
-            $sampleResponse['content'][] = $order;
+            $sampleResponse['content'][] = $order1;
+            $sampleResponse['content'][] = $order2;
+        }
+        if (isset($sampleResponse['content'][0])) {
+            if ($test) {
+                unset($sampleResponse['content'][0]['data']['shipping_list'][0]);
+                //unset($sampleResponse['content'][0]['data']['shipping_list'][1]);
+                unset($sampleResponse['content'][0]['data']['shipping_list'][2]);
+                unset($sampleResponse['content'][0]['data']['shipping_list'][3]);
+                unset($sampleResponse['content'][0]['data']['shipping_list'][4]);
+                //unset($sampleResponse['content'][0]['data']['shipping_list'][5]);
+            } else {
+                unset($sampleResponse['content'][1]['data']['shipping_list'][4]);
+                unset($sampleResponse['content'][1]['data']['shipping_list'][5]);
+            }
+
+        }
+        if (isset($sampleResponse['content'][1])) {
+            unset($sampleResponse['content'][1]['data']['shipping_list'][4]);
+            unset($sampleResponse['content'][1]['data']['shipping_list'][5]);
         }
         return $sampleResponse;
     }
@@ -604,7 +645,7 @@ class Split
         $responseOAR = $e->getMessage();
         try {
             $response = $this->serializer->unserialize($responseOAR);
-            if (isset($response['content']) && isset($response['code']) && $response['code'] == 200) {
+            if (isset($response['content'])) {
                 $result['status'] = 'success';
                 $result['response'] = $response;
             }
