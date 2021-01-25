@@ -57,7 +57,7 @@ class Shipping extends \Magento\Quote\Model\Quote\Address\Total\Shipping
                 if (isset($shippingList[self::DC])) {
                     $rate = $shippingList[self::DC];
                 } elseif (isset($shippingList[self::TRANS_COURIER])) {
-                    $rate = $shippingList[self::DC];
+                    $rate = $shippingList[self::TRANS_COURIER];
                 } else {
                     $rate = reset($shippingList);
                 }
