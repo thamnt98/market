@@ -164,7 +164,7 @@ abstract class AbstractCollection extends \Magento\Framework\Model\ResourceModel
      */
     protected function joinStoreRelationTable($tableName, $linkField)
     {
-        if ($this->getFilter('store') && strpos($this->getSelect()->__toString(),"store_table") !== false) {
+        if ($this->getFilter('store') && strpos($this->getSelect()->__toString(),"trans_today_deals_store") === false) {
             $this->getSelect()->join(
                 ['store_table' => $this->getTable($tableName)],
                 'main_table.' . $linkField . ' = store_table.' . $linkField,
