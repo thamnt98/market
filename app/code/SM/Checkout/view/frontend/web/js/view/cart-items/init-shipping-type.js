@@ -681,6 +681,9 @@ define([
             return;
         }
         mod.getShippingMethodHandleAction(JSON.stringify(data));
+        console.log('update shortest store:' + updateShortestStore());
+        console.log('check first:' + first);
+        console.log('store pick up items count:' + Object.keys(storePickupItems).length);
         if (!updateShortestStore() && Object.keys(storePickupItems).length !== 0) {
             mod.updateSortestStore(data, storePickupItems);
         } else if (!first && Object.keys(storePickupItems).length !== 0) {
