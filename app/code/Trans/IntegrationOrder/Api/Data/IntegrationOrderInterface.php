@@ -86,7 +86,8 @@ interface IntegrationOrderInterface {
 	const TIME_SLOT        = 'time_slot';
     const GRAND_TOTAL      = 'grand_total';
     const LOGISTIC_COURIER_NAME = 'logistic_courier_name';
-    const LOGISTIC_COURIER = 'LOGISTIC_COURIER';
+    const LOGISTIC_COURIER = 'logistic_courier';
+    const SHIPPING_FEE_DISCOUNT = 'shipping_fee_discount';
 
 	/**
 	 * Get Oms Order Id
@@ -789,4 +790,15 @@ interface IntegrationOrderInterface {
      * @return int
      */
     public function setLogisticCourier($logisticCourier);
+
+    /**
+     * @return int
+     */
+    public function getShippingFeeDiscount();
+
+    /**
+     * @param int $shippingFeeDiscount
+     * @return int
+     */
+    public function setShippingFeeDiscount($shippingFeeDiscount);
 }

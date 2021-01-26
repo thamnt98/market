@@ -483,6 +483,7 @@ class SendOMS
         }
         $interface->setTimeSlot($timeslot);
         /*calculate discount*/
+        $shippingFeeDiscount = (int)$order->getShippingDiscountAmount();
         $shippingFee = (int)$order->getShippingInclTax();
         $discount = (int)$order->getDiscountAmount();
         $interface->setShippingFee($shippingFee);
@@ -509,6 +510,7 @@ class SendOMS
         }
         $interface->setLogisticCourierName($logisticCourierName);
         $interface->setLogisticCourier($logisticCourier);
+        $interface->setShippingFeeDiscount($shippingFeeDiscount);
         return $interface;
     }
 
