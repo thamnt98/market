@@ -95,7 +95,6 @@ class SubmitForm extends Action implements HttpPostActionInterface
             try {
                 $params = $this->prepareParams($params);
                 if ($this->sendToJira->send($params)) {
-                    $this->messageManager->addSuccessMessage(__('Your request has been sent successfully'));
                     return $this->goToSuccessPage();
                 } else {
                     $this->messageManager->addErrorMessage(__('Something went wrong while summiting your request'));
