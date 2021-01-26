@@ -1,0 +1,35 @@
+<?php
+/**
+ * SMCommerce
+ *
+ * Date: January, 20 2021
+ * Time: 4:46 PM
+ * User: VooThanh DEV
+ *
+ * @author    SMCommerce Core Team <connect@smartosc.com>
+ * @copyright Copyright SMCommerce (http://smartosc.com/)
+ */ ?>
+<?php /** @var $block \Magento\Framework\View\Element\Template */ ?>
+<?php $helper = $this->helper('MGS\Ajaxscroll\Helper\Data') ?>
+
+<script type="text/javascript">
+    require([
+        "jquery",
+        "jquery/ui",
+        "ajaxscroll"
+    ], function($){
+        $(document).ready(function(){
+            var ajaxscroll = $.scroll({
+                wrapperSelector : '.products.wrapper',
+                itemSelector: '.product-item',
+                paginationSelector: '.pages-items .item',
+                nextSelector: '.pages-items .next',
+                listSelector: 'ol.product-items'
+            });
+
+            ajaxscroll.extension(
+                new scrollLoading({html: '<div class="ajax-scroll-loading"><img src="<?= $helper->getLoadingImageUrl($this->getViewFileUrl('MGS_Ajaxscroll::images/loader.gif')) ?>" /></div>'})
+            );
+        });
+    });
+</script>

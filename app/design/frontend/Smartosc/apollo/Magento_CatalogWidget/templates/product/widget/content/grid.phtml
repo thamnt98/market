@@ -117,7 +117,7 @@ $shoppingListHelper = $this->helper('SM\ShoppingList\Helper\Data');
                                                     <?php $childrenIds = $_item->getTypeInstance()->getChildrenIds($_item->getId()); ?>
                                                     <?php if ($childrenIds): ?>
                                                         <a title="<?= $block->escapeHtmlAttr(__('View Details')) ?>"
-                                                           href="<?= $block->escapeUrl($_item->getProductUrl()) ?>"
+                                                           href="<?= $block->escapeHtmlAttr($_item->getProductUrl()) ?>"
                                                            class="action view-details primary"
                                                            <?php if ($dataGTM) : ?>
                                                            data-gtm-product='<?= $dataGTM ?>'

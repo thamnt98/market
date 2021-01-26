@@ -35,66 +35,97 @@ callback.prototype = {
 }, function (a) {
     "use strict";
     var b = -1, c = function (c, d) {
-        return this.itemsContainerSelector = d.wrapperSelector, this.itemSelector = d.itemSelector, this.nextSelector = d.nextSelector, this.paginationSelector = d.paginationSelector, this.$scrollContainer = c, this.$itemsContainer = a(this.itemsContainerSelector), this.$container = window === c.get(0) ? a(document) : c, this.defaultDelay = d.delay, this.negativeMargin = d.negativeMargin, this.nextUrl = null, this.isBound = !1, this.listeners = {
-            next: new callback,
-            load: new callback,
-            loaded: new callback,
-            render: new callback,
-            rendered: new callback,
-            scroll: new callback,
-            noneLeft: new callback,
-            ready: new callback
-        }, this.extensions = [], this.scrollHandler = function () {
-            var a = this.getCurrentScrollOffset(this.$scrollContainer), c = this.getScrollThreshold();
-            this.isBound && b != c && (this.fire("scroll", [a, c]), a >= c && this.next())
-        }, this.getLastItem = function () {
-            return a(this.itemSelector, this.$itemsContainer.get(0)).last()
-        }, this.getFirstItem = function () {
-            return a(this.itemSelector, this.$itemsContainer.get(0)).first()
-        }, this.getScrollThreshold = function (a) {
-            var c;
-            return a = a || this.negativeMargin, a = a >= 0 ? -1 * a : a, c = this.getLastItem(), 0 === c.size() ? b : c.offset().top + c.height() + a
-        }, this.getCurrentScrollOffset = function (a) {
-            var b = 0, c = a.height();
-            return b = window === a.get(0) ? a.scrollTop() : a.offset().top, (-1 != navigator.platform.indexOf("iPhone") || -1 != navigator.platform.indexOf("iPod")) && (c += 80), b + c
-        }, this.getNextUrl = function (b) {
-            return b || (b = this.$container), a(this.nextSelector, b).last().attr("href")
-        }, this.load = function (b, c, d) {
-            var e, f, g = this, h = [], i = +new Date;
-            d = d || this.defaultDelay;
-            var j = {url: b};
-            return g.fire("load", [j]), a.get(j.url, null, a.proxy(function (b) {
-                e = a(this.itemsContainerSelector, b).eq(0), 0 === e.length && (e = a(b).filter(this.itemsContainerSelector).eq(0)), e && e.find(this.itemSelector).each(function () {
-                    h.push(this)
-                }), g.fire("loaded", [b, h]), c && (f = +new Date - i, d > f ? setTimeout(function () {
-                    c.call(g, b, h)
-                }, d - f) : c.call(g, b, h))
-            }, g), "html")
-        }, this.render = function (b, c) {
-            var d = this, e = this.getLastItem(), f = 0, g = this.fire("render", [b]);
-            g.done(function () {
-                a(b).hide(), e.after(b), a(b).fadeIn(400, function () {
-                    ++f < b.length || (d.fire("rendered", [b]), c && c())
-                }), a(".actions-primary")
-                    .updateQtyAddedToProduct({ajax: true})
-            })
-        }, this.hidePagination = function () {
-            this.paginationSelector && a(this.paginationSelector, this.$container).hide(), a(".toolbar-amount").hide()
-        }, this.restorePagination = function () {
-            this.paginationSelector && a(this.paginationSelector, this.$container).show()
-        }, this.throttle = function (b, c) {
-            var d, e, f = 0;
-            return d = function () {
-                function a() {
-                    f = +new Date, b.apply(d, g)
-                }
+        return this.itemsContainerSelector = d.wrapperSelector,
+            this.itemSelector = d.itemSelector,
+            this.listSelector = d.listSelector,
+            this.nextSelector = d.nextSelector,
+            this.paginationSelector = d.paginationSelector,
+            this.$scrollContainer = c,
+            this.$itemsContainer = a(this.itemsContainerSelector),
+            this.$container = window === c.get(0) ? a(document) : c,
+            this.defaultDelay = d.delay,
+            this.negativeMargin = d.negativeMargin,
+            this.nextUrl = null,
+            this.isBound = !1,
+            this.listeners = {
+                next    : new callback,
+                load    : new callback,
+                loaded  : new callback,
+                render  : new callback,
+                rendered: new callback,
+                scroll  : new callback,
+                noneLeft: new callback,
+                ready   : new callback
+            },
+            this.extensions = [], this.scrollHandler = function () {
+                var a = this.getCurrentScrollOffset(this.$scrollContainer), c = this.getScrollThreshold();
+                this.isBound && b != c && (this.fire("scroll", [a, c]), a >= c && this.next())
+            },
+            this.getLastItem = function () {
+                return a(this.itemSelector, this.$itemsContainer.get(0)).last()
+            },
+            this.getFirstItem = function () {
+                return a(this.itemSelector, this.$itemsContainer.get(0)).first()
+            },
+            this.getScrollThreshold = function (a) {
+                var c;
+                return a = a || this.negativeMargin, a = a >= 0 ? -1 * a : a, c = this.getLastItem(), 0 === c.size() ? b : c.offset().top + c.height() + a
+            },
+            this.getCurrentScrollOffset = function (a) {
+                var b = 0, c = a.height();
+                return b = window === a.get(0) ? a.scrollTop() : a.offset().top, (-1 != navigator.platform.indexOf("iPhone") || -1 != navigator.platform.indexOf("iPod")) && (c += 80), b + c
+            },
+            this.getNextUrl = function (b) {
+                return b || (b = this.$container), a(this.nextSelector, b).last().attr("href")
+            },
+            this.load = function (b, c, d) {
+                var e, f, g = this, h = [], i = +new Date;
+                d = d || this.defaultDelay;
+                var j = {url: b};
+                return g.fire("load", [j]),
+                    a.get(j.url, null, a.proxy(function (b) {
+                        e = a(this.itemsContainerSelector, b).eq(0),
+                        0 === e.length && (e = a(b).filter(this.itemsContainerSelector).eq(0)),
+                        e && e.find(this.listSelector).each(function () {
+                            h.push(this)
+                        }), g.fire("loaded", [b, h]),
+                        c && (
+                            f = +new Date - i, d > f ? setTimeout(function () {
+                                c.call(g, b, h)
+                            }, d - f) : c.call(g, b, h)
+                        )
+                    }, g), "html")
+            },
+            this.render = function (b, c) {
+                var d = this, e = this.getLastItem(), f = 0, g = this.fire("render", [b]);
+                g.done(function () {
+                    a(b).hide(), e.after(b), a(b).fadeIn(400, function () {
+                        ++f < b.length || (d.fire("rendered", [b]), c && c())
+                    }), a(".actions-primary")
+                        .updateQtyAddedToProduct({ajax: true})
+                })
+            },
+            this.hidePagination = function () {
+                this.paginationSelector && a(this.paginationSelector, this.$container).hide(), a(".toolbar-amount").hide()
+            },
+            this.restorePagination = function () {
+                this.paginationSelector && a(this.paginationSelector, this.$container).show()
+            },
+            this.throttle = function (b, c) {
+                let d, e, f = 0;
+                return d = function () {
+                    function a() {
+                        f = +new Date, b.apply(d, g)
+                    }
 
-                var d = this, g = arguments, h = +new Date - f;
-                e ? clearTimeout(e) : a(), h > c ? a() : e = setTimeout(a, c)
-            }, a.guid && (d.guid = b.guid = b.guid || a.guid++), d
-        }, this.fire = function (a, b) {
-            return this.listeners[a].fireWith(this, b)
-        }, this
+                    var d = this, g = arguments, h = +new Date - f;
+                    e ? clearTimeout(e) : a(), h > c ? a() : e = setTimeout(a, c)
+                }, a.guid && (d.guid = b.guid = b.guid || a.guid++), d
+            },
+            this.fire = function (a, b) {
+                return this.listeners[a].fireWith(this, b)
+            },
+            this
     };
     c.prototype.initialize = function () {
         var a = this.getCurrentScrollOffset(this.$scrollContainer), b = this.getScrollThreshold();
@@ -154,7 +185,8 @@ callback.prototype = {
         nextSelector: ".pagination .next",
         paginationSelector: ".pagination .item",
         delay: 500,
-        negativeMargin: 10
+        negativeMargin: 10,
+        listSelector: 'ol.product-items'
     }
 }(jQuery);
 var scrollLoading = function (a) {
