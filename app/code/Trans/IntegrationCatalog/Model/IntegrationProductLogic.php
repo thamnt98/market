@@ -1456,7 +1456,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 						$productDataAttr[$i] = $productData[$i]->getResource()->getAttribute(IntegrationProductInterface::SELLING_UNIT_CODE);
 						
 						$attributeOptionValues[$i] = $productDataAttr[$i]->getSource()->getOptionText(
-							$saveProductData[$i]->getData(IntegrationProductInterface::SELLING_UNIT_CODE)
+							$productData[$i]->getData(IntegrationProductInterface::SELLING_UNIT_CODE)
 						);
 						$attributeValueData[$i] = [
 							'label'        => $productDataAttr[$i]->getAttributeCode(),
