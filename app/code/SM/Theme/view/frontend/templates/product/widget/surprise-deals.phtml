@@ -131,7 +131,7 @@ $helperSMCatalog = $this->helper('SM\Catalog\Helper\Data');
                                                 <?php $childrenIds = $_product->getTypeInstance()->getChildrenIds($_product->getId()); ?>
                                                 <?php if ($childrenIds): ?>
                                                     <a title="<?= $block->escapeHtmlAttr(__('View Details')) ?>"
-                                                       href="<?= $block->escapeUrl($_product->getProductUrl()) ?>"
+                                                       href="<?= $block->escapeHtmlAttr($_product->getProductUrl()) ?>"
                                                        class="action view-details primary"
                                                        <?php if ($dataGTM) : ?>
                                                        data-gtm-product='<?= $dataGTM ?>'
