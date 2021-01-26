@@ -46,7 +46,10 @@ define([
     'use strict';
 
     let mod = {};
-    var notAvailableMethod = 'transshipping_transshipping0',
+    var sortSourceDefault = window.checkoutConfig.sortSource,
+        sourceList = window.checkoutConfig.msi,
+        preStorePickUpItems = [],
+        notAvailableMethod = 'transshipping_transshipping0',
         imageData = window.checkoutConfig.imageData,
         preSelectItems = window.checkoutConfig.pre_select_items,
         singleOrderIsFresh = false,
@@ -681,14 +684,45 @@ define([
             return;
         }
         mod.getShippingMethodHandleAction(JSON.stringify(data));
-        console.log('update shortest store:' + updateShortestStore());
-        console.log('check first:' + first);
-        console.log('store pick up items count:' + Object.keys(storePickupItems).length);
         if (!updateShortestStore() && Object.keys(storePickupItems).length !== 0) {
             mod.updateSortestStore(data, storePickupItems);
-        } else if (!first && Object.keys(storePickupItems).length !== 0) {
+        } else if (!first && Object.keys(storePickupItems).length !== 0 && JSON.stringify(preStorePickUpItems) != JSON.stringify(storePickupItems)) {
             mod.updateStore(data, storePickupItems);
+        } else if (Object.keys(storePickupItems).length === 0 && JSON.stringify(preStorePickUpItems) != JSON.stringify(storePickupItems)) {
+            if (sortSourceDefault.length > 0) {
+                var distanceData = {};
+                $.each(sortSourceDefault, function (index, source) {
+                    findStoreAction.sourceShortestDistanceList.push(sourceList[source.source_code]);
+                    distanceData[source.source_code] = source.distance;
+                });
+                findStoreAction.sourceDistanceList(distanceData);
+                mod.selectedStore(sourceList[sortSourceDefault[0].source_code].source_code);
+            } else {
+                $.each(sourceList, function (index, item) {
+                    mod.selectedStore(item.source_code);
+                    return false;
+                });
+            }
         }
+        preStorePickUpItems = storePickupItems;
+    };
+
+    mod.selectedStore = function (source_code){
+        var source = sourceList[source_code],
+            storeAddress = source.street;
+        if (source.city && source.city != '') {
+            storeAddress += ', ' + source.city;
+        }
+        if (source.region && source.region != '') {
+            storeAddress += ', ' + source.region;
+            if (source.postcode && source.postcode != '') {
+                storeAddress += ' ' + source.postcode;
+            }
+        }
+        pickup.currentPickupId(source_code);
+        pickup.currentStoreName(source.name);
+        pickup.currentStoreAddress(storeAddress);
+        pickup.hasCurrentStore(true);
     };
 
     mod.updateSortestStore = function (data, storePickupItems) {
@@ -699,6 +733,8 @@ define([
                 var latlng = {lat: Number(position.coords.latitude), lng: Number(position.coords.longitude)};
                 mod.searchStoreHandle(data, latlng, storePickupItems, false);
             });
+        } else {
+            mod.updateStore(data, storePickupItems);
         }
     };
 
