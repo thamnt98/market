@@ -21,6 +21,7 @@ use Trans\Mepay\Helper\Customer\Customer as CustomerHelper;
 use  Trans\Mepay\Helper\Data;
 use Trans\Mepay\Gateway\Request\PaymentSourceMethodDataBuilder;
 use Trans\Mepay\Model\Invoice;
+use Trans\Mepay\Model\Payment\Status;
 use Trans\Mepay\Logger\LoggerWrite;
 
 class Authorize
@@ -81,12 +82,20 @@ class Authorize
   {
     try {
         //init related data
+        $forceCapture = false;
         $transactionData = $this->transactionHelper->getTransaction($id);
         $orderId = $transactionData->getOrderId();
         $order = $this->transactionHelper->getOrder($orderId);
         $payment = $order->getPayment();
-
+        
         if ($payment->getCcType() == PaymentSourceMethodDataBuilder::AUTH_CAPTURE) {
+            $forceCapture = true;
+            if ($transaction->getStatus() && ($transaction->getStatus() == Status::DECLINED)) {
+                $forceCapture = false;
+            }
+        }
+
+        if ($forceCapture) {
             $capture = Data::getClassInstance('Trans\Mepay\Model\Payment\Status\Capture');
             $capture->handle($transaction, $inquiryTransaction, $token, true);
         } else {
