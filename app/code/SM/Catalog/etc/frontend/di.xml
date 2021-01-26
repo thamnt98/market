@@ -20,4 +20,12 @@
         <plugin name="sm_catalog_swatches_configurable"
                 type="SM\Catalog\Plugin\Swatches\Block\Product\Renderer\Configurable" sortOrder="30"/>
     </type>
+    <type name="Magento\Catalog\Block\Product\View\Description">
+        <plugin name="SM_Catalog::PDP_Detail_GetProduct"
+                type="SM\Catalog\Plugin\MagentoCatalog\Block\Product\View" />
+    </type>
+    <type name="Magento\Catalog\Block\Product\View\Attributes">
+        <plugin name="SM_Catalog::PDP_Detail_GetProduct"
+                type="SM\Catalog\Plugin\MagentoCatalog\Block\Product\View" />
+    </type>
 </config>

@@ -50,18 +50,21 @@
                     <argument name="at_label" xsi:type="string">none</argument>
                     <argument name="title" translate="true" xsi:type="string">Product Information</argument>
                     <argument name="sort_order" xsi:type="string">10</argument>
+                    <argument name="is_dynamic" xsi:type="boolean">true</argument>
                 </arguments>
             </block>
             <block class="Magento\Catalog\Block\Product\View\Attributes" name="product.attributes" as="additional" template="Magento_Catalog::customtab/attributes.phtml" group="detailed_info">
                 <arguments>
                     <argument translate="true" name="title" xsi:type="string">Specifications</argument>
                     <argument name="sort_order" xsi:type="string">20</argument>
+                    <argument name="is_dynamic" xsi:type="boolean">true</argument>
                 </arguments>
             </block>
             <block class="SM\Catalog\Block\Product\View" name="delivery.return.tab" as="delivery.return" template="Magento_Catalog::customtab/delivery_return.phtml" group="detailed_info">
                 <arguments>
                     <argument translate="true" name="title" xsi:type="string">Delivery and Return Information</argument>
                     <argument name="sort_order" xsi:type="string">30</argument>
+                    <argument name="is_dynamic" xsi:type="boolean">false</argument>
                 </arguments>
             </block>
         </referenceBlock>

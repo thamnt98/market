@@ -19,6 +19,7 @@
             <module name="Magento_CatalogInventory"/>
             <module name="Magento_Report"/>
             <module name="SM_Setup"/>
+            <module name="Magento_Swatches"/>
         </sequence>
     </module>
 </config>
