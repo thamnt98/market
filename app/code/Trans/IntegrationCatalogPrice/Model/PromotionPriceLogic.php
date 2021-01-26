@@ -1961,14 +1961,26 @@ class PromotionPriceLogic implements PromotionPriceLogicInterface
 
             // $this->productRepositoryInterface->save($product);
 
-            if ($attributeIdarray[$specialPriceCode]['attribute_id']) {
-                $dataMarkdown =
-                    [
-                        "attribute_id"=>"".$attributeIdarray[$specialPriceCode]['attribute_id'][0]."",
-                        "value"=>"".$specialPrice."",
-                        "row_id"=>"".$product->getRowId().""
-                    ];
+            $this->logger->info('Attribute ID Array');
+            $this->logger->info(print_r($attributeIdarray, true));
 
+            $isOwnCourier = strtolower($product->getData('own_courier'));
+            $isFresh = strtolower($product->getData('is_fresh'));
+            $weight = $product->getWeight();
+            $soldIn = strtolower($product->getData('sold_in'));
+            
+            if ($attributeIdarray[$specialPriceCode]['attribute_id']) {
+                if (($isFresh == 'yes' || $isFresh == 1) && ($soldIn == 'kg' || $soldIn == 'pcs')) {
+                    $this->logger->info('Fresh');
+                    $specialPrice = $weight * ($specialPrice / 1000);
+                }
+
+                $dataMarkdown =
+                [
+                    "attribute_id"=>"".$attributeIdarray[$specialPriceCode]['attribute_id'][0]."",
+                    "value"=>"".$specialPrice."",
+                    "row_id"=>"".$product->getRowId().""
+                ];
             }
             else {
                 return false;
