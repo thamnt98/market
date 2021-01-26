@@ -1449,10 +1449,11 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 						$skus[$i] = $row->getPimSku();
 
 						$productData[$i] = $this->productRepositoryInterface->getById($row->getMagentoEntityId());
-						$productData[$i]->setVisibility(IntegrationProductInterface::VISIBILITY_NOT_VISIBLE);
-						$saveProductData[$i] = $this->productRepositoryInterface->save($productData[$i]);
 
-						$productDataAttr[$i] = $saveProductData[$i]->getResource()->getAttribute(IntegrationProductInterface::SELLING_UNIT_CODE);
+						$productData[$i]->setVisibility(IntegrationProductInterface::VISIBILITY_NOT_VISIBLE);
+						$productData[$i]->getResource()->saveAttribute($productData[$i], 'visibility');
+						
+						$productDataAttr[$i] = $productData[$i]->getResource()->getAttribute(IntegrationProductInterface::SELLING_UNIT_CODE);
 						
 						$attributeOptionValues[$i] = $productDataAttr[$i]->getSource()->getOptionText(
 							$saveProductData[$i]->getData(IntegrationProductInterface::SELLING_UNIT_CODE)
@@ -1468,23 +1469,108 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 							'attribute_value'  => $attributeOptionValues[$i]
 						];
 
-
-
 						$attrCode=$productDataAttr[$i]->getAttributeCode();
 						$attrId=$productDataAttr[$i]->getId();
-						$productName=$saveProductData[$i]->getName();
+						$productName=$productData[$i]->getName();
 
-						if($saveProductData[$i]->getStatus() == 1){
+						if($productData[$i]->getStatus() == 1){
 							$isActive++;
 						}
 						
-						$categoryIds=$this->generateCategoryIds($categoryIds,$saveProductData[$i]->getCategoryIds());
+						$categoryIds=$this->generateCategoryIds($categoryIds,$productData[$i]->getCategoryIds());
+					}
+					$i++;
+				} catch (\Exception $e) {
+					$msg = __FUNCTION__." Error : ".$e->getMessage();
+					$this->logger->info($msg);
+					continue;
+				}
+			}
+
+			if(!empty($productName)){
+				$result = [
+					"product_map_data" => $dataSimpleProducts,
+					"magento_entity_ids" => $magentoIds,
+					"skus" => $skus,
+					"attr_value_index" => $attributeValueData,
+					"attr_code" => $attrCode,
+					"attr_id" => $attrId,
+					"default_product_name" => $productName,
+					"simple_active" => $isActive,
+					"simple_category_ids" => array_unique($categoryIds),
+					"simple_data_attr" => $getAttributeDatas
+				];
+			}else{
+				$result = [];
+			}
+		} catch (\Exception $ex) {
+			$msg = __FUNCTION__." Error : ".$ex->getMessage();
+			$this->logger->info($msg);
+			throw new StateException(__($msg));
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Update Simple Product Data By Configurable
+	 */
+	protected function bulkUpdateSimpleProductDataByConfigurable($dataSimpleProducts=[]){
+		$result = [];
+		$i=0;
+		$productData = [];
+		$saveProductData=[];
+		
+		$productDataAttr = [];
+		$attributeOptionValues=[];
+		$attributeValueData=[];
+		$attrCode="";
+		$attrId="";
+		$magentoIds=[];
+		$productName ="";
+		$isActive=0;
+		$categoryIds=[];
+		$getAttributeDatas =[];
+		try{
+			foreach($dataSimpleProducts as $row){
+				try {
+					if($row->getMagentoEntityId() > 0){
+						$this->logger->info("Magento Entity ID : " . $row->getMagentoEntityId());
+						$magentoIds[$i] = $row->getMagentoEntityId();
+
+						$this->logger->info("SKU : " . $row->getPimSku());
+						$skus[$i] = $row->getPimSku();
+
+						$productData[$i] = $this->productRepositoryInterface->getById($row->getMagentoEntityId());
+
+						$productData[$i]->setVisibility(IntegrationProductInterface::VISIBILITY_NOT_VISIBLE);
+						$productData[$i]->getResource()->saveAttribute($productData[$i], 'visibility');
 						
-						// Get All Custom Attributes
-						// foreach ( $saveProductData[$i]->getCustomAttributes() as $attribute) {  
-						// 	$this->logger->info(__FUNCTION__."--".print_r($attribute->getAttributeCode(),true));
-							
-						// }
+						$productDataAttr[$i] = $productData[$i]->getResource()->getAttribute(IntegrationProductInterface::SELLING_UNIT_CODE);
+						
+						$attributeOptionValues[$i] = $productDataAttr[$i]->getSource()->getOptionText(
+							$saveProductData[$i]->getData(IntegrationProductInterface::SELLING_UNIT_CODE)
+						);
+						$attributeValueData[$i] = [
+							'label'        => $productDataAttr[$i]->getAttributeCode(),
+							'attribute_id' => $productDataAttr[$i]->getId(),
+							'value_index'  => $attributeOptionValues[$i]
+						];
+
+						$getAttributeDatas[$i]      = [
+							'attribute_code'   => $productDataAttr[$i]->getAttributeCode(),
+							'attribute_value'  => $attributeOptionValues[$i]
+						];
+
+						$attrCode=$productDataAttr[$i]->getAttributeCode();
+						$attrId=$productDataAttr[$i]->getId();
+						$productName=$productData[$i]->getName();
+
+						if($productData[$i]->getStatus() == 1){
+							$isActive++;
+						}
+						
+						$categoryIds=$this->generateCategoryIds($categoryIds,$productData[$i]->getCategoryIds());
 					}
 					$i++;
 				} catch (\Exception $e) {
@@ -1985,6 +2071,22 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 				__(__FUNCTION__." - ".$exception->getMessage())
 			);
 		}	
+	}
+
+	/**
+     * Get product by multiple sku
+     */
+    protected function getProductByMultipleId($idList)
+    {
+        $result = [];
+        if (empty($idList) == false) {
+            $this->logger->info('Before get product ' . date('d-M-Y H:i:s'));
+            $collection = $this->productCollectionFactory->create()->addFieldToFilter('entity_id', ['in'=>$idList]);
+            $collection->getSelect()->reset(\Zend_Db_Select::COLUMNS)->columns(['entity_id','sku','row_id','type_id']);
+            $result = $collection->getItems();
+            $this->logger->info('After get product ' . date('d-M-Y H:i:s'));
+        }
+        return $result;
 	}
 
 }
