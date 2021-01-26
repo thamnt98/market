@@ -151,5 +151,22 @@ class UpgradeData implements UpgradeDataInterface
             } catch (\Exception $e) {
             }
         }
+
+        if (version_compare($context->getVersion(), '1.0.6', '<')) {
+            $tableName = $setup->getTable('omni_shipping_postcode');
+            $setup->getConnection()->truncateTable($tableName);
+            $directory = $this->moduleReader->getModuleDir('etc', 'SM_Checkout');
+            $file = $directory . '/ecommerce-coverage-area-update.csv';
+            try {
+                if ($this->fileDriver->isExists($file)) {
+                    $data = $this->fileCsv->getData($file);
+                    unset($data[0]);
+                    $columns = ['post_code', 'sub_district', 'district', 'jenis', 'city', 'regency'];
+                    $setup->getConnection()->insertArray($tableName, $columns, $data);
+
+                }
+            } catch (\Exception $e) {
+            }
+        }
     }
 }
