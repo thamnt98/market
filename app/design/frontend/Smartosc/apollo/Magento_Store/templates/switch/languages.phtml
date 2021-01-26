@@ -12,12 +12,17 @@
         <div class="actions options switcher-options">
             <ul class="switcher-dropdown">
                 <?php foreach ($block->getStores() as $_lang) : ?>
-                    <?php $cssClasses =  $_lang->getId() == $block->getCurrentStoreId() ? ' is-active' : '' ?>
-                    <li class="view-<?= $block->escapeHtml($_lang->getCode()) ?> switcher-option<?= $cssClasses ?>">
-                        <a href="<?= $block->escapeUrl($block->getViewModel()->getTargetStoreRedirectUrl($_lang)) ?>">
+                    <?php if ($_lang->getId() == $block->getCurrentStoreId()) : ?>
+                        <li class="view-<?= $block->escapeHtml($_lang->getCode()) ?> switcher-option is-active">
                             <?= $block->escapeHtml($_lang->getName()) ?>
-                        </a>
-                    </li>
+                        </li>
+                    <?php else: ?>
+                        <li class="view-<?= $block->escapeHtml($_lang->getCode()) ?> switcher-option">
+                            <a href="<?= $block->escapeUrl($block->getViewModel()->getTargetStoreRedirectUrl($_lang)) ?>">
+                                <?= $block->escapeHtml($_lang->getName()) ?>
+                            </a>
+                        </li>
+                    <?php endif; ?>
                 <?php endforeach; ?>
             </ul>
         </div>
