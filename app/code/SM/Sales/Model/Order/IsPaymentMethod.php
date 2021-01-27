@@ -32,6 +32,14 @@ class IsPaymentMethod
         'trans_mepay_cc'
     ];
 
+    const CREDIT_CARD_METHODS = [];
+
+    const DEBIT_CARD_METHODS = [
+        "sprint_allbankfull_cc",
+        'trans_mepay_debit',
+        'trans_mepay_qris'
+    ];
+
     /**
      * @param string $method
      * @return bool
@@ -63,6 +71,29 @@ class IsPaymentMethod
                 return true;
             }
         }
+
+        if (self::isCreditCard($method)) {
+            return true;
+        }
+
         return false;
+    }
+
+    /**
+     * @param $method
+     * @return bool
+     */
+    public static function isDebitCard($method)
+    {
+        return in_array($method, self::DEBIT_CARD_METHODS);
+    }
+
+    /**
+     * @param $method
+     * @return bool
+     */
+    public static function isCreditCard($method)
+    {
+        return in_array($method, self::CREDIT_CARD_METHODS);
     }
 }
