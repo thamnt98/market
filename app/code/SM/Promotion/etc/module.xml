@@ -6,6 +6,7 @@
             <module name="Amasty_Promo" />
             <module name="Amasty_Rules" />
             <module name="Amasty_Conditions"/>
+            <module name="Amasty_BannersLite"/>
             <module name="Magento_SalesRule" />
             <module name="Magento_SalesRuleStaging" />
         </sequence>
