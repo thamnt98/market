@@ -9,6 +9,7 @@ define([
     'uiComponent',
     'mage/storage',
     'mage/url',
+    'gtmCheckout',
     'Magento_Checkout/js/model/full-screen-loader',
     'Magento_Checkout/js/action/get-totals',
     'SM_Checkout/js/view/global-observable',
@@ -22,7 +23,27 @@ define([
     'SM_Checkout/js/view/cart-items/set-shipping-type',
     'SM_Checkout/js/view/cart-items/init-shipping-type',
     'Trans_Mepay/js/view/payment/method-renderer/trans_mepay'
-], function ($, ko, Component, storage, urlManager, fullScreenLoader, getTotalsAction, globalVar, customerData, placeOrder, $t, messageList, pickup, split, findStoreAction, setShippingType, initShippingType, transMepay) {
+], function (
+    $,
+    ko,
+    Component,
+    storage,
+    urlManager,
+    gtmCheckout,
+    fullScreenLoader,
+    getTotalsAction,
+    globalVar,
+    customerData,
+    placeOrder,
+    $t,
+    messageList,
+    pickup,
+    split,
+    findStoreAction,
+    setShippingType,
+    initShippingType,
+    transMepay
+) {
     'use strict';
 
     return Component.extend({
@@ -105,6 +126,7 @@ define([
                 /**
                  * chua trigger dc enable/disable button place order de tam nhu nay nhe :v
                  */
+                this.pushGtmStep2();
                 globalVar.isStepPreviewOrder(false);
                 globalVar.isStepPayment(true);
                 $('.custom-placeorder-button').attr('disabled', true);
@@ -130,6 +152,7 @@ define([
                         globalVar.isStepPreviewOrder(true);
                     } else {
                         globalVar.isStepPayment(true);
+                        this.pushGtmStep2();
                     }
                     split.setPreviewOrder(response.order);
                     globalVar.isStepShipping(false);
@@ -243,6 +266,76 @@ define([
                 "text": $.mage.__("Payment"),
             })))
 
+        },
+
+        pushGtmStep2: function () {
+            let items          = window.checkoutConfig.quoteItemData,
+                deliveryOption = window.itemsCheckoutGTM,
+                itemsData      = [];
+
+            if (!dataLayerSourceObjects || !items || !items.length) {
+                return;
+            }
+
+            $.each(items, function (key, value) {
+                let delivery = "Delivery";
+
+                if (deliveryOption[key].shipping_method_selected === 'store_pickup_store_pickup') {
+                    delivery = $('h4[data-bind="html: currentStoreName"]').text();
+                }
+
+                itemsData.push({
+                    'productId'      : value.product_id,
+                    'productQty'     : value.qty,
+                    'delivery_option': delivery
+                });
+            });
+
+            $.ajax({
+                type: 'POST',
+                url: urlManager.build('sm_gtm/gtm/product'),
+                data: {'productsInfo': itemsData},
+                dataType: "json",
+                async: true,
+                success: function (result) {
+                    if (result) {
+                        let dataProducts = [],
+                            quantity     = 0,
+                            total        = 0;
+                        $.each(result, function (key, value) {
+                            try {
+                                let product = JSON.parse(value);
+
+                                dataProducts.push(product);
+                                quantity += (product.quantity * 1);
+                                total += (product.quantity * product.price);
+                            } catch (e) {
+                            }
+                        });
+
+                        dataProducts['step'] = 2;
+                        dataProducts['option'] = 'Delivery Option';
+                        dataProducts['basket_value'] = total;
+                        dataProducts['basket_quantity'] = quantity;
+                        dataProducts['eventCallback'] = function () {};
+                        dataProducts['eventTimeout'] = 2000;
+                        gtmCheckout.push('checkout', dataProducts);
+                        $.localStorage.set(
+                            'product-checkout-gtm',
+                            {
+                                'step'           : 3,
+                                'option'         : 'Payment Method',
+                                'basket_value'   : total,
+                                'basket_quantity': quantity,
+                                'eventTimeout'   : 2000,
+                                'product'        : dataProducts
+                            }
+                        );
+                    }
+                },
+                error: function () {
+                }
+            });
         }
     });
 });
