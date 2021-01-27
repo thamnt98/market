@@ -2177,8 +2177,25 @@ class ProductImport extends \Magento\CatalogImportExport\Model\Import\Product
     private function reindexProducts($productIdsToReindex = [])
     {
         $indexer = $this->indexerRegistry->get('catalog_product_category');
-        if (is_array($productIdsToReindex) && count($productIdsToReindex) > 0 && !$indexer->isScheduled()) {
-            $indexer->reindexList($productIdsToReindex);
+
+        if(is_array($productIdsToReindex) && count($productIdsToReindex) > 0){
+            $indexer = $this->indexerRegistry->get('catalog_product_category');
+
+            if(!$indexer->isScheduled()){
+                $indexer->reindexList($productIdsToReindex);
+            }
+
+            $indexer = $this->indexerRegistry->get('catalog_category_product');
+
+            if(!$indexer->isScheduled()){
+                $indexer->reindexList($productIdsToReindex);
+            }
+
+            $indexer = $this->indexerRegistry->get('catalog_product_price');
+
+            if(!$indexer->isScheduled()){
+                $indexer->reindexList($productIdsToReindex);
+            }
         }
     }
 
