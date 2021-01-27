@@ -21,7 +21,7 @@ class BankRepository
     const BANKS = [
         "bank_mega" => "Bank Mega",
         "bca" => "BCA",
-        self::BANK_INSERT_BY_TEXT_KEY => "Insert by Text",
+        self::BANK_INSERT_BY_TEXT_KEY => "Enter bank name",
     ];
 
     private $bankFactory;

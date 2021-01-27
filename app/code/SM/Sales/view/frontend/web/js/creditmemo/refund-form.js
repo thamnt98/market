@@ -14,7 +14,7 @@ define(
                     $inputBankContainer.css('display', 'block');
                     $inputBank.addClass('required-entry');
                 } else {
-                    $inputBankContainer.parents('.field').next('.no-display').css('display', 'none');
+                    $inputBankContainer.css('display', 'none');
                     $inputBank.removeClass('required-entry');
                 }
             });
