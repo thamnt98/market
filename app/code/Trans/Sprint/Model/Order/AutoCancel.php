@@ -165,10 +165,13 @@ class AutoCancel implements \Trans\Sprint\Api\AutoCancelInterface
                             $orderEntityId = $order->getEntityId();
                             $orderHistory  = $this->orderStatusHistoryInterfaceFactory->create();
                             $orderHistory->setParentId($orderEntityId);
-                            $orderHistory->setStatus('canceled');
+                            $orderHistory->setStatus('order_canceled');
                             $this->orderStatusHistoryRepoInterface->save($orderHistory);
                             $this->logger->info('$refNumber = ' . $refNumber);
                             $this->logger->info('$orderEntityId = ' . $orderEntityId);
+
+                            $order->setStatus('order_canceled');
+                            $order->save();
 
                             /**
                              * Digital Order is not sent to OMS
