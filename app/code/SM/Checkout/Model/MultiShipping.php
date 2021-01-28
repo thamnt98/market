@@ -581,7 +581,7 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function previewOrder($items, $storeDateTime, $deliveryDateTime, $isSplitOrder)
+    public function previewOrder($items, $storeDateTime, $deliveryDateTime, $isSplitOrder, $store)
     {
         $itemsFormat = [];
         foreach ($items as $item) {
@@ -604,7 +604,7 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
         $storeDateTime = $this->storePickUpFormat($storeDateTime);
         $deliveryDateTime = $this->formatDeliveryDateTime($deliveryDateTime);
         $quote = $checkoutSession->getQuote();
-        $reload = $this->multiShippingHandle->handlePreviewOrder($deliveryDateTime, $storeDateTime, $quote);
+        $reload = $this->multiShippingHandle->handlePreviewOrder($deliveryDateTime, $storeDateTime, $store, $quote);
         if ($reload) {
             $this->messageManager->addWarning(__("An error occurred, please checkout again!"));
             return $this->previewOrderInterfaceFactory->create()->setReload(true)->setOrder([])->setIsSplitOrder(false);
@@ -654,7 +654,6 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
         if (empty($sourceList)) {
             return $response;
         }
-
         foreach ($this->msiFullFill->sortSourceByDistance($sourceList, $destinationLatLng, true) as $source) {
             $data[] = $this->sourceStoreInterfaceFactory->create()->setSourceCode($source['source_code'])->setDistance($source['distance']);
         }

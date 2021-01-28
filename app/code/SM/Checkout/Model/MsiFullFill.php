@@ -21,16 +21,6 @@ use SM\Checkout\Api\Data\Checkout\SearchStoreInterfaceFactory;
 class MsiFullFill
 {
     /**
-     * @var SourceItemRepositoryInterface
-     */
-    protected $sourceItemRepository;
-
-    /**
-     * @var SearchCriteriaBuilder
-     */
-    protected $searchCriteriaBuilder;
-
-    /**
      * @var SourceRepositoryInterface
      */
     protected $sourceRepository;
@@ -61,66 +51,77 @@ class MsiFullFill
     protected $searchStoreInterfaceFactory;
 
     /**
+     * @var ResourceModel\ConnectionDB
+     */
+    protected $connectionDB;
+
+    /**
+     * @var \Magento\InventoryApi\Api\Data\SourceInterfaceFactory
+     */
+    protected $sourceInterfaceFactory;
+
+    /**
      * MsiFullFill constructor.
-     * @param SourceItemRepositoryInterface $sourceItemRepository
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param SourceRepositoryInterface $sourceRepository
      * @param AddressInterfaceFactory $addressInterfaceFactory
      * @param LatLngInterfaceFactory $latLngInterfaceFactory
      * @param GetLatLngFromAddressInterface $getLatLngFromAddress
      * @param GetDistanceInterface $getDistance
      * @param SearchStoreInterfaceFactory $searchStoreInterfaceFactory
+     * @param ResourceModel\ConnectionDB $connectionDB
+     * @param \Magento\InventoryApi\Api\Data\SourceInterfaceFactory $sourceInterfaceFactory
      */
     public function __construct(
-        SourceItemRepositoryInterface $sourceItemRepository,
-        SearchCriteriaBuilder $searchCriteriaBuilder,
         SourceRepositoryInterface $sourceRepository,
         AddressInterfaceFactory $addressInterfaceFactory,
         LatLngInterfaceFactory $latLngInterfaceFactory,
         GetLatLngFromAddressInterface $getLatLngFromAddress,
         GetDistanceInterface $getDistance,
-        SearchStoreInterfaceFactory $searchStoreInterfaceFactory
+        SearchStoreInterfaceFactory $searchStoreInterfaceFactory,
+        \SM\Checkout\Model\ResourceModel\ConnectionDB $connectionDB,
+        \Magento\InventoryApi\Api\Data\SourceInterfaceFactory $sourceInterfaceFactory
     ) {
-        $this->sourceItemRepository = $sourceItemRepository;
-        $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->sourceRepository = $sourceRepository;
         $this->addressInterfaceFactory = $addressInterfaceFactory;
         $this->latLngInterfaceFactory = $latLngInterfaceFactory;
         $this->getLatLngFromAddress = $getLatLngFromAddress;
         $this->getDistance = $getDistance;
         $this->searchStoreInterfaceFactory = $searchStoreInterfaceFactory;
+        $this->connectionDB = $connectionDB;
+        $this->sourceInterfaceFactory = $sourceInterfaceFactory;
     }
 
     /**
-     * @param array $skuList
+     * @param $skuList
      * @return array
      */
     public function getMsiFullFill($skuList)
     {
-        $searchCriteria = $this->searchCriteriaBuilder
-            ->addFilter(SourceItemInterface::SOURCE_CODE, 'default', 'neq')
-            ->addFilter(SourceItemInterface::SKU, array_keys($skuList), 'in')
-            ->addFilter(SourceItemInterface::STATUS, SourceItemInterface::STATUS_IN_STOCK)
-            ->create();
-
-        $items = $this->sourceItemRepository->getList($searchCriteria)->getItems();
-        $msi = [];
+        $items = $this->connectionDB->getMsi(array_keys($skuList));
+        $msiListCode = [];
+        $result = [];
         foreach ($items as $item) {
-            if (!isset($skuList[$item->getSku()])) {
+            if (!isset($skuList[$item['sku']])) {
                 continue;
             }
-            if ((int)$item->getQuantity() >= (int)$skuList[$item->getSku()]) {
-                $msi[$item->getSku()][] = $item->getSourceCode();
+            if ((int)$item['quantity'] >= (int)$skuList[$item['sku']]) {
+                $msiListCode[$item['sku']][] = $item['source_code'];
+                $result[$item['source_code']] = $item;
             }
         }
-        $result = [];
+        $msi = [];
         $i = 0;
-        foreach ($msi as $list) {
+        foreach ($msiListCode as $list) {
             $i++;
             if ($i == 1) {
-                $result = $list;
+                $msi = $list;
             } else {
-                $result = array_intersect($result, $list);
+                $msi = array_intersect($msi, $list);
+            }
+        }
+        foreach ($result as $sourceCode => $list) {
+            if (!in_array($sourceCode, $msi)) {
+                unset($result[$sourceCode]);
             }
         }
         return $result;
@@ -171,24 +172,17 @@ class MsiFullFill
     public function sortSourceByDistance($sourceList, $address, $addressLatLng = false)
     {
         try {
-            $sources = [];
             $sort = [];
-            foreach ($sourceList as $sourceCode) {
-                try {
-                    $sources[] = $this->sourceRepository->get($sourceCode);
-                } catch (\Exception $e) {
-                }
-            }
             $distanceBySourceCode = $sortSources = $sourcesWithoutDistance = [];
             if (!$addressLatLng) {
                 $addressLatLong = $this->getLongLat($address);
             } else {
                 $addressLatLong = $address;
             }
-            foreach ($sources as $source) {
+            foreach ($sourceList as $source) {
                 try {
-                    $sourceLatLong = $this->getLongLat($source);
-                    $distanceBySourceCode[$source->getSourceCode()] = $this->getDistance->execute($sourceLatLong, $addressLatLong);
+                    $sourceLatLong = $this->getLongLatMsi($source);
+                    $distanceBySourceCode[$source['source_code']] = $this->getDistance->execute($sourceLatLong, $addressLatLong);
                     $sortSources[] = $source;
                 } catch (LocalizedException $e) {
                     $sourcesWithoutDistance[] = $source;
@@ -198,18 +192,17 @@ class MsiFullFill
             // Sort sources by distance
             uasort(
                 $sortSources,
-                function (SourceInterface $a, SourceInterface $b) use ($distanceBySourceCode) {
-                    $distanceFromA = $distanceBySourceCode[$a->getSourceCode()];
-                    $distanceFromB = $distanceBySourceCode[$b->getSourceCode()];
+                function ($a, $b) use ($distanceBySourceCode) {
+                    $distanceFromA = $distanceBySourceCode[$a['source_code']];
+                    $distanceFromB = $distanceBySourceCode[$b['source_code']];
 
                     return ($distanceFromA < $distanceFromB) ? -1 : 1;
                 }
             );
-
             foreach (array_merge($sortSources, $sourcesWithoutDistance) as $source) {
-                $data = ['source_code' => $source->getSourceCode()];
-                if (isset($distanceBySourceCode[$source->getSourceCode()])) {
-                    $data['distance'] = round((int)$distanceBySourceCode[$source->getSourceCode()]/1000, 2);
+                $data = ['source_code' => $source['source_code']];
+                if (isset($distanceBySourceCode[$source['source_code']])) {
+                    $data['distance'] = round((int)$distanceBySourceCode[$source['source_code']]/1000, 2);
                 } else {
                     $data['distance'] = 0;
                 }
@@ -237,24 +230,17 @@ class MsiFullFill
         if (!$currentStoreCode) {
             $data['current_store_fulfill'] = true;
         }
-        $sources = [];
         try {
-            foreach ($sourceList as $sourceCode) {
-                try {
-                    $sources[] = $this->sourceRepository->get($sourceCode);
-                } catch (\Exception $e) {
-                }
-            }
             $distanceBySourceCode = $sortSources = $sourcesWithoutDistance = [];
             if (!$addressLatLng) {
                 $addressLatLong = $this->getLongLat($address);
             } else {
                 $addressLatLong = $address;
             }
-            foreach ($sources as $source) {
+            foreach ($sourceList as $source) {
                 try {
-                    $sourceLatLong = $this->getLongLat($source);
-                    $distanceBySourceCode[$source->getSourceCode()] = $this->getDistance->execute($sourceLatLong, $addressLatLong);
+                    $sourceLatLong = $this->getLongLatMsi($source);
+                    $distanceBySourceCode[$source['source_code']] = $this->getDistance->execute($sourceLatLong, $addressLatLong);
                     $sortSources[] = $source;
                 } catch (LocalizedException $e) {
                     $sourcesWithoutDistance[] = $source;
@@ -264,22 +250,32 @@ class MsiFullFill
             // Sort sources by distance
             uasort(
                 $sortSources,
-                function (SourceInterface $a, SourceInterface $b) use ($distanceBySourceCode) {
-                    $distanceFromA = $distanceBySourceCode[$a->getSourceCode()];
-                    $distanceFromB = $distanceBySourceCode[$b->getSourceCode()];
+                function ($a, $b) use ($distanceBySourceCode) {
+                    $distanceFromA = $distanceBySourceCode[$a['source_code']];
+                    $distanceFromB = $distanceBySourceCode[$b['source_code']];
 
                     return ($distanceFromA < $distanceFromB) ? -1 : 1;
                 }
             );
 
             foreach (array_merge($sortSources, $sourcesWithoutDistance) as $source) {
-                if ($currentStoreCode && $currentStoreCode == $source->getSourceCode()) {
+                if ($currentStoreCode && $currentStoreCode == $source['source_code']) {
                     $data['current_store_fulfill'] = true;
                 }
                 $searchStoreInf = $this->searchStoreInterfaceFactory->create();
-                $searchStoreInf->setStore($source);
-                if (isset($distanceBySourceCode[$source->getSourceCode()])) {
-                    $distance = round((int)$distanceBySourceCode[$source->getSourceCode()]/1000, 2);
+                $sourceObject = $this->sourceInterfaceFactory->create();
+                $sourceObject->setCity($source['city']);
+                $sourceObject->setCountryId($source['country_id']);
+                $sourceObject->setLatitude($source['latitude']);
+                $sourceObject->setLongitude($source['longitude']);
+                $sourceObject->setName($source['name']);
+                $sourceObject->setPostcode($source['postcode']);
+                $sourceObject->setRegion($source['region']);
+                $sourceObject->setStreet($source['street']);
+                $sourceObject->setSourceCode($source['source_code']);
+                $searchStoreInf->setStore($sourceObject);
+                if (isset($distanceBySourceCode[$source['source_code']])) {
+                    $distance = round((int)$distanceBySourceCode[$source['source_code']]/1000, 2);
                 } else {
                     $distance = 0;
                 }
@@ -294,6 +290,29 @@ class MsiFullFill
         } catch (\Exception $e) {
         }
         return $data;
+    }
+
+    /**
+     * @param $source
+     * @return \Magento\InventoryDistanceBasedSourceSelectionApi\Api\Data\LatLngInterface
+     */
+    protected function getLongLatMsi($source)
+    {
+        if (!$source['latitude'] || !$source['longitude'] || $source['latitude'] == '' || $source['longitude'] == '') {
+            $street = $source['street'];
+            $sourceAddress = $this->addressInterfaceFactory->create([
+                'country' => $source['country_id'] ?? '',
+                'postcode' => $source['postcode'] ?? '',
+                'street' => $street ?? '',
+                'region' => $source['region'] ?? '',
+                'city' => $source['city'] ?? ''
+            ]);
+            return $this->getLatLngFromAddress->execute($sourceAddress);
+        }
+        return $this->latLngInterfaceFactory->create([
+            'lat' => (float) $source['latitude'],
+            'lng' => (float) $source['longitude']
+        ]);
     }
 
     /**

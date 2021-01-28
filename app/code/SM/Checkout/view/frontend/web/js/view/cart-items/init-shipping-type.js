@@ -243,6 +243,7 @@ define([
                 return false;
             }
         });
+        return;
         console.log(oldValue);
         console.log(newValue);
         if (typeof oldValue !== "undefined" && setShippingType.getValue()() == '1') {
@@ -679,12 +680,11 @@ define([
             digitalDetail();
             return;
         }
+        mod.getShippingMethodHandleAction(JSON.stringify(data));
         if (!updateShortestStore() && Object.keys(storePickupItems).length !== 0) {
             mod.updateSortestStore(data, storePickupItems);
         } else if (!first && Object.keys(storePickupItems).length !== 0) {
             mod.updateStore(data, storePickupItems);
-        } else {
-            mod.getShippingMethodHandleAction(JSON.stringify(data));
         }
     };
 
@@ -695,11 +695,7 @@ define([
             navigator.geolocation.getCurrentPosition(function (position) {
                 var latlng = {lat: Number(position.coords.latitude), lng: Number(position.coords.longitude)};
                 mod.searchStoreHandle(data, latlng, storePickupItems, false);
-            }, function (error) {
-                mod.getShippingMethodHandleAction(JSON.stringify(data));
             });
-        } else {
-            mod.getShippingMethodHandleAction(JSON.stringify(data));updateCurrentStore
         }
     };
 
@@ -730,19 +726,7 @@ define([
     };
 
     mod.searchStoreHandle = function (data, latlng, storePickupItems, updateCurrentStore, update) {
-        var currentPickupId = pickup.currentPickupId();
-        findStoreAction.searchShortestStoreAction(latlng, storePickupItems, updateCurrentStore, update).done(
-            function (response) {
-                if (currentPickupId == pickup.currentPickupId()) {
-                    data.additional_info.store_pick_up.store = currentPickupId;
-                    mod.getShippingMethodHandleAction(JSON.stringify(data));
-                }
-            }
-        ).fail(
-            function (response) {
-                mod.getShippingMethodHandleAction(JSON.stringify(data));
-            }
-        );
+        findStoreAction.searchShortestStoreAction(latlng, storePickupItems, updateCurrentStore, update);
     };
 
     mod.getShippingMethodHandleAction = function (data) {
@@ -849,6 +833,7 @@ define([
                     });
                 }
                 if (!response.error) {
+                    console.log('1111111111');
                     globalVar.disableGoPaymentButton(false);
                 }
                 if (response.stock_message != '') {

@@ -114,6 +114,7 @@ define([
             var rateData = initShippingType.getRatesData(),
                 data = initShippingType.getDateTime();
             data['items'] = rateData['items'];
+            data['store'] = pickup.currentPickupId();
             fullScreenLoader.startLoader();
             storage.post(
                 urlManager.build('rest/V1/trans-checkout/me/previewOrder'),
