@@ -601,10 +601,10 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
             $this->messageManager->addWarning(__("Some products are updated."));
             return $this->previewOrderInterfaceFactory->create()->setReload(true)->setOrder([])->setIsSplitOrder(false);
         }
-        $storeDateTime = $this->storePickUpFormat($storeDateTime);
+        $storeDateTime = $this->storePickUpFormat($storeDateTime, $store);
         $deliveryDateTime = $this->formatDeliveryDateTime($deliveryDateTime);
         $quote = $checkoutSession->getQuote();
-        $reload = $this->multiShippingHandle->handlePreviewOrder($deliveryDateTime, $storeDateTime, $store, $quote);
+        $reload = $this->multiShippingHandle->handlePreviewOrder($deliveryDateTime, $storeDateTime, $quote);
         if ($reload) {
             $this->messageManager->addWarning(__("An error occurred, please checkout again!"));
             return $this->previewOrderInterfaceFactory->create()->setReload(true)->setOrder([])->setIsSplitOrder(false);
@@ -663,11 +663,13 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
 
     /**
      * @param $storeDateTime
-     * @return array[]
+     * @param $store
+     * @return array
      */
-    public function storePickUpFormat($storeDateTime)
+    public function storePickUpFormat($storeDateTime, $store)
     {
         return [
+            "store_code" => $store,
             "date" => $storeDateTime->getDate(),
             "time" => $storeDateTime->getTime(),
         ];

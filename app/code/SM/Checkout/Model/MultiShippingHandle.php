@@ -431,7 +431,7 @@ class MultiShippingHandle
         $storePickUp = $additionalInfo->getStorePickUp();
         return [
             "store_pick_up" => [
-                "store_code" => ($storePickUp->getStore()) ? $storePickUp->getStore() : "",
+                "store_code" => ($storePickUp->getStore()) ? $storePickUp->getStore()->getSourceCode() : "",
                 "date" => $storePickUp->getDate(),
                 "time" => $storePickUp->getTime(),
             ],
@@ -1014,12 +1014,11 @@ class MultiShippingHandle
     /**
      * @param $deliveryDateTime
      * @param $storeDateTime
-     * @param $store
      * @param $quote
      * @return bool
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function handlePreviewOrder($deliveryDateTime, $storeDateTime, $store, $quote)
+    public function handlePreviewOrder($deliveryDateTime, $storeDateTime, $quote)
     {
         $reload          = false;
         $shippingAddress = $quote->getAllShippingAddresses();
@@ -1032,6 +1031,7 @@ class MultiShippingHandle
             } elseif ($shippingMethod == self::STORE_PICK_UP) {
                 $date = $this->timezone->convertConfigTimeToUtc($storeDateTime['date']);
                 $time = $storeDateTime['time'];
+                $store = $storeDateTime['store_code'];
                 $this->saveStorePickUpDateTime($address, $date, $time, $store);
             } else {
                 if ($shippingMethod == self::SCHEDULE) {
