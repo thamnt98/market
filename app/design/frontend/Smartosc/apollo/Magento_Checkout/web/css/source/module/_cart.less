@@ -130,10 +130,9 @@
     }
 
     .checkout-cart-index {
-       /* .page-main {
-            padding-left: 0;
-            padding-right: 0;
-        }*/
+       .minicart-wrapper{
+           display: none;
+       }
         .cart-container .cart-gift-item .gift-options {
             padding:0;
             margin:0;
@@ -427,6 +426,10 @@
 
                 &.qty {
                     text-align: left;
+                    position: relative;
+                    .action-primary-loader{
+                        left: 34%;
+                    }
                     .text-qlty {
                         .lib-font-size(14);
                         color: @c-tsm-grey14;
