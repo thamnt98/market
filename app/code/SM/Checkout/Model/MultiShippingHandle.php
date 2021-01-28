@@ -431,7 +431,7 @@ class MultiShippingHandle
         $storePickUp = $additionalInfo->getStorePickUp();
         return [
             "store_pick_up" => [
-                "store_code" => ($storePickUp->getStore()) ? $storePickUp->getStore() : "",
+                "store_code" => ($storePickUp->getStore()) ? $storePickUp->getStore()->getSourceCode() : "",
                 "date" => $storePickUp->getDate(),
                 "time" => $storePickUp->getTime(),
             ],
@@ -1016,7 +1016,7 @@ class MultiShippingHandle
      * @param $storeDateTime
      * @param $quote
      * @return bool
-     * @throws \Exception
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function handlePreviewOrder($deliveryDateTime, $storeDateTime, $quote)
     {
@@ -1031,7 +1031,8 @@ class MultiShippingHandle
             } elseif ($shippingMethod == self::STORE_PICK_UP) {
                 $date = $this->timezone->convertConfigTimeToUtc($storeDateTime['date']);
                 $time = $storeDateTime['time'];
-                $this->saveStorePickUpDateTime($address, $date, $time);
+                $store = $storeDateTime['store_code'];
+                $this->saveStorePickUpDateTime($address, $date, $time, $store);
             } else {
                 if ($shippingMethod == self::SCHEDULE) {
                     $dateTime = $deliveryDateTime[$address->getCustomerAddressId()];
@@ -1058,10 +1059,11 @@ class MultiShippingHandle
      * @param $address
      * @param $date
      * @param $time
+     * @param $store
      */
-    protected function saveStorePickUpDateTime($address, $date, $time)
+    protected function saveStorePickUpDateTime($address, $date, $time, $store)
     {
-        $address->setStorePickUpTime($date)->setStorePickUpDelivery($time)->save();
+        $address->setStorePickUpTime($date)->setStorePickUpDelivery($time)->setStorePickUp($store)->save();
     }
 
     /**

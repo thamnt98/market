@@ -203,4 +203,36 @@ class ProductRepository implements ProductRepositoryInterface
 
         return $products;
     }
+
+    /**
+     * @return Collection
+     */
+    public function generateCollection()
+    {
+        /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection $coll */
+        $coll = $this->collectionFactory->create();
+        try {
+            $coll->addFieldToSelect('*');
+            $this->extensionAttributesJoinProcessor->process($coll);
+            $this->collectionFilter->filter($coll, $this->getRootCategory());
+        } catch (\Exception $e) {
+        }
+
+        return $coll;
+    }
+
+    /**
+     * @return Collection
+     */
+    public function generateMobileCollection()
+    {
+        return $this
+            ->generateCollection()
+            ->addAttributeToFilter(// Mobile not show tobacco product
+                [
+                    ["attribute" => "is_tobacco", "null" => true],
+                    ["attribute" => "is_tobacco", "eq" => 0],
+                ]
+            );
+    }
 }
