@@ -152,7 +152,7 @@ define([
                         globalVar.isStepPreviewOrder(true);
                     } else {
                         globalVar.isStepPayment(true);
-                        this.pushGtmStep2();
+                        self.pushGtmStep2();
                     }
                     split.setPreviewOrder(response.order);
                     globalVar.isStepShipping(false);
