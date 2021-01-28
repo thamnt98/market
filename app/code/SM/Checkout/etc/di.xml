@@ -186,4 +186,6 @@
         <plugin name="SM_Checkout::SprintPaymentSendEmail"
                 type="SM\Checkout\Plugin\TransSprint\Model\PaymentSendEmail" />
     </type>
+    <preference for="Magento\Checkout\Model\Cart" type="SM\Checkout\Preference\Checkout\Model\Cart"/>
+    <preference for="Magento\Checkout\Model\TotalsInformationManagement" type="SM\Checkout\Preference\Checkout\Model\TotalsInformationManagement"/>
 </config>
