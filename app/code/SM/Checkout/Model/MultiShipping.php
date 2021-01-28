@@ -581,7 +581,7 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function previewOrder($items, $storeDateTime, $deliveryDateTime, $isSplitOrder)
+    public function previewOrder($items, $storeDateTime, $deliveryDateTime, $isSplitOrder, $store)
     {
         $itemsFormat = [];
         foreach ($items as $item) {
@@ -601,7 +601,7 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
             $this->messageManager->addWarning(__("Some products are updated."));
             return $this->previewOrderInterfaceFactory->create()->setReload(true)->setOrder([])->setIsSplitOrder(false);
         }
-        $storeDateTime = $this->storePickUpFormat($storeDateTime);
+        $storeDateTime = $this->storePickUpFormat($storeDateTime, $store);
         $deliveryDateTime = $this->formatDeliveryDateTime($deliveryDateTime);
         $quote = $checkoutSession->getQuote();
         $reload = $this->multiShippingHandle->handlePreviewOrder($deliveryDateTime, $storeDateTime, $quote);
@@ -654,7 +654,6 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
         if (empty($sourceList)) {
             return $response;
         }
-
         foreach ($this->msiFullFill->sortSourceByDistance($sourceList, $destinationLatLng, true) as $source) {
             $data[] = $this->sourceStoreInterfaceFactory->create()->setSourceCode($source['source_code'])->setDistance($source['distance']);
         }
@@ -664,11 +663,13 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
 
     /**
      * @param $storeDateTime
-     * @return array[]
+     * @param $store
+     * @return array
      */
-    public function storePickUpFormat($storeDateTime)
+    public function storePickUpFormat($storeDateTime, $store)
     {
         return [
+            "store_code" => $store,
             "date" => $storeDateTime->getDate(),
             "time" => $storeDateTime->getTime(),
         ];

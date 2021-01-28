@@ -28,7 +28,13 @@ class Search extends \Magento\CatalogSearch\Block\Result
     protected $filterSettingHelper;
     protected $mProductStock;
 
+    /**
+     * @var \Magento\Review\Model\ResourceModel\Review\Summary
+     */
+    protected $reviewSummary;
+
     public function __construct(
+        \Magento\Review\Model\ResourceModel\Review\Summary $reviewSummary,
         \Magento\Framework\ObjectManagerInterface $objectManagerInterface,
         \Magento\Framework\View\Element\BlockFactory $blockFactory,
         \Magento\Framework\View\Element\Template\Context $context,
@@ -63,6 +69,7 @@ class Search extends \Magento\CatalogSearch\Block\Result
         $this->filterSettingHelper      = $settingHelper;
         $this->mProductStock            = $mProductStock;
         parent::__construct($context, $layerResolver, $catalogSearchData, $queryFactory, $data);
+        $this->reviewSummary = $reviewSummary;
     }
 
     /**
@@ -352,5 +359,26 @@ class Search extends \Magento\CatalogSearch\Block\Result
         $this->_setProductCollection($collection);
 
         $this->_toolbar = $toolbar;
+    }
+
+    /**
+     * @return \Magento\Catalog\Model\ResourceModel\Product\Collection
+     */
+    public function getProductCollectionWithReview()
+    {
+        $coll = clone $this->_getProductCollection();
+        $coll->clear();
+        $coll->addAttributeToSelect('*');
+
+        try {
+            $this->reviewSummary->appendSummaryFieldsToCollection(
+                $coll,
+                $this->_storeManager->getStore()->getId() . '',
+                \Magento\Review\Model\Review::ENTITY_PRODUCT_CODE
+            );
+        } catch (\Exception $e) {
+        }
+
+        return $coll;
     }
 }

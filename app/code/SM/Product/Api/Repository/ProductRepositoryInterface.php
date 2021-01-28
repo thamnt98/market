@@ -38,4 +38,14 @@ interface ProductRepositoryInterface
      * @return \Magento\Catalog\Api\Data\ProductInterface[]
      */
     public function getStoreFrontProductByIds(array $productIds, $limit = null, $sortBy = self::ENTITY_ID, $direction = SortOrder::SORT_ASC): array;
+
+    /**
+     * @return \Magento\Catalog\Model\ResourceModel\Product\Collection
+     */
+    public function generateCollection();
+    
+    /**
+     * @return \Magento\Catalog\Model\ResourceModel\Product\Collection
+     */
+    public function generateMobileCollection();
 }

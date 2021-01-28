@@ -46,7 +46,10 @@ define([
     'use strict';
 
     let mod = {};
-    var notAvailableMethod = 'transshipping_transshipping0',
+    var sortSourceDefault = window.checkoutConfig.sortSource,
+        sourceList = window.checkoutConfig.msi,
+        preStorePickUpItems = [],
+        notAvailableMethod = 'transshipping_transshipping0',
         imageData = window.checkoutConfig.imageData,
         preSelectItems = window.checkoutConfig.pre_select_items,
         singleOrderIsFresh = false,
@@ -243,6 +246,7 @@ define([
                 return false;
             }
         });
+        return;
         console.log(oldValue);
         console.log(newValue);
         if (typeof oldValue !== "undefined" && setShippingType.getValue()() == '1') {
@@ -679,70 +683,107 @@ define([
             digitalDetail();
             return;
         }
+        mod.getShippingMethodHandleAction(JSON.stringify(data));
         if (!updateShortestStore() && Object.keys(storePickupItems).length !== 0) {
+            console.log('11111');
             mod.updateSortestStore(data, storePickupItems);
-        } else if (!first && Object.keys(storePickupItems).length !== 0) {
+        } else if (!first && Object.keys(storePickupItems).length !== 0 && JSON.stringify(preStorePickUpItems) != JSON.stringify(storePickupItems)) {
+            console.log('22222');
             mod.updateStore(data, storePickupItems);
-        } else {
-            mod.getShippingMethodHandleAction(JSON.stringify(data));
+        } else if (Object.keys(storePickupItems).length === 0 && JSON.stringify(preStorePickUpItems) != JSON.stringify(storePickupItems)) {
+            console.log('333333');
+            findStoreAction.sourceShortestDistanceList.removeAll();
+            if (sortSourceDefault.length > 0) {
+                console.log('444444');
+                var distanceData = {};
+                $.each(sortSourceDefault, function (index, source) {
+                    findStoreAction.sourceShortestDistanceList.push(sourceList[source.source_code]);
+                    distanceData[source.source_code] = source.distance;
+                });
+                findStoreAction.sourceDistanceList(distanceData);
+                mod.selectedStore(sourceList[sortSourceDefault[0].source_code].source_code);
+            } else {
+                console.log('555555');
+                $.each(sourceList, function (index, item) {
+                    mod.selectedStore(item.source_code);
+                    return false;
+                });
+            }
         }
+        preStorePickUpItems = storePickupItems;
+    };
+
+    mod.selectedStore = function (source_code){
+        var source = sourceList[source_code],
+            storeAddress = source.street;
+        if (source.city && source.city != '') {
+            storeAddress += ', ' + source.city;
+        }
+        if (source.region && source.region != '') {
+            storeAddress += ', ' + source.region;
+            if (source.postcode && source.postcode != '') {
+                storeAddress += ' ' + source.postcode;
+            }
+        }
+        pickup.currentPickupId(source_code);
+        pickup.currentStoreName(source.name);
+        pickup.currentStoreAddress(storeAddress);
+        pickup.hasCurrentStore(true);
     };
 
     mod.updateSortestStore = function (data, storePickupItems) {
         console.log('update-shortest-store');
         updateShortestStore(true);
         if (navigator.geolocation) {
+            console.log('66666');
             navigator.geolocation.getCurrentPosition(function (position) {
                 var latlng = {lat: Number(position.coords.latitude), lng: Number(position.coords.longitude)};
                 mod.searchStoreHandle(data, latlng, storePickupItems, false);
             }, function (error) {
-                mod.getShippingMethodHandleAction(JSON.stringify(data));
+                console.log('xxxx');
+                mod.updateStore(data, storePickupItems);
             });
         } else {
-            mod.getShippingMethodHandleAction(JSON.stringify(data));updateCurrentStore
+            console.log('777777');
+            mod.updateStore(data, storePickupItems);
         }
     };
 
     mod.updateStore = function (data, storePickupItems) {
         var defaultLatlng = window.checkoutConfig.latlng;
         if (typeof findStoreAction.searchStoreAddress() !== 'undefined' && findStoreAction.searchStoreAddress() != '') {
+            console.log('8888888');
             var geocoder = new google.maps.Geocoder;
             geocoder.geocode( { 'address' : findStoreAction.searchStoreAddress() }, function( results, status ) {
                 if (status === 'OK') {
+                    console.log('99999');
                     var latlng = {lat: results[0].geometry.location.lat(), lng: results[0].geometry.location.lng()};
                     mod.searchStoreHandle(data, latlng, storePickupItems, update)
                 } else {
+                    console.log('10000');
                     alert($t("Geocode was not successful for the following reason: %1").replace('%1', status));
                 }
             });
         } else if (navigator.geolocation) {
+            console.log('10001');
             navigator.geolocation.getCurrentPosition(function (position) {
+                console.log('10002');
                 var latlng = {lat: Number(position.coords.latitude), lng: Number(position.coords.longitude)};
                 mod.searchStoreHandle(data, latlng, storePickupItems, false, true);
             }, function (error) {
+                console.log('10003');
                 var latlng = {lat: Number(defaultLatlng.lat), lng: Number(defaultLatlng.lng)};
                 mod.searchStoreHandle(data, latlng, storePickupItems, false, true);
             });
         } else {
+            onsole.log('10004');
             var latlng = {lat: Number(defaultLatlng.lat), lng: Number(defaultLatlng.lng)};
             mod.searchStoreHandle(data, latlng, storePickupItems, false, true);
         }
     };
 
     mod.searchStoreHandle = function (data, latlng, storePickupItems, updateCurrentStore, update) {
-        var currentPickupId = pickup.currentPickupId();
-        findStoreAction.searchShortestStoreAction(latlng, storePickupItems, updateCurrentStore, update).done(
-            function (response) {
-                if (currentPickupId == pickup.currentPickupId()) {
-                    data.additional_info.store_pick_up.store = currentPickupId;
-                    mod.getShippingMethodHandleAction(JSON.stringify(data));
-                }
-            }
-        ).fail(
-            function (response) {
-                mod.getShippingMethodHandleAction(JSON.stringify(data));
-            }
-        );
+        findStoreAction.searchShortestStoreAction(latlng, storePickupItems, updateCurrentStore, update);
     };
 
     mod.getShippingMethodHandleAction = function (data) {
@@ -849,6 +890,7 @@ define([
                     });
                 }
                 if (!response.error) {
+                    console.log('1111111111');
                     globalVar.disableGoPaymentButton(false);
                 }
                 if (response.stock_message != '') {

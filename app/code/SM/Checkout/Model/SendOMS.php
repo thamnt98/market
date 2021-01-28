@@ -229,6 +229,8 @@ class SendOMS
 
             if ((int)$product->getData('is_fresh')) {
                 $qty = $weight / 1000 * $qty;
+                $oriPrice = ceil($oriPrice * 1000 / $weight);
+                $sellPrice = ceil($sellPrice * 1000 / $weight);
             }
 
             $itemData = [
