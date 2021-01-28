@@ -245,4 +245,48 @@ class Search implements SearchInterface
 
         return $this->smProductInterface->getList($category_id, $limit, $p, false);
     }
+
+    /**
+     * @param \Magento\Framework\Api\Search\SearchCriteriaInterface $searchCriteria
+     *
+     * @return \Magento\Framework\Api\Search\SearchResultInterface
+     */
+    protected function baseSearch($searchCriteria)
+    {
+        $this->resolver->resolveVisibilityFilter($searchCriteria);
+
+        return $this->search->search($searchCriteria);
+    }
+
+    /**
+     * @param \Magento\Framework\Api\Search\SearchCriteriaInterface $searchCriteria
+     *
+     * @return \Magento\Framework\Api\Search\SearchResultInterface|null
+     */
+    public function searchSuggestion($searchCriteria)
+    {
+        $this->registry->register(Config::IS_QUICK_SUGGESTION_REQUEST, true);
+        $result = $this->baseSearch($searchCriteria);
+        
+        if ($result->getTotalCount()) {
+            return $result;
+        }
+        
+        try {
+            $query = $this->createQuery($searchCriteria);
+        } catch (\Exception $e) {
+            return $result;
+        }
+
+        if ($suggestKeywords = $this->suggestedQueries->getItems($query)) {
+            $suggestKeyword = reset($suggestKeywords);
+            $typoSuggestKeyword = $suggestKeyword->getQueryText();
+            $query->setQueryText($typoSuggestKeyword);
+            $this->suggestionPreparator->updateSearchText($searchCriteria, $typoSuggestKeyword);
+
+            return $this->search->search($searchCriteria);
+        }
+
+        return $result;
+    }
 }

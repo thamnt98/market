@@ -37,7 +37,7 @@ class Search implements SearchProductInterface
     /**
      * @var CollectionFactory
      */
-    protected $productFactory;
+    protected $productCollectionFactory;
 
     /**
      * @var \SM\MobileApi\Helper\Product
@@ -105,26 +105,62 @@ class Search implements SearchProductInterface
     protected $registry;
 
     /**
+     * @var \SM\MobileApi\Model\Data\Product\ListItemFactory
+     */
+    protected $productDataFactory;
+
+    /**
+     * @var \SM\Catalog\Helper\Data
+     */
+    protected $helper;
+
+    /**
+     * @var \SM\MobileApi\Model\Data\Catalog\Product\ReviewFactory
+     */
+    protected $productReviewDataFactory;
+
+    /**
+     * @var \SM\Search\Api\Data\Product\SuggestionInterfaceFactory
+     */
+    protected $suggestionFactory;
+
+    /**
+     * @var \SM\Search\Api\Catalog\SuggestionResultInterface
+     */
+    protected $suggestionResult;
+
+    /**
      * Search constructor.
-     * @param Searchs $search
-     * @param \Magento\Framework\Api\Search\SearchCriteriaInterface $searchCriteria
-     * @param \Magento\Framework\Api\Search\FilterGroup $filterGroup
-     * @param \Magento\Framework\Api\FilterFactory $filter
-     * @param CollectionFactory $productFactory
-     * @param \SM\MobileApi\Helper\Product $productHelper
-     * @param SearchInterface $searchInterface
-     * @param \Magento\Framework\Api\SortOrder $sortOrder
-     * @param ReportViewedProductSummaryRepositoryInterface $reportViewedProductSummaryRepository
-     * @param QueryFactory $queryFactory
-     * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
+     *
+     * @param \SM\Search\Api\Catalog\SuggestionResultInterface                           $suggestionResult
+     * @param \SM\Search\Api\Data\Product\SuggestionInterfaceFactory                     $suggestionFactory
+     * @param \SM\Catalog\Helper\Data                                                    $helper
+     * @param \SM\MobileApi\Model\Data\Catalog\Product\ReviewFactory                     $productReviewDataFactory
+     * @param \SM\MobileApi\Model\Data\Product\ListItemFactory                           $productDataFactory
+     * @param Searchs                                                                    $search
+     * @param \Magento\Framework\Api\Search\SearchCriteriaInterface                      $searchCriteria
+     * @param \Magento\Framework\Api\Search\FilterGroup                                  $filterGroup
+     * @param \Magento\Framework\Api\FilterFactory                                       $filter
+     * @param CollectionFactory                                                          $productFactory
+     * @param \SM\MobileApi\Helper\Product                                               $productHelper
+     * @param SearchInterface                                                            $searchInterface
+     * @param \Magento\Framework\Api\SortOrder                                           $sortOrder
+     * @param ReportViewedProductSummaryRepositoryInterface                              $reportViewedProductSummaryRepository
+     * @param QueryFactory                                                               $queryFactory
+     * @param \Magento\Catalog\Api\ProductRepositoryInterface                            $productRepository
      * @param \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable $configurableProductModel
-     * @param \Magento\Framework\Api\SortOrderBuilder $sortOrderBuilder
-     * @param \Magento\Framework\App\RequestInterface $request
-     * @param \SM\Category\Model\Catalog\Search $mCatalogSearch
-     * @param \SM\MobileApi\Model\Data\Product\LiistFactory $listFactory
-     * @param \Magento\Framework\Registry $registry
+     * @param \Magento\Framework\Api\SortOrderBuilder                                    $sortOrderBuilder
+     * @param \Magento\Framework\App\RequestInterface                                    $request
+     * @param \SM\Category\Model\Catalog\Search                                          $mCatalogSearch
+     * @param \SM\MobileApi\Model\Data\Product\LiistFactory                              $listFactory
+     * @param \Magento\Framework\Registry                                                $registry
      */
     public function __construct(
+        \SM\Search\Api\Catalog\SuggestionResultInterface $suggestionResult,
+        \SM\Search\Api\Data\Product\SuggestionInterfaceFactory $suggestionFactory,
+        \SM\Catalog\Helper\Data $helper,
+        \SM\MobileApi\Model\Data\Catalog\Product\ReviewFactory $productReviewDataFactory,
+        \SM\MobileApi\Model\Data\Product\ListItemFactory $productDataFactory,
         Searchs $search,
         \Magento\Framework\Api\Search\SearchCriteriaInterface $searchCriteria,
         \Magento\Framework\Api\Search\FilterGroup $filterGroup,
@@ -147,7 +183,7 @@ class Search implements SearchProductInterface
         $this->searchCriterial                      = $searchCriteria;
         $this->filterGroup                          = $filterGroup;
         $this->filterFactory                        = $filter;
-        $this->productFactory                       = $productFactory;
+        $this->productCollectionFactory             = $productFactory;
         $this->productHelper                        = $productHelper;
         $this->responseInterface                    = $searchInterface;
         $this->sortOrder                            = $sortOrder;
@@ -160,6 +196,11 @@ class Search implements SearchProductInterface
         $this->mCatalogSearch                       = $mCatalogSearch;
         $this->productListFactory                   = $listFactory;
         $this->registry                             = $registry;
+        $this->productDataFactory = $productDataFactory;
+        $this->helper = $helper;
+        $this->productReviewDataFactory = $productReviewDataFactory;
+        $this->suggestionFactory = $suggestionFactory;
+        $this->suggestionResult = $suggestionResult;
     }
 
     /**
@@ -181,9 +222,9 @@ class Search implements SearchProductInterface
         }
 
         $this->searchCriterial->setCurrentPage($page);
-        $filter[] = $this->_createFilterFactory(SearchHelperConfig::SEARCH_PARAM_SEARCH_TEXT_FIELD_NAME, $keyword, 'eq');
+        $filter[] = $this->createFilterFactory(SearchHelperConfig::SEARCH_PARAM_SEARCH_TEXT_FIELD_NAME, $keyword, 'eq');
         if (!empty($categoryId)) {
-            $filter[] = $this->_createFilterFactory(SearchHelperConfig::CATEGORY_IDS_ATTRIBUTE_CODE, $categoryId, 'eq');
+            $filter[] = $this->createFilterFactory(SearchHelperConfig::CATEGORY_IDS_ATTRIBUTE_CODE, $categoryId, 'eq');
         }
         $this->filterGroup->setFilters($filter);
 
@@ -200,7 +241,13 @@ class Search implements SearchProductInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param int    $customerId
+     * @param string $keyword
+     * @param int    $p
+     * @param int    $limit
+     *
+     * @return \SM\MobileApi\Api\Data\Product\ListInterface
+     * @throws NoSuchEntityException
      * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function searchV2($customerId, $keyword, $p = 1, $limit = 12)
@@ -216,7 +263,7 @@ class Search implements SearchProductInterface
         $result = $this->productListFactory->create();
         $result->setToolbarInfo($this->mCatalogSearch->getToolbarInfo());
         $result->setFilters($this->mCatalogSearch->getFilters());
-        $result->setProducts($this->mCatalogSearch->getProductsV2());
+        $result->setProducts($this->getLayerProducts($customerId));
 
         return $result;
     }
@@ -227,7 +274,7 @@ class Search implements SearchProductInterface
      * @param $conditionType
      * @return \Magento\Framework\Api\Filter
      */
-    protected function _createFilterFactory($key, $value, $conditionType)
+    protected function createFilterFactory($key, $value, $conditionType)
     {
         $filter = $this->filterFactory->create();
         $filter->setValue($value);
@@ -238,50 +285,69 @@ class Search implements SearchProductInterface
 
     /**
      * @param int $customerId
+     *
      * @return array|SearchInterface
+     * @throws NoSuchEntityException
      * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getRecommendationProducts(int $customerId)
     {
-        /** @var \Magento\Framework\Api\Search\SearchResult $result */
-        $result = $this->reportViewedProductSummaryRepository->getRecommendationProducts($customerId);
+        $total = 0;
+        $productsData = [];
 
-        $items      = $result->getProducts();
-        $totalCount = $result->getTotalCount();
-        return $this->_convertProductByIds($items, $totalCount, true);
+        if ($customerId) {
+            $enableReview = $this->productHelper->getReviewEnable();
+            $coll = $this->reportViewedProductSummaryRepository->getRecommendationCollection($customerId);
+            foreach ($coll as $item) {
+                $productsData[] = $this->prepareListItemData($item)->setReviewEnable($enableReview);
+            }
+
+            $total = count($productsData);
+        }
+
+        $this->responseInterface->setProducts($productsData);
+        $this->responseInterface->setTotal($total);
+
+        return $this->responseInterface;
     }
 
     /**
      * @param string $keyword
-     * @param int $categoryId
-     * @return array|SearchInterface
-     * @throws \Magento\Framework\Exception\LocalizedException
+     * @param int    $category_id
+     *
+     * @return \SM\Search\Api\Catalog\SuggestionResultInterface
      */
-    public function getSearchSuggestion($keyword, $categoryId = null)
+    public function getSearchSuggestion($keyword, $category_id = null)
     {
-        $filter = [];
-        $filter[] = $this->_createFilterFactory(SearchHelperConfig::SEARCH_PARAM_SEARCH_TEXT_FIELD_NAME, $keyword, 'eq');
-
-        if (!empty($categoryId)) {
-            $filter[] = $this->_createFilterFactory(SearchHelperConfig::CATEGORY_IDS_ATTRIBUTE_CODE, $categoryId, 'eq');
-            $this->registry->register(self::SHOW_CATEGORY_NAMES, false);
-        } else {
-            $this->registry->register(self::SHOW_CATEGORY_NAMES, true);
-        }
-
-        $this->filterGroup->setFilters($filter);
-
+        $this->filterGroup->setFilters($this->getSuggestionFilter($keyword, $category_id));
         $this->searchCriterial->setFilterGroups([$this->filterGroup]);
         $this->searchCriterial->setRequestName('quick_search_container');
 
-        /** @var \Magento\Framework\Api\Search\SearchResult $result */
-        $result            = $this->search->suggest($this->searchCriterial);
-        $responseInterface = $this->_initProducts($result);
-        $responseInterface->setSearchType($result->getType());
-        $responseInterface->setSuggestKeyword($result->getTypoSuggestKeyword());
+        /** @var \Magento\Framework\Api\Search\SearchResult $searchResult */
+        $searchResult = $this->search->searchSuggestion($this->searchCriterial);
+        $productIds   = [];
+        foreach ($searchResult->getItems() as $item) {
+            $productIds[] = $item->getId();
+        }
 
-        return $responseInterface;
+        /** @var \Magento\Catalog\Model\ResourceModel\Product\Collection $coll */
+        $coll = $this->productCollectionFactory->create();
+        $coll->addAttributeToSelect('name')
+            ->addFieldToFilter('entity_id', ['in' => $productIds])
+            ->addAttributeToFilter([
+                ["attribute" => "is_tobacco", "null" => true],
+                ["attribute" => "is_tobacco", "eq" => 0]
+            ]);
+
+        if ($this->request->getParam('limit')) {
+            $coll->getSelect()->limit((int)$this->request->getParam('limit'));
+        }
+
+        $list = $this->prepareSuggestionData($coll->getItems());
+
+        return $this->suggestionResult
+            ->setProducts($list)
+            ->setTotal(count($list));
     }
 
     /**
@@ -332,7 +398,7 @@ class Search implements SearchProductInterface
      */
     protected function _getProductByBarcode(string $barcode)
     {
-        $productCollection = $this->productFactory->create();
+        $productCollection = $this->productCollectionFactory->create();
         $products          = $productCollection->addAttributeToSelect('name')->addFieldToFilter(
             Config::PRODUCT_ATTRIBUTE_BARCODE,
             ['eq' => $barcode]
@@ -399,7 +465,7 @@ class Search implements SearchProductInterface
             }
         }
 
-        $productCollection = $this->productFactory->create();
+        $productCollection = $this->productCollectionFactory->create();
         $products          = $productCollection->addFieldToSelect('*')
             ->addFieldToFilter('entity_id', ['in' => $productIds])
             ->addAttributeToFilter([
@@ -422,5 +488,179 @@ class Search implements SearchProductInterface
         $this->responseInterface->setTotal($productCollection->getSize());
 
         return $this->responseInterface;
+    }
+
+    /**
+     * @param \Magento\Catalog\Model\Product $product
+     *
+     * @return \SM\MobileApi\Api\Data\Product\ListItemInterface
+     */
+    protected function prepareListItemData($product)
+    {
+        /** @var \SM\MobileApi\Model\Data\Product\ListItem $data */
+        $data = $this->productDataFactory->create();
+        /** @var \SM\MobileApi\Model\Data\Catalog\Product\Review $reviewData */
+        $reviewData = $this->productReviewDataFactory->create();
+
+        $reviewData
+            ->setReviewCounter($product->getData('reviews_count'))
+            ->setPercent($product->getData('rating_summary'));
+
+        if ($product->getTypeId() !== \Magento\Bundle\Model\Product\Type::TYPE_CODE) {
+            $minProduct = $this->helper->getMinProduct($product);
+            $price = $minProduct->getPrice();
+            $final = $minProduct->getFinalPrice();
+            $discountPercent = $this->helper->getDiscountSingle($minProduct);
+        } else {
+            [$final, $price] = $this->helper->getSumPriceMinBundle($product);
+            $discountPercent = $this->helper->getDiscountBundleMin($final, $price);
+        }
+
+        $data
+            ->setId($product->getId())
+            ->setSku($product->getSku())
+            ->setName($product->getName())
+            ->setType($product->getTypeId())
+            ->setTypeId($product->getTypeId())
+            ->setPrice($price)
+            ->setFinalPrice($final)
+            ->setReview($reviewData)
+            ->setItemId($product->getData('quote_item_id'))
+            ->setItemQty($product->getData('quote_item_qty'))
+            ->setIsAvailable($product->isAvailable())
+            ->setStock($this->productHelper->getProductStockQty($product))
+            ->setIsInStock($product->isInStock())
+            ->setIsSaleable($product->isSaleable())
+            ->setConfigChildCount($this->helper->getCountChildren($product->getId()))
+            ->setDiscountPercent((int)$discountPercent);
+
+        try {
+            $data->setGtmData($this->productHelper->prepareGTM($product, $data));
+        } catch (\Exception $e) {
+        }
+
+        try {
+            $data->setImage($this->productHelper->getMainImage($product));
+        } catch (\Exception $e) {
+        }
+
+        try {
+            $data->setProductLabel($this->productHelper->getProductLabel($product));
+        } catch (\Exception $e) {
+        }
+
+        return $data;
+    }
+
+    /**
+     * @param string $keyword
+     * @param int $categoryId
+     *
+     * @return \Magento\Framework\Api\Filter[]
+     */
+    protected function getSuggestionFilter($keyword, $categoryId)
+    {
+        $result = [];
+        $result[] = $this->createFilterFactory(
+            SearchHelperConfig::SEARCH_PARAM_SEARCH_TEXT_FIELD_NAME,
+            $keyword,
+            'eq'
+        );
+
+        if (!empty($categoryId)) {
+            $result[] = $this->createFilterFactory(SearchHelperConfig::CATEGORY_IDS_ATTRIBUTE_CODE, $categoryId, 'eq');
+            $this->registry->register(self::SHOW_CATEGORY_NAMES, false);
+        } else {
+            $this->registry->register(self::SHOW_CATEGORY_NAMES, true);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param \Magento\Catalog\Model\Product[]|\Magento\Framework\DataObject[] $products
+     *
+     * @return \SM\Search\Api\Data\Product\SuggestionInterface[]
+     */
+    protected function prepareSuggestionData($products)
+    {
+        $result = [];
+
+        foreach ($products as $product) {
+            /** @var \SM\Search\Api\Data\Product\SuggestionInterface $data */
+            $data = $this->suggestionFactory->create();
+
+            $data
+                ->setId($product->getId())
+                ->setSku($product->getSku())
+                ->setName($product->getName());
+
+            $result[] = $data;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param int $customerId
+     *
+     * @return array
+     */
+    protected function getLayerProducts($customerId)
+    {
+        $result = [];
+
+        $enableReview = $this->productHelper->getReviewEnable();
+        /** @var \Magento\Catalog\Model\Product $product */
+        foreach ($this->prepareLayerProductCollection($customerId) as $product) {
+            $result[] = $this->prepareListItemData($product)->setReviewEnable($enableReview);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param int $customerId
+     *
+     * @return \Magento\Catalog\Model\ResourceModel\Product\Collection
+     */
+    protected function prepareLayerProductCollection($customerId)
+    {
+        $coll = $this->mCatalogSearch->getProductCollectionWithReview();
+
+        $coll
+            ->addAttributeToSelect('*')
+            ->addAttributeToFilter(
+                [
+                    ["attribute" => "is_tobacco", "null" => true],
+                    ["attribute" => "is_tobacco", "eq" => 0],
+                ]
+            );
+
+        if ($customerId) { // Add quote item data
+            $inCartSelect = $coll->getConnection()->select();
+            $inCartSelect
+                ->from(['qi' => 'quote_item'], [])
+                ->joinInner(['q' => 'quote'], 'q.entity_id = qi.quote_id', [])
+                ->where('qi.product_id = e.entity_id')
+                ->where('qi.parent_item_id IS NULL')
+                ->where('q.is_active = ?', 1)
+                ->where('q.customer_id = ?', $customerId)
+                ->limit(1);
+
+            $itemIdSelect = clone $inCartSelect;
+            $itemIdSelect->columns(['qi.item_id']);
+            $qtySelect = clone $inCartSelect;
+            $qtySelect->columns(['qi.qty']);
+
+            $coll
+                ->getSelect()
+                ->columns([
+                    "({$itemIdSelect->__toString()}) AS quote_item_id",
+                    "({$qtySelect->__toString()}) AS quote_item_qty",
+                ]);
+        }
+
+        return $coll;
     }
 }

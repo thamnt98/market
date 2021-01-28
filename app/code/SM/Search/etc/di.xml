@@ -24,6 +24,10 @@
     <!-- Search -->
     <preference for="SM\Search\Api\SearchInterface"
                 type="SM\Search\Model\Search"/>
+    <preference for="SM\Search\Api\Data\Product\SuggestionInterface"
+                type="SM\Search\Model\Api\Data\Product\Suggestion"/>
+    <preference for="SM\Search\Api\Catalog\SuggestionResultInterface"
+                type="SM\Search\Model\Api\SuggestionResult"/>
 
     <!-- Suggestion -->
     <preference for="Magento\Search\Controller\Ajax\Suggest"

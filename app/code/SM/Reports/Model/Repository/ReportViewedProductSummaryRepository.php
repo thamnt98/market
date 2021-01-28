@@ -80,20 +80,28 @@ class ReportViewedProductSummaryRepository implements ReportViewedProductSummary
     protected $config;
 
     /**
+     * @var \Magento\Review\Model\ResourceModel\Review\Summary
+     */
+    protected $reviewSummary;
+
+    /**
      * ReportViewedProductSummaryRepository constructor.
-     * @param ResourceModel $resourceModel
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param SortOrderBuilder $sortOrderBuilder
-     * @param CollectionFactory $collectionFactory
-     * @param CollectionProcessorInterface $collectionProcessor
+     *
+     * @param \Magento\Review\Model\ResourceModel\Review\Summary      $reviewSummary
+     * @param ResourceModel                                           $resourceModel
+     * @param SearchCriteriaBuilder                                   $searchCriteriaBuilder
+     * @param SortOrderBuilder                                        $sortOrderBuilder
+     * @param CollectionFactory                                       $collectionFactory
+     * @param CollectionProcessorInterface                            $collectionProcessor
      * @param ReportViewedProductSummarySearchResultsInterfaceFactory $searchResultsFactory
-     * @param StoreManagerInterface $storeManager
-     * @param RequestInterface $request
-     * @param Extractor $extractor
-     * @param ProductRepositoryInterface $productRepository
-     * @param Config $config
+     * @param StoreManagerInterface                                   $storeManager
+     * @param RequestInterface                                        $request
+     * @param Extractor                                               $extractor
+     * @param ProductRepositoryInterface                              $productRepository
+     * @param Config                                                  $config
      */
     public function __construct(
+        \Magento\Review\Model\ResourceModel\Review\Summary $reviewSummary,
         ResourceModel $resourceModel,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         SortOrderBuilder $sortOrderBuilder,
@@ -117,6 +125,7 @@ class ReportViewedProductSummaryRepository implements ReportViewedProductSummary
         $this->extractor = $extractor;
         $this->productRepository = $productRepository;
         $this->config = $config;
+        $this->reviewSummary = $reviewSummary;
     }
 
     /**
@@ -151,35 +160,65 @@ class ReportViewedProductSummaryRepository implements ReportViewedProductSummary
      */
     public function getRecommendationProducts(int $customerId): ReportViewedProductSummarySearchResultsInterface
     {
-        $sortByPopularity = $this->sortOrderBuilder
-        ->setField(ReportViewedProductSummaryInterface::POPULARITY)
-        ->setDescendingDirection()
-        ->create();
+        /** @var ReportViewedProductSummarySearchResultsInterface $result */
+        $result = $this->searchResultsFactory->create();
+        $coll = $this->getRecommendationCollection($customerId);
 
-        $sortByLatestView = $this->sortOrderBuilder
-        ->setField(ReportViewedProductSummaryInterface::UPDATED_AT)
-        ->setDescendingDirection()
-        ->create();
+        $result->setProducts($coll->getItems());
+        $result->setTotalCount($coll->getSize());
 
-        $limit = $this->request->getParam(Config::SEARCH_PARAM_RECOMMENDATION_LIMIT_FIELD_NAME)
-            ?? $this->config->getRecommendationProductsSize();
+        return $result;
+    }
 
-        $searchCriteria = $this->searchCriteriaBuilder
-            ->addFilter(ReportViewedProductSummaryInterface::CUSTOMER_ID, $customerId)
-            ->addFilter(ReportViewedProductSummaryInterface::STORE_ID, $this->storeManager->getStore()->getId())
-            ->setSortOrders([$sortByPopularity, $sortByLatestView])
-            ->setPageSize($limit * 5) //Increase the product number limit to exclude out of stock or deleted product
-            ->create();
+    /**
+     * @param $customerId
+     *
+     * @return \Magento\Catalog\Model\ResourceModel\Product\Collection
+     * @throws \Magento\Framework\Exception\NoSuchEntityException|LocalizedException
+     */
+    public function getRecommendationCollection($customerId)
+    {
+        $limit = $this->request->getParam(
+            \SM\Reports\Helper\Config::SEARCH_PARAM_RECOMMENDATION_LIMIT_FIELD_NAME,
+            $this->config->getRecommendationProductsSize()
+        );
 
-        $searchResult = $this->getList($searchCriteria);
+        $coll = $this->productRepository->generateMobileCollection();
+        $this->reviewSummary->appendSummaryFieldsToCollection(
+            $coll,
+            $this->storeManager->getStore()->getId() . '',
+            \Magento\Review\Model\Review::ENTITY_PRODUCT_CODE
+        );
 
-        $productIds = $this->extractor->extractProductIds($searchResult->getItems());
-        if (!empty($productIds)) {
-            $searchResult->setProducts(
-                $this->productRepository->getStoreFrontProductByIds($productIds, $limit)
-            );
-        }
+        $inCartSelect = $coll->getConnection()->select();
+        $inCartSelect
+            ->from(['qi' => 'quote_item'], 'item_id')
+            ->joinInner(['q' => 'quote'], 'q.entity_id = qi.quote_id', [])
+            ->where('qi.product_id = e.entity_id')
+            ->where('qi.parent_item_id IS NULL')
+            ->where('q.is_active = ?', 1)
+            ->where('q.customer_id = ?', $customerId)
+            ->limit(1);
 
-        return $searchResult;
+        $coll->getSelect()
+            ->joinInner(
+                ['view' => 'report_viewed_product_summary'],
+                'e.entity_id = view.product_id',
+                []
+            )->where(
+                'view.customer_id = ?',
+                $customerId
+            )->where(
+                'view.store_id = ?',
+                $this->storeManager->getStore()->getId()
+            )->where(
+                "({$inCartSelect->__toString()}) IS NULL"
+            )->order(
+                'view.popularity DESC'
+            )->order(
+                'view.updated_at DESC'
+            )->limit($limit);
+
+        return $coll;
     }
 }
