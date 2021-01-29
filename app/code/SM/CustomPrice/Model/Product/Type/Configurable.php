@@ -188,6 +188,7 @@ class Configurable extends \Magento\ConfigurableProduct\Model\Product\Type\Confi
         $requiredAttributeIds = null
     ) {
         $collection = $this->getUsedProductCollection($product);
+        $collection->addAttributeToFilter('status', 1);
 
         if ($skipStockFilter) {
             $collection->setFlag('has_stock_status_filter', true);
