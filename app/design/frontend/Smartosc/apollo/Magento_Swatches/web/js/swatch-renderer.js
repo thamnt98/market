@@ -324,7 +324,10 @@ define([
                         i = i + 1;
                         var swatchOption = $(item).find('div.swatch-option[option-id="' + order + '"]');
                         if (swatchOption.length && !$(item).find('div.swatch-option').hasClass('selected')) {
-                            swatchOption.trigger('click');
+                            setTimeout(function(){
+                                swatchOption.parents('.wrapper-option-config').trigger('click');
+                            }, 1000);
+
                         }
                     });
                 }
