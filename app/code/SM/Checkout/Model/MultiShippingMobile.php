@@ -27,6 +27,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
     protected $errorCheckout = false;
     protected $errorCheckoutByAddress = false;
     protected $rebuild = false;
+    protected $notSpoList = false;
     /**
      * @var bool
      */
@@ -443,6 +444,9 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         $this->itemSelectShippingAddressId = $addressSelectedId;
         $addressesList = $this->getAddressSelectedList($customerId, $addressSelectedId);
         $defaultShippingMethod = \SM\Checkout\Model\MultiShippingHandle::DEFAULT_METHOD;
+        $orderToSendOar['order_id'] = $quote->getCustomerId();
+        $orderToSendOar['merchant_code'] = $this->split->getMerchantCode();
+        $this->getSkuListForPickUp($quote, $defaultShippingAddress);
         foreach ($allVisibleItems as $quoteItem) {
             $this->buildItemsInit($quoteItem, $quote, $defaultShippingMethod, $weightUnit, $currencySymbol, $storeId, $defaultShippingAddressId);
         }
@@ -461,6 +465,37 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
     }
 
     /**
+     * @param $quote
+     * @param $defaultShippingAddress
+     */
+    public function getSkuListForPickUp($quote, $defaultShippingAddress)
+    {
+        $orderToSendOar['order_id'] = (string)$quote->getCustomerId();
+        $orderToSendOar['merchant_code'] = $this->split->getMerchantCode();
+        $orderToSendOar['quote_address_id'] = 'spo';
+        try {
+            $regionId = $defaultShippingAddress->getRegionId();
+            $province = $this->split->getProvince($regionId);
+            $district = $defaultShippingAddress->getCustomAttribute('district') ? $defaultShippingAddress->getCustomAttribute('district')->getValue() : '';
+            $district = $this->split->getDistrictName($district);
+            $lat = $defaultShippingAddress->getCustomAttribute('latitude') ? $defaultShippingAddress->getCustomAttribute('latitude')->getValue() : 0;
+            $long = $defaultShippingAddress->getCustomAttribute('longitude') ? $defaultShippingAddress->getCustomAttribute('longitude')->getValue() : 0;
+            $city = $this->split->getCityName($defaultShippingAddress->getCity());
+            $orderToSendOar['destination'] = [
+                "address" => $defaultShippingAddress->getStreetFull(),
+                "province" => $province,
+                "city" => $city,
+                "district" => $district,
+                "postcode" => $defaultShippingAddress->getPostcode(),
+                "latitude" => (float)$lat,
+                "longitude" => (float)$long
+            ];
+            $this->notSpoList = $this->multiShippingHandle->getSkuListForPickUp($quote, $orderToSendOar, true);
+        } catch (\Exception $e) {
+            $this->notSpoList = [];
+        }
+    }
+    /**
      * @param $quoteItem
      * @param $quote
      * @param $defaultShippingMethod
@@ -474,6 +509,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
     protected function buildItemsInit($quoteItem, $quote, $defaultShippingMethod, $weightUnit, $currencySymbol, $storeId, $defaultShippingAddressId)
     {
         $this->requestItems[$quoteItem->getId()] = $this->multiShippingHandle->buildQuoteItemForMobile(
+            $this->notSpoList,
             $quoteItem,
             $defaultShippingMethod,
             [],
@@ -494,19 +530,40 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         $interface = $this->searchStoreResponseFactory->create();
         $customer = $this->customerFactory->create()->load($customerId);
         $quote = $this->quoteRepository->get($cartId);
-        $skuList = $this->getCartSkuList($quote);
+        $defaultShipping = $customer->getDefaultShippingAddress();
+        $orderToSendOar['order_id'] = (string)$customerId;
+        $orderToSendOar['merchant_code'] = $this->split->getMerchantCode();
+        try {
+            $regionId = $defaultShipping->getRegionId();
+            $province = $this->split->getProvince($regionId);
+            $district = $defaultShipping->getCustomAttribute('district') ? $defaultShipping->getCustomAttribute('district')->getValue() : '';
+            $district = $this->split->getDistrictName($district);
+            $lat = $defaultShipping->getCustomAttribute('latitude') ? $defaultShipping->getCustomAttribute('latitude')->getValue() : 0;
+            $long = $defaultShipping->getCustomAttribute('longitude') ? $defaultShipping->getCustomAttribute('longitude')->getValue() : 0;
+            if ($lat != 0 && $long != 0) {
+                $defaultShipping->setLatitude($lat)->setLongitude($long);
+            }
+            $city = $this->split->getCityName($defaultShipping->getCity());
+            $defaultShipping->setCity($city);
+        } catch (\Exception $e) {
+            return [];
+        }
+        $orderToSendOar['destination'] = [
+            "address" => $defaultShipping->getStreetFull(),
+            "province" => $province,
+            "city" => $city,
+            "district" => $district,
+            "postcode" => $defaultShipping->getPostcode(),
+            "latitude" => (float)$lat,
+            "longitude" => (float)$long
+        ];
+        $orderToSendOar['quote_address_id'] = 'spo';
+        $skuList = $this->multiShippingHandle->getSkuListForPickUp($quote, $orderToSendOar, false);
         $sourceList = $this->msiFullFill->getMsiFullFill($skuList);
         if (empty($sourceList)) {
             $interface->setCurrentStoreFulFill(false);
             return $interface;
         }
-        $defaultShipping = $customer->getDefaultShippingAddress();
-        $defaultLat = $defaultShipping->getCustomAttribute('latitude') ? $defaultShipping->getCustomAttribute('latitude')->getValue() : 0;
-        $defaultLng = $defaultShipping->getCustomAttribute('longitude') ? $defaultShipping->getCustomAttribute('longitude')->getValue() : 0;
-        if ($defaultLat != 0 && $defaultLng != 0) {
-            $defaultShipping->setLatitude($defaultLat)->setLongitude($defaultLng);
-        }
-        $defaultShipping->setCity($this->split->getCityName($defaultShipping->getCity()));
         $storeList = $this->msiFullFill->sortSourceByDistanceMobile($sourceList, $defaultShipping);
         $interface->setStoreList($storeList['store_list']);
         if (isset($storeList['store_list'][0])) {
@@ -580,7 +637,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         $storeDateTime = $additionalInfoFormat['store_pick_up'];
         $this->multiShippingHandle->handlePreviewOrder($deliveryDateTime, $storeDateTime, $quote);
 
-        $previewOrderProcess = $this->multiShippingHandle->getPreviewOrderData($quote, false);
+        $previewOrderProcess = $this->multiShippingHandle->getPreviewOrderData($quote, false, $this->notSpoList);
         $addressSelectedId = $this->getAddressSelectedId($shippingAddress);
         $quote->collectTotals();
         $this->quoteRepository->save($quote);
@@ -698,7 +755,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         } else {
             $voucherData = ['cart_total' => null, 'voucher_data' => null];
         }
-        $previewOrderProcess = $this->multiShippingHandle->getPreviewOrderData($checkoutSession->getQuote(), false, $dataHandle['data'], $dataHandle['mobile-items-format'], $dataHandle['child-items']);
+        $previewOrderProcess = $this->multiShippingHandle->getPreviewOrderData($checkoutSession->getQuote(), false, $this->notSpoList, $dataHandle['data'], $dataHandle['mobile-items-format'], $dataHandle['child-items'], $dataHandle['default-shipping-address']);
         $quoteItems = $previewOrderProcess['quote_item_data'];
         if (empty($quoteItems)) {
             $this->cartEmpty = true;
@@ -840,18 +897,26 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         $interface->setCurrentStore($currentStore);
         foreach ($quote->getAllItems() as $item) {
             if ($item->getParentItemId() && $item->getParentItemId() != null) {
-                $child[$item->getParentItemId()] = $item->getSku();
+                $child[$item->getParentItemId()][] = $item;
             }
         }
         foreach ($quote->getAllVisibleItems() as $item) {
             if (in_array($item->getId(), $storePickupItems)) {
-                $product = $item->getProduct();
-                $isWarehouse = $product->getIsWarehouse();
-                if ($isWarehouse == 1) {
-                    continue;
+                if (isset($child[$item->getItemId()])) {
+                    foreach ($child[$item->getItemId()] as $childItem) {
+                        if (isset($skuList[$childItem->getSku()])) {
+                            $skuList[$childItem->getSku()] += (int)$childItem->getQty() * (int)$item->getQty();
+                        } else {
+                            $skuList[$childItem->getSku()] = (int)$childItem->getQty() * (int)$item->getQty();
+                        }
+                    }
+                } else {
+                    if (isset($skuList[$item->getSku()])) {
+                        $skuList[$item->getSku()] += (int)$item->getQty();
+                    } else {
+                        $skuList[$item->getSku()] = (int)$item->getQty();
+                    }
                 }
-                $sku = (isset($child[$item->getItemId()])) ? $child[$item->getItemId()] : $item->getSku();
-                $skuList[$sku] = $item->getQty();
             }
         }
         $sourceList = $this->msiFullFill->getMsiFullFill($skuList);
@@ -899,6 +964,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
             $defaultShippingMethod = \SM\Checkout\Model\MultiShippingHandle::DEFAULT_METHOD;
             $weightUnit = $this->checkoutHelperConfig->getWeightUnit();
             $defaultShippingAddressId = $defaultShippingAddress->getId();
+            $this->getSkuListForPickUp($quote, $defaultShippingAddress);
             foreach ($quote->getAllVisibleItems() as $quoteItem) {
                 $itemId = $quoteItem->getId();
                 if (isset($itemsFormat[$itemId])) {
@@ -938,7 +1004,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         if ($response) {
             $response->setCheckoutTotal($voucherData['cart_total'])->setVoucher($voucherData['voucher_data']);
         } else {
-            $previewOrderProcess = $this->multiShippingHandle->getPreviewOrderData($quote, false);
+            $previewOrderProcess = $this->multiShippingHandle->getPreviewOrderData($quote, false, $this->notSpoList);
             $data = [
                 CheckoutDataInterface::SHIPPING_ADDRESS => $addressesList,
                 CheckoutDataInterface::ITEMS => $requestItems,
@@ -1006,7 +1072,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         } catch (\Exception $e) {
             $isErrorCheckout = true;
         }
-        $previewOrderProcess = $this->multiShippingHandle->getPreviewOrderData($quote, false);
+        $previewOrderProcess = $this->multiShippingHandle->getPreviewOrderData($quote, false, $this->notSpoList);
         $data = [
             CheckoutDataInterface::SHIPPING_ADDRESS => [],
             CheckoutDataInterface::ITEMS => [],

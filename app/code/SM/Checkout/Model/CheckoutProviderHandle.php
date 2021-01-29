@@ -44,11 +44,11 @@ class CheckoutProviderHandle
     protected $currentItemsListId = [];
     protected $isAddressEachItem = false;
     protected $fulFill = true;
-    protected $storePickUpItemsEnable = [];
     protected $quote = false;
     protected $allChildItems = [];
     protected $allParentItems = [];
     protected $skuListForPickUp = [];
+    protected $itemNotIsSpo = [];
 
     /**
      * @var \Magento\Framework\Api\SearchCriteriaBuilder
@@ -285,6 +285,7 @@ class CheckoutProviderHandle
         }
         $data['is_address_each_items'] = $this->isAddressEachItem;
         $data['currentItemsListId'] = implode(",", $this->currentItemsListId);
+        $data['itemNotIsSpo'] = array_values($this->itemNotIsSpo);
         return $data;
     }
 
@@ -689,30 +690,171 @@ class CheckoutProviderHandle
      */
     protected function handleQuoteItems()
     {
-        $notFulFillType = false;
+        $allChildItemsId = [];
         $quote = $this->getQuote();
         foreach ($quote->getAllItems() as $item) {
             if ($item->getParentItemId() && $item->getParentItemId() != null) {
-                $this->allChildItems[$item->getParentItemId()] = $item->getSku();
+                $this->allChildItems[$item->getParentItemId()][] = $item;
+                $allChildItemsId[$item->getParentItemId()][] = $item->getId();
             }
         }
+        $totalWeight = 0;
+        $totalQty = 0;
+        $totalPrice = 0;
+        $orderToSendOar = ['items' => []];
+        $allItemsSkuList = [];
+        $allParentItemsId = [];
         foreach ($quote->getAllVisibleItems() as $item) {
-            $product = $item->getProduct();
             $this->currentQuoteItems[$item->getId()] = $item;
             $this->currentItemsListId[] = $item->getId();
-            $isWarehouse = (bool)$product->getIsWarehouse();
-            if ($isWarehouse) {
-                $this->fulFill = false;
+            $rowTotal = (int) $item->getRowTotal();
+            $totalPrice += $rowTotal;
+            if (isset($allChildItems[$item->getItemId()])) {
+                foreach ($this->allChildItems[$item->getItemId()] as $itemData) {
+                    $product    = $itemData->getProduct();
+                    $ownCourier = (bool)$product->getData('own_courier');
+                    $sku      = $itemData->getSku();
+                    $childQty = (int) $item->getQty() * (int) $itemData->getQty();
+                    $price    = ((int) $itemData->getPrice() != 0) ? (int) $itemData->getPrice() : (int) $product->getFinalPrice();
+                    if (isset($orderToSendOar['items'][$sku])) {
+                        $orderToSendOar['items'][$sku]['quantity'] += $childQty;
+                    } else {
+                        $orderToSendOar['items'][$sku] = [
+                            'sku' => $sku,
+                            'sku_basic' => $sku,
+                            'quantity' => $childQty,
+                            'price' => $price,
+                            'weight' => (int) $itemData->getWeight(),
+                            'is_spo' => false,
+                            'is_own_courier' => $ownCourier,
+                        ];
+                    }
+                    $totalWeight += $childQty * (int) $itemData->getWeight();
+                    $totalQty += $childQty;
+                    if ($rowTotal == 0) {
+                        $rowTotal = $price * $childQty;
+                        $totalPrice += $rowTotal;
+                    }
+                    $allItemsSkuList[$itemData->getId()] = ['parent_id' => $item->getId(), 'sku' => $sku, 'qty' => (int) $item->getQty() * (int) $itemData->getQty()];
+                }
             } else {
-                $notFulFillType = true;
-                $sku = (isset($child[$item->getItemId()])) ? $child[$item->getItemId()] : $item->getSku();
-                $this->skuListForPickUp[$sku] = $item->getQty();
+                $product    = $item->getProduct();
+                $ownCourier = (bool)$product->getData('own_courier');
+                // sing quote item id
+                $sku   = $item->getSku();
+                $price = ((int) $item->getPrice() != 0) ? (int) $item->getPrice() : (int) $product->getFinalPrice();
+                if (isset($orderToSendOar['items'][$sku])) {
+                    $orderToSendOar['items'][$sku]['quantity'] += (int) $item->getQty();
+                } else {
+                    $orderToSendOar['items'][$sku] = [
+                        'sku' => $sku,
+                        'sku_basic' => $sku,
+                        'quantity' => (int) $item->getQty(),
+                        'price' => $price,
+                        'weight' => (int) $item->getWeight(),
+                        'is_spo' => false,
+                        'is_own_courier' => $ownCourier,
+                    ];
+                }
+
+                $totalWeight += (int) $item->getWeight();
+                $totalQty += (int) $item->getQty();
+                if ($rowTotal == 0) {
+                    $rowTotal = $price * (int) $item->getQty();
+                    $totalPrice += $rowTotal;
+                }
+                $allItemsSkuList[$item->getId()] = ['parent_id' => $item->getId(), 'sku' => $sku, 'qty' => (int) $item->getQty()];
+            }
+            $allParentItemsId[$item->getId()] = $item->getId();
+        }
+        $orderToSendOar['total_weight'] = $totalWeight;
+        $orderToSendOar['total_price'] = $totalPrice;
+        $orderToSendOar['total_qty'] = $totalQty;
+        $spoSku = $this->buildOarDataToCheckIsSpo($orderToSendOar);
+        $allItemsSkuListCheckSpo = $allItemsSkuList;
+        $allParentItemsIsSpo = $allParentItemsId;
+        foreach ($allItemsSkuListCheckSpo as $itemId => $itemData) {
+            if (!isset($allItemsSkuList[$itemId])) {
+                continue;
+            }
+            $itemSku = $itemData['sku'];
+            if (!in_array($itemSku, $spoSku)) {
+                $parentItemId = $allItemsSkuList[$itemId]['parent_id'];
+                unset($allParentItemsIsSpo[$parentItemId]);
+                if (isset($allChildItemsId[$parentItemId])) {
+                    foreach ($allChildItemsId[$parentItemId] as $childItemId) {
+                        unset($allItemsSkuList[$childItemId]);
+                    }
+                }
             }
         }
-        if (!$this->fulFill && !$notFulFillType) {
+        foreach ($allItemsSkuList as $item) {
+            if (isset($this->skuListForPickUp[$item['sku']])) {
+                $this->skuListForPickUp[$item['sku']] += $item['qty'];
+            } else {
+                $this->skuListForPickUp[$item['sku']] = $item['qty'];
+            }
+        }
+        if (empty($allParentItemsIsSpo)) {
+            $this->fulFill = false;
             $this->notFulFillMessage = __('Sorry, pick-up method is not applicable for this order. Shop conveniently with our delivery.');
-        } elseif (!$this->fulFill && $notFulFillType) {
+        } elseif (count($allParentItemsId) != count($allParentItemsIsSpo)) {
+            $this->fulFill = false;
             $this->notFulFillMessage = __('Sorry, some items are not available for pick-up. We have more delivery options for you, try them out!');
         }
+        $this->itemNotIsSpo = $allParentItemsIsSpo;
+    }
+
+    /**
+     * @param $orderToSendOar
+     * @param $checkIsSpo
+     * @return array
+     */
+    protected function buildOarDataToCheckIsSpo($orderToSendOar)
+    {
+        $orderToSendOar['order_id'] = $this->getCustomer()->getId();
+        $orderToSendOar['merchant_code'] = $this->split->getMerchantCode();
+        $defaultAddress = $this->getCustomer()->getDefaultShippingAddress();
+        try {
+            $regionId = $defaultAddress->getRegionId();
+            $province = $this->split->getProvince($regionId);
+            $district = $defaultAddress->getCustomAttribute('district') ? $defaultAddress->getCustomAttribute('district')->getValue() : '';
+            $district = $this->split->getDistrictName($district);
+            $lat = $defaultAddress->getCustomAttribute('latitude') ? $defaultAddress->getCustomAttribute('latitude')->getValue() : 0;
+            $long = $defaultAddress->getCustomAttribute('longitude') ? $defaultAddress->getCustomAttribute('longitude')->getValue() : 0;
+            $city = $this->split->getCityName($defaultAddress->getCity());
+        } catch (\Exception $e) {
+            return [];
+        }
+        $orderToSendOar['destination'] = [
+            "address" => $defaultAddress->getStreetFull(),
+            "province" => $province,
+            "city" => $city,
+            "district" => $district,
+            "postcode" => $defaultAddress->getPostcode(),
+            "latitude" => (float)$lat,
+            "longitude" => (float)$long
+        ];
+        $orderToSendOar['items'] = array_values($orderToSendOar['items']);
+        $orderToSendOar['quote_address_id'] = 'spo';
+        $response = $this->split->getOarResponse([$orderToSendOar]);
+        if (!is_array($response) || isset($response['error']) || !isset($response['content'])) {
+            return [];
+        }
+        $spo = [];
+        foreach ($response['content'] as $data) {
+            if (!isset($data['data'])) {
+                continue;
+            }
+            if (!isset($data['data']['items'])) {
+                continue;
+            }
+            foreach ($data['data']['items'] as $item) {
+                if (!$item['is_spo']) {
+                    $spo[] = $item['sku'];
+                }
+            }
+        }
+        return $spo;
     }
 }

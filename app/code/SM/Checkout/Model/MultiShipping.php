@@ -636,18 +636,26 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
         }
         foreach ($quote->getAllItems() as $item) {
             if ($item->getParentItemId() && $item->getParentItemId() != null) {
-                $child[$item->getParentItemId()] = $item->getSku();
+                $child[$item->getParentItemId()][] = $item;
             }
         }
         foreach ($quote->getAllVisibleItems() as $item) {
             if (in_array($item->getId(), $storePickupItems)) {
-                $product = $item->getProduct();
-                $isWarehouse = (bool)$product->getIsWarehouse();
-                if ($isWarehouse) {
-                    continue;
+                if (isset($child[$item->getItemId()])) {
+                    foreach ($child[$item->getItemId()] as $childItem) {
+                        if (isset($skuList[$childItem->getSku()])) {
+                            $skuList[$childItem->getSku()] += (int)$childItem->getQty() * (int)$item->getQty();
+                        } else {
+                            $skuList[$childItem->getSku()] = (int)$childItem->getQty() * (int)$item->getQty();
+                        }
+                    }
+                } else {
+                    if (isset($skuList[$item->getSku()])) {
+                        $skuList[$item->getSku()] += (int)$item->getQty();
+                    } else {
+                        $skuList[$item->getSku()] = (int)$item->getQty();
+                    }
                 }
-                $sku = (isset($child[$item->getItemId()])) ? $child[$item->getItemId()] : $item->getSku();
-                $skuList[$sku] = $item->getQty();
             }
         }
         $sourceList = $this->msiFullFill->getMsiFullFill($skuList);
