@@ -269,7 +269,7 @@ class SendOMS
                     'quantity' => (float)$qty,
                     'ori_price' => (int)$oriPrice,
                     'sell_price' => (int)$sellPrice,
-                    'disc_price' => (int)$discPrice,
+                    'disc_price' => ((int)$discPrice > 0) ? (int)$discPrice * -1 : (int)$discPrice,
                     'paid_price' => (int)$padPrice,
                     'sub_total' => (int)$subTotal,
                     'total_weight' => (float)$weight * (float)$qty,
