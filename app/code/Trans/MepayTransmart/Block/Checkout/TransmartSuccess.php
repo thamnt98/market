@@ -73,6 +73,7 @@ class TransmartSuccess extends Success
    * @param array $data
    */
   public function __construct (
+      \Magento\SalesRule\Model\ResourceModel\Coupon\CollectionFactory $couponCollFact,
     Context $context,
     Session $checkoutSession,
     OrderConfig $orderConfig,
@@ -98,6 +99,7 @@ class TransmartSuccess extends Success
     $this->transactionHelper = $objectManager->create('Trans\Mepay\Helper\Payment\Transaction');
     $this->statusCheck = $objectManager->create('Trans\Mepay\Model\Payment\Status');
     parent::__construct(
+        $couponCollFact,
       $context,
       $checkoutSession,
       $orderConfig,
