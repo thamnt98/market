@@ -52,7 +52,7 @@ class Resolver
     {
         $names = [];
 
-        $categoryIds = $product->getData(Config::CATEGORY_IDS_ATTRIBUTE_CODE);
+        $categoryIds = $this->getAllCategoryRowIds($product);
         if (empty($categoryIds)) {
             return '';
         }
@@ -65,9 +65,10 @@ class Resolver
 
             $select = $this->connection
                 ->select()
-                ->from(['v' => $nameAttr->getBackendTable()], 'value')
-                ->joinInner(['cce' => 'catalog_category_entity'], 'cce.row_id = v.row_id', [])
-                ->where('attribute_id = ?', $nameAttr->getId())
+                ->from(['ccev' => $nameAttr->getBackendTable()], 'value')
+                ->joinInner(['cce' => 'catalog_category_entity'], 'cce.row_id = ccev.row_id', [])
+                ->where('ccev.attribute_id = ?', $nameAttr->getId())
+                ->where('cce.parent_id NOT IN (0, 1)')
                 ->where('cce.entity_id in (' . implode(',', $categoryIds) . ')');
 
             $names = array_unique($this->connection->fetchCol($select));
@@ -79,5 +80,38 @@ class Resolver
         }
 
         return implode(' | ', $names);
+    }
+
+    /**
+     * @param Product $product
+     *
+     * @return array
+     */
+    public function getAllCategoryRowIds($product)
+    {
+        $categoryIds = $product->getData(Config::CATEGORY_IDS_ATTRIBUTE_CODE);
+        if (empty($categoryIds)) {
+            return [];
+        }
+
+        $select = $this->connection
+            ->select()
+            ->from('catalog_category_entity', [])
+            ->where('entity_id in (' . implode(',', $categoryIds) . ')')
+            ->columns([
+                "group_concat(replace(path, '/', ',')) as path"
+            ]);
+
+        $result = [];
+        foreach ($this->connection->fetchCol($select) as $path) {
+            foreach (array_unique(explode(',', $path)) as $id) {
+                if ($id != 0 && $id != 1) {
+                    $result[] = $id;
+                }
+            }
+
+        }
+
+        return $result;
     }
 }
