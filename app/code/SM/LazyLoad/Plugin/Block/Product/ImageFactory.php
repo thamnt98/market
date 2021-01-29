@@ -14,6 +14,21 @@ namespace SM\LazyLoad\Plugin\Block\Product;
 class ImageFactory
 {
     /**
+     * @var \Magento\Catalog\Helper\Image
+     */
+    private $imageHelper;
+
+    /**
+     * ImageFactory constructor.
+     * @param \Magento\Catalog\Helper\Image $imageHelper
+     */
+    public function __construct(
+        \Magento\Catalog\Helper\Image $imageHelper
+    ) {
+        $this->imageHelper = $imageHelper;
+    }
+
+    /**
      * @param $subject
      * @param $result
      * @return mixed
@@ -22,6 +37,7 @@ class ImageFactory
         $subject,
         $result
     ) {
+        $result->setPlaceHolderImage($this->imageHelper->getDefaultPlaceholderUrl('small_image'));
         $result->setTemplate('SM_LazyLoad::product/image_with_borders.phtml');
         return $result;
     }
