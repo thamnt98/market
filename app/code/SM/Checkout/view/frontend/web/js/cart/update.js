@@ -23,7 +23,7 @@ define([
     const cartContainer = $(".cart-container"),
         updateController = BASE_URL + "transcheckout/cart/update",
         updateItemController = BASE_URL + "transcheckout/cart/updateitemqty",
-        doneTypingInterval = 1500;
+        doneTypingInterval = 1000;
     let timerFunction;
 
     /**
@@ -228,10 +228,12 @@ define([
          */
         if (parseInt(itemQty.val()) >= 99 || parseInt(itemQty.val()) >= itemStockQty) {
             elementId.css("background", "#ccc");
-            elementId.attr('readonly', true);
+            downElementId.attr('readonly', true);
+            downElementId.addClass('disabled', false);
         } else {
             downElementId.css("background", "#f7b500");
             downElementId.attr('readonly', false);
+            downElementId.removeClass('disabled', false);
         }
 
         clearTimeout(timerFunction);
@@ -309,9 +311,11 @@ define([
         if (parseInt(itemQty.val()) <= 1) {
             elementId.css("background", "#ccc");
             elementId.attr('readonly', true);
+            elementId.addClass('disabled', false);
         } else {
             plusElementId.css("background", "#f7b500");
             plusElementId.attr('readonly', false);
+            plusElementId.removeClass('disabled', false);
         }
         clearTimeout(timerFunction);
         timerFunction = setTimeout(function () {

@@ -86,7 +86,7 @@ class UpdateItemQty extends Action
         $itemQty = $this->getRequest()->getParam('item_qty') * 1;
 
         try {
-            $this->checkQuoteItem($itemId);
+            $this->checkQuoteItem($itemId, $itemQty);
             $this->updateQuoteItem($itemId, $itemQty);
             return $this->jsonResponse();
         } catch (LocalizedException $e) {
@@ -104,12 +104,13 @@ class UpdateItemQty extends Action
      * @throws LocalizedException
      * @return $this
      */
-    protected function checkQuoteItem($itemId)
+    protected function checkQuoteItem($itemId, $itemQty)
     {
         $item = $this->itemFactory->create();
         $this->itemResourceModel->load($item, $itemId);
         $item->setQuote($this->cart->getQuote());
         $this->currentItem = $item;
+        $this->currentItem->setQty($itemQty);
         if (!$item instanceof CartItemInterface) {
             throw new LocalizedException(__("The quote item isn't found. Verify the item and try again."));
         }
