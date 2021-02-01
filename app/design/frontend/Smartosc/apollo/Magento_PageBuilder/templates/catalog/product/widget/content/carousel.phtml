@@ -102,7 +102,7 @@ $shoppingListHelper = $this->helper('SM\ShoppingList\Helper\Data');
 
                                     <div class="product-item-actions">
                                         <?php if ($showCart) : ?>
-                                            <!--<span class="action-primary-loader"></span>-->
+                                            <span class="action-primary-loader"></span>
                                             <div class="actions-primary">
                                                 <?php $childrenIds = $_item->getTypeInstance()->getChildrenIds($_item->getId()); ?>
                                                 <?php if ($childrenIds): ?>

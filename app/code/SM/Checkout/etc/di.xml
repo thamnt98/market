@@ -186,8 +186,6 @@
         <plugin name="SM_Checkout::SprintPaymentSendEmail"
                 type="SM\Checkout\Plugin\TransSprint\Model\PaymentSendEmail" />
     </type>
-    <preference for="Magento\Checkout\Model\Cart" type="SM\Checkout\Preference\Checkout\Model\Cart"/>
-    <preference for="Magento\Checkout\Model\TotalsInformationManagement" type="SM\Checkout\Preference\Checkout\Model\TotalsInformationManagement"/>
     <type name="Magento\Quote\Model\Quote\Address\Total\Shipping">
         <plugin name="SM_Checkout::total_shipping"
                 type="SM\Checkout\Plugin\Quote\Model\Quote\Address\Total\Shipping" />
