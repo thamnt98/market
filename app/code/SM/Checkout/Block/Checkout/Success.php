@@ -99,29 +99,37 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
     protected $orderCollectionFactory;
 
     /**
+     * @var \Magento\SalesRule\Model\ResourceModel\Coupon\CollectionFactory
+     */
+    protected $couponCollFact;
+
+    /**
      * Success constructor.
-     * @param \Magento\Framework\View\Element\Template\Context $context
-     * @param \Magento\Checkout\Model\Session $checkoutSession
-     * @param Order\Config $orderConfig
-     * @param \Magento\Framework\App\Http\Context $httpContext
-     * @param \Trans\Sprint\Api\SprintResponseRepositoryInterface $sprintResponseRepository
-     * @param \Trans\Sprint\Api\SprintPaymentFlagRepositoryInterface $sprintPaymentFlagRepository
-     * @param SprintHelper $config
-     * @param SprintHelper $paymentLogo
-     * @param \Trans\Sprint\Helper\Data $sprintHelperData
-     * @param \Magento\Framework\Pricing\Helper\Data $priceHelper
-     * @param \Magento\Framework\Stdlib\DateTime\DateTime $date
-     * @param TimezoneInterface $timezone
-     * @param SourceRepositoryInterface $sourceRepository
-     * @param Config $checkoutConfigHelper
-     * @param \Magento\Catalog\Helper\Image $image
-     * @param CityRepository $cityRepository
-     * @param DistrictRepository $districtRepository
-     * @param Payment $paymentHelper
-     * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $orderCollectionFactory
-     * @param array $data
+     *
+     * @param \Magento\SalesRule\Model\ResourceModel\Coupon\CollectionFactory $couponCollFact
+     * @param \Magento\Framework\View\Element\Template\Context                $context
+     * @param \Magento\Checkout\Model\Session                                 $checkoutSession
+     * @param Order\Config                                                    $orderConfig
+     * @param \Magento\Framework\App\Http\Context                             $httpContext
+     * @param \Trans\Sprint\Api\SprintResponseRepositoryInterface             $sprintResponseRepository
+     * @param \Trans\Sprint\Api\SprintPaymentFlagRepositoryInterface          $sprintPaymentFlagRepository
+     * @param SprintHelper                                                    $config
+     * @param SprintHelper                                                    $paymentLogo
+     * @param \Trans\Sprint\Helper\Data                                       $sprintHelperData
+     * @param \Magento\Framework\Pricing\Helper\Data                          $priceHelper
+     * @param \Magento\Framework\Stdlib\DateTime\DateTime                     $date
+     * @param TimezoneInterface                                               $timezone
+     * @param SourceRepositoryInterface                                       $sourceRepository
+     * @param Config                                                          $checkoutConfigHelper
+     * @param \Magento\Catalog\Helper\Image                                   $image
+     * @param CityRepository                                                  $cityRepository
+     * @param DistrictRepository                                              $districtRepository
+     * @param Payment                                                         $paymentHelper
+     * @param \Magento\Sales\Model\ResourceModel\Order\CollectionFactory      $orderCollectionFactory
+     * @param array                                                           $data
      */
     public function __construct(
+        \Magento\SalesRule\Model\ResourceModel\Coupon\CollectionFactory $couponCollFact,
         \Magento\Framework\View\Element\Template\Context $context,
         \Magento\Checkout\Model\Session $checkoutSession,
         \Magento\Sales\Model\Order\Config $orderConfig,
@@ -161,6 +169,7 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
         $this->districtRepository          = $districtRepository;
         $this->paymentHelper = $paymentHelper;
         $this->orderCollectionFactory = $orderCollectionFactory;
+        $this->couponCollFact = $couponCollFact;
     }
 
     public function getGrandTotal()
@@ -425,11 +434,28 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
     }
     /**
      * get rule id applied for GTM
-     * @return float|string
+     * @return string
      */
     public function getCouponCodeGTM()
     {
-        return $this->order->getAppliedRuleIds() ?? "Not available";
+        if (empty($this->order->getAppliedRuleIds())) {
+            return 'Not available';
+        }
+
+        /** @var \Magento\SalesRule\Model\ResourceModel\Coupon\Collection $coll */
+        $coll = $this->couponCollFact->create();
+        $coll
+            ->getSelect()
+            ->joinInner(['sr' => 'salesrule'], 'main_table.rule_id = sr.rule_id', ['name'])
+            ->where('sr.rule_id IN (' . $this->order->getAppliedRuleIds() .')');
+
+        $voucherNames = $coll->getColumnValues('name');
+
+        if (empty($voucherNames)) {
+            return 'Not available';
+        }
+
+        return implode(',', $voucherNames);
     }
 
     /**

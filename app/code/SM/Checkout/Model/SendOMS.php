@@ -179,8 +179,11 @@ class SendOMS
                 $order = $this->orderFactory->create()->load($id);
                 $data[] = $this->prepareData($order, $mainOrder);
             }
-            $this->omsIntegration->createOrderOms($data);
-
+            $resultCreateOms = $this->omsIntegration->createOrderOms($data);
+            if (!isset($resultCreateOms['code']) || $resultCreateOms['code'] != 200) {
+                $this->payment->paymentFailed($mainOrder, true);
+                throw new \Exception(__('Something went wrong. Please try again later!'));
+            }
             return;
         } catch (\Exception $e) {
             $this->payment->paymentFailed($mainOrder, true);
@@ -212,42 +215,70 @@ class SendOMS
          * @var \Magento\Sales\Model\Order\Item $item
          */
         $items = [];
+        $parentItem = [];
+        foreach ($order->getAllItems() as $item) {
+            if (!$item->getParentItemId() && $item->getProductType() == 'configurable') {
+                $weight = $item->getWeight();
+                $qty = $item->getQtyOrdered();
+                $sellPrice = $item->getPrice(); // final_price
+                $discPrice = $item->getDiscountAmount(); // total_discount
+                $subTotal = $sellPrice * $qty;
+                $padPrice = $subTotal - $discPrice; // sub_total - total_discount
+                $parentItem[$item->getId()] = [
+                    'quantity' => (float)$qty,
+                    'sell_price' => (int)$sellPrice,
+                    'disc_price' => (int)$discPrice,
+                    'paid_price' => (int)$padPrice,
+                    'sub_total' => (int)$subTotal,
+                    'total_weight' => (float)$weight * (float)$qty,
+                    'weight' => (float)$weight,
+                ];
+            }
+        }
         foreach ($order->getAllItems() as $item) {
             if (!$item->getParentItemId() && ($item->getProductType() == 'configurable' || $item->getProductType() == 'bundle')) {
                 continue;
             }
             $product = $item->getProduct();
-            $regularPrice = $this->price->getRegularPrice($product);
-            $qty = $item->getQtyOrdered();
-            $weight = $item->getWeight();
-            $price = $item->getPrice();
-            $oriPrice = $regularPrice; // regular_price
-            $sellPrice = $price; // final_price
-            $discPrice = $item->getDiscountAmount(); // total_discount
-            $subTotal = $sellPrice * $qty;
-            $padPrice = $subTotal - $discPrice; // sub_total - total_discount
+            $oriPrice = $this->price->getRegularPrice($product);
+            if ($item->getParentItemId() && isset($parentItem[$item->getParentItemId()])) {
+                $itemData = $parentItem[$item->getParentItemId()];
+                $itemData['sku_basic'] = '';
+                $itemData['sku'] = $item->getSku();
+                $itemData['ori_price'] = (int)$oriPrice;
+                $itemData['coupon_code'] = '';
+                $itemData['coupon_val'] = 0;
+                $itemData['is_warehouse'] = $product->getIsWarehouse();
+            } else {
+                $qty = $item->getQtyOrdered();
+                $weight = $item->getWeight();
+                $sellPrice = $item->getPrice(); // final_price
+                $discPrice = $item->getDiscountAmount(); // total_discount
+                $subTotal = $sellPrice * $qty;
+                $padPrice = $subTotal - $discPrice; // sub_total - total_discount
 
-            if ((int)$product->getData('is_fresh')) {
-                $qty = $weight / 1000 * $qty;
-                $oriPrice = ceil($oriPrice * 1000 / $weight);
-                $sellPrice = ceil($sellPrice * 1000 / $weight);
+                if ((int)$product->getData('is_fresh')) {
+                    $qty = $weight / 1000 * $qty;
+                    $oriPrice = ceil($oriPrice * 1000 / $weight);
+                    $sellPrice = ceil($sellPrice * 1000 / $weight);
+                }
+
+                $itemData = [
+                    'sku_basic' => '',
+                    'sku' => $item->getSku(),
+                    'quantity' => (float)$qty,
+                    'ori_price' => (int)$oriPrice,
+                    'sell_price' => (int)$sellPrice,
+                    'disc_price' => (int)$discPrice,
+                    'paid_price' => (int)$padPrice,
+                    'sub_total' => (int)$subTotal,
+                    'total_weight' => (float)$weight * (float)$qty,
+                    'weight' => (float)$weight,
+                    'coupon_code' => '', // pass
+                    'coupon_val' => 0,
+                    'is_warehouse' => $product->getIsWarehouse(),
+                ];
             }
-
-            $itemData = [
-                'sku_basic' => '',
-                'sku' => $item->getSku(),
-                'quantity' => (float)$qty,
-                'ori_price' => (int)$oriPrice,
-                'sell_price' => (int)$sellPrice,
-                'disc_price' => (int)$discPrice,
-                'paid_price' => (int)$padPrice,
-                'sub_total' => (int)$subTotal,
-                'total_weight' => (float)$weight * (float)$qty,
-                'weight' => (float)$weight,
-                'coupon_code' => '', // pass
-                'coupon_val' => 0,
-                'is_warehouse' => $product->getIsWarehouse(),
-            ];
 
             $this->eventManager->dispatch(
                 'send_oms_prepare_item_data_after',

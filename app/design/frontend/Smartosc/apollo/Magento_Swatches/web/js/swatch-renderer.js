@@ -849,16 +849,27 @@ define([
             }
 
             for (let key in data) {
-                let element = $('#' + key);
+                let element = $('#' + key),
+                    labelKey = 'tab-label-' + key;
 
                 $(element).empty();
-                if (data[key]) {
+                if (data.hasOwnProperty(key) && data[key]) {
                     $(element).append(data[key]);
-                    $('#tab-label-' + key).show();
+                    $('#' + labelKey).show();
                 } else {
-                    $('#tab-label-' + key).hide();
+                    $('#' + labelKey).hide();
                 }
             }
+
+            let firstTabKey = '#' + $('.detailed > .items > .item.title:visible')
+                .first()
+                .attr('id')
+                .replace(/[!"#$%&'()*+,.\/:;<=>?@[\\\]^`{|}~]/g, "\\$&");
+
+            $('.detailed > .items > .item.title.active').removeClass('active');
+            $('.detailed > .items > .item.content').hide();
+            $(firstTabKey).addClass('active');
+            $(firstTabKey.replace('tab-label-', '')).show();
         },
 
         /**

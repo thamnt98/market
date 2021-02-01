@@ -34,6 +34,7 @@ define(
                 }
             });
             var urlParams = new URLSearchParams(window.location.search);
+            console.log(urlParams.has('recovery'));
             if (urlParams.has('recovery') && recoveryForm === false) {
                 // show recovery popup
                 mod.callAjax('recovery-form');
