@@ -11,7 +11,7 @@ $helper = $this->helper(\SM\FlashSale\Helper\Quantity::class);
         <img class="lazy <?= $block->escapeHtmlAttr($block->getClass()) ?>" loading="lazy"
             <?= $block->escapeHtmlAttr($block->getCustomAttributes()) ?>
              data-src="<?= $block->escapeUrl($block->getImageUrl()) ?>"
-             src= "<?= $block->getViewFileUrl('SM_LazyLoad::images/loader.gif') ?>"
+             src= "<?= $block->getPlaceHolderImage() ?>"
              max-width="<?= $block->escapeHtmlAttr($block->getWidth()) ?>"
              max-height="<?= $block->escapeHtmlAttr($block->getHeight()) ?>"
              alt="<?= /* @noEscape */ $block->stripTags($block->getLabel(), null, true) ?>"/></span>

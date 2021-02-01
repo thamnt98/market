@@ -414,7 +414,7 @@ class MultiShippingHandle
         $checkoutSession->setQuoteCustomerBillingAddress($billing);
         $message = 'SM\Checkout\Model\MultiShippingHandle. Thoi gian set shipping method - quoteID ' . $checkoutSession->getQuote()->getId() . ': ';
         $dateStart = microtime(true); // log_time
-        $checkoutSession->setShippingMethods($addressShippingMethod);
+        //$checkoutSession->setShippingMethods($addressShippingMethod);
         $dateEnd = microtime(true); // log_time
         $this->writeTimeLog($dateEnd, $dateStart, $message);
         $data['mobile-items-format'] = $this->mobileItemsFormat;

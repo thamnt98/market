@@ -6,7 +6,7 @@
  *
  * @var $block \SM\GTM\Block\Product\ListProduct
  */
-$positionGTM = ($block->getToolbarBlock()->getCurrentPage() - 1) * 50 + 1;
+$positionGTM = ($block->getToolbarBlock()->getCurrentPage() - 1) * ($block->getToolbarBlock()->getLimit()) + 1;
 $helper = $this->helper('SM\Catalog\Helper\Data');
 $isPopupShowed = false;
 $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');

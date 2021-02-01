@@ -17,7 +17,7 @@ use Magento\Framework\App\Action\Action;
  */
 ?>
 <?php if (!$_product->getData('hide_cta_button')) : ?>
-    <span class="action-primary-loader"></span>
+    <!--<span class="action-primary-loader"></span>-->
     <div class="actions-primary"<?= strpos($pos, $viewMode . '-primary') ? $block->escapeHtmlAttr($position) : '' ?>>
         <?php $childrenIds = $_product->getTypeInstance()->getChildrenIds($_product->getId()); ?>
         <?php if ($childrenIds): ?>
