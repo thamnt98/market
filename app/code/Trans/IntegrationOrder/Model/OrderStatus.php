@@ -183,7 +183,7 @@ class OrderStatus implements OrderStatusInterface {
 		$this->resource                           = $resource;
 		$this->transaction                        = $transaction;
 		$this->registry                           = $registry;
-		$this->productRepository = $productRepository;
+		$this->productRepository                  = $productRepository;
 
 		$this->loggerOrder = $helperData->getLogger();
 	}
@@ -488,15 +488,15 @@ class OrderStatus implements OrderStatusInterface {
 				$product = $this->productRepository->get($itemData['sku']);
 
 				$allocatedQty = (float) $itemData['quantity_allocated'];
-				$qty = (float) $itemData['quantity'];
+				$qty          = (float) $itemData['quantity'];
 
-				if((int)$product->getData('is_fresh') == 1) {
-					$weight = (float) $product->getWeight('weight');
-					$allocatedQty = (1000 / $weight) *  $allocatedQty;
-					$qty = (1000 / $weight) *  $qty;
+				if ((int) $product->getData('is_fresh') == 1) {
+					$weight       = (float) $product->getWeight('weight');
+					$allocatedQty = (1000 / $weight) * $allocatedQty;
+					$qty          = (1000 / $weight) * $qty;
 				}
 
-				$itemData['quantity'] = floor($qty);
+				$itemData['quantity']           = floor($qty);
 				$itemData['quantity_allocated'] = floor($allocatedQty);
 
 				$orderItem[] = $itemData;
@@ -706,7 +706,8 @@ class OrderStatus implements OrderStatusInterface {
 		$loadItemByOrderId = $this->statusRepo->loadByOrderId($orderId);
 
 		$trxAmount = (int) $loadDataOrder->getGrandTotal();
-		/** Load Item By Order Id */
+
+		//Load Item By Order Id
 		$fetchData = $this->statusRepo->loadItemByOrderIds($entityIdSalesOrder);
 		$itemId    = $fetchData->getItemId();
 
@@ -769,8 +770,9 @@ class OrderStatus implements OrderStatusInterface {
 			}
 			/* End Non CC*/
 
-			if ($paymentMethod === 'sprint_mega_cc' || $paymentMethod === 'sprint_allbankfull_cc' || $paymentMethod === 'sprint_mega_debit' || $paymentMethod === 'trans_mepay_cc') {
+			if ($paymentMethod === 'sprint_mega_cc' || $paymentMethod === 'sprint_allbankfull_cc' || $paymentMethod === 'sprint_mega_debit' || $paymentMethod === 'trans_mepay_cc' || $paymentMethod === 'trans_mepay_allbankccdebit' || $paymentMethod === 'trans_mepay_debit' || $paymentMethod === 'trans_mepay_qris') {
 				$this->loggerOrder->info('=========== refund CC DEBIT start ===========');
+
 				/**
 				 * prepare data array refund send to PG
 				 */
@@ -780,12 +782,12 @@ class OrderStatus implements OrderStatusInterface {
 					$qtyOrder       = $itemOrder->getQty();
 					$qtyAllocated   = $itemOrder->getQtyAllocated();
 
-					$amount         = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
+					$amount = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 
 					$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
 				}
 
-				if ($paymentMethod === 'trans_mepay_cc') {
+				if ($paymentMethod === 'trans_mepay_cc' || $paymentMethod === 'trans_mepay_allbankccdebit' || $paymentMethod === 'trans_mepay_debit' || $paymentMethod === 'trans_mepay_qris') {
 					$this->eventManager->dispatch(
 						'refund_with_mega_payment',
 						[
@@ -1186,12 +1188,12 @@ class OrderStatus implements OrderStatusInterface {
 		$creditMemoData['comment_text']        = 'Refund';
 		$creditMemoData['send_email']          = 1;
 
-        if ($order->getData('is_parent')) {
-            // SOSC - Don't send email for parent order
-            $creditMemoData['send_email'] = 0;
-            // CTCD Update order status
-            $this->updateOrderStatus($orderId, 'in_process', 'processing');
-        }
+		if ($order->getData('is_parent')) {
+			// SOSC - Don't send email for parent order
+			$creditMemoData['send_email'] = 0;
+			// CTCD Update order status
+			$this->updateOrderStatus($orderId, 'in_process', 'processing');
+		}
 
 		$totalQty = 0;
 		foreach ($orderItemIds as $item) {
