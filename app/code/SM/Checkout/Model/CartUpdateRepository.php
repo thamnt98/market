@@ -176,7 +176,9 @@ class CartUpdateRepository implements CartUpdateRepositoryInterface
                 }
             }
 
-            $this->quoteRepository->save($quote);
+            if (!empty($items)) {
+                $this->quoteRepository->save($quote);
+            }
 
             if ($quote->isVirtual()) {
                 $addressTotalsData = $quote->getBillingAddress()->getData();
