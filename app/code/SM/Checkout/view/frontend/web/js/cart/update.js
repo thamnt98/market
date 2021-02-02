@@ -228,8 +228,8 @@ define([
          */
         if (parseInt(itemQty.val()) >= 99 || parseInt(itemQty.val()) >= itemStockQty) {
             elementId.css("background", "#ccc");
-            downElementId.attr('readonly', true);
-            downElementId.addClass('disabled', false);
+            elementId.attr('readonly', true);
+            elementId.addClass('disabled', true);
         } else {
             downElementId.css("background", "#f7b500");
             downElementId.attr('readonly', false);
