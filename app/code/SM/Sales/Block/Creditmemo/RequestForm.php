@@ -15,6 +15,7 @@ use Magento\Customer\Model\SessionFactory;
 use Magento\Framework\Pricing\Helper\Data;
 use Magento\Framework\View\Element\Template;
 use SM\Sales\Api\Data\Creditmemo\FormInformationInterface;
+use SM\Sales\Model\Creditmemo\BankRepository;
 use SM\Sales\Model\Creditmemo\RequestFormData;
 
 class RequestForm extends Template
@@ -28,7 +29,15 @@ class RequestForm extends Template
      * @var SessionFactory
      */
     private $sessionFactory;
+
+    /**
+     * @var Data
+     */
     private $priceHelper;
+    /**
+     * @var BankRepository
+     */
+    private $bankRepository;
 
     /**
      * RequestForm constructor.
@@ -43,11 +52,13 @@ class RequestForm extends Template
         SessionFactory $sessionFactory,
         RequestFormData $requestFormData,
         Data $priceHelper,
+        BankRepository $bankRepository,
         array $data = []
     ) {
         $this->requestFormData = $requestFormData;
         $this->sessionFactory = $sessionFactory;
         $this->priceHelper = $priceHelper;
+        $this->bankRepository = $bankRepository;
         parent::__construct($context, $data);
     }
 
@@ -150,5 +161,13 @@ class RequestForm extends Template
     public function formatCurrency($value)
     {
         return $this->priceHelper->currency($value, true, false);
+    }
+
+    /**
+     * @return \SM\Sales\Model\Creditmemo\Data\Bank[]
+     */
+    public function getBanks()
+    {
+        return $this->bankRepository->getList();
     }
 }
