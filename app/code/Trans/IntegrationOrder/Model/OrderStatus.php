@@ -706,7 +706,8 @@ class OrderStatus implements OrderStatusInterface {
 		$loadItemByOrderId = $this->statusRepo->loadByOrderId($orderId);
 
 		$trxAmount = (int) $loadDataOrder->getGrandTotal();
-		/** Load Item By Order Id */
+
+		//Load Item By Order Id
 		$fetchData = $this->statusRepo->loadItemByOrderIds($entityIdSalesOrder);
 		$itemId    = $fetchData->getItemId();
 
@@ -724,6 +725,14 @@ class OrderStatus implements OrderStatusInterface {
 					$amount         = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
 
 					$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
+
+					// $this->loggerOrder->info('===== Credit Memo ===== Start');
+
+					// $credit       = $this->creditMemos($parentEntityId, $itemId, $qtyAllocated);
+					// $creditEncode = json_encode($credit);
+
+					// $this->loggerOrder->info('$creditEncode : ' . $creditEncode);
+					// $this->loggerOrder->info('===== Credit Memo ===== End');
 
 				}
 
@@ -761,8 +770,9 @@ class OrderStatus implements OrderStatusInterface {
 			}
 			/* End Non CC*/
 
-			if ($paymentMethod === 'sprint_mega_cc' || $paymentMethod === 'sprint_allbankfull_cc' || $paymentMethod === 'sprint_mega_debit' || $paymentMethod === 'trans_mepay_cc') {
+			if ($paymentMethod === 'sprint_mega_cc' || $paymentMethod === 'sprint_allbankfull_cc' || $paymentMethod === 'sprint_mega_debit' || $paymentMethod === 'trans_mepay_cc' || $paymentMethod === 'trans_mepay_allbankccdebit' || $paymentMethod === 'trans_mepay_debit' || $paymentMethod === 'trans_mepay_qris') {
 				$this->loggerOrder->info('=========== refund CC DEBIT start ===========');
+
 				/**
 				 * prepare data array refund send to PG
 				 */
@@ -777,7 +787,7 @@ class OrderStatus implements OrderStatusInterface {
 					$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
 				}
 
-				if ($paymentMethod === 'trans_mepay_cc') {
+				if ($paymentMethod === 'trans_mepay_cc' || $paymentMethod === 'trans_mepay_allbankccdebit' || $paymentMethod === 'trans_mepay_debit' || $paymentMethod === 'trans_mepay_qris') {
 					$this->eventManager->dispatch(
 						'refund_with_mega_payment',
 						[
