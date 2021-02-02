@@ -182,7 +182,6 @@
                                let data = $.localStorage.get('product-checkout-gtm');
                                 response = $.parseJSON(response);
                                if (response.status=='success') {
-                                   location.reload();
                                    if (data) {
                                        data['payment_method'] = "<?= $block->getTitlePaymentMethod() ?>";
                                        data['coupon'] = "<?= $block->getCouponCodeGTM() ?>";
