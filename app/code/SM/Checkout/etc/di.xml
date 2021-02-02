@@ -83,6 +83,8 @@
                 type="SM\Checkout\Model\Api\CheckoutWeb\SearchStore"/>
     <preference for="SM\Checkout\Api\Data\CheckoutWeb\VoucherInterface"
                 type="SM\Checkout\Model\Api\CheckoutWeb\Voucher"/>
+    <preference for="SM\Checkout\Api\Data\CheckoutWeb\PaymentMethodInterface"
+                type="SM\Checkout\Model\Api\CheckoutWeb\PaymentMethod"/>
 
     <virtualType name="Magento\Sales\Model\ResourceModel\Order\Grid" type="Magento\Sales\Model\ResourceModel\Grid">
         <arguments>

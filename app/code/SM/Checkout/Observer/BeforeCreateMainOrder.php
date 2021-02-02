@@ -61,8 +61,15 @@ class BeforeCreateMainOrder implements ObserverInterface
         foreach ($quote->getAllVisibleItems() as $item) {
             $subtotal += $item->getRowTotal();
             $baseSubtotal += $item->getBaseRowTotal();
-            $discount += abs($item->getDiscountAmount());
-            $baseDiscount += abs($item->getBaseDiscountAmount());
+            if ($item->getHasChildren() && $item->isChildrenCalculated()) {
+                foreach ($item->getChildren() as $child) {
+                    $discount += abs($child->getDiscountAmount());
+                    $baseDiscount += abs($child->getBaseDiscountAmount());
+                }
+            } else {
+                $discount += abs($item->getDiscountAmount());
+                $baseDiscount += abs($item->getBaseDiscountAmount());
+            }
         }
 
         /** @var \Magento\Quote\Model\Quote\Address $address */

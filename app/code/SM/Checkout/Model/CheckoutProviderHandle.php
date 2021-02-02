@@ -303,7 +303,7 @@ class CheckoutProviderHandle
         $logoUrl = $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA);
         foreach ($this->paymentMethodList->getActiveList($store) as $method) {
             $methodInstance = $this->instanceFactory->create($method);
-            if ($methodInstance->isAvailable($quote) && $this->canUseMethod($methodInstance, $quote)) {
+            if ($method->getTitle() && $methodInstance->isAvailable($quote) && $this->canUseMethod($methodInstance, $quote)) {
                 $description = $this->helperConfig->getPaymentDescription($method->getCode());
                 $tooltipDescription = $this->helperConfig->getPaymentTooltipDescription($method->getCode());
                 $logo = "logo/paymentmethod/" . $this->helperConfig->getPaymentLogo($method->getCode());

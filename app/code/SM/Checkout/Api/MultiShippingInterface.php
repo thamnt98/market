@@ -32,9 +32,10 @@ interface MultiShippingInterface
      * @param \SM\Checkout\Api\Data\CheckoutWeb\PreviewOrder\Request\DeliveryDateTimeInterface[] $deliveryDateTime
      * @param bool $isSplitOrder
      * @param string $store
+     * @param bool $updatePaymentMethod
      * @return \SM\Checkout\Api\Data\CheckoutWeb\PreviewOrderInterface
      */
-    public function previewOrder($items, $storeDateTime, $deliveryDateTime, $isSplitOrder, $store);
+    public function previewOrder($items, $storeDateTime, $deliveryDateTime, $isSplitOrder, $store, $updatePaymentMethod);
 
     /**
      * respond orders ids "10001,10001-1,10001-2,10001-3,10001-4....";
