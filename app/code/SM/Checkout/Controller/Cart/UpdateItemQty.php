@@ -106,14 +106,13 @@ class UpdateItemQty extends Action
      */
     protected function checkQuoteItem($itemId, $itemQty)
     {
-        $item = $this->itemFactory->create();
-        $this->itemResourceModel->load($item, $itemId);
-        $item->setQuote($this->cart->getQuote());
-        $this->currentItem = $item;
+        $this->currentItem = $item = $this->cart->getQuote()->getItemById($itemId);
         $this->currentItem->setQty($itemQty);
         if (!$item instanceof CartItemInterface) {
             throw new LocalizedException(__("The quote item isn't found. Verify the item and try again."));
         }
+
+
         return $this;
     }
 

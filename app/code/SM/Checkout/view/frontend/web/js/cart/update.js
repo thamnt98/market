@@ -241,8 +241,10 @@ define([
             if (form !== undefined) {
                 const data = {'item_id': itemId, 'item_qty': itemQtyUpdate},
                     $parentCol = $this.parents('.col.qty'),
-                    $loader = $parentCol.find('.action-primary-loader');
+                    $loader = $parentCol.find('.action-primary-loader'),
+                    isChecked = $('#itemid-' + itemId).is(":checked");
                 $loader.css('display', 'block');
+
                 setTimeout(function () {
                     $loader.css('display', 'none');
                 }, 1500);
@@ -265,7 +267,9 @@ define([
                             }
 
                             // The totals summary block reloading
-                            recollect(true);
+                            if (isChecked) {
+                                recollect(true);
+                            }
 
                             var messages = $.cookieStorage.get('mage-messages');
                             if (!_.isEmpty(messages)) {
@@ -294,12 +298,13 @@ define([
 
     cartContainer.on("click", ".decrease-qty", function () {
 
-        let $this = $(this),
+        const $this = $(this),
             itemId =$this .attr('itemId'),
             itemQty = $('#cart-qty-'+ itemId),
             elementId = $('a#subtract-cart-item-' + itemId),
             plusElementId = $('a#add-cart-item-' + itemId),
-            form = $("#form-validate");
+            form = $("#form-validate"),
+            isChecked = $('#itemid-' + itemId).is(":checked");
 
         if (itemQty.val() <= 0 || elementId.is('[readonly]')) {
             return this;
@@ -337,7 +342,9 @@ define([
                         if (res.success === true) {
                             $parentCol.next('.col.subtotal').html(res.row_total);
                             // The totals summary block reloading
-                            recollect(true);
+                            if (isChecked) {
+                                recollect(true);
+                            }
                             //Decrease quantity GTM
                             let productId = $(this).parents().eq(4).find('[data-gtm-event="removeFromCart"]').attr('data-gtm-product-id');
                             gtmCollectData.collectData('removeFromCart', productId, itemQty.val());
