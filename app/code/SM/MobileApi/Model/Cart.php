@@ -109,6 +109,11 @@ class Cart implements \SM\MobileApi\Api\CartInterface
 
     public $quoteManagement;
 
+    /**
+     * @var \Magento\Quote\Api\Data\CartInterface
+     */
+    private $currentQuote;
+
     public function __construct(
         \SM\MobileApi\Api\Data\GTM\BasketInterfaceFactory $basketInterfaceFactory,
         \SM\GTM\Model\ResourceModel\Basket\CollectionFactory $basketCollectionFactory,
@@ -471,7 +476,7 @@ class Cart implements \SM\MobileApi\Api\CartInterface
         $optionSelected = [];
         $infoBuyRequest = $option['info_buyRequest'];
         $bundleOption = $infoBuyRequest['bundle_option'];
-        foreach ($productOption as $optionId =>$productOpt) {
+        foreach ($productOption as $optionId => $productOpt) {
             foreach ($bundleOption as $opt) {
                 if (in_array($productOpt->getSelectionId(), $opt)) {
                     $optionSelected[] = $productOpt;
@@ -621,7 +626,7 @@ class Cart implements \SM\MobileApi\Api\CartInterface
      * @inheritdoc
      * @throws \Magento\Framework\Webapi\Exception
      */
-    public function getItems($cartId)
+    public function getItems($cartId, $checkStock = true)
     {
         $output             = [];
         $cartMessageFactory = [];
@@ -629,7 +634,12 @@ class Cart implements \SM\MobileApi\Api\CartInterface
         $isAdjustQty        = false;
 
         /** @var  \Magento\Quote\Model\Quote $quote */
-        $quote      = $this->quoteRepository->getActive($cartId);
+        if (empty($this->currentQuote)) {
+            $quote = $this->quoteRepository->getActive($cartId);
+        } else {
+            $quote = $this->currentQuote;
+        }
+
         $customerId = $quote->getCustomerId();
         $totalQty   = 0;
         if ($quote->isMultipleShippingAddresses() || $quote->getIsMultiShipping()) {
@@ -665,28 +675,31 @@ class Cart implements \SM\MobileApi\Api\CartInterface
             $item->setExtensionAttributes($extension);
 
             $cartMessageFactory = $this->cartMessageFactory->create();
-            $availableStock = $this->productStock->getStock($item); //get saleable quantity
+
+            if ($checkStock) {
+                $availableStock = $this->productStock->getStock($item); //get saleable quantity
 
             //Adjust stock of product or remove product if product out of stock
-            if ($availableStock <= 0) {
-                $quote->removeItem($item->getItemId());
-                if (!$this->registry->registry("remove_cart_item")) {
-                    $this->registry->register("remove_cart_item", true);
-                }
-                $isRemoveProduct = true;
-                $message = "One of the product is no longer available and we remove it from your cart";
-                $cartMessageFactory->setMessage($message);
-                $cartMessageFactory->setMessageType(MessageInterface::TYPE_WARNING);
-                continue;
-            } else {
-                if ($item->getQty() > $availableStock) {
-                    $item->setQty($availableStock);
-                    $isAdjustQty         = true;
-                    $extensionAttributes = $item->getExtensionAttributes();
-                    $cartMessageFactory->setMessage(__('The quantity has been adjusted due to stock limitation.'));
+                if ($availableStock <= 0) {
+                    $quote->removeItem($item->getItemId());
+                    if (!$this->registry->registry("remove_cart_item")) {
+                        $this->registry->register("remove_cart_item", true);
+                    }
+                    $isRemoveProduct = true;
+                    $message = "One of the product is no longer available and we remove it from your cart";
+                    $cartMessageFactory->setMessage($message);
                     $cartMessageFactory->setMessageType(MessageInterface::TYPE_WARNING);
-                    $extensionAttributes->setCartMessage($cartMessageFactory);
-                    $item->setExtensionAttributes($extensionAttributes);
+                    continue;
+                } else {
+                    if ($item->getQty() > $availableStock) {
+                        $item->setQty($availableStock);
+                        $isAdjustQty         = true;
+                        $extensionAttributes = $item->getExtensionAttributes();
+                        $cartMessageFactory->setMessage(__('The quantity has been adjusted due to stock limitation.'));
+                        $cartMessageFactory->setMessageType(MessageInterface::TYPE_WARNING);
+                        $extensionAttributes->setCartMessage($cartMessageFactory);
+                        $item->setExtensionAttributes($extensionAttributes);
+                    }
                 }
             }
 
@@ -722,6 +735,22 @@ class Cart implements \SM\MobileApi\Api\CartInterface
         }
 
         return $cartItem;
+    }
+
+    /**
+     * @param \Magento\Quote\Api\Data\CartInterface $quote
+     */
+    public function setQuote(\Magento\Quote\Api\Data\CartInterface $quote)
+    {
+        $this->currentQuote = $quote;
+    }
+
+    /**
+     * @return \Magento\Quote\Api\Data\CartInterface
+     */
+    public function getQuote()
+    {
+        return $this->currentQuote;
     }
 
     /**

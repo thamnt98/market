@@ -47,6 +47,6 @@
     <preference for="Mirasvit\Blog\Model\Post"
                 type="SM\MobileApi\Model\Post"/>
 
-    <preference for="Magento\Quote\Model\Quote\Item\Repository"
+    <preference for="\SM\MobileApi\Api\CartItemRepositoryInterface"
                 type="SM\MobileApi\Model\Quote\Item\Repository"/>
 </config>
