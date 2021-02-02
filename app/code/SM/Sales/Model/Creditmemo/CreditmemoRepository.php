@@ -49,11 +49,16 @@ class CreditmemoRepository implements \SM\Sales\Api\CreditmemoRepositoryInterfac
     private $customerRepository;
 
     /**
+     * @var BankRepository
+     */
+    private $bankRepository;
+
+    /**
      * CreditmemoRepository constructor.
      * @param \SM\Sales\Api\Data\Creditmemo\FormInformationInterfaceFactory $formInformationFactory
      * @param \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository
      * @param CustomerRepositoryInterface $customerRepository
-     * @param \SM\Sales\Api\Data\Creditmemo\BankInterfaceFactory $bankFactory
+     * @param BankRepository $bankRepository
      * @param SendToJira $sendToJira
      * @param RequestFormData $requestFormData
      */
@@ -61,13 +66,13 @@ class CreditmemoRepository implements \SM\Sales\Api\CreditmemoRepositoryInterfac
         \SM\Sales\Api\Data\Creditmemo\FormInformationInterfaceFactory $formInformationFactory,
         \Magento\Sales\Api\CreditmemoRepositoryInterface $creditmemoRepository,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
-        \SM\Sales\Api\Data\Creditmemo\BankInterfaceFactory $bankFactory,
+        \SM\Sales\Model\Creditmemo\BankRepository $bankRepository,
         \SM\Sales\Model\Creditmemo\SendToJira $sendToJira,
         \SM\Sales\Model\Creditmemo\RequestFormData $requestFormData
     ) {
         $this->formInformationFactory = $formInformationFactory;
         $this->creditmemoRepository = $creditmemoRepository;
-        $this->bankFactory = $bankFactory;
+        $this->bankRepository = $bankRepository;
         $this->sendToJira = $sendToJira;
         $this->requestFormData = $requestFormData;
         $this->customerRepository = $customerRepository;
@@ -84,7 +89,7 @@ class CreditmemoRepository implements \SM\Sales\Api\CreditmemoRepositoryInterfac
          */
         $formData = $this->formInformationFactory->create();
 
-        $formData->setData(FormInformationInterface::BANKS, $this->getBanks())
+        $formData->setData(FormInformationInterface::BANKS, $this->bankRepository->getList())
             ->setData(FormInformationInterface::IS_SUBMITTED, false);
 
         try {
@@ -148,9 +153,9 @@ class CreditmemoRepository implements \SM\Sales\Api\CreditmemoRepositoryInterfac
     protected function prepareParams(array $params): array
     {
         return [
-            RequestFormData::BANK_KEY => $this->prepareBankName($params['bank']),
+            RequestFormData::BANK_KEY => $this->prepareBankName($params),
             RequestFormData::ACCOUNT_NAME_KEY => $params['account_name'],
-            RequestFormData::ACCOUNT_KEY => (int) $params['account_number'],
+            RequestFormData::ACCOUNT_KEY => $params['account_number'],
             RequestFormData::ORDER_REFERENCE_NUMBER_KEY =>  $this->requestFormData->getReferenceNumber(),
             RequestFormData::PAYMENT_NUMBER_KEY  => $this->requestFormData->getPaymentNumber(),
             RequestFormData::TOTAL_REFUND_KEY => (int) $this->requestFormData->getTotalRefund(),
@@ -173,32 +178,22 @@ class CreditmemoRepository implements \SM\Sales\Api\CreditmemoRepositoryInterfac
     }
 
     /**
-     * @return Data\Bank[]
-     */
-    private function getBanks()
-    {
-        /**
-         * @var \SM\Sales\Model\Creditmemo\Data\Bank $bank
-         */
-        $bank = $this->bankFactory->create();
-        $bank->setData(BankInterface::CODE, 'bank_mega');
-        $bank->setData(BankInterface::NAME, 'Bank Mega');
-
-        return [$bank];
-    }
-
-    /**
-     * @param $bank
+     * @param $params
      * @return mixed
      * @throws \Exception
      */
-    private function prepareBankName($bank)
+    private function prepareBankName($params)
     {
-        foreach ($this->getBanks() as $bankObject) {
-            if ($bank == $bankObject->getCode()) {
-                return $bankObject->getName();
+        if ($params['bank'] == \SM\Sales\Model\Creditmemo\BankRepository::BANK_INSERT_BY_TEXT_KEY) {
+            return $params[\SM\Sales\Model\Creditmemo\BankRepository::BANK_INSERT_KEY];
+        }
+
+        foreach ($this->bankRepository->getList() as $bank) {
+            if ($params['bank'] == $bank->getCode()) {
+                return $bank->getName();
             }
         }
+
         throw new \Exception('Invalid Bank Name');
     }
 }

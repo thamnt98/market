@@ -17,6 +17,11 @@ use SM\GTM\Api\MapperInterface;
 class Quote implements CollectorInterface
 {
     /**
+     * @var \Magento\Quote\Model\QuoteRepository
+     */
+    protected $quoteRepository;
+
+    /**
      * @var CartInterface
      */
     private $quote;
@@ -37,11 +42,13 @@ class Quote implements CollectorInterface
      * @param Session $checkoutSession
      */
     public function __construct(
+        \Magento\Quote\Model\QuoteRepository $quoteRepository,
         MapperInterface $mapper,
         Session $checkoutSession
     ) {
         $this->mapper = $mapper;
         $this->checkoutSession = $checkoutSession;
+        $this->quoteRepository = $quoteRepository;
     }
 
     /**
@@ -62,7 +69,15 @@ class Quote implements CollectorInterface
     public function getQuote()
     {
         if (!$this->quote) {
-            $this->quote = $this->checkoutSession->getQuote();
+            if ((
+                    strpos($_SERVER['HTTP_REFERER'], 'transcheckout/index/success') !== false
+                    && $_REQUEST['isAjax']
+                ) || strpos($_SERVER['REQUEST_URI'], 'transcheckout/index/success')
+            ) {
+                $this->quote = $this->quoteRepository->get($this->checkoutSession->getLastRealOrder()->getQuoteId());
+            } else {
+                $this->quote = $this->checkoutSession->getQuote();
+            }
         }
         $this->quote->setItemsQty((int)$this->quote->getItemsQty());
         return $this->quote;

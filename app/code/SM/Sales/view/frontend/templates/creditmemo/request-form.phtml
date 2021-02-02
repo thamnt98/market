@@ -3,6 +3,9 @@
  * @var \SM\Sales\Block\Creditmemo\RequestForm $block
  */
 ?>
+<?php
+    $banks = $block->getBanks();
+?>
 <div class="refund-request-form">
     <div class="request-form-header">
         <div class="left">
@@ -25,10 +28,20 @@
                     <span><?= __('Bank Name') ?></span>
                 </label>
                 <div class="control">
-                    <select name="bank" data-validate="{required:true}">
+                    <select name="bank" data-validate="{required:true}" data-mage-init='{"RefundForm": {}}'>
                         <option value=""><?= __('Select Bank Name') ?></option>
-                        <option value="Bank Mega">Bank Mega</option>
+                        <?php foreach ($banks as $bank): ?>
+                        <option value="<?= $bank->getCode() ?>"><?= $bank->getName() ?></option>
+                        <?php endforeach; ?>
                     </select>
+                </div>
+            </div>
+            <div class="field no-display">
+                <label class="label">
+                    <span><?= __('Other Bank') ?></span>
+                </label>
+                <div class="control">
+                    <input type="text" name="bank_insert" value="" class="input-text" placeholder="<?= __('Other Bank') ?>"/>
                 </div>
             </div>
             <div class="field">
