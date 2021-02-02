@@ -114,22 +114,28 @@ define([
 
         getCurrentLocation: function() {
             var self = this;
-            if (self.loadGoogleAPI() && navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition (function (position){
-                    var geocoder = new google.maps.Geocoder,
-                        latlng = {lat: position.coords.latitude, lng: position.coords.longitude};
-                    geocoder.geocode({'location': latlng}, function(results, status) {
-                        if (status === 'OK') {
-                            self.searchStoreAddress(results[0].formatted_address);
-                            var storePickupItems = initShippingType.getRatesData().storePickupItems;
-                            if (Object.keys(storePickupItems).length !== 0) {
-                                findStoreAction.searchShortestStoreAction(latlng, storePickupItems);
-                            }
-                        } else {
-                            alert($t("Geocode was not successful for the following reason: %1").replace('%1', status));
-                        }
-                    });
-                })
+            if (self.loadGoogleAPI()) {
+                navigator.permissions.query({name:'geolocation'}).then(function(result) {
+                    if (result.state === 'denied') {
+                        alert($t("Geocode was not successful for the following reason."));
+                    } else {
+                        navigator.geolocation.getCurrentPosition (function (position){
+                            var geocoder = new google.maps.Geocoder,
+                                latlng = {lat: position.coords.latitude, lng: position.coords.longitude};
+                            geocoder.geocode({'location': latlng}, function(results, status) {
+                                if (status === 'OK') {
+                                    self.searchStoreAddress(results[0].formatted_address);
+                                    var storePickupItems = initShippingType.getRatesData().storePickupItems;
+                                    if (Object.keys(storePickupItems).length !== 0) {
+                                        findStoreAction.searchShortestStoreAction(latlng, storePickupItems);
+                                    }
+                                } else {
+                                    alert($t("Geocode was not successful for the following reason: %1").replace('%1', status));
+                                }
+                            });
+                        })
+                    }
+                });
             } else {
                 alert($t("Geolocation is not supported by this browser."));
             }

@@ -90,19 +90,21 @@ define(
 
         mod.getLocation = function () {
             var self = mod;
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    if (!locationLong) {
-                        locationLong = position.coords.longitude;
-                        locationLat = position.coords.latitude;
-                        $(self.options.latSelector).val(locationLat);
-                        $(self.options.longSelector).val(locationLong);
-                        allowLocation = true;
-                    }
-                }, function (error) {
+            navigator.permissions.query({name:'geolocation'}).then(function(result) {
+                if (result.state !== 'denied') {
+                    navigator.geolocation.getCurrentPosition(function (position) {
+                        if (!locationLong) {
+                            locationLong = position.coords.longitude;
+                            locationLat = position.coords.latitude;
+                            $(self.options.latSelector).val(locationLat);
+                            $(self.options.longSelector).val(locationLong);
+                            allowLocation = true;
+                        }
+                    }, function (error) {
 
-                });
-            }
+                    });
+                }
+            });
         };
 
         mod.detected = function () {

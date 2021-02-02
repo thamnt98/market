@@ -32,13 +32,20 @@ define(
                         alert($t("Geocode was not successful for the following reason: %1").replace('%1', status));
                     }
                 });
-            } else if (updateCurrentStore && navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function (position) {
-                    var latlng = {lat: Number(position.coords.latitude), lng: Number(position.coords.longitude)};
-                    mod.searchShortestStoreAction(latlng, storePickupItems, updateCurrentStore, update);
-                }, function (error) {
-                    var latlng = {lat: Number(defaultLatlng.lat), lng: Number(defaultLatlng.lng)};
-                    mod.searchShortestStoreAction(latlng, storePickupItems, updateCurrentStore, update);
+            } else if (updateCurrentStore) {
+                navigator.permissions.query({name:'geolocation'}).then(function(result) {
+                    if (result.state === 'denied') {
+                        var latlng = {lat: Number(defaultLatlng.lat), lng: Number(defaultLatlng.lng)};
+                        mod.searchShortestStoreAction(latlng, storePickupItems, updateCurrentStore, update);
+                    } else {
+                        navigator.geolocation.getCurrentPosition(function (position) {
+                            var latlng = {lat: Number(position.coords.latitude), lng: Number(position.coords.longitude)};
+                            mod.searchShortestStoreAction(latlng, storePickupItems, updateCurrentStore, update);
+                        }, function (error) {
+                            var latlng = {lat: Number(defaultLatlng.lat), lng: Number(defaultLatlng.lng)};
+                            mod.searchShortestStoreAction(latlng, storePickupItems, updateCurrentStore, update);
+                        });
+                    }
                 });
             } else {
                 var latlng = {lat: Number(defaultLatlng.lat), lng: Number(defaultLatlng.lng)};
