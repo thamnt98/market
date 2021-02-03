@@ -176,23 +176,23 @@ define([
         placeOrder: function () {
             // **** BANK MEGA payment ****
             var obj = this.getPaymentMethods();
-
+            var redirectUrl = urlManager.build('transcheckout');
             if (obj['method'] == 'trans_mepay_debit' || obj['method'] == 'trans_mepay_cc' || obj['method'] == 'trans_mepay_va' || obj['method'] == 'trans_mepay_qris') {
-                return $.when(placeOrder(this.getPaymentMethods(), '')).done(
+                return placeOrder(this.getPaymentMethods(), '').success(
                     function () {
-
-                        var redirectUrl = urlManager.build('transmepay/payment/redirect');
                         $('[data-href="payment-error"]').text('').addClass('hidden');
+                        window.location.replace(urlManager.build('transmepay/payment/redirect'));
+                    }
+                ).fail(
+                    function () {
                         window.location.replace(redirectUrl);
-
                     }
                 );
             }
             // **** end BANK MEGA payment ****
 
-            return $.when(placeOrder(this.getPaymentMethods(), '')).done(
+            return placeOrder(this.getPaymentMethods(), '').success(
                 function () {
-
                     var redirectUrl = urlManager.build('sprint/payment/authorization');
                     $('[data-href="payment-error"]').text('').addClass('hidden');
                     $.ajax({
@@ -237,9 +237,13 @@ define([
                             }
                         } //end of ajax success
                         , error: function (error) {
-                            console.log(error);
+                            window.location.replace(redirectUrl);
                         }
                     });
+                }
+            ).fail(
+                function () {
+                    window.location.replace(redirectUrl);
                 }
             );
         },
