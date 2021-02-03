@@ -211,7 +211,7 @@ class Repository implements \SM\MobileApi\Api\CartItemRepositoryInterface
         $quoteItems = $quote->getItems();
         $quoteItems[] = $cartItem;
         $quote->setItems($quoteItems);
-        $this->quoteRepository->save($quote);
+        $this->quoteRepository->save($quote->setTotalsCollectedFlag(true));
         $this->mbCartRepository->setQuote($quote);
 
         if ($message != "") {
