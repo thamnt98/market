@@ -419,7 +419,7 @@ class MultiShippingHandle
         $this->writeTimeLog($dateEnd, $dateStart, $message);
         $data['mobile-items-format'] = $this->mobileItemsFormat;
         $data['child-items'] = $this->child;
-        $data['default-shipping-address'] = $billing;
+        $data['default-shipping-address'] = $customer->getDefaultShippingAddress();
         return $data;
     }
 
@@ -1101,7 +1101,7 @@ class MultiShippingHandle
             $storeId = $quote->getStoreId();
             $voucher = $quote->getApplyVoucher();
         }
-        if (!$web && !$notSpoList) {
+        if (!$web && !$notSpoList && $defaultShipping) {
             $orderToSendOar['order_id'] = $quote->getCustomerId();
             $orderToSendOar['merchant_code'] = $this->split->getMerchantCode();
             try {
