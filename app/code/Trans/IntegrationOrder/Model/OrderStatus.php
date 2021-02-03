@@ -1010,7 +1010,7 @@ class OrderStatus implements OrderStatusInterface {
 			$this->loggerOrder->info('=========== prepare salesorder history Delivery end ===========');
 		}
 
-		if($saveDataToStatusHistory) {
+		if($saveStatusHistory) {
 			$this->saveStatusHistory($loadDataOrder->getData('parent_order'), $status, $loadStatusDelivery);
 		}
 
