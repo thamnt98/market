@@ -438,10 +438,14 @@ class CheckoutProviderHandle
         $this->defaultLat = $defaultShipping->getCustomAttribute('latitude') ? $defaultShipping->getCustomAttribute('latitude')->getValue() : 0;
         $this->defaultLng = $defaultShipping->getCustomAttribute('longitude') ? $defaultShipping->getCustomAttribute('longitude')->getValue() : 0;
         if (empty($this->skuListForPickUp)) {
+            $this->fulFill = false;
+            $this->notFulFillMessage = __('Sorry, pick-up method is not applicable for this order. Shop conveniently with our delivery.');
             return [];
         }
         $sourceList = $this->msiFullFill->getMsiFullFill($this->skuListForPickUp);
         if (empty($sourceList)) {
+            $this->fulFill = false;
+            $this->notFulFillMessage = __('Sorry, pick-up method is not applicable for this order. Shop conveniently with our delivery.');
             return [];
         }
         if ($this->defaultLat != 0 && $this->defaultLng != 0) {
