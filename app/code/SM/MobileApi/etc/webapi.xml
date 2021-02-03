@@ -154,7 +154,17 @@
     </route>
 
     <route url="/V1/carts/mine/items/:itemId" method="PUT">
-        <service class="\SM\MobileApi\Api\CartItemRepositoryInterface" method="save"/>
+        <service class="\SM\MobileApi\Api\CartItemRepositoryInterface" method="update"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+
+    <route url="/V1/carts/mine/items" method="POST">
+        <service class="\SM\MobileApi\Api\CartItemRepositoryInterface" method="addToCart"/>
         <resources>
             <resource ref="self" />
         </resources>
