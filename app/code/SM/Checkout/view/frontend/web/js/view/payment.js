@@ -31,7 +31,7 @@ define([
     'use strict';
 
     /** Set payment methods to collection */
-    paymentService.setPaymentMethods(methodConverter(window.checkoutConfig.paymentMethods));
+    paymentService.setPaymentMethods(methodConverter(globalVar.paymentMethod()));
 
     return Component.extend({
         defaults: {
