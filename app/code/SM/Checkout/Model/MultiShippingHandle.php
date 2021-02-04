@@ -1405,6 +1405,7 @@ class MultiShippingHandle
                     $quoteItemModel->setMessage(__('Quantity has been adjusted.'));
                 }
                 unset($this->initItems[$quoteItemId]);
+                $quoteItemModel->setRowTotal($quoteItem->getRowTotal());
                 return $quoteItemModel;
             }
         }
@@ -1424,7 +1425,7 @@ class MultiShippingHandle
         $quoteItemModel->setWeightUnit($weightUnit);
         $quoteItemModel->setQty($quoteItem->getQty());
         $quoteItemModel->setThumbnail($this->getImageUrl($product, $storeId));
-        $quoteItemModel->setRowTotal($quoteItem->getRowTotal());
+        $quoteItemModel->setRowTotal($quoteItem->getPrice() * $quoteItem->getQty());
         $quoteItemModel->setDisableStorePickUp((!in_array($quoteItemId, $notSpoList))); // add spo
         $product = $this->productRepository->getById($product->getId());
         $model = $this->gtmCart->create();
