@@ -82,7 +82,6 @@
 
     <table name="sm_notification_email" resource="default" engine="innodb" comment="SmartOSC Notification Type Email">
         <column xsi:type="int" name="message_id" padding="10" unsigned="true" nullable="false" comment="Message ID"/>
-        <column xsi:type="varchar" name="subject" length="255" nullable="false" comment="Subject"/>
         <column xsi:type="varchar" name="template_id" nullable="false" length="255" comment="Email Template ID"/>
         <column xsi:type="text" name="params" nullable="true" comment="Email Params"/>
         <constraint xsi:type="primary" referenceId="PRIMARY">

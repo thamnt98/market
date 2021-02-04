@@ -264,7 +264,7 @@
                 <group id="order_status_group" translate="label" type="text" sortOrder="0"
                        showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Order Status</label>
-                    <field id="failed_delivery" translate="label" type="select" sortOrder="10"
+                    <field id="order_failed_delivery" translate="label" type="select" sortOrder="10"
                            canRestore="1" showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>Failed Delivery</label>
                         <config_path>sm_notification/email/failed_delivery</config_path>
@@ -321,6 +321,16 @@
                     <field id="in_delivery" translate="label" sortOrder="30" type="image"
                            showInDefault="1" showInWebsite="1" showInStore="1">
                         <label>In Delivery</label>
+                        <backend_model>Magento\Config\Model\Config\Backend\Image</backend_model>
+                        <upload_dir config="system/filesystem/media" scope_info="1">notification</upload_dir>
+                        <base_url type="media" scope_info="1">notification</base_url>
+                        <comment>
+                            <![CDATA[Allowed file types: jpg, jpeg, gif, png.<br/>Image's size is 118 x 118 px]]>
+                        </comment>
+                    </field>
+                    <field id="failed_delivery" translate="label" sortOrder="40" type="image"
+                           showInDefault="1" showInWebsite="1" showInStore="1">
+                        <label>Failed Delivery</label>
                         <backend_model>Magento\Config\Model\Config\Backend\Image</backend_model>
                         <upload_dir config="system/filesystem/media" scope_info="1">notification</upload_dir>
                         <base_url type="media" scope_info="1">notification</base_url>

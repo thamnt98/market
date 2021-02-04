@@ -55,7 +55,6 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
                 [Resource::EMAIL_TABLE_ALIAS => Email::TABLE_NAME],
                 'main_table.id = ' . Resource::EMAIL_TABLE_ALIAS . '.message_id',
                 [
-                    Resource::EMAIL_SUBJECT_ALIAS     => Resource::EMAIL_TABLE_ALIAS . '.subject',
                     Resource::EMAIL_TEMPLATE_ID_ALIAS => Resource::EMAIL_TABLE_ALIAS . '.template_id',
                     Resource::EMAIL_PARAMS_ALIAS      => Resource::EMAIL_TABLE_ALIAS . '.params',
                 ]

@@ -102,6 +102,14 @@ class Generate
     }
 
     /**
+     * @return \SM\Notification\Model\Notification
+     */
+    public function getNotify()
+    {
+        return $this->notify;
+    }
+
+    /**
      * @param int|null $store
      */
     protected function startEmulator($store = null)
@@ -153,7 +161,7 @@ class Generate
             ->prepareUnknownDevice()
             ->setNotificationTranslation();
 
-        return $this->notify;
+        return $this->getNotify();
     }
 
     /**
@@ -191,7 +199,7 @@ class Generate
             ->preparePromo()
             ->setNotificationTranslation(null, $store);
 
-        return $this->notify;
+        return $this->getNotify();
     }
 
     /**
@@ -210,7 +218,7 @@ class Generate
             ->prepareInformation(\SM\Notification\Model\Source\RedirectType::TYPE_HELP_PAGE, $helpId)
             ->setNotificationTranslation(null, $storeId);
 
-        return $this->notify;
+        return $this->getNotify();
     }
 
     /**
@@ -256,7 +264,7 @@ class Generate
             ->prepareOrder($order->getData('parent_order'))
             ->setNotificationTranslation(null, $order->getStoreId());
 
-        return $this->notify;
+        return $this->getNotify();
     }
 
     /**
@@ -267,7 +275,7 @@ class Generate
      *
      * @return Generate
      */
-    protected function initNotification($customerIds, $title, $message, $params = [])
+    public function initNotification($customerIds, $title, $message, $params = [])
     {
         $this->notify = $this->modelFactory->create()
             ->setTitle($title)
@@ -291,7 +299,7 @@ class Generate
      *
      * @return Generate
      */
-    protected function prepareOrder($orderId)
+    public function prepareOrder($orderId)
     {
         if ($this->notify) {
             if (count($this->notify->getCustomerIds()) == 1) {
@@ -313,7 +321,7 @@ class Generate
     /**
      * @return Generate
      */
-    protected function prepareUnknownDevice()
+    public function prepareUnknownDevice()
     {
         if ($this->notify) {
             if (count($this->notify->getCustomerIds()) == 1) {
@@ -338,7 +346,7 @@ class Generate
      *
      * @return Generate
      */
-    protected function prepareInformation($redirectType, $redirectId)
+    public function prepareInformation($redirectType, $redirectId)
     {
         if ($this->notify) {
             if (count($this->notify->getCustomerIds()) == 1) {
@@ -367,7 +375,7 @@ class Generate
      *
      * @return Generate
      */
-    protected function preparePromo($ruleId = null)
+    public function preparePromo($ruleId = null)
     {
         if ($this->notify) {
             if (count($this->notify->getCustomerIds()) == 1) {
@@ -399,7 +407,7 @@ class Generate
      *
      * @return Generate
      */
-    protected function setNotificationEmail($templateId, $params)
+    public function setNotificationEmail($templateId, $params = [])
     {
         if ($this->notify && (!$this->eventSetting->isInit() || $this->eventSetting->isEmail())) {
             $this->notify
@@ -416,7 +424,7 @@ class Generate
      *
      * @return Generate
      */
-    protected function setNotificationTranslation($sms = null, $storeId = null)
+    public function setNotificationTranslation($sms = null, $storeId = null)
     {
         if ($this->notify) {
             $this->startEmulator($storeId);

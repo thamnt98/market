@@ -38,7 +38,6 @@ class Notification extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
      */
     const PUSH_TITLE_ALIAS        = 'push_title';
     const PUSH_CONTENT_ALIAS      = 'push_content';
-    const EMAIL_SUBJECT_ALIAS     = 'email_subject';
     const EMAIL_TEMPLATE_ID_ALIAS = 'email_template';
     const EMAIL_PARAMS_ALIAS      = 'email_params';
     const SMS_CONTENT_ALIAS       = 'sms';
@@ -76,7 +75,6 @@ class Notification extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
             [self::EMAIL_TABLE_ALIAS => Email::TABLE_NAME],
             $this->getMainTable() . '.id = ' . self::EMAIL_TABLE_ALIAS . '.message_id',
             [
-                self::EMAIL_SUBJECT_ALIAS     => self::EMAIL_TABLE_ALIAS . '.subject',
                 self::EMAIL_TEMPLATE_ID_ALIAS => self::EMAIL_TABLE_ALIAS . '.template_id',
                 self::EMAIL_PARAMS_ALIAS      => self::EMAIL_TABLE_ALIAS . '.params',
             ]
@@ -185,19 +183,20 @@ class Notification extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     {
         if ($object->getEmailTemplate()) {
             $params = $object->getEmailParams();
-            if ($params && is_array($params)) {
+            
+            if (is_array($params)) {
                 $params = json_encode($params);
             }
+            
             $this->getConnection()
                 ->insertOnDuplicate(
                     Email::TABLE_NAME,
                     [
                         'message_id'  => $object->getId(),
-                        'subject'     => $object->getEmailSubject(),
                         'template_id' => $object->getEmailTemplate(),
                         'params'      => $params,
                     ],
-                    ['subject', 'template_id', 'params']
+                    ['template_id', 'params']
                 );
         }
 

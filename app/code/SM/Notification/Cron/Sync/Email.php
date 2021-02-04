@@ -88,7 +88,7 @@ class Email extends AbstractSync
         $select->joinInner(
             ['type' => \SM\Notification\Model\ResourceModel\Email::TABLE_NAME],
             'main_table.message_id = type.message_id',
-            ['subject', 'template_id', 'params']
+            ['template_id', 'params']
         )->where(
             'main_table.email_status = ?',
             \SM\Notification\Model\Notification::SYNC_PENDING
