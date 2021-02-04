@@ -161,22 +161,25 @@ class CartUpdateRepository implements CartUpdateRepositoryInterface
     /**
      * @inheritdoc
      */
-    public function updateSelectedItem($cartId, $items){
+    public function updateSelectedItem($cartId, $items)
+    {
+        $quote = $this->getQuote($cartId);
+        $saveItems = [];
         try {
-            foreach ($items as $item){
-                $quoteItem = $this->getQuote($cartId)->getItemById($item->getItemId());
-                if ($quoteItem) {
-                    if ($item->getIsChecked() == true) {
-                        $quoteItem->setIsActive(true);
-                    } else {
-                        $quoteItem->setIsActive(false);
+            foreach ($quote->getItemsCollection() as $quoteItem) {
+                if (!$quoteItem->isDeleted() && !$quoteItem->getParentItemId() && !$quoteItem->getParentItem()) {
+                    foreach ($items as $item) {
+                        if ($item->getItemId() == $quoteItem->getItemId()) {
+                            $quoteItem->setIsActive($item->getIsChecked());
+                        }
                     }
-                    $this->cartItemRepository->save($quoteItem);
                 }
             }
 
-            /** @var \Magento\Quote\Model\Quote $quote */
-            $quote = $this->quoteRepository->getActive($cartId);
+            if (!empty($items)) {
+                $this->quoteRepository->save($quote);
+            }
+
             if ($quote->isVirtual()) {
                 $addressTotalsData = $quote->getBillingAddress()->getData();
                 $addressTotals = $quote->getBillingAddress()->getTotals();
@@ -188,13 +191,14 @@ class CartUpdateRepository implements CartUpdateRepositoryInterface
 
             /** @var \Magento\Quote\Api\Data\TotalsInterface $quoteTotals */
             $quoteTotals = $this->totalsFactory->create();
+
             $this->dataObjectHelper->populateWithArray(
                 $quoteTotals,
                 $addressTotalsData,
                 \Magento\Quote\Api\Data\TotalsInterface::class
             );
             $items = [];
-            foreach ($quote->getAllVisibleItems() as $index => $item) {
+            foreach ($quote->getItems() as $index => $item) {
                 $items[$index] = $this->itemConverter->modelToDataObject($item);
             }
             $calculatedTotals = $this->totalsConverter->process($addressTotals);
@@ -209,7 +213,6 @@ class CartUpdateRepository implements CartUpdateRepositoryInterface
             $quoteTotals->setBaseCurrencyCode($quote->getBaseCurrencyCode());
             $quoteTotals->setQuoteCurrencyCode($quote->getQuoteCurrencyCode());
             return $quoteTotals;
-
         } catch (\Exception $e) {
             throw new \Exception($e->getMessage());
         }
