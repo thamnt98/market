@@ -36,4 +36,15 @@ interface PreviewOrderInterface
      * @return bool
      */
     public function getIsSplitOrder();
+
+    /**
+     * @param \SM\Checkout\Api\Data\CheckoutWeb\PaymentMethodInterface[] $paymentMethod
+     * @return $this
+     */
+    public function setPaymentMethod($paymentMethod);
+
+    /**
+     * @return \SM\Checkout\Api\Data\CheckoutWeb\PaymentMethodInterface[]
+     */
+    public function getPaymentMethod();
 }

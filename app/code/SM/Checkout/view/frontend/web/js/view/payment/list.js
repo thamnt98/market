@@ -80,7 +80,7 @@ define([
             return priceUtils.formatPrice(price, quote.getPriceFormat(), false);
         },
         paymentLists: function () {
-            return window.checkoutConfig.paymentMethods;
+            return globalVar.paymentMethod();
         },
         getListPaymentVirtualAccount: function () {
             var methods = ["sprint_bca_va", "trans_mepay_va"];

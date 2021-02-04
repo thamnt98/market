@@ -12,7 +12,8 @@ define([
      * current step
      */
     var paymentFail = window.checkoutConfig.payment_fail,
-        isVirtual = window.checkoutConfig.is_virtual;
+        isVirtual = window.checkoutConfig.is_virtual,
+        paymentMethod = ko.observable(window.checkoutConfig.paymentMethods);
 
     if (paymentFail || isVirtual) {
         var isStepShipping = ko.observable(false),
@@ -42,7 +43,8 @@ define([
         showPaymentDetails: showPaymentDetails,
         disableGoPaymentButton: disableGoPaymentButton,
         splitOrder: splitOrder,
-        showOrderSummary: showOrderSummary
+        showOrderSummary: showOrderSummary,
+        paymentMethod: paymentMethod
     };
 });
 

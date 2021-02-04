@@ -46,6 +46,7 @@ define([
 ) {
     'use strict';
 
+    var updatePaymentMethodFromPreviewOrder = false;
     return Component.extend({
         defaults: {
             template: 'SM_Checkout/view/placeorder'
@@ -137,6 +138,7 @@ define([
                 data = initShippingType.getDateTime();
             data['items'] = rateData['items'];
             data['store'] = pickup.currentPickupId();
+            data['update_payment_method'] = updatePaymentMethodFromPreviewOrder;
             fullScreenLoader.startLoader();
             storage.post(
                 urlManager.build('rest/V1/trans-checkout/me/previewOrder'),
@@ -158,6 +160,10 @@ define([
                     split.setPreviewOrder(response.order);
                     globalVar.isStepShipping(false);
                     globalVar.paymentSelected(false);
+                    if (!updatePaymentMethodFromPreviewOrder) {
+                        globalVar.paymentMethod(response.payment_method);
+                        updatePaymentMethodFromPreviewOrder = true;
+                    }
                     self.addBreadCrumb();
                 }
             ).fail(

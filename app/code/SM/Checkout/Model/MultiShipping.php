@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace SM\Checkout\Model;
 
+use Magento\Payment\Model\Method\AbstractMethod;
 use SM\Checkout\Api\Data\Checkout\PaymentMethods\BankInterfaceFactory;
 use SM\Checkout\Model\Payment\Authorization;
 use SM\DigitalProduct\Api\Data\DigitalInterface;
@@ -181,11 +182,12 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
     /**
      * @var \SM\GTM\Model\ResourceModel\Basket\CollectionFactory
      */
-    private $basketCollectionFactory;
+    protected $basketCollectionFactory;
+
     /**
      * @var BasketFactory
      */
-    private $basketFactory;
+    protected $basketFactory;
 
     /**
      * @var \Magento\Quote\Api\PaymentMethodManagementInterface
@@ -196,6 +198,31 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
      * @var \Magento\Quote\Api\Data\PaymentInterfaceFactory
      */
     protected $corePaymentInterfaceFactory;
+
+    /**
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
+    protected $storeManager;
+
+    /**
+     * @var \Magento\Payment\Api\PaymentMethodListInterface
+     */
+    protected $paymentMethodList;
+
+    /**
+     * @var \Magento\Payment\Model\Method\InstanceFactory
+     */
+    protected $instanceFactory;
+
+    /**
+     * @var \Magento\Payment\Model\Checks\SpecificationFactory
+     */
+    protected $methodSpecificationFactory;
+
+    /**
+     * @var \SM\Checkout\Api\Data\CheckoutWeb\PaymentMethodInterface
+     */
+    protected $paymentMethodFactory;
 
     /**
      * MultiShipping constructor.
@@ -233,11 +260,15 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
      * @param \SM\GTM\Block\Product\ListProduct $productGtm
      * @param \SM\MobileApi\Api\Data\GTM\GTMCheckoutInterfaceFactory $gtmCheckout
      * @param \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
-     * @param \SM\MobileApi\Api\Data\GTM\BasketInterfaceFactory $basketInterfaceFactory
      * @param \SM\GTM\Model\ResourceModel\Basket\CollectionFactory $basketCollectionFactory
      * @param BasketFactory $basketFactory
      * @param \Magento\Quote\Api\PaymentMethodManagementInterface $paymentMethodManagement
      * @param \Magento\Quote\Api\Data\PaymentInterfaceFactory $corePaymentInterfaceFactory
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Payment\Api\PaymentMethodListInterface $paymentMethodList
+     * @param \Magento\Payment\Model\Method\InstanceFactory $instanceFactory
+     * @param \Magento\Payment\Model\Checks\SpecificationFactory $methodSpecificationFactory
+     * @param \SM\Checkout\Api\Data\CheckoutWeb\PaymentMethodInterfaceFactory $paymentMethodFactory
      */
     public function __construct(
         \Magento\Customer\Model\Session $customerSession,
@@ -274,11 +305,15 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
         \SM\GTM\Block\Product\ListProduct $productGtm,
         \SM\MobileApi\Api\Data\GTM\GTMCheckoutInterfaceFactory $gtmCheckout,
         \Magento\Catalog\Api\ProductRepositoryInterface $productRepository,
-        \SM\MobileApi\Api\Data\GTM\BasketInterfaceFactory $basketInterfaceFactory,
         \SM\GTM\Model\ResourceModel\Basket\CollectionFactory $basketCollectionFactory,
         BasketFactory $basketFactory,
         \Magento\Quote\Api\PaymentMethodManagementInterface $paymentMethodManagement,
-        \Magento\Quote\Api\Data\PaymentInterfaceFactory $corePaymentInterfaceFactory
+        \Magento\Quote\Api\Data\PaymentInterfaceFactory $corePaymentInterfaceFactory,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Payment\Api\PaymentMethodListInterface $paymentMethodList,
+        \Magento\Payment\Model\Method\InstanceFactory $instanceFactory,
+        \Magento\Payment\Model\Checks\SpecificationFactory $methodSpecificationFactory,
+        \SM\Checkout\Api\Data\CheckoutWeb\PaymentMethodInterfaceFactory $paymentMethodFactory
     ) {
         $this->customerSession = $customerSession;
         $this->checkoutSession = $checkoutSession;
@@ -318,6 +353,11 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
         $this->basketFactory = $basketFactory;
         $this->paymentMethodManagement = $paymentMethodManagement;
         $this->corePaymentInterfaceFactory = $corePaymentInterfaceFactory;
+        $this->storeManager = $storeManager;
+        $this->paymentMethodList = $paymentMethodList;
+        $this->instanceFactory = $instanceFactory;
+        $this->methodSpecificationFactory = $methodSpecificationFactory;
+        $this->paymentMethodFactory = $paymentMethodFactory;
     }
 
     /**
@@ -581,7 +621,7 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function previewOrder($items, $storeDateTime, $deliveryDateTime, $isSplitOrder, $store)
+    public function previewOrder($items, $storeDateTime, $deliveryDateTime, $isSplitOrder, $store, $updatePaymentMethod)
     {
         $itemsFormat = [];
         foreach ($items as $item) {
@@ -613,7 +653,12 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
         if ($this->helperConfig->showOrderSummary()) {
             $isSplitOrder = true;
         }
-        return $this->previewOrderInterfaceFactory->create()->setReload(false)->setOrder($previewOrderProcess['preview_order'])->setIsSplitOrder($isSplitOrder);
+        if (!$updatePaymentMethod) {
+            $paymentMethodList = $this->getPaymentMethod();
+        } else {
+            $paymentMethodList = [];
+        }
+        return $this->previewOrderInterfaceFactory->create()->setReload(false)->setOrder($previewOrderProcess['preview_order'])->setIsSplitOrder($isSplitOrder)->setPaymentMethod($paymentMethodList);
     }
 
     /**
@@ -769,5 +814,57 @@ class MultiShipping implements \SM\Checkout\Api\MultiShippingInterface
     {
         $category = $product->getCategoryCollection()->addAttributeToSelect('name')->getFirstItem();
         return $category->getName();
+    }
+
+    /**
+     * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getPaymentMethod()
+    {
+        $quote = $this->checkoutSession->getQuote();
+        $store = $quote ? $quote->getStoreId() : null;
+        $methods = [];
+        $logoUrl = $this->storeManager->getStore()->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_MEDIA);
+        foreach ($this->paymentMethodList->getActiveList($store) as $method) {
+            $methodInstance = $this->instanceFactory->create($method);
+            if ($method->getTitle() && $methodInstance->isAvailable($quote) && $this->canUseMethod($methodInstance, $quote)) {
+                $description = $this->helperConfig->getPaymentDescription($method->getCode());
+                $tooltipDescription = $this->helperConfig->getPaymentTooltipDescription($method->getCode());
+                $logo = "logo/paymentmethod/" . $this->helperConfig->getPaymentLogo($method->getCode());
+                $methodObj = $this->paymentMethodFactory->create();
+                $methodObj->setTitle($method->getTitle());
+                $methodObj->setStoreId($method->getStoreId());
+                $methodObj->setIsActive($method->getIsActive());
+                $methodObj->setDescription($description);
+                $methodObj->setTooltipDescription($tooltipDescription);
+                $methodObj->setLogo($logoUrl . $logo);
+                $methodObj->setMethod($method->getCode());
+                $methods[] = $methodObj;
+            }
+        }
+        return $methods;
+    }
+
+    /**
+     * @param $method
+     * @param $quote
+     * @return bool
+     * @throws \Magento\Framework\Exception\LocalizedException
+     */
+    protected function canUseMethod($method, $quote)
+    {
+        $checks = [
+            AbstractMethod::CHECK_USE_FOR_COUNTRY,
+            AbstractMethod::CHECK_USE_FOR_CURRENCY,
+            AbstractMethod::CHECK_ORDER_TOTAL_MIN_MAX,
+            AbstractMethod::CHECK_ZERO_TOTAL
+        ];
+
+        return $this->methodSpecificationFactory->create($checks)->isApplicable(
+            $method,
+            $quote
+        );
     }
 }

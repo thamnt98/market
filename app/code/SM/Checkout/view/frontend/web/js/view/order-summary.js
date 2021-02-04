@@ -13,15 +13,17 @@ define([
     'SM_Checkout/js/view/global-observable',
     'SM_Checkout/js/view/split',
     'SM_Checkout/js/view/cart-items/init-shipping-type',
-    'SM_Checkout/js/view/shipping-address/current-pickup'
-], function ($, ko, Component, quote, priceUtils, $t, globalVar, split, shippingType, currentPickup) {
+    'SM_Checkout/js/view/shipping-address/current-pickup',
+    'SM_Checkout/js/view/cart-items/current-items'
+], function ($, ko, Component, quote, priceUtils, $t, globalVar, split, shippingType, currentPickup, currentItemsData) {
     'use strict';
 
     var imageData = window.checkoutConfig.imageData,
         weightUnit = window.checkoutConfig.weightUnit,
         customerAddressData = shippingType.getCustomerAddressData(),
         addressNameList = shippingType.getAddressNameList(),
-        itemsData = shippingType.getItemsDataList();
+        itemsData = shippingType.getItemsDataList(),
+        basePrice = {};
 
     return Component.extend({
         isStepPreviewOrder: globalVar.isStepPreviewOrder,
@@ -108,11 +110,45 @@ define([
             return '';
         },
 
-        isDiscount: function (baseSubtotal, subtotal) {
-            if (baseSubtotal != subtotal) {
+        isDiscount: function (quoteItem) {
+            let basePriceByLocation = this.getBasePriceByLocation(quoteItem['item_id']);
+            if (parseInt(quoteItem['price']) != parseInt(basePriceByLocation) && parseInt(basePriceByLocation) != 0) {
+                basePrice[quoteItem['item_id']] = parseInt(basePriceByLocation);
                 return true;
             }
+            basePrice[quoteItem['item_id']] = 0;
             return false;
+        },
+
+        getBaseSubTotal: function (quoteItem) {
+            return this.getFormattedPrice(basePrice[quoteItem['item_id']] * quoteItem['qty']);
+        },
+
+        /**
+         * @param {Object} quoteItem
+         * @return {*|String}
+         */
+        getValue: function (quoteItem) {
+            let currentItem = currentItemsData.getCurrentItemsData(quoteItem.item_id);
+            if (typeof currentItem !== "undefined") {
+                if (parseInt(currentItem().row_total) != parseInt(quoteItem.row_total)) {
+                    return this.getFormattedPrice(currentItem().row_total);
+                }
+            }
+            return this.getFormattedPrice(quoteItem.row_total);
+        },
+
+        getBasePriceByLocation: function (itemId) {
+            let price = 0,
+                items  = window.checkoutConfig.quoteItemData;
+            $.each(items, function (key, data) {
+                if (data.item_id == itemId) {
+                    price = data.regular_price;
+                    return false;
+                }
+            });
+
+            return price;
         },
 
         isFreshProduct: function (item_id) {

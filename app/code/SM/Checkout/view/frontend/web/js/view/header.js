@@ -4,10 +4,11 @@
  */
 
 define([
+    'jquery',
     'uiComponent',
     'SM_Checkout/js/view/global-observable',
     'mage/translate'
-], function (Component, globalVar, $t) {
+], function ($, Component, globalVar, $t) {
     'use strict';
 
     return Component.extend({
@@ -28,6 +29,10 @@ define([
             globalVar.isStepPreviewOrder(false);
             globalVar.isStepShipping(true);
             globalVar.showPaymentDetails(false);
+            $(".breadcrumbs ul.items li").last().remove();
+            $(".breadcrumbs ul.items li.Out").html($("<strong/>", {
+                "text": $.mage.__("Check Out")
+            }));
         }
     });
 });

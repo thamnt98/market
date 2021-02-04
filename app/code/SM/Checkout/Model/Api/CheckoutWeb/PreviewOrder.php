@@ -7,6 +7,7 @@ class PreviewOrder extends \Magento\Framework\Api\AbstractExtensibleObject imple
     const RELOAD = 'reload';
     const ORDER = 'order';
     const IS_SPLIT_ORDER = 'is_split_order';
+    const PAYMENT_METHOD = 'payment_method';
 
     /**
      * {@inheritdoc}
@@ -54,5 +55,21 @@ class PreviewOrder extends \Magento\Framework\Api\AbstractExtensibleObject imple
     public function getIsSplitOrder()
     {
         return $this->_get(self::IS_SPLIT_ORDER);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPaymentMethod($paymentMethod)
+    {
+        return $this->setData(self::PAYMENT_METHOD, $paymentMethod);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPaymentMethod()
+    {
+        return $this->_get(self::PAYMENT_METHOD);
     }
 }

@@ -13,8 +13,9 @@ define([
     'SM_Checkout/js/view/global-observable',
     'SM_Checkout/js/view/split',
     'SM_Checkout/js/view/cart-items/init-shipping-type',
-    'SM_Checkout/js/view/shipping-address/current-pickup'
-], function ($, ko, Component, quote, priceUtils, $t, globalVar, split, shippingType, currentPickup) {
+    'SM_Checkout/js/view/shipping-address/current-pickup',
+    'SM_Checkout/js/view/cart-items/current-items'
+], function ($, ko, Component, quote, priceUtils, $t, globalVar, split, shippingType, currentPickup, currentItemsData) {
     'use strict';
 
     var imageData = window.checkoutConfig.imageData,
@@ -38,6 +39,20 @@ define([
                 return price;
             }
             return priceUtils.formatPrice(price, quote.getPriceFormat());
+        },
+
+        /**
+         * @param {Object} quoteItem
+         * @return {*|String}
+         */
+        getValue: function (quoteItem) {
+            let currentItem = currentItemsData.getCurrentItemsData(quoteItem.item_id);
+            if (typeof currentItem !== "undefined") {
+                if (parseInt(currentItem().row_total) != parseInt(quoteItem.row_total)) {
+                    return this.getFormattedPrice(currentItem().row_total);
+                }
+            }
+            return this.getFormattedPrice(quoteItem.row_total);
         },
 
         getTitle: function(sort) {

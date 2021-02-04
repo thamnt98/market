@@ -71,10 +71,10 @@
                                 </div>
                             </div>
                             <div class="subtotal">
-                                <!-- ko if: $parents[2].isDiscount(item.row_total, item.row_total)-->
-                                <span class="price old-price" data-bind="text: $parents[2].getFormattedPrice(item.row_total)"></span>
+                                <!-- ko if: $parents[2].isDiscount(item)-->
+                                <!--<span class="price old-price" data-bind="text: $parents[2].getBaseSubTotal(item)"></span>-->
                                 <!--/ko-->
-                                <span class="price" data-bind="text: $parents[2].getFormattedPrice(item.row_total), css: {'final-price': $parents[2].isDiscount(item.row_total, item.row_total)}"></span>
+                                <span class="price" data-bind="text: $parents[2].getValue(item), css: {final: $parents[2].isDiscount(item)}"></span>
                             </div>
                         </div>
                     </div>

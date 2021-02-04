@@ -76,12 +76,12 @@ class TotalsCollector extends \Magento\Quote\Model\Quote\TotalsCollector
         $total->setGrandTotal(0);
         $total->setBaseGrandTotal(0);
 
-        $this->checkoutSession->setIsMultipleShippingAddresses($quote->isMultipleShippingAddresses());
+        $this->checkoutSession->setIsMultipleShippingAddresses(true);
         $shippingDefaultId = $quote->isVirtual() ? 0 : $quote->getShippingAddress()->getId();
         $addresses = $quote->getAllAddresses();
 
         // Collect quote shipping address finally
-        if ($shippingDefaultId !== 0 && $quote->isMultipleShippingAddresses()) {
+        if ($shippingDefaultId !== 0) {
             foreach ($addresses as $index => $address) {
                 if ($address->getId() == $shippingDefaultId ||
                     (is_null($shippingDefaultId) && $address->getAddressType() === 'shipping')
@@ -93,7 +93,7 @@ class TotalsCollector extends \Magento\Quote\Model\Quote\TotalsCollector
         }
 
         foreach ($addresses as $key => $address) {
-            if ($quote->isMultipleShippingAddresses() && $address->getAddressType() === 'shipping') {
+            if ($address->getAddressType() === 'shipping') {
                 if ($key === 'main') { // Main Address (Quote shipping address)
                     $this->checkoutSession->setMainOrder(true);
                     $addressTotal = $this->collectAddressTotals($quote, $address);
