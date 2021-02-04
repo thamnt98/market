@@ -212,4 +212,21 @@
                 type="SM\Promotion\Override\MagentoSalesRule\Model\Coupon\Massgenerator"/>
     <preference for="SM\Promotion\Api\Data\RuleSuggestionInterface"
                 type="SM\Promotion\Model\Data\RuleSuggestion"/>
+    <type name="Magento\Framework\EntityManager\Operation\ExtensionPool">
+        <arguments>
+            <argument name="extensionActions" xsi:type="array">
+                <item name="Magento\SalesRule\Api\Data\RuleInterface" xsi:type="array">
+                    <item name="create" xsi:type="array">
+                        <item name="create_promo_banners_lite" xsi:type="string">SM\Promotion\Override\AmastyBannersLite\Model\SalesRule\SaveHandler</item>
+                    </item>
+                    <item name="update" xsi:type="array">
+                        <item name="update_promo_banners_lite" xsi:type="string">SM\Promotion\Override\AmastyBannersLite\Model\SalesRule\SaveHandler</item>
+                    </item>
+                    <item name="read" xsi:type="array">
+                        <item name="read_promo_banners_lite" xsi:type="string">SM\Promotion\Override\AmastyBannersLite\Model\SalesRule\ReadHandler</item>
+                    </item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
 </config>
