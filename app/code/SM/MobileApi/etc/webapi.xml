@@ -153,6 +153,16 @@
         </data>
     </route>
 
+    <route url="/V1/carts/mine/items/:itemId" method="PUT">
+        <service class="\SM\MobileApi\Api\CartItemRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="self" />
+        </resources>
+        <data>
+            <parameter name="cartId" force="true">%cart_id%</parameter>
+        </data>
+    </route>
+
     <route url="/V1/cart/getcartitems" method="GET">
         <service class="SM\MobileApi\Api\CartInterface" method="getItems"/>
         <resources>

@@ -47,4 +47,15 @@ interface CartInterface
      * @throws CouldNotSaveException Can't create quote for customer
      */
     public function getCartIdForCustomer($customerId);
+
+    /**
+     * @param \Magento\Quote\Api\Data\CartInterface $quote
+     * @return void
+     */
+    public function setQuote(\Magento\Quote\Api\Data\CartInterface $quote);
+
+    /**
+     * @return Magento\Quote\Api\Data\CartInterface
+     */
+    public function getQuote();
 }
