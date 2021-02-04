@@ -15,7 +15,10 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
     <group id="trans_mepay_cron_groups">
         <job name="check_latest_status_authorize_transaction" instance="Trans\Mepay\Cron\Transaction\Status" method="execute">
-            <schedule>* * * * *</schedule>
+            <schedule>30 * * * *</schedule>
+        </job>
+        <job name="auto_cancel_pending_order" instance="Trans\Mepay\Cron\Transaction\AutoCancel" method="execute">
+            <schedule>30 * * * *</schedule>
         </job>
     </group>
 </config>
