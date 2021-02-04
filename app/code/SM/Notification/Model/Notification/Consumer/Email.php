@@ -19,8 +19,9 @@ use SM\Notification\Model\Email as Model;
 
 class Email extends AbstractConsumer
 {
-    const EMAIL_PARAM_ORDER_KEY = 'order';
+    const EMAIL_PARAM_ORDER_KEY       = 'order';
     const EMAIL_PARAM_CONTACT_US_LINK = 'contact_us';
+    const EMAIL_PARAM_STORE_ID        = 'store_id';
 
     /**
      * @var \SM\Notification\Helper\Generate\Email
@@ -35,8 +36,8 @@ class Email extends AbstractConsumer
     /**
      * Email constructor.
      *
+     * @param \SM\Notification\Model\EventSettingFactory                          $eventSettingFactory
      * @param \Magento\Customer\Model\ResourceModel\Online\Grid\CollectionFactory $customerOnlineCollFact
-     * @param \SM\Notification\Helper\CustomerSetting                             $settingHelper
      * @param \Magento\Framework\App\ResourceConnection                           $resourceConnection
      * @param \Magento\Customer\Api\CustomerRepositoryInterface                   $customerRepository
      * @param \Trans\IntegrationNotification\Api\IntegrationNotificationInterface $integrationNotification
@@ -45,8 +46,8 @@ class Email extends AbstractConsumer
      * @param \Magento\Framework\Logger\Monolog                                   $logger
      */
     public function __construct(
+        \SM\Notification\Model\EventSettingFactory $eventSettingFactory,
         \Magento\Customer\Model\ResourceModel\Online\Grid\CollectionFactory $customerOnlineCollFact,
-        \SM\Notification\Helper\CustomerSetting $settingHelper,
         \Magento\Framework\App\ResourceConnection $resourceConnection,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
         \Trans\IntegrationNotification\Api\IntegrationNotificationInterface $integrationNotification,
@@ -55,8 +56,8 @@ class Email extends AbstractConsumer
         \Magento\Framework\Logger\Monolog $logger
     ) {
         parent::__construct(
+            $eventSettingFactory,
             $customerOnlineCollFact,
-            $settingHelper,
             $resourceConnection,
             $customerRepository,
             $integrationNotification,
@@ -80,20 +81,31 @@ class Email extends AbstractConsumer
                 return;
             }
 
-            $template = $this->helper->getEmailTemplateById($request->getTemplateId());
+            $params = $this->prepareParams($request->getParams());
+            $templateOptions = [
+                'area' => \Magento\Framework\App\Area::AREA_FRONTEND,
+            ];
+            
+            if ($params[self::EMAIL_PARAM_STORE_ID]) {
+                $templateOptions['store'] = $params[self::EMAIL_PARAM_STORE_ID];
+            }
+            
+            $template = $this->helper->getEmailTemplateById($request->getTemplateId(), $templateOptions);
             if ($template) {
-                $template->setVars($this->prepareParams($request->getParams()));
-                $subject = $request->getSubject() ?: $template->getSubject();
-                $result = $this->integration->sendEmail(
-                    $customer->getEmail(),
-                    $subject,
-                    $template->processTemplate()
-                );
+                $template->setOptions($templateOptions);
+                $template->setVars($params);
+                $subject = $template->getSubject();
+                $content = $template->processTemplate();
+                $result = $this->integration->sendEmail($customer->getEmail(), $subject, $content);
                 $this->logInfo(
                     "Consumer `Email` Success\n",
                     [
                         'result' => $result,
-                        'params' => $request->getData(),
+                        'params' => [
+                            'subject' => $subject,
+                            'content' => $content,
+                            'request' => $request->getData()
+                        ],
                     ]
                 );
             } else {
@@ -153,14 +165,14 @@ class Email extends AbstractConsumer
     }
 
     /**
-     * @param array $params
+     * @param array|string $params
      *
      * @return array
      */
     protected function prepareParams($params)
     {
         if (!is_array($params)) {
-            return $params;
+            $params = json_decode($params, true);
         }
 
         $result = [];

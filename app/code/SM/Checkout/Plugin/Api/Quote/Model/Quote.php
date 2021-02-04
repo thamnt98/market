@@ -198,6 +198,7 @@ class Quote
         \Magento\Quote\Model\Quote $subject,
         callable $proceed
     ) {
+        return $proceed();
         $items = [];
         $this->quote = $subject;
         /**

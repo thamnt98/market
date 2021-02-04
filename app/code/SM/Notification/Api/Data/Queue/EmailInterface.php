@@ -18,18 +18,6 @@ namespace SM\Notification\Api\Data\Queue;
 interface EmailInterface extends GeneralInterface
 {
     /**
-     * @param string $subject
-     *
-     * @return $this
-     */
-    public function setSubject($subject);
-
-    /**
-     * @return string
-     */
-    public function getSubject();
-
-    /**
      * @param string $id
      *
      * @return $this
@@ -42,14 +30,14 @@ interface EmailInterface extends GeneralInterface
     public function getTemplateId();
 
     /**
-     * @param string[] $params
+     * @param string $params Json string
      *
      * @return $this
      */
     public function setParams($params);
 
     /**
-     * @return string[]
+     * @return string Json string
      */
     public function getParams();
 }

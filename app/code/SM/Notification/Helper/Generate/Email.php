@@ -30,7 +30,7 @@ class Email extends \Magento\Framework\App\Helper\AbstractHelper
     const EMAIL_TEMPLATE_PAYMENT_SUCCESS_DIGITAL_PLN_BILL        = 'payment_success_pln_bill';
     const EMAIL_TEMPLATE_PAYMENT_SUCCESS_DIGITAL_MOBILE_POSTPAID = 'payment_success_mobile_postpaid';
     const EMAIL_TEMPLATE_PAYMENT_SUCCESS_PHYSICAL                = 'payment_success_physical';
-    const EMAIL_TEMPLATE_FAILED_DELIVERY                         = 'failed_delivery';
+    const EMAIL_TEMPLATE_FAILED_DELIVERY                         = 'order_failed_delivery';
 
     /**
      * @var \Magento\Email\Model\TemplateFactory
@@ -171,14 +171,21 @@ class Email extends \Magento\Framework\App\Helper\AbstractHelper
     }
 
     /**
-     * @param $id
+     * @param string|int $id
+     * @param array      $options
      *
      * @return \Magento\Email\Model\Template|null
      */
-    public function getEmailTemplateById($id)
+    public function getEmailTemplateById($id, $options = [])
     {
         /** @var \Magento\Email\Model\Template $template */
-        $template = $this->emailTemplateFactory->create()->load($id);
+        $template = $this->emailTemplateFactory->create();
+        $template->setOptions($options);
+        if (is_numeric($id)) {
+            $template->load($id);
+        } else {
+            $template->loadDefault($id);
+        }
 
         if ($template->getId()) {
             return $template;

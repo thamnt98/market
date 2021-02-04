@@ -148,7 +148,12 @@ class Data extends AbstractHelper
      */
     public function getInProcessWaitingForPickUpStatus()
     {
-        return 'in_process_waiting_for_pickup';
+        $result = $this->tranConfig->getInProcessWaitingPickupStatus();
+        if (empty($result)) {
+            $result = 'in_process_waiting_for_pickup';
+        }
+
+        return $result;
     }
 
     /**

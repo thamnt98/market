@@ -269,7 +269,7 @@ class SendOMS
                     'quantity' => (float)$qty,
                     'ori_price' => (int)$oriPrice,
                     'sell_price' => (int)$sellPrice,
-                    'disc_price' => (int)$discPrice,
+                    'disc_price' => ((int)$discPrice > 0) ? (int)$discPrice * -1 : (int)$discPrice,
                     'paid_price' => (int)$padPrice,
                     'sub_total' => (int)$subTotal,
                     'total_weight' => (float)$weight * (float)$qty,
@@ -483,6 +483,7 @@ class SendOMS
         }
         $interface->setTimeSlot($timeslot);
         /*calculate discount*/
+        $shippingFeeDiscount = (int)$order->getShippingDiscountAmount();
         $shippingFee = (int)$order->getShippingInclTax();
         $discount = (int)$order->getDiscountAmount();
         $interface->setShippingFee($shippingFee);
@@ -509,6 +510,7 @@ class SendOMS
         }
         $interface->setLogisticCourierName($logisticCourierName);
         $interface->setLogisticCourier($logisticCourier);
+        $interface->setShippingFeeDiscount($shippingFeeDiscount);
         return $interface;
     }
 

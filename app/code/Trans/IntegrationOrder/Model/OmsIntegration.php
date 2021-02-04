@@ -376,6 +376,7 @@ class OmsIntegration implements OmsIntegrationInterface {
 				"time_slot" => $timeSlot,
 				"sub_total" => $paidPrice,
 				"shipping_fee" => $shippingFee, // cart original price
+                "shipping_fee_discount" => $dataOrder->getShippingFeeDiscount(), // smartosc custom
 				"grand_total" => $grandTotal, // final price
 				"flag_spo" => $flagSpo,
 				"order_items" => $orderItem,

@@ -30,6 +30,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
     const XML_IMAGE_ORDER_STATUS_READY_TO_PICKUP = self::XML_GROUP_IMAGE_ORDER_STATUS . 'ready_to_pickup';
     const XML_IMAGE_ORDER_STATUS_DELIVERED       = self::XML_GROUP_IMAGE_ORDER_STATUS . 'delivered';
     const XML_IMAGE_ORDER_STATUS_IN_DELIVERY     = self::XML_GROUP_IMAGE_ORDER_STATUS . 'in_delivery';
+    const XML_IMAGE_ORDER_STATUS_FAILED_DELIVERY = self::XML_GROUP_IMAGE_ORDER_STATUS . 'failed_delivery';
     const XML_GROUP_IMAGE_PAYMENT                = self::XML_GROUP_IMAGE . 'payment/';
     const XML_IMAGE_PAYMENT_FAILED               = self::XML_GROUP_IMAGE_PAYMENT . 'failed';
     const XML_IMAGE_PAYMENT_SUCCESS              = self::XML_GROUP_IMAGE_PAYMENT . 'success';

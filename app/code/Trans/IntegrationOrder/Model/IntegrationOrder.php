@@ -766,4 +766,18 @@ IntegrationOrderInterface {
     public function setLogisticCourier($logisticCourier) {
         return $this->setData(IntegrationOrderInterface::LOGISTIC_COURIER, $logisticCourier);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getShippingFeeDiscount() {
+        return $this->getData(IntegrationOrderInterface::SHIPPING_FEE_DISCOUNT);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setShippingFeeDiscount($shippingFeeDiscount) {
+        return $this->setData(IntegrationOrderInterface::SHIPPING_FEE_DISCOUNT, $shippingFeeDiscount);
+    }
 }

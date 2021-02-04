@@ -16,12 +16,12 @@
         xsi:noNamespaceSchemaLocation="urn:magento:framework:Communication/etc/communication.xsd">
     <topic name="sm.notification.sms" request="SM\Notification\Api\Data\Queue\SmsInterface">
         <handler name="sm.notification.sms"
-                 type="SM\Notification\Model\Notification\Consumer\Email"
+                 type="SM\Notification\Model\Notification\Consumer\Sms"
                  method="process" />
     </topic>
     <topic name="sm.notification.email" request="SM\Notification\Api\Data\Queue\EmailInterface">
         <handler name="sm.notification.email"
-                 type="SM\Notification\Model\Notification\Consumer\Sms"
+                 type="SM\Notification\Model\Notification\Consumer\Email"
                  method="process" />
     </topic>
     <topic name="sm.notification.push" request="SM\Notification\Api\Data\Queue\PushDeviceInterface">

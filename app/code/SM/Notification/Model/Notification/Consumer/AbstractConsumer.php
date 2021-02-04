@@ -48,7 +48,7 @@ abstract class AbstractConsumer
     protected $settingHelper;
 
     /**
-     * @var array
+     * @var \SM\Notification\Model\EventSetting[]
      */
     protected $customerSetting = [];
 
@@ -58,18 +58,23 @@ abstract class AbstractConsumer
     protected $customerOnlineCollFact;
 
     /**
+     * @var \SM\Notification\Model\EventSettingFactory
+     */
+    protected $eventSettingFactory;
+
+    /**
      * AbstractConsumer constructor.
      *
+     * @param \SM\Notification\Model\EventSettingFactory                          $eventSettingFactory
      * @param \Magento\Customer\Model\ResourceModel\Online\Grid\CollectionFactory $customerOnlineCollFact
-     * @param \SM\Notification\Helper\CustomerSetting                             $settingHelper
      * @param \Magento\Framework\App\ResourceConnection                           $resourceConnection
      * @param \Magento\Customer\Api\CustomerRepositoryInterface                   $customerRepository
      * @param \Trans\IntegrationNotification\Api\IntegrationNotificationInterface $integrationNotification
      * @param \Magento\Framework\Logger\Monolog                                   $logger
      */
     public function __construct(
+        \SM\Notification\Model\EventSettingFactory $eventSettingFactory,
         \Magento\Customer\Model\ResourceModel\Online\Grid\CollectionFactory $customerOnlineCollFact,
-        \SM\Notification\Helper\CustomerSetting $settingHelper,
         \Magento\Framework\App\ResourceConnection $resourceConnection,
         \Magento\Customer\Api\CustomerRepositoryInterface $customerRepository,
         \Trans\IntegrationNotification\Api\IntegrationNotificationInterface $integrationNotification,
@@ -79,8 +84,8 @@ abstract class AbstractConsumer
         $this->integration = $integrationNotification;
         $this->customerRepository = $customerRepository;
         $this->logger = $logger;
-        $this->settingHelper = $settingHelper;
         $this->customerOnlineCollFact = $customerOnlineCollFact;
+        $this->eventSettingFactory = $eventSettingFactory;
     }
 
     /**
@@ -126,16 +131,19 @@ abstract class AbstractConsumer
 
     /**
      * @param int $customerId
+     * @param string    $event
      *
-     * @return array
+     * @return \SM\Notification\Model\EventSetting
      */
-    protected function getCustomerSetting($customerId)
+    protected function getCustomerSetting($customerId, $event)
     {
-        if (empty($this->customerSetting[$customerId])) {
-            $this->customerSetting[$customerId] = $this->settingHelper->getCustomerSetting($customerId);
+        if (empty($this->customerSetting[$customerId][$event])) {
+            $this->customerSetting
+            [$customerId]
+            [$event] = $this->eventSettingFactory->create()->init($customerId, $event);
         }
 
-        return $this->customerSetting[$customerId];
+        return $this->customerSetting[$customerId][$event];
     }
 
     /**
@@ -147,20 +155,25 @@ abstract class AbstractConsumer
      */
     protected function validate($customerId, $event, $type)
     {
-        $setting = $this->getCustomerSetting($customerId);
-        $settingCode = $this->settingHelper->generateSettingCode($event, $type);
-        if ($event === Notification::EVENT_ORDER_STATUS) {
-            $offlineCode = $this->settingHelper->generateSettingCode(
-                Notification::EVENT_ORDER_STATUS_SIGN_OUT,
-                $type
-            );
+        $setting = $this->getCustomerSetting($customerId, $event);
 
-            if (!in_array($offlineCode, $setting) && !$this->checkCustomerOnline($customerId)) {
-                return false;
+        if ($event === Notification::EVENT_ORDER_STATUS) {
+            if (!$this->checkCustomerOnline($customerId)) {
+                $this->logger->info('Customer offline');
+                $setting = $this->getCustomerSetting($customerId, Notification::EVENT_ORDER_STATUS_SIGN_OUT);
             }
         }
 
-        return in_array($settingCode, $setting);
+        switch ($type) {
+            case \SM\Notification\Model\Email::NOTIFICATION_TYPE:
+                return $setting->isEmail();
+            case \SM\Notification\Model\Push::NOTIFICATION_TYPE:
+                return $setting->isPush();
+            case \SM\Notification\Model\Sms::NOTIFICATION_TYPE:
+                return $setting->isSms();
+            default:
+                return false;
+        }
     }
 
     /**

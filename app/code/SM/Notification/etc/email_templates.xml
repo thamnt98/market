@@ -47,7 +47,7 @@
     <template id="sm_notification_email_payment_group_payment_success_physical"
               label="SM Notification Payment Success Physical"
               area="frontend" file="payment_success.html" type="html" module="SM_Notification"/>
-    <template id="sm_notification_email_order_status_group_failed_delivery"
+    <template id="sm_notification_email_order_status_group_order_failed_delivery"
               label="SM Notification Failed Delivery"
               area="frontend" file="failed_delivery.html" type="html" module="SM_Notification"/>
 </config>

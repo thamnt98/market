@@ -1,3 +1,7 @@
+"We are very sorry to inform you that we had to cancel order %order_id. Our courier failed to deliver your oder.","Kami mohon maaf karena harus membatalkan order %order_id. Kurir kami tidak berhasil melakukan pengiriman."
+"Please find more information about this order by contacting <a href='%contact_us'>Transmart Customer Service</a>. Thank you so much for your understanding.","Silakan hubungi <a href='%contact_us'>Transmart Customer Service</a>. untuk mengetahui info lebih lanjut mengenai order ini. Kami berterima kasih atas pengertian Anda."
+"Sorry, we had to cancel order %1.","Maaf, kami harus membatalkan order %1."
+"Your order delivery is unsuccessful. Find more info here.","Pengiriman order tidak berhasil dilakukan. Cek info lebih lanjut di sini."
 "%1, order %2 has been cancelled.","%1, order %2 telah dibatalkan."
 "Sorry, you've gone past the pick up time limit.","Maaf, Anda telah melewatkan batas waktu pengambilan di gerai."
 "%1, we are sorry...","%1, kami mohon maaf..."
@@ -8781,7 +8785,7 @@ New quote ,New quote
  submitted by buyer, submitted by buyer
 "Thank you,","Terima kasih,"
 %store_name,%store_name
-"Dear %customer_name,","Dear %customer_name,"
+"Dear %customer_name","Halo %customer_name"
 Your quote ,Your quote
  has been declined by the seller., has been declined by the seller.
 Reason: %reason.,Reason: %reason.
