@@ -70,14 +70,31 @@ class Repository implements \SM\MobileApi\Api\CartItemRepositoryInterface
     }
 
     /**
+     * @inheridoc
+     */
+    public function update(\Magento\Quote\Api\Data\CartItemInterface $cartItem)
+    {
+        return $this->save($cartItem, true);
+    }
+
+    /**
+     * @inheridoc
+     */
+    public function addToCart(\Magento\Quote\Api\Data\CartItemInterface $cartItem)
+    {
+        return $this->save($cartItem);
+    }
+
+    /**
      * @param \Magento\Quote\Api\Data\CartItemInterface $cartItem
+     * @param bool $isUpdate
      * @return \Magento\Quote\Api\Data\CartItemInterface|\SM\MobileApi\Api\Data\CartItemInterface
      * @throws InputException
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      * @throws \Magento\Framework\Webapi\Exception
      */
-    public function save(\Magento\Quote\Api\Data\CartItemInterface $cartItem)
+    protected function save(\Magento\Quote\Api\Data\CartItemInterface $cartItem, $isUpdate = false)
     {
         /** @var \Magento\Quote\Model\Quote $quote */
         $cartId = $cartItem->getQuoteId();
@@ -211,14 +228,18 @@ class Repository implements \SM\MobileApi\Api\CartItemRepositoryInterface
         $quoteItems = $quote->getItems();
         $quoteItems[] = $cartItem;
         $quote->setItems($quoteItems);
-        $this->quoteRepository->save($quote);
+        $this->quoteRepository->save($quote->setTotalsCollectedFlag(true));
         $this->mbCartRepository->setQuote($quote);
 
         if ($message != "") {
             throw new \Magento\Framework\Webapi\Exception(__($message), 444, 404);
         }
 
-        return $this->mbCartRepository->getItems($cartId, false);
+        if ($isUpdate) {
+            return $this->mbCartRepository->getItems($cartId, false);
+        } else {
+            return $quote->getLastAddedItem();
+        }
     }
 
     protected function _initializeEventsForQuoteItems(\Magento\Quote\Model\Quote $quote)

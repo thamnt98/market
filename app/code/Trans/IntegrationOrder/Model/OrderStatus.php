@@ -952,8 +952,11 @@ class OrderStatus implements OrderStatusInterface {
 
 		/* Updating data status order in core magento table */
 
+		$saveStatusHistory = false;
 		if ($loadDataOrder->getStatus() != $configStatus->getPickupByCustomerStatus()) {
 			$this->loggerOrder->info('=========== prepare salesorder history Pickup ===========');
+			$status = $configStatus->getPickupByCustomerStatus();
+			
 			$pickUp = $loadDataOrder->setStatus($configStatus->getPickupByCustomerStatus());
 			$saveDataToStatusHistory->setParentId($entityIdSalesOrder);
 			$saveDataToStatusHistory->setStatus($configStatus->getPickupByCustomerStatus());
@@ -975,11 +978,14 @@ class OrderStatus implements OrderStatusInterface {
 			}
 
 			$this->orderStatusHistoryRepoInterface->save($saveDataToStatusHistory);
+			$saveStatusHistory = true;
 			$this->loggerOrder->info('=========== prepare salesorder history end Pickup ===========');
 		}
 
 		if ($orderData->getOrderType() === self::DELIVERY) {
 			$this->loggerOrder->info('=========== prepare salesorder history Delivery start ===========');
+			$status = $configStatus->getInProcessWaitingPickupStatus();
+
 			$deliveries = $loadDataOrder->setStatus($configStatus->getInProcessWaitingPickupStatus());
 			$saveDataToStatusHistory->setParentId($entityIdSalesOrder);
 			$saveDataToStatusHistory->setStatus($configStatus->getInProcessWaitingPickupStatus());
@@ -1000,8 +1006,12 @@ class OrderStatus implements OrderStatusInterface {
 				}
 			}
 			$this->orderStatusHistoryRepoInterface->save($saveDataToStatusHistory);
+			$saveStatusHistory = true;
 			$this->loggerOrder->info('=========== prepare salesorder history Delivery end ===========');
+		}
 
+		if($saveStatusHistory) {
+			$this->saveStatusHistory($loadDataOrder->getData('parent_order'), $status, $loadStatusDelivery);
 		}
 
 		$historyOrderUpdated = false;
@@ -1102,6 +1112,16 @@ class OrderStatus implements OrderStatusInterface {
 			$shipment->getOrder()->save();
 			$this->updateOrderStatus($getEntityIds, 'in_process_waiting_for_pickup', 'processing');
 
+			$checkChildStatus = $this->checkOrderStatus($loadDataOrder->getData('parent_order'), 'in_process_waiting_for_pickup');
+
+			$status = 'in_process';
+			$state  = 'processing';
+			if ($checkChildStatus) {
+				$status = 'in_process_waiting_for_pickup';
+			}
+			
+			$this->updateOrderStatus($loadDataOrder->getData('parent_order'), $status, $state);
+
 			// Send email
 			$this->shipmentNotify->create()->notify($shipment);
 			$shipment->save();
@@ -1114,6 +1134,25 @@ class OrderStatus implements OrderStatusInterface {
 
 		$this->loggerOrder->info(__FUNCTION__ . ' end');
 		return $result;
+	}
+
+	/**
+	 * save history status order 
+	 * 
+	 * @param int $orderId 
+	 * @param string $status
+	 * @param object $loadStatusDelivery
+	 * @return void
+	 */
+	protected function saveStatusHistory($orderId, $status, $loadStatusDelivery)
+	{
+		$saveDataToStatusHistory    = $this->orderStatusHistoryInterfaceFactory->create();
+		$saveDataToStatusHistory->setParentId($orderId);
+		$saveDataToStatusHistory->setStatus($status);
+		$saveDataToStatusHistory->setComment($loadStatusDelivery->getFeStatus() . $loadStatusDelivery->getFeSubStatus());
+		$saveDataToStatusHistory->setEntityName('order');
+
+		$this->orderStatusHistoryRepoInterface->save($saveDataToStatusHistory);
 	}
 
 	/**
@@ -1485,6 +1524,56 @@ class OrderStatus implements OrderStatusInterface {
 		}
 	}
 
+	/**
+	 * check sales order status
+	 *
+	 * @param int $parentId
+	 * @param string $status
+	 * @return bool
+	 */
+	protected function checkOrderStatus($parentId, $status)
+	{
+		$result = false;
+		// $status = 'in_process_waiting_for_pickup';
+		$connection = $this->resource->getConnection();
+		$table      = $connection->getTableName('sales_order');
+
+		$query = $connection->select();
+		$query->from(
+			$table,
+			['*']
+		);
+		$query->where('parent_order = ?', $parentId);
+		// $query->where('status = ?', $status);
+
+		$collection = $connection->fetchAll($query);
+
+		if($collection) {
+			$count = count($collection);
+
+			$currentData = 0;
+			foreach($collection as $order) {
+				if($order['status'] === $status) {
+					$currentData++;
+				}
+			}
+
+			if($count == $currentData) {
+				$result = true;
+			}
+		}
+
+		return $result;
+	}
+
+	/**
+	 * update order status
+	 *
+	 * @param \Magento\Sales\Api\Data\OrderInterface $order
+	 * @param string $status
+	 * @param string $state
+	 * @return void
+	 */
 	protected function updateStatuses($order, $status, $state) {
 		$refNumber   = $order->getData('reference_number');
 		$parentOrder = $this->transactionMegaHelper->getSalesOrderArrayParent($refNumber);
