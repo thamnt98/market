@@ -7,6 +7,8 @@ use Magento\Checkout\Model\Cart;
 use Magento\Checkout\Model\Sidebar;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\Action\HttpGetActionInterface;
+use Magento\Framework\App\Action\HttpPostActionInterface as HttpPostActionInterface;
 use Magento\Framework\App\Response\Http;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Json\Helper\Data;
@@ -14,7 +16,7 @@ use Magento\Framework\Locale\ResolverInterface;
 use Magento\Quote\Api\Data\CartItemInterface;
 use Psr\Log\LoggerInterface;
 
-class UpdateItemQty extends Action
+class UpdateItemQty extends Action implements HttpPostActionInterface
 {
     /**
      * @var Cart

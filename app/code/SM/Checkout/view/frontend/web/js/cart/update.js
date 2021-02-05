@@ -251,6 +251,7 @@ define([
                 $.ajax({
                     url: updateItemController,
                     data: data,
+                    type: 'POST',
                     showLoader: false,
                     success: function (res) {
                         if (res.success === true) {
@@ -337,6 +338,7 @@ define([
                 $.ajax({
                     url: updateItemController,
                     data: data,
+                    type: 'POST',
                     showLoader: false,
                     success: function (res) {
                         if (res.success === true) {
