@@ -229,11 +229,16 @@ define([
         if (parseInt(itemQty.val()) >= 99 || parseInt(itemQty.val()) >= itemStockQty) {
             elementId.css("background", "#ccc");
             elementId.attr('readonly', true);
-            elementId.addClass('disabled', true);
+            elementId.addClass('disabled');
+            if (!downElementId.hasClass('disable')) {
+                downElementId.css("background", "#f7b500");
+                downElementId.attr('readonly', false);
+                downElementId.removeClass('disabled');
+            }
         } else {
             downElementId.css("background", "#f7b500");
             downElementId.attr('readonly', false);
-            downElementId.removeClass('disabled', false);
+            downElementId.removeClass('disabled');
         }
 
         clearTimeout(timerFunction);
@@ -317,12 +322,18 @@ define([
         if (parseInt(itemQty.val()) <= 1) {
             elementId.css("background", "#ccc");
             elementId.attr('readonly', true);
-            elementId.addClass('disabled', false);
+            elementId.addClass('disabled');
+            if (plusElementId.hasClass('disabled')) {
+                plusElementId.css("background", "#f7b500");
+                plusElementId.attr('readonly', false);
+                plusElementId.removeClass('disabled');
+            }
         } else {
             plusElementId.css("background", "#f7b500");
             plusElementId.attr('readonly', false);
-            plusElementId.removeClass('disabled', false);
+            plusElementId.removeClass('disabled');
         }
+
         clearTimeout(timerFunction);
         timerFunction = setTimeout(function () {
             if (form !== undefined) {
