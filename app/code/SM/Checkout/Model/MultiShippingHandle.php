@@ -1736,16 +1736,11 @@ class MultiShippingHandle
         }
         $spo = [];
         foreach ($response['content'] as $data) {
-            if (!isset($data['data'])) {
-                continue;
-            }
-            if (!isset($data['data']['items'])) {
+            if (!isset($data['data']) || !isset($data['data']['is_spo']) || $data['data']['is_spo'] || !isset($data['data']['items'])) {
                 continue;
             }
             foreach ($data['data']['items'] as $item) {
-                if (!$item['is_spo']) {
-                    $spo[] = $item['sku'];
-                }
+                $spo[] = $item['sku'];
             }
         }
         return $spo;
