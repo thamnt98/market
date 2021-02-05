@@ -348,7 +348,7 @@ class Cart implements \SM\MobileApi\Api\CartInterface
                     $quoteItems = $quote->getItems();
                     $quoteItems[] = $item;
                     $quote->setItems($quoteItems);
-                    $this->quoteRepository->save($quote);
+                    $this->quoteRepository->save($quote->setTotalsCollectedFlag(true));
 
                     if ($truePrice != 0) {
                         $quote->getLastAddedItem()->setCustomPrice($truePrice);
@@ -360,7 +360,6 @@ class Cart implements \SM\MobileApi\Api\CartInterface
                         $quote->getLastAddedItem()->setEventId($event->getId());
                         $quote->getLastAddedItem()->setEvent($event);
                     }
-                    $quote->collectTotals();
 
                     $this->setOriginalPrice($customer, $quote->getLastAddedItem());
 
