@@ -5,7 +5,7 @@ git-push-to-transmart:
     only:
         refs:
             - /APO-.*/
-    allow_failure: false
+    allow_failure: true
     script:
         - cd /var/www/apollo11/
         - git fetch smartosc
