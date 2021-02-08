@@ -401,6 +401,11 @@ class MultiShippingHandle
         $data['show_each_items'] = $showEachItems;
         $data['data'] = $itemsValidMethod;
         $data['addressEachItems']    = $this->addressEachItems;
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/bbbb.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+        $logger->info(print_r($this->outStockByOar, true));
+        //$logger->info('outStockByM:' . count($this->outStockByMagento));
         if (!empty($this->outStockByOar) || !empty($this->outStockByMagento)) {
             $data['out_stock'] = true;
         }
@@ -419,6 +424,7 @@ class MultiShippingHandle
         $this->writeTimeLog($dateEnd, $dateStart, $message);
         $data['mobile-items-format'] = $this->mobileItemsFormat;
         $data['child-items'] = $this->child;
+        $data['default-shipping-address'] = $customer->getDefaultShippingAddress();
         return $data;
     }
 
@@ -494,6 +500,7 @@ class MultiShippingHandle
         foreach ($allItems as $item) {
             if ($item->getParentItemId() && $item->getParentItemId() != null) {
                 $this->child[$item->getParentItemId()][] = $item;
+                $allChildItemsId[$item->getParentItemId()][] = $item->getId();
             } else {
                 $currentParentItems[$item->getId()] = $item->getId();
                 $product = $item->getProduct();
@@ -521,6 +528,13 @@ class MultiShippingHandle
         }
         $dateEnd = microtime(true); // log_time
         $this->writeTimeLog($dateEnd, $dateStart, $message);
+        $shippingMethodSelectedList = [];
+        foreach ($items as $item) {
+            $shippingMethodSelected = $item->getShippingMethodSelected();
+            if ($shippingMethodSelected != self::NOT_AVAILABLE && $shippingMethodSelected != self::STORE_PICK_UP) {
+                $shippingMethodSelectedList[] = $shippingMethodSelected;
+            }
+        }
         foreach ($items as $item) {
             $quoteItemId = $item->getItemId();
             $shippingMethodSelected = $item->getShippingMethodSelected();
@@ -550,6 +564,13 @@ class MultiShippingHandle
                     ];
                 }
             } else {
+                if ($shippingMethodSelected == self::NOT_AVAILABLE) {
+                    if (empty($shippingMethodSelectedList)) {
+                        $shippingMethodSelected = self::DEFAULT_METHOD;
+                    } else {
+                        $shippingMethodSelected = $shippingMethodSelectedList[0];
+                    }
+                }
                 if (!in_array($addressIdSelected, $addressIds)) {
                     $addressIds[] = $addressIdSelected;
                 }
@@ -628,6 +649,7 @@ class MultiShippingHandle
                                     'store_pickup' => '',
                                     'split_store_code' => 0,
                                 ];
+                                unset($this->inputItemsFormatAfterHandle[$quoteItemId]);
                                 continue;
                             }
                         }
@@ -702,7 +724,7 @@ class MultiShippingHandle
                         && $orderToSendOar['destination']['latitude'] != 0
                         && $orderToSendOar['destination']['longitude'] != 0
                     ) {
-                        $orderToSendOar['items']           = array_values($orderToSendOar['items']);
+                        $orderToSendOar['items'] = array_values($orderToSendOar['items']);
                         $orderToSendOar['order_id'] = (string)$i;
                         $dataSendToOar[] = $orderToSendOar;
                         $i++;
@@ -1078,10 +1100,16 @@ class MultiShippingHandle
     /**
      * @param $quote
      * @param bool $web
+     * @param false $notSpoList
      * @param array $invalidShippingList
+     * @param array $items
+     * @param array $childItems
+     * @param false $defaultShipping
      * @return array
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws \Zend_Json_Exception
      */
-    public function getPreviewOrderData($quote, $web = true, $invalidShippingList = [], $items = [], $childItems = [])
+    public function getPreviewOrderData($quote, $web = true, $notSpoList = false, $invalidShippingList = [], $items = [], $childItems = [], $defaultShipping = false)
     {
         $this->initItems = $items;
         $quoteItemData = [];
@@ -1093,6 +1121,34 @@ class MultiShippingHandle
             $storeId = $quote->getStoreId();
             $voucher = $quote->getApplyVoucher();
         }
+        if (!$web && !$notSpoList && $defaultShipping) {
+            $orderToSendOar['order_id'] = $quote->getCustomerId();
+            $orderToSendOar['merchant_code'] = $this->split->getMerchantCode();
+            try {
+                $regionId = $defaultShipping->getRegionId();
+                $province = $this->split->getProvince($regionId);
+                $district = $defaultShipping->getCustomAttribute('district') ? $defaultShipping->getCustomAttribute('district')->getValue() : '';
+                $district = $this->split->getDistrictName($district);
+                $lat = $defaultShipping->getCustomAttribute('latitude') ? $defaultShipping->getCustomAttribute('latitude')->getValue() : 0;
+                $long = $defaultShipping->getCustomAttribute('longitude') ? $defaultShipping->getCustomAttribute('longitude')->getValue() : 0;
+                $city = $this->split->getCityName($defaultShipping->getCity());
+                $orderToSendOar['destination'] = [
+                    "address" => $defaultShipping->getStreetFull(),
+                    "province" => $province,
+                    "city" => $city,
+                    "district" => $district,
+                    "postcode" => $defaultShipping->getPostcode(),
+                    "latitude" => (float)$lat,
+                    "longitude" => (float)$long
+                ];
+                $notSpoList = $this->getSkuListForPickUp($quote, $orderToSendOar, true);
+            } catch (\Exception $e) {
+                $notSpoList = [];
+            }
+        } else {
+            $notSpoList = [];
+        }
+
         foreach ($shippingAddress as $address) {
             $date           = $time           = "";
             $previewOrder   = $this->previewOrderInterfaceFactory->create();
@@ -1153,7 +1209,7 @@ class MultiShippingHandle
                 $itemList[] = $quoteItemId;
                 $itemTotal  = $itemTotal + (int) $item->getQty();
                 if (!$web && !empty($invalidShippingList)) {
-                    $quoteItemData[$quoteItemId] = $this->buildQuoteItemForMobile($item, $shippingMethod, $invalidShippingList, $weightUnit, $currencySymbol, $storeId, $addressId, $voucher, false, $childItems);
+                    $quoteItemData[$quoteItemId] = $this->buildQuoteItemForMobile($notSpoList, $item, $shippingMethod, $invalidShippingList, $weightUnit, $currencySymbol, $storeId, $addressId, $voucher, false, $childItems);
                 }
             }
             $previewOrder->setItems($itemList);
@@ -1297,6 +1353,7 @@ class MultiShippingHandle
     }
 
     /**
+     * @param $notSpoList
      * @param $quoteItem
      * @param $shippingMethod
      * @param $invalidShippingList
@@ -1306,11 +1363,12 @@ class MultiShippingHandle
      * @param $addressId
      * @param $voucher
      * @param false $init
+     * @param array $childItems
      * @return mixed|\SM\Checkout\Api\Data\Checkout\QuoteItems\ItemInterface
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      * @throws \Zend_Json_Exception
      */
-    public function buildQuoteItemForMobile($quoteItem, $shippingMethod, $invalidShippingList, $weightUnit, $currencySymbol, $storeId, $addressId, $voucher, $init = false, $childItems = [])
+    public function buildQuoteItemForMobile($notSpoList, $quoteItem, $shippingMethod, $invalidShippingList, $weightUnit, $currencySymbol, $storeId, $addressId, $voucher, $init = false, $childItems = [])
     {
         if ($quoteItem instanceof \Magento\Quote\Model\Quote\Address\Item) {
             $quoteItemId = $quoteItem->getQuoteItemId();
@@ -1320,7 +1378,7 @@ class MultiShippingHandle
         if (!$init) {
             if (isset($this->initItems[$quoteItemId])) {
                 $product = $quoteItem->getProduct();
-                if ((bool)$product->getIsWarehouse()) {
+                if (!in_array($quoteItemId, $notSpoList)) {
                     $this->disablePickUp = true;
                 } else {
                     if (isset($childItems[$quoteItemId])) {
@@ -1367,6 +1425,7 @@ class MultiShippingHandle
                     $quoteItemModel->setMessage(__('Quantity has been adjusted.'));
                 }
                 unset($this->initItems[$quoteItemId]);
+                $quoteItemModel->setRowTotal($quoteItem->getRowTotal());
                 return $quoteItemModel;
             }
         }
@@ -1386,8 +1445,8 @@ class MultiShippingHandle
         $quoteItemModel->setWeightUnit($weightUnit);
         $quoteItemModel->setQty($quoteItem->getQty());
         $quoteItemModel->setThumbnail($this->getImageUrl($product, $storeId));
-        $quoteItemModel->setRowTotal($quoteItem->getRowTotal());
-        $quoteItemModel->setDisableStorePickUp((bool)$product->getIsWarehouse());
+        $quoteItemModel->setRowTotal($quoteItem->getPrice() * $quoteItem->getQty());
+        $quoteItemModel->setDisableStorePickUp((!in_array($quoteItemId, $notSpoList))); // add spo
         $product = $this->productRepository->getById($product->getId());
         $model = $this->gtmCart->create();
         $data = $this->productGtm->getGtm($product);
@@ -1550,4 +1609,161 @@ class MultiShippingHandle
         $logger->info($message . $timeDiff . 's');
     }
 
+    /**
+     * @param $quote
+     * @param $orderToSendOar
+     * @param $checkIsSpo
+     * @return array
+     */
+    public function getSkuListForPickUp($quote, $orderToSendOar, $checkIsSpo)
+    {
+        $allChildItemsId = [];
+        $allChildItems = [];
+        foreach ($quote->getAllItems() as $item) {
+            if ($item->getParentItemId() && $item->getParentItemId() != null) {
+                $allChildItems[$item->getParentItemId()][] = $item;
+                $allChildItemsId[$item->getParentItemId()][] = $item->getId();
+            }
+        }
+        $totalWeight = 0;
+        $totalQty = 0;
+        $totalPrice = 0;
+        $orderToSendOar['items'] = [];
+        $allItemsSkuList = [];
+        $allParentItemsId = [];
+        foreach ($quote->getAllVisibleItems() as $item) {
+            $rowTotal = (int) $item->getRowTotal();
+            $totalPrice += $rowTotal;
+            if (isset($allChildItems[$item->getItemId()])) {
+                foreach ($allChildItems[$item->getItemId()] as $itemData) {
+                    $product    = $itemData->getProduct();
+                    $ownCourier = (bool)$product->getData('own_courier');
+                    $sku      = $itemData->getSku();
+                    $childQty = (int) $item->getQty() * (int) $itemData->getQty();
+                    $price    = ((int) $itemData->getPrice() != 0) ? (int) $itemData->getPrice() : (int) $product->getFinalPrice();
+                    if (isset($orderToSendOar['items'][$sku])) {
+                        $orderToSendOar['items'][$sku]['quantity'] += $childQty;
+                    } else {
+                        $orderToSendOar['items'][$sku] = [
+                            'sku' => $sku,
+                            'sku_basic' => $sku,
+                            'quantity' => $childQty,
+                            'price' => $price,
+                            'weight' => (int) $itemData->getWeight(),
+                            'is_spo' => false,
+                            'is_own_courier' => $ownCourier,
+                        ];
+                    }
+                    $totalWeight += $childQty * (int) $itemData->getWeight();
+                    $totalQty += $childQty;
+                    if ($rowTotal == 0) {
+                        $rowTotal = $price * $childQty;
+                        $totalPrice += $rowTotal;
+                    }
+                    $allItemsSkuList[$itemData->getId()] = ['parent_id' => $item->getId(), 'sku' => $sku, 'qty' => (int) $item->getQty() * (int) $itemData->getQty()];
+                }
+            } else {
+                $product    = $item->getProduct();
+                $ownCourier = (bool)$product->getData('own_courier');
+                // sing quote item id
+                $sku   = $item->getSku();
+                $price = ((int) $item->getPrice() != 0) ? (int) $item->getPrice() : (int) $product->getFinalPrice();
+                if (isset($orderToSendOar['items'][$sku])) {
+                    $orderToSendOar['items'][$sku]['quantity'] += (int) $item->getQty();
+                } else {
+                    $orderToSendOar['items'][$sku] = [
+                        'sku' => $sku,
+                        'sku_basic' => $sku,
+                        'quantity' => (int) $item->getQty(),
+                        'price' => $price,
+                        'weight' => (int) $item->getWeight(),
+                        'is_spo' => false,
+                        'is_own_courier' => $ownCourier,
+                    ];
+                }
+
+                $totalWeight += (int) $item->getWeight();
+                $totalQty += (int) $item->getQty();
+                if ($rowTotal == 0) {
+                    $rowTotal = $price * (int) $item->getQty();
+                    $totalPrice += $rowTotal;
+                }
+                $allItemsSkuList[$item->getId()] = ['parent_id' => $item->getId(), 'sku' => $sku, 'qty' => (int) $item->getQty()];
+            }
+            $allParentItemsId[$item->getId()] = $item->getId();
+        }
+        $orderToSendOar['total_weight'] = $totalWeight;
+        $orderToSendOar['total_price'] = $totalPrice;
+        $orderToSendOar['total_qty'] = $totalQty;
+        $notSpoSku = $this->buildOarDataToCheckIsSpo($orderToSendOar);
+        if (!$checkIsSpo) {
+            $allItemsSkuListCheckSpo = $allItemsSkuList;
+            $allParentItemsIsSpo = $allParentItemsId;
+            foreach ($allItemsSkuListCheckSpo as $itemId => $itemData) {
+                if (!in_array($itemId, $allItemsSkuList)) {
+                    continue;
+                }
+                $itemSku = $itemData['sku'];
+                if (!in_array($itemSku, $notSpoSku)) {
+                    $parentItemId = $allItemsSkuList[$itemId]['parent_id'];
+                    unset($allParentItemsIsSpo[$parentItemId]);
+                    if (isset($allChildItemsId[$parentItemId])) {
+                        foreach ($allChildItemsId[$parentItemId] as $childItemId) {
+                            unset($allItemsSkuList[$childItemId]);
+                        }
+                    }
+                }
+            }
+            $skuListForPickUp = [];
+            foreach ($allItemsSkuList as $item) {
+                if (isset($skuListForPickUp[$item['sku']])) {
+                    $skuListForPickUp[$item['sku']] += $item['qty'];
+                } else {
+                    $skuListForPickUp[$item['sku']] = $item['qty'];
+                }
+            }
+            return $skuListForPickUp;
+        } else {
+            $allItemsSkuListCheckSpo = $allItemsSkuList;
+            $allParentItemsIsSpo = $allParentItemsId;
+            foreach ($allItemsSkuListCheckSpo as $itemId => $itemData) {
+                $itemSku = $itemData['sku'];
+                if (!in_array($itemSku, $notSpoSku)) {
+                    $parentItemId = $allItemsSkuList[$itemId]['parent_id'];
+                    unset($allParentItemsIsSpo[$parentItemId]);
+                }
+            }
+            if (empty($allParentItemsIsSpo)) {
+                $this->disablePickUp = false;
+                //$this->notFulFillMessage = __('Sorry, pick-up method is not applicable for this order. Shop conveniently with our delivery.');
+            } elseif (count($allParentItemsId) != count($allParentItemsIsSpo)) {
+                $this->disablePickUp = false;
+                //$this->notFulFillMessage = __('Sorry, some items are not available for pick-up. We have more delivery options for you, try them out!');
+            }
+            return $allParentItemsIsSpo;
+        }
+    }
+
+    /**
+     * @param $orderToSendOar
+     * @return array
+     */
+    public function buildOarDataToCheckIsSpo($orderToSendOar)
+    {
+        $orderToSendOar['items'] = array_values($orderToSendOar['items']);
+        $response = $this->split->getOarResponse([$orderToSendOar]);
+        if (!is_array($response) || isset($response['error']) || !isset($response['content'])) {
+            return [];
+        }
+        $spo = [];
+        foreach ($response['content'] as $data) {
+            if (!isset($data['data']) || !isset($data['data']['is_spo']) || $data['data']['is_spo'] || !isset($data['data']['items'])) {
+                continue;
+            }
+            foreach ($data['data']['items'] as $item) {
+                $spo[] = $item['sku'];
+            }
+        }
+        return $spo;
+    }
 }

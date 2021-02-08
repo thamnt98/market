@@ -197,7 +197,7 @@ class Onepage extends \Magento\Checkout\Block\Onepage
                         }
                     }
 
-                    $imageData[$key]['is_warehouse'] = (bool)($item['product']['is_warehouse'] ?? false);
+                    $imageData[$key]['is_warehouse'] = !in_array($item['item_id'], $data['itemNotIsSpo']);
                 }
             }
         }
