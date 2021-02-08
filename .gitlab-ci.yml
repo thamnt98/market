@@ -1,0 +1,18 @@
+stages:
+    - push-to-transmart
+git-push-to-transmart:
+    stage: push-to-transmart
+    only:
+        refs:
+            - /APO-.*/
+    allow_failure: true
+    script:
+        - cd /var/www/apollo11/
+        - git fetch smartosc
+        - git checkout ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
+        - git checkout staging
+        - git branch -D ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
+        - git checkout -b ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} smartosc/${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
+        - git push transmart
+    tags:
+        - Push-To-Transmart
