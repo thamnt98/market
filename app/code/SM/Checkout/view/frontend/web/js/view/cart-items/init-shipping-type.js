@@ -764,19 +764,25 @@ define([
                     alert($t("Geocode was not successful for the following reason: %1").replace('%1', status));
                 }
             });
-        } else if (navigator.geolocation) {
-            console.log('10001');
-            navigator.geolocation.getCurrentPosition(function (position) {
-                console.log('10002');
-                var latlng = {lat: Number(position.coords.latitude), lng: Number(position.coords.longitude)};
-                mod.searchStoreHandle(data, latlng, storePickupItems, false, true);
-            }, function (error) {
-                console.log('10003');
-                var latlng = {lat: Number(defaultLatlng.lat), lng: Number(defaultLatlng.lng)};
-                mod.searchStoreHandle(data, latlng, storePickupItems, false, true);
-            });
         } else {
-            onsole.log('10004');
+            navigator.permissions.query({name:'geolocation'}).then(function(result) {
+                if (result.state === 'denied') {
+                    console.log('10001');
+                    var latlng = {lat: Number(defaultLatlng.lat), lng: Number(defaultLatlng.lng)};
+                    mod.searchStoreHandle(data, latlng, storePickupItems, false, true);
+                } else {
+                    navigator.geolocation.getCurrentPosition(function (position) {
+                        console.log('10002');
+                        var latlng = {lat: Number(position.coords.latitude), lng: Number(position.coords.longitude)};
+                        mod.searchStoreHandle(data, latlng, storePickupItems, false, true);
+                    }, function (error) {
+                        console.log('10003');
+                        var latlng = {lat: Number(defaultLatlng.lat), lng: Number(defaultLatlng.lng)};
+                        mod.searchStoreHandle(data, latlng, storePickupItems, false, true);
+                    });
+                }
+            });
+            console.log('10004');
             var latlng = {lat: Number(defaultLatlng.lat), lng: Number(defaultLatlng.lng)};
             mod.searchStoreHandle(data, latlng, storePickupItems, false, true);
         }
