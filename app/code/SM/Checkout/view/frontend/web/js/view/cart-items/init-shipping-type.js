@@ -275,7 +275,7 @@ define([
             } else {
                 // one address, delivery shipping, not split order
                 let currentItemsListId = currentItemsData.getCurrentItemsListId()().split(',');
-                if (currentItemsListId.length > 0) {
+                if (currentItemsListId.length > 0 && singleDeliveryMethodValid.indexOf(shippingMethodSelectList[currentItemsListId[0]]()) !== -1) {
                     let shippingMethod = shippingMethodSelectList[currentItemsListId[0]]();
                     $('select[name="order-delivery-method"]  option[value="' + shippingMethod + '"]').prop("selected", true);
                     selectSingleShippingMethod(shippingMethod);
@@ -493,6 +493,8 @@ define([
             orderSelectAddressList = updateStatus.getOrderSelectAddressList()(),
             orderDeliveryType = setShippingType.getValue()(),
             currentItemsListId = currentItemsData.getCurrentItemsListId()().split(',');
+            console.log(orderSelectAddressList.length);
+            console.log(globalVar.splitOrder());
         if (orderSelectAddressList.length == 1) { // single address
             if (orderDeliveryType == '0') { // delivery
                 if (globalVar.splitOrder()) {
@@ -511,11 +513,17 @@ define([
                                     qty = currentItem().qty;
                                 }
                             }
-                            items.push({"item_id": itemId, "qty": qty, "shipping_address_id": addressSelectedList[itemId](), "shipping_method_selected": rateSelected()});
+                            if (orderSelectAddressList[0] != addressSelectedList[itemId]()) {
+                                var shippingSelectedItem = selectSingleShippingMethod();
+                            } else {
+                                var shippingSelectedItem = rateSelected();
+                            }
+                            items.push({"item_id": itemId, "qty": qty, "shipping_address_id": orderSelectAddressList[0], "shipping_method_selected": shippingSelectedItem});
                         }
                     });
                 } else {
                     if (typeof selectSingleShippingMethod() !== 'undefined') {
+                        console.log(itemsDataSingleAddress());
                         $.each(itemsDataSingleAddress(), function( itemId, addressId ) {
                             if($.inArray(itemId.toString(), currentItemsListId) === -1) {
                                 return true;
@@ -527,7 +535,7 @@ define([
                                     qty = currentItem().qty;
                                 }
                             }
-                            items.push({"item_id": itemId, "qty": qty, "shipping_address_id": addressId, "shipping_method_selected": selectSingleShippingMethod()});
+                            items.push({"item_id": itemId, "qty": qty, "shipping_address_id": orderSelectAddressList[0], "shipping_method_selected": selectSingleShippingMethod()});
                         });
                     }
                 }
@@ -582,7 +590,12 @@ define([
                                     qty = currentItem().qty;
                                 }
                             }
-                            items.push({"item_id": itemId, "qty": qty, "shipping_address_id": itemsDataSingleAddress()[itemId], "shipping_method_selected": rateSelected()});
+                            if (orderSelectAddressList[0] != addressSelectedList[itemId]()) {
+                                var shippingSelectedItem = selectSingleShippingMethod();
+                            } else {
+                                var shippingSelectedItem = rateSelected();
+                            }
+                            items.push({"item_id": itemId, "qty": qty, "shipping_address_id": orderSelectAddressList[0], "shipping_method_selected": shippingSelectedItem});
                         }
                     }
                 });
@@ -827,6 +840,7 @@ define([
                 }
                 var updateShippingMethod = false;
                 globalVar.disableGoPaymentButton(true);
+                console.log(setShippingType.getValue()());
                 if (updateStatus.getOrderSelectAddressList()().length == 1) { // single address
                     if (setShippingType.getValue()() == '2' || (setShippingType.getValue()() == 0 && response.show_each_items)) { // both
                         $.each(response.items_valid_method, function (index, data) {

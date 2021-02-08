@@ -401,6 +401,11 @@ class MultiShippingHandle
         $data['show_each_items'] = $showEachItems;
         $data['data'] = $itemsValidMethod;
         $data['addressEachItems']    = $this->addressEachItems;
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/bbbb.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+        $logger->info(print_r($this->outStockByOar, true));
+        //$logger->info('outStockByM:' . count($this->outStockByMagento));
         if (!empty($this->outStockByOar) || !empty($this->outStockByMagento)) {
             $data['out_stock'] = true;
         }
@@ -523,6 +528,13 @@ class MultiShippingHandle
         }
         $dateEnd = microtime(true); // log_time
         $this->writeTimeLog($dateEnd, $dateStart, $message);
+        $shippingMethodSelectedList = [];
+        foreach ($items as $item) {
+            $shippingMethodSelected = $item->getShippingMethodSelected();
+            if ($shippingMethodSelected != self::NOT_AVAILABLE && $shippingMethodSelected != self::STORE_PICK_UP) {
+                $shippingMethodSelectedList[] = $shippingMethodSelected;
+            }
+        }
         foreach ($items as $item) {
             $quoteItemId = $item->getItemId();
             $shippingMethodSelected = $item->getShippingMethodSelected();
@@ -552,6 +564,13 @@ class MultiShippingHandle
                     ];
                 }
             } else {
+                if ($shippingMethodSelected == self::NOT_AVAILABLE) {
+                    if (empty($shippingMethodSelectedList)) {
+                        $shippingMethodSelected = self::DEFAULT_METHOD;
+                    } else {
+                        $shippingMethodSelected = $shippingMethodSelectedList[0];
+                    }
+                }
                 if (!in_array($addressIdSelected, $addressIds)) {
                     $addressIds[] = $addressIdSelected;
                 }
@@ -630,6 +649,7 @@ class MultiShippingHandle
                                     'store_pickup' => '',
                                     'split_store_code' => 0,
                                 ];
+                                unset($this->inputItemsFormatAfterHandle[$quoteItemId]);
                                 continue;
                             }
                         }
@@ -704,7 +724,7 @@ class MultiShippingHandle
                         && $orderToSendOar['destination']['latitude'] != 0
                         && $orderToSendOar['destination']['longitude'] != 0
                     ) {
-                        $orderToSendOar['items']           = array_values($orderToSendOar['items']);
+                        $orderToSendOar['items'] = array_values($orderToSendOar['items']);
                         $orderToSendOar['order_id'] = (string)$i;
                         $dataSendToOar[] = $orderToSendOar;
                         $i++;
