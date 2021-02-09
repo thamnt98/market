@@ -69,7 +69,7 @@ class EventSetting
             $this->setting->generateSettingCode($event, 'sms'),
             $setting
         );
-        
+
         $this->isInit = true;
 
         return $this;
@@ -81,7 +81,7 @@ class EventSetting
     public function isPush()
     : bool
     {
-        return $this->isPush;
+        return true;
     }
 
     /**

@@ -107,6 +107,7 @@ $freshHelper = $this->helper('SM\FreshProduct\Helper\Data');
         <div class="field qty">
             <label class="text-qlty"><?= $block->escapeHtmlAttr(__('Quantity')) ?></label>
             <div class="control qty">
+                <span class="action-primary-loader" style="display: none;"></span>
                 <a id="subtract-cart-item-<?= $block->escapeHtmlAttr($_item->getId()) ?>"
                    class="subtract-cart-item decrease-qty <?= $viewModel->isEnableQtyDecrease($_item) ? '' : 'disabled' ?>"
                    itemId="<?= $_item->getId() ?>"
