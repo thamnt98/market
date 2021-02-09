@@ -1121,29 +1121,35 @@ class MultiShippingHandle
             $storeId = $quote->getStoreId();
             $voucher = $quote->getApplyVoucher();
         }
-        if (!$web && !$notSpoList && $defaultShipping) {
-            $orderToSendOar['order_id'] = $quote->getCustomerId();
-            $orderToSendOar['merchant_code'] = $this->split->getMerchantCode();
-            try {
-                $regionId = $defaultShipping->getRegionId();
-                $province = $this->split->getProvince($regionId);
-                $district = $defaultShipping->getCustomAttribute('district') ? $defaultShipping->getCustomAttribute('district')->getValue() : '';
-                $district = $this->split->getDistrictName($district);
-                $lat = $defaultShipping->getCustomAttribute('latitude') ? $defaultShipping->getCustomAttribute('latitude')->getValue() : 0;
-                $long = $defaultShipping->getCustomAttribute('longitude') ? $defaultShipping->getCustomAttribute('longitude')->getValue() : 0;
-                $city = $this->split->getCityName($defaultShipping->getCity());
-                $orderToSendOar['destination'] = [
-                    "address" => $defaultShipping->getStreetFull(),
-                    "province" => $province,
-                    "city" => $city,
-                    "district" => $district,
-                    "postcode" => $defaultShipping->getPostcode(),
-                    "latitude" => (float)$lat,
-                    "longitude" => (float)$long
-                ];
-                $notSpoList = $this->getSkuListForPickUp($quote, $orderToSendOar, true);
-            } catch (\Exception $e) {
-                $notSpoList = [];
+        if (!$web) {
+            if (!$notSpoList) {
+                if ($defaultShipping) {
+                    $orderToSendOar['order_id'] = $quote->getCustomerId();
+                    $orderToSendOar['merchant_code'] = $this->split->getMerchantCode();
+                    try {
+                        $regionId = $defaultShipping->getRegionId();
+                        $province = $this->split->getProvince($regionId);
+                        $district = $defaultShipping->getCustomAttribute('district') ? $defaultShipping->getCustomAttribute('district')->getValue() : '';
+                        $district = $this->split->getDistrictName($district);
+                        $lat = $defaultShipping->getCustomAttribute('latitude') ? $defaultShipping->getCustomAttribute('latitude')->getValue() : 0;
+                        $long = $defaultShipping->getCustomAttribute('longitude') ? $defaultShipping->getCustomAttribute('longitude')->getValue() : 0;
+                        $city = $this->split->getCityName($defaultShipping->getCity());
+                        $orderToSendOar['destination'] = [
+                            "address" => $defaultShipping->getStreetFull(),
+                            "province" => $province,
+                            "city" => $city,
+                            "district" => $district,
+                            "postcode" => $defaultShipping->getPostcode(),
+                            "latitude" => (float)$lat,
+                            "longitude" => (float)$long
+                        ];
+                        $notSpoList = $this->getSkuListForPickUp($quote, $orderToSendOar, true);
+                    } catch (\Exception $e) {
+                        $notSpoList = [];
+                    }
+                } else {
+                    $notSpoList = [];
+                }
             }
         } else {
             $notSpoList = [];
@@ -1734,10 +1740,10 @@ class MultiShippingHandle
                 }
             }
             if (empty($allParentItemsIsSpo)) {
-                $this->disablePickUp = false;
+                $this->disablePickUp = true;
                 //$this->notFulFillMessage = __('Sorry, pick-up method is not applicable for this order. Shop conveniently with our delivery.');
             } elseif (count($allParentItemsId) != count($allParentItemsIsSpo)) {
-                $this->disablePickUp = false;
+                $this->disablePickUp = true;
                 //$this->notFulFillMessage = __('Sorry, some items are not available for pick-up. We have more delivery options for you, try them out!');
             }
             return $allParentItemsIsSpo;
