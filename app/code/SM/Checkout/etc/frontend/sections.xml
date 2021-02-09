@@ -8,6 +8,9 @@
     <action name="transcheckout/cart/update">
         <section name="cart"/>
     </action>
+    <action name="transcheckout/cart/updateitemqty">
+        <section name="cart"/>
+    </action>
     <action name="digitalproduct/index/addtocart">
         <section name="cart"/>
     </action>
