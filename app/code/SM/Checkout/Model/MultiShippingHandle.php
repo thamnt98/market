@@ -737,7 +737,11 @@ class MultiShippingHandle
 
             $message = 'SM\Checkout\Model\MultiShippingHandle. Thoi gian OAR tra ve de split order - quoteID ' . $checkoutSession->getQuote()->getId() . ': ';
             $dateStart = microtime(true); // log_time
-            $splitOrder = $this->split->getOarResponse($dataSendToOar);
+            if (empty($dataSendToOar)) {
+                $splitOrder = false;
+            } else {
+                $splitOrder = $this->split->getOarResponse($dataSendToOar);
+            }
             $dateEnd = microtime(true); // log_time
             $this->writeTimeLog($dateEnd, $dateStart, $message);
 
