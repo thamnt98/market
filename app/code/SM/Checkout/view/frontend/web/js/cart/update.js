@@ -23,7 +23,8 @@ define([
     const cartContainer = $(".cart-container"),
         updateController = BASE_URL + "transcheckout/cart/update",
         updateItemController = BASE_URL + "transcheckout/cart/updateitemqty",
-        doneTypingInterval = 1000;
+        doneTypingInterval = 1000,
+        $checkoutButton = $('[data-role="proceed-to-checkout"]');
     let timerFunction;
 
     /**
@@ -58,6 +59,12 @@ define([
         });
 
         $loadingMark.show();
+
+        if (checked === 0) {
+            disableCheckoutButton();
+        } else {
+            enableCheckoutButton();
+        }
 
         setTimeout(function () {
             $loadingMark.hide();
@@ -167,6 +174,15 @@ define([
                 count++;
             }
         });
+
+        /**
+         * Check and enable/disable checkout button
+         */
+        if (count === 0) {
+            disableCheckoutButton();
+        } else {
+            enableCheckoutButton();
+        }
 
         if (count == $('.item-checked').length) {
             $('#selected-all').attr('checked', true);
@@ -406,5 +422,29 @@ define([
         setTimeout(function () {
             window.location.reload();
         }, 3000);
+    }
+    function disableCheckoutButton()
+    {
+        $checkoutButton.addClass('disabled');
+    }
+
+    function enableCheckoutButton()
+    {
+        $checkoutButton.removeClass('disabled');
+    }
+
+    function checkCheckoutButton()
+    {
+        let count = 0;
+        $('.item-checked').each(function () {
+            if ($(this).is(":checked") == true) {
+                count++;
+            }
+        });
+        if (count === 0) {
+            disableCheckoutButton();
+        } else {
+            enableCheckoutButton();
+        }
     }
 });
