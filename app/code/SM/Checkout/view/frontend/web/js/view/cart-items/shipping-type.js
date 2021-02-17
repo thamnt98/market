@@ -171,7 +171,12 @@ define([
         },
 
         selectScheduleDate: function (item_id) {
-            var addressId = this.addressSelectedList[item_id]();
+            var orderSelectAddressList = updateStatus.getOrderSelectAddressList()();
+            if (orderSelectAddressList.length == 1) {
+                var addressId = orderSelectAddressList[0];
+            } else {
+                var addressId = this.addressSelectedList[item_id]();
+            }
             if (this.addressListDate[addressId]() == '') {
                 var startDate = new Date();
                 startDate.setDate(startDate.getDate() + 1);
