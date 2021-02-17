@@ -9,6 +9,7 @@ use Magento\Framework\App\Action\Context;
 use Magento\Framework\App\Response\Http;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\LocalizedException;
+use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Json\Helper\Data;
 use Magento\InventoryCatalog\Model\GetStockIdForCurrentWebsite;
 use Magento\InventorySalesApi\Api\GetProductSalableQtyInterface;
@@ -127,11 +128,13 @@ class UpdateItemQty extends Action
             }
 
             return $this->jsonResponse();
-        } catch (LocalizedException $e) {
-            return $this->jsonResponse($e->getMessage());
+        } catch (NoSuchEntityException $e) {
+            $this->messageManager->addErrorMessage($e->getMessage());
+            return $this->jsonResponse($e->getMessage(), 1);
         } catch (\Exception $e) {
             $this->logger->critical($e);
-            return $this->jsonResponse($e->getMessage());
+            $this->messageManager->addErrorMessage($e->getMessage());
+            return $this->jsonResponse($e->getMessage(), 0);
         }
     }
 
@@ -141,37 +144,40 @@ class UpdateItemQty extends Action
      * @param string $error
      * @return Http
      */
-    protected function jsonResponse($error = '')
+    protected function jsonResponse($error = '', $errorCode = 0)
     {
         return $this->getResponse()->representJson(
-            $this->jsonHelper->jsonEncode($this->getResponseData($error))
+            $this->jsonHelper->jsonEncode($this->getResponseData($error, $errorCode))
         );
     }
 
     /**
      * Compile response data
      *
-     * @param string $error
+     * @param string $errorMessage
+     * @param int $errorCode
      * @return array
      */
-    protected function getResponseData($error = ''): array
+    protected function getResponseData($errorMessage = '', $errorCode = 0): array
     {
-        if (empty($error)) {
+        if (empty($errorMessage)) {
             $response = [
                 'success' => true,
                 'qty' => $this->saleableQty
             ];
         } else {
-            if ($this->saleableQty || $this->saleableQty = 0) {
+            if ($this->saleableQty || $this->saleableQty == 0) {
                 $response = [
                     'success' => false,
-                    'error_message' => $error,
+                    'error_code' => $errorCode,
+                    'error_message' => $errorMessage,
                     'qty' => $this->saleableQty
                 ];
             } else {
                 $response = [
                     'success' => false,
-                    'error_message' => $error
+                    'error_code' => $errorCode,
+                    'error_message' => $errorMessage
                 ];
             }
 
@@ -201,7 +207,7 @@ class UpdateItemQty extends Action
     protected function validateItem($item, float $itemQty)
     {
         if (!$item instanceof CartItemInterface) {
-            throw new LocalizedException(__("The quote item isn't found. Verify the item and try again."));
+            throw new NoSuchEntityException(__("The quote item isn't found. Verify the item and try again."));
         }
 
         $saleableQty = $this->getSaleableQty($item->getSku());
