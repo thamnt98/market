@@ -108,9 +108,6 @@ class ConnectionDB
      */
     public function getMsi($skuList)
     {
-        foreach ($skuList as $key => $sku) {
-            $skuList[$key] = (string)$sku;
-        }
         $select = $this->readAdapter->select()
         ->from(
             ['main_table' => $this->getTableName('inventory_source_item')],
