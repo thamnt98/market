@@ -4,7 +4,7 @@ git-push-to-transmart:
     stage: push-to-transmart
     only:
         refs:
-            - /APO-.*/
+            - merge_requests
     allow_failure: true
     script:
         - cd /var/www/apollo11/
