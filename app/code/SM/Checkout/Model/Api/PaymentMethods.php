@@ -245,16 +245,26 @@ class PaymentMethods
                     ->setTerms($termData);
             }
         }
+        $methodList = [];
+        if (!empty($creditMethods)) {
+            $methodList[] = $this->methodInterfaceFactory->create()
+                ->setBanks($creditMethods)
+                ->setMinimumAmount($this->paymentHelper->getMinimumAmountCC())
+                ->setTitle('Full payment')
+                ->setDescription(__('Pay your order in full amount'))
+                ->setType('cc_full_payment');
+        }
+        if (!empty($installmentMethods)) {
+            $methodList[] = $this->methodInterfaceFactory->create()
+                ->setBanks($installmentMethods)
+                ->setMinimumAmount($this->paymentHelper->getMinimumAmountCC())
+                ->setTitle('Installment')
+                ->setDescription(__('Select preferred installment type & tenure'))
+                ->setType('cc_installment');
+        }
         return $this->paymentMethodFactory->create()->setTitle('Credit Card')
             ->setDescription($this->scopeConfig->getValue('payment/sprint/sprint_cc_payment/description'))
-                                   ->setMethods([
-                                       $this->methodInterfaceFactory->create()->setBanks($creditMethods)
-                                           ->setMinimumAmount($this->paymentHelper->getMinimumAmountCC())
-                                       ->setTitle('Full payment')->setDescription(__('Pay your order in full amount'))->setType('cc_full_payment'),
-                                       $this->methodInterfaceFactory->create()->setBanks($installmentMethods)
-                                           ->setMinimumAmount($this->paymentHelper->getMinimumAmountCC())
-                                           ->setTitle('Installment')->setDescription(__('Select preferred installment type & tenure'))->setType('cc_installment')
-                                   ])->setCardType('credit_card');
+                                   ->setMethods($methodList)->setCardType('credit_card');
     }
 
     /**
