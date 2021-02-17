@@ -737,7 +737,11 @@ class MultiShippingHandle
 
             $message = 'SM\Checkout\Model\MultiShippingHandle. Thoi gian OAR tra ve de split order - quoteID ' . $checkoutSession->getQuote()->getId() . ': ';
             $dateStart = microtime(true); // log_time
-            $splitOrder = $this->split->getOarResponse($dataSendToOar);
+            if (empty($dataSendToOar)) {
+                $splitOrder = false;
+            } else {
+                $splitOrder = $this->split->getOarResponse($dataSendToOar);
+            }
             $dateEnd = microtime(true); // log_time
             $this->writeTimeLog($dateEnd, $dateStart, $message);
 
@@ -1115,7 +1119,7 @@ class MultiShippingHandle
         $quoteItemData = [];
         $previewOrderData       = [];
         $shippingAddress        = $quote->getAllShippingAddresses();
-        if (!$web && !empty($invalidShippingList)) {
+        if (!$web) {
             $weightUnit = $this->helperConfig->getWeightUnit();
             $currencySymbol = trim($this->helperConfig->getCurrencySymbol());
             $storeId = $quote->getStoreId();
@@ -1214,7 +1218,7 @@ class MultiShippingHandle
                 }
                 $itemList[] = $quoteItemId;
                 $itemTotal  = $itemTotal + (int) $item->getQty();
-                if (!$web && !empty($invalidShippingList)) {
+                if (!$web) {
                     $quoteItemData[$quoteItemId] = $this->buildQuoteItemForMobile($notSpoList, $item, $shippingMethod, $invalidShippingList, $weightUnit, $currencySymbol, $storeId, $addressId, $voucher, false, $childItems);
                 }
             }
@@ -1419,7 +1423,9 @@ class MultiShippingHandle
                     $shippingCode = 'transshipping_transshipping' . $value;
                     $shippingMethodObj = $this->shippingMethodInterfaceFactory->create();
                     $shippingMethodObj->setValue($shippingCode)->setLabel($label)->setDisabled(true);
-                    if (in_array($shippingCode, $invalidShippingList[$quoteItemId])) {
+                    if ($shippingMethod == self::STORE_PICK_UP
+                        || (isset($invalidShippingList[$quoteItemId]) && in_array($shippingCode, $invalidShippingList[$quoteItemId]))
+                    ) {
                         $shippingMethodObj->setDisabled(false);
                     }
                     $shippingMethodList[] = $shippingMethodObj;
@@ -1502,6 +1508,7 @@ class MultiShippingHandle
         $quoteItemModel->setAdditionalInfo($additionalInfo);
         $quoteItemModel->setDisable(false);
         $quoteItemModel->setMessage('');
+        unset($this->initItems[$quoteItemId]);
         return $quoteItemModel;
     }
 

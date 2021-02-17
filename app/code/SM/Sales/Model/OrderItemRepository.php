@@ -130,11 +130,10 @@ class OrderItemRepository implements OrderItemRepositoryInterface
                 $resultData->setMessage(__("\"%1\" has been added to cart.", $item->getName()));
             } else {
                 $resultData->setStatus(0);
-                $resultData->setMessage(__($item));
+                $resultData->setMessage(__('Product that you are trying to add is not available.'));
             }
         } catch (Exception $e) {
-            $resultData->setStatus(0);
-            $resultData->setMessage(__($e->getMessage()));
+            $resultData->setMessage(__('Product that you are trying to add is not available.'));
         }
 
         return $resultData;
@@ -172,7 +171,7 @@ class OrderItemRepository implements OrderItemRepositoryInterface
             $resultData->setMessage(__("You have added all products from a completed order to shopping cart."));
         } catch (Exception $e) {
             $resultData->setStatus(0);
-            $resultData->setMessage(__($e->getMessage()));
+            $resultData->setMessage(__('Product that you are trying to add is not available.'));
         }
 
         return $resultData;
