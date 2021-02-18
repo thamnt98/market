@@ -9,8 +9,9 @@ git-push-to-transmart:
         refs:
             - master
             - Integration
+            - integration
             - staging
-            - sosc-dev
+            - production
     allow_failure: true
     script:
         - cd /var/www/apollo11/
