@@ -124,6 +124,8 @@ define([
                     setTimeout(function () {
                         //Remove selected items GTM
                         gtmCollectData.removeItemSelected();
+                        // The mini cart reloading
+                        customerData.invalidate(['cart'], true);
                     }, 1000);
                 },
                 cancel: function (){},
