@@ -156,7 +156,7 @@ define([
                 let $qtyElement = form.find('input[name="item_qty"]').stop();
                 $qtyElement.val(updateQty);
                 formData.set('item_qty', updateQty.toString());
-                formAction = BASE_URL + 'checkout/sidebar/updateItemQty';
+                formAction = BASE_URL + 'checkout/sidebar/updateitemqty';
             } else {
                 formAction = form.attr('action');
                 let $qtyElement = form.find('input[name="item_qty"]').stop();
@@ -231,16 +231,26 @@ define([
                             .html(res.product.statusText);
                     }
                     self.enableAddToCartButton(form);
+
                     // Start Customize
                     if (!itemQty) {
-                        if(form.data('custom') != "nothide"){
+                        if (form.data('custom') != "nothide") {
                             form.children('.action.tocart').hide();
                         }
                         updateCartQty.show();
                     }
 
-                    if (res.success === false && (res.qty || res.qty == 0)) {
-                        self.disableIncreaseButton(form, res.qty);
+                    if (res.success === false) {
+                        if (res.qty || res.qty == 0) {
+                            self.disableIncreaseButton(form, res.qty);
+                        }
+                        if (typeof res.error_code !== "undefined") {
+                            // 1 means the item doesn't exist
+                            if (res.error_code === 1) {
+                                updateCartQty.hide();
+                                form.children('.action.tocart').show();
+                            }
+                        }
                     } else {
                         if (res.qty === updateQty) {
                             self.disableIncreaseButton(form, res.qty);
