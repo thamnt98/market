@@ -56,7 +56,7 @@ define([
         ) {
             var self = this,
                 poupPDPStorePickup = $('#pdp-pickup-connect'),
-                triggerEl = $('#pdp-store-info'),
+                triggerEl = $('.pdp-store-info'),
                 options = {
                     type: 'popup',
                     responsive: true,
