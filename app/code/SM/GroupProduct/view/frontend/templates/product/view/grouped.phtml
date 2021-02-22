@@ -116,7 +116,7 @@
                         </div>
                         <div class="available-pickup delivery-info-item">
                             <div class="title">
-                                <span class="apl-ic-pickup apl-ic-store"></span> <?= $block->escapeHtml(__('20 Stores Have Stock')) ?>
+                                <span class="apl-ic-pickup apl-ic-store"></span> <?= $block->escapeHtml(__('%1 Stores Have Stock', $block->getIsWarehouse($item))) ?>
                             </div>
                             <a href="#" id="store-pickup-btn-<?= $item->getId() ?>" class="store-info link">
                                 <?= $block->escapeHtml(__('Store info')) . '(' . $block->getIsWarehouse($item) . ' Stores)' ?>
