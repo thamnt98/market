@@ -11,10 +11,7 @@
             data-role="proceed-to-checkout"
             data-gtm-event="checkout-step-1"
             title="<?= $block->escapeHtmlAttr(__('Checkout')) ?>"
-            class="action primary checkout<?= ($block->isDisabled()) ? ' disabled' : '' ?>"
-        <?php if ($block->isDisabled()) :?>
-            disabled="disabled"
-        <?php endif; ?>>
+            class="action primary checkout<?= ($block->isDisabled()) ? ' disabled' : '' ?>">
         <span><?= $block->escapeHtml(__('Check Out')) ?></span>
     </button>
     <script type="text/javascript">

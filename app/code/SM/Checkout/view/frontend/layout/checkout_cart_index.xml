@@ -32,6 +32,10 @@
             </action>
         </referenceBlock>
 
+        <referenceContainer name="page.messages">
+            <block class="SM\Checkout\Block\Cart\ValidationMessages" name="checkout.cart.validationmessages"/>
+        </referenceContainer>
+
         <!--<referenceBlock name="checkout.cart.shipping" remove="true"/>-->
         <referenceBlock name="checkout.cart.methods.multishipping" remove="true"/>
 
