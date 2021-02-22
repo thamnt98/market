@@ -5,6 +5,13 @@ git-push-to-transmart:
     only:
         refs:
             - merge_requests
+    except:
+        refs:
+            - master
+            - Integration
+            - integration
+            - staging
+            - production
     allow_failure: true
     script:
         - cd /var/www/apollo11/
@@ -13,6 +20,6 @@ git-push-to-transmart:
         - git checkout staging
         - git branch -D ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
         - git checkout -b ${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME} smartosc/${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}
-        - git push transmart
+        - git push transmart -f
     tags:
         - Push-To-Transmart
