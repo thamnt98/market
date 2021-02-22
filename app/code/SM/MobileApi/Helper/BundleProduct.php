@@ -88,6 +88,7 @@ class BundleProduct extends \SM\MobileApi\Helper\Product\Common
      * @param Emulation $appEmulation
      * @param \SM\GTM\Block\Product\ListProduct $productGtm
      * @param \SM\MobileApi\Model\Data\GTM\GTMFactory $gtmDataFactory
+     * @param Labels\CollectionFactory $labelCollectionFactory
      */
     public function __construct(
         Context $context,
@@ -110,7 +111,8 @@ class BundleProduct extends \SM\MobileApi\Helper\Product\Common
         Image $productHelperImage,
         Emulation $appEmulation,
         \SM\GTM\Block\Product\ListProduct $productGtm,
-        \SM\MobileApi\Model\Data\GTM\GTMFactory $gtmDataFactory
+        \SM\MobileApi\Model\Data\GTM\GTMFactory $gtmDataFactory,
+        \Amasty\Label\Model\ResourceModel\Labels\CollectionFactory $labelCollectionFactory
     ) {
         $this->optionsFactory = $optionsFactory;
         $this->bundleItemsFactory = $bundleItemsFactory;
@@ -133,7 +135,8 @@ class BundleProduct extends \SM\MobileApi\Helper\Product\Common
             $helperStorePickup,
             $storeInfoFactory,
             $helperDelivery,
-            $deliveryIntoFactory
+            $deliveryIntoFactory,
+            $labelCollectionFactory
         );
     }
 

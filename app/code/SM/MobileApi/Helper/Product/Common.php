@@ -3,6 +3,7 @@
 namespace SM\MobileApi\Helper\Product;
 
 use Magento\Framework\Exception\NoSuchEntityException;
+use setasign\Fpdi\PdfParser\CrossReference\FixedReader;
 
 class Common extends \Magento\Framework\App\Helper\AbstractHelper
 {
@@ -32,6 +33,21 @@ class Common extends \Magento\Framework\App\Helper\AbstractHelper
     protected $helperDelivery;
     protected $deliveryIntoFactory;
 
+    /**
+     * @var int
+     */
+    private $storeId;
+
+    /**
+     * @var \Amasty\Label\Model\ResourceModel\Labels\CollectionFactory
+     */
+    private $labelCollectionFactory;
+
+    /**
+     * @var \Amasty\Label\Model\ResourceModel\Labels\Collection
+     */
+    private $labelCollection;
+
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Framework\ObjectManagerInterface $objectManagerInterface,
@@ -46,7 +62,8 @@ class Common extends \Magento\Framework\App\Helper\AbstractHelper
         \SM\Catalog\Helper\StorePickup $helperStorePickup,
         \SM\MobileApi\Model\Data\Catalog\Product\StoreInfoFactory $storeInfoFactory,
         \SM\Catalog\Helper\Delivery $helperDelivery,
-        \SM\MobileApi\Model\Data\Catalog\Product\DeliveryIntoFactory $deliveryIntoFactory
+        \SM\MobileApi\Model\Data\Catalog\Product\DeliveryIntoFactory $deliveryIntoFactory,
+        \Amasty\Label\Model\ResourceModel\Labels\CollectionFactory $labelCollectionFactory
     ) {
         $this->_objectManager       = $objectManagerInterface;
         $this->_stockRegistry       = $stockRegistry;
@@ -61,6 +78,8 @@ class Common extends \Magento\Framework\App\Helper\AbstractHelper
         $this->storeInfoFactory     = $storeInfoFactory;
         $this->helperDelivery       = $helperDelivery;
         $this->deliveryIntoFactory  = $deliveryIntoFactory;
+        $this->labelCollectionFactory  = $labelCollectionFactory;
+        $this->storeId = $storeManager->getStore()->getId();
 
         parent::__construct($context);
     }
@@ -147,13 +166,26 @@ class Common extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getLabels($productId)
     {
-        $storeId = $this->_storeManager->getStore()->getId();
-        $labelIds = $this->labelIndex->getIdsFromIndex($productId, $storeId);
-        if (empty($labelIds)) {
-            return [];
+        if (empty($this->labelCollection)) {
+            $now = $this->timezone->date()->format('Y-m-d H:i:s');
+            $this->labelCollection = $this->labelCollectionFactory->create();
+            $this->labelCollection->addActiveFilter()
+                ->addFieldToFilter('from_date', ['gteq' => $now])
+                ->addFieldToFilter('to_date', ['lteq' => $now]);
         }
 
-        return array_unique($labelIds);
+        if ($this->labelCollection->getSize() > 0) {
+            if ($this->labelIndex->checkValidProductFromIndex($this->labelCollection->getAllIds(), $productId, 'product_id')) {
+                $labelIds = $this->labelIndex->getIdsFromIndex($productId, $this->storeId);
+                if (empty($labelIds)) {
+                    return [];
+                }
+
+                return array_unique($labelIds);
+            }
+        }
+
+        return [];
     }
 
     /**
@@ -183,7 +215,7 @@ class Common extends \Magento\Framework\App\Helper\AbstractHelper
             if ($labelData->getStatus() == 1) {
                 $checkDate = true;
                 $stores = (explode(",", $labelData->getStores()));
-                $storeId = $this->_storeManager->getStore()->getId();
+                $storeId = $this->storeId;
                 if (!in_array($storeId, $stores)) {
                     $checkDate = false;
                 }

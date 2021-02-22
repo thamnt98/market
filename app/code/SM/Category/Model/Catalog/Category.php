@@ -131,7 +131,10 @@ class Category extends \Magento\Catalog\Block\Product\ListProduct
          * Init category
          */
         $this->_initCategory($categoryId);
+    }
 
+    public function applyFilter()
+    {
         /**
          * Apply filters
          */
@@ -182,7 +185,7 @@ class Category extends \Magento\Catalog\Block\Product\ListProduct
      */
     public function getProductsV2()
     {
-        return $this->mProductHelper->convertProductCollectionToResponseV2($this->getLoadedProductCollection());
+        return $this->mProductHelper->convertProductCollectionToResponseV2($this->_getProductCollection());
     }
 
     /**
@@ -303,8 +306,9 @@ class Category extends \Magento\Catalog\Block\Product\ListProduct
 
         // set collection to toolbar and apply sort
         $toolbar->setCollection($collection);
-
-        $this->_getProductCollection()->load();
+        if (!$collection->isLoaded()) {
+            $collection->load();
+        }
 
         $this->_eventManager->dispatch(
             'catalog_block_product_list_collection',
