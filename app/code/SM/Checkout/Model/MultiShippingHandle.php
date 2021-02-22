@@ -1216,6 +1216,9 @@ class MultiShippingHandle
                 } else {
                     $quoteItemId = $item->getId();
                 }
+                if ($addressId == 0 && isset($items[$quoteItemId])) {
+                    $addressId = $items[$quoteItemId]->getShippingAddressId();
+                }
                 $itemList[] = $quoteItemId;
                 $itemTotal  = $itemTotal + (int) $item->getQty();
                 if (!$web) {
@@ -1417,7 +1420,7 @@ class MultiShippingHandle
                     $shippingMethod = self::NOT_AVAILABLE;
                 }
                 if ($shippingMethod == self::STORE_PICK_UP) {
-                    $quoteItemModel->setShippingAddressId(0);
+                    $quoteItemModel->setShippingAddressId($addressId);
                 }
                 foreach ($this->split->getListMethodFakeName() as $value => $label) {
                     $shippingCode = 'transshipping_transshipping' . $value;

@@ -11,6 +11,10 @@ use Magento\GroupedProduct\Model\Product\Type\Grouped;
 
 class Quote extends \Magento\Quote\Model\Quote
 {
+    /**
+     * @var array
+     */
+    private $allVisibleItems;
 
     /**
      * Add product. Returns error message if product type instance can't prepare product.
@@ -204,19 +208,22 @@ class Quote extends \Magento\Quote\Model\Quote
      */
     public function getAllVisibleItems()
     {
-        $items = [];
+        if (empty($this->allVisibleItems)) {
+            $items = [];
+            foreach ($this->getItemsCollection() as $item) {
+                if (!$item->getId() || $item->getIsActive() === null) {
+                    $item->setIsActive(1);
+                }
 
-        foreach ($this->getItemsCollection() as $item) {
-            if (!$item->getId() || $item->getIsActive() === null) {
-                $item->setIsActive(1);
+                if (!$item->isDeleted() && $item->getIsActive() && !$item->getParentItemId() && !$item->getParentItem()) {
+                    $items[] = $item;
+                }
             }
 
-            if (!$item->isDeleted() && $item->getIsActive() && !$item->getParentItemId() && !$item->getParentItem()) {
-                $items[] = $item;
-            }
+            $this->allVisibleItems = $items;
         }
 
-        return $items;
+        return $this->allVisibleItems;
     }
 
     /**
@@ -293,10 +300,26 @@ class Quote extends \Magento\Quote\Model\Quote
         $items = [];
         foreach ($this->getItemsCollection() as $item) {
             if (!$item->isDeleted() && !$item->getParentItemId() && !$item->getParentItem()) {
-
                 $items[] = $item;
             }
         }
         return $items;
+    }
+
+    /**
+     * Validate minimum amount.
+     *
+     * @param bool $multishipping
+     * @return bool
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     */
+    public function validateMinimumAmount($multishipping = false)
+    {
+        if (empty($this->getAllVisibleItems())) {
+            return false;
+        }
+
+        return parent::validateMinimumAmount($multishipping);
     }
 }
