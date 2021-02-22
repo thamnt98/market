@@ -177,14 +177,25 @@ class MsiFullFill
      */
     public function sortSourceByDistance($sourceList, $address, $addressLatLng = false)
     {
-        try {
-            $sort = [];
-            $distanceBySourceCode = $sortSources = $sourcesWithoutDistance = [];
-            if (!$addressLatLng) {
+        $sort = [];
+        $distanceBySourceCode = $sortSources = $sourcesWithoutDistance = [];
+        if (!$addressLatLng) {
+            try {
                 $addressLatLong = $this->getLongLat($address);
-            } else {
-                $addressLatLong = $address;
+            } catch (\Exception $e) {
+                foreach ($sourceList as $source) {
+                    $data = ['source_code' => $source['source_code'], 'distance' => 0];
+                    $sort[] = $data;
+                    if ($this->getCountOfArray($sort) == 5) {
+                        break;
+                    }
+                }
+                return $sort;
             }
+        } else {
+            $addressLatLong = $address;
+        }
+        try {
             foreach ($sourceList as $source) {
                 try {
                     $sourceLatLong = $this->getLongLatMsi($source);
@@ -236,13 +247,41 @@ class MsiFullFill
         if (!$currentStoreCode) {
             $data['current_store_fulfill'] = true;
         }
-        try {
-            $distanceBySourceCode = $sortSources = $sourcesWithoutDistance = [];
-            if (!$addressLatLng) {
+        $distanceBySourceCode = $sortSources = $sourcesWithoutDistance = [];
+        if (!$addressLatLng) {
+            try {
                 $addressLatLong = $this->getLongLat($address);
-            } else {
-                $addressLatLong = $address;
+            } catch (\Exception $e) {
+                foreach ($sourceList as $source) {
+                    if ($currentStoreCode && $currentStoreCode == $source['source_code']) {
+                        $data['current_store_fulfill'] = true;
+                    }
+                    $searchStoreInf = $this->searchStoreInterfaceFactory->create();
+                    $sourceObject = $this->sourceInterfaceFactory->create();
+                    $sourceObject->setCity($source['city']);
+                    $sourceObject->setCountryId($source['country_id']);
+                    $sourceObject->setLatitude($source['latitude']);
+                    $sourceObject->setLongitude($source['longitude']);
+                    $sourceObject->setName($source['name']);
+                    $sourceObject->setPostcode($source['postcode']);
+                    $sourceObject->setRegion($source['region']);
+                    $sourceObject->setStreet($source['street']);
+                    $sourceObject->setSourceCode($source['source_code']);
+                    $searchStoreInf->setStore($sourceObject);
+                    $searchStoreInf->setDistance(0);
+                    if ($this->getCountOfArray($data['store_list']) < 5) {
+                        $data['store_list'][] = $searchStoreInf;
+                    }
+                    if ($this->getCountOfArray($data['store_list']) >= 5 && $data['current_store_fulfill']) {
+                        break;
+                    }
+                }
+                return $data;
             }
+        } else {
+            $addressLatLong = $address;
+        }
+        try {
             foreach ($sourceList as $source) {
                 try {
                     $sourceLatLong = $this->getLongLatMsi($source);
