@@ -188,7 +188,9 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
 
     public function getCreatedAt()
     {
-        return $this->timeZone->date($this->order->getCreatedAt())->format('d M Y | h:i A');
+        return $this->timeZone
+            ->date(strtotime($this->order->getCreatedAt()))
+            ->format('d M Y | h:i A');
     }
 
     public function getTitlePaymentMethod()
