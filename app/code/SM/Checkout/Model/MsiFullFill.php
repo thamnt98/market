@@ -92,19 +92,25 @@ class MsiFullFill
     }
 
     /**
-     * @param $skuList
+     * @param $skus
      * @return array
      */
-    public function getMsiFullFill($skuList)
+    public function getMsiFullFill($skus)
     {
-        $items = $this->connectionDB->getMsi(array_keys($skuList));
+        $skuList = $skuListCheck = [];
+        foreach ($skus as $sku => $qty) {
+            $skuList[strtolower((string)$sku)] = $qty;
+            $skuListCheck[] = (string)$sku;
+        }
+        $items = $this->connectionDB->getMsi($skuListCheck);
         $msiListCode = [];
         $result = [];
         foreach ($items as $item) {
-            if (!isset($skuList[$item['sku']])) {
+            $sku = strtolower($item['sku']);
+            if (!isset($skuList[$sku])) {
                 continue;
             }
-            if ((int)$item['quantity'] >= (int)$skuList[$item['sku']]) {
+            if ((int)$item['quantity'] >= (int)$skuList[$sku]) {
                 $msiListCode[$item['sku']][] = $item['source_code'];
                 $result[$item['source_code']] = $item;
             }
