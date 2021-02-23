@@ -13,14 +13,13 @@
 
 namespace SM\Help\Model;
 
-use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
-use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\CouldNotDeleteException;
+use Magento\Framework\Exception\CouldNotSaveException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Store\Model\StoreManagerInterface;
 use SM\Help\Api\Data\QuestionInterface;
-use SM\Help\Api\QuestionRepositoryInterface;
 use SM\Help\Api\Data\QuestionInterfaceFactory;
+use SM\Help\Api\QuestionRepositoryInterface;
 use SM\Help\Model\ResourceModel\Question as ResourceQuestion;
 use SM\Help\Model\ResourceModel\Question\CollectionFactory as QuestionCollectionFactory;
 
@@ -181,35 +180,41 @@ class QuestionRepository implements QuestionRepositoryInterface
         if ($questionIds) {
             $questionCollection = $this->questionCollectionFactory->create()
                 ->addFieldToFilter('main_table.question_id', ['in' => $questionIds])
-                ->addStoreFilter($this->getStoreId())
                 ->addVisibilityFilter()
                 ->getItems();
 
             $data = [];
 
-            foreach ($questionCollection as $question){
+            foreach ($questionCollection as $question) {
                 $ques = $this->questionFactory->create();
-                $ques->setId($question->getData('question_id'));
-                $ques->setTitle($question->getData('title'));
-                $ques->setStatus($question->getData('status'));
-                $ques->setUrlKey($question->getData('url_key'));
-                $ques->setTopicId($question->getData('topic_ids'));
-                $ques->setContent($question->getData('content'));
-                $ques->setCreatedAt($question->getData('created_at'));
-                $ques->setStoreIds($question->getData('store_id'));
-                $ques->setSortOrder($question->getData('sort_order'));
-                $url = $this->storeManager->getStore()->getBaseUrl() . self::CONTENT_URL . 'id/'.$question->getData('question_id');
-                $ques->setContentUrl($url);
 
-                $topic = $this->topicFactory->create();
-                $this->topicResource->load($topic, $question->getData('topic_ids'));
-                if($topic->getId()) {
-                    $ques->setTopicName($topic->getName());
-                }else{
-                    $ques->setTopicName("");
+                if ($question->getData('store_id') !== $this->getStoreId() && $question->getData('question_id_link')) {
+                    $question = $this->getById($question->getData('question_id_link'));
                 }
 
-                $data[] = $ques;
+                if (in_array($question->getData('store_id')[0], [0, $this->getStoreId()])) {
+                    $ques->setId($question->getData('question_id'));
+                    $ques->setTitle($question->getData('title'));
+                    $ques->setStatus($question->getData('status'));
+                    $ques->setUrlKey($question->getData('url_key'));
+                    $ques->setTopicId($question->getData('topic_ids'));
+                    $ques->setContent($question->getData('content'));
+                    $ques->setCreatedAt($question->getData('created_at'));
+                    $ques->setStoreIds($question->getData('store_id'));
+                    $ques->setSortOrder($question->getData('sort_order'));
+                    $url = $this->storeManager->getStore()->getBaseUrl() . self::CONTENT_URL . 'id/' . $question->getData('question_id');
+                    $ques->setContentUrl($url);
+
+                    $topic = $this->topicFactory->create();
+                    $this->topicResource->load($topic, $question->getData('topic_ids'));
+                    if ($topic->getId()) {
+                        $ques->setTopicName($topic->getName());
+                    } else {
+                        $ques->setTopicName("");
+                    }
+
+                    $data[] = $ques;
+                }
             }
 
             return $data;
