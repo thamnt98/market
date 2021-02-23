@@ -68,6 +68,9 @@ class Banner
             $bannerResp->setPromoName($banner->getPromoName());
             $bannerResp->setPromoCreative($banner->getPromoCreative());
             $bannerResp->setPromoPosition($banner->getPosition() ?? 0);
+            $bannerResp
+                ->setLinkType($banner->getLinkType())
+                ->setLinkTypeValue($banner->getLinkTypeValue());
             $data[] = $bannerResp;
         }
 
