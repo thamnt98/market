@@ -8,9 +8,11 @@ interface CartInterface
 
     /**
      * @param \Magento\Quote\Api\Data\CartItemInterface[] $cartItem
+     * @param int $cartId
+     * @param int $customerId
      * @return boolean
      */
-    public function addToCart($cartItem);
+    public function addToCart($cartItem, $cartId, $customerId);
 
     /**
      * @param int $cartId
