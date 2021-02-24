@@ -344,7 +344,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $data = [];
 
         //select all attributes
-        $collection->addAttributeToSelect('*');
+        //$collection->addAttributeToSelect('*');
 
         //Should not filter product in here, that will make filter and toolbar working not correctly
         foreach ($collection as $product) {
@@ -379,7 +379,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $productCollection
             ->addAttributeToSelect($this->catalogConfig->getProductAttributes());
 
-        $productCollection->addTaxPercents();
+        //$productCollection->addTaxPercents();
 
         if (self:: UNDEFINED_ID == $productId) {
             //get by sku
@@ -433,7 +433,6 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         }
         /** @var \SM\MobileApi\Api\Data\Product\ListItemInterface $productInfo */
         $productInfo = $this->productListV2Factory->create();
-        $productRepository = $this->productRepository->get($product->getSku());
         $isShowCategoryNames = $this->registry->registry(\SM\MobileApi\Model\Product\Search::SHOW_CATEGORY_NAMES);
         $categoryNames = $isShowCategoryNames ? $this->productPreparator->prepareCategoryNames($product) : [];
 
@@ -445,7 +444,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $productInfo->setProductUrl($this->_getProductUrl($product));
         $productInfo->setCategoryNames($categoryNames);
         $productInfo->setStock(floor($this->getProductStockQty($product)));
-        $productInfo->setIsSaleable($productRepository->isSalable());
+        $productInfo->setIsSaleable($product->isSalable());
         $productInfo->setIsInStock((boolean)$productInfo->getStock());
         $productInfo->setIsAvailable($product->isAvailable());
         $this->adjustPrice->execute($productInfo, $product);
@@ -480,12 +479,13 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $productInfo->setFlashSaleQtyPerCustomer($product->getData('flashsale_qty_per_customer'));
         $productInfo->setFlashSaleQtyAvailable($this->productFlashSale->getFlashSaleAvailableQty($product));
 
-        $inCart = $this->checkInCart($product);
+       /* $inCart = $this->checkInCart($product);
 
         if ($inCart != false) {
             $productInfo->setItemId($inCart['item_id']);
             $productInfo->setItemQty($inCart['item_qty']);
-        }
+        }*/
+
         $discountPercent = $this->smCatalogHelper->getDiscountPercent($product);
         if (!$discountPercent) {
             $discountPercent = 0;

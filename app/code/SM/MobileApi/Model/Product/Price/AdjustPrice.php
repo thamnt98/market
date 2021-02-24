@@ -98,7 +98,7 @@ class AdjustPrice
         }
 
         //Tier prices
-        $productInfo->setTierPrice($this->getProductTierPrice($product));
+        //$productInfo->setTierPrice($this->getProductTierPrice($product));
 
         //Set base price, final price, minimal price depends on product type
         $productType = $product->getTypeId();

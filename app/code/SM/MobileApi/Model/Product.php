@@ -94,16 +94,16 @@ class Product implements \SM\MobileApi\Api\ProductInterface
         $this->initCustomerSession($customerId);
         //Init category and apply filter
         $this->catalogCategory->init($category_id);
-
+        $result = $this->productListFactory->create();
         //Init toolbar and apply pagination
         $toolbar = $this->catalogCategory->getToolbarInfo();
+        $result->setToolbarInfo($toolbar);
 
         /* @var $result \SM\MobileApi\Api\Data\Product\ListInterface */
-        $result = $this->productListFactory->create();
         $result->setCategoryId($category_id);
         if ($layer) {
+            $this->catalogCategory->applyFilter();
             $result->setFilters($this->catalogCategory->getFilters());
-            $result->setToolbarInfo($toolbar);
         }
 
         $result->setProducts($this->catalogCategory->getProductsV2());
