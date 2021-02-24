@@ -6,12 +6,11 @@ git-push-to-transmart:
         refs:
             - merge_requests
     except:
-        refs:
-            - master
-            - Integration
-            - integration
-            - staging
-            - production
+        - master
+        - Integration
+        - integration
+        - staging
+        - production
     allow_failure: true
     script:
         - cd /var/www/apollo11/

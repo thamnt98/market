@@ -31,7 +31,7 @@
   /**
     * @var string
     */
-  const MEGA_DEBIT = 'megadebit';
+  const MEGA_DEBIT = 'megadc';
 
   /**
    * @var string
