@@ -18,6 +18,15 @@ $hasSourceListAvailable = $block->hasSourceListAvailable($sourceListTypeSimple, 
 $productType = $block->getProduct()->getTypeId();
 $checkHasSource = ($hasSourceListAvailable ||
     $productType == \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE) ? 'true' : 'false';
+$checkHasSourceIgnoreWarehouseCondition = 'true';
+if ($checkHasSource == 'false') {
+    $sourceListTypeSimple = $block->getSourcesListSimple($block->getProduct(), false);
+    $sourceListTypeConfig = $block->getSourcesListConfigurable($block->getProduct(), false);
+    $sourceListTypeBundle = $block->getSourcesListBundle($block->getProduct(), false);
+    $hasSourceListAvailable = $block->hasSourceListAvailable($sourceListTypeSimple, $sourceListTypeConfig, $sourceListTypeBundle);
+    $checkHasSourceIgnoreWarehouseCondition = ($block->hasSourceListAvailable($sourceListTypeSimple, $sourceListTypeConfig, $sourceListTypeBundle) ||
+        $productType == \Magento\GroupedProduct\Model\Product\Type\Grouped::TYPE_CODE) ? 'true' : 'false';
+}
 ?>
 <div class="block-container-object-php block-container-pickup" id="pdp-pickup-connect" style="display: none;">
     <div class="block-content" aria-labelledby="block-product-pickup-heading">
@@ -90,6 +99,7 @@ $checkHasSource = ($hasSourceListAvailable ||
                                     "component": "Magento_Catalog/js/pdp/store-pickup",
                                         "config": {
                                             "hasSourceListAvailable": <?php echo $checkHasSource; ?>,
+                                            "hasSourceListAvailableIncludeWareHouse": <?php echo $checkHasSourceIgnoreWarehouseCondition; ?>,
                                             "countListTypeSimple": <?php echo count($sourceListTypeSimple); ?>,
                                             "countListTypeConfig": <?php echo count($sourceListTypeConfig); ?>,
                                             "countListTypeBundle": <?php echo count($sourceListTypeBundle); ?>,

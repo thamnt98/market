@@ -23,8 +23,10 @@ define([
          */
         initialize: function (config) {
             var self = this,
-                availablePickupEl = $('.available-pickup'),
+                availablePickupEl = $('.available-pickup:not(.available-pickup-include-warehouse)'),
+                availablePickupElIncludeWarehouse = $('.available-pickup-include-warehouse'),
                 hasSourceListAvailable = config.hasSourceListAvailable,
+                hasSourceListAvailableIncludeWareHouse = config.hasSourceListAvailableIncludeWareHouse,
                 countListTypeSimple = config.countListTypeSimple,
                 countListTypeConfig = config.countListTypeConfig,
                 countListTypeBundle = config.countListTypeBundle,
@@ -36,6 +38,14 @@ define([
             if (hasSourceListAvailable) {
                 self._openStorePickupList(
                     availablePickupEl,
+                    countListTypeSimple,
+                    countListTypeConfig,
+                    countListTypeBundle,
+                    productType
+                );
+            } else if (hasSourceListAvailableIncludeWareHouse) {
+                self._openStorePickupList(
+                    availablePickupElIncludeWarehouse,
                     countListTypeSimple,
                     countListTypeConfig,
                     countListTypeBundle,
