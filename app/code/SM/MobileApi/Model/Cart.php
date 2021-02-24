@@ -205,13 +205,14 @@ class Cart implements \SM\MobileApi\Api\CartInterface
      * @throws \Magento\Framework\Webapi\Exception
      * @throws \Zend_Json_Exception
      */
-    public function addToCart($cartItem)
+    public function addToCart($cartItem, $cartId, $customerId)
     {
         if ($this->registry->registry("remove_cart_item")) {
             $this->registry->unregister("remove_cart_item");
         }
         try {
             foreach ($cartItem as $item) {
+                $item->setQuoteId($cartId);
                 /** @var \Magento\Quote\Model\Quote $quote */
                 $cartId = $item->getQuoteId();
                 if (!$cartId) {
