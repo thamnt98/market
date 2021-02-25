@@ -33,6 +33,7 @@ class Multishipping extends \Magento\Framework\DataObject
 {
     protected $quote;
     protected $customer;
+    protected $fakeId = 1;
     /**
      * Quote shipping addresses items cache
      *
@@ -588,6 +589,10 @@ class Multishipping extends \Magento\Framework\DataObject
                  * Require shipping rate recollect
                  */
                 $quoteAddress->setCollectShippingRates((bool)$this->getCollectRatesFlag())->setShippingMethod($data['shipping_method']);
+                if (!$quoteAddress->getFakeAddressId()) {
+                    $quoteAddress->setFakeAddressId($this->fakeId);
+                    $this->fakeId++;
+                }
             }
         }
         return $this;

@@ -56,6 +56,7 @@ class RulesApplier
         \Magento\Quote\Model\Quote\Address $address,
         \Magento\SalesRule\Model\Rule $rule
     ) {
+        $id = ($address->getId()) ? $address->getId() : $address->getFakeAddressId();
         if (!$address->getFreeShipping() &&
             $address->getShippingDiscountAmount() > 0 &&
             $rule->getApplyToShipping()
@@ -63,7 +64,7 @@ class RulesApplier
             $this->discountRegistry->setShippingDiscount(
                 $rule->getRuleId(),
                 $address->getShippingDiscountAmount(),
-                $address->getId()
+                $id
             );
         }
     }
