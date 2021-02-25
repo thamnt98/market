@@ -388,7 +388,7 @@ class Transaction extends AbstractHelper {
 	 * @param string $referenceNumber
 	 * @return array
 	 */
-	public function getSalesOrderArrayParent($referenceNumber = null) {
+	public function getSalesOrderArrayParent($referenceNumber = null, $joinPayment = false) {
 		if ($referenceNumber) {
 			$connection = $this->salesOrderResource->getConnection();
 			$table      = $connection->getTableName('sales_order');
@@ -399,7 +399,40 @@ class Transaction extends AbstractHelper {
 				['*']
 			)->where('reference_number = ?', $referenceNumber)->where('is_parent = ?', 1);
 
+			if($joinPayment) {
+				$query->joinLeft(['payment' => 'sales_order_payment'], 'sales_order.entity_id = payment.parent_id', ['payment.method']);
+			}
+
 			return $collection = $connection->fetchRow($query);
 		}
+	}
+
+	public function getPgResponse(int $orderId)
+	{
+		$lists = $this->getTxnCriteriaByOrderId($orderId);
+		foreach ($lists as $key => $value) {
+			if($value->getTransMepayInquiry()) {
+				return $value->getTransMepayInquiry();
+			}
+		}
+		return '';
+	}
+
+	public function getPgTransaction(int $orderId)
+	{
+		$lists = $this->getTxnCriteriaByOrderId($orderId);
+		foreach ($lists as $key => $value) {
+			if($value->getTransMepayTransaction()) {
+				return $value->getTransMepayTransaction();
+			}
+		}
+		return '';
+	}
+
+	public function getTxnCriteriaByOrderId(int $orderId)
+	{
+		$param = ['order_id' => $orderId];
+		$searchCriteria = $this->getSearchCriteria($param);
+		return $this->transactionRepo->getList($searchCriteria);
 	}
 }

@@ -18,13 +18,16 @@ use Trans\Mepay\Model\Config\Provider\Cc;
 use Trans\Mepay\Model\Config\Provider\Qris;
 use Trans\Mepay\Model\Config\Provider\Va;
 use Trans\Mepay\Model\Config\Provider\Debit;
+use Trans\Mepay\Model\Config\Provider\CcDebit;
+use Trans\Mepay\Model\Config\Provider\AllbankCc;
+use Trans\Mepay\Model\Config\Provider\AllbankDebit;
 
 class Data extends AbstractHelper
 {
   /**
    * @var array
    */
-  const BANK_MEGA_PAYMENT_METHOD = [ Cc::CODE_CC, Qris::CODE_QRIS, Va::CODE_VA, Debit::CODE ];
+  const BANK_MEGA_PAYMENT_METHOD = [ Cc::CODE_CC, Qris::CODE_QRIS, Va::CODE_VA, Debit::CODE, CcDebit::CODE, AllbankCc::CODE, AllbankDebit::CODE];
 
   /**
    * Constructor

@@ -37,7 +37,9 @@ class TransmartCallbacks extends Callbacks
     if ($this->checkoutSession->getLastRealOrderId()) {
       $orderId = $this->getOrderId();
       $order = $this->transaction->getOrder($orderId);
-      if ($this->checkOrderCreated($order)) {
+
+      //check if order void, cancel, or expire
+      if ($this->checkOrderCreated($order) && !$this->orderExpired($order)) {
         $txn = $this->transaction->getLastOrderTransaction($orderId);
         if(\is_object($txn)) {
           $txn = $txn->getData();
@@ -104,12 +106,49 @@ class TransmartCallbacks extends Callbacks
     return $resultRedirect;
   }
 
+  //mobile restoreQuote
   public function restoreQuoteMobile($quoteId)
   {
     $quoteRepo = Data::getQuoteRepo();
     $quote = $quoteRepo->get($quoteId);
     $quote->setIsActive(1)->setReservedOrderId(null);
     $quoteRepo->save($quote);
+  }
+
+  //check order expiration
+  public function orderExpired($order)
+  {
+    $instance = null;
+    $method = $order->getPayment()->getMethod();
+    switch($method) {
+      case \Trans\Mepay\Model\Config\Provider\Cc::CODE_CC : 
+        $instance = Data::getClassInstance('Trans\Mepay\Model\Config\Provider\Cc\Expire');
+      break;
+      case \Trans\Mepay\Model\Config\Provider\CcDebit::CODE :
+        $instance = Data::getClassInstance('Trans\Mepay\Model\Config\Provider\CcDebit\Expire');
+      break;
+      case \Trans\Mepay\Model\Config\Provider\Debit::CODE :
+        $instance = Data::getClassInstance('Trans\Mepay\Model\Config\Provider\Debit\Expire');
+      break;
+      case \Trans\Mepay\Model\Config\Provider\Qris::CODE_QRIS :
+        $instance = Data::getClassInstance('Trans\Mepay\Model\Config\Provider\Qris\Expire');
+      break;
+      case \Trans\Mepay\Model\Config\Provider\Va::CODE_VA :
+        $instance = Data::getClassInstance('Trans\Mepay\Model\Config\Provider\Va\Expire');
+      break;
+      case \Trans\Mepay\Model\Config\Provider\AllbankCc::CODE :
+        $instance = Data::getClassInstance('Trans\Mepay\Model\Config\Provider\AllbankCc\Expire');
+      break;
+      case \Trans\Mepay\Model\Config\Provider\AllbankDebit::CODE :
+        $instance = Data::getClassInstance('Trans\Mepay\Model\Config\Provider\AllbankDebit\Expire');
+      break;
+    }
+
+    if ($instance !== null) {
+      return $instance->isExpired($order->getId());
+    }
+
+    return true;
   }
 
 }

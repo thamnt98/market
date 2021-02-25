@@ -20,6 +20,9 @@
  use Trans\Mepay\Model\Config\Provider\Va;
  use Trans\Mepay\Model\Config\Provider\Qris;
  use Trans\Mepay\Model\Config\Provider\Debit;
+ use Trans\Mepay\Model\Config\Provider\CcDebit;
+ use Trans\Mepay\Model\Config\Provider\AllbankCc;
+ use Trans\Mepay\Model\Config\Provider\AllbankDebit;
  use Trans\Mepay\Logger\Logger;
 
  class Config
@@ -180,6 +183,66 @@
   const PAYMENT_TRANS_MEPAY_DEBIT_ORDER_STATE = 'payment/trans_mepay_debit/order_state';
 
    /**
+   * @var string
+   */
+  const PAYMENT_TRANS_MEPAY_ALLBANKCCDEBIT_ACTIVE = 'payment/trans_mepay_allbankccdebit/active';
+
+  /**
+   * @var string
+   */
+  const PAYMENT_TRANS_MEPAY_ALLBANKCCDEBIT_TITLE = 'payment/trans_mepay_allbankccdebit/title';
+ 
+  /**
+   * @var string
+   */
+  const PAYMENT_TRANS_MEPAY_ALLBANKCCDEBIT_ORDER_STATUS = 'payment/trans_mepay_allbankccdebit/order_status';
+ 
+  /**
+   * @var string
+   */
+  const PAYMENT_TRANS_MEPAY_ALLBANKCCDEBIT_ORDER_STATE = 'payment/trans_mepay_allbankccdebit/order_state';
+
+  /**
+   * @var string
+   */
+  const PAYMENT_TRANS_MEPAY_ALLBANKCC_ACTIVE = 'payment/trans_mepay_allbank_cc/active';
+
+  /**
+   * @var string
+   */
+  const PAYMENT_TRANS_MEPAY_ALLBANKCC_TITLE = 'payment/trans_mepay_allbank_cc/title';
+ 
+  /**
+   * @var string
+   */
+  const PAYMENT_TRANS_MEPAY_ALLBANKCC_ORDER_STATUS = 'payment/trans_mepay_allbank_cc/order_status';
+ 
+  /**
+   * @var string
+   */
+  const PAYMENT_TRANS_MEPAY_ALLBANKCC_ORDER_STATE = 'payment/trans_mepay_allbank_cc/order_state';
+
+  /**
+   * @var string
+   */
+  const PAYMENT_TRANS_MEPAY_ALLBANKDEBIT_ACTIVE = 'payment/trans_mepay_allbank_debit/active';
+
+  /**
+   * @var string
+   */
+  const PAYMENT_TRANS_MEPAY_ALLBANKDEBIT_TITLE = 'payment/trans_mepay_allbank_debit/title';
+ 
+  /**
+   * @var string
+   */
+  const PAYMENT_TRANS_MEPAY_ALLBANKDEBIT_ORDER_STATUS = 'payment/trans_mepay_allbank_debit/order_status';
+ 
+  /**
+   * @var string
+   */
+  const PAYMENT_TRANS_MEPAY_ALLBANKDEBIT_ORDER_STATE = 'payment/trans_mepay_allbank_debit/order_state';
+
+   /**
     * @var string
     */
    const PAYMENT_TRANS_MEPAY_CONTENT_TYPE = 'payment/trans_mepay/content_type';
@@ -229,11 +292,17 @@
           break;
         case Cc::CODE_CC : return (bool) $this->getValue(self::PAYMENT_TRANS_MEPAY_CC_ACTIVE);
           break;
+        case CcDebit::CODE : return (bool) $this->getValue(self::PAYMENT_TRANS_MEPAY_ALLBANKCCDEBIT_ACTIVE);
+          break;
         case Va::CODE_VA : return (bool) $this->getValue(self::PAYMENT_TRANS_MEPAY_VA_ACTIVE);
           break;
         case Qris::CODE_QRIS : return (bool) $this->getValue(self::PAYMENT_TRANS_MEPAY_QRIS_ACTIVE);
           break;
         case Debit::CODE : return (bool) $this->getValue(self::PAYMENT_TRANS_MEPAY_DEBIT_ACTIVE);
+          break;
+        case AllbankCc::CODE : return (bool) $this->getValue(self::PAYMENT_TRANS_MEPAY_ALLBANKCC_ACTIVE);
+          break;
+        case AllbankDebit::CODE : return (bool) $this->getValue(self::PAYMENT_TRANS_MEPAY_ALLBANKDEBIT_ACTIVE);
           break;
       }
       return false;
@@ -391,6 +460,12 @@
           break;
         case Debit::CODE : $title = $this->getValue(self::PAYMENT_TRANS_MEPAY_DEBIT_TITLE);
           break;
+        case CcDebit::CODE : $title = $this->getValue(self::PAYMENT_TRANS_MEPAY_ALLBANKCCDEBIT_TITLE);
+          break;
+        case AllbankCc::CODE : $title = $this->getValue(self::PAYMENT_TRANS_MEPAY_ALLBANKCC_TITLE);
+          break;
+        case AllbankDebit::CODE : $title = $this->getValue(self::PAYMENT_TRANS_MEPAY_ALLBANKDEBIT_TITLE);
+          break;
       }
       return $title;
     }
@@ -412,6 +487,12 @@
           break;
         case Debit::CODE : $status = $this->getValue(self::PAYMENT_TRANS_MEPAY_DEBIT_ORDER_STATUS);
           break;
+        case CcDebit::CODE : $status = $this->getValue(self::PAYMENT_TRANS_MEPAY_ALLBANKCCDEBIT_ORDER_STATUS);
+          break;
+        case AllbankCc::CODE : $status = $this->getValue(self::PAYMENT_TRANS_MEPAY_ALLBANKCC_ORDER_STATUS);
+          break;
+        case AllbankDebit::CODE : $status = $this->getValue(self::PAYMENT_TRANS_MEPAY_ALLBANKDEBIT_ORDER_STATUS);
+          break;
       }
       return $status;
     }
@@ -432,6 +513,12 @@
         case Qris::CODE_QRIS : $state = $this->getValue(self::PAYMENT_TRANS_MEPAY_QRIS_ORDER_STATE);
           break;
         case Debit::CODE : $state = $this->getValue(self::PAYMENT_TRANS_MEPAY_DEBIT_ORDER_STATE);
+          break;
+        case CcDebit::CODE : $state = $this->getValue(self::PAYMENT_TRANS_MEPAY_ALLBANKCCDEBIT_ORDER_STATE);
+          break;
+        case AllbankCc::CODE : $state = $this->getValue(self::PAYMENT_TRANS_MEPAY_ALLBANKCC_ORDER_STATE);
+          break;
+        case AllbankDebit::CODE : $state = $this->getValue(self::PAYMENT_TRANS_MEPAY_ALLBANKDEBIT_ORDER_STATE);
           break;
       }
       return $state;

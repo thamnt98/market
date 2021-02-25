@@ -69,6 +69,11 @@ class OrderDataBuilder implements BuilderInterface
   const AFTER_DISCOUNT = 'afterDiscount';
 
   /**
+   * @var string
+   */
+  const DISABLE_PROMO = 'disablePromo';
+
+  /**
    * @var SubjectReader
    */
   private $subjectReader;
@@ -108,7 +113,8 @@ class OrderDataBuilder implements BuilderInterface
     $result = [
       self::ORDER =>[
         self::ID => $order->getOrderIncrementId(),
-        self::ITEMS => $items
+        self::ITEMS => $items,
+        self::DISABLE_PROMO => $this->isPromoDisabled()
       ]
     ];
 
@@ -118,6 +124,10 @@ class OrderDataBuilder implements BuilderInterface
 
     if (strpos($code, 'debit') !== false) {
         $result[self::ORDER][self::AFTER_DISCOUNT] = self::DEBIT_MEGA;
+    }
+    
+    if (strpos($code, 'allbank') !== false) {
+        $result[self::ORDER][self::AFTER_DISCOUNT] = '';
     }
 
     return $result; 
@@ -156,5 +166,14 @@ class OrderDataBuilder implements BuilderInterface
         self::ITEMS => $items
       ]
     ];
+  }
+
+  /**
+   * Is Promo Disabled
+   * @return string
+   */
+  public function isPromoDisabled()
+  {
+    return 'true';
   }
 }

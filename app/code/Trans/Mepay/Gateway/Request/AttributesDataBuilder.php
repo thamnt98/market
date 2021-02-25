@@ -56,7 +56,8 @@ class AttributesDataBuilder implements BuilderInterface
    */
   public function build(array $buildSubject)
   {
-    return [self::ATTRIBUTES => [self::DISABLE_PROMO => $this->isPromoDisabled()]];
+    // return [self::ATTRIBUTES => [self::DISABLE_PROMO => $this->isPromoDisabled()]];
+    return [];
   }
 
   /**

@@ -137,11 +137,22 @@ class TransmartSuccess extends Success
         if ($paymentMethod == 'trans_mepay_cc') {
           return $this->isCaptured();
         }
+        if ($paymentMethod == 'trans_mepay_allbankccdebit') {
+          return $this->isCaptured();
+        }
         if ($paymentMethod == 'trans_mepay_qris') {
           return $this->isCaptured();
         }
 
         if ($paymentMethod == 'trans_mepay_debit') {
+          return $this->isCaptured();
+        }
+
+        if ($paymentMethod == 'trans_mepay_allbank_debit') {
+          return $this->isCaptured();
+        }
+
+        if ($paymentMethod == 'trans_mepay_allbank_cc') {
           return $this->isCaptured();
         }
 
