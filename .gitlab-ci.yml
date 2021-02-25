@@ -2,15 +2,15 @@ stages:
     - push-to-transmart
 git-push-to-transmart:
     stage: push-to-transmart
-    only:
-        refs:
-            - merge_requests
     except:
-        - master
-        - Integration
-        - integration
-        - staging
-        - production
+        variables:
+            - $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "master"
+            - $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "production"
+            - $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "staging"
+            - $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "integration"
+            - $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME == "Integration"
+    only:
+        - merge_requests
     allow_failure: true
     script:
         - cd /var/www/apollo11/
