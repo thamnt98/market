@@ -24,6 +24,10 @@
             <allow_multiple_address>1</allow_multiple_address>
         </method>
 
+        <method name="trans_mepay_allbankccdebit">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
+
         <method name="trans_mepay_debit">
             <allow_multiple_address>1</allow_multiple_address>
         </method>
@@ -33,6 +37,14 @@
         </method>
 
         <method name="trans_mepay_qris">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
+
+        <method name="trans_mepay_allbank_cc">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
+
+        <method name="trans_mepay_allbank_debit">
             <allow_multiple_address>1</allow_multiple_address>
         </method>
 

@@ -17,6 +17,7 @@ use Magento\Payment\Gateway\Helper\SubjectReader;
 use Trans\Mepay\Model\Config\Source\Provider;
 use Trans\Mepay\Model\Config\Config;
 use Trans\Mepay\Logger\Logger;
+use Trans\Mepay\Model\Config\Provider\CcDebit;
 
 class PaymentSourceMethodDataBuilder implements BuilderInterface
 {
@@ -101,7 +102,8 @@ class PaymentSourceMethodDataBuilder implements BuilderInterface
     $method = '';
     if ((int) $this->config->getIsAuthCapture()) {
       switch($source) {
-        case $this->provider::MEGA_CC : $method = self::AUTH_CAPTURE;
+        case $this->provider::MEGA_CC :
+            $method = self::AUTH_CAPTURE;
         break;
       }
     }

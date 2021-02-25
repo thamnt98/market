@@ -13,8 +13,11 @@
  */
 -->
 <include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <include path="Trans_Mepay::methods/allbankccdebit.xml"/>
     <include path="Trans_Mepay::methods/cc.xml"/>
     <include path="Trans_Mepay::methods/debit.xml"/>
     <include path="Trans_Mepay::methods/va.xml"/>
     <include path="Trans_Mepay::methods/qris.xml"/>
+    <include path="Trans_Mepay::methods/allbankcc.xml"/>
+    <include path="Trans_Mepay::methods/allbankdebit.xml"/>
 </include>
