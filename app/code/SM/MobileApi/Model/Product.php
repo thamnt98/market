@@ -96,14 +96,16 @@ class Product implements \SM\MobileApi\Api\ProductInterface
         $this->catalogCategory->init($category_id);
         $result = $this->productListFactory->create();
 
+        //Init toolbar and apply pagination
+        $toolbar = $this->catalogCategory->getToolbarInfo();
+        $result->setToolbarInfo($toolbar);
+
         /* @var $result \SM\MobileApi\Api\Data\Product\ListInterface */
         $result->setCategoryId($category_id);
         if ($layer) {
             $this->catalogCategory->applyFilter();
             $result->setFilters($this->catalogCategory->getFilters());
-            //Init toolbar and apply pagination
-            $toolbar = $this->catalogCategory->getToolbarInfo();
-            $result->setToolbarInfo($toolbar);
+
         }
 
         $result->setProducts($this->catalogCategory->getProductsV2());
