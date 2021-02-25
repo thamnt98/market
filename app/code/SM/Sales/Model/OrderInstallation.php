@@ -7,6 +7,7 @@ use Magento\Framework\Mail\Template\SenderResolverInterface;
 use Magento\Sales\Model\Order\Address\Renderer;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Framework\Serialize\SerializerInterface;
+use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use SM\Email\Model\Email\Sender as EmailSender;
 
 class OrderInstallation
@@ -41,11 +42,16 @@ class OrderInstallation
      * @var SerializerInterface
      */
     private $serializer;
+    /**
+     * @var TimezoneInterface
+     */
+    private $timezone;
 
     /**
      * OrderInstallation constructor.
      * @param ScopeConfigInterface $scopeConfig
      * @param SerializerInterface $serializer
+     * @param TimezoneInterface $timezone
      * @param Renderer $addressRenderer
      * @param EmailSender $emailSender
      * @param SenderResolverInterface $senderResolver
@@ -53,6 +59,7 @@ class OrderInstallation
     public function __construct(
         ScopeConfigInterface $scopeConfig,
         SerializerInterface $serializer,
+        TimezoneInterface $timezone,
         Renderer $addressRenderer,
         EmailSender $emailSender,
         SenderResolverInterface $senderResolver
@@ -60,6 +67,7 @@ class OrderInstallation
         $this->addressRenderer = $addressRenderer;
         $this->scopeConfig = $scopeConfig;
         $this->serializer = $serializer;
+        $this->timezone = $timezone;
         $this->emailSender = $emailSender;
         $this->senderResolver = $senderResolver;
     }
@@ -73,26 +81,31 @@ class OrderInstallation
     {
         $isInstallation = false;
         $mappingVariables = $this->getMappingVariables();
+        $skuList = [];
+        foreach ($mappingVariables as $mappingVariable) {
+                $skuList[$mappingVariable['sku']] = $mappingVariable['email'];
+        }
         foreach ($order->getItems() as $item) {
             $buyRequest = $item->getProductOptionByCode('info_buyRequest');
             if (isset($buyRequest['installation_service'])) {
                 if ($buyRequest['installation_service']['is_installation'] == 1) {
                     $isInstallation = true;
-                    if (in_array($item->getSku(), [])) {
+                    if (array_key_exists($item->getSku(), $skuList)) {
                         $templateId = $this->getConfigEmailID(self::EMAIL_TEMPLATE_ORDER_INSTALLATION_SUPPLIER);
                         $storeId = (int)$order->getStoreId();
                         $sender = $this->getConfigEmailID(self::EMAIL_SENDER_ORDER_INSTALLATION_SUPPLIER);
-                        $email = $this->getConfigEmailID(self::EMAIL_RECEIVER_ORDER_INSTALLATION);
+                        $email = explode(',', $skuList[$item->getSku()]);
                         $name = $order->getCustomerLastname();
+                        $address = $order->getShippingAddress();
                         $templateVars = [
-                            "customer_name" => $order->getId(),
-                            "phone_number" => $order->getId(),
-                            "address" => $order->getId(),
-                            "product" => $order->getId(),
-                            "qty" => $order->getId(),
-                            "order_id" => $order->getId(),
-                            "estimate_date_of_delivery" => $order->getId(),
-                            "estimate_date_of_receive" => $order->getId()
+                            "customer_name" => $this->getCustomerName($address),
+                            "phone_number" => $address->getData('telephone'),
+                            "address" => $this->getCustomerAddress($address),
+                            "product" => $item->getName(),
+                            "qty" => round($item->getQtyOrdered()),
+                            "order_id" => $order->getIncrementId(),
+                            "estimate_date_of_delivery" => $this->getEstimateDateOfDelivery($order->getCreatedAt()),
+                            "estimate_date_of_receive" => $this->getEstimateDateOfReceive($order->getCreatedAt())
                         ];
                         $this->emailSender->sends(
                             $templateId,
@@ -169,5 +182,27 @@ class OrderInstallation
         );
 
         return $this->serializer->unserialize($mappingVariables) ?: [];
+    }
+
+    public function getCustomerName($address)
+    {
+        $firstName = trim($address->getFirstName());
+        $lastName = trim($address->getLastName());
+        return $firstName == $lastName ? $firstName :  $firstName. ' ' . $lastName;
+    }
+
+    public function getCustomerAddress($address)
+    {
+        return $address->getStreet()[0] ? $address->getStreet()[0] : '';
+    }
+
+    public function getEstimateDateOfDelivery($createdAt)
+    {
+        return date('d M Y', strtotime('+ 1 days' , strtotime($this->timezone->date($createdAt)->format('d M Y'))));
+    }
+
+    public function getEstimateDateOfReceive($createdAt)
+    {
+        return date('d M Y', strtotime('+ 5 days' , strtotime($this->timezone->date($createdAt)->format('d M Y'))));
     }
 }
