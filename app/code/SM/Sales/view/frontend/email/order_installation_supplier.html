@@ -1,0 +1,164 @@
+<!--@subject {{trans "Installation Request Transmart.co.id"}} @-->
+<!--@vars {
+"var formattedBillingAddress|raw":"Billing Address",
+"layout handle=\"sales_email_order_items\" order=$order area=\"frontend\"":"Order Items Grid",
+"var formattedShippingAddress|raw":"Shipping Address",
+
+} @-->
+{{template config_path="design/email/header_template"}}
+<table class="greeting" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "Dear Supplier,"}}
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End greeting-->
+<table class="message-email-2" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "Please help with following details of installation process:"}}
+            </p>
+        </td>
+    </tr>
+</table>
+<!--End Message Email 2-->
+<table class="list-deliver">
+    <tbody>
+    <tr>
+        <td class="two-column">
+            <table>
+                <tbody>
+                <tr>
+                    <td class="one-of-two-column">
+                        <table class="total">
+                            <tbody>
+                            <tr>
+                                <td class="inner-td">
+                                    <table class="content">
+                                        <tbody>
+                                        <tr>
+                                            <td class="title">
+                                                <p>
+                                                    {{trans "Customer Name"}}
+                                                </p>
+                                            </td>
+                                            <td class="description">
+                                                <p>
+                                                    {{var customer_name}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="title">
+                                                <p>
+                                                    {{trans "Phone Number"}}
+                                                </p>
+                                            </td>
+                                            <td class="description">
+                                                <p>
+                                                    {{var phone_number}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="title">
+                                                <p>
+                                                    {{trans "Address"}}
+                                                </p>
+                                            </td>
+                                            <td class="description">
+                                                <p>
+                                                    {{var address}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="title">
+                                                <p>
+                                                    {{trans "Product"}}
+                                                </p>
+                                            </td>
+                                            <td class="description">
+                                                <p>
+                                                    {{var product}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="title">
+                                                <p>
+                                                    {{trans "Qty"}}
+                                                </p>
+                                            </td>
+                                            <td class="description">
+                                                <p>
+                                                    {{var qty}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="title">
+                                                <p>
+                                                    {{trans "Order ID"}}
+                                                </p>
+                                            </td>
+                                            <td class="description">
+                                                <p>
+                                                    {{var order_id}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="title">
+                                                <p>
+                                                    {{trans "Estimation Date of Delivery"}}
+                                                </p>
+                                            </td>
+                                            <td class="description">
+                                                <p>
+                                                    {{var estimate_date_of_delivery}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="title">
+                                                <p>
+                                                    {{trans "Estimation Date of Receive"}}
+                                                </p>
+                                            </td>
+                                            <td class="description">
+                                                <p>
+                                                    {{var estimate_date_of_receive}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<table class="message-email-2" width="100%">
+    <tr>
+        <td>
+            <p>
+                {{trans "And please reconfirm directly to customer whether product had been received.
+            Thank you for your attention and good cooperation."}}
+            </p>
+        </td>
+    </tr>
+</table>
+<!-- End order detail-->
+{{template config_path="design/email/footer_template"}}
