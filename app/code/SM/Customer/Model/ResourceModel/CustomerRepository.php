@@ -28,6 +28,7 @@ use SM\Customer\Model\ResourceModel\Customer as ResourceModel;
 use SM\GTM\Helper\Data;
 use Trans\CustomerMyProfile\Helper\Data as TransCustomerHelper;
 use Trans\LocationCoverage\Model\ResourceModel\City\CollectionFactory as CityCollection;
+use Magento\Framework\DB\Adapter\DuplicateException;
 
 /**
  * Class CustomerRepository
@@ -445,6 +446,8 @@ class CustomerRepository implements \SM\Customer\Api\TransCustomerRepositoryInte
             $this->logResponse('Completed');
 
             return $customerDataObject;
+        } catch (DuplicateException $e) {
+            throw new \Magento\Framework\Webapi\Exception(__("Email has already been existed. Please try again"));
         } catch (\Exception $e) {
             $this->throwException($e);
         }
