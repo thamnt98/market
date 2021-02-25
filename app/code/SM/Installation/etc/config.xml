@@ -24,6 +24,9 @@
                 <receiver>operation.omni@ctcorpdigital.com</receiver>
                 <template>installation_email_template</template>
             </email>
+            <supplier_email>
+                <variables>{"sku1":{"sku":"40510021001","email":"Menara.carrefour@gmail.com"},"sku2":{"sku":"40510022001","email":"Menara.carrefour@gmail.com"},"sku3":{"sku":"40510258001","email":"Menara.carrefour@gmail.com"},"sku4":{"sku":"40510261001","email":"Menara.carrefour@gmail.com"},"sku5":{"sku":"40512018001","email":"Menara.carrefour@gmail.com"},"sku6":{"sku":"40512019001","email":"Menara.carrefour@gmail.com"},"sku7":{"sku":"40512275001","email":"Menara.carrefour@gmail.com"},"sku8":{"sku":"40512280001","email":"Menara.carrefour@gmail.com"},"sku9":{"sku":"40510026001","email":"marinadiantari.beko@gmail.com,prasetyo.bein@gmail.com"},"sku10":{"sku":"40512026001","email":"marinadiantari.beko@gmail.com,prasetyo.bein@gmail.com"},"sku11":{"sku":"40510012001","email":"denpooservice@gmail.com"},"sku12":{"sku":"40512012001","email":"denpooservice@gmail.com"},"sku13":{"sku":"40510007001","email":"Menara.carrefour@gmail.com"},"sku14":{"sku":"40510027001","email":"Menara.carrefour@gmail.com"},"sku15":{"sku":"40512003001","email":"Menara.carrefour@gmail.com"},"sku16":{"sku":"40512027001","email":"Menara.carrefour@gmail.com"}}</variables>
+            </supplier_email>
         </installation>
     </default>
 </config>
