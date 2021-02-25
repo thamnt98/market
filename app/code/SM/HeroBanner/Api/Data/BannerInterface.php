@@ -148,12 +148,12 @@ interface BannerInterface extends \Magento\Framework\Api\ExtensibleDataInterface
     public function setLinkType($value);
 
     /**
-     * @return int
+     * @return string
      */
     public function getLinkTypeValue();
 
     /**
-     * @param int $value
+     * @param string $value
      * @return $this
      */
     public function setLinkTypeValue($value);

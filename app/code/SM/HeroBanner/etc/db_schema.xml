@@ -11,7 +11,6 @@
                 comment="Promotion Position"/>
         <column xsi:type="int" name="link_type" padding="10" unsigned="true" nullable="true" default="0"
                 comment="Link Type"/>
-        <column xsi:type="int" name="link_type_value" padding="10" unsigned="true" nullable="true" default="0"
-                comment="Link Type Value"/>
+        <column xsi:type="varchar" length="100" name="link_type_value" nullable="true" comment="Link Type Value"/>
     </table>
 </schema>
