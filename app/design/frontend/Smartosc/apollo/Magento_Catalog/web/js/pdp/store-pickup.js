@@ -34,6 +34,7 @@ define([
 
             //default auto hide pickup info
             availablePickupEl.hide();
+            availablePickupElIncludeWarehouse.hide();
             // if has source list available for product
             if (hasSourceListAvailable) {
                 self._openStorePickupList(
@@ -43,7 +44,9 @@ define([
                     countListTypeBundle,
                     productType
                 );
-            } else if (hasSourceListAvailableIncludeWareHouse) {
+            }
+
+            if (hasSourceListAvailableIncludeWareHouse) {
                 self._openStorePickupList(
                     availablePickupElIncludeWarehouse,
                     countListTypeSimple,
