@@ -243,7 +243,7 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
         ) {
             $this->setCancelMessage($subordersCancelType, $result);
         }
-        
+
         return $result;
     }
 
@@ -473,6 +473,32 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
                     'pickup_postcode'   => 'is.postcode',
                     'pickup_region'     => 'is.region',
                 ]
+            )->joinLeft(
+                "sales_order_address",
+                "sales_order_address.parent_id = main_table.entity_id" .
+                " AND sales_order_address.address_type = 'shipping'",
+                [
+                    "street",
+                    "address_tag",
+                    "lastname",
+                    "firstname",
+                    "postcode",
+                    "telephone",
+                    "region",
+                ]
+            )->joinLeft(
+                "districts",
+                "districts.district_id = sales_order_address.district",
+                [
+                    "district",
+                ]
+            )->joinLeft(
+                "regency",
+                "regency.entity_id = districts.entity_id",
+                [
+                    "region_id" => "entity_id",
+                    "city",
+                ]
             )->where(
                 'main_table.customer_id = ?',
                 $customerId
@@ -485,6 +511,7 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
         $main = null;
         $sub = [];
 
+        /** @var \Magento\Sales\Model\Order $order */
         foreach ($coll->getItems() as $order) {
             if ($order->getData('is_parent')) {
                 $main = $order;

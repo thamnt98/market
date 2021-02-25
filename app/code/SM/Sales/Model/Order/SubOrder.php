@@ -908,6 +908,11 @@ class SubOrder
             $data->setStoreInfo($storeInfo);
         }
 
+        if (!$order->getIsVirtual()) {
+            $this->setDeliveryData($order, $data);
+            $this->setStatusHistoriesData($order, $data);
+        }
+
         try {
             $this->appEmulation->startEnvironmentEmulation(
                 $this->storeManager->getStore()->getId(),
