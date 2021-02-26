@@ -280,7 +280,7 @@ define([
                 deliveryOption = window.itemsCheckoutGTM,
                 itemsData      = [];
 
-            if (!dataLayerSourceObjects || !items || !items.length) {
+            if ((typeof dataLayerSourceObjects !== "undefined") || !items || !items.length) {
                 return;
             }
 
