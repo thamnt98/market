@@ -31,8 +31,21 @@ define([
     'use strict';
 
     /** Set payment methods to collection */
-    paymentService.setPaymentMethods(methodConverter(window.checkoutConfig.paymentMethods));
-
+    var isPaymentMethodsAvailableGlobal = ko.observable(false);
+    if (globalVar.isStepPayment()) {
+        paymentService.setPaymentMethods(methodConverter(globalVar.paymentMethod()));
+        if (paymentService.getAvailablePaymentMethods().length > 0) {
+            isPaymentMethodsAvailableGlobal(true);
+        }
+    }
+    globalVar.paymentMethod.subscribe(function (newValue) {;
+        paymentService.setPaymentMethods(methodConverter(newValue));
+        if (paymentService.getAvailablePaymentMethods().length > 0) {
+            isPaymentMethodsAvailableGlobal(true);
+        } else {
+            isPaymentMethodsAvailableGlobal(false);
+        }
+    });
     return Component.extend({
         defaults: {
             template: 'SM_Checkout/payment',
@@ -40,10 +53,7 @@ define([
         },
         isVisible: ko.observable(quote.isVirtual()),
         quoteIsVirtual: quote.isVirtual(),
-        isPaymentMethodsAvailable: ko.computed(function () {
-            return paymentService.getAvailablePaymentMethods().length > 0;
-        }),
-
+        isPaymentMethodsAvailable: isPaymentMethodsAvailableGlobal,
         /** @inheritdoc */
         initialize: function () {
             this._super();
