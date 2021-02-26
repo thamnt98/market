@@ -21,6 +21,7 @@ use Trans\Mepay\Api\Data\TransactionInterfaceFactory;
 use Trans\Mepay\Api\Data\TransactionInterface;
 use Trans\Mepay\Api\Data\ResponseInterfaceFactory;
 use Trans\Mepay\Api\Data\ResponseInterface;
+use Trans\Mepay\Model\Payment\Status;
 use Trans\Mepay\Model\Payment\StatusFactory;
 use Trans\Mepay\Logger\LoggerWrite;
 use Magento\Framework\Serialize\Serializer\Json;
@@ -95,9 +96,21 @@ class Webhook extends DataObject implements WebhookInterface
    */
   protected $inquiryResponseHelper;
 
+  /**
+   * @var \Trans\Mepay\Helper\Response\Payment\Transaction
+   */
+  protected $transactionResponse;
+
+  /**
+   * @var \Trans\Mepay\Helper\Order
+   */
+  protected $orderHelper;
+
   protected $transactionHelper;
 
   protected $eventManager;
+
+  protected $restoreHelper;
 
   /**
    * Constructor
@@ -110,6 +123,8 @@ class Webhook extends DataObject implements WebhookInterface
    * @param Json                        $json
    * @param Request                     $request
    * @param InquiryResponseHelper       $inquiryResponseHelper
+   * @param \Trans\Mepay\Helper\Response\Payment\Transaction $transactionResponse
+   * @param \Trans\Mepay\Helper\Order $orderHelper
    */
   public function __construct(
     InquiryInterfaceFactory $inquiryFactory,
@@ -122,7 +137,10 @@ class Webhook extends DataObject implements WebhookInterface
     Request $request,
     InquiryResponseHelper $inquiryResponseHelper,
     TransactionHelper $transactionHelper,
-    EventManager $eventManager
+    EventManager $eventManager,
+    \Trans\Mepay\Helper\Response\Payment\Transaction $transactionResponse,
+    \Trans\Mepay\Helper\Order $orderHelper,
+    \Trans\Mepay\Helper\Restore $restoreHelper
   ) {
     $this->inquiry = $inquiryFactory->create();
     $this->transaction = $transactionFactory->create();
@@ -135,6 +153,9 @@ class Webhook extends DataObject implements WebhookInterface
     $this->inquiryResponseHelper = $inquiryResponseHelper;
     $this->transactionHelper = $transactionHelper;
     $this->eventManager = $eventManager;
+    $this->transactionResponse = $transactionResponse;
+    $this->orderHelper = $orderHelper;
+    $this->restoreHelper = $restoreHelper;
   }
 
     /**
@@ -217,11 +238,36 @@ class Webhook extends DataObject implements WebhookInterface
       'token'=>$token
     ]);
 
-    if (strtolower($type) == ResponseInterface::PAYMENT_RECEIVED_TYPE)
-       return $this->received($type, $transaction, $inquiry, $token);
-    else
-      return $this->validate($type, $inquiry);
+    if (strtolower($type) == ResponseInterface::PAYMENT_RECEIVED_TYPE) {
+        return $this->received($type, $transaction, $inquiry, $token);
+    } else {
+        $validate = $this->validate($type, $inquiry);
 
+        if($validate->getStatus() == ResponseInterface::STATUS_OK) {
+            $inquryData = $this->inquiryResponseHelper->convertToArray($inquiry);
+            if(isset($inquryData['order']['id'])) {
+                $refNumber = $inquryData['order']['id'];
+                $salesOrder = $this->transactionHelper->getSalesOrderArrayParent($refNumber, true);
+                $payment = $salesOrder['method'];
+                
+                if (strpos($payment, 'cc') !== false) {
+                    $transactionData = $this->transactionResponse->convertToArray($transaction);
+                    
+                    if(isset($transactionData['status'])) {
+                        $status = $transactionData['status'];
+                        if($status == Status::DECLINED) {
+                            $this->orderHelper->doCancelationOrderByRefNumber($refNumber);
+                            $quoteId = $this->orderHelper->getQuoteIdByReffNumber($refNumber);
+                            $this->restoreHelper->restoreQuote($quoteId);
+                        }
+                      
+                    }
+                }
+            }
+        }
+        
+        return $validate;
+    }
   }
 
   /**
@@ -287,7 +333,7 @@ class Webhook extends DataObject implements WebhookInterface
       if ($type == ResponseInterface::PAYMENT_VALIDATE_TYPE) {
         return ResponseInterface::STATUS_OK;
       }
-     return ResponseInterface::STATUS_ACK;
+      return ResponseInterface::STATUS_ACK;
     }
 
     if ($type == ResponseInterface::PAYMENT_VALIDATE_TYPE)

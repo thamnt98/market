@@ -144,13 +144,25 @@ class Order extends AbstractHelper
      */
     public function isOrderPaymentIsExpired(int $orderId, string $createdAt)
     {
+        $instance = null;
         $payment = $this->getPaymentData($orderId);
-        $expireTime = $this->getPaymentExpiration($payment['method']);
-        $dateStart = new \DateTime($createdAt);
-        $dateEnd = new \DateTime(date("Y-m-d H:i:s"));
-        $diff = $dateEnd->diff($dateStart);
-        $seconds = ($diff->format('%r%a') * 24 * 60 * 60) + ($diff->h * 60 * 60) + ($diff->i * 60) + $diff->s;
-        return ($seconds > $expireTime)? true : false;
+        if ($payment['method'] == \Trans\Mepay\Model\Config\Provider\Cc::CODE_CC)
+            $instance = Data::getClassInstance('Trans\Mepay\Model\Config\Provider\Cc\Expire');
+        if ($payment['method'] == \Trans\Mepay\Model\Config\Provider\CcDebit::CODE)
+            $instance = Data::getClassInstance('Trans\Mepay\Model\Config\Provider\CcDebit\Expire');
+        if ($payment['method'] == \Trans\Mepay\Model\Config\Provider\Debit::CODE)
+            $instance = Data::getClassInstance('Trans\Mepay\Model\Config\Provider\Debit\Expire');
+        if ($payment['method'] == \Trans\Mepay\Model\Config\Provider\Qris::CODE_QRIS)
+            $instance = Data::getClassInstance('Trans\Mepay\Model\Config\Provider\Qris\Expire');
+        if ($payment['method'] == \Trans\Mepay\Model\Config\Provider\Va::CODE_VA)
+            $instance = Data::getClassInstance('Trans\Mepay\Model\Config\Provider\Va\Expire');
+        if ($payment['method'] == \Trans\Mepay\Model\Config\Provider\AllbankCc::CODE)
+            $instance = Data::getClassInstance('Trans\Mepay\Model\Config\Provider\AllbankCc\Expire');
+        if ($payment['method'] == \Trans\Mepay\Model\Config\Provider\AllbankDebit::CODE)
+            $instance = Data::getClassInstance('Trans\Mepay\Model\Config\Provider\AllbankDebit\Expire');
+        if ($instance)
+            return $instance->isExpired($orderId);
+        throw new \Exception("Error Processing Request", 1);
     }
 
     /**
@@ -182,6 +194,16 @@ class Order extends AbstractHelper
             ->limit(1)
         ;
         return $result->query()->fetch();
+    }
+
+    public function getQuoteIdByReffNumber(string $reffNum)
+    {
+        $connection = $this->orderResource->getConnection();
+        $tableSales = $connection->getTableName('sales_order');
+        $salesData = $connection->select();
+        $salesData->from($tableSales, ['*'])->where('reference_number = ?', $refNumber);
+        $salesData = $connection->fetchAll($salesData);
+        return $salesData['quote_id'];
     }
 
     /**
