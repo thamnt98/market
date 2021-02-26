@@ -274,6 +274,27 @@ class Banner extends Generic implements TabInterface
             'class' => 'validate-zero-or-greater validate-number',
         ]);
 
+        $fieldset->addField('link_type', 'select', [
+            'name'  => 'link_type',
+            'label' => __('Link Type'),
+            'title' => __('Link Type'),
+            'values' => [
+                ['value' => 0, 'label' => __('--- Please Select ---')],
+                ['value' => 1, 'label' => __('Category Page')],
+                ['value' => 2, 'label' => __('Campaign Page')],
+                ['value' => 3, 'label' => __('Product List')],
+                ['value' => 4, 'label' => __('Product Detail')],
+            ],
+            'note'   => __('The page type that the banner should redirect to.')
+        ]);
+
+        $fieldset->addField('link_type_value', 'text', [
+            'name'  => 'link_type_value',
+            'label' => __('Link Type Value'),
+            'title' => __('Link Type Value'),
+            'note'   => __('Input SKU if link type is Product Detail. Input ID if link type is the others.')
+        ]);
+
         $newTab = $fieldset->addField('newtab', 'select', [
             'name'   => 'newtab',
             'label'  => __('Open new tab after click'),

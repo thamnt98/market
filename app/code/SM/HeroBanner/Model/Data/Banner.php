@@ -173,4 +173,24 @@ class Banner extends \Magento\Framework\Model\AbstractExtensibleModel implements
     {
         return $this->setData('promo_position', $data);
     }
+
+    public function getLinkType()
+    {
+        return $this->getData("link_type");
+    }
+
+    public function setLinkType($value)
+    {
+        return $this->setData("link_type", $value);
+    }
+
+    public function getLinkTypeValue()
+    {
+        return $this->getData("link_type_value");
+    }
+
+    public function setLinkTypeValue($value)
+    {
+        return $this->setData("link_type_value", $value);
+    }
 }
