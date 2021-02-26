@@ -16,4 +16,8 @@
     <event name="email_creditmemo_set_template_vars_before">
         <observer name="add_refund_account_data" instance="SM\Sales\Observer\CreditMemo\AddRefundDataToEmail"/>
     </event>
+    <event name="sales_quote_collect_totals_after">
+        <observer name="SM_Sales::QuoteCollectTotalAfter"
+                  instance="SM\Sales\Observer\QuoteCollectTotalAfter" />
+    </event>
 </config>
