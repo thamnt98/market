@@ -35,7 +35,7 @@ class TransmartPaymentInformationManagement extends PaymentInformationManagement
 
     $method = $payment->getMethod();
 
-    if (in_array($method, ['trans_mepay_cc', 'trans_mepay_va', 'trans_mepay_qris'])) {
+    if (in_array($method, ['trans_mepay_allbankccdebit', 'trans_mepay_cc', 'trans_mepay_va', 'trans_mepay_qris', 'trans_mepay_allbank_cc', 'trans_mepay_allbank_debit'])) {
         $resourceCon = $objectManager->create('Magento\Framework\App\ResourceConnection');
         $connection = $resourceCon->getConnection();
         $table = $connection->getTableName('sales_order_status_history');

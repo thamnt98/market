@@ -52,6 +52,24 @@
                 <payment_channel>credit_card</payment_channel>
             </trans_mepay_cc>
 
+            <trans_mepay_allbankccdebit>
+                <active>1</active>
+                <title>All Bank Credit/Debit Card</title>
+                <model>TransMepayCcDebitFacade</model>
+                <group>trans_mepay</group>
+                <payment_code>trans_mepay_allbankccdebit</payment_code>
+                <order_status>pending_payment</order_status>
+                <order_state>new</order_state>
+                <allowspecific>1</allowspecific>
+                <payment_action>authorize</payment_action>
+                <is_gateway>1</is_gateway>
+                <can_use_checkout>1</can_use_checkout>
+                <can_authorize>1</can_authorize>
+                <can_capture>1</can_capture>
+                <all_bank>1</all_bank>
+                <payment_channel>credit_card</payment_channel>
+            </trans_mepay_allbankccdebit>
+
             <trans_mepay_debit>
                 <active>1</active>
                 <title>Mepay Debit Solution</title>
@@ -103,6 +121,39 @@
                 <payment_channel>qris_code</payment_channel>
             </trans_mepay_qris>
 
+            <trans_mepay_allbank_cc>
+                <active>1</active>
+                <title>Mepay All Bank Credit Card Solution</title>
+                <model>TransMepayAllbankccFacade</model>
+                <group>trans_mepay</group>
+                <payment_code>trans_mepay_allbankcc</payment_code>
+                <order_status>pending_payment</order_status>
+                <order_state>new</order_state>
+                <allowspecific>1</allowspecific>
+                <payment_action>authorize</payment_action>
+                <is_gateway>1</is_gateway>
+                <can_use_checkout>1</can_use_checkout>
+                <can_authorize>1</can_authorize>
+                <can_capture>1</can_capture>
+                <payment_channel>credit_card</payment_channel>
+            </trans_mepay_allbank_cc>
+
+            <trans_mepay_allbank_debit>
+                <active>1</active>
+                <title>Mepay All Bank Debit Card Solution</title>
+                <model>TransMepayAllbankdebitFacade</model>
+                <group>trans_mepay</group>
+                <payment_code>trans_mepay_allbankdebit</payment_code>
+                <order_status>pending_payment</order_status>
+                <order_state>new</order_state>
+                <allowspecific>1</allowspecific>
+                <payment_action>authorize</payment_action>
+                <is_gateway>1</is_gateway>
+                <can_use_checkout>1</can_use_checkout>
+                <can_authorize>1</can_authorize>
+                <can_capture>1</can_capture>
+                <payment_channel>debit</payment_channel>
+            </trans_mepay_allbank_debit>
         </payment>
     </default>
 </config>

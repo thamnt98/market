@@ -223,6 +223,7 @@ class TransmartPaymentMethods extends PaymentMethods
     {
         $creditMethods = $installmentMethods = [];
 
+        //set original credit card method
         foreach ($this->paymentHelper->getCreditMethods() as $methodCode) {
             if ($this->checkIsSprintMethod($methodCode)) {
                 $creditMethods[] = $this->bankInterfaceFactory
@@ -233,6 +234,20 @@ class TransmartPaymentMethods extends PaymentMethods
                     ->setTitle($this->methods[$methodCode]['title']);
             }
         }
+
+        //set additional credit card method
+        foreach ($this->getAdditionalCreditCardMethod() as $key => $value) {
+            if (isset($this->methods[$value])) {
+                $creditMethods[] = $this->bankInterfaceFactory
+                    ->create()
+                    ->setCode($value)
+                    ->setLogo($this->paymentHelper->getLogoPayment($value,true))
+                    ->setDescription($this->scopeConfig->getValue('payment/sprint/sprint_cc_payment/'.$methodCode.'/description'))
+                    ->setTitle($this->methods[$value]['title']);
+            }
+        }
+
+        //set installment credit card method
         foreach ($this->paymentHelper->getInstallmentMethods() as $methodCode) {
             if ($this->checkIsSprintMethod($methodCode)) {
 
@@ -295,5 +310,14 @@ class TransmartPaymentMethods extends PaymentMethods
     protected function checkIsSprintMethod($methodCode)
     {
         return (array_key_exists($methodCode, $this->methods));
+    }
+
+    /**
+     * Get additional credit card
+     * @return array
+     */
+    public function getAdditionalCreditCardMethod()
+    {
+        return [\Trans\Mepay\Model\Config\Provider\CcDebit::CODE];
     }
 }

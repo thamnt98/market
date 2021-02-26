@@ -255,5 +255,29 @@
             </parameter>
         </parameters>
     </widget>
+    <widget id="recommendation_for_you" class="SM\Theme\Block\Widget\RecommendationForYou">
+        <label>Transmart Recommendation for You</label>
+        <description>Recommendation for You (Latest Viewed Products) Widget</description>
+        <parameters>
+            <parameter name="title" sort_order="10" visible="true" xsi:type="text">
+                <label>Title</label>
+            </parameter>
+            <parameter name="show_review" xsi:type="select" visible="true">
+                <label translate="true">Show Review</label>
+                <options>
+                    <option name="true" value="1">
+                        <label translate="true">Yes</label>
+                    </option>
+                    <option name="false" value="0" selected="true">
+                        <label translate="true">No</label>
+                    </option>
+                </options>
+            </parameter>
+            <parameter name="cache_lifetime" sort_order="20" xsi:type="text" visible="true">
+                <label translate="true">Cache Lifetime (Seconds)</label>
+                <description>86400 by default, if not set. To refresh instantly, clear the Blocks HTML Output cache.</description>
+            </parameter>
+        </parameters>
+    </widget>
 </widgets>
 

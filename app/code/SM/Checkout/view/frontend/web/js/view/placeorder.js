@@ -177,8 +177,8 @@ define([
             // **** BANK MEGA payment ****
             var obj = this.getPaymentMethods();
             var redirectUrl = urlManager.build('transcheckout');
-            if (obj['method'] == 'trans_mepay_debit' || obj['method'] == 'trans_mepay_cc' || obj['method'] == 'trans_mepay_va' || obj['method'] == 'trans_mepay_qris') {
-                return placeOrder(this.getPaymentMethods(), '').success(
+            if (obj['method'] == 'trans_mepay_allbankccdebit' || obj['method'] == 'trans_mepay_debit' || obj['method'] == 'trans_mepay_cc' || obj['method'] == 'trans_mepay_va' || obj['method'] == 'trans_mepay_qris' || obj['method'] == 'trans_mepay_allbank_cc' || obj['method'] == 'trans_mepay_allbank_debit') {
+                return $.when(placeOrder(this.getPaymentMethods(), '')).done(
                     function () {
                         $('[data-href="payment-error"]').text('').addClass('hidden');
                         window.location.replace(urlManager.build('transmepay/payment/redirect'));

@@ -86,7 +86,8 @@ class TransmartOrderDataBuilder extends OrderDataBuilder
     $result = [
       self::ORDER =>[
         self::ID => $order->getOrderIncrementId(),
-        self::ITEMS => $items
+        self::ITEMS => $items,
+        self::DISABLE_PROMO => $this->isPromoDisabled()
       ]
     ];
 
@@ -96,6 +97,10 @@ class TransmartOrderDataBuilder extends OrderDataBuilder
 
     if (strpos($code, 'debit') !== false) {
         $result[self::ORDER][self::AFTER_DISCOUNT] = self::DEBIT_MEGA;
+    }
+
+    if (strpos($code, 'allbank') !== false) {
+        $result[self::ORDER][self::AFTER_DISCOUNT] = '';
     }
 
     return $result; 
@@ -134,5 +139,14 @@ class TransmartOrderDataBuilder extends OrderDataBuilder
         self::ITEMS => $items
       ]
     ];
+  }
+
+  /**
+   * Is Promo Disabled
+   * @return string
+   */
+  public function isPromoDisabled()
+  {
+    return 'true';
   }
 }

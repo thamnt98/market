@@ -19,6 +19,7 @@ use Magento\Sales\Model\ResourceModel\Order as OrderResource;
 use Magento\Sales\Api\OrderManagementInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Framework\Event\ManagerInterface;
+use Trans\Sprint\Helper\Config as SprintConfig;
 use Trans\Mepay\Logger\LoggerWrite;
 
 class Order extends AbstractHelper
@@ -32,12 +33,12 @@ class Order extends AbstractHelper
      * @var array
      */
     const PAYMENT_EXPIRATION_ON_SECOND = [
-        \Trans\Mepay\Model\Config\Provider\Cc::CODE_CC => 600,
-        \Trans\Mepay\Model\Config\Provider\Qris::CODE_QRIS => 2000,
-        \Trans\Mepay\Model\Config\Provider\Va::CODE_VA => 7500,
-        \Trans\Mepay\Model\Config\Provider\Debit::CODE => 600,
-        \Trans\Mepay\Model\Config\Provider\CcDebit::CODE => 600,
-        'others'=> 60
+        \Trans\Mepay\Model\Config\Provider\Cc::CODE_CC => 0,
+        \Trans\Mepay\Model\Config\Provider\Qris::CODE_QRIS => 0,
+        \Trans\Mepay\Model\Config\Provider\Va::CODE_VA => 0,
+        \Trans\Mepay\Model\Config\Provider\Debit::CODE => 0,
+        \Trans\Mepay\Model\Config\Provider\CcDebit::CODE => 0,
+        'others'=> 0
     ];
 
     /**
@@ -186,9 +187,10 @@ class Order extends AbstractHelper
     /**
      * Cancel order
      * @param  int $orderId
+     * @param  bool $updateOms
      * @return void
      */
-    public function doCancelationOrder (int $orderId)
+    public function doCancelationOrder (int $orderId, $updateOms = true)
     {
         $this->orderManagement->cancel($orderId);
         $order = $this->orderRepo->get($orderId);
@@ -207,12 +209,54 @@ class Order extends AbstractHelper
             $connection->query($query);
         }
 
-        $this->eventManager->dispatch(
-            'update_payment_oms',
-            [
-                'reference_number' => $order->getReferenceNumber(),
-                'payment_status' => SprintConfig::OMS_CANCEL_PAYMENT_ORDER,
-            ]
-        );
+        if($updateOms) {
+            $this->eventManager->dispatch(
+                'update_payment_oms',
+                [
+                    'reference_number' => $order->getReferenceNumber(),
+                    'payment_status' => SprintConfig::OMS_CANCEL_PAYMENT_ORDER,
+                ]
+            );
+        }
+    }
+
+    /**
+     * Cancel order by reference number
+     * @param  int $orderId
+     * @param  bool $updateOms
+     * @return void
+     */
+    public function doCancelationOrderByRefNumber (string $refNumber)
+    {
+        $connection = $this->orderResource->getConnection();
+        $tableSales = $connection->getTableName('sales_order');
+        $orderStatus = 'order_canceled';
+        $orderState = 'canceled';
+        
+        $salesData = $connection->select();
+        $salesData->from(
+                $tableSales,
+                ['*']
+            )->where('reference_number = ?', $refNumber);
+
+        $salesData = $connection->fetchAll($salesData);
+
+        $orderIds = [];
+        $historyData = [];
+        foreach ($salesData as $order) {
+            $orderIds[] = $order['entity_id'];
+            
+            $history['parent_id'] = $order['entity_id'];
+            $history['status'] = $orderStatus;
+            $history['comment'] = 'Order Canceled by Transmart';
+            $history['entity_name'] = 'order';
+            $historyData[] = $history;
+        }
+
+        $connection->update($tableSales, ['status' => $orderStatus, 'state' => $orderState], ['entity_id IN (?)' => $orderIds]);
+
+        $historyTable = $connection->getTableName('sales_order_status_history');
+        $connection->insertOnDuplicate($historyTable, $historyData);        
     }
 }
+

@@ -17,6 +17,13 @@ define(
             component: 'Trans_Mepay/js/view/payment/method-renderer/trans_mepay'
           }
         );
+        
+        rendererList.push(
+          {
+            type: 'trans_mepay_allbankccdebit',
+            component: 'Trans_Mepay/js/view/payment/method-renderer/trans_mepay'
+          }
+        );
 
         rendererList.push(
           {
@@ -35,6 +42,20 @@ define(
         rendererList.push(
           {
             type: 'trans_mepay_qris',
+            component: 'Trans_Mepay/js/view/payment/method-renderer/trans_mepay'
+          }
+        );
+
+        rendererList.push(
+          {
+            type: 'trans_mepay_allbank_cc',
+            component: 'Trans_Mepay/js/view/payment/method-renderer/trans_mepay'
+          }
+        );
+
+        rendererList.push(
+          {
+            type: 'trans_mepay_allbank_debit',
             component: 'Trans_Mepay/js/view/payment/method-renderer/trans_mepay'
           }
         );
