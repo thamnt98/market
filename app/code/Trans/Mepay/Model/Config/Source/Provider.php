@@ -15,8 +15,11 @@
  use Magento\Framework\Option\ArrayInterface;
  use Trans\Mepay\Model\Config\Provider\Cc;
  use Trans\Mepay\Model\Config\Provider\Debit;
+ use Trans\Mepay\Model\Config\Provider\CcDebit;
  use Trans\Mepay\Model\Config\Provider\Va;
  use Trans\Mepay\Model\Config\Provider\Qris;
+ use Trans\Mepay\Model\Config\Provider\AllbankCc;
+ use Trans\Mepay\Model\Config\Provider\AllbankDebit;
 
  /**
   * Class \Trans\Mepay\Model\Config\Source\Environment
@@ -103,9 +106,15 @@
         break;
       case Debit::CODE : $source = self::MEGA_DEBIT;
         break;
+      case CcDebit::CODE : $source = self::MEGA_CC;
+        break;
       case Va::CODE_VA : $source = self::MEGA_VA;
         break;
       case Qris::CODE_QRIS : $source = self::MEGA_QRIS;
+        break;
+      case AllbankCc::CODE : $source = self::MEGA_CC;
+        break;
+      case AllbankDebit::CODE : $source = self::MEGA_DEBIT;
         break;
     }
     return $source;

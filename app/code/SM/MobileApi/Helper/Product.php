@@ -443,7 +443,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         $productInfo->setTypeId($product->getTypeId());
         $productInfo->setProductUrl($this->_getProductUrl($product));
         $productInfo->setCategoryNames($categoryNames);
-        $productInfo->setStock(floor($this->getProductStockQty($product)));
+        $productInfo->setStock(floor($product->getQty()));
         $productInfo->setIsSaleable($product->isSalable());
         $productInfo->setIsInStock((boolean)$productInfo->getStock());
         $productInfo->setIsAvailable($product->isAvailable());

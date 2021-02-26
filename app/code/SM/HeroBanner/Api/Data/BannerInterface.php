@@ -135,4 +135,26 @@ interface BannerInterface extends \Magento\Framework\Api\ExtensibleDataInterface
      * @return $this
      */
     public function setPromoPosition($data);
+
+    /**
+     * @return int
+     */
+    public function getLinkType();
+
+    /**
+     * @param int $value
+     * @return $this
+     */
+    public function setLinkType($value);
+
+    /**
+     * @return string
+     */
+    public function getLinkTypeValue();
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setLinkTypeValue($value);
 }

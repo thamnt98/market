@@ -309,10 +309,10 @@ class CheckoutProviderHandle
                 $tooltipDescription = $this->helperConfig->getPaymentTooltipDescription($method->getCode());
                 $logo = "logo/paymentmethod/" . $this->helperConfig->getPaymentLogo($method->getCode());
                 $methods[] = [
-                    'code'  => $method->getCode(),
+                    'method'  => $method->getCode(),
                     'title' => $method->getTitle(),
-                    'storeId'   => $method->getStoreId(),
-                    'isActive'  => $method->getIsActive(),
+                    'store_id'   => $method->getStoreId(),
+                    'is_active'  => $method->getIsActive(),
                     'description'   => $description,
                     'tooltip_description'   => $tooltipDescription,
                     'logo'      => $logoUrl . $logo

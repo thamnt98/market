@@ -1,0 +1,60 @@
+<?php
+use Magento\Catalog\Helper\Output;
+use SM\Theme\Block\Widget\RecommendationForYou;
+
+$viewMode = 'grid';
+$imageDisplayArea = 'category_page_grid';
+
+/**
+ * @var Output $helper
+ * @var SM\Catalog\Helper\Data $helperSMCatalog
+ * @var RecommendationForYou $block
+ */
+$helper = $this->helper(Output::class);
+$helperSMCatalog = $this->helper('SM\Catalog\Helper\Data');
+
+$products = $block->getProducts();
+?>
+
+<?php if (count($products)): ?>
+<div class="block-latest-viewed-product products-grid smart-products">
+    <div class="block-title">
+        <?php if ($title = $block->getData('title')) : ?>
+            <strong><?= $block->escapeHtml(__($title)) ?></strong>
+        <?php endif ?>
+    </div>
+    <ol class="product-cards product-items row">
+        <?php foreach ($products as $product): ?>
+            <li class="product-card col-xs-6 col-sm-4 col-md-15">
+                <div class="product-item product-item--hideCart ">
+                    <div class="product-item-info " data-container="product-list">
+                        <div class="product-item-photo-wrapper">
+                            <?php $productImage = $block->getImage($product, $imageDisplayArea); ?>
+                            <a href="<?= $block->escapeUrl($product->getProductUrl()) ?>"
+                               class="product photo product-item-photo"
+                               tabindex="-1">
+                                <?= $productImage->toHtml() ?>
+                            </a>
+                        </div>
+
+                        <div class="product details product-item-details">
+                            <div class="product-item-name">
+                                <a href="<?= $block->escapeUrl($product->getProductUrl()); ?>"
+                                   class="product-item-link <?= $product->getId() ?>sd"
+                                   tabindex="-1">
+                                    <?= $block->escapeHtml($product->getName()); ?>
+                                </a>
+                            </div>
+                            <?= /* @noEscape */ $block->getProductPrice($product) ?>
+
+                            <?php if ($block->getData("show_review")??true) : ?>
+                                <?= $block->getReviewsSummaryHtml($product, \Magento\Catalog\Block\Product\ReviewRendererInterface::SHORT_VIEW, true) ?>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </li>
+        <?php endforeach;?>
+    </ol>
+</div>
+<?php endif;?>
