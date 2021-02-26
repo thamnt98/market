@@ -31,4 +31,14 @@
         <resource ref="anonymous"/>
     </resources>
   </route>
+  <route url="/V1/transmepay/recovercart/me" method="POST">
+    <service class="Trans\Mepay\Api\CartRecoveryInterface" method="execute"/>
+    <resources>
+        <resource ref="self"/>
+    </resources>
+    <data>
+        <parameter name="id" force="true">%customer_id%</parameter>
+    </data>
+  </route>
 </routes>
+
