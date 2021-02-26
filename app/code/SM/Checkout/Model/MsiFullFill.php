@@ -3,6 +3,7 @@
 namespace SM\Checkout\Model;
 
 use Magento\Framework\Api\SearchCriteriaBuilder;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\InventoryApi\Api\Data\SourceInterface;
 use Magento\InventoryApi\Api\Data\SourceItemInterface;
@@ -61,6 +62,11 @@ class MsiFullFill
     protected $sourceInterfaceFactory;
 
     /**
+     * @var ScopeConfigInterface
+     */
+    protected $scopeConfig;
+
+    /**
      * MsiFullFill constructor.
      * @param SourceRepositoryInterface $sourceRepository
      * @param AddressInterfaceFactory $addressInterfaceFactory
@@ -70,6 +76,7 @@ class MsiFullFill
      * @param SearchStoreInterfaceFactory $searchStoreInterfaceFactory
      * @param ResourceModel\ConnectionDB $connectionDB
      * @param \Magento\InventoryApi\Api\Data\SourceInterfaceFactory $sourceInterfaceFactory
+     * @param ScopeConfigInterface $scopeConfig
      */
     public function __construct(
         SourceRepositoryInterface $sourceRepository,
@@ -79,7 +86,8 @@ class MsiFullFill
         GetDistanceInterface $getDistance,
         SearchStoreInterfaceFactory $searchStoreInterfaceFactory,
         \SM\Checkout\Model\ResourceModel\ConnectionDB $connectionDB,
-        \Magento\InventoryApi\Api\Data\SourceInterfaceFactory $sourceInterfaceFactory
+        \Magento\InventoryApi\Api\Data\SourceInterfaceFactory $sourceInterfaceFactory,
+        ScopeConfigInterface $scopeConfig
     ) {
         $this->sourceRepository = $sourceRepository;
         $this->addressInterfaceFactory = $addressInterfaceFactory;
@@ -89,6 +97,7 @@ class MsiFullFill
         $this->searchStoreInterfaceFactory = $searchStoreInterfaceFactory;
         $this->connectionDB = $connectionDB;
         $this->sourceInterfaceFactory = $sourceInterfaceFactory;
+        $this->scopeConfig = $scopeConfig;
     }
 
     /**
@@ -102,7 +111,12 @@ class MsiFullFill
             $skuList[strtolower((string)$sku)] = $qty;
             $skuListCheck[] = (string)$sku;
         }
-        $items = $this->connectionDB->getMsi($skuListCheck);
+        if ($this->isEnableLimitStorePickUp()) {
+            $limitStoreCodeList = $this->getEnableCodeList();
+            $items = $this->connectionDB->getMsi($skuListCheck, true, $limitStoreCodeList);
+        } else {
+            $items = $this->connectionDB->getMsi($skuListCheck);
+        }
         $msiListCode = [];
         $result = [];
         foreach ($items as $item) {
@@ -408,5 +422,28 @@ class MsiFullFill
     protected function getCountOfArray($array)
     {
         return count($array);
+    }
+
+    /**
+     * @return false|string[]
+     */
+    protected function getEnableCodeList()
+    {
+        $storeCodeList = $this->scopeConfig->getValue(
+            'trans_catalog/limit_store_pickup/store_code_list',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
+        return explode(',', $storeCodeList);
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function isEnableLimitStorePickUp()
+    {
+        return $this->scopeConfig->getValue(
+            'trans_catalog/limit_store_pickup/active',
+            \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+        );
     }
 }
