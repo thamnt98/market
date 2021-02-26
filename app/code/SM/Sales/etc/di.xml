@@ -40,10 +40,6 @@
 
     <preference for="SM\Sales\Api\Data\DigitalOrderDataInterface" type="SM\Sales\Model\Data\DigitalOrderData"/>
 
-    <type name="SM\MyVoucher\Model\AmastyRules\DiscountRegistry">
-        <plugin name="sm_quote_save_voucher_detail" type="SM\Sales\Plugin\Quote\PrepareVoucherDetail"/>
-    </type>
-
     <type name="SM\Checkout\Model\VoucherManagement">
         <plugin name="sm_quote_remove_voucher_detail" type="SM\Sales\Plugin\Quote\RemoveVoucher"/>
     </type>
