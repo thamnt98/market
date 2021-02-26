@@ -69,7 +69,7 @@ class TransmartWebhook
             if($paymentMethod == 'trans_mepay_va'){
                 $vaNumber = $this->transmartSetEmailNewOrderData->getBankMegaVaNumber($payment->getLastTransId());
                 if($vaNumber){
-                    $this->orderSender->send($order, true);
+                    //$this->orderSender->send($order, true);
                 }
             }
         }

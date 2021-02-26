@@ -43,4 +43,9 @@
         <observer name="sm_trancheckout_payment_expire_send_email"
                   instance="\SM\Checkout\Observer\PaymentExpireSendEmail" />
     </event>
+
+    <event name="sales_order_save_after">
+        <observer name="sm_trancheckout_sales_order_save_after"
+                  instance="SM\Checkout\Observer\Order\SaveAfter" />
+    </event>
 </config>

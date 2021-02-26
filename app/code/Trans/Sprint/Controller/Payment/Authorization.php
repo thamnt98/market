@@ -173,7 +173,7 @@ class Authorization extends \Magento\Framework\App\Action\Action implements Csrf
 		$this->logger->info('additional information = ' . $this->dataHelper->serializeJson($order->getPayment()->getData()));
 
 		$paymentMethod = $order->getPayment()->getMethod();
-		
+
 		$refNumber = $this->sprintResource->getReferenceNumber($orderIncrementId);
 		$this->logger->info('reference_number = ' . $refNumber);
 
@@ -199,9 +199,9 @@ class Authorization extends \Magento\Framework\App\Action\Action implements Csrf
 				'promoCode' => null,
 			);
 		}
-		
+
 		$globalFeature = $this->dataHelper->serializeJson($featured);
-		
+
 		$this->logger->info('Billing data = ' . $this->dataHelper->serializeJson($billingData));
 
 		$orderDate = $this->dataHelper->convertDatetime($order->getCreatedAt());
@@ -245,11 +245,11 @@ class Authorization extends \Magento\Framework\App\Action\Action implements Csrf
 				$dataPayment['authCode']      = $this->dataHelper->doAuthCode(array('channel_id' => $dataPayment['channelId'], 'transaction_no' => $dataPayment['transactionNo'], 'transaction_amount' => $dataPayment['transactionAmount']), $paymentMethod);
 				$order->setSprintTransactionNo($dataPayment['transactionNo']);
 				$order->save();
-				
+
 				$this->logger->info('xxxxxxxxxxxxxxxxxxxxxx before hit api ' . $counter . 'x ' . date('Y-m-d H:i:s'));
 				$hit = $this->hitApi($dataPayment, $paymentMethod);
 				$this->logger->info('xxxxxxxxxxxxxxxxxxxxxx after hit api ' . $counter . 'x ' . date('Y-m-d H:i:s'));
-				
+
 				$counter++;
 			}
 			if ($hit['insertStatus'] == '00') {
@@ -261,7 +261,7 @@ class Authorization extends \Magento\Framework\App\Action\Action implements Csrf
 			$this->logger->info('xxxxxxxxxxxxxxxxxxxxxx after saveResponse ' . date('Y-m-d H:i:s'));
 
 			if($paymentMethod == 'sprint_bca_va' && $dataPayment['customerAccount'] && $dataPayment['transactionExpire']){
-				$this->orderSender->send($order, true);
+				//$this->orderSender->send($order, true);
 			}
 		}
 
