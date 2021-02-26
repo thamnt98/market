@@ -196,7 +196,7 @@ class Order extends AbstractHelper
         return $result->query()->fetch();
     }
 
-    public function getQuoteIdByReffNumber(string $reffNum)
+    public function getQuoteIdByReffNumber(string $refNumber)
     {
         $connection = $this->orderResource->getConnection();
         $tableSales = $connection->getTableName('sales_order');
