@@ -371,7 +371,7 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
 
     public function getStorePickupTime($order)
     {
-        $date = $this->timeZone->date($order->getStorePickUpTime())->format('d F Y');
+        $date = $this->timeZone->date(strtotime($order->getStorePickUpTime()))->format('d F Y');
         $time = $order->getStorePickUpDelivery();
         return $date . ' ' . $time;
     }
