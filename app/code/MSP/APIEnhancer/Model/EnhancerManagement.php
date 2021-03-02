@@ -83,7 +83,8 @@ class EnhancerManagement implements EnhancerManagementInterface
     {
         // Make sure it is a rest-API call (at this level we cannot rely on detected area)
         $uriPath = $this->request->getRequestUri();
-        if (strpos($uriPath, static::BASE_PATH . '/') !== 0) {
+        $allowPos = [0,1];
+        if (!in_array(strpos($uriPath, static::BASE_PATH . '/'), $allowPos)) {
             return false;
         }
 
