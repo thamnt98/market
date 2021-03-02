@@ -216,7 +216,7 @@ class RulesApplier extends \Magento\SalesRule\Model\RulesApplier
      */
     protected function getDiscountData($item, $rule, $address)
     {
-        if (!$this->checkoutSession->getData('main_order') &&
+        /*if (!$this->checkoutSession->getData('main_order') &&
             $this->checkoutSession->getData('is_multiple_shipping_addresses')
         ) {
             $discountData = $this->discountFactory->create();
@@ -226,7 +226,7 @@ class RulesApplier extends \Magento\SalesRule\Model\RulesApplier
                 ->setOriginalAmount(0);
 
             return $discountData;
-        }
+        }*/
 
         return parent::getDiscountData($item, $rule, $address);
     }
