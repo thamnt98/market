@@ -86,13 +86,13 @@ class TotalsCollector extends \Magento\Quote\Model\Quote\TotalsCollector
                 if ($address->getId() == $shippingDefaultId ||
                     (is_null($shippingDefaultId) && $address->getAddressType() === 'shipping')
                 ) {
-                    $newAddress['main'] = $address;
+                    $addresses['main'] = $address;
                     break;
                 }
             }
         }
-        $newAddress = $newAddress + $addresses;
-        foreach ($newAddress as $key => $address) {
+        //$newAddress = $newAddress + $addresses;
+        foreach ($addresses as $key => $address) {
             if ($address->getAddressType() === 'shipping') {
                 if ($key === 'main') { // Main Address (Quote shipping address)
                     $this->checkoutSession->setMainOrder(true);
