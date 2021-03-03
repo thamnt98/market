@@ -204,57 +204,47 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
     }
 
     /**
-     * @param int $orderId
      * @param int $customerId
+     * @param int $orderId
+     *
      * @return ParentOrderDataInterface
-     * @throws NoSuchEntityException
-     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function getById($customerId, $orderId)
     {
-        /** @var OrderCollection $orderCollection */
-        $subOrderCollection = $this->orderCollectionFactory
-            ->create()
-            ->selectSub()
-            ->addFieldToFilter([
-                "main_table.customer_id",
-                "main_table.parent_order",
-                "main_table.entity_id"
-            ], [
-                ["eq" => $customerId],
-                ["eq" => $orderId]
-            ]);
-
-        /** @var Order $parentOrder */
-        $parentOrder = $this->orderCollectionFactory
-            ->create()
-            ->selectParent()
-            ->addFieldToFilter(OrderInterface::CUSTOMER_ID, $customerId)
-            ->addFieldToFilter(OrderInterface::ENTITY_ID, $orderId)
-            ->getFirstItem();
-
-        if (empty($subOrderCollection->getSize()) && empty($parentOrder->getData())) {
+        /**
+         * @var \Magento\Sales\Model\Order $main
+         * @var \Magento\Sales\Model\Order[] $sub
+         */
+        [$main, $sub] = $this->generateMainSubOrder($orderId, $customerId);
+        if (empty($main) || empty($sub)) {
             return null;
         }
 
-        $hasInvoice = (bool) $parentOrder->getReferenceInvoiceNumber();
-        $result = $this->subOrder->handleSubOrders($subOrderCollection, $cancelType, $hasInvoice);
-        $subOrders = $result->getData("sub_orders");
+        $subOrdersData = $subordersCancelType = [];
+        $result = $this->parentOrder->prepareOrderData($main);
 
-        $orderData = $this->parentOrder->parentOrderProcess(
-            $parentOrder,
-            $subOrders[$parentOrder->getEntityId()]??[]
-        );
-
-        if (!empty($cancelType) && $orderData->getStatus() == ParentOrderRepositoryInterface::STATUS_ORDER_CANCELED) {
-            $this->setCancelMessage($cancelType, $orderData);
-        }
-        if ($orderData->getPaymentInfo()) {
-            $transactionId = $orderData->getPaymentInfo()->getTransactionId();
-            $orderData->setTransactionId($transactionId ? $transactionId : null);
+        if ($main->getData('reference_invoice_number')) {
+            $result->setInvoiceLink($this->subOrder->getInvoiceLink($main->getId()));
         }
 
-        return $orderData;
+        foreach ($sub as $item) {
+            $subOrdersData[] = $this->subOrder
+                ->prepareOder($item)
+                ->setInvoiceLink($result->getInvoiceLink());
+            if ($item->getData('cancel_type')) {
+                $subordersCancelType[] = $item->getData('cancel_type');
+            }
+        }
+
+        $result->setSubOrders($subOrdersData);
+
+        if ($main->getStatus() === ParentOrderRepositoryInterface::STATUS_ORDER_CANCELED
+            && count($subordersCancelType)
+        ) {
+            $this->setCancelMessage($subordersCancelType, $result);
+        }
+
+        return $result;
     }
 
     /**
@@ -458,5 +448,78 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
 
         $this->appEmulation->stopEnvironmentEmulation();
         return $results;
+    }
+
+    /**
+     * @param int $mainOrderId
+     * @param int $customerId
+     *
+     * @return array
+     */
+    protected function generateMainSubOrder($mainOrderId, $customerId)
+    {
+        /** @var OrderCollection $coll */
+        $coll = $this->orderCollectionFactory->create();
+
+        $coll
+            ->getSelect()
+            ->joinLeft(
+                ['is' => 'inventory_source'],
+                'main_table.store_pick_up = is.source_code',
+                [
+                    'pickup_store_name' => 'is.name',
+                    'pickup_city'       => 'is.city',
+                    'pickup_street'     => 'is.street',
+                    'pickup_postcode'   => 'is.postcode',
+                    'pickup_region'     => 'is.region',
+                ]
+            )->joinLeft(
+                "sales_order_address",
+                "sales_order_address.parent_id = main_table.entity_id" .
+                " AND sales_order_address.address_type = 'shipping'",
+                [
+                    "street",
+                    "address_tag",
+                    "lastname",
+                    "firstname",
+                    "postcode",
+                    "telephone",
+                    "region",
+                ]
+            )->joinLeft(
+                "districts",
+                "districts.district_id = sales_order_address.district",
+                [
+                    "district",
+                ]
+            )->joinLeft(
+                "regency",
+                "regency.entity_id = districts.entity_id",
+                [
+                    "region_id" => "entity_id",
+                    "city",
+                ]
+            )->where(
+                'main_table.customer_id = ?',
+                $customerId
+            )
+            ->where(
+                'main_table.entity_id = ? OR main_table.parent_order = ?',
+                $mainOrderId
+            );
+
+        $main = null;
+        $sub = [];
+
+        /** @var \Magento\Sales\Model\Order $order */
+        foreach ($coll->getItems() as $order) {
+            if ($order->getData('is_parent')) {
+                $main = $order;
+            } else {
+                $sub[] = $order;
+            }
+        }
+
+        return [$main, $sub];
     }
 }
