@@ -202,7 +202,7 @@ class Order extends AbstractHelper
         $tableSales = $connection->getTableName('sales_order');
         $salesData = $connection->select();
         $salesData->from($tableSales, ['*'])->where('reference_number = ?', $refNumber);
-        $salesData = $connection->fetchAll($salesData);
+        $salesData = $connection->fetchRow($salesData);
         return $salesData['quote_id'];
     }
 
