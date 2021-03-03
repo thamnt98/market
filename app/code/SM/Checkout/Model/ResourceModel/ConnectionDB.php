@@ -104,9 +104,11 @@ class ConnectionDB
 
     /**
      * @param $skuList
+     * @param false $limit
+     * @param array $limitStoreCodeList
      * @return array
      */
-    public function getMsi($skuList)
+    public function getMsi($skuList, $limit = false, $limitStoreCodeList = [])
     {
         $select = $this->readAdapter->select()
         ->from(
@@ -122,6 +124,9 @@ class ConnectionDB
         ->where('main_table.status =?', 1)
         ->where('main_table.quantity > 0')
         ->where('t1.enabled =?', 1);
+        if ($limit) {
+            $select->where('main_table.source_code IN (?)', $limitStoreCodeList);
+        }
         return $this->readAdapter->fetchAll($select);
     }
 }
