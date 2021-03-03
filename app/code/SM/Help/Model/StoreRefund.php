@@ -57,11 +57,13 @@ class StoreRefund implements \SM\Help\Api\StoreRefundInterface
                 ScopeInterface::SCOPE_STORE
             );
             $storeIds = explode(',', $storeIds);
-            $searchCriteria = $this->searchCriteriaBuilder->addFilter(SourceItemInterface::SOURCE_CODE, ['in' => $storeIds])
+            $searchCriteria = $this->searchCriteriaBuilder
+                ->addFilter(SourceItemInterface::SOURCE_CODE, $storeIds, 'in')
                 ->addFilter('enabled', 1)
                 ->create();
         } else {
-            $searchCriteria = $this->searchCriteriaBuilder->addFilter(SourceItemInterface::SOURCE_CODE, 'default', 'neq')
+            $searchCriteria = $this->searchCriteriaBuilder
+                ->addFilter(SourceItemInterface::SOURCE_CODE, 'default', 'neq')
                 ->addFilter('enabled', 1)
                 ->create();
         }
