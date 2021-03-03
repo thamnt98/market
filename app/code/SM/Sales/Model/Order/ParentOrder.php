@@ -377,4 +377,42 @@ class ParentOrder
 
         return $message;
     }
+
+    /**
+     * @param \Magento\Sales\Model\Order $order
+     *
+     * @return ParentOrderDataInterface
+     */
+    public function prepareOrderData($order)
+    {
+        /** @var \SM\Sales\Api\Data\ParentOrderDataInterface $data */
+        $data = $this->parentOrderDataFactory->create();
+        $payment = $order->getPayment();
+
+        $data
+            ->setIsDigital($order->getIsVirtual())
+            ->setParentOrderId($order->getEntityId())
+            ->setReferenceNumber($order->getData('reference_number'))
+            ->setOrderDate($order->getCreatedAt())
+            ->setStatus($order->getStatus())
+            ->setTotalShippingAmount($order->getShippingAmount())
+            ->setTotalPayment($order->getGrandTotal())
+            ->setGrandTotal($order->getTotalInvoiced())
+            ->setSubTotal($order->getSubtotal())
+            ->setInvoiceNumber($order->getData('reference_invoice_number'))
+            ->setConvertDate($this->convertDate($order->getCreatedAt()));
+
+        $this->voucherDetailProcess($data, $order);
+
+        if ($payment) {
+            $paymentInfoData = $this->paymentInfoProcess($payment, $order->getData('reference_number'));
+            $data->setPaymentMethod($payment->getMethodInstance()->getTitle());
+            if ($paymentInfoData) {
+                $data->setPaymentInfo($paymentInfoData);
+                $data->setTransactionId($paymentInfoData->getTransactionId());
+            }
+        }
+
+        return $data;
+    }
 }

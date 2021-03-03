@@ -853,4 +853,85 @@ class SubOrder
         }
         return __('This item is not available.');
     }
+
+    /**
+     * @param \Magento\Sales\Model\Order $order
+     *
+     * @return SubOrderDataInterface
+     */
+    public function prepareOder($order)
+    {
+        /** @var \SM\Sales\Api\Data\SubOrderDataInterface $data */
+        $data = $this->subOrderDataFactory->create();
+
+        $data
+            ->setId($order->getEntityId())
+            ->setSubOrderId($order->getData("reference_order_id"))
+            ->setStatus($order->getStatus())
+            ->setCreatedAt($order->getCreatedAt())
+            ->setTotalPayment($order->getGrandTotal())
+            ->setTotalRefund((int) $order->getTotalRefunded())
+            ->setGrandTotal((int) ($order->getTotalInvoiced() - $order->getTotalRefunded()))
+            ->setSubtotal($order->getSubtotal())
+            ->setHasCreditmemo($order->hasCreditmemos())
+            ->setCreditmemoId($this->getCreditmemoId($order))
+            ->setCanCreditmemo($this->getCanCreditmemo($order))
+            ->setShowRefundButton(
+                $order->hasCreditmemos()
+                && \SM\Sales\Model\Order\IsPaymentMethod::isVirtualAccount($order->getPayment()->getMethod())
+            )->setEnableRefundButton(
+                $order->hasCreditmemos()
+                && $this->currentCreditemo->getCreditmemoStatus() != FormInformationInterface::SUBMITTED_VALUE
+            )->setRefundMessage(
+                $this->getRefundMessage($data->getShowRefundButton(), $data->getCanCreditmemo())
+            );
+
+        if (!$order->getIsVirtual()) {
+            $this->setDeliveryData($order, $data);
+            $this->setStatusHistoriesData($order, $data);
+            $order->setData('cancel_type', $this->history->getCancelType());
+        }
+
+        if ($order->getData('store_pick_up')) {
+            /** @var \SM\MobileApi\Model\Data\Catalog\Product\StoreInfo $storeInfo */
+            $storeInfo = $this->storeInfoFactory->create();
+
+            $storeInfo
+                ->setName($order->getData('pickup_store_name'))
+                ->setCity($order->getData('pickup_city'))
+                ->setStreet($order->getData('pickup_street'))
+                ->setPostcode($order->getData('pickup_postcode'))
+                ->setRegion($order->getData('pickup_region'))
+                ->setPickUpTime($order->getData('store_pick_up_delivery'))
+                ->setPickUpDate($order->getData('store_pick_up_time'));
+
+            $data->setStoreInfo($storeInfo);
+        }
+
+        if (!$order->getIsVirtual()) {
+            $this->setDeliveryData($order, $data);
+            $this->setStatusHistoriesData($order, $data);
+        }
+
+        try {
+            $this->appEmulation->startEnvironmentEmulation(
+                $this->storeManager->getStore()->getId(),
+                Area::AREA_FRONTEND,
+                true
+            );
+
+            $this->setItemsData($order, $data);
+
+            $data->setStatusLabel($order->getStatusLabel());$this->appEmulation->startEnvironmentEmulation(
+                $this->storeManager->getStore()->getId(),
+                Area::AREA_FRONTEND,
+                true
+            );
+
+            $this->appEmulation->stopEnvironmentEmulation();
+        } catch (\Exception $e) {
+        }
+
+        return $data;
+    }
 }

@@ -243,6 +243,7 @@ class Webhook extends DataObject implements WebhookInterface
     } else {
         $validate = $this->validate($type, $inquiry);
 
+        /*
         if($validate->getStatus() == ResponseInterface::STATUS_OK) {
             $inquryData = $this->inquiryResponseHelper->convertToArray($inquiry);
             if(isset($inquryData['order']['id'])) {
@@ -265,6 +266,7 @@ class Webhook extends DataObject implements WebhookInterface
                 }
             }
         }
+        */
         
         return $validate;
     }

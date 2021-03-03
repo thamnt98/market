@@ -104,9 +104,11 @@ class ConnectionDB
 
     /**
      * @param $skuList
+     * @param false $limit
+     * @param array $limitStoreCodeList
      * @return array
      */
-    public function getMsi($skuList)
+    public function getMsi($skuList, $limit = false, $limitStoreCodeList = [])
     {
         $select = $this->readAdapter->select()
         ->from(
@@ -122,6 +124,28 @@ class ConnectionDB
         ->where('main_table.status =?', 1)
         ->where('main_table.quantity > 0')
         ->where('t1.enabled =?', 1);
+        if ($limit) {
+            $select->where('main_table.source_code IN (?)', $limitStoreCodeList);
+        }
         return $this->readAdapter->fetchAll($select);
+    }
+
+    /**
+     * @param $orderId
+     */
+    public function updateSendOrderConfirmation($orderId)
+    {
+        $table = $this->getTableName('sales_order');
+        if ($table) {
+            try {
+                $this->writeAdapter->update(
+                    $table,
+                    ['send_order_confirmation' => 1],
+                    ['entity_id' => $orderId]
+                );
+            } catch (\Exception $e) {
+                $e->getMessage();
+            }
+        }
     }
 }
