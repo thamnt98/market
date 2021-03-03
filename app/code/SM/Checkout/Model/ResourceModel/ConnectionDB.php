@@ -129,4 +129,23 @@ class ConnectionDB
         }
         return $this->readAdapter->fetchAll($select);
     }
+
+    /**
+     * @param $orderId
+     */
+    public function updateSendOrderConfirmation($orderId)
+    {
+        $table = $this->getTableName('sales_order');
+        if ($table) {
+            try {
+                $this->writeAdapter->update(
+                    $table,
+                    ['send_order_confirmation' => 1],
+                    ['entity_id' => $orderId]
+                );
+            } catch (\Exception $e) {
+                $e->getMessage();
+            }
+        }
+    }
 }
