@@ -147,7 +147,7 @@ class VoucherManagement implements \SM\Checkout\Api\VoucherInterface
         if (!$quote->getItemsCount()) {
             throw new \Exception(__('The "%1" Cart doesn\'t contain products.', $cartId));
         }
-        $quote->getShippingAddress()->setCollectShippingRates(true);
+        $quote->getShippingAddress()->setCollectShippingRates(false);
         try {
             if ($quote->getApplyVoucher() && $quote->getApplyVoucher() != '') {
                 $oldApplyCoupon = explode(',', $quote->getApplyVoucher());

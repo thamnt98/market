@@ -58,7 +58,7 @@ class ActiveItems implements ObserverInterface
                         $item->setIsActive(0);
                     }
                 }
-                $this->quoteRepository->save($quote->collectTotals());
+                $this->quoteRepository->save($quote->setTotalsCollectedFlag(true)->collectTotals());
             }
         }
     }

@@ -124,6 +124,8 @@ class OrderItemRepository implements OrderItemRepositoryInterface
             $item = $this->addOrderItem($itemId, $quote);
 
             if (!is_string($item)) {
+                $quote->getShippingAddress()->setCollectShippingRates(false);
+                $quote->setTotalsCollectedFlag(true);
                 $quote->collectTotals()->save();
 
                 $resultData->setStatus(1);
@@ -165,6 +167,8 @@ class OrderItemRepository implements OrderItemRepositoryInterface
                     }
                 }
             }
+            $quote->getShippingAddress()->setCollectShippingRates(false);
+            $quote->setTotalsCollectedFlag(true);
             $quote->collectTotals()->save();
 
             $resultData->setStatus(1);

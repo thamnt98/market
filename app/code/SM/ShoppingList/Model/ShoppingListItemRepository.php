@@ -395,6 +395,8 @@ class ShoppingListItemRepository implements ShoppingListItemRepositoryInterface
         $item = $quote->addProduct($product);
 
         if (!is_string($item)) {
+            $quote->getShippingAddress()->setCollectShippingRates(false);
+            $quote->setTotalsCollectedFlag(true);
             $quote->collectTotals()->save();
             $this->deleteById($itemData->getWishlistItemId());
             return true;
