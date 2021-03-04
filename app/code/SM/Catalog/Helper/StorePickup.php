@@ -206,7 +206,7 @@ class StorePickup
      * @return array
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function getSourcesListBundle($product)
+    public function getSourcesListBundle($product, $ignore= true)
     {
         if (!$this->isBundleProductPDP($product)) {
             return [];
@@ -219,7 +219,7 @@ class StorePickup
             foreach ($valCB as $childId) {
                 $parent = $this->productRepository->getById($childId);
                 if ($parent->getTypeId() == 'configurable') {
-                    if ($parent->getIsWarehouse()) {
+                    if ($parent->getIsWarehouse() && $ignore) {
                         return [];
                     }
                     $child = $parent->getTypeInstance()->getUsedProducts($parent);
@@ -239,7 +239,7 @@ class StorePickup
             foreach ($childBundleIds as $childCBID) {
                 $product = $this->productRepository->getById($childCBID);
                 // if product has not available in store
-                if ($product->getIsWarehouse()) {
+                if ($product->getIsWarehouse() && $ignore) {
                     return [];
                 }
                 $skuChildB = $product->getSku();
@@ -275,7 +275,7 @@ class StorePickup
      * @return array
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function getSourcesListConfigurable($product)
+    public function getSourcesListConfigurable($product, $ignore = true)
     {
         if (!$this->isConfigurableProductPDP($product)) {
             return [];
@@ -295,7 +295,7 @@ class StorePickup
             foreach ($childConfigIds as $childCID) {
                 $product = $this->productRepository->getById($childCID);
                 // if product has not available in store
-                if ($product->getIsWarehouse()) {
+                if ($product->getIsWarehouse()  && $ignore) {
                     return [];
                 }
                 $skuChildC = $product->getSku();
@@ -408,14 +408,14 @@ class StorePickup
      * @param $product
      * @return array
      */
-    public function getSourcesListSimple($product)
+    public function getSourcesListSimple($product, $ignore = true)
     {
         if (!$this->isSimpleProductPDP($product)) {
             return [];
         }
 
         //product has not available in store
-        if ($product->getIsWarehouse()) {
+        if ($product->getIsWarehouse() && $ignore) {
             return [];
         }
 

@@ -105,14 +105,23 @@
                                 <?= $block->escapeHtml(__('Delivery info')) ?>
                             </a>
                         </div>
-                        <?php if ($block->getIsWarehouse($item)) : ?>
+                        <?php $isWarehouse = $block->getIsWarehouse($item);?>
+                        <?php if ($isWarehouse) : ?>
                         <div class="available-pickup delivery-info-item">
                             <div class="title">
                                 <span class="apl-ic-pickup"></span> <?= $block->escapeHtml(__('Available for Pick Up')) ?>
                             </div>
-                            <a href="#" id="store-pickup-btn-<?= $item->getId() ?>" class="store-info link">
-                                <?= $block->escapeHtml(__('Store info')) . '(' . $block->getIsWarehouse($item) . ' Stores)' ?>
+                            <a href="#" class="store-info link store-pickup-btn-<?= $item->getId() ?>">
+                                <?= $block->escapeHtml(__('Store info')) . '(' . $isWarehouse . ' Stores)' ?>
                             </a>
+                        </div>
+                        <?php endif;?>
+                        <?php if ($block->getProduct()->isSaleable()) : ?>
+                        <?php $isWarehouse = $isWarehouse ? $isWarehouse : $block->getIsWarehouse($item, false) ?>
+                        <div class="available-pickup available-pickup-include-warehouse delivery-info-item">
+                        <div class="title text-blue-cursor">
+                                <span class="apl-ic-pickup apl-ic-store"></span> <a href="#" class="store-pickup-btn-<?= $item->getId() ?>"><?= $block->escapeHtml(__('%1 Stores Have Stock', $isWarehouse)) ?></a>
+                            </div>
                         </div>
                         <?php endif;?>
                     </div>

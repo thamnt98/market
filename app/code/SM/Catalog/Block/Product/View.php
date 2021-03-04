@@ -339,9 +339,9 @@ class View extends ViewDefault
      * @param $product
      * @return array
      */
-    public function getSourcesListSimple($product)
+    public function getSourcesListSimple($product, $ignore = true)
     {
-        return $this->helperPickup->getSourcesListSimple($product);
+        return $this->helperPickup->getSourcesListSimple($product, $ignore);
     }
 
     /**
@@ -349,9 +349,9 @@ class View extends ViewDefault
      * @return array
      * @throws NoSuchEntityException
      */
-    public function getSourcesListConfigurable($product)
+    public function getSourcesListConfigurable($product,  $ignore = true)
     {
-        return $this->helperPickup->getSourcesListConfigurable($product);
+        return $this->helperPickup->getSourcesListConfigurable($product, $ignore);
     }
 
     /**
@@ -359,9 +359,9 @@ class View extends ViewDefault
      * @return array
      * @throws NoSuchEntityException
      */
-    public function getSourcesListBundle($product)
+    public function getSourcesListBundle($product, $ignore = true)
     {
-        return $this->helperPickup->getSourcesListBundle($product);
+        return $this->helperPickup->getSourcesListBundle($product, $ignore);
     }
 
     /**
