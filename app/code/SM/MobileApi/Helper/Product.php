@@ -669,7 +669,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
         /**
          * Load configurable data
          */
-        $productInfo->setConfigurableAttributes($this->configurableHelper->getConfigurableAttributes($product));
+        $productInfo->setConfigurableAttributes($this->configurableHelper->getConfigurableAttributes($product, $productInfo));
 
         /**
          * Load bundle data

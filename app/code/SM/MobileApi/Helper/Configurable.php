@@ -80,6 +80,11 @@ class Configurable extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected $appEmulation;
 
+    /**
+     * @var \SM\MobileApi\Model\Product\Image
+     */
+    private $image;
+
     public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\ConfigurableProduct\Model\ConfigurableAttributeData $configurableAttributeData,
@@ -97,7 +102,8 @@ class Configurable extends \Magento\Framework\App\Helper\AbstractHelper
         \Magento\InventoryApi\Api\GetSourceItemsBySkuInterface $sourceItemsBySku,
         \Magento\Eav\Model\Config $config,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Store\Model\App\Emulation $appEmulation
+        \Magento\Store\Model\App\Emulation $appEmulation,
+        \SM\MobileApi\Model\Product\Image $image
     ) {
         $this->_configurableAttributeData   = $configurableAttributeData;
         $this->_configurableHelper          = $configurableHelper;
@@ -114,6 +120,7 @@ class Configurable extends \Magento\Framework\App\Helper\AbstractHelper
         $this->config                       = $config;
         $this->storeManager                 = $storeManager;
         $this->appEmulation                 = $appEmulation;
+        $this->image                        = $image;
 
         parent::__construct($context);
     }
@@ -126,7 +133,7 @@ class Configurable extends \Magento\Framework\App\Helper\AbstractHelper
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getConfigurableAttributes($product)
+    public function getConfigurableAttributes($product, &$productInfo)
     {
         if (!$product || !$product->getId()) {
             return null;
@@ -136,7 +143,11 @@ class Configurable extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         $dataModel = $this->_configurableAttributeData;
-        $options = $this->_getOptions($product, $this->_getAllowProducts($product));
+        $productInfo->setGallery([]);
+        $allowProducts =  $this->_getAllowProducts($product, $productInfo);
+        $productInfo->setGallery(array_reverse($productInfo->getGallery()));
+
+        $options = $this->_getOptions($product, $allowProducts);
         $attributesData = $dataModel->getAttributesData($product, $options);
         if (!isset($attributesData['attributes'])) {
             return null;
@@ -242,7 +253,7 @@ class Configurable extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Catalog\Model\Product $product
      * @return array
      */
-    protected function _getAllowProducts($product)
+    protected function _getAllowProducts($product, $productInfo)
     {
         $products = [];
         $skipSaleableCheck = $this->_productHelper->getSkipSaleableCheck();
@@ -251,6 +262,7 @@ class Configurable extends \Magento\Framework\App\Helper\AbstractHelper
             /* @var \Magento\Catalog\Model\Product $product */
             if ($product->isSaleable() || $skipSaleableCheck) {
                 $products[] = $product;
+                $this->setParentsImages($product, $productInfo);
             }
         }
 
@@ -373,5 +385,15 @@ class Configurable extends \Magento\Framework\App\Helper\AbstractHelper
         $this->appEmulation->stopEnvironmentEmulation();
 
         return $thumbnailImage;
+    }
+
+    private function setParentsImages($product, &$productInfo)
+    {
+        $productInfo->setGallery(
+            array_merge(
+                $productInfo->getGallery(),
+                $this->image->getGalleryInfo($product, '', 'swatch_image')
+            )
+        );
     }
 }
