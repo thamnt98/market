@@ -143,7 +143,10 @@ class Configurable extends \Magento\Framework\App\Helper\AbstractHelper
         }
 
         $dataModel = $this->_configurableAttributeData;
+        $productInfo->setGallery([]);
         $allowProducts =  $this->_getAllowProducts($product, $productInfo);
+        $productInfo->setGallery(array_reverse($productInfo->getGallery()));
+
         $options = $this->_getOptions($product, $allowProducts);
         $attributesData = $dataModel->getAttributesData($product, $options);
         if (!isset($attributesData['attributes'])) {
@@ -386,6 +389,11 @@ class Configurable extends \Magento\Framework\App\Helper\AbstractHelper
 
     private function setParentsImages($product, &$productInfo)
     {
-        $productInfo->setGallery(array_merge($productInfo->getGallery(), $this->image->getGalleryInfo($product)));
+        $productInfo->setGallery(
+            array_merge(
+                $productInfo->getGallery(),
+                $this->image->getGalleryInfo($product, '', 'swatch_image')
+            )
+        );
     }
 }

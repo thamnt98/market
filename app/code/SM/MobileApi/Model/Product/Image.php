@@ -157,7 +157,7 @@ class Image
      * @return \SM\MobileApi\Api\Data\Catalog\Product\ImageInterface[]
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getGalleryInfo($product, $ignore = '')
+    public function getGalleryInfo($product, $ignore = '', $type = '')
     {
         /** @var \Magento\Catalog\Model\Product $product */
         $images = $product->getMediaGalleryEntries();
@@ -174,6 +174,9 @@ class Image
 
         $this->_appEmulation->startEnvironmentEmulation($storeId, \Magento\Framework\App\Area::AREA_FRONTEND, true);
         foreach ($images as $img) {
+            if (!empty($type) && !in_array($type, $img->getTypes())) {
+                continue;
+            }
             $_helper = $this->_imageHelper->init($product, '');
             $_imageName = $this->_getImageFileName($img->getFile());
 
