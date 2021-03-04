@@ -1,9 +1,7 @@
 <!--@subject {{trans "Installation Request Transmart.co.id"}} @-->
 <!--@vars {
-"var formattedBillingAddress|raw":"Billing Address",
 "layout handle=\"sales_email_order_items\" order=$order area=\"frontend\"":"Order Items Grid",
-"var formattedShippingAddress|raw":"Shipping Address",
-
+"var formattedShippingAddress|raw":"Customer Address"
 } @-->
 {{template config_path="design/email/header_template"}}
 <table class="greeting" width="100%">
@@ -154,8 +152,14 @@
     <tr>
         <td>
             <p>
-                {{trans "And please reconfirm directly to customer whether product had been received.
-            Thank you for your attention and good cooperation."}}
+                {{trans "And please reconfirm directly to customer whether product had been received."}}
+            </p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <p>
+                {{trans "Thank you for your attention and good cooperation."}}
             </p>
         </td>
     </tr>
