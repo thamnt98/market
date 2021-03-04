@@ -188,7 +188,9 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
 
     public function getCreatedAt()
     {
-        return $this->timeZone->date($this->order->getCreatedAt())->format('d M Y | h:i A');
+        return $this->timeZone
+            ->date(strtotime($this->order->getCreatedAt()))
+            ->format('d M Y | h:i A');
     }
 
     public function getTitlePaymentMethod()
@@ -369,7 +371,7 @@ class Success extends \Magento\Checkout\Block\Onepage\Success
 
     public function getStorePickupTime($order)
     {
-        $date = $this->timeZone->date($order->getStorePickUpTime())->format('d F Y');
+        $date = $this->timeZone->date(strtotime($order->getStorePickUpTime()))->format('d F Y');
         $time = $order->getStorePickUpDelivery();
         return $date . ' ' . $time;
     }

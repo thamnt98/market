@@ -148,15 +148,15 @@ class Group extends \Magento\GroupedProduct\Block\Product\View\Type\Grouped
      * @return int|void
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function getIsWarehouse($product)
+    public function getIsWarehouse($product, $ignore = true)
     {
         $count = 0;
         if ($product->getTypeId() === \Magento\ConfigurableProduct\Model\Product\Type\Configurable::TYPE_CODE) {
-            $stores = $this->helperStorePickup->getSourcesListConfigurable($product);
+            $stores = $this->helperStorePickup->getSourcesListConfigurable($product, $ignore);
         }
 
         if ($product->getTypeId() === \SM\Catalog\Helper\StorePickup::PRODUCT_SIMPLE) {
-            $stores = $this->helperStorePickup->getSourcesListSimple($product);
+            $stores = $this->helperStorePickup->getSourcesListSimple($product, $ignore);
         }
         $count = (isset($stores)) ? count($stores) : $count;
         return $count;

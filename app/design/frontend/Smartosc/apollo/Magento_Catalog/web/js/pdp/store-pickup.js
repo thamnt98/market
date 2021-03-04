@@ -23,8 +23,10 @@ define([
          */
         initialize: function (config) {
             var self = this,
-                availablePickupEl = $('.available-pickup'),
+                availablePickupEl = $('.available-pickup:not(.available-pickup-include-warehouse)'),
+                availablePickupElIncludeWarehouse = $('.available-pickup-include-warehouse'),
                 hasSourceListAvailable = config.hasSourceListAvailable,
+                hasSourceListAvailableIncludeWareHouse = config.hasSourceListAvailableIncludeWareHouse,
                 countListTypeSimple = config.countListTypeSimple,
                 countListTypeConfig = config.countListTypeConfig,
                 countListTypeBundle = config.countListTypeBundle,
@@ -32,10 +34,21 @@ define([
 
             //default auto hide pickup info
             availablePickupEl.hide();
+            availablePickupElIncludeWarehouse.hide();
             // if has source list available for product
             if (hasSourceListAvailable) {
                 self._openStorePickupList(
                     availablePickupEl,
+                    countListTypeSimple,
+                    countListTypeConfig,
+                    countListTypeBundle,
+                    productType
+                );
+            }
+
+            if (hasSourceListAvailableIncludeWareHouse) {
+                self._openStorePickupList(
+                    availablePickupElIncludeWarehouse,
                     countListTypeSimple,
                     countListTypeConfig,
                     countListTypeBundle,
@@ -56,7 +69,8 @@ define([
         ) {
             var self = this,
                 poupPDPStorePickup = $('#pdp-pickup-connect'),
-                triggerEl = $('#pdp-store-info'),
+                triggerEl = $('.pdp-store-info'),
+                triggerElText = $('.pdp-store-info-text'),
                 options = {
                     type: 'popup',
                     responsive: true,
@@ -74,8 +88,10 @@ define([
                 triggerEl.e
                 if (countListTypeSimple > 1) {
                     triggerEl.text($.mage.__(' Store info (%1 Stores)').replace('%1', countListTypeSimple));
+                    triggerElText.text($.mage.__('%1 Stores Have Stock').replace('%1', countListTypeSimple));
                 } else {
                     triggerEl.text($.mage.__(' Store info (%1 Store)').replace('%1', countListTypeSimple));
+                    triggerElText.text($.mage.__('%1 Stores Have Stock').replace('%1', countListTypeSimple));
                 }
             }
             //config product
@@ -84,8 +100,10 @@ define([
                 triggerEl.empty();
                 if (countListTypeConfig > 1) {
                     triggerEl.text($.mage.__(' Store info (%1 Stores)').replace('%1', countListTypeConfig));
+                    triggerElText.text($.mage.__('%1 Stores Have Stock').replace('%1', countListTypeConfig));
                 } else {
                     triggerEl.text($.mage.__(' Store info (%1 Store)').replace('%1', countListTypeConfig));
+                    triggerElText.text($.mage.__('%1 Stores Have Stock').replace('%1', countListTypeConfig));
                 }
             }
             //bundle product
@@ -94,8 +112,10 @@ define([
                 triggerEl.empty();
                 if (countListTypeBundle > 1) {
                     triggerEl.text($.mage.__(' Store info (%1 Stores)').replace('%1', countListTypeBundle));
+                    triggerElText.text($.mage.__('%1 Stores Have Stock').replace('%1', countListTypeBundle));
                 } else {
                     triggerEl.text($.mage.__(' Store info (%1 Store)').replace('%1', countListTypeBundle));
+                    triggerElText.text($.mage.__('%1 Stores Have Stock').replace('%1', countListTypeBundle));
                 }
             }
             if (productType === "grouped") {

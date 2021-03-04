@@ -226,10 +226,10 @@ class SendOMS
                 $padPrice = $subTotal - $discPrice; // sub_total - total_discount
                 $parentItem[$item->getId()] = [
                     'quantity' => (float)$qty,
-                    'sell_price' => (int)$sellPrice,
-                    'disc_price' => (int)$discPrice,
-                    'paid_price' => (int)$padPrice,
-                    'sub_total' => (int)$subTotal,
+                    'sell_price' => (int) round($sellPrice, 0, PHP_ROUND_HALF_EVEN),
+                    'disc_price' => (int) round($discPrice, 0, PHP_ROUND_HALF_EVEN),
+                    'paid_price' => (int) round($padPrice, 0, PHP_ROUND_HALF_EVEN),
+                    'sub_total' => (int) round($subTotal, 0, PHP_ROUND_HALF_EVEN),
                     'total_weight' => (float)$weight * (float)$qty,
                     'weight' => (float)$weight,
                 ];
@@ -267,11 +267,11 @@ class SendOMS
                     'sku_basic' => '',
                     'sku' => $item->getSku(),
                     'quantity' => (float)$qty,
-                    'ori_price' => (int)$oriPrice,
-                    'sell_price' => (int)$sellPrice,
-                    'disc_price' => ((int)$discPrice > 0) ? (int)$discPrice * -1 : (int)$discPrice,
-                    'paid_price' => (int)$padPrice,
-                    'sub_total' => (int)$subTotal,
+                    'ori_price' => (int) round($oriPrice, 0, PHP_ROUND_HALF_EVEN),
+                    'sell_price' => (int) round($sellPrice, 0, PHP_ROUND_HALF_EVEN),
+                    'disc_price' => ((int)$discPrice > 0) ? (int) round($discPrice * -1, 0, PHP_ROUND_HALF_EVEN) : (int) round($discPrice, 0, PHP_ROUND_HALF_EVEN),
+                    'paid_price' => (int) round($padPrice, 0, PHP_ROUND_HALF_EVEN),
+                    'sub_total' => (int) round($subTotal, 0, PHP_ROUND_HALF_EVEN),
                     'total_weight' => (float)$weight * (float)$qty,
                     'weight' => (float)$weight,
                     'coupon_code' => '', // pass
@@ -483,13 +483,13 @@ class SendOMS
         }
         $interface->setTimeSlot($timeslot);
         /*calculate discount*/
-        $shippingFeeDiscount = (int)$order->getShippingDiscountAmount();
-        $shippingFee = (int)$order->getShippingInclTax();
+        $shippingFeeDiscount = (int) round($order->getShippingDiscountAmount(), 0, PHP_ROUND_HALF_EVEN);
+        $shippingFee = (int) round($order->getShippingInclTax(), 0, PHP_ROUND_HALF_EVEN);
         $discount = (int)$order->getDiscountAmount();
         $interface->setShippingFee($shippingFee);
         $interface->setPromotionValue($discount);
         $interface->setPromotionType($order->getAppliedRuleIds());
-        $interface->setGrandTotal((int)$order->getGrandTotal());
+        $interface->setGrandTotal((int) round($order->getGrandTotal(), 0, PHP_ROUND_HALF_EVEN));
         $logisticCourierName = '';
         $logisticCourier = 0;
         if ($logisticType == 0) {
