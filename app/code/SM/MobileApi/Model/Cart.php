@@ -642,6 +642,7 @@ class Cart implements \SM\MobileApi\Api\CartInterface
 
         $customerId = $quote->getCustomerId();
         $totalQty   = 0;
+        $removeMultiShippingFlag = false;
         if ($quote->isMultipleShippingAddresses() || $quote->getIsMultiShipping()) {
             foreach ($quote->getAllShippingAddresses() as $address) {
                 $quote->removeAddress($address->getId());
@@ -657,7 +658,8 @@ class Cart implements \SM\MobileApi\Api\CartInterface
             if ($extensionAttributes && $extensionAttributes->getShippingAssignments()) {
                 $extensionAttributes->setShippingAssignments([]);
             }
-            $this->quoteRepository->save($quote);
+            $removeMultiShippingFlag = true;
+            //$this->quoteRepository->save($quote);
         }
         /** @var \Magento\Quote\Model\Quote\Item $item */
         foreach ($quote->getItemsCollection() as $item) {
@@ -708,7 +710,8 @@ class Cart implements \SM\MobileApi\Api\CartInterface
             $output[] = $this->cartItemOptionsProcessor->applyCustomOptions($item);
         }
 
-        if ($isRemoveProduct || $isAdjustQty) {
+        if ($isRemoveProduct || $isAdjustQty || $removeMultiShippingFlag) {
+            $quote->setTotalsCollectedFlag(true);
             $this->quoteRepository->save($quote);
         }
         if ($this->registry->registry("remove_cart_item")) {
