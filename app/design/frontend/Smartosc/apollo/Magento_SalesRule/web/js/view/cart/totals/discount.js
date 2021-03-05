@@ -15,8 +15,8 @@ define([
     'Magento_SalesRule/js/view/summary/discount',
     'jquery',
     'Magento_Checkout/js/model/quote',
-    'Amasty_Conditions/js/action/recollect-totals'
-], function (Component, $, quote, recollect) {
+    'Magento_Checkout/js/action/get-totals'
+], function (Component, $, quote, getTotalsAction) {
     'use strict';
 
     return Component.extend({
@@ -38,7 +38,10 @@ define([
             this.initCollapseBreakdown();
             this.rules(this.getRules());
             quote.totals.subscribe(this.getDiscountDataFromTotals.bind(this));
-            recollect(true);
+            
+            let deferred = $.Deferred();
+            
+            getTotalsAction([], deferred);
         },
 
         /**
