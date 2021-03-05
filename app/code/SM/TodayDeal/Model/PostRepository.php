@@ -669,6 +669,7 @@ class PostRepository implements PostRepositoryInterface
         $postCollection->addPeriodDateFilter()
             ->addStartDateFilter()
             ->addFieldToFilter('mb_is_highlighted', 1)
+            ->addFieldToFilter(\SM\TodayDeal\Api\Data\PostInterface::IS_ACTIVE, 1)
             ->setOrder('publish_to', 'ASC')
             ->setPageSize(5);
 
