@@ -632,6 +632,7 @@ class Cart implements \SM\MobileApi\Api\CartInterface
     /**
      * @inheritdoc
      * @throws \Magento\Framework\Webapi\Exception
+     * @throws CouldNotSaveException
      */
     public function getItems($checkStock = true)
     {
@@ -639,8 +640,7 @@ class Cart implements \SM\MobileApi\Api\CartInterface
         if (!$customerId || $customerId == 0) {
             return $this->cartItemFactory->create();
         }
-        $this->getCartIdForCustomer($customerId);
-        $quote = $this->quote;
+
         $output             = [];
         $cartMessageFactory = [];
         $isRemoveProduct    = false;
@@ -648,12 +648,12 @@ class Cart implements \SM\MobileApi\Api\CartInterface
 
         /** @var  \Magento\Quote\Model\Quote $quote */
         if (empty($this->currentQuote)) {
-            $quote = $this->quoteRepository->getActive($cartId);
+            $this->getCartIdForCustomer($customerId);
+            $quote = $this->currentQuote = $this->quote;
         } else {
             $quote = $this->currentQuote;
         }
 
-        $customerId = $quote->getCustomerId();
         $totalQty   = 0;
         if ($quote->isMultipleShippingAddresses() || $quote->getIsMultiShipping()) {
             foreach ($quote->getAllShippingAddresses() as $address) {
