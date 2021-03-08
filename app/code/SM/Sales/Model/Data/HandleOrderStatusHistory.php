@@ -65,7 +65,7 @@ class HandleOrderStatusHistory
         Statuses::STATUS_PENDING_PAYMENT => 'Order Created. Waiting For Payment',
         Statuses::STATUS_ORDER_CANCELED => 'Order has been cancelled',
         Statuses::STATUS_IN_DELIVERY => 'Order is being Delivered by Courier',
-        Statuses::STATUS_FAILED_DELIVERY => 'Recipient was absent. Order is now to be picked up in store',
+        Statuses::STATUS_FAILED_DELIVERY => 'Your order has been cancelled due to unsuccessful delivery',
         Statuses::STATUS_IN_PROCESS => 'Payment Successful',
         Statuses::STATUS_DELIVERED => 'Order has been Successfully Delivered into Destination',
         Statuses::STATUS_COMPLETE => 'Order has been Successfully Completed',

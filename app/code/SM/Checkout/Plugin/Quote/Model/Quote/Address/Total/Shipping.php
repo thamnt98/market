@@ -45,7 +45,7 @@ class Shipping extends \Magento\Quote\Model\Quote\Address\Total\Shipping
         if ($total->getShippingDescription()) {
             return $result;
         }
-        if ($method) {
+        if ($method && $method != '_') {
             $shippingList = [];
             foreach ($address->getAllShippingRates() as $rate) {
                 if (strpos($rate->getCode(), 'transshipping') !== false) {

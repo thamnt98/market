@@ -73,15 +73,20 @@ class DiscountRegistry extends \Amasty\Rules\Model\DiscountRegistry
     protected $ruleFreeShip = [];
 
     /**
+     * @var \Magento\Checkout\Model\Session
+     */
+    protected $checkoutSession;
+
+    /**
      * DiscountRegistry constructor.
-     *
-     * @param \Magento\SalesRule\Model\RuleFactory                  $ruleFactory
-     * @param \Magento\SalesRule\Model\Utility                      $validatorUtility
-     * @param \Magento\Store\Model\StoreManagerInterface            $storeManager
-     * @param \Magento\SalesRule\Api\RuleRepositoryInterface        $ruleRepository
-     * @param \Psr\Log\LoggerInterface                              $logger
+     * @param \Magento\SalesRule\Model\RuleFactory $ruleFactory
+     * @param \Magento\SalesRule\Model\Utility $validatorUtility
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\SalesRule\Api\RuleRepositoryInterface $ruleRepository
+     * @param \Psr\Log\LoggerInterface $logger
      * @param \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor
-     * @param \Amasty\Rules\Model\DiscountBreakdownLineFactory      $breakdownLineFactory
+     * @param \Amasty\Rules\Model\DiscountBreakdownLineFactory $breakdownLineFactory
+     * @param \Magento\Checkout\Model\Session $checkoutSession
      */
     public function __construct(
         \Magento\SalesRule\Model\RuleFactory $ruleFactory,
@@ -90,7 +95,8 @@ class DiscountRegistry extends \Amasty\Rules\Model\DiscountRegistry
         \Magento\SalesRule\Api\RuleRepositoryInterface $ruleRepository,
         \Psr\Log\LoggerInterface $logger,
         \Magento\Framework\App\Request\DataPersistorInterface $dataPersistor,
-        \Amasty\Rules\Model\DiscountBreakdownLineFactory $breakdownLineFactory
+        \Amasty\Rules\Model\DiscountBreakdownLineFactory $breakdownLineFactory,
+        \Magento\Checkout\Model\Session $checkoutSession
     ) {
         parent::__construct($storeManager, $ruleRepository, $logger, $dataPersistor, $breakdownLineFactory);
         $this->storeManager = $storeManager;
@@ -99,6 +105,7 @@ class DiscountRegistry extends \Amasty\Rules\Model\DiscountRegistry
         $this->breakdownLineFactory = $breakdownLineFactory;
         $this->validatorUtility = $validatorUtility;
         $this->ruleFactory = $ruleFactory;
+        $this->checkoutSession = $checkoutSession;
     }
 
     /**
@@ -226,10 +233,9 @@ class DiscountRegistry extends \Amasty\Rules\Model\DiscountRegistry
      */
     public function setShippingDiscount($ruleId, $shippingDiscountAmount, $addressId = null)
     {
-        if (is_null($addressId)) {
+        if ($this->checkoutSession->getMainOrder()) {
             return;
         }
-
         if (isset($this->shippingAddressDiscount[$addressId][$ruleId])) {
             $this->shippingAddressDiscount[$addressId] = [];
         }
@@ -251,7 +257,6 @@ class DiscountRegistry extends \Amasty\Rules\Model\DiscountRegistry
                 $this->shippingDiscountDataForBreakdown[$ruleId] += $amount;
             }
         }
-
         $this->dataPersistor->set(self::DISCOUNT_REGISTRY_SHIPPING_DATA, $this->shippingDiscountDataForBreakdown);
     }
 
