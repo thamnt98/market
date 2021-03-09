@@ -26,14 +26,7 @@ define(
 
         mod.init = function () {
             $('.sign-link a, .authorization-link a, a.showcart').click(function(event){
-                event.preventDefault();
-                $('.modals-overlay').remove();
-                if (loginForm) {
-                    $('#tab-login').modal('openModal');
-                } else {
-                    mod.callAjax('login-form');
-                }
-                $('body').addClass('_has-modal');
+                mod.triggerLoginForm(event)
             });
             $('.register-link').click(function(event){
                 event.preventDefault();
@@ -44,7 +37,7 @@ define(
                 }
             });
             if ($('.sign-link a').length > 0) {
-                $('.page-footer a').click(function (event) {
+                $('.page-footer a, .nav.item a').click(function (event) {
                     if($(this).attr('href').indexOf('contactus') != -1){
                         event.preventDefault();
                         $('.sign-link a').trigger('click');
@@ -62,6 +55,10 @@ define(
                 // show login popup
                 $('.sign-link a').trigger('click');
             }
+
+            $('a.button-to-contactus, .pagehelp-contactus a').click(function(event){
+                mod.triggerLoginForm(event)
+            });
         };
 
         mod.callAjax = function (type) {
@@ -96,6 +93,17 @@ define(
                 }
             });
         };
+
+        mod.triggerLoginForm = function (event) {
+            event.preventDefault();
+            $('.modals-overlay').remove();
+            if (loginForm) {
+                $('#tab-login').modal('openModal');
+            } else {
+                mod.callAjax('login-form');
+            }
+            $('body').addClass('_has-modal');
+        }
 
         return mod.init();
     }
