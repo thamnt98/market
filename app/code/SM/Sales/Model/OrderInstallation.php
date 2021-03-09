@@ -198,11 +198,15 @@ class OrderInstallation
 
     public function getEstimateDateOfDelivery($createdAt)
     {
-        return date('d M Y', strtotime('+ 1 days' , strtotime($this->timezone->date($createdAt)->format('d M Y'))));
+        return date('d M Y', strtotime('+ 1 days' ,
+            strtotime($this->timezone->date(strtotime($createdAt))->format('d M Y'))
+        ));
     }
 
     public function getEstimateDateOfReceive($createdAt)
     {
-        return date('d M Y', strtotime('+ 5 days' , strtotime($this->timezone->date($createdAt)->format('d M Y'))));
+        return date('d M Y', strtotime('+ 5 days' ,
+            strtotime($this->timezone->date(strtotime($createdAt))->format('d M Y'))
+        ));
     }
 }
