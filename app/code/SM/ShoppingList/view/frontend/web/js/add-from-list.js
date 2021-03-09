@@ -10,6 +10,10 @@ define(
         'use strict';
 
         return function (config) {
+            if (!config.my_favorite_id) {
+                return
+            }
+
             /** check item has added*/
             checkItemHasAdded(config.product_id, config.is_added_shopping_list);
 

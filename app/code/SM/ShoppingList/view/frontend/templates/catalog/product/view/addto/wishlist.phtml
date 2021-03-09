@@ -85,7 +85,8 @@ $shoppingListHelper = $this->helper('SM\ShoppingList\Helper\Data');
                 "store_id":"<?= $viewModel->getStoreId() ?>",
                 "remove_item_url":"<?= $block->getUrl("shoppinglist/ajax/removeitem")?>",
                 "is_added_shopping_list":"<?php echo $isAddedShoppingList ?>",
-                "store_id":"<?= $viewModel->getStoreId() ?>"
+                "store_id":"<?= $viewModel->getStoreId() ?>",
+                "my_favorite_id": "<?= $shoppingListHelper->getMyFavoritesListDefaultId(); ?>"
             }
         }
     }

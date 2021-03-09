@@ -59,6 +59,14 @@ define(
             $('a.button-to-contactus, .pagehelp-contactus a').click(function(event){
                 mod.triggerLoginForm(event)
             });
+
+            $('a.towishlist').click(function(event){
+                mod.triggerLoginForm(event)
+            });
+
+            $('html').on('click', '.navbar-wishlist a', function (event) {
+                mod.triggerLoginForm(event)
+            });
         };
 
         mod.callAjax = function (type) {
