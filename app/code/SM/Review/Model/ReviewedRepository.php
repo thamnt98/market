@@ -336,7 +336,7 @@ class ReviewedRepository implements ReviewedRepositoryInterface
                 $reviewedData,
                 [
                     "time_created" => $this->dataHelper->dateFormat($order->getCreatedAt()),
-                    "reference_number" => $order->getReferenceNumber(),
+                    "reference_number" => $order->getData('reference_order_id'),
                     "order_id" => $order->getEntityId()
                 ],
                 ReviewedInterface::class

@@ -47,7 +47,7 @@ class Order extends AbstractHelper
         /** @var \Magento\Sales\Model\ResourceModel\Order\Collection $orderCollection */
         $orderCollection = $this->orderCollectionFactory->create();
         $orderCollection->addFieldToSelect([
-            "reference_number",
+            "reference_order_id",
             "created_at",
             "entity_id"
         ]);
