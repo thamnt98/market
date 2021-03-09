@@ -552,7 +552,7 @@ class Cart implements \SM\MobileApi\Api\CartInterface
 
         /** @var  \Magento\Quote\Model\Quote\Item $item */
         foreach ($quote->getItemsCollection() as $item) {
-            if ($item->getParentItemId()) {
+            if ($item->isDeleted() || !$item->getIsActive() || $item->getParentItemId() || $item->getParentItem()) {
                 continue;
             }
             $total += $item->getQty();
@@ -560,7 +560,7 @@ class Cart implements \SM\MobileApi\Api\CartInterface
         $quote = $this->quoteRepository->getActive($cartId);
         $basketInterface->setCartTotal($total);
         $basketInterface->setBasketQty($total);
-        $basketInterface->setBasketValue($quote->getGrandTotal());
+        $basketInterface->setBasketValue($quote->getSubtotalWithDiscount());
         $basketInterface->setCartTotal($total);
         if ($customerId) {
             $basket = $this->basketCollectionFactory->create()->addFieldToFilter('customer_id', $customerId)->getFirstItem();
