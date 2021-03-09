@@ -128,7 +128,7 @@ class CartUpdateRepository implements CartUpdateRepositoryInterface
                 foreach ($removeIds as $id) {
                     $this->getQuote($cartId)->removeItem($id);
                 }
-                $this->getQuote($cartId)->setTotalsCollectedFlag(false)->collectTotals();
+                $this->getQuote($cartId)->setTotalsCollectedFlag(true)->collectTotals();
                 $this->quoteRepository->save($this->getQuote($cartId));
                 $this->registry->unregister("remove_cart_item");
                 return true;
