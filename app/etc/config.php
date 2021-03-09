@@ -469,7 +469,7 @@ return [
         'Klarna_Core' => 1,
         'Klarna_Ordermanagement' => 1,
         'Klarna_Kp' => 1,
-        'LiveChat_LiveChat' => 0,
+        'LiveChat_LiveChat' => 1,
         'MGS_Ajaxscroll' => 1,
         'MGS_Lookbook' => 1,
         'Magento_PaypalReCaptcha' => 1,

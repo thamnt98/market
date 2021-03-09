@@ -65,6 +65,7 @@ class Customer
     public function updateCart($customerId)
     {
         $quote = $this->quoteFactory->create()->loadByCustomer($customerId);
+        $quote->getShippingAddress()->setCollectShippingRates(false);
         $quote->collectTotals();
     }
 }

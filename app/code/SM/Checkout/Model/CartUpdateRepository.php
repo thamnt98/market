@@ -128,7 +128,7 @@ class CartUpdateRepository implements CartUpdateRepositoryInterface
                 foreach ($removeIds as $id) {
                     $this->getQuote($cartId)->removeItem($id);
                 }
-                $this->getQuote($cartId)->setTotalsCollectedFlag(false)->collectTotals();
+                $this->getQuote($cartId)->setTotalsCollectedFlag(true)->collectTotals();
                 $this->quoteRepository->save($this->getQuote($cartId));
                 $this->registry->unregister("remove_cart_item");
                 return true;
@@ -165,12 +165,14 @@ class CartUpdateRepository implements CartUpdateRepositoryInterface
     {
         $quote = $this->getQuote($cartId);
         $saveItems = [];
+        $itemsQty = 0;
         try {
             foreach ($quote->getItemsCollection() as $quoteItem) {
                 if (!$quoteItem->isDeleted() && !$quoteItem->getParentItemId() && !$quoteItem->getParentItem()) {
                     foreach ($items as $item) {
                         if ($item->getItemId() == $quoteItem->getItemId()) {
                             $quoteItem->setIsActive($item->getIsChecked());
+                            $itemsQty += $item->getIsChecked() ? $quoteItem->getQty() : 0;
                         }
                     }
                 }
@@ -209,7 +211,7 @@ class CartUpdateRepository implements CartUpdateRepositoryInterface
             $quoteTotals->setCouponCode($this->couponService->get($cartId));
             $quoteTotals->setGrandTotal($amount);
             $quoteTotals->setItems($items);
-            $quoteTotals->setItemsQty($quote->getItemsQty());
+            $quoteTotals->setItemsQty($itemsQty);
             $quoteTotals->setBaseCurrencyCode($quote->getBaseCurrencyCode());
             $quoteTotals->setQuoteCurrencyCode($quote->getQuoteCurrencyCode());
             return $quoteTotals;

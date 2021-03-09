@@ -82,7 +82,8 @@ class UpdateStockItem
             }
 
             if ($hasRemove || $hasUpdate) {
-                $quote->setTotalsCollectedFlag(false)->collectTotals();
+                $quote->getShippingAddress()->setCollectShippingRates(false);
+                $quote->setTotalsCollectedFlag(true)->collectTotals();
                 $this->quoteRepository->save($quote);
             }
         }

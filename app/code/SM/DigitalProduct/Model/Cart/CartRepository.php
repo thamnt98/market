@@ -136,7 +136,7 @@ class CartRepository implements \SM\DigitalProduct\Api\CartRepositoryInterface
     {
         if ($quote->hasDataChanges()) {
             // For update item
-            $this->quoteResource->save($quote->collectTotals());
+            $this->quoteResource->save($quote->setTotalsCollectedFlag(true)->collectTotals());
         }
 
         $cartItem->setQty(1);

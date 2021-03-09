@@ -245,7 +245,7 @@ class ToBeReviewedRepository implements ToBeReviewedRepositoryInterface
                 $toBeReviewed,
                 [
                     "time_created" => $this->dataHelper->dateFormat($order->getCreatedAt()),
-                    "reference_number" => $order->getReferenceNumber(),
+                    "reference_number" => $order->getData('reference_order_id'),
                     "order_id" => $order->getEntityId()
                 ],
                 ToBeReviewedInterface::class
@@ -327,6 +327,9 @@ class ToBeReviewedRepository implements ToBeReviewedRepositoryInterface
     {
         /** @var OrderItemCollection $orderItemCollection */
         $orderItemCollection = $this->orderItemCollectionFactory->create();
+        $expression = new \Zend_Db_Expr(
+            '(`main_table`.`qty_ordered` - `main_table`.`qty_refunded`)'
+        );
         $orderItemCollection->addFieldToSelect([
             "order_id",
             "parent_item_id",
@@ -355,11 +358,12 @@ class ToBeReviewedRepository implements ToBeReviewedRepositoryInterface
             ]
         )->group("main_table.item_id");
 
-        $orderItemCollection->addFieldToFilter("main_order.is_parent", 1);
+        $orderItemCollection->addFieldToFilter("main_order.is_parent", 0);
         $orderItemCollection->addFieldToFilter("main_table.parent_item_id", ["null" => true]);
         $orderItemCollection->addFieldToFilter("main_order.reference_number", ["neq" => "null"]);
         $orderItemCollection->addFieldToFilter("review.review_id", ["null" => true]);
         $orderItemCollection->addFieldToFilter("main_order.status", "complete");
+        $orderItemCollection->addFieldToFilter($expression, ["gt" => 0]);
         return $orderItemCollection;
     }
 }
