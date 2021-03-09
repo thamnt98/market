@@ -14,8 +14,8 @@ interface ProductInterface
      * @param int  $category_id
      * @param int  $limit
      * @param int  $p
-     * @param int  $customerId
      * @param bool $layer
+     * @param int  $customerId
      *
      * @return \SM\MobileApi\Api\Data\Product\ListInterface
      */
