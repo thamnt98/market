@@ -469,6 +469,7 @@ define(
                             data.username = tabLoginModal.find('input[name=mobile_number]').val();
                             data.step = 2;
                         }
+                        data.redirect_url = window.location.href;
                         self.loginRequest(data);
                     } else if (step == 3) {
                         var formEnableByValidateFieldOTP = true,
@@ -497,6 +498,7 @@ define(
                                 data.username = tabLoginModal.find('input[name=mobile_number]').val();
                                 data.step = 3;
                             }
+                            data.redirect_url = window.location.href;
                             self.loginRequest(data);
                         } else if (!formEnableByCounter) {
                             tabLoginModal.find('[selector=message-otp-error]').text($.mage.__('Make sure the code is correct')).show();
