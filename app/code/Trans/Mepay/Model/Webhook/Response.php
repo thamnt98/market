@@ -92,23 +92,6 @@ class Response extends DataObject implements ResponseInterface
   }
 
   /**
-   * @inheritdoc
-   */
-  public function getList()
-  {
-    return $this->_getData(ResponseInterface::LIST_DATA);
-  }
-
-  /**
-   * @inheritdoc
-   */
-  public function setList($data)
-  {
-    $this->setData(ResponseInterface::LIST_DATA, $data);
-    return $this;
-  }
-
-  /**
    * Build
    * @param  string $type
    * @param  string $status

@@ -91,8 +91,7 @@ class Capture
               //update customer token
               if ($token) {
                 $customerId = $order->getCustomerId();
-                $payment = $order->getPayment();
-                $this->customerHelper->setCustomerToken($customerId, $payment->getMethod(), $token);
+                $this->customerHelper->setCustomerToken($customerId, $token);
               }
 
               //close authorize transaction

@@ -43,16 +43,10 @@
   <preference for="Trans\Mepay\Api\Data\TransactionStatusDataInterface" type="Trans\Mepay\Model\Webhook\Transaction\StatusData" />
   <preference for="Trans\Mepay\Api\ConfigPullStatusRepositoryInterface" type="Trans\Mepay\Model\ResourceModel\ConfigPullStatusRepository" />
   <preference for="Trans\Mepay\Api\Data\ConfigPullStatusInterface" type="Trans\Mepay\Model\ConfigPullStatus" />
-
+  
   <!-- Auth Capture Mode -->
   <preference for="Trans\Mepay\Api\Data\AuthCaptureInterface" type="Trans\Mepay\Model\Data\AuthCapture" />
   <preference for="Trans\Mepay\Api\AuthCaptureRepositoryInterface" type="Trans\Mepay\Model\AuthCaptureRepository" />
-
-  <preference for="Trans\Mepay\Api\CardSavedTokenRepoInterface" type="Trans\Mepay\Model\CardSavedTokenRepo" />
-  <preference for="Trans\Mepay\Api\Data\CardSavedTokenInterface" type="Trans\Mepay\Model\CardSavedToken" />
-
-  <!--  Tokenization  -->
-  <preference for="Trans\Mepay\Api\TokenizationInterface" type="Trans\Mepay\Model\Tokenization" />
 
   <!--<type name="Magento\Checkout\Model\PaymentInformationManagement">
       <plugin name="TransMepayPluginMagentoCheckoutModelPaymentInformationManagement" type="Trans\Mepay\Plugin\Magento\Checkout\Model\PaymentInformationManagement" />
