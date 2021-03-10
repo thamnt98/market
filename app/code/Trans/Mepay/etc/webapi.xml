@@ -40,20 +40,5 @@
         <parameter name="id" force="true">%customer_id%</parameter>
     </data>
   </route>
-
-  <route url="/V1/transmepay/tokenization/tokenlist" method="POST">
-    <service class="Trans\Mepay\Api\TokenizationInterface" method="tokenlist"/>
-    <resources>
-        <resource ref="self"/>
-    </resources>
-  </route>
-
-  <route url="/V1/transmepay/tokenization/savetoken" method="POST">
-    <service class="Trans\Mepay\Api\TokenizationInterface" method="savetoken"/>
-    <resources>
-        <resource ref="self"/>
-    </resources>
-  </route>
-
 </routes>
 

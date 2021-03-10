@@ -107,9 +107,8 @@ class Failed
 
             //update customer token
             if ($token) {
-                $customerId = $order->getCustomerId();
-                $payment = $order->getPayment();
-                $this->customerHelper->setCustomerToken($customerId, $payment->getMethod(), $token);
+              $customerId = $order->getCustomerId();
+              $this->customerHelper->setCustomerToken($customerId, $token);
             }
 
             //change status to void and close transaction
