@@ -87,8 +87,9 @@ class Paid
 
         //update customer token
         if ($token) {
-          $customerId = $order->getCustomerId();
-          $this->customerHelper->setCustomerToken($customerId, $token);
+            $customerId = $order->getCustomerId();
+            $payment = $order->getPayment();
+            $this->customerHelper->setCustomerToken($customerId, $payment->getMethod(), $token);
         }
 
         //close authorize transaction
