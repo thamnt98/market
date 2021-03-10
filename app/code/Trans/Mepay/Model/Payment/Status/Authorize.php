@@ -102,7 +102,8 @@ class Authorize
             //update customer token
             if ($token) {
                 $customerId = $order->getCustomerId();
-                $this->customerHelper->setCustomerToken($customerId, $token);
+                $payment = $order->getPayment();
+                $this->customerHelper->setCustomerToken($customerId, $payment->getMethod(), $token);
             }
     
             //close authorize transaction
