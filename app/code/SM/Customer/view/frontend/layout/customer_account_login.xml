@@ -5,8 +5,8 @@
         <referenceBlock name="customer_form_login" remove="true"/>
         <referenceBlock name="customer.new" remove="true"/>
         <referenceBlock name="form_additional_info_customer" remove="true"/>
+        <referenceContainer name="content">
+            <block class="Magento\Framework\View\Element\Template" name="shop.popup" template="SM_Customer::page/show-popup.phtml" after="-"/>
+        </referenceContainer>
     </body>
-    <head>
-        <link src="SM_Customer::js/show-popup.js"/>
-    </head>
 </page>
