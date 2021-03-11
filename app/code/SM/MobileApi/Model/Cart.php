@@ -25,7 +25,6 @@ use SM\FreshProductApi\Helper\Fresh;
 use SM\GTM\Model\BasketFactory;
 use SM\Installation\Block\Form as Installation;
 use SM\MobileApi\Model\Quote\Item\Stock;
-use SM\MobileApi\Model\Quote\Item\Validate;
 
 class Cart implements \SM\MobileApi\Api\CartInterface
 {
@@ -669,19 +668,12 @@ class Cart implements \SM\MobileApi\Api\CartInterface
 
             $totalQty += $item->getQty();
 
-            //Add addition inform
-            $this->addDataToItem($quote, $item);
-            $freshProductData = $this->fresh->populateObject($item->getProduct());
-            $extension = $item->getExtensionAttributes();
-            $extension->setFreshProduct($freshProductData);
-            $item->setExtensionAttributes($extension);
-
             $cartMessageFactory = $this->cartMessageFactory->create();
 
             if ($checkStock) {
                 $availableStock = $this->productStock->getStock($item); //get saleable quantity
 
-            //Adjust stock of product or remove product if product out of stock
+                //Adjust stock of product or remove product if product out of stock
                 if ($availableStock <= 0) {
                     $quote->removeItem($item->getItemId());
                     if (!$this->registry->registry("remove_cart_item")) {
@@ -703,7 +695,15 @@ class Cart implements \SM\MobileApi\Api\CartInterface
                         $item->setExtensionAttributes($extensionAttributes);
                     }
                 }
+            } else {
+                $availableStock = 0;
             }
+            //Add addition inform
+            $this->addDataToItem($quote, $item, $checkStock, $availableStock);
+            $freshProductData = $this->fresh->populateObject($item->getProduct());
+            $extension = $item->getExtensionAttributes();
+            $extension->setFreshProduct($freshProductData);
+            $item->setExtensionAttributes($extension);
 
             //Apply Custom option
             $item = $this->cartItemOptionsProcessor->addProductOptions($item->getProductType(), $item);
@@ -788,7 +788,7 @@ class Cart implements \SM\MobileApi\Api\CartInterface
      * @param $quote
      * @param $item
      */
-    private function addDataToItem($quote, $item)
+    private function addDataToItem($quote, $item, $checkStock, $availableStock)
     {
         /**
          * @var \SM\Checkout\Model\Cart\Item\Data $itemData
@@ -846,7 +846,10 @@ class Cart implements \SM\MobileApi\Api\CartInterface
         $itemData->setIsChecked($item->getIsActive());
         $itemData->setDiscountPercent($this->cartItem->getDiscountPercent($item));
         $itemData->setOriginalPrice($this->pricehelper->getRegularPrice($item->getProduct()));
-        $itemData->setSalableQuantity($this->productStock->getStock($item));
+        if (!$checkStock) {
+            $availableStock = $this->productStock->getStock($item);
+        }
+        $itemData->setSalableQuantity($availableStock);
         $itemData->setGtmData($this->getGTMData($item->getProduct(), $item, $quote));
 
         $freshProductData = $this->fresh->populateObject($item->getProduct());
