@@ -57,6 +57,13 @@ class AutoCancel implements \Trans\Sprint\Api\AutoCancelInterface
     protected $gateway;
 
     /**
+     * Application Event Dispatcher
+     *
+     * @var \Magento\Framework\Event\ManagerInterface
+     */
+    protected $_eventManager;
+
+    /**
      * CancelOrderPending constructor.
      *
      * @param \Magento\Sales\Model\ResourceModel\Sales\CollectionFactory $salesCollection
@@ -74,7 +81,8 @@ class AutoCancel implements \Trans\Sprint\Api\AutoCancelInterface
         \Trans\Sprint\Api\PaymentNotifyInterface $notifyInterface,
         \Trans\Sprint\Helper\Config $configHelper,
         \Trans\Sprint\Helper\Data $dataHelper,
-        \Trans\Sprint\Helper\Gateway $gateway
+        \Trans\Sprint\Helper\Gateway $gateway,
+        \Magento\Framework\Event\ManagerInterface $_eventManager
     ) {
         $this->salesCollection = $salesCollection;
         $this->orderResource = $orderResource;
@@ -83,6 +91,7 @@ class AutoCancel implements \Trans\Sprint\Api\AutoCancelInterface
         $this->configHelper = $configHelper;
         $this->dataHelper = $dataHelper;
         $this->gateway = $gateway;
+        $this->_eventManager = $_eventManager;
 
         $this->logger = $dataHelper->getLogger();
     }
@@ -114,9 +123,9 @@ class AutoCancel implements \Trans\Sprint\Api\AutoCancelInterface
                     ['sprint' => 'sprint_response'],
                     'main_table.reference_number= sprint.transaction_no',
                     [
-                        'payment_method' => 'sprint.payment_method', 
-                        'expire' => 'sprint.expire_date', 
-                        'insert_date' => 'sprint.insert_date', 
+                        'payment_method' => 'sprint.payment_method',
+                        'expire' => 'sprint.expire_date',
+                        'insert_date' => 'sprint.insert_date',
                         'channel_id' => 'sprint.channel_id'
                     ]
                 );
@@ -127,13 +136,13 @@ class AutoCancel implements \Trans\Sprint\Api\AutoCancelInterface
             $collection->getSelect()->group('reference_number');
 
             if ($collection->getSize()) {
-                
+
                 // $orderIds = [];
                 $refNumbers = [];
                 /** @var Order $order */
                 foreach ($collection as $order) {
                     if ($order instanceof \Magento\Sales\Api\Data\OrderInterface) {
-                        
+
                         /**
                          * Digital Order is not sent to OMS
                          * Reference: APO-1418
@@ -142,21 +151,28 @@ class AutoCancel implements \Trans\Sprint\Api\AutoCancelInterface
                             $this->logger->info('Virtual Order -> Skip');
                             continue;
                         }
-                        
+
                         $this->logger->info('===> start loop cancel order.');
-                        
+
+                        /**
+                         * Handle Send email payment expire for VA payment.
+                         * Reference: APO-5552
+                         */
+                        $this->_eventManager->dispatch('trans_sprint_set_order_cancel_after', ['order' => $order]);
+
+
                         try {
                             $checkStatus = $this->gateway->checkTrxStatus($order);
                             $check = $checkStatus['status'];
 
                             $refNumber = $order->getData('reference_number');
-                            
+
                             if(!$check) {
                                 $this->logger->info('Order BCA VA expired.');
                                 $this->logger->info('$refNumber = ' . $refNumber);
                                 $this->logger->info('$orderEntityId = ' . $order->getEntityId());
                                 // $orderIds[] = (int) $order->getEntityId();
-                                
+
                                 if(!in_array($refNumber, $refNumbers) && $order->getStatus() != 'order_canceled') {
                                     $updateOms = $this->paymentStatusOms->sendStatusPayment($refNumber, 99);
                                     if ($updateOms) {
@@ -218,7 +234,7 @@ class AutoCancel implements \Trans\Sprint\Api\AutoCancelInterface
         $tableSales = $connection->getTableName('sales_order');
         $orderStatus = 'order_canceled';
         $orderState = 'canceled';
-        
+
         $connection->update($tableSales, ['status' => $orderStatus, 'state' => $orderState], ['reference_number IN (?)' => $refNumbers]);
     }
 
@@ -246,7 +262,7 @@ class AutoCancel implements \Trans\Sprint\Api\AutoCancelInterface
             }
 
             $this->logger->info('Param History = ' . print_r($historyData, true));
-            
+
             $historyTable = $connection->getTableName('sales_order_status_history');
             $connection->insertOnDuplicate($historyTable, $historyData);
         }
