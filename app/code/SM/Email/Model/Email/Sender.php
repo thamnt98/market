@@ -57,4 +57,35 @@ class Sender
 
         $transport->sendMessage();
     }
+
+    /**
+     * @param string|int $templateId
+     * @param string $sender
+     * @param array|string $email
+     * @param string|null $name
+     * @param array $templateParams
+     * @param int|null $storeId
+     * @param string $area
+     * @throws LocalizedException
+     * @throws MailException
+     */
+    public function sends(
+        $templateId,
+        string $sender,
+        $email,
+        string $name = null,
+        array $templateParams = [],
+        int $storeId = Store::DEFAULT_STORE_ID,
+        string $area = Area::AREA_FRONTEND
+    ): void {
+        $transport = $this->transportBuilder
+            ->setTemplateIdentifier($templateId)
+            ->setFromByScope($sender, $storeId)
+            ->addTo($email, $name)
+            ->setTemplateVars($templateParams)
+            ->setTemplateOptions(['area' => $area, 'store' => $storeId])
+            ->getTransport();
+
+        $transport->sendMessage();
+    }
 }

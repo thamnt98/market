@@ -52,6 +52,26 @@
                     <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
                 </field>
             </group>
+            <group id="supplier_email" showInStore="1" showInWebsite="1" showInDefault="1" translate="label comment"
+                   sortOrder="10">
+                <label>Installation Supplier Mapping</label>
+                <field id="variables" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Mapping Variables</label>
+                    <comment>SKU => Emails(Separate by ",")</comment>
+                    <frontend_model>SM\Installation\Block\Adminhtml\System\Form\Field\Supplier\Variables</frontend_model>
+                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
+                </field>
+                <field id="template" translate="label" type="select" sortOrder="0" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Email Template</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Template</source_model>
+                </field>
+                <field id="sender" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1"
+                       showInStore="1">
+                    <label>Sender</label>
+                    <source_model>Magento\Config\Model\Config\Source\Email\Identity</source_model>
+                </field>
+            </group>
         </section>
     </system>
 </config>

@@ -1,6 +1,9 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
+    <template id="installation_supplier_email_template"
+              label="SM Sales Installation Supplier"
+              area="frontend" file="order_installation_supplier.html" type="html" module="SM_Sales"/>
     <template id="installation_email_template"
               label="SM Sales Installation"
               area="frontend" file="order_installation.html" type="html" module="SM_Sales"/>
