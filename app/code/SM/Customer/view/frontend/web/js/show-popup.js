@@ -7,7 +7,7 @@ define(
         "use strict";
         let show = {};
         show.init = function () {
-            $(window).load(function () {
+            $(window).ready(function () {
                 $('.sign-link a').trigger('click');
             });
         }
