@@ -135,14 +135,6 @@ class UserExist extends Action
             else {
                 try {
                     $customer = $this->customerTransRepository->getByPhone($user);
-                    $socialCollection = $this->socialCollectionFactory->create();
-                    $customerSocial = $socialCollection->addFieldToFilter('customer_id',
-                        $customer->getId())->getFirstItem();
-                    if ($customerSocial->getId()) {
-                        $customerOnMagento = self::CUSTOMER_EXIST_ON_MAGENTO;
-                        $message = __('You are linked with %1. Please sign in with your %1 account',
-                            $customerSocial->getType());
-                    }
                     if ($customer->getId()) {
                         $customerOnMagento = self::CUSTOMER_EXIST_ON_MAGENTO;
                     }
