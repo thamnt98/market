@@ -54,7 +54,6 @@ class Mepay implements ConfigProviderInterface
       ));
 
       $this->unifyProviderConfig($providers);
-
       return [
           'payment' => [
               self::CODE => [

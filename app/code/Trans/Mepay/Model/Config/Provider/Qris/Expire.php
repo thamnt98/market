@@ -84,6 +84,7 @@ class Expire extends ExpireParent
                     $dateNow = new \DateTime(date("Y-m-d H:i:s"));
                     $dateEnd = new \DateTime($txExpireDate);
                     return ($dateNow > $dateEnd)? true : false;
+                    return ($dateNow > $dateEnd)? true : false;
                 }
             }
         } catch (\Exception $e) {
