@@ -25,6 +25,11 @@ class TokenDataBuilder implements BuilderInterface
   const TOKEN = 'token';
 
   /**
+   * @var string
+   */
+  const DELIMITER = '|';
+
+  /**
    * @var SubjectReader
    */
   private $subjectReader;
@@ -62,7 +67,14 @@ class TokenDataBuilder implements BuilderInterface
   {
     $paymentDO = $this->subjectReader->readPayment($buildSubject);
     $order = $paymentDO->getOrder();
-    $token = $this->customerHelper->getCustomerToken($order->getCustomerId());
+    try {
+      $token = $this->customerHelper->getCustomerActiveToken($order->getCustomerId());
+      if ($token && $token != '') {
+          $token = $this->extractToken($token);
+      }
+    } catch (\Exception $e) {
+      $token = '';
+    }
     return [self::TOKEN => $token];
   }
 
@@ -73,7 +85,22 @@ class TokenDataBuilder implements BuilderInterface
    */
   public function getCustomerToken($order)
   {
-    $token = $this->customerHelper->getCustomerToken($order->getCustomerId());
+    $payment = $order->getPayment();
+    $token = $this->customerHelper->getCustomerToken($order->getCustomerId(), $payment->getMethodInstance());
     return [self::TOKEN => $token];
+  }
+
+  /**
+   * Extract token
+   *
+   * @param string $token
+   * @return string
+   */
+  protected function extractToken($token)
+  {
+    $result = explode(self::DELIMITER, $token);
+    foreach ($result as $value) {
+      return $value;
+    }
   }
 }

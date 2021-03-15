@@ -31,6 +31,8 @@
                 type="SM\Promotion\Override\MagentoSalesRule\Model\Validator" />
     <preference for="Magento\SalesRule\Model\Coupon\UpdateCouponUsages"
                 type="SM\Promotion\Override\MagentoSalesRule\Model\Coupon\UpdateCouponUsages" />
+    <preference for="Magento\SalesRule\Model\Rule\Action\Discount\ByPercent"
+                type="SM\Promotion\Override\Magento\SalesRule\Model\Rule\Action\Discount\ByPercent" />
 
     <!-- Amasty -->
     <preference for="Amasty\Rules\Model\Rule\Action\Discount\BuyxgetnFixdisc"
@@ -49,7 +51,7 @@
     <!-- Plugins -->
     <!-- Magento -->
     <type name="Magento\SalesRule\Model\Utility">
-        <plugin name="SM_Promotion::DayOfWeekRule" type="SM\Promotion\Plugin\DayOfWeekRule" />
+        <plugin name="SM_Promotion::SalesRuleUtility" type="SM\Promotion\Plugin\Magento\SalesRule\Model\Utility" />
     </type>
     <type name="Magento\SalesRule\Model\Rule\Condition\Product">
         <plugin name="SM_Promotion::SalesRuleAdditionalConditions"

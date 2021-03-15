@@ -35,4 +35,8 @@
       <column name="id"/>
     </constraint>
   </table>
+
+  <table name="quote_payment" resource="default" engine="innodb">
+    <column xsi:type="varchar" name="card_token" nullable="true" length="40" comment="Json card token"/>
+  </table>
 </schema>

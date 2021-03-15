@@ -2,7 +2,7 @@ define([
     'jquery',
     'Magento_Ui/js/modal/confirm',
     'Magento_Checkout/js/model/cart/cache',
-    'Amasty_Conditions/js/action/recollect-totals',
+    'Magento_Checkout/js/action/get-totals',
     'Magento_Customer/js/customer-data',
     'gtmCheckout',
     'SM_GTM/js/gtm/sm-gtm-cart-collect-data',
@@ -12,7 +12,7 @@ define([
     $,
     confirm,
     cartCache,
-    recollect,
+    getTotalsAction,
     customerData,
     gtmCheckout,
     gtmCollectData
@@ -82,7 +82,10 @@ define([
                      * reload totals
                      */
                     cartCache.set('totals',null);
-                    recollect(true);
+
+                    let deferred = $.Deferred();
+
+                    getTotalsAction([], deferred);
                 }
 
                 if (response.reload === true) {
@@ -213,7 +216,10 @@ define([
                      * reload totals
                      */
                     cartCache.set('totals',null);
-                    recollect(true);
+
+                    let deferred = $.Deferred();
+
+                    getTotalsAction([], deferred);
                 }
                 if (response.reload === true) {
                     reloadPageAfterChangeAddress(response);
@@ -292,7 +298,9 @@ define([
 
                             // The totals summary block reloading
                             if (isChecked) {
-                                recollect(true);
+                                let deferred = $.Deferred();
+
+                                getTotalsAction([], deferred);
                             }
 
                             var messages = $.cookieStorage.get('mage-messages');
@@ -374,7 +382,9 @@ define([
                             $parentCol.next('.col.subtotal').html(res.row_total);
                             // The totals summary block reloading
                             if (isChecked) {
-                                recollect(true);
+                                let deferred = $.Deferred();
+
+                                getTotalsAction([], deferred);
                             }
                             //Decrease quantity GTM
                             let productId = $(this).parents().eq(4).find('[data-gtm-event="removeFromCart"]').attr('data-gtm-product-id');

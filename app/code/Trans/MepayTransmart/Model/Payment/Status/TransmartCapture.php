@@ -86,7 +86,10 @@ class TransmartCapture extends Capture
             //update customer token
             if ($token) {
               $customerId = $order->getCustomerId();
-              $this->customerHelper->setCustomerToken($customerId, $token);
+              $payment = $order->getPayment();
+              $this->customerHelper->setCustomerToken($customerId, $payment->getMethod(), $token);
+            } else {
+              $this->customerHelper->removeTokenByOrder($order);
             }
 
             //close authorize transaction

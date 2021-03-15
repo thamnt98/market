@@ -65,6 +65,11 @@ interface ResponseInterface
   const PAYMENT_RECEIVED_TYPE = 'payment.received';
 
   /**
+   * @var string
+   */
+  const LIST_DATA = 'list';
+
+  /**
    * Set status
    * @param string $status
    * @return void
@@ -102,4 +107,17 @@ interface ResponseInterface
    * @return Trans\Mepay\Api\Data\InquiryInterface
    */
   public function getInquiry();
+
+  /**
+   * get list
+   * @return \Trans\Mepay\Model\CardSavedToken[]
+   */
+  public function getList();
+
+  /**
+   * set list
+   * @param array $data
+   * @return $this
+   */
+  public function setList($data);
 }
