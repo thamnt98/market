@@ -14,7 +14,7 @@
 
 <script>
     require(['jquery'],function ($) {
-        if (typeof dataLayerSourceObjects !== 'undefined') {
+        if (typeof dataLayerSourceObjects !== 'undefined' && dataLayerSourceObjects.customer.loginType !== "null") {
             $('.item.title .switch').on('click', function () {
                 let title = $(this).text();
                 window.dataLayer = window.dataLayer || [];

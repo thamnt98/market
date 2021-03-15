@@ -15,11 +15,8 @@
     <route url="/V1/order/reorder-quickly" method="GET">
         <service class="SM\Sales\Api\ParentOrderRepositoryInterface" method="getListReorderQuickly"/>
         <resources>
-            <resource ref="self"/>
+            <resource ref="anonymous"/>
         </resources>
-        <data>
-            <parameter name="customerId" force="true">%customer_id%</parameter>
-        </data>
     </route>
 
     <route url="/V1/order/parent-orders/:orderId" method="GET">

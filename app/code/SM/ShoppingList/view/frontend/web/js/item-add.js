@@ -10,6 +10,9 @@ define(
 
         $.widget('vendor.mod', {
             _create: function () {
+                if (!this.options.my_favorite_id) {
+                    return
+                }
                 this._initElement();
             },
             _initElement: function () {

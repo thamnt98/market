@@ -109,6 +109,11 @@ class ContactUs extends \Magento\Framework\View\Element\Template
     protected $sourceRepository;
 
     /**
+     * @var \Magento\Framework\App\Http\Context
+     */
+    protected $httpContext;
+
+    /**
      * ContactUs constructor.
      * @param \SM\Help\Model\Config $config
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
@@ -124,6 +129,7 @@ class ContactUs extends \Magento\Framework\View\Element\Template
      * @param SortOrderBuilder $sortOrderBuilder
      * @param SubOrderRepositoryInterface $subOrderRepository
      * @param \Magento\InventoryApi\Api\SourceRepositoryInterface $sourceRepository
+     * @param \Magento\Framework\App\Http\Context $httpContext
      * @param array $data
      */
     public function __construct(
@@ -141,6 +147,7 @@ class ContactUs extends \Magento\Framework\View\Element\Template
         SortOrderBuilder $sortOrderBuilder,
         SubOrderRepositoryInterface $subOrderRepository,
         \Magento\InventoryApi\Api\SourceRepositoryInterface $sourceRepository,
+        \Magento\Framework\App\Http\Context $httpContext,
         array $data = []
     ) {
         $this->topicCollectionFactory = $topicCollectionFactory->create();
@@ -157,6 +164,7 @@ class ContactUs extends \Magento\Framework\View\Element\Template
         parent::__construct($context, $data);
         $this->config = $config;
         $this->sourceRepository = $sourceRepository;
+        $this->httpContext = $httpContext;
     }
 
     /**
@@ -355,4 +363,15 @@ class ContactUs extends \Magento\Framework\View\Element\Template
             ScopeInterface::SCOPE_STORE
         );
     }
+
+    /**
+     * Checking customer register status
+     *
+     * @return bool
+     */
+    public function isLoggedIn()
+    {
+        return $this->httpContext->getValue(\Magento\Customer\Model\Context::CONTEXT_AUTH);
+    }
+
 }

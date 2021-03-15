@@ -28,7 +28,7 @@ class HandleOrderStatusHistory
     const SVG_IN_PROGRESS = "InProcessGrey.svg";
     const SVG_IN_DELIVERY = "InDeliveryGrey.svg";
     const SVG_COMPLETE = "OrderReceivedGrey.svg";
-    const SVG_PICK_UP = "PickUpGrey.svg";
+    const SVG_PICK_UP = "PaymentHandGrey.svg";
     const SVG_READY_PICK_UP = "PaymentHandGrey.svg";
 
     const MAP_STATUS_SVG = [

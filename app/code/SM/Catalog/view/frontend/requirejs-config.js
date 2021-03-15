@@ -18,5 +18,12 @@ var config = {
             'Magento_Theme/js/view/messages':'SM_Catalog/js/view/messages',
             productListToolbarForm : 'SM_Catalog/js/product/list/toolbar'
         }
+    },
+    config: {
+        mixins: {
+            'Magento_Catalog/js/catalog-add-to-cart': {
+                'SM_Catalog/js/catalog-add-to-cart-mixin': true
+            },
+        }
     }
 };

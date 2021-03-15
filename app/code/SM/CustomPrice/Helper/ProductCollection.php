@@ -25,10 +25,8 @@ class ProductCollection
         \Magento\Customer\Model\SessionFactory $customerSessionFactory
     ) {
         $this->_customerSession = $customerSessionFactory->create();
-        if ($this->_customerSession->isLoggedIn()||$this->_customerSession->isLoggedInByAPI()) {
-            $this->basePriceCode  = $this->_customerSession->getOmniNormalPriceAttributeCode();
-            $this->promoPriceCode = $this->_customerSession->getOmniFinalPriceAttributeCode();
-        }
+        $this->basePriceCode  = $this->_customerSession->getOmniNormalPriceAttributeCode();
+        $this->promoPriceCode = $this->_customerSession->getOmniFinalPriceAttributeCode();
     }
 
     public function addCustomPriceToProductCollection(

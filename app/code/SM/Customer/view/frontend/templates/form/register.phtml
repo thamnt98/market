@@ -14,6 +14,11 @@ if (!$block->isLoggedIn()) :?>
                 <img src='<?= $block->escapeUrl($block->getViewFileUrl('images/reliable.jpg')); ?>' alt="Welcome" loading="lazy" width="585" height="859">
             </div>
             <div class="container-signin--right col-xs-12 col-xl-6">
+                <header class="register-header">
+                    <button class="action-close" data-role="closeBtn" type="button">
+                        <span><?= $block->escapeHtml(__('Close')) ?></span>
+                    </button>
+                </header>
                 <div class="container-signin--content">
                     <div class="block-title block-title-register">
                         <strong id="block-customer-login-heading" role="heading"
@@ -219,9 +224,6 @@ if (!$block->isLoggedIn()) :?>
                     clickableOverlay: false,
                     opened: function($Event) {
                         $('.modal-header button.action-close', $Event.srcElement).hide();
-                    },
-                    keyEventHandlers: {
-                        escapeKey: function () { return; }
                     }
                 };
                 modal(options, registerContainer);
@@ -322,6 +324,13 @@ if (!$block->isLoggedIn()) :?>
                         });
                     }
 
+                });
+                $('body').on('click', '#register #login', function () {
+                    $('#register').modal('closeModal');
+                    $('.sign-link a').trigger('click');
+                });
+                registerContainer.find('.register-header [selector=action-back]').click(function (){
+                    $('#register').modal('closeModal');
                 });
             }
         );

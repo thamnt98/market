@@ -10,13 +10,18 @@
 ?>
 <?php $_order = $block->getOrder() ?>
 <?php if ($_order) : ?>
-    <?php $_items = $block->getInstallationItems($_order); ?>
+    <?php
+    $_items = $block->getInstallationItems($_order);
+    $count = count($_items);
+    ?>
     <table class="order-detail">
         <tr>
             <td class="title-order-detail">
-                <p>
-                    <?= $block->escapeHtml(__('Request Items (%1 items)', count($_items))) ?>
-                </p>
+                <?php if ($count > 0) : ?>
+                    <p><?= $block->escapeHtml(__('Detail Permintaan Instalasi (%1 items)', $count)) ?></p>
+                <?php else: ?>
+                    <p><?= $block->escapeHtml(__('Detail Permintaan Instalasi (%1 item)', $count)) ?></p>
+                <?php endif; ?>
             </td>
         </tr>
         <tr>
@@ -31,12 +36,12 @@
                         </td>
                         <td class="title-td-2 title-td item-info">
                             <p>
-                                <?= $block->escapeHtml(__('Product')) ?>
+                                <?= $block->escapeHtml(__('Produk')) ?>
                             </p>
                         </td>
                         <td class="title-td-3 title-td item-qty">
                             <p>
-                                <?= $block->escapeHtml(__('Qty')) ?>
+                                <?= $block->escapeHtml(__('Jumlah')) ?>
                             </p>
                         </td>
                         <td class="title-td-4 title-td text-right item-price">
@@ -49,8 +54,8 @@
                     <?php $position = 1; ?>
                     <?php foreach ($_items as $_item) : ?>
                         <?php if (!$_item->getParentItem()) : ?>
-                                <?php $buyRequest = $_item->getProductOptionByCode('info_buyRequest'); ?>
-                                <tbody>
+                            <?php $buyRequest = $_item->getProductOptionByCode('info_buyRequest'); ?>
+                            <tbody>
                             <tr>
                                 <td class="pl-10 text-center"><?= $position ++ ?></td>
                                 <td class="item-info">

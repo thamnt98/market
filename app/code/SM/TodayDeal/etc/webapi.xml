@@ -17,31 +17,31 @@
     <route url="/V1/todaydeal/post/:postId" method="GET">
         <service class="SM\TodayDeal\Api\PostRepositoryInterface" method="getByIdMobile"/>
         <resources>
-            <resource ref="self"/>
+            <resource ref="anonymous"/>
         </resources>
     </route>
     <route url="/V1/todaydeal/getList" method="GET">
         <service class="SM\TodayDeal\Api\PostRepositoryInterface" method="getList"/>
         <resources>
-            <resource ref="self"/>
+            <resource ref="anonymous"/>
         </resources>
     </route>
     <route url="/V1/todaydeal/getAllProducts" method="GET">
         <service class="SM\TodayDeal\Api\PostRepositoryInterface" method="getProducts"/>
         <resources>
-            <resource ref="self"/>
+            <resource ref="anonymous"/>
         </resources>
     </route>
     <route url="/V1/todaydeal/getListDeals" method="GET">
         <service class="SM\TodayDeal\Api\PostRepositoryInterface" method="getListDeals"/>
         <resources>
-            <resource ref="self"/>
+            <resource ref="anonymous"/>
         </resources>
     </route>
     <route url="/V1/todaydeal/flashsale" method="GET">
         <service class="SM\TodayDeal\Api\PostRepositoryInterface" method="getFlashSaleDetail"/>
         <resources>
-            <resource ref="self"/>
+            <resource ref="anonymous"/>
         </resources>
     </route>
 </routes>

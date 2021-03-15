@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace SM\Search\Model\Repository;
 
+use Magento\Customer\Model\Session;
 use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
 use Magento\Framework\Api\SearchCriteriaBuilder;
 use Magento\Framework\Api\SearchCriteriaInterface;
 use Magento\Framework\Api\SortOrderBuilder;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Store\Model\StoreManagerInterface;
+use SM\MobileApi\Model\Authorization\TokenUserContext;
 use SM\Search\Api\Data\Response\SearchQueryPersonalSearchResultsInterface;
 use SM\Search\Api\Data\Response\SearchQueryPersonalSearchResultsInterfaceFactory;
 use SM\Search\Api\Entity\SearchQueryPersonalInterface;
@@ -62,6 +64,16 @@ class SearchQueryPersonalRepository implements SearchQueryPersonalRepositoryInte
     protected $config;
 
     /**
+     * @var TokenUserContext
+     */
+    protected $tokenUserContext;
+
+    /**
+     * @var Session
+     */
+    protected $customerSession;
+
+    /**
      * SearchQueryPersonalRepository constructor.
      * @param ResourceModel $resourceModel
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
@@ -71,6 +83,8 @@ class SearchQueryPersonalRepository implements SearchQueryPersonalRepositoryInte
      * @param SearchQueryPersonalSearchResultsInterfaceFactory $searchResultsFactory
      * @param StoreManagerInterface $storeManager
      * @param Config $config
+     * @param TokenUserContext $tokenUserContext
+     * @param Session $customerSession
      */
     public function __construct(
         ResourceModel $resourceModel,
@@ -80,7 +94,9 @@ class SearchQueryPersonalRepository implements SearchQueryPersonalRepositoryInte
         CollectionProcessorInterface $collectionProcessor,
         SearchQueryPersonalSearchResultsInterfaceFactory $searchResultsFactory,
         StoreManagerInterface $storeManager,
-        Config $config
+        Config $config,
+        TokenUserContext $tokenUserContext,
+        Session $customerSession
     ) {
         $this->resourceModel = $resourceModel;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
@@ -90,6 +106,8 @@ class SearchQueryPersonalRepository implements SearchQueryPersonalRepositoryInte
         $this->searchResultsFactory = $searchResultsFactory;
         $this->storeManager = $storeManager;
         $this->config = $config;
+        $this->tokenUserContext = $tokenUserContext;
+        $this->customerSession = $customerSession;
     }
 
     /**
@@ -138,22 +156,32 @@ class SearchQueryPersonalRepository implements SearchQueryPersonalRepositoryInte
      * @inheritDoc
      * @throws LocalizedException
      */
-    public function getLatest(int $customerId): array
+    public function getLatest(): array
     {
-        $sortByPosition = $this->sortOrderBuilder
-        ->setField(SearchQueryPersonalInterface::UPDATED_AT)
-        ->setDescendingDirection()
-        ->create();
+        $customerId = $this->tokenUserContext->getUserId();
 
-        $searchCriteria = $this->searchCriteriaBuilder
-            ->addFilter(Config::STORE_ID_ATTRIBUTE_CODE, $this->storeManager->getStore()->getId())
-            ->addFilter(SearchQueryPersonalInterface::CUSTOMER_ID, $customerId)
-            ->setSortOrders([$sortByPosition])
-            ->setPageSize($this->config->getLatestSearchSize())
-            ->create();
+        if (!isset($customerId)) {
+            $customerId = $this->customerSession->getCustomerId();
+        }
 
-        $searchResult = $this->getList($searchCriteria);
+        if (isset($customerId)) {
+            $sortByPosition = $this->sortOrderBuilder
+                ->setField(SearchQueryPersonalInterface::UPDATED_AT)
+                ->setDescendingDirection()
+                ->create();
 
-        return $searchResult->getItems();
+            $searchCriteria = $this->searchCriteriaBuilder
+                ->addFilter(Config::STORE_ID_ATTRIBUTE_CODE, $this->storeManager->getStore()->getId())
+                ->addFilter(SearchQueryPersonalInterface::CUSTOMER_ID, (int)$customerId)
+                ->setSortOrders([$sortByPosition])
+                ->setPageSize($this->config->getLatestSearchSize())
+                ->create();
+
+            $searchResult = $this->getList($searchCriteria);
+
+            return $searchResult->getItems();
+        }
+
+        return [];
     }
 }

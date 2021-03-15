@@ -140,7 +140,7 @@ $category = $block->getLayer()->getCurrentCategory();
 <?php endforeach; ?>
 <script>
     require(['jquery', "gtmProduct", 'Magento_Ui/js/lib/view/utils/async', 'domReady!'], function ($, gtm, async) {
-        if (typeof dataLayerSourceObjects !== 'undefined') {
+        if (typeof dataLayerSourceObjects !== 'undefined' && dataLayerSourceObjects.customer.loginType !== "null") {
             window.eventCreate = window.eventCreate || {};
             $('.product-item-link').click(function (e) {
                 e.preventDefault();

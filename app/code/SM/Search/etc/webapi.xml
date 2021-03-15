@@ -16,11 +16,8 @@
     <route url="/V1/search/mine/latest-search" method="GET">
         <service class="SM\Search\Api\Repository\SearchQueryPersonalRepositoryInterface" method="getLatest"/>
         <resources>
-            <resource ref="self" />
+            <resource ref="anonymous" />
         </resources>
-        <data>
-            <parameter name="customerId" force="true">%customer_id%</parameter>
-        </data>
     </route>
     <route url="/V1/search/mine/delete-search/:queryText" method="DELETE">
         <service class="SM\Search\Api\Repository\SearchQueryPersonalRepositoryInterface" method="deleteOne"/>
@@ -68,7 +65,7 @@
     <route url="/V1/search/no-result/product" method="GET">
         <service class="SM\Search\Api\SearchInterface" method="getSuggestProductOnNoResult"/>
         <resources>
-            <resource ref="self" />
+            <resource ref="anonymous" />
         </resources>
     </route>
 </routes>

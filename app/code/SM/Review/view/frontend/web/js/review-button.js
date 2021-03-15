@@ -17,6 +17,8 @@ define(
                     if (data != 0) {
                         $("#review-pdp").append(data).trigger('contentUpdated');
                         $("#notice-empty").show();
+                    } else {
+                        $('#review-form').remove();
                     }
                 }
             });

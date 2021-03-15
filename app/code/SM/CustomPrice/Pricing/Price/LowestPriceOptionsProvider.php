@@ -39,20 +39,16 @@ class LowestPriceOptionsProvider extends \Magento\ConfigurableProduct\Pricing\Pr
         $this->collectionFactory          = $collectionFactory;
         $this->storeManager               = $storeManager;
         $this->customerSession            = $session;
-        if ($session->isLoggedIn()) {
-            $this->promoPrice = $session->getOmniFinalPriceAttributeCode();
-            $this->basePrice  = $session->getOmniNormalPriceAttributeCode();
-            $promoPrice       = $eavConfig->getAttribute('catalog_product', $this->promoPrice);
-            $basePrice        = $eavConfig->getAttribute('catalog_product', $this->basePrice);
-            if (!$promoPrice || !$promoPrice->getAttributeId()) {
-                $this->promoPrice = null;
-            }
-            if (!$basePrice || !$basePrice->getAttributeId()) {
-                $this->basePrice = null;
-            }
-
+        $this->promoPrice = $session->getOmniFinalPriceAttributeCode();
+        $this->basePrice  = $session->getOmniNormalPriceAttributeCode();
+        $promoPrice       = $eavConfig->getAttribute('catalog_product', $this->promoPrice);
+        $basePrice        = $eavConfig->getAttribute('catalog_product', $this->basePrice);
+        if (!$promoPrice || !$promoPrice->getAttributeId()) {
+            $this->promoPrice = null;
         }
-
+        if (!$basePrice || !$basePrice->getAttributeId()) {
+            $this->basePrice = null;
+        }
     }
 
     public function getProducts(ProductInterface $product)

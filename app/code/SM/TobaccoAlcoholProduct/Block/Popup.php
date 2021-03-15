@@ -90,7 +90,7 @@ class Popup extends Template
     public function isShow()
     {
         $customer = $this->popupHelper->getCurrentCustomer($this->isSearch());
-        if (!$this->popupHelper->isCustomerInformed($customer)) {
+        if ($customer && !$this->popupHelper->isCustomerInformed($customer)) {
             /**
              * For both case PLP and Landing Page
              */

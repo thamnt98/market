@@ -42,9 +42,7 @@ class RequestGenerator extends \Magento\CatalogSearch\Model\Search\RequestGenera
         parent::__construct($productAttributeCollectionFactory);
         $this->generatorResolver = $generatorResolver
             ?: ObjectManager::getInstance()->get(GeneratorResolver::class);
-        if ($session->isLoggedIn()) {
-            $this->currentAttribute = $session->getOmniFinalPriceAttributeCode();
-        }
+        $this->currentAttribute = $session->getOmniFinalPriceAttributeCode();
 
     }
 

@@ -19,7 +19,8 @@ var config = {
             ForgotPasswordConfirm: 'SM_Customer/js/forgot-password/confirm',
             RecoveryPassword: 'SM_Customer/js/recovery-password/form',
             CustomerSocialProvider: 'SM_Customer/js/social-login-provider',
-            CityDistrictData: 'SM_Customer/js/city-district-data'
+            CityDistrictData: 'SM_Customer/js/city-district-data',
+            ShowPopup: 'SM_Customer/js/show-popup',
         }
     }
 

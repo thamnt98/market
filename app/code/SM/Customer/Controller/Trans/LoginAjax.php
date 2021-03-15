@@ -313,6 +313,9 @@ class LoginAjax extends \Magento\Framework\App\Action\Action implements HttpPost
                                 $this->getAccountRedirect()->clearRedirectCookie();
                             } else {
                                 $response['redirectUrl'] = $this->_url->getBaseUrl();
+                                if (isset($credentials['redirect_url'])) {
+                                    $response['redirectUrl'] = $credentials['redirect_url'];
+                                }
                             }
 
                             // Handle Shopping List share after customer login
@@ -378,6 +381,9 @@ class LoginAjax extends \Magento\Framework\App\Action\Action implements HttpPost
                     $this->getAccountRedirect()->clearRedirectCookie();
                 } else {
                     $response['redirectUrl'] = $this->_url->getBaseUrl();
+                    if (isset($credentials['redirect_url'])) {
+                        $response['redirectUrl'] = $credentials['redirect_url'];
+                    }
                 }
 
                 // Handle Shopping List share after customer login

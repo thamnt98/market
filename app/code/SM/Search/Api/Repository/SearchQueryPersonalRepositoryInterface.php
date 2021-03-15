@@ -38,8 +38,7 @@ interface SearchQueryPersonalRepositoryInterface
     public function getList(SearchCriteriaInterface $searchCriteria): SearchQueryPersonalSearchResultsInterface;
 
     /**
-     * @param int $customerId
      * @return \SM\Search\Api\Entity\SearchQueryPersonalInterface[]
      */
-    public function getLatest(int $customerId): array;
+    public function getLatest(): array;
 }

@@ -15,6 +15,10 @@ define(
             }
         };
 
+        $('a.showcart').click(function(){
+            window.location.href = $(this).attr("data-href")
+        });
+
         mod.callAjax = function (type) {
             $.ajax({
                 url: urlBuilder.build("customer/popup/index"),

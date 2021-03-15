@@ -139,17 +139,15 @@ class Configurable extends \Magento\ConfigurableProduct\Model\Product\Type\Confi
         $this->customerSession = $session;
         $this->salableProcessor = $salableProcessor;
 
-        if ($session->isLoggedIn()) {
-            $this->promoPrice = $session->getOmniFinalPriceAttributeCode();
-            $this->basePrice = $session->getOmniNormalPriceAttributeCode();
-            $promoPrice = $eavConfig->getAttribute('catalog_product', $this->promoPrice);
-            $basePrice = $eavConfig->getAttribute('catalog_product', $this->basePrice);
-            if (!$promoPrice || !$promoPrice->getAttributeId()) {
-                $this->promoPrice = null;
-            }
-            if (!$basePrice || !$basePrice->getAttributeId()) {
-                $this->basePrice = null;
-            }
+        $this->promoPrice = $session->getOmniFinalPriceAttributeCode();
+        $this->basePrice = $session->getOmniNormalPriceAttributeCode();
+        $promoPrice = $eavConfig->getAttribute('catalog_product', $this->promoPrice);
+        $basePrice = $eavConfig->getAttribute('catalog_product', $this->basePrice);
+        if (!$promoPrice || !$promoPrice->getAttributeId()) {
+            $this->promoPrice = null;
+        }
+        if (!$basePrice || !$basePrice->getAttributeId()) {
+            $this->basePrice = null;
         }
     }
 

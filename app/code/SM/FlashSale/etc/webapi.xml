@@ -11,7 +11,7 @@
     <route url="/V1/flashsale/get-event-product" method="GET">
         <service class="SM\FlashSale\Api\FlashSaleEventInterface" method="getEventProduct"/>
         <resources>
-            <resource ref="self" />
+            <resource ref="anonymous" />
         </resources>
     </route>
 
@@ -32,7 +32,7 @@
     <route url="/V1/flashsale/get-end-time-product/:productId" method="GET">
         <service class="SM\FlashSale\Api\FlashSaleEventInterface" method="getEventEndTimeByProduct"/>
         <resources>
-            <resource ref="self" />
+            <resource ref="anonymous" />
         </resources>
     </route>
 </routes>

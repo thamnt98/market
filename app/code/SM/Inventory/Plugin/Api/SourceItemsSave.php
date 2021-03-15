@@ -213,7 +213,7 @@ class SourceItemsSave
 
         $deductQty = $sourceItem->getQuantity() - $this->configurableStock->getBaseQty();
         if ($deductQty >= 0) {
-            $sourceItem->setQuantity($sourceItem->getQuantity() - $this->configurableStock->getBaseQty());
+            $sourceItem->setQuantity($this->configurableStock->getBaseQty());
             if ($sourceItem->getQuantity() <= 0) {
                 $sourceItem->setStatus(SourceItemInterface::STATUS_OUT_OF_STOCK);
             }
@@ -243,7 +243,7 @@ class SourceItemsSave
             return null;
         }
 
-        $sourceItem->setQuantity($sourceItem->getQuantity() + $this->configurableStock->getBaseQty());
+        $sourceItem->setQuantity($this->configurableStock->getBaseQty());
         $sourceItem->setStatus(SourceItemInterface::STATUS_IN_STOCK);
 
         return $sourceItem;

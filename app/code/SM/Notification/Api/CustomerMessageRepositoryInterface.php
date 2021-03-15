@@ -20,6 +20,15 @@ interface CustomerMessageRepositoryInterface
     /**
      * Get Customer Notification Messages
      *
+     * @param \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria
+     *
+     * @return \SM\Notification\Api\CustomerMessageResultInterface
+     */
+    public function getMobileList(\Magento\Framework\Api\SearchCriteriaInterface $searchCriteria);
+
+    /**
+     * Get Customer Notification Messages
+     *
      * @param int                                            $customerId
      * @param \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria
      * @param int                                            $isMobile
@@ -52,13 +61,12 @@ interface CustomerMessageRepositoryInterface
     );
 
     /**
-     * @param int                                                 $customerId
      * @param \Magento\Framework\Api\SearchCriteriaInterface|null $searchCriteria
      *
      * @return int
      * @throws \Magento\Framework\Exception\CouldNotSaveException
      */
-    public function getCountUnread($customerId, \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria = null);
+    public function getCountUnread(\Magento\Framework\Api\SearchCriteriaInterface $searchCriteria = null);
 
     /**
      * @return \SM\Notification\Api\Data\NotificationTypeInterface[]

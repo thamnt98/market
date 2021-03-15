@@ -39,6 +39,9 @@ define([
             ) {
                 e.preventDefault();
             }
+                if(typeof  window.dataLayer === "undefined") {
+                    window.dataLayer = [];
+                }
                 try {
                     let temporaryObject = Object.assign({}, dataLayerSourceObjects), data;
 
