@@ -118,4 +118,14 @@ class LoggerWrite
     $this->logger->debug('===== Common Log ====');
     $this->logger->debug($message);
   }
+
+  /**
+   * write log info
+   * @param  string $message
+   * @return void
+   */
+  public function writeInfo(string $message)
+  {
+      $this->logger->debug($message);
+  }
 }
