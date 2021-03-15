@@ -21,7 +21,7 @@ use Magento\Customer\Setup\CustomerSetup;
 /**
  * Class \Trans\Mepay\Setup\Patch\Data\CustomerMepayTokenAttribute;
  */
-class CustomerMepayTokenAttribute implements DataPatchInterface, PatchRevertableInterface
+class CustomerMepayDebitAllTokenAttribute implements DataPatchInterface, PatchRevertableInterface
 {
    /**
      * @var ModuleDataSetupInterface
@@ -57,10 +57,10 @@ class CustomerMepayTokenAttribute implements DataPatchInterface, PatchRevertable
         $customerSetup
         ->addAttribute(
             \Magento\Customer\Model\Customer::ENTITY,
-            'trans_mepay_cc_cardtoken',
+            'trans_mepay_allbank_debit_cardtoken',
             [
                 'type' => 'text',
-                'label' => 'Mepay Token',
+                'label' => 'Mepay Debit Allbank Token',
                 'input' => 'text',
                 'source' => '',
                 'required' => false,
@@ -71,7 +71,7 @@ class CustomerMepayTokenAttribute implements DataPatchInterface, PatchRevertable
             ]
         );
          
-        $attribute = $customerSetup->getEavConfig()->getAttribute('customer', 'trans_mepay_cc_cardtoken')->addData([
+        $attribute = $customerSetup->getEavConfig()->getAttribute('customer', 'trans_mepay_allbank_debit_cardtoken')->addData([
             'used_in_forms' => [
                 'adminhtml_customer'
             ]
@@ -86,7 +86,7 @@ class CustomerMepayTokenAttribute implements DataPatchInterface, PatchRevertable
         $this->moduleDataSetup->getConnection()->startSetup();
         /** @var CustomerSetup $customerSetup */
         $customerSetup = $this->eavSetupFactory->create(['setup' => $this->moduleDataSetup]);
-        $customerSetup->removeAttribute(\Magento\Customer\Model\Customer::ENTITY, 'trans_mepay_cc_cardtoken');
+        $customerSetup->removeAttribute(\Magento\Customer\Model\Customer::ENTITY, 'trans_mepay_allbank_debit_cardtoken');
  
         $this->moduleDataSetup->getConnection()->endSetup();
     }

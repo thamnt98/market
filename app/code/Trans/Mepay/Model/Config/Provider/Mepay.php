@@ -52,7 +52,6 @@ class Mepay implements ConfigProviderInterface
           \Magento\Store\Model\ScopeInterface::SCOPE_STORE,
           $this->storeManager->getStore()->getId()
       ));
-
       $this->unifyProviderConfig($providers);
 
       return [
