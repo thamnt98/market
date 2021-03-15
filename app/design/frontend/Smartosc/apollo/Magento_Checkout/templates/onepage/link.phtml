@@ -18,7 +18,7 @@
         require(['jquery', 'gtmCheckout', 'mage/url', 'domReady!'], function ($, gtmCheckout, urlBuilder) {
             $(window).load(function () {
                 $('[data-role="proceed-to-checkout"]').on('click',function () {
-                    if (typeof dataLayerSourceObjects !== 'undefined') {
+                    if (typeof dataLayerSourceObjects !== 'undefined' && dataLayerSourceObjects.customer.loginType !== "null") {
                         let productIds = [];
                         $('input.item-checked:checked').each(function () {
                             //Todo Remove Debug

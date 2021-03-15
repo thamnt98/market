@@ -169,7 +169,7 @@ class PaymentNotify implements \Trans\Sprint\Api\PaymentNotifyInterface
                 $invoice = $this->saveInvoice($mainOrder);
                 $this->saveOrderPaymentTransaction($mainOrder, $postData, $invoice);
             } else {
-                if (!$postData['transactionStatus'] != Config::PAYMENT_FLAG_DECLINED_02) {
+                if ($postData['transactionStatus'] != Config::PAYMENT_FLAG_DECLINED_02) {
                     if ($mainOrder instanceof \Magento\Sales\Api\Data\OrderInterface) {
                         // $orderEntityId = $mainOrder->getEntityId();
                         $this->orderCancelled($mainOrder);

@@ -37,8 +37,12 @@ $stores = $block->getStores();
                 <img src='<?= $block->escapeUrl($block->getViewFileUrl('images/reliable.jpg')); ?>' alt="Welcome" loading="lazy" width="585" height="859">
             </div>
             <div class="container-signin--right col-xs-12 col-xl-6">
+                <header class="signin-header">
+                    <button class="action-close" data-role="closeBtn" type="button">
+                        <span><?= $block->escapeHtml(__('Close')) ?></span>
+                    </button>
+                </header>
                 <div class="container-signin--content">
-
                     <div class="block-title block-title-signin">
                         <button type="button" class="action-back" selector="action-back" style="display: none">
                             <i class="icon ic-black"> </i>

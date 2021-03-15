@@ -109,9 +109,7 @@ class Price extends \Amasty\Shopby\Model\Layer\Filter\Price
         $this->messageManager     = $messageManager;
 
         $this->currentAttribute = $this->_requestVar;
-        if ($this->customerSession->isLoggedIn()) {
-            $this->currentAttribute = $this->customerSession->getOmniFinalPriceAttributeCode();
-        }
+        $this->currentAttribute = $this->customerSession->getOmniFinalPriceAttributeCode();
     }
 
     /**

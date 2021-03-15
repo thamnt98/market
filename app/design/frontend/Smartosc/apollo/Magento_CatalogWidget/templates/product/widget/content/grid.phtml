@@ -282,7 +282,7 @@ $shoppingListHelper = $this->helper('SM\ShoppingList\Helper\Data');
     </div>
     <script>
         require(['jquery', "gtmProduct", 'Magento_Ui/js/lib/view/utils/async', 'domReady!'], function ($, gtm, async) {
-            if (typeof dataLayerSourceObjects !== 'undefined') {
+            if (typeof dataLayerSourceObjects !== 'undefined' && dataLayerSourceObjects.customer.loginType !== "null") {
                 window.eventCreate = window.eventCreate || {};
                 async.async('.product-item-link', function () {
                     if (!eventCreate['.product-item-link']) {

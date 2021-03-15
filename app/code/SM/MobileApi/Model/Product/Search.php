@@ -130,6 +130,11 @@ class Search implements SearchProductInterface
     protected $suggestionResult;
 
     /**
+     * @var \SM\MobileApi\Model\Authorization\TokenUserContext
+     */
+    protected $tokenUserContext;
+
+    /**
      * Search constructor.
      *
      * @param \SM\Search\Api\Catalog\SuggestionResultInterface                           $suggestionResult
@@ -177,7 +182,8 @@ class Search implements SearchProductInterface
         \Magento\Framework\App\RequestInterface $request,
         \SM\Category\Model\Catalog\Search $mCatalogSearch,
         \SM\MobileApi\Model\Data\Product\LiistFactory $listFactory,
-        \Magento\Framework\Registry $registry
+        \Magento\Framework\Registry $registry,
+        \SM\MobileApi\Model\Authorization\TokenUserContext $tokenUserContext
     ) {
         $this->search                               = $search;
         $this->searchCriterial                      = $searchCriteria;
@@ -196,6 +202,7 @@ class Search implements SearchProductInterface
         $this->mCatalogSearch                       = $mCatalogSearch;
         $this->productListFactory                   = $listFactory;
         $this->registry                             = $registry;
+        $this->tokenUserContext                     = $tokenUserContext;
         $this->productDataFactory = $productDataFactory;
         $this->helper = $helper;
         $this->productReviewDataFactory = $productReviewDataFactory;
@@ -250,12 +257,14 @@ class Search implements SearchProductInterface
      * @throws NoSuchEntityException
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function searchV2($customerId, $keyword, $p = 1, $limit = 12)
+    public function searchV2($keyword, $p = 1, $limit = 12)
     {
-        //Set prams for query factory
+        //Set param for query factory
         $this->request->setParams([QueryFactory::QUERY_VAR_NAME => $keyword]);
 
-        $this->mCatalogSearch->init($customerId);
+        //Create query and apply filter
+        $this->mCatalogSearch->init();
+
         //Save number result to update data in latest search
         $query = $this->queryFactory->get();
         $query->saveNumResults($this->mCatalogSearch->getToolbarInfo()->getProductTotal());
@@ -263,7 +272,7 @@ class Search implements SearchProductInterface
         $result = $this->productListFactory->create();
         $result->setToolbarInfo($this->mCatalogSearch->getToolbarInfo());
         $result->setFilters($this->mCatalogSearch->getFilters());
-        $result->setProducts($this->getLayerProducts($customerId));
+        $result->setProducts($this->mCatalogSearch->getProductsV2());
 
         return $result;
     }
@@ -290,12 +299,13 @@ class Search implements SearchProductInterface
      * @throws NoSuchEntityException
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function getRecommendationProducts(int $customerId)
+    public function getRecommendationProducts()
     {
+        $customerId = $this->tokenUserContext->getUserId();
         $total = 0;
         $productsData = [];
 
-        if ($customerId) {
+        if (isset($customerId)) {
             $enableReview = $this->productHelper->getReviewEnable();
             $coll = $this->reportViewedProductSummaryRepository->getRecommendationCollection($customerId);
             foreach ($coll as $item) {
@@ -322,6 +332,7 @@ class Search implements SearchProductInterface
         $this->filterGroup->setFilters($this->getSuggestionFilter($keyword, $category_id));
         $this->searchCriterial->setFilterGroups([$this->filterGroup]);
         $this->searchCriterial->setRequestName('quick_search_container');
+        $this->searchCriterial->setPageSize(5);
 
         /** @var \Magento\Framework\Api\Search\SearchResult $searchResult */
         $searchResult = $this->search->searchSuggestion($this->searchCriterial);
@@ -353,10 +364,19 @@ class Search implements SearchProductInterface
     /**
      * Search product using barcode
      * {@inheritDoc}
+     * @param string $barcode
+     * @return SearchInterface
+     * @throws NoSuchEntityException
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Webapi\Exception
+     * @throws \Zend_Json_Exception
      */
-    public function searchProductByBarcode(int $customerId, string $barcode)
+    public function searchProductByBarcode(string $barcode)
     {
         $barcode = urldecode($barcode);
+
+        //Get customer id by token
+        $customerId = $this->tokenUserContext->getUserId();
 
         //Get Products
         $product = $this->_getProductByBarcode($barcode);
@@ -367,7 +387,9 @@ class Search implements SearchProductInterface
 
         //Create or update query search
         $query = $this->queryFactory->create()->loadByQueryText($productName);
-        $query->setData(Config::CUSTOMER_ID_ATTRIBUTE_CODE, $customerId);
+        if (isset($customerId)) {
+            $query->setData(Config::CUSTOMER_ID_ATTRIBUTE_CODE, $customerId);
+        }
 
         if (empty($product)) {
             $query->setQueryText('');
@@ -394,7 +416,6 @@ class Search implements SearchProductInterface
     /**
      * @param string $barcode
      * @return ProductInterface|\Magento\Framework\DataObject | null
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     protected function _getProductByBarcode(string $barcode)
     {
@@ -431,28 +452,26 @@ class Search implements SearchProductInterface
     }
 
     /**
-     * @param $result
+     * @param \Magento\Framework\Api\Search\SearchResult $result$result
      * @return array|SearchInterface
      * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     * @throws NoSuchEntityException
      */
     protected function _initProducts($result)
     {
-        $items      = $result->getProducts();
-        $totalItems = $result->getTotalCount();
+        $items = $result->getProducts();
 
-        return $this->_convertProductByIds($items, $totalItems);
+        return $this->_convertProductByIds($items);
     }
 
     /**
      * @param $items
-     * @param $totalItems
      * @param bool $getId
      * @return array|SearchInterface
+     * @throws NoSuchEntityException
      * @throws \Magento\Framework\Exception\LocalizedException
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    protected function _convertProductByIds($items, $totalItems, $getId = true)
+    protected function _convertProductByIds($items, $getId = true)
     {
         $productIds = [];
         foreach ($items as $item) {

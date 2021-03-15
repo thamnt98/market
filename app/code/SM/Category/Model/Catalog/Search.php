@@ -27,6 +27,7 @@ class Search extends \Magento\CatalogSearch\Block\Result
     protected $urlResolver;
     protected $filterSettingHelper;
     protected $mProductStock;
+    protected $tokenUserContext;
 
     /**
      * @var \Magento\Review\Model\ResourceModel\Review\Summary
@@ -52,6 +53,7 @@ class Search extends \Magento\CatalogSearch\Block\Result
         \SM\MobileApi\Model\Data\Product\ListItemFactory $listItemFactory,
         \Amasty\Shopby\Helper\FilterSetting $settingHelper,
         \SM\MobileApi\Model\Product\Stock $mProductStock,
+        \SM\MobileApi\Model\Authorization\TokenUserContext $tokenUserContext,
         array $data = []
     ) {
         $this->layerResolver            = $layerResolver;
@@ -68,21 +70,21 @@ class Search extends \Magento\CatalogSearch\Block\Result
         $this->urlResolver              = $urlResolver;
         $this->filterSettingHelper      = $settingHelper;
         $this->mProductStock            = $mProductStock;
+        $this->tokenUserContext         = $tokenUserContext;
         parent::__construct($context, $layerResolver, $catalogSearchData, $queryFactory, $data);
         $this->reviewSummary = $reviewSummary;
     }
 
     /**
-     * @param $customerId
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function init($customerId)
+    public function init()
     {
         /**
          * Init search query
          */
-        $this->_initSearch($customerId);
+        $this->_initSearch();
 
         /**
          * Apply filters
@@ -196,17 +198,22 @@ class Search extends \Magento\CatalogSearch\Block\Result
     /**
      * init Search
      *
-     * @param $customerId
      * @throws \Magento\Framework\Exception\LocalizedException
      * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    protected function _initSearch($customerId)
+    protected function _initSearch()
     {
         /* @var $query \Magento\Search\Model\Query */
         $query = $this->_getQuery();
-
         $query->setStoreId($this->_storeManager->getStore()->getId());
-        $query->setData(Config::CUSTOMER_ID_ATTRIBUTE_CODE, $customerId);
+
+        //Get customer id by token
+        $customerId = $this->tokenUserContext->getUserId();
+
+        //Save query text by customer id
+        if (isset($customerId)) {
+            $query->setData(Config::CUSTOMER_ID_ATTRIBUTE_CODE, $customerId);
+        }
 
         if (! $query->getQueryText() || $query->getQueryText() == '') {
             throw new \Magento\Framework\Exception\LocalizedException(__('Query cannot be empty.'));

@@ -25,14 +25,25 @@ define(
             optForm = false;
 
         mod.init = function () {
-            $('.sign-link a').click(function(event){
+            $('.sign-link a, .authorization-link a, a.showcart').click(function(event){
+                mod.triggerLoginForm(event)
+            });
+            $('.register-link').click(function(event){
                 event.preventDefault();
-                if (loginForm) {
-                    $('#tab-login').modal('openModal');
+                if (registerForm) {
+                    $('#register').modal('openModal');
                 } else {
-                    mod.callAjax('login-form');
+                    mod.callAjax('register-form');
                 }
             });
+            if ($('.sign-link a').length > 0) {
+                $('.page-footer a, .nav.item a').click(function (event) {
+                    if($(this).attr('href').indexOf('contactus') != -1){
+                        event.preventDefault();
+                        $('.sign-link a').trigger('click');
+                    }
+                });
+            }
             var urlParams = new URLSearchParams(window.location.search);
             console.log(urlParams.has('recovery'));
             if (urlParams.has('recovery') && recoveryForm === false) {
@@ -40,10 +51,22 @@ define(
                 mod.callAjax('recovery-form');
             } else if (urlParams.has('recoverytoken')) {
                 mod.callAjax('lock-reset-form');
-            } else {
+            } else if (window.location.href.indexOf('checkout/cart') != -1) {
                 // show login popup
                 $('.sign-link a').trigger('click');
             }
+
+            $('a.button-to-contactus, .pagehelp-contactus a').click(function(event){
+                mod.triggerLoginForm(event)
+            });
+
+            $('a.towishlist').click(function(event){
+                mod.triggerLoginForm(event)
+            });
+
+            $('html').on('click', '.navbar-wishlist a', function (event) {
+                mod.triggerLoginForm(event)
+            });
         };
 
         mod.callAjax = function (type) {
@@ -60,9 +83,7 @@ define(
                         loginForm = true;
                         $('#create-account').click(function (){
                             $('#tab-login').modal('closeModal');
-                            if (!registerForm) {
-                                mod.callAjax('register-form');
-                            }
+                            $('.register-link').trigger('click');
                         });
                         $('#action-forgot-password').click(function () {
                             if (!forgotPassForm) {
@@ -80,6 +101,17 @@ define(
                 }
             });
         };
+
+        mod.triggerLoginForm = function (event) {
+            event.preventDefault();
+            $('.modals-overlay').remove();
+            if (loginForm) {
+                $('#tab-login').modal('openModal');
+            } else {
+                mod.callAjax('login-form');
+            }
+            $('body').addClass('_has-modal');
+        }
 
         return mod.init();
     }

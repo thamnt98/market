@@ -24,19 +24,27 @@ class MiniForm extends Template
     protected $categoryRepository;
 
     /**
+     * @var \Magento\Framework\App\Http\Context
+     */
+    protected $httpContext;
+
+    /**
      * MiniForm constructor.
      * @param Context $context
      * @param CategoryRepository $categoryRepository
+     * @param \Magento\Framework\App\Http\Context $httpContext
      * @param array $data
      */
     public function __construct(
         Context $context,
         CategoryRepository $categoryRepository,
+        \Magento\Framework\App\Http\Context $httpContext,
         array $data = []
     ) {
         parent::__construct($context, $data);
 
         $this->categoryRepository = $categoryRepository;
+        $this->httpContext = $httpContext;
     }
 
     /**
@@ -61,5 +69,15 @@ class MiniForm extends Template
                 }
             }
         }
+    }
+
+    /**
+     * Checking customer register status
+     *
+     * @return bool
+     */
+    public function isLoggedIn()
+    {
+        return $this->httpContext->getValue(\Magento\Customer\Model\Context::CONTEXT_AUTH);
     }
 }

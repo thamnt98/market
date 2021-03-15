@@ -66,4 +66,12 @@
     <preference for="Trans\Sprint\Api\SprintCustomerTokenizationRepositoryInterface" type="Trans\Sprint\Model\CustomerTokenizationRepository" />
     <preference for="Trans\Sprint\Api\AutoCancelInterface" type="Trans\Sprint\Model\Order\AutoCancel" />
 
+    <type name="Magento\Framework\Console\CommandList">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                 <item name="Trans_Sprint_Console_Check_Status" xsi:type="object">Trans\Sprint\Console\AutoCancel</item>
+            </argument>
+        </arguments>
+    </type>
+
 </config>

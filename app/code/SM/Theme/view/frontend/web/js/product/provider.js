@@ -175,7 +175,7 @@ define([
                         document.location = obj.productUrl;
                     };
                     $('a'+ href +':not([data-gtm-product])').click(function (e) {
-                        if (typeof dataLayerSourceObjects !== 'undefined') {
+                        if (typeof dataLayerSourceObjects !== 'undefined' && dataLayerSourceObjects.customer.loginType !== "null") {
                             e.preventDefault();
                             gtm.push("productClick", result);
                         } else {

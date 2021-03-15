@@ -12,12 +12,14 @@ interface ProductInterface
      * Get category assigned products
      *
      * @param int  $category_id
-     * @param int  $customerId
+     * @param int  $limit
+     * @param int  $p
      * @param bool $layer
+     * @param int  $customerId
      *
      * @return \SM\MobileApi\Api\Data\Product\ListInterface
      */
-    public function getList($category_id, $customerId, $layer = true);
+    public function getList($category_id, $limit = 12, $p = 1, $layer = true, $customerId = 0);
 
     /**
      * Get product details
@@ -32,11 +34,9 @@ interface ProductInterface
      * Get product details
      *
      * @param string $sku
-     *
-     * @param int $customerId
      * @return \SM\MobileApi\Api\Data\Product\ProductInterface
      */
-    public function getDetailsBySKU($sku, $customerId);
+    public function getDetailsBySKU($sku);
 
     /**
      * Get product related products

@@ -127,6 +127,9 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
      */
     protected $storeManager;
 
+    /**
+     * @var \SM\MobileApi\Model\Authorization\TokenUserContext
+     */
     protected $tokenUserContext;
 
     /**
@@ -140,7 +143,7 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
      * @param Emulation $appEmulation
      * @param Image $imageHelper
      * @param StoreManagerInterface $storeManager
-     * @param \Magento\Webapi\Model\Authorization\TokenUserContext $tokenUserContext
+     * @param \SM\MobileApi\Model\Authorization\TokenUserContext $tokenUserContext
      */
     public function __construct(
         ParentOrder $parentOrder,
@@ -151,7 +154,8 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
         OrderDataInterfaceFactory $orderDataFactory,
         Emulation $appEmulation,
         Image $imageHelper,
-        StoreManagerInterface $storeManager
+        StoreManagerInterface $storeManager,
+        \SM\MobileApi\Model\Authorization\TokenUserContext $tokenUserContext
     ) {
         $this->storeManager = $storeManager;
         $this->appEmulation = $appEmulation;
@@ -162,6 +166,7 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
         $this->orderCollectionFactory = $orderCollectionFactory;
         $this->searchResultsFactory = $searchResultsFactory;
         $this->orderItemCollectionFactory = $orderItemCollectionFactory;
+        $this->tokenUserContext = $tokenUserContext;
     }
 
     /**
@@ -388,12 +393,15 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
     }
 
     /**
-     * @param int $customerId
      * @return OrderDataInterface[]
      * @throws NoSuchEntityException
      */
-    public function getListReorderQuickly($customerId)
+    public function getListReorderQuickly()
     {
+        $customerId = $this->tokenUserContext->getUserId();
+        if (!$customerId || $customerId == 0) {
+            return [];
+        }
         $this->appEmulation->startEnvironmentEmulation(
             $this->storeManager->getStore()->getId(),
             Area::AREA_FRONTEND,

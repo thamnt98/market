@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * @category Trans
  * @package  Trans_MepayTransmart
@@ -55,7 +55,7 @@ class TransmartParentOrderRepository extends ParentOrderRepository
      * @param Emulation $appEmulation
      * @param Image $imageHelper
      * @param StoreManagerInterface $storeManager
-     * @param \Magento\Webapi\Model\Authorization\TokenUserContext $tokenUserContext
+     * @param \SM\MobileApi\Model\Authorization\TokenUserContext $tokenUserContext
      */
     public function __construct(
         ParentOrder $parentOrder,
@@ -67,7 +67,8 @@ class TransmartParentOrderRepository extends ParentOrderRepository
         Emulation $appEmulation,
         Image $imageHelper,
         StoreManagerInterface $storeManager,
-        OrderRepositoryInterface $orderRepo
+        OrderRepositoryInterface $orderRepo,
+        \SM\MobileApi\Model\Authorization\TokenUserContext $tokenUserContext
     ) {
         $this->orderRepo = $orderRepo;
         parent::__construct(
@@ -79,7 +80,8 @@ class TransmartParentOrderRepository extends ParentOrderRepository
           $orderDataFactory,
           $appEmulation,
           $imageHelper,
-          $storeManager
+          $storeManager,
+          $tokenUserContext
         );
     }
 

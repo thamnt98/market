@@ -13,7 +13,7 @@
     <route url="/V1/homepage/getMostPopular" method="GET">
         <service class="SM\MobileApi\Api\HomeInterface" method="getMostPopular"/>
         <resources>
-            <resource ref="self"/>
+            <resource ref="anonymous"/>
         </resources>
     </route>
 
@@ -27,40 +27,34 @@
     <route url="/V1/homepage/message" method="GET">
         <service class="SM\MobileApi\Api\HomeInterface" method="getGreetingMessage"/>
         <resources>
-            <resource ref="self"/>
+            <resource ref="anonymous"/>
         </resources>
-        <data>
-            <parameter name="customerId" force="true">%customer_id%</parameter>
-        </data>
     </route>
 
     <!-- Product -->
     <route url="/V1/product/getProductById" method="GET">
         <service class="SM\MobileApi\Api\ProductInterface" method="getDetails"/>
         <resources>
-            <resource ref="self"/>
+            <resource ref="anonymous"/>
         </resources>
     </route>
 
     <route url="/V1/product/getProductBySku" method="GET">
         <service class="SM\MobileApi\Api\ProductInterface" method="getDetailsBySKU"/>
         <resources>
-            <resource ref="self"/>
+            <resource ref="anonymous"/>
         </resources>
-        <data>
-            <parameter name="customerId" force="true">%customer_id%</parameter>
-        </data>
     </route>
 
     <route url="/V1/product/getRelatedProduct" method="GET">
         <service class="SM\MobileApi\Api\ProductInterface" method="getRelatedProducts"/>
         <resources>
-            <resource ref="self"/>
+            <resource ref="anonymous"/>
         </resources>
     </route>
 
     <!--    search product -->
-    <route url="/V1/search/products" method="GET">
+<!--    <route url="/V1/search/products" method="GET">
         <service class="SM\MobileApi\Api\SearchProductInterface" method="search"/>
         <resources>
             <resource ref="self" />
@@ -68,16 +62,13 @@
         <data>
             <parameter name="customerId" force="true">%customer_id%</parameter>
         </data>
-    </route>
+    </route>-->
 
     <route url="/V2/search/products" method="GET">
         <service class="SM\MobileApi\Api\SearchProductInterface" method="searchV2"/>
         <resources>
-            <resource ref="self" />
+            <resource ref="anonymous" />
         </resources>
-        <data>
-            <parameter name="customerId" force="true">%customer_id%</parameter>
-        </data>
     </route>
 
     <route url="/V1/search/products/recommendation" method="GET">
@@ -85,9 +76,6 @@
         <resources>
             <resource ref="anonymous" />
         </resources>
-        <data>
-            <parameter name="customerId" force="true">%customer_id%</parameter>
-        </data>
     </route>
 
     <route url="/V1/search/products/suggestion" method="GET">
@@ -100,11 +88,8 @@
     <route url="/V1/search/products/scan" method="GET">
         <service class="SM\MobileApi\Api\SearchProductInterface" method="searchProductByBarcode"/>
         <resources>
-            <resource ref="self" />
+            <resource ref="anonymous" />
         </resources>
-        <data>
-            <parameter name="customerId" force="true">%customer_id%</parameter>
-        </data>
     </route>
 
     <!-- Cms Page -->
@@ -138,12 +123,8 @@
     <route url="/V1/cart/getcartcount" method="GET">
         <service class="SM\MobileApi\Api\CartInterface" method="getCartCount"/>
         <resources>
-            <resource ref="self"/>
+            <resource ref="anonymous"/>
         </resources>
-        <data>
-            <parameter name="cartId" force="true">%cart_id%</parameter>
-            <parameter name="customerId" force="true">%customer_id%</parameter>
-        </data>
     </route>
 
     <route url="/V1/cart/removecart/:id" method="DELETE">
@@ -153,7 +134,6 @@
         </resources>
         <data>
             <parameter name="cartId" force="true">%cart_id%</parameter>
-            <parameter name="customerId" force="true">%customer_id%</parameter>
         </data>
     </route>
 
@@ -180,11 +160,8 @@
     <route url="/V1/cart/getcartitems" method="GET">
         <service class="SM\MobileApi\Api\CartInterface" method="getItems"/>
         <resources>
-            <resource ref="self"/>
+            <resource ref="anonymous"/>
         </resources>
-        <data>
-            <parameter name="cartId" force="true">%cart_id%</parameter>
-        </data>
     </route>
 
     <route url="/V1/cart/getId" method="GET">

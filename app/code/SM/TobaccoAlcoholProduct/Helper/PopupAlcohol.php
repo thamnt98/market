@@ -128,20 +128,25 @@ class PopupAlcohol extends AbstractHelper
 
     /**
      * @param bool $isSearch
-     * @return CustomerInterface
+     * @return false|CustomerInterface
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getCurrentCustomer(bool $isSearch)
     {
-        if ($isSearch) {
-            /**
-             * For some reason, customer data in session is missing in search result page
-             * => Cannot check value of attribute 'is_alcohol_informed'
-             * That's why I have to use repository to get customer data in search page.
-             *
-             * TODO: Investigate this issue.
-             */
-            return $this->customerRepository->getById($this->customerSession->getCustomerId());
+        if ($this->customerSession->isLoggedIn()) {
+            if ($isSearch) {
+                /**
+                 * For some reason, customer data in session is missing in search result page
+                 * => Cannot check value of attribute 'is_alcohol_informed'
+                 * That's why I have to use repository to get customer data in search page.
+                 *
+                 * TODO: Investigate this issue.
+                 */
+                return $this->customerRepository->getById($this->customerSession->getCustomerId());
+            }
+            return $this->currentCustomer->getCustomer();
         }
-        return $this->currentCustomer->getCustomer();
+        return false;
     }
 }

@@ -1,17 +1,15 @@
 <?php
 
-
 namespace SM\CustomPrice\Model\Session;
-
 
 use Magento\Customer\Api\CustomerRepositoryInterface;
 use Magento\Customer\Api\GroupManagementInterface;
 use Magento\Customer\Model\AccountConfirmation;
-use  \Magento\Customer\Model\Url;
+use Magento\Customer\Model\Config\Share;
 use Magento\Customer\Model\CustomerFactory;
 use Magento\Customer\Model\ResourceModel\Customer as ResourceCustomer;
 use Magento\Customer\Model\Session;
-use Magento\Customer\Model\Config\Share;
+use Magento\Customer\Model\Url;
 use Magento\Framework\App\Area;
 use Magento\Framework\App\State;
 use SM\CustomPrice\Model\ResourceModel\District;
@@ -26,15 +24,17 @@ class Customer extends Session
      * @var State
      */
     protected $state;
+
     /**
-     * @var \Magento\Webapi\Model\Authorization\TokenUserContext
+     * @var \SM\MobileApi\Model\Authorization\TokenUserContext
      */
-    protected $tokenUserContext;
+    protected $smartTokenUserContext;
 
     /**
      * @var \Magento\Eav\Model\Config
      */
     protected $eavConfig;
+
 
     public function __construct(
         \Magento\Eav\Model\Config $eavConfig,
@@ -61,37 +61,61 @@ class Customer extends Session
         \Magento\Framework\App\Response\Http $response,
         District $district,
         State $state,
-        \Magento\Webapi\Model\Authorization\TokenUserContext $tokenUserContext,
+        \SM\MobileApi\Model\Authorization\TokenUserContext $smartTokenUserContext,
         AccountConfirmation $accountConfirmation = null
     ) {
-        parent::__construct($request, $sidResolver, $sessionConfig, $saveHandler, $validator, $storage, $cookieManager,
-            $cookieMetadataFactory, $appState, $configShare, $coreUrl, $customerUrl, $customerResource,
-            $customerFactory, $urlFactory, $session, $eventManager, $httpContext, $customerRepository, $groupManagement,
-            $response, $accountConfirmation);
+        parent::__construct(
+            $request,
+            $sidResolver,
+            $sessionConfig,
+            $saveHandler,
+            $validator,
+            $storage,
+            $cookieManager,
+            $cookieMetadataFactory,
+            $appState,
+            $configShare,
+            $coreUrl,
+            $customerUrl,
+            $customerResource,
+            $customerFactory,
+            $urlFactory,
+            $session,
+            $eventManager,
+            $httpContext,
+            $customerRepository,
+            $groupManagement,
+            $response,
+            $accountConfirmation
+        );
 
-        $this->district           = $district;
-        $this->state              = $state;
-        $this->tokenUserContext   = $tokenUserContext;
-        $this->customerRepository = $customerRepository;
+        $this->district              = $district;
+        $this->state                 = $state;
+        $this->customerRepository    = $customerRepository;
+        $this->smartTokenUserContext = $smartTokenUserContext;
         $this->eavConfig = $eavConfig;
     }
 
     /**
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getOmniFinalPriceAttributeCode()
     {
         $omni_store_id = $this->getOmniStoreId();
-        return \SM\CustomPrice\Model\Customer::PREFIX_OMNI_FINAL_PRICE. $omni_store_id;
+        return \SM\CustomPrice\Model\Customer::PREFIX_OMNI_FINAL_PRICE . $omni_store_id;
     }
 
     /**
      * @return string
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function getOmniNormalPriceAttributeCode()
     {
         $omni_store_id = $this->getOmniStoreId();
-        return \SM\CustomPrice\Model\Customer::PREFIX_OMNI_NORMAL_PRICE. $omni_store_id;
+        return \SM\CustomPrice\Model\Customer::PREFIX_OMNI_NORMAL_PRICE . $omni_store_id;
     }
 
     /**
@@ -101,42 +125,47 @@ class Customer extends Session
      */
     public function getOmniStoreId()
     {
-        if (!$this->isLoggedIn()&&!$this->isLoggedInByAPI()) {
-            return null;
-        }
-        if ($this->isLoggedInByAPI()) {
-            $customerId = $this->tokenUserContext->getUserId();
+        $isLoginByAPI = $this->isLoggedInByAPI();
+        if ($isLoginByAPI) {
+            $customerId = $this->smartTokenUserContext->getUserId();
             $customer   = $this->customerRepository->getById($customerId);
             if (!empty($customer)) {
                 $omni_store_id = $customer->getCustomAttribute(\SM\CustomPrice\Model\Customer::OMNI_STORE_ID);
             }
-        } else {
+        } elseif ($this->isLoggedIn()) {
             $omni_store_id = $this->getCustomerData()->getCustomAttribute(\SM\CustomPrice\Model\Customer::OMNI_STORE_ID);
-
+        } else {
+            return $this->getDefaultOmniStoreCode();
         }
-
         if (!empty($omni_store_id)) {
             $basePriceCode = \SM\CustomPrice\Model\Customer::PREFIX_OMNI_NORMAL_PRICE . $omni_store_id->getValue();
             $basePriceAttr = $this->eavConfig->getAttribute(\Magento\Catalog\Model\Product::ENTITY, $basePriceCode);
-
             if ($basePriceAttr && $basePriceAttr->getId()) {
                 return $omni_store_id->getValue();
             }
         }
-
         return $this->getDefaultOmniStoreCode();
     }
 
+    /**
+     * @return mixed
+     */
     public function getDefaultOmniStoreCode()
     {
         $customer = $this->getCustomer();
         return $customer->getDefaultOmniStoreCode();
     }
 
+    /**
+     * @return bool
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Webapi\Exception
+     */
     public function isLoggedInByAPI()
     {
-        if ($this->state->getAreaCode() == Area::AREA_WEBAPI_REST && (bool)$this->tokenUserContext->getUserId()) {
+        if ($this->state->getAreaCode() == Area::AREA_WEBAPI_REST && (bool)$this->smartTokenUserContext->getUserId()) {
             return true;
         }
+        return false;
     }
 }

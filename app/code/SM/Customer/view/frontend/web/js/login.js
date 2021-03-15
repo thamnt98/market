@@ -126,14 +126,12 @@ define(
                             title: '',
                             buttons: [],
                             modalClass: 'modal-popup-signin',
-                            clickableOverlay: false,
-                            keyEventHandlers: {
-                                escapeKey: function () {
-                                    return;
-                                }
-                            }
+                            clickableOverlay: false
                     };
                     modal(options, $(self.options.tabLoginSelector));
+                    $(self.options.tabLoginSelector + '.signin-header [selector=action-back]').click(function (){
+                        $(self.options.tabLoginSelector).modal('closeModal');
+                    });
                     /*var urlParams = new URLSearchParams(window.location.search);
                     if (!urlParams.has('recovery') && !urlParams.has('recoverytoken')) {
                         tabLoginModal = $(self.options.tabLoginSelector).modal('openModal').show();
@@ -148,10 +146,6 @@ define(
                                 tabLoginModal.find('#user-not-exist').text('').hide();
                             }
                         })
-                    });
-                    $('body').on('click', '#register #login', function () {
-                        $('#register').modal('closeModal');
-                        $(self.options.tabLoginSelector).modal('openModal').show();
                     });
                 },
 
@@ -475,6 +469,7 @@ define(
                             data.username = tabLoginModal.find('input[name=mobile_number]').val();
                             data.step = 2;
                         }
+                        data.redirect_url = window.location.href;
                         self.loginRequest(data);
                     } else if (step == 3) {
                         var formEnableByValidateFieldOTP = true,
@@ -503,6 +498,7 @@ define(
                                 data.username = tabLoginModal.find('input[name=mobile_number]').val();
                                 data.step = 3;
                             }
+                            data.redirect_url = window.location.href;
                             self.loginRequest(data);
                         } else if (!formEnableByCounter) {
                             tabLoginModal.find('[selector=message-otp-error]').text($.mage.__('Make sure the code is correct')).show();

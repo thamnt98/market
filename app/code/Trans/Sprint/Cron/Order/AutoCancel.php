@@ -77,7 +77,7 @@ class AutoCancel
         $methods = array();
         
         foreach ($payments as $paymentCode => $paymentModel) {
-            if (strpos($paymentCode, '_va') !== false) {
+            if (strpos($paymentCode, '_va') !== false && strpos($paymentCode, 'sprint') !== false) {
                 $methods[] = $paymentCode;
             }
         }

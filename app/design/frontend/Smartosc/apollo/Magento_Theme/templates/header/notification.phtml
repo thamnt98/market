@@ -11,7 +11,7 @@
             <!-- /ko -->
         </span>
     </button>
-    <?php if (true) :?>
+    <?php if ($block->isLogin()) :?>
         <div class="block block-notification"
              data-role="dropdownDialog"
              data-mage-init='{"dropdownDialog":{
@@ -31,8 +31,8 @@
     <?php else :?>
         <script>
             require(['jquery'], function ($) {
-                $('button.action.show-notification').click(function() {
-                    $(document.body).trigger('processStart');
+                $('[data-block=notification]').click(function (){
+                    $('.sign-link a').trigger('click');
                 });
             });
         </script>

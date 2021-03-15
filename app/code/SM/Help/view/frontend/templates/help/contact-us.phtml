@@ -9,15 +9,16 @@
  */
 ?>
 <?php /** @var SM\Help\Block\ContactUs\ContactUs $block */ ?>
-<?php
-    $_orders = $block->getOrder();
-    $_ordersReturn = $block->getOrderForReturn();
-?>
 <div class="help-pages">
     <div class="go-back">
         <div class="icon ic-arrow-prev"></div>
         <a href="<?= $block->escapeUrl($block->getBackUrl()) ?>"><?= $block->escapeHtml('Back') ?></a>
     </div>
+    <?php if ($block->isLoggedIn()) : ?>
+    <?php
+        $_orders = $block->getOrder();
+        $_ordersReturn = $block->getOrderForReturn();
+    ?>
     <!------site content------>
     <div class="help-content help-contactus-wrap">
         <div class="help-content-list-top">
@@ -66,16 +67,16 @@
                     </div>
                 </div>
 
-                <div class="help-return-refund" style="display: none">
-                    <label class="title__contactus"><?= $block->escapeHtml(__('Have you received your order?'))?></label>
-                    <div class="radio-custom">
-                        <input type="radio" id="yes" value="return" name="is_received"/>
-                        <label for="yes"><?= $block->escapeHtml(__('Yes (full/partially)'))?></label>
-                    </div>
-                    <div class="radio-custom" id="radio-custom">
-                        <input type="radio" id="no" value="general" name="is_received"/>
-                        <label for="no"><?= $block->escapeHtml(__('No'))?></label>
-                    </div>
+                    <div class="help-return-refund" style="display: none">
+                        <label class="title__contactus"><?= $block->escapeHtml(__('Have you received your order?'))?></label>
+                        <div class="radio-custom">
+                            <input type="radio" id="yes" value="return" name="is_received"/>
+                            <label for="yes"><?= $block->escapeHtml(__('Yes (full/partially)'))?></label>
+                        </div>
+                        <div class="radio-custom" id="radio-custom">
+                            <input type="radio" id="no" value="general" name="is_received"/>
+                            <label for="no"><?= $block->escapeHtml(__('No'))?></label>
+                        </div>
 
                     <div class="return-refund-select-no" style="display: none">
                         <div id="button-select-product">
@@ -103,100 +104,99 @@
                 </div>
 
 
-                <div class="help-contact-textarea">
-                    <label class="title__contactus"><?= $block->escapeHtml(__('Tell us your concerns'))?></label>
-                    <textarea name="description" id="help-textarea" maxlength="500" rows="4" cols="50" placeholder="<?= $block->escapeHtml(__("Example: I need help to track my order because the feature doesn't seem to work."))?>" ></textarea>
-                    <span class="typ-word">0/500</span>
-                    <div class="rw-upload-photo">
-                        <label class="title__contactus"><?= $block->escapeHtml(__('Upload Photos')) ?></label>
-                        <div class="upload-wrapper upload-photo" data-bind="scope: 'uploader'">
-                            <!-- ko template: getTemplate() --><!-- /ko -->
+                    <div class="help-contact-textarea">
+                        <label class="title__contactus"><?= $block->escapeHtml(__('Tell us your concerns'))?></label>
+                        <textarea name="description" id="help-textarea" maxlength="500" rows="4" cols="50" placeholder="<?= $block->escapeHtml(__("Example: I need help to track my order because the feature doesn't seem to work."))?>" ></textarea>
+                        <span class="typ-word">0/500</span>
+                        <div class="rw-upload-photo">
+                            <label class="title__contactus"><?= $block->escapeHtml(__('Upload Photos')) ?></label>
+                            <div class="upload-wrapper upload-photo" data-bind="scope: 'uploader'">
+                                <!-- ko template: getTemplate() --><!-- /ko -->
+                            </div>
+                            <p class="note"><?= $block->escapeHtml(__('Maximum size 10 MB. You can upload up to 5 photos.')) ?></p>
                         </div>
-                        <p class="note"><?= $block->escapeHtml(__('Maximum size 10 MB. You can upload up to 5 photos.')) ?></p>
-                    </div>
-                    <div class="checkbox-custom">
-                        <input name="store_id" type="hidden" value="<?= $block->getStoreId() ?>" />
-                        <input id="checkSendEmail" type="checkbox" name="help_messages" value="Yes" checked/>
-                        <label for="checkSendEmail"><?= $block->escapeHtml(__('Send me the copy of my message')) ?></label>
-                    </div>
-                    <span id="sendEmailHelp" style="display: none"><?php echo $this->getUrl('help/contactus/sendemail');?></span>
-                    <span id="getOrderProduct" style="display: none"><?php echo $this->getUrl('help/contactus/getproduct');?></span>
-                    <span id="getOrderProductById" style="display: none"><?php echo $this->getUrl('help/contactus/getproductbyid');?></span>
-                    <span id="myOrderId" style="display: none"><?php echo $block->getMyOrderId();?></span>
-                    <span id="returnRefundId" style="display: none"><?php echo $block->getReturnRefundId();?></span>
-                    <div class="align-right">
-                        <button class="action primary" id="contact-us-submit" type="submit"><?= $block->escapeHtml(__('Send'))?></button>
-                    </div>
-                    <div id="return-refund-order" class="return-refund-order" style="display: none">
-                        <label class="txt-title-order-list"><?= $block->escapeHtml(__('Select any defect, wrong, or missing products. You may select more than one item')) ?></label>
-                        <div class="table-responsive">
-                        <table class="table table-returns-refund">
-                            <thead>
-                                <div class="check-all-head">
-                                    <div class="checkbox-custom">
-                                        <input id="order-product-selected-all" class="order-product-selected-all" type="checkbox" name="selected-all" />
-                                        <label for="order-product-selected-all"><?= $block->escapeHtml(__('Select all products')) ?></label>
+                        <div class="checkbox-custom">
+                            <input name="store_id" type="hidden" value="<?= $block->getStoreId() ?>" />
+                            <input id="checkSendEmail" type="checkbox" name="help_messages" value="Yes" checked/>
+                            <label for="checkSendEmail"><?= $block->escapeHtml(__('Send me the copy of my message')) ?></label>
+                        </div>
+                        <span id="sendEmailHelp" style="display: none"><?php echo $this->getUrl('help/contactus/sendemail');?></span>
+                        <span id="getOrderProduct" style="display: none"><?php echo $this->getUrl('help/contactus/getproduct');?></span>
+                        <span id="getOrderProductById" style="display: none"><?php echo $this->getUrl('help/contactus/getproductbyid');?></span>
+                        <span id="myOrderId" style="display: none"><?php echo $block->getMyOrderId();?></span>
+                        <span id="returnRefundId" style="display: none"><?php echo $block->getReturnRefundId();?></span>
+                        <div class="align-right">
+                            <button class="action primary" id="contact-us-submit" type="submit"><?= $block->escapeHtml(__('Send'))?></button>
+                        </div>
+                        <div id="return-refund-order" class="return-refund-order" style="display: none">
+                            <label class="txt-title-order-list"><?= $block->escapeHtml(__('Select any defect, wrong, or missing products. You may select more than one item')) ?></label>
+                            <div class="table-responsive">
+                            <table class="table table-returns-refund">
+                                <thead>
+                                    <div class="check-all-head">
+                                        <div class="checkbox-custom">
+                                            <input id="order-product-selected-all" class="order-product-selected-all" type="checkbox" name="selected-all" />
+                                            <label for="order-product-selected-all"><?= $block->escapeHtml(__('Select all products')) ?></label>
+                                        </div>
                                     </div>
-                                </div>
-                            </thead>
-                            <tbody id="return-refund-product">
-                            </tbody>
-                        </table>
-                        </div>
-                        <div class="return-refund-button">
-                            <a id="back-cancel" class="back-cancel pagebuilder-banner-button pagebuilder-button-secondary" href="#">
-                                <?= $block->escapeHtml(__('Cancel'))?>
-                            </a>
-                            <a id="back-save" class="back-save pagebuilder-banner-button pagebuilder-button-primary" href="#">
-                                <?= $block->escapeHtml(__('Save'))?>
-                            </a>
+                                </thead>
+                                <tbody id="return-refund-product">
+                                </tbody>
+                            </table>
+                            </div>
+                            <div class="return-refund-button">
+                                <a id="back-cancel" class="back-cancel pagebuilder-banner-button pagebuilder-button-secondary" href="#">
+                                    <?= $block->escapeHtml(__('Cancel'))?>
+                                </a>
+                                <a id="back-save" class="back-save pagebuilder-banner-button pagebuilder-button-primary" href="#">
+                                    <?= $block->escapeHtml(__('Save'))?>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </form>
-    </div>
-    <!------site content------>
+            </form>
+        </div>
+        <!------site content------>
 
-    <!------site bar left------>
-    <div class="sidebar sidebar-main">
-        <div class="block block-collapsible-nav">
-            <div class="title block-collapsible-nav-title">
-                <strong><?= $block->escapeHtml(__('Help Center')) ?></strong>
-            </div>
-            <div class="content block-collapsible-nav-content" id="block-collapsible-nav">
-                <ul class="nav items">
-                    <?php foreach ($block->getTopics() as $topic): ?>
-                        <?php /** @var SM\Help\Model\Topic $topic */?>
-                        <li class="item"><a href="<?= $block->escapeUrl($topic->getUrl()) ?>"><?= $block->escapeHtml(__($topic->getName())) ?></a></li>
-                    <?php endforeach; ?>
-                    <li class="nav item active"><a href="<?= $block->escapeUrl($block->getUrl('help/contactus')) ?>"><?= $block->escapeHtml(__('Contact Us'))?></a></li>
-                </ul>
+        <!------site bar left------>
+        <div class="sidebar sidebar-main">
+            <div class="block block-collapsible-nav">
+                <div class="title block-collapsible-nav-title">
+                    <strong><?= $block->escapeHtml(__('Help Center')) ?></strong>
+                </div>
+                <div class="content block-collapsible-nav-content" id="block-collapsible-nav">
+                    <ul class="nav items">
+                        <?php foreach ($block->getTopics() as $topic): ?>
+                            <?php /** @var SM\Help\Model\Topic $topic */?>
+                            <li class="item"><a href="<?= $block->escapeUrl($topic->getUrl()) ?>"><?= $block->escapeHtml(__($topic->getName())) ?></a></li>
+                        <?php endforeach; ?>
+                        <li class="nav item active"><a href="<?= $block->escapeUrl($block->getUrl('help/contactus')) ?>"><?= $block->escapeHtml(__('Contact Us'))?></a></li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </div>
-    <!------site bar left------>
+        <!------site bar left------>
 
-    <div class="message-notification">
-        <div class="message-content">
-            <div class="message-image">
-                <img src='<?= $block->escapeUrl($block->getViewFileUrl('images/email-confirm.png')); ?>' alt="success forgot password">
+        <div class="message-notification">
+            <div class="message-content">
+                <div class="message-image">
+                    <img src='<?= $block->escapeUrl($block->getViewFileUrl('images/email-confirm.png')); ?>' alt="success forgot password">
+                </div>
+                <p><?= $block->escapeHtml(__('Thank you for contacting us.'))?></p>
+                <p><?= $block->escapeHtml(__('We have received your message and we\'ll get back to you in 24 hours.'))?></p>
             </div>
-            <p><?= $block->escapeHtml(__('Thank you for contacting us.'))?></p>
-            <p><?= $block->escapeHtml(__('We have received your message and we\'ll get back to you in 24 hours.'))?></p>
+            <div class="message-button">
+                <a class="back-to-help pagebuilder-banner-button pagebuilder-button-secondary" href="<?= $block->escapeUrl($block->getUrl('help')) ?>">
+                    <?= $block->escapeHtml(__('Back to Help'))?>
+                </a>
+                <a class="back-continue pagebuilder-banner-button pagebuilder-button-primary" href="<?= $block->getBaseUrl() ?>">
+                    <?= $block->escapeHtml(__('Go to Home'))?>
+                </a>
+            </div>
         </div>
-        <div class="message-button">
-            <a class="back-to-help pagebuilder-banner-button pagebuilder-button-secondary" href="<?= $block->escapeUrl($block->getUrl('help')) ?>">
-                <?= $block->escapeHtml(__('Back to Help'))?>
-            </a>
-            <a class="back-continue pagebuilder-banner-button pagebuilder-button-primary" href="<?= $block->getBaseUrl() ?>">
-                <?= $block->escapeHtml(__('Go to Home'))?>
-            </a>
-        </div>
-    </div>
-</div>
 
-<script type="text/x-magento-init">
+        <script type="text/x-magento-init">
     {
         "*": {
             "SM_Help/js/return-refund": {},
@@ -221,16 +221,27 @@
         }
     }
 </script>
-<script>
-    require(['jquery', 'jquery/jquery-storageapi', 'domReady!'], function ($) {
-        $(window).load(function () {
-            setTimeout(function () {
-                let triggerOrder = $.localStorage.get('order_help_form');
-                if (triggerOrder) {
-                    $('li[data-value="2"]').click().change();
-                    $.localStorage.remove('order_help_form');
-                }
-            }, 2000);
-        });
-    });
-</script>
+        <script>
+            require(['jquery', 'jquery/jquery-storageapi', 'domReady!'], function ($) {
+                $(window).load(function () {
+                    setTimeout(function () {
+                        let triggerOrder = $.localStorage.get('order_help_form');
+                        if (triggerOrder) {
+                            $('li[data-value="2"]').click().change();
+                            $.localStorage.remove('order_help_form');
+                        }
+                    }, 2000);
+                });
+            });
+        </script>
+    <?php else: ?>
+        <script>
+            require(['jquery', 'SM_Customer/js/popup'], function ($) {
+                $(window).load(function () {
+                    $('.sign-link a').trigger('click');
+                })
+            });
+        </script>
+    <?php endif; ?>
+</div>
+

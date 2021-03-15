@@ -15,6 +15,7 @@ use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Message\MessageInterface;
 use Magento\Framework\UrlInterface;
+use Magento\Framework\Webapi\Exception as HttpException;
 use Magento\Quote\Api\Data\CartItemExtensionInterfaceFactory;
 use Magento\Store\Model\App\Emulation;
 use Magento\Store\Model\StoreManagerInterface;
@@ -25,11 +26,12 @@ use SM\FreshProductApi\Helper\Fresh;
 use SM\GTM\Model\BasketFactory;
 use SM\Installation\Block\Form as Installation;
 use SM\MobileApi\Model\Quote\Item\Stock;
-use SM\MobileApi\Model\Quote\Item\Validate;
 
 class Cart implements \SM\MobileApi\Api\CartInterface
 {
     const PRODUCT_IMAGE_PATH = 'catalog/product';
+
+    protected $quote;
 
     protected $quoteRepository;
 
@@ -143,7 +145,7 @@ class Cart implements \SM\MobileApi\Api\CartInterface
         \SM\Bundle\Helper\Data $apiBundleHelper,
         \Magento\Framework\Registry $registry,
         \SM\Checkout\ViewModel\CartItem $cartItem,
-        \Magento\Webapi\Model\Authorization\TokenUserContext $tokenUserContext,
+        \SM\MobileApi\Model\Authorization\TokenUserContext $tokenUserContext,
         CustomerRepositoryInterface $customer,
         Stock $productStock,
         \SM\Checkout\Model\Data\CartMessageFactory $cartMessageFactory,
@@ -196,6 +198,8 @@ class Cart implements \SM\MobileApi\Api\CartInterface
 
     /**
      * Add product to cart
+     * @return int $cartId
+     * @return int $customerId
      * @param \Magento\Quote\Api\Data\CartItemInterface[] $cartItem
      * @return bool
      * @throws Exception
@@ -205,8 +209,10 @@ class Cart implements \SM\MobileApi\Api\CartInterface
      * @throws \Magento\Framework\Webapi\Exception
      * @throws \Zend_Json_Exception
      */
-    public function addToCart($cartItem, $cartId, $customerId)
+    public function addToCart($cartId, $customerId, $cartItem)
     {
+        $quote = $this->quoteRepository->getActive($cartId);
+        $customer = $this->customer->getById($customerId);
         if ($this->registry->registry("remove_cart_item")) {
             $this->registry->unregister("remove_cart_item");
         }
@@ -221,10 +227,7 @@ class Cart implements \SM\MobileApi\Api\CartInterface
                     );
                 }
                 $notAdd = false;
-                $quote = $this->quoteRepository->getActive($cartId);
                 $this->_initializeEventsForQuoteItems($quote);
-                $customerId = $this->tokenUserContext->getUserId();
-                $customer = $this->customer->getById($customerId);
                 $truePrice = 0;
                 $currentProduct = $this->productRepository->get($item->getSku());
                 $event = $this->event;
@@ -539,17 +542,24 @@ class Cart implements \SM\MobileApi\Api\CartInterface
     }
 
     /**
-     * @param int $cartId
-     * @param int $customerId
      * @return \SM\MobileApi\Api\Data\GTM\BasketInterface
      */
-    public function getCartCount($cartId, $customerId)
+    public function getCartCount()
     {
+        $customerId = $this->tokenUserContext->getUserId();
+        if (!$customerId || $customerId == 0) {
+            $basketInterface = $this->basketInterfaceFactory->create();
+            $basketInterface->setCartTotal(0);
+            $basketInterface->setBasketQty(0);
+            $basketInterface->setBasketValue(0);
+            $basketInterface->setCartTotal(0);
+            return $basketInterface;
+        }
         $basketInterface = $this->basketInterfaceFactory->create();
         $total = 0;
+        $this->getCartIdForCustomer($customerId);
         /** @var  \Magento\Quote\Model\Quote $quote */
-        $quote = $this->quoteRepository->getActive($cartId);
-
+        $quote = $this->quote;
         /** @var  \Magento\Quote\Model\Quote\Item $item */
         foreach ($quote->getItemsCollection() as $item) {
             if ($item->isDeleted() || !$item->getIsActive() || $item->getParentItemId() || $item->getParentItem()) {
@@ -557,7 +567,6 @@ class Cart implements \SM\MobileApi\Api\CartInterface
             }
             $total += $item->getQty();
         }
-        $quote = $this->quoteRepository->getActive($cartId);
         $basketInterface->setCartTotal($total);
         $basketInterface->setBasketQty($total);
         $basketInterface->setBasketValue($quote->getSubtotalWithDiscount());
@@ -577,14 +586,12 @@ class Cart implements \SM\MobileApi\Api\CartInterface
     /**
      * @param int $cartId
      * @param int $id
-     * @param int $customerId
      * @return bool
      * @throws CouldNotSaveException
      * @throws NoSuchEntityException
      */
-    public function removeCart($customerId, $cartId, $id)
+    public function removeCart($cartId, $id)
     {
-        /** @var \Magento\Quote\Model\Quote $quote */
         $quote = $this->quoteRepository->getActive($cartId);
         $quoteItem = $quote->getItemById($id);
         if (!$quoteItem) {
@@ -625,9 +632,15 @@ class Cart implements \SM\MobileApi\Api\CartInterface
     /**
      * @inheritdoc
      * @throws \Magento\Framework\Webapi\Exception
+     * @throws CouldNotSaveException
      */
-    public function getItems($cartId, $checkStock = true)
+    public function getItems($checkStock = true)
     {
+        $customerId = $this->tokenUserContext->getUserId();
+        if (!$customerId || $customerId == 0) {
+            return $this->cartItemFactory->create();
+        }
+
         $output             = [];
         $cartMessageFactory = [];
         $isRemoveProduct    = false;
@@ -635,12 +648,12 @@ class Cart implements \SM\MobileApi\Api\CartInterface
 
         /** @var  \Magento\Quote\Model\Quote $quote */
         if (empty($this->currentQuote)) {
-            $quote = $this->quoteRepository->getActive($cartId);
+            $this->getCartIdForCustomer($customerId);
+            $quote = $this->currentQuote = $this->quote;
         } else {
             $quote = $this->currentQuote;
         }
 
-        $customerId = $quote->getCustomerId();
         $totalQty   = 0;
         if ($quote->isMultipleShippingAddresses() || $quote->getIsMultiShipping()) {
             foreach ($quote->getAllShippingAddresses() as $address) {
@@ -1000,10 +1013,12 @@ class Cart implements \SM\MobileApi\Api\CartInterface
         try {
             //Get active quote by customer id
             $quote = $this->quoteRepository->getActiveForCustomer($customerId);
+            $this->quote = $quote;
         } catch (NoSuchEntityException $e) {
             //If quote is not active or customer don't have
             //We will create new quote for customer
             $quote = $this->quoteManagement->createEmptyCartForCustomer($customerId);
+            $this->quote = $quote;
             return (int)$quote;
         } catch (CouldNotSaveException $e) {
             throw new CouldNotSaveException(__("The cart can't be created."));
