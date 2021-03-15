@@ -188,6 +188,7 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper {
 				$this->curl->setOption(CURLOPT_CONNECTTIMEOUT, 0);
 				$this->curl->setTimeout($this->config->getTimeout());
 			}
+			$this->logger->info('PARAM = ' . json_encode($data));
 			$this->curl->post($url, $data);
 		} catch (\Exception $e) {
 			$this->logger->info('HIT API ERROR = ' . $e->getMessage());

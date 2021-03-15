@@ -12,15 +12,8 @@
 
 namespace Trans\Sprint\Model\Order;
 
-use Magento\Framework\Api\FilterBuilder;
-use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\Api\Search\FilterGroup;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Sales\Api\Data\OrderStatusHistoryInterfaceFactory;
-use Magento\Sales\Api\OrderManagementInterface;
-use Magento\Sales\Api\OrderRepositoryInterface;
-use Magento\Sales\Api\OrderStatusHistoryRepositoryInterface;
 use Magento\Sales\Model\Order;
 
 /**
@@ -29,34 +22,14 @@ use Magento\Sales\Model\Order;
 class AutoCancel implements \Trans\Sprint\Api\AutoCancelInterface
 {
     /**
-     * @var OrderRepositoryInterface
-     */
-    private $orderRepository;
-
-    /**
-     * @var SearchCriteriaBuilder
-     */
-    private $searchCriteriaBuilder;
-
-    /**
-     * @var FilterBuilder
-     */
-    private $filterBuilder;
-
-    /**
-     * @var FilterGroup
-     */
-    private $filterGroup;
-
-    /**
-     * @var OrderManagementInterface
-     */
-    private $orderManagement;
-
-    /**
      * @var \Magento\Sales\Model\ResourceModel\Sales\CollectionFactory
      */
     protected $salesCollection;
+
+    /**
+     * @var \Magento\Sales\Model\ResourceModel\Order
+     */
+    protected $orderResource;
 
     /**
      * @var \Trans\IntegrationOrder\Api\PaymentStatusInterface
@@ -69,51 +42,49 @@ class AutoCancel implements \Trans\Sprint\Api\AutoCancelInterface
     protected $configHelper;
 
     /**
+     * @var \Trans\Sprint\Api\PaymentNotifyInterface
+     */
+    protected $notifyInterface;
+
+    /**
      * @var \Trans\Sprint\Helper\Data
      */
     protected $dataHelper;
 
     /**
+     * @var \Trans\Sprint\Helper\Gateway
+     */
+    protected $gateway;
+
+    /**
      * CancelOrderPending constructor.
      *
-     * @param OrderRepositoryInterface $orderRepository
-     * @param SearchCriteriaBuilder $searchCriteriaBuilder
-     * @param FilterBuilder $filterBuilder
-     * @param FilterGroup $filterGroup
-     * @param OrderManagementInterface $orderManagement
      * @param \Magento\Sales\Model\ResourceModel\Sales\CollectionFactory $salesCollection
+     * @param \Magento\Sales\Model\ResourceModel\Order $orderResource
      * @param \Trans\IntegrationOrder\Api\PaymentStatusInterface $paymentStatusOms
+     * @param \Trans\Sprint\Api\PaymentNotifyInterface $notifyInterface
      * @param \Trans\Sprint\Helper\Config $configHelper
      * @param \Trans\Sprint\Helper\Data $dataHelper
+     * @param \Trans\Sprint\Helper\Gateway $gateway
      */
     public function __construct(
-        OrderRepositoryInterface $orderRepository,
-        OrderStatusHistoryInterfaceFactory $orderStatusHistoryInterfaceFactory,
-        OrderStatusHistoryRepositoryInterface $orderStatusHistoryRepoInterface,
-        SearchCriteriaBuilder $searchCriteriaBuilder,
-        FilterBuilder $filterBuilder,
-        FilterGroup $filterGroup,
-        OrderManagementInterface $orderManagement,
         \Magento\Sales\Model\ResourceModel\Order\CollectionFactory $salesCollection,
+        \Magento\Sales\Model\ResourceModel\Order $orderResource,
         \Trans\IntegrationOrder\Api\PaymentStatusInterface $paymentStatusOms,
+        \Trans\Sprint\Api\PaymentNotifyInterface $notifyInterface,
         \Trans\Sprint\Helper\Config $configHelper,
-        \Trans\Sprint\Helper\Data $dataHelper
+        \Trans\Sprint\Helper\Data $dataHelper,
+        \Trans\Sprint\Helper\Gateway $gateway
     ) {
-        $this->orderRepository                    = $orderRepository;
-        $this->orderStatusHistoryInterfaceFactory = $orderStatusHistoryInterfaceFactory;
-        $this->orderStatusHistoryRepoInterface    = $orderStatusHistoryRepoInterface;
-        $this->searchCriteriaBuilder              = $searchCriteriaBuilder;
-        $this->filterBuilder                      = $filterBuilder;
-        $this->filterGroup                        = $filterGroup;
-        $this->orderManagement                    = $orderManagement;
-        $this->salesCollection                    = $salesCollection;
-        $this->paymentStatusOms                   = $paymentStatusOms;
-        $this->configHelper                       = $configHelper;
-        $this->dataHelper                         = $dataHelper;
+        $this->salesCollection = $salesCollection;
+        $this->orderResource = $orderResource;
+        $this->paymentStatusOms = $paymentStatusOms;
+        $this->notifyInterface = $notifyInterface;
+        $this->configHelper = $configHelper;
+        $this->dataHelper = $dataHelper;
+        $this->gateway = $gateway;
 
-        $writer       = new \Zend\Log\Writer\Stream(BP . '/var/log/auto_cancel.log');
-        $logger       = new \Zend\Log\Logger();
-        $this->logger = $logger->addWriter($writer);
+        $this->logger = $dataHelper->getLogger();
     }
 
     /**
@@ -140,64 +111,93 @@ class AutoCancel implements \Trans\Sprint\Api\AutoCancelInterface
             $collection = $this->salesCollection->create();
             $collection->getSelect()
                 ->join(
-                    array('sprint' => 'sprint_response'),
+                    ['sprint' => 'sprint_response'],
                     'main_table.reference_number= sprint.transaction_no',
-                    array('payment_method' => 'sprint.payment_method', 'expire' => 'sprint.expire_date')
+                    [
+                        'payment_method' => 'sprint.payment_method', 
+                        'expire' => 'sprint.expire_date', 
+                        'insert_date' => 'sprint.insert_date', 
+                        'channel_id' => 'sprint.channel_id'
+                    ]
                 );
-            // $collection->getSelect()->where('payment_method in (' . $string . ')');
             $collection->setPageSize(50);
             $collection->addFieldToFilter('payment_method', ['in' => $paymentCodes]);
             $collection->addFieldToFilter('status', $status);
             $collection->addFieldToFilter('expire_date', ['lteq' => $today]);
+            $collection->getSelect()->group('reference_number');
 
             if ($collection->getSize()) {
+                
+                // $orderIds = [];
+                $refNumbers = [];
                 /** @var Order $order */
                 foreach ($collection as $order) {
                     if ($order instanceof \Magento\Sales\Api\Data\OrderInterface) {
+                        
+                        /**
+                         * Digital Order is not sent to OMS
+                         * Reference: APO-1418
+                         */
+                        if ($order->getIsVirtual()) {
+                            $this->logger->info('Virtual Order -> Skip');
+                            continue;
+                        }
+                        
+                        $this->logger->info('===> start loop cancel order.');
+                        
                         try {
-                            $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/order-status.log');
-                            $logger = new \Zend\Log\Logger();
-                            $logger->addWriter($writer);
-                            $logger->info('Trans\Sprint\Model\Order\AutoCancel' . '. Order-Id: ' . $order->getId() . '. Before Status: ' . $order->getStatus());
-                            $this->orderManagement->cancel($order->getId()); //cancel order
-                            $logger->info('Trans\Sprint\Model\Order\AutoCancel' . '. Order-Id: ' . $order->getId() . '. After Status: ' . $order->getStatus());
-                            $refNumber     = $order->getData('reference_number');
-                            $orderEntityId = $order->getEntityId();
-                            $orderHistory  = $this->orderStatusHistoryInterfaceFactory->create();
-                            $orderHistory->setParentId($orderEntityId);
-                            $orderHistory->setStatus('order_canceled');
-                            $this->orderStatusHistoryRepoInterface->save($orderHistory);
-                            $this->logger->info('$refNumber = ' . $refNumber);
-                            $this->logger->info('$orderEntityId = ' . $orderEntityId);
+                            $checkStatus = $this->gateway->checkTrxStatus($order);
+                            $check = $checkStatus['status'];
 
-                            $order->setStatus('order_canceled');
-                            $order->save();
-
-                            /**
-                             * Digital Order is not sent to OMS
-                             * Reference: APO-1418
-                             */
-                            if ($order->getIsVirtual()) {
-                                $this->logger->info('Virtual Order -> Skip');
-                                continue;
+                            $refNumber = $order->getData('reference_number');
+                            
+                            if(!$check) {
+                                $this->logger->info('Order BCA VA expired.');
+                                $this->logger->info('$refNumber = ' . $refNumber);
+                                $this->logger->info('$orderEntityId = ' . $order->getEntityId());
+                                // $orderIds[] = (int) $order->getEntityId();
+                                
+                                if(!in_array($refNumber, $refNumbers) && $order->getStatus() != 'order_canceled') {
+                                    $updateOms = $this->paymentStatusOms->sendStatusPayment($refNumber, 99);
+                                    if ($updateOms) {
+                                        $updateOms = json_encode($updateOms);
+                                    }
+                                    $this->logger->info('$updateOms response =' . $updateOms);
+                                }
                             }
 
-                            $updateOms = $this->paymentStatusOms->sendStatusPayment($refNumber, 99);
-                            if ($updateOms) {
-                                $updateOms = json_encode($updateOms);
+                            if(!in_array($refNumber, $refNumbers)) {
+                                if(!$check) {
+                                    $refNumbers[] = $refNumber;
+                                }
+
+                                $postData = isset($checkStatus['response']['queryResponse'][0]['transactionNo']) ? $checkStatus['response']['queryResponse'][0] : null;
+
+                                if(empty($postData)) {
+                                    continue;
+                                }
+
+                                $this->notifyInterface->processingNotify($postData);
                             }
-                            $this->logger->info('$updateOms response =' . $updateOms);
                         } catch (InputException $e) {
                             $this->logger->info($e->getMessage());
+                            $this->logger->info('===> end. next loop cancel order.');
                             continue;
                         } catch (NoSuchEntityException $e) {
                             $this->logger->info($e->getMessage());
+                            $this->logger->info('===> end. next loop cancel order.');
                             continue;
                         } catch (\Exception $e) {
                             $this->logger->info($e->getMessage());
                             continue;
                         }
                     }
+                    $this->logger->info('===> end. next loop cancel order.');
+                }
+
+                if($refNumbers) {
+                    $this->cancelOrders($refNumbers);
+                    $this->saveStatusHistoryOrder($refNumbers);
                 }
             }
         } catch (\Exception $e) {
@@ -205,5 +205,50 @@ class AutoCancel implements \Trans\Sprint\Api\AutoCancelInterface
         }
 
         $this->logger->info(__FUNCTION__ . ' end ----------');
+    }
+
+    /**
+     * Cancel order by reference number
+     * @param  array $refNumbers
+     * @return void
+     */
+    protected function cancelOrders(array $refNumbers)
+    {
+        $connection = $this->orderResource->getConnection();
+        $tableSales = $connection->getTableName('sales_order');
+        $orderStatus = 'order_canceled';
+        $orderState = 'canceled';
+        
+        $connection->update($tableSales, ['status' => $orderStatus, 'state' => $orderState], ['reference_number IN (?)' => $refNumbers]);
+    }
+
+    /**
+     * Order status history 'cancel order'
+     * @param  array $refNumbers
+     * @return void
+     */
+    protected function saveStatusHistoryOrder(array $refNumbers)
+    {
+        $connection = $this->orderResource->getConnection();
+        $orderStatus = 'order_canceled';
+
+        $orders = $this->salesCollection->create();
+        $orders->addFieldToFilter('reference_number', ['in' => $refNumbers]);
+
+        if ($orders->getSize()) {
+            $historyData = [];
+            foreach ($orders as $order) {
+                $history['parent_id'] = $order->getId();
+                $history['status'] = $orderStatus;
+                // $history['comment'] = 'Order Canceled by Transmart';
+                $history['entity_name'] = 'order';
+                $historyData[] = $history;
+            }
+
+            $this->logger->info('Param History = ' . print_r($historyData, true));
+            
+            $historyTable = $connection->getTableName('sales_order_status_history');
+            $connection->insertOnDuplicate($historyTable, $historyData);
+        }
     }
 }
