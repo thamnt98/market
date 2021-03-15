@@ -155,22 +155,22 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	protected $attrGroupGeneralInfoId;
 
 	/**
-	 * @var ProductAttributeInterfaceFactory 
+	 * @var ProductAttributeInterfaceFactory
 	 */
-	protected $productAttributeFactory;	
+	protected $productAttributeFactory;
 
 	/**
-	 * @var ProductAttributeRepositoryInterface 
+	 * @var ProductAttributeRepositoryInterface
 	 */
 	protected $productAttributeRepository;
 
 	/**
-	 * @var ProductAttributeManagementInterface 
+	 * @var ProductAttributeManagementInterface
 	 */
-	protected $productAttributeManagement;	
+	protected $productAttributeManagement;
 
 	/**
-	 * @var \Magento\Catalog\Model\ResourceModel\Eav\Attribute 
+	 * @var \Magento\Catalog\Model\ResourceModel\Eav\Attribute
 	 */
 	protected $eavAttribute;
 
@@ -205,6 +205,11 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	protected $brandFactory;
 
 	/**
+	 * @var \Trans\Core\Helper\Url
+	 */
+	protected $coreUrlHelper;
+
+	/**
 	 * @var \Magento\Framework\App\ResourceConnection
 	 */
 	protected $resource;
@@ -236,6 +241,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	 * @param \Trans\IntegrationEntity\Model\IntegrationProductAttributeRepository $attributeSet
 	 * @param \Trans\Brand\Api\BrandRepositoryInterface $brandRepository
 	 * @param \Trans\Brand\Api\Data\BrandInterface $brandFactory
+	 * @param \Trans\Core\Helper\Url $coreUrlHelper
 	 */
 	public function __construct
 	(
@@ -270,7 +276,8 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		\Trans\IntegrationCatalog\Helper\Data $dataHelper,
 		\Trans\IntegrationEntity\Model\IntegrationProductAttributeRepository $attributeSet,
 		\Trans\Brand\Api\BrandRepositoryInterface $brandRepository,
-		\Trans\Brand\Api\Data\BrandInterfaceFactory $brandFactory
+		\Trans\Brand\Api\Data\BrandInterfaceFactory $brandFactory,
+		\Trans\Core\Helper\Url $coreUrlHelper
 	) {
 		$this->logger = $logger;
 		$this->configurableAttribute = $configurableAttribute;
@@ -299,6 +306,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		$this->attributeSet = $attributeSet;
 		$this->brandRepository = $brandRepository;
 		$this->brandFactory = $brandFactory;
+		$this->coreUrlHelper = $coreUrlHelper;
 
 		// $this->attrGroupGeneralInfoId = $this->integrationAttributeRepository->getAttributeGroupId(IntegrationProductAttributeInterface::ATTRIBUTE_GROUP_CODE_GENERAL);
 		$this->attrGroupGeneralInfoId = IntegrationProductInterface::ATTRIBUTE_SET_ID;
@@ -320,10 +328,10 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	 * @param object $datas
 	 * @param int $status
 	 * @param string $msg
-	 * @throw error 
+	 * @throw error
 	 */
 	protected function updateJobData($jobId=0,$status="" , $msg=""){
-	
+
 		if ($jobId<1) {
 			throw new StateException(
 				__(IntegrationJobInterface::MSG_DATA_NOTAVAILABLE)
@@ -334,7 +342,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			$dataJobs->setStatus($status);
 			if(!empty($msg)){
 				$dataJobs->setMessages($msg);
-			}	
+			}
 			$this->integrationJobRepositoryInterface->save($dataJobs);
 		}catch (\Exception $exception) {
 			$this->logger->info(__FUNCTION__."------ ERROR ".$exception->getMessage());
@@ -359,9 +367,9 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			if($jobs->getFirstItem()){
 				$jobId     = $jobs->getFirstItem()->getId();
 				$jobStatus = $jobs->getFirstItem()->getStatus();
-				
+
 				$status    = IntegrationProductInterface::STATUS_JOB;
-				
+
 				$result = $this->integrationDataValueRepositoryInterface->getByJobIdWithStatus($jobId, $status);
 				if ($result->getSize() < 1) {
 					throw new NoSuchEntityException(__('Result Data Value Are Empty!!'));
@@ -382,14 +390,14 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	 * @param Object Data Value Product
 	 */
 	public function saveProduct($datas, $jobData = null) {
-		
+
 		$checkData = array_filter($datas->getData());
 		if (empty($checkData)) {
 			throw new StateException(
 				__(IntegrationJobInterface::MSG_DATA_NOTAVAILABLE)
 			);
 		}
-		
+
 		$jobId    = $datas->getFirstItem()->getJbId();
 		$this->updateJobData($jobId,IntegrationJobInterface::STATUS_PROGRESS_CATEGORY);
 
@@ -402,9 +410,9 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			$resultDataConfigurable=[];
 
 			foreach ($datas as $data) {
-			
+
 				$dataProduct[$i] = $this->validateProductDataValue($data);
-				
+
 				if(empty($dataProduct[$i]['sku']) || is_null($dataProduct[$i]['sku'])){
 					$msg="Error , SKU ARE EMPTY !!";
 					$this->logger->info($msg);
@@ -417,9 +425,9 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 					$this->saveStatusMessage($data, $msg, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
 					continue;
 				}
-				
+
 				if ($dataProduct[$i]['is_deleted']<1) {
-					
+
 					try {
 						$saveMagento[$i] = $this->saveDataToMagento($dataProduct[$i],$data);
 					} catch (StateException $e) {
@@ -429,10 +437,10 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 						$this->logger->info($e->getMessage());
 						continue;
 					}
-					
+
 					if($saveMagento[$i]['entity_id']>0){
 						$integrationProductMap[$i] = $this->saveDataToIntegrationProduct($saveMagento[$i]['entity_id'],$dataProduct[$i],$data);
-					
+
 						if($saveMagento[$i]['is_configurable']>0){
 							$this->createIntegrationProductMapConfigurable($dataProduct[$i],$data);
 							$this->logger->info("Created configurable ".print_r($dataProduct[$i]['sku'],true));
@@ -442,18 +450,18 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 					}
 				}else{
 					$this->deleteProduct($dataProduct[$i],$data);
-				
+
 				}
 				$this->saveStatusMessage($data,NULL,IntegrationDataValueInterface::STATUS_DATA_SUCCESS);
 				// return $dataProduct[$i];
 				$i++;
-				
+
 			}
 		} catch (\Exception $exception) {
 			$msg = __FUNCTION__." ERROR : ".$exception->getMessage();
 			$this->logger->info($msg);
 			$this->updateJobData($jobId,IntegrationJobInterface::STATUS_PROGRES_UPDATE_FAIL);
-			
+
 			throw new StateException(__($exception->getMessage()));
 		}
 
@@ -464,7 +472,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	/**
 	 * Validate Product Data Value
 	 * @param instance Integration Data Value
-	 * 
+	 *
 	 */
 	protected function validateProductDataValue($integrationDataValue){
 		if(!$integrationDataValue->getId()){
@@ -486,7 +494,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			$result['height']	 		= $this->validation->validateArray(IntegrationProductInterface::HEIGHT, $dataProduct);
 			$result['length']	 		= $this->validation->validateArray(IntegrationProductInterface::LENGTH, $dataProduct);
 			$result['width']	 		= $this->validation->validateArray(IntegrationProductInterface::WIDTH, $dataProduct);
-			
+
 
 			$result['active']	 		= $this->validation->validateArray(IntegrationProductInterface::IS_ACTIVE, $dataProduct);
 			$result['short_desc']		= $this->validation->validateArray(IntegrationProductInterface::SHORT_DESC, $dataProduct);
@@ -494,7 +502,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			$result['data_attributes']	= $this->validation->validateArray(IntegrationProductInterface::ATTRIBUTES, $dataProduct);
 
 			$result['pim_id'] 			= $this->validation->validateArray(IntegrationProductInterface::ID, $dataProduct);
-			
+
 			$result[IntegrationProductInterface::COMPANY_CODE] = $this->validation->validateArray(IntegrationProductInterface::COMPANY_CODE, $dataProduct);
 
 			$result[IntegrationProductInterface::PRODUCT_TYPE]	= IntegrationProductInterface::PRODUCT_TYPE_SIMPLE_VALUE;
@@ -506,7 +514,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			if(!empty($result[IntegrationProductInterface::PRODUCT_TYPE]) && ($result[IntegrationProductInterface::PRODUCT_TYPE]==IntegrationProductInterface::PRODUCT_TYPE_DIGITAL_VALUE)){
 				$result[IntegrationProductInterface::CATALOG_TYPE]	=IntegrationProductInterface::CATALOG_TYPE_DIGITAL_VALUE;
 			}
-			
+
 
 			// get magento category id
 			$result['m_category_id'] = $this->getCategoryId($result['category_id']);
@@ -528,7 +536,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			$this->saveStatusMessage($integrationDataValue, $msg, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
 			throw new StateException(__($msg));
 		}
-		
+
 		return $result;
 
 	}
@@ -539,10 +547,10 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	 * @return \Magento\Catalog\Api\Data\ProductInterface
 	 * @throws CouldNotSaveException
 	 */
-	protected function saveDataToMagento($dataProduct, $integrationDataValue) 
+	protected function saveDataToMagento($dataProduct, $integrationDataValue)
 	{
 		$this->logger->info('Start saveDataToMagento ' . date('H:i:s'));
-		$isConfigurable = 0;	
+		$isConfigurable = 0;
 		try {
 			// Check SKU
 			$productMapingData = $this->integrationProductRepositoryInterface->loadDataByPimSku($dataProduct['sku']);
@@ -552,7 +560,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			if ($productMapingData) {
 				$productId = $productMapingData->getMagentoEntityId();
 			}
-		
+
 			if($productId) {
 				try {
 					$product = $this->productRepositoryInterface->getById($productId);
@@ -567,11 +575,11 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 
 			if(!$update) {
 				// Set sku
-				$product->setSku($dataProduct['sku']); 
+				$product->setSku($dataProduct['sku']);
 				// Set Url
 				$product->setUrlKey(
 					$this->changeUrlKeyChildProduct(
-						$dataProduct['product_name'], 
+						$dataProduct['product_name'],
 						$dataProduct['sku']
 					)
 				);
@@ -584,19 +592,19 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			$this->saveStatusMessage($integrationDataValue, $msg, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
 			throw new StateException(__($msg));
 		}
-		
+
 
 		try {
-			
+
 			$checkCat = array_filter($dataProduct['m_category_id']);
 			if(!empty($checkCat)){
 				$product->setCategoryIds($dataProduct['m_category_id']);
 			}
-			
+
 			$product->setName($dataProduct['product_name']); // Name of Product
 
 			$attributeSet = $this->prepareAttributeSet($dataProduct);
-			
+
 			$product->setAttributeSetId($attributeSet); // Attribute set id
 
 			// weight of product
@@ -621,9 +629,9 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 				$isConfigurable = 1;
 				$visibility = IntegrationProductInterface::VISIBILITY_NOT_VISIBLE; // Not visible
 			}
-			
+
 			$product->setVisibility($visibility); // Not visible
-			
+
 			$product->setTaxClassId(0); // Tax class id
 			if(isset($dataProduct['product_type']) && !empty($dataProduct['product_type'])){
 				$this->logger->info($dataProduct['sku']." ----".strtoupper($dataProduct['product_type'])." ---");
@@ -643,9 +651,9 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			if ((int) $dataProduct['is_active'] == 1) {
 				$status = IntegrationProductInterface::STATUS_ENABLED;
 			}
-			
+
 			$product->setStatus($status);
-						
+
 			if(!empty($dataProduct['short_desc'])){
 				$product->setShortDescription($dataProduct['short_desc']);
 			}
@@ -663,7 +671,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 
 			// Create Attribute Item Code
 			$dataAttributes = $this->addAttributeSellingForConfigurable($dataProduct);
-			
+
 			// Set Attributes
 			if(isset($dataAttributes['attributes']) && is_array($dataAttributes['attributes'])){
 				$checkAttr  = array_filter($dataAttributes['attributes']);
@@ -727,26 +735,26 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 
 			//Code for change product category
 			$this->removeAndAssignProductCategory($productId, $product, $dataProduct);
-		
+
 		} catch (CouldNotSaveException $exception) {
 			$msg = __FUNCTION__." On Save : ".$exception->getMessage();
 			$this->logger->info($msg);
 			$this->saveStatusMessage($integrationDataValue,$msg , IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
-			
+
 			$this->logger->info('End saveDataToMagento ' . date('H:i:s'));
 			throw new StateException(__($msg));
 		} catch (\Exception $exception) {
 			$msg = __FUNCTION__." On Save : ".$exception->getMessage();
 			$this->logger->info($msg);
 			$this->saveStatusMessage($integrationDataValue,$msg , IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE);
-			
+
 			$this->logger->info('End saveDataToMagento ' . date('H:i:s'));
 			throw new StateException(__($msg));
 		} catch (\RuntimeException $exception) {
 			$msg = __FUNCTION__." On Save Runtime : ".$exception->getMessage();
 			$this->logger->info($msg);
 			$this->saveStatusMessage($integrationDataValue, $msg, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE_CONFIGURE);
-			
+
 			$this->logger->info('End saveDataToMagento ' . date('H:i:s'));
 			throw new StateException(__($msg));
 		}
@@ -791,7 +799,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 					}
 				}
 				break;
-			
+
 			case 'configurable':
 				if(isset($productData['magento_entity_ids']) && $productData['magento_entity_ids']) {
 					$childs = array_values($productData['magento_entity_ids']);
@@ -822,7 +830,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	}
 
 	/**
-	 * 
+	 *
 	 */
 	public function checkConfigurable($sku=""){
 		$result['is_configurable']=0;
@@ -858,7 +866,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 				$result['is_configurable']=1;
 				$result['query_integration_product'] = $queryIntegrationProduct ;
 			}
-		
+
 		}
 		return $result;
 	}
@@ -869,11 +877,11 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	 * @param array $dataAttributes
 	 */
 	protected function addAttributeSellingForConfigurable($dataProduct)
-	{	
+	{
 		$dataAttributes = $dataProduct['data_attributes'];
 		try {
 			if ($dataProduct[IntegrationProductInterface::PRODUCT_TYPE] != IntegrationProductInterface::PRODUCT_TYPE_DIGITAL_LABEL) {
-				$sellingUnit = substr($dataProduct['sku'], -3); //get 3 last char from SKU 
+				$sellingUnit = substr($dataProduct['sku'], -3); //get 3 last char from SKU
 				$attributeCode = IntegrationProductInterface::SELLING_UNIT_CODE;
 				$attributeId = $this->saveAttributeProduct($attributeCode);
 
@@ -890,7 +898,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 
 		$result['attributes'] = $dataAttributes;
 		$this->logger->info(__FUNCTION__." ATTRS :". json_encode($dataAttributes));
-		
+
 		return $result;
 	}
 
@@ -906,11 +914,11 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		try{
 			$assignNewcategory = false;
 			$categoryIds = $dataProduct['m_category_id'];
-			
+
 			if(!is_array($categoryIds)){
 				return false;
 			}
-			
+
 			if ($productId) {
 				if ($product->getCategoryIds()) {
 					$i  = 0;
@@ -925,7 +933,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 						}
 						$i++;
 					}
-				} 
+				}
 				$assignNewcategory = $this->categoryLinkManagementInterface->assignProductToCategories($product->getSku(), $categoryIds);
 			}
 		} catch (\Exception $exception) {
@@ -993,39 +1001,39 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		$attributeId 		= NULL;
 		try {
 			$attributeData = $this->eavAttribute->getCollection()->addFieldToFilter('attribute_code', $attributeCode);
-			
-			if($attributeData->getSize() > 0){ 
+
+			if($attributeData->getSize() > 0){
 				foreach($attributeData as $attributeDatas)
-				{ 
+				{
 					$attributeId = $attributeDatas['attribute_id'];
 				}
 			}else{
-				
+
 				$this->createAttributeProduct($attributeCode);
 			}
 		} catch (\Exception $exception) {
 			throw new StateException(
 				__(__FUNCTION__." - ".$exception->getMessage())
 			);
-		}	
+		}
 
         return $attributeId;
 	}
 
 	/**
 	 * Create New Attribute
-	 * 
+	 *
 	 * @param $attributeCode string
 	 * @return
 	 */
 	protected function createAttributeProduct($attributeCode=""){
 		try {
-			
+
 			$frontentInput    = IntegrationProductInterface::INPUT_TYPE_FRONTEND_FORMAT_PRICE;
 			$backendInput     = IntegrationProductInterface::INPUT_TYPE_BACKEND_FORMAT_PRICE;
-			
+
 			$attributeValue = $this->productAttributeFactory->create();
-			
+
 			$attributeValue->setIsHtmlAllowedOnFront(IntegrationProductInterface::IS_HTML_ALLOWED_ON_FRONT);
 			$attributeValue->setIsUsedInGrid(IntegrationProductInterface::IS_USED_IN_GRID);
 			$attributeValue->setIsVisibleInGrid(IntegrationProductInterface::IS_VISIBLE_IN_GRID);
@@ -1033,7 +1041,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			$attributeValue->setPosition(IntegrationProductInterface::POSITION);
 			$attributeValue->setApplyTo(IntegrationProductInterface::APPLY_TO);
 			$attributeValue->setIsVisible(IntegrationProductInterface::IS_VISIBLE);
-			
+
 			$attributeValue->setScope(IntegrationProductInterface::SCOPE);
 			$attributeValue->setAttributeCode($attributeCode);
 			$attributeValue->setFrontendInput($frontentInput);
@@ -1044,18 +1052,18 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			$attributeValue->setBackendType($backendInput);
 			$attributeValue->setDefaultValue(0);
 			$attributeValue->setIsUnique(IntegrationProductInterface::IS_UNIQUE);
-			
+
 			$this->productAttributeRepository->save($attributeValue);
-			
+
 			//Set Attribute to Attribute Set (Default)
 			$this->productAttributeManagement->assign($this->attrGroupGeneralInfoId, $this->attrGroupProductDetailId, $attributeCode, IntegrationProductInterface::SORT_ORDER);
-				
+
 		} catch (\Exception $exception) {
-			
+
 			throw new StateException(
 				__(__FUNCTION__." - ".$exception->getMessage())
 			);
-		}	
+		}
 	}
 
     /**
@@ -1074,7 +1082,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
                 if ($attributeData->getId()) {
                     if ($attributeData->getAdditionalData() || $attributeData->getFrontendInput() == IntegrationProductInterface::FRONTEND_INPUT_TYPE_SELECT) {
                     	$attrVal = $this->attributeOption->createOrGetId(
-                                $attributeCode, 
+                                $attributeCode,
                                 $attributeValue
                             );
 
@@ -1090,14 +1098,14 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
                             $product->setColor($attrVal);
                         } else {
                             $product->setData(
-                                $attributeCode, 
+                                $attributeCode,
                                 $attrVal
                             );
                         }
                     } else {
                     	$attributeValue = $attributeData->getBackendType() == 'int' ? (int) $attributeValue : $attributeValue;
                     	$product->setData(
-                            $attributeCode, 
+                            $attributeCode,
                             $attributeValue
                         );
                     }
@@ -1123,16 +1131,16 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			$integrationProduct = $this->integrationProductRepositoryInterface->loadDataByPimSku(
 				$dataProduct['sku']
 			);
-			
+
 			if ($integrationProduct) {
-				
+
 			}else{
 				$integrationProduct = $this->integrationProductInterfaceFactory->create();
 
 			}
 			$integrationProduct->setPimId($dataProduct['pim_id']);
 			$integrationProduct->setPimSku($dataProduct['sku']);
-			
+
 			$integrationProduct->setMagentoEntityId($magentoProductId);
 			$integrationProduct->setItemId($dataProduct['item_id']);
 
@@ -1157,13 +1165,13 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 				$productType = IntegrationProductInterface::PRODUCT_TYPE_DIGITAL_VALUE;
 			}
 			$integrationProduct->setProductType($productType);
-			
+
 			$result = $this->integrationProductRepositoryInterface->save($integrationProduct);
 
 		} catch (\Exception $ex) {
 			$msg = __FUNCTION__." Save Integration Catalog Map : ".$ex->getMessage();
 			$this->logger->info($msg);
-			
+
 			if($integrationDataValue) {
 				$this->saveStatusMessage($integrationDataValue, $msg, IntegrationDataValueInterface::STATUS_DATA_FAIL_UPDATE_MAPPING);
 			}
@@ -1198,8 +1206,8 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			if(isset($integrationProduct)){
 				$this->logger->info(print_r($integrationProduct->getData(), true));
 			}
-			
-			
+
+
 			if ($integrationProduct) {
 				if($integrationProduct->getStatusConfigurable()<1){
 					return "IS NOT CONFIGURABLE";
@@ -1208,7 +1216,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 					$integrationProduct->setStatusConfigurable(integrationProductInterface::STATUS_CONFIGURABLE_NEED_UPDATE);
 				}
 				$integrationProduct->setStatusConfigurable(integrationProductInterface::STATUS_CONFIGURABLE_NEED_UPDATE);
-				
+
 			} else {
 				$integrationProduct = $this->integrationProductInterfaceFactory->create();
 				$integrationProduct->setPimSku($dataProduct['item_id']);
@@ -1221,7 +1229,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 				$jsonCat = json_encode($categoryIds);
 				$integrationProduct->setPimCategoryId($jsonCat);
 			}
-			
+
 			$result = $this->integrationProductRepositoryInterface->save($integrationProduct);
 
 		} catch (\Exception $ex) {
@@ -1243,13 +1251,13 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	protected function deleteProduct($dataProduct=[],$integrationDataValue=[]){
 		try {
 			$productMapingData = $this->integrationProductRepositoryInterface->loadDataByPimSku($dataProduct['sku']);
-			
+
 			if ($productMapingData) {
 				$this->productRepositoryInterface->deleteById($dataProduct['sku']);
 				$this->integrationProductRepositoryInterface->delete($productMapingData);
 				// $product       = $this->productRepositoryInterface->getById($productMapingData->getMagentoEntityId());
 				// $productDelete = $this->productModel->delete($product);
-			
+
 			}
 
 		} catch (\Exception $ex) {
@@ -1269,7 +1277,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	public function prepareDataConfigurable(){
 		$result = [];
 		$status = [
-			IntegrationProductInterface::STATUS_CONFIGURABLE_NEED_CREATE, 
+			IntegrationProductInterface::STATUS_CONFIGURABLE_NEED_CREATE,
 			IntegrationProductInterface::STATUS_CONFIGURABLE_NEED_UPDATE
 		];
 		try{
@@ -1279,19 +1287,19 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 				$i = 0;
 				$queryDataValue = [];
 				$dataValue = [];
-				
+
 				foreach($query as $row) {
 					try{
 						$result[$i]['sku'] = $row->getPimSku();
 						$result[$i]['map_id'] = $row->getId();
 						$result[$i]['product_configurable']	= $row;
-						$queryDataValue[$i] = $this->integrationDataValueRepositoryInterface->getById($row->getIntegrationDataId());					
+						$queryDataValue[$i] = $this->integrationDataValueRepositoryInterface->getById($row->getIntegrationDataId());
 						if ($queryDataValue[$i]) {
 							$dataValue[$i] = json_decode($queryDataValue[$i]->getDataValue());
 							$result[$i]['last_simple_product_data']=$dataValue[$i];
 							$result[$i]['simple_products'] = $this->getSimpleProductBySkuConfigurable($row->getPimSku());
 						}
-						
+
 						$i++;
 					}catch(Exception $e){
 						$msg = __FUNCTION__." Error : ".$e->getMessage();
@@ -1307,7 +1315,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			$this->logger->info($ex->getTraceAsString());
 			throw new StateException(__($msg));
 		}
-		
+
 		return $result;
 	}
 
@@ -1343,7 +1351,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		}
 		$checkSimple = [];
 		$i=0;
-		
+
 		$simpleProductDatas = [];
 		$configureProduct	= [];
 		try{
@@ -1368,7 +1376,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 
 						$this->logger->info("-- Update Catalog Product Mapping Simple");
 						$this->updateMapBySimpleProduct($configureProduct[$i],$row['simple_products']);
-						
+
 					}
 					$i++;
 				} catch (\Exception $ex) {
@@ -1410,7 +1418,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		if(is_array($paramCategoryIds)){
 			$check = array_filter($getCategoryIds);
 			if(!empty($check)){
-			
+
 				$paramCategoryIds = array_merge($paramCategoryIds,$check);
 			}
 		}else{
@@ -1427,7 +1435,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		$i=0;
 		$productData = [];
 		$saveProductData=[];
-		
+
 		$productDataAttr = [];
 		$attributeOptionValues=[];
 		$attributeValueData=[];
@@ -1452,9 +1460,9 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 
 						$productData[$i]->setVisibility(IntegrationProductInterface::VISIBILITY_NOT_VISIBLE);
 						$productData[$i]->getResource()->saveAttribute($productData[$i], 'visibility');
-						
+
 						$productDataAttr[$i] = $productData[$i]->getResource()->getAttribute(IntegrationProductInterface::SELLING_UNIT_CODE);
-						
+
 						$attributeOptionValues[$i] = $productDataAttr[$i]->getSource()->getOptionText(
 							$productData[$i]->getData(IntegrationProductInterface::SELLING_UNIT_CODE)
 						);
@@ -1476,7 +1484,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 						if($productData[$i]->getStatus() == 1){
 							$isActive++;
 						}
-						
+
 						$categoryIds=$this->generateCategoryIds($categoryIds,$productData[$i]->getCategoryIds());
 					}
 					$i++;
@@ -1520,7 +1528,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		$i=0;
 		$productData = [];
 		$saveProductData=[];
-		
+
 		$productDataAttr = [];
 		$attributeOptionValues=[];
 		$attributeValueData=[];
@@ -1545,9 +1553,9 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 
 						$productData[$i]->setVisibility(IntegrationProductInterface::VISIBILITY_NOT_VISIBLE);
 						$productData[$i]->getResource()->saveAttribute($productData[$i], 'visibility');
-						
+
 						$productDataAttr[$i] = $productData[$i]->getResource()->getAttribute(IntegrationProductInterface::SELLING_UNIT_CODE);
-						
+
 						$attributeOptionValues[$i] = $productDataAttr[$i]->getSource()->getOptionText(
 							$saveProductData[$i]->getData(IntegrationProductInterface::SELLING_UNIT_CODE)
 						);
@@ -1569,7 +1577,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 						if($productData[$i]->getStatus() == 1){
 							$isActive++;
 						}
-						
+
 						$categoryIds=$this->generateCategoryIds($categoryIds,$productData[$i]->getCategoryIds());
 					}
 					$i++;
@@ -1612,7 +1620,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	{
 		$productConfigurableId = $this->productModel->getIdBySku($sku);
 		$attributeSetId = $this->prepareAttributeSet($simpleProducts, 'configurable');
-		
+
 		try {
 			$product = $this->productRepositoryInterface->get($sku);
 			$this->logger->info(__FUNCTION__."---- Update Product");
@@ -1626,7 +1634,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 
 		$product->setUrlKey($urlKey);
 		$this->logger->info(__FUNCTION__."---- Create New Product");
-		
+
 		$product->setAttributeSetId($attributeSetId);
 		$product->setTypeId(IntegrationProductInterface::PRODUCT_TYPE_CONFIGURABLE);
 
@@ -1665,7 +1673,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		                        	} else {
 		                        		continue;
 		                        	}
-		                        	
+
 		                        	$attrLabel = $simpleProduct->getResource()->getAttribute($attr)->getFrontend()->getValue($simpleProduct);
 		                        	if(!$attrLabel || $attrLabel == 'default') {
 			                        	if(!in_array($productDataAttr->getId(), $rejectedAttr)) {
@@ -1673,7 +1681,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 				                        }
 			                        	continue;
 			                        }
-		                        	
+
 			                        if(!in_array($productDataAttr->getId(), $attributeIds)) {
 		                            	$attributeIds[] = $productDataAttr->getId();
 		                            	$swatch[] = $productDataAttr->getId();
@@ -1721,7 +1729,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 				}
 			}
 		}
-		
+
 		if($product->getId()) {
 			$this->removeSuperAttr($product);
 		}
@@ -1733,7 +1741,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		$configurableAttributesData = $product->getTypeInstance()->getConfigurableAttributesAsArray($product);
         $product->setCanSaveConfigurableAttributes(true);
         $product->setConfigurableAttributesData($configurableAttributesData);
-        
+
         if(!empty($configurableProductsData)) {
             $product->setConfigurableProductsData($configurableProductsData);
         }
@@ -1762,12 +1770,12 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		// }
 
 		$configurableActive = \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_DISABLED;
-		
+
 		if (isset($simpleProducts['simple_active']) && ($simpleProducts['simple_active'] > 0)) {
 			$configurableActive = \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED;
 		}
 
-		
+
 		$product->setWebsiteIds([1]);
 		$product->setName($simpleProducts['default_product_name']);
 		$product->setCategoryIds($simpleProducts['simple_category_ids']);
@@ -1796,7 +1804,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		try {
 			//Save Product Configurable
 			$productSave = $this->productRepositoryInterface->save($product);
-			
+
 			//Code for change product category
 			$dataProduct['m_category_id'] = $simpleProducts['simple_category_ids'];
 			$this->removeAndAssignProductCategory($product->getId(), $productSave, $dataProduct);
@@ -1809,7 +1817,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 
 	/**
 	 * check url key
-	 * 
+	 *
 	 * @param string $urlKey
 	 * @param string $sku
 	 * @return bool
@@ -1818,12 +1826,11 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	{
 		$connection = $this->resource->getConnection();
 		$table = $connection->getTableName('url_rewrite');
-		
 		$query = $connection->select();
 		$query->from(
 			$table,
 			['*']
-		)->where('request_path like "%' . $urlKey . '.%"');
+		)->where('request_path like "%' . $urlKey. '.%"');
 
 		$collection = $connection->fetchAll($query);
 
@@ -1860,7 +1867,8 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	{
 		$connection = $this->resource->getConnection();
 		$table = $connection->getTableName('catalog_product_entity_varchar');
-		$newUrlKey = $urlKey . '-' . $sku;
+		$replacePercent = str_replace("%","",$urlKey);
+		$newUrlKey = $replacePercent . '-' . $sku;
 		$query = 'UPDATE ' . $table . ' set value = ' . $connection->quote($newUrlKey) . ' where value = ' . $connection->quote($urlKey) . ' and attribute_id = ' . $connection->quote($attributeId);
 
 		$connection->query($query);
@@ -1871,7 +1879,9 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		$connection = $this->resource->getConnection();
 		$table = $connection->getTableName('url_rewrite');
 
-		$query = 'UPDATE ' . $table . ' set request_path = ' . $connection->quote($requestPath) . ' where url_rewrite_id = ' . $connection->quote($urlRewriteId);
+		$replaceRequestPath = str_replace('%', '', $requestPath);
+
+		$query = 'UPDATE ' . $table . ' set request_path = ' . $connection->quote($replaceRequestPath) . ' where url_rewrite_id = ' . $connection->quote($urlRewriteId);
 		$connection->query($query);
 
 		$this->resource->closeConnection();
@@ -1981,7 +1991,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 		if($magentoConfigureProduct->getCategoryIds()){
 			$configureProductMap->setMagentoCategoryIds(json_encode($magentoConfigureProduct->getCategoryIds()));
 		}
-			
+
 		$configureProductMap->setStatusConfigurable(IntegrationProductInterface::STATUS_CONFIGURABLE_UPDATED);
 		$this->integrationProductRepositoryInterface->save($configureProductMap);
 	}
@@ -1990,7 +2000,7 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	 * Update with dynamic status IntegrationProductInterface
 	 */
 	protected function updateMapByConfigureProduct($configureProductMap=[],$status=""){
-			
+
 		$configureProductMap->setStatusConfigurable($status);
 		$this->integrationProductRepositoryInterface->save($configureProductMap);
 	}
@@ -1999,14 +2009,8 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	 * Update URL
 	 */
 	public function changeUrlKeyChildProduct($name, $extraForUrlKey) {
-		$result = "";
-		if ($extraForUrlKey) {
-			$result = str_replace(' ', '-', strtolower($name)) . '-' . $extraForUrlKey;
-		} else {
-			$result = str_replace(' ', '-', strtolower($name));
-		}
-
-		return $result;
+		$result = $extraForUrlKey ? $name.' '.$extraForUrlKey : $name;
+		return $this->coreUrlHelper->urlSlug($result);
 	}
 
 	/**
@@ -2018,8 +2022,8 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 	protected function saveAttributeBarcode($attributeCode, $attributeValue) {
 		try {
 			$attributeData = $this->eavAttribute->getCollection()->addFieldToFilter('attribute_code', $attributeCode);
-			
-			if($attributeData->getSize() <= 0) { 
+
+			if($attributeData->getSize() <= 0) {
 				$this->createAttributeBarcode($attributeCode);
 			}
 
@@ -2032,17 +2036,17 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 
 	/**
 	 * Create New Attribute
-	 * 
+	 *
 	 * @param $attributeCode string
 	 * @return
 	 */
 	protected function createAttributeBarcode($attributeCode=""){
 		try {
-			
+
 			$frontentInput    = IntegrationProductInterface::FRONTEND_INPUT_TYPE_TEXT;
-			
+
 			$attributeValue = $this->productAttributeFactory->create();
-			
+
 			$attributeValue->setIsHtmlAllowedOnFront(IntegrationProductInterface::IS_HTML_ALLOWED_ON_FRONT);
 			$attributeValue->setIsUsedInGrid(IntegrationProductInterface::IS_USED_IN_GRID);
 			$attributeValue->setIsVisibleInGrid(IntegrationProductInterface::IS_VISIBLE_IN_GRID);
@@ -2059,18 +2063,18 @@ class IntegrationProductLogic implements IntegrationProductLogicInterface {
 			$attributeValue->setIsUserDefined(IntegrationProductInterface::IS_USER_DEFINED);
 			$attributeValue->setDefaultFrontendLabel($attributeCode);
 			$attributeValue->setIsUnique(IntegrationProductInterface::IS_UNIQUE);
-			
+
 			$this->productAttributeRepository->save($attributeValue);
-			
+
 			//Set Attribute to Attribute Set (Default)
 			$this->productAttributeManagement->assign($this->attrGroupGeneralInfoId, $this->attrGroupProductDetailId, $attributeCode, IntegrationProductInterface::SORT_ORDER);
-				
+
 		} catch (\Exception $exception) {
-			
+
 			throw new StateException(
 				__(__FUNCTION__." - ".$exception->getMessage())
 			);
-		}	
+		}
 	}
 
 	/**
