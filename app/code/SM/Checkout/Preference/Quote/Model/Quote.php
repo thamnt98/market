@@ -12,11 +12,6 @@ use Magento\GroupedProduct\Model\Product\Type\Grouped;
 class Quote extends \Magento\Quote\Model\Quote
 {
     /**
-     * @var array
-     */
-    private $allVisibleItems;
-
-    /**
      * Add product. Returns error message if product type instance can't prepare product.
      *
      * @param mixed $product
@@ -208,22 +203,18 @@ class Quote extends \Magento\Quote\Model\Quote
      */
     public function getAllVisibleItems()
     {
-        if (empty($this->allVisibleItems)) {
-            $items = [];
-            foreach ($this->getItemsCollection() as $item) {
-                if (!$item->getId() || $item->getIsActive() === null) {
-                    $item->setIsActive(1);
-                }
-
-                if (!$item->isDeleted() && $item->getIsActive() && !$item->getParentItemId() && !$item->getParentItem()) {
-                    $items[] = $item;
-                }
+        $items = [];
+        foreach ($this->getItemsCollection() as $item) {
+            if (!$item->getId() || $item->getIsActive() === null) {
+                $item->setIsActive(1);
             }
 
-            $this->allVisibleItems = $items;
+            if (!$item->isDeleted() && $item->getIsActive() && !$item->getParentItemId() && !$item->getParentItem()) {
+                $items[] = $item;
+            }
         }
 
-        return $this->allVisibleItems;
+        return $items;
     }
 
     /**

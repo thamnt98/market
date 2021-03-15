@@ -84,18 +84,15 @@ class RemoveItemsOutOfStock implements ObserverInterface
     public function execute(EventObserver $observer)
     {
         $quote = $this->checkoutSession->getQuote();
-        $needToSaveQuote = false;
 
         $quotePayment =  $quote->getPayment();
         if ($quotePayment->getMethod()) {
             $quotePayment->setMethod(null);
-            $needToSaveQuote = true;
         }
 
         $quoteShippingAddress = $quote->getShippingAddress();
         if ($quoteShippingAddress->getShippingMethod()) {
             $quoteShippingAddress->setShippingMethod(null);
-            $needToSaveQuote = true;
         }
 
         if ($quote->getIsMultiShipping()) {
@@ -125,8 +122,6 @@ class RemoveItemsOutOfStock implements ObserverInterface
             }
 
             if ($hasRemove || $hasUpdate) {
-                $needToSaveQuote = true;
-                $quote->setTotalsCollectedFlag(false);
                 if ($hasRemove) {
                     $this->messageManager->addSuccessMessage(
                         __("We found some out of stock items in your cart. We've removed the items for you.")
@@ -134,9 +129,8 @@ class RemoveItemsOutOfStock implements ObserverInterface
                 }
             }
 
-            if ($needToSaveQuote) {
-                $this->quoteRepository->save($quote);
-            }
+            $quote->setTotalsCollectedFlag(false);
+            $this->quoteRepository->save($quote);
         }
     }
 
