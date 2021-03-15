@@ -72,17 +72,18 @@ class Gateway extends \Magento\Framework\App\Helper\AbstractHelper
 		$query['channelId'] = $dataOrder['channel_id'];
 		$queryRequest['transactionNo'] = $dataOrder['reference_number'];
 		$queryRequest['transactionDate'] = $dataOrder['insert_date'];
-		// $queryRequest['transactionNo'] = 'App-4000012671';
-		// $queryRequest['transactionDate'] = '2021-02-25 17:26:19';
+		
 		$query['queryRequest'][] = $queryRequest;
-		// $this->logger->info('PARAM = ' . json_encode($query));
 		
 		$hit = $this->dataHelper->doHitApi($query, self::PAYMENT_QUERY_PATH, $paymentMethod);
-		
-		if(isset($hit['queryResponse'][0]['transactionStatus']) && $hit['queryResponse'][0]['transactionStatus'] === self::TRX_STATUS_SUCCESS) {
-			return true;
-		}
 
-		return false;
+		$result['status'] = false;
+		$result['response'] = $hit;
+
+		if(isset($hit['queryResponse'][0]['transactionStatus']) && $hit['queryResponse'][0]['transactionStatus'] === self::TRX_STATUS_SUCCESS) {
+			$result['status'] = true;
+		}
+		
+		return $result;
 	}
 }
