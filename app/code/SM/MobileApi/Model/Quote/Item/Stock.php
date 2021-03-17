@@ -20,6 +20,7 @@ use SM\MobileApi\Helper\Product\Common;
  */
 class Stock
 {
+    protected $stockId = 0;
     /**
      * @var StockByWebsiteIdResolverInterface
      */
@@ -106,10 +107,12 @@ class Stock
      */
     protected function _calculateStockBySku($sku)
     {
+        $stockId = $this->getStockId($sku);
+        if ($stockId == 0) {
+            return 0;
+        }
         try {
-            $product           = $this->productRepository->get($sku);
-            $websiteId         = $product->getStore()->getWebsiteId();
-            $stockId           = (int)$this->stockByWebsiteId->execute($websiteId)->getStockId();
+
             $productSalableQty = $this->getProductSalableQty->execute($sku, $stockId);
             $stock             = $productSalableQty;
         } catch (NoSuchEntityException $exception) {
@@ -121,5 +124,24 @@ class Stock
         }
 
         return $stock;
+    }
+
+    /**
+     * @param $sku
+     * @return int
+     * @throws NoSuchEntityException
+     */
+    protected function getStockId($sku)
+    {
+        if ($this->stockId == 0) {
+            try {
+                $product           = $this->productRepository->get($sku);
+                $websiteId         = $product->getStore()->getWebsiteId();
+                $this->stockId      = (int)$this->stockByWebsiteId->execute($websiteId)->getStockId();
+            } catch (\Exception $e) {
+
+            }
+        }
+        return $this->stockId;
     }
 }
