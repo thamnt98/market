@@ -65,6 +65,11 @@ define(
                 }
             };
             mod.container.on('submit', function (e) {
+                mod.input.val(String(mod.input.val())
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;'));
                 pushGTM(window.eventName);
             });
             mod.container.find('input').bind('keypress keydown keyup',function (e) {
