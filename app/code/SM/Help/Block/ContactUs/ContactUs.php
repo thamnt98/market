@@ -26,10 +26,10 @@ use Magento\Store\Model\ScopeInterface;
 use SM\Help\Api\Data\TopicInterface;
 use SM\Help\Model\ResourceModel\Topic\Collection;
 use SM\Help\Model\ResourceModel\Topic\CollectionFactory as TopicCollectionFactory;
+use SM\Sales\Api\SubOrderRepositoryInterface;
 use SM\Sales\Model\ParentOrderRepository;
 use SM\StoreLocator\Model\Store\ResourceModel\Location\CollectionFactory as StoreCollectionFactory;
 use SM\Theme\Helper\Data;
-use SM\Sales\Api\SubOrderRepositoryInterface;
 
 /**
  * Class ContactUs
@@ -234,7 +234,8 @@ class ContactUs extends \Magento\Framework\View\Element\Template
             $storeIds = explode(',', $storeIds);
             $searchCriteria = $this->searchCriteriaBuilder->addFilter(
                 SourceItemInterface::SOURCE_CODE,
-                ['in' => $storeIds]
+                $storeIds,
+                'in'
             )
                 ->addFilter('enabled', 1)
                 ->create();
