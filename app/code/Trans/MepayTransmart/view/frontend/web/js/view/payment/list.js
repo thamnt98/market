@@ -37,7 +37,7 @@ define([
     priceUtils
 ) {
     'use strict';
-    console.log('test override js bambang');
+
     return Component.extend({
         ccFullPaymentCode: 'sprint_allbankfull_cc',
         selectedMethod: ko.observable(),
@@ -259,6 +259,69 @@ define([
                 self.enableBtnPay();
             });
             return true;
+        },
+        setPaymentToken: function(tokenv, methodv) {
+            storage.post(
+                urlManager.build('rest/V1/transmepay/tokenization/savetoken'),
+                JSON.stringify({token: tokenv, method: methodv }),
+                false
+            ).done(
+                function(response){
+                    console.log(response);
+                }
+            ).fail(
+                function(response)
+                {
+                    let error = JSON.parse(response.responseText);
+
+                    fullScreenLoader.stopLoader();
+                    messageList.addErrorMessage({
+                        message: error.message
+                    });
+
+                    return false;
+                }
+            );
+        },
+        getPaymentToken: function (method){
+            let self = this;
+            $('.mepay-card-token-section').html('');
+            $('.mepay-card-token-section').unbind('click');
+            $('.mepay-card-token-section').on("click", "li", function (event) {
+                $('.mepay-card-token-section li').removeClass('active');
+                $(this).addClass('active');
+                self.setPaymentToken($(this).attr('data-token'), $(this).attr('data-method'));
+            });
+            storage.post(
+                urlManager.build('rest/V1/transmepay/tokenization/tokenlist'),
+                JSON.stringify({paymentCode: method}),
+                false
+            ).done(
+                function(response){
+                    var flag = false;
+                    $('.mepay-card-token-section').html('');
+                    if (parseInt(response.status) == 200) {
+                        $.each(response.list, function (key, val){
+                            flag = true;
+                            $('.mepay-card-token-section').append('<li data-token="'+ val.token +'" data-method="'+ val.method+'">-xxxx-'+val.key+'</li>');
+                        });
+                        if (flag)
+                            $('.mepay-card-token-section').prepend('<li class="use-new-card" data-token="" data-method="'+method+'">- use new card -</li>');
+                    }
+                }
+            ).fail(
+                function(response)
+                {
+                    let error = JSON.parse(response.responseText);
+
+                    fullScreenLoader.stopLoader();
+                    messageList.addErrorMessage({
+                        message: error.message
+                    });
+
+                    return false;
+                }
+            );
         },
         setPaymentMethod: function (method, serviceFee, cb) {
             let self = this,
