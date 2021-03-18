@@ -95,6 +95,8 @@ class RulesApplier extends \Magento\SalesRule\Model\RulesApplier
     public function applyRules($item, $rules, $skipValidation, $couponCode)
     {
         $address = $item->getAddress();
+        $address->setShippingDiscountAmount(0);
+        $address->setBaseShippingDiscountAmount(0);
         $appliedRuleIds = [];
         $this->discountAggregator = [];
         $skipFlag = false;
