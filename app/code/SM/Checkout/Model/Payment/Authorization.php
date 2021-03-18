@@ -169,7 +169,7 @@ class Authorization
         $dataPayment['channelId']           = $this->getChannelId($order);
         $dataPayment['currency']            = Data::CURRENCY;
         $dataPayment['transactionNo']       = $transactionNo;
-        $dataPayment['transactionAmount']   = round($grandTotal, 2);
+        $dataPayment['transactionAmount']   = round($grandTotal, 0, PHP_ROUND_HALF_EVEN);
         $dataPayment['transactionFee']      = $serviceFee;
         $dataPayment['transactionDate']     = $orderDate;
         $dataPayment['transactionExpire']   = date('Y-m-d H:i:s', strtotime('+' . $expire . ' minutes', strtotime($dataPayment['transactionDate'])));
