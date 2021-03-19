@@ -127,9 +127,13 @@ class IntegrationProductDataMap implements ObserverInterface
                     // $this->productLogic->saveDataToIntegrationProduct($product['entity_id'], $rowData);
 
                     if(!empty($simple)) {
-                        $connection = $this->productResource->getConnection();
-                        $tableName = $connection->getTableName('integration_catalog_product');
-                        $connection->insertOnDuplicate($tableName, $simple, ['pim_sku']);
+                        $checkMap = $this->checkMapData($simple);
+
+                        if(!$checkMap) {
+                            $connection = $this->productResource->getConnection();
+                            $tableName = $connection->getTableName('integration_catalog_product');
+                            $connection->insertOnDuplicate($tableName, $simple, ['pim_sku']);
+                        }
                     }
 
                     if($this->integrationProdRepository->checkPosibilityConfigurable($sku, false)) {
@@ -155,6 +159,38 @@ class IntegrationProductDataMap implements ObserverInterface
 
         }
         $this->logger->info('End Mapping ' . date('H:i:s'));
+    }
+
+    /**
+     * check and update map data
+     *
+     * @param array $data
+     * @return bool
+     */
+    protected function checkMapData(array $data)
+    {
+        if(!empty($data)) {
+            $connection = $this->productResource->getConnection();
+            $tableName = $connection->getTableName('integration_catalog_product');
+            $query = $connection->select();
+            $query->from(
+                $tableName,
+                ['*']
+            );
+            $query->where('pim_sku = ?', $data['pim_sku']);
+
+            $collection = $connection->fetchRow($query);
+
+            if($collection) {
+                $where = ['pim_sku = ?' => $data['pim_sku']];
+
+                $connection->update($tableName, $data, $where);
+
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
