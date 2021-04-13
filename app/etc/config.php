@@ -472,6 +472,7 @@ return [
         'LiveChat_LiveChat' => 1,
         'MGS_Ajaxscroll' => 1,
         'MGS_Lookbook' => 1,
+        'MSP_APIEnhancer' => 1,
         'Magento_PaypalReCaptcha' => 1,
         'MSP_TwoFactorAuth' => 1,
         'Mageplaza_Core' => 1,
