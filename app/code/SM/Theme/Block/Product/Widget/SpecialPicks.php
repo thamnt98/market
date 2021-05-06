@@ -9,10 +9,17 @@ declare(strict_types=1);
 
 namespace SM\Theme\Block\Product\Widget;
 
+use Magento\Catalog\Api\CategoryRepositoryInterface;
+use Magento\Catalog\Model\Product\Visibility;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
+use Magento\CatalogWidget\Model\Rule;
+use Magento\Framework\App\Http\Context;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Url\EncoderInterface;
 use Magento\Framework\View\LayoutFactory;
 use Magento\Review\Model\RatingFactory as RatingFactory;
+use Magento\Rule\Model\Condition\Sql\Builder;
+use Magento\Widget\Helper\Conditions;
 use SM\Catalog\Block\Product\ProductList\Item\AddTo\Iteminfo;
 use SM\Catalog\Helper\Data as CatalogHelper;
 use Zend_Json_Encoder;
@@ -45,36 +52,38 @@ class SpecialPicks extends \Magento\CatalogWidget\Block\Product\ProductsList
 
     /**
      * SpecialPicks constructor.
+     * @param \Magento\Catalog\Block\Product\Context $context
+     * @param CollectionFactory $productCollectionFactory
+     * @param Visibility $catalogProductVisibility
+     * @param Context $httpContext
+     * @param Builder $sqlBuilder
+     * @param Rule $rule
+     * @param Conditions $conditionsHelper
+     * @param CategoryRepositoryInterface $categoryRepository
+     * @param Json|null $json
+     * @param LayoutFactory|null $layoutFactory
+     * @param EncoderInterface|null $urlEncoder
      * @param CatalogHelper $catalogHelper
      * @param Iteminfo $itemInfo
      * @param RatingFactory $rating
-     * @param \Magento\Catalog\Block\Product\Context $context
-     * @param \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory
-     * @param \Magento\Catalog\Model\Product\Visibility $catalogProductVisibility
-     * @param \Magento\Framework\App\Http\Context $httpContext
-     * @param \Magento\Rule\Model\Condition\Sql\Builder $sqlBuilder
-     * @param \Magento\CatalogWidget\Model\Rule $rule
-     * @param \Magento\Widget\Helper\Conditions $conditionsHelper
      * @param array $data
-     * @param Json|NULL $json
-     * @param LayoutFactory|NULL $layoutFactory
-     * @param EncoderInterface|NULL $urlEncoder
      */
     public function __construct(
+        \Magento\Catalog\Block\Product\Context $context,
+        CollectionFactory $productCollectionFactory,
+        Visibility $catalogProductVisibility,
+        Context $httpContext,
+        Builder $sqlBuilder,
+        Rule $rule,
+        Conditions $conditionsHelper,
+        CategoryRepositoryInterface $categoryRepository,
+        Json $json = null,
+        LayoutFactory $layoutFactory = null,
+        EncoderInterface $urlEncoder = null,
         CatalogHelper $catalogHelper,
         Iteminfo $itemInfo,
         RatingFactory $rating,
-        \Magento\Catalog\Block\Product\Context $context,
-        \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory,
-        \Magento\Catalog\Model\Product\Visibility $catalogProductVisibility,
-        \Magento\Framework\App\Http\Context $httpContext,
-        \Magento\Rule\Model\Condition\Sql\Builder $sqlBuilder,
-        \Magento\CatalogWidget\Model\Rule $rule,
-        \Magento\Widget\Helper\Conditions $conditionsHelper,
-        array $data = [],
-        Json $json = null,
-        LayoutFactory $layoutFactory = null,
-        EncoderInterface $urlEncoder = null
+        array $data = []
     ) {
         $this->itemInfo = $itemInfo;
         $this->rating = $rating;
@@ -86,6 +95,7 @@ class SpecialPicks extends \Magento\CatalogWidget\Block\Product\ProductsList
             $sqlBuilder,
             $rule,
             $conditionsHelper,
+            $categoryRepository,
             $data,
             $json,
             $layoutFactory,
@@ -222,7 +232,7 @@ class SpecialPicks extends \Magento\CatalogWidget\Block\Product\ProductsList
     public function getGTMProductRating($product)
     {
         $RatingOb = $this->rating->create()->getEntitySummary($product->getId());
-        return $RatingOb->getSum() ? ($RatingOb->getSum()/$RatingOb->getCount() ? (($RatingOb->getSum()/$RatingOb->getCount())/20) . " Stars" : "Not available") : "Not available";
+        return $RatingOb->getSum() ? ($RatingOb->getSum() / $RatingOb->getCount() ? (($RatingOb->getSum() / $RatingOb->getCount()) / 20) . " Stars" : "Not available") : "Not available";
     }
 
     /**
@@ -285,11 +295,16 @@ class SpecialPicks extends \Magento\CatalogWidget\Block\Product\ProductsList
         $priceGTM = $this->getPriceGTM($product);
         $initPrice = $this->getGTMInitialProductPrice($product);
         $price = $priceGTM['sale_price'] != 'Not in sale' ? $priceGTM['sale_price'] : $initPrice;
+        if (is_numeric($initPrice) && is_numeric($price)) {
+            $salePrice = $initPrice - $price;
+        } else {
+            $salePrice =  'Not in sale';
+        }
         return Zend_Json_Encoder::encode([
             "product_size" => $this->getGTMProductSize($product),
             "product_volume" => $this->getGTMProductVolume($product),
             "product_weight" => $this->getGTMProductWeight($product),
-            "salePrice" => $initPrice - $price,
+            "salePrice" => $salePrice,
             "discountRate" => $priceGTM['discount_rate'],
             "rating" => $this->getGTMProductRating($productBase),
             "initialPrice" => $initPrice,
