@@ -15,6 +15,7 @@ declare(strict_types=1);
 
 namespace SM\Theme\Block\Product\Widget;
 
+use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Catalog\Model\Product\Visibility;
 use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\CatalogInventory\Model\Stock\StockItemRepository;
@@ -61,7 +62,7 @@ class TransCarousel extends \Magento\CatalogWidget\Block\Product\ProductsList
      * @param EncoderInterface|NULL $urlEncoder
      * @param Iteminfo $itemInfo
      */
-    public function __construct(
+/*    public function __constructx(
         StockItemRepository $stockItemRepository,
         \Magento\Catalog\Block\Product\Context $context,
         CollectionFactory $productCollectionFactory,
@@ -91,8 +92,42 @@ class TransCarousel extends \Magento\CatalogWidget\Block\Product\ProductsList
             $layoutFactory,
             $urlEncoder
         );
-    }
+    }*/
 
+    public function __construct(
+        \Magento\Catalog\Block\Product\Context $context,
+        CollectionFactory $productCollectionFactory,
+        Visibility $catalogProductVisibility,
+        Context $httpContext,
+        Builder $sqlBuilder,
+        Rule $rule,
+        Conditions $conditionsHelper,
+        CategoryRepositoryInterface $categoryRepository,
+        Json $json = null,
+        LayoutFactory $layoutFactory = null,
+        EncoderInterface $urlEncoder = null,
+        StockItemRepository $stockItemRepository,
+        Iteminfo $itemInfo,
+        array $data = []
+
+    ) {
+        $this->stockItemRepository = $stockItemRepository;
+        $this->itemInfo = $itemInfo;
+        parent::__construct(
+            $context,
+            $productCollectionFactory,
+            $catalogProductVisibility,
+            $httpContext,
+            $sqlBuilder,
+            $rule,
+            $conditionsHelper,
+            $categoryRepository,
+            $data,
+            $json,
+            $layoutFactory,
+            $urlEncoder
+        );
+    }
 
     /**
      * Get stock product
