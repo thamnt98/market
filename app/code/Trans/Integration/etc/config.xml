@@ -38,7 +38,7 @@
                     <description>PIM API - Category 2.0</description>
                     <method>GET</method>
                     <headers>{}</headers>
-                    <query_params>{"company_code":"TRTLMRT001"}</query_params>
+                    <query_params>{"company_code":"TRTLMET001"}</query_params>
                     <body>{}</body>
                     <path>/api/ext/category</path>
                 </channel_method_1>
@@ -48,7 +48,7 @@
                     <description>PIM API - Product 2.0</description>
                     <method>GET</method>
                     <headers>{}</headers>
-                    <query_params>{"company_code":"TRTLMRT001","product_type":"simple"}</query_params>
+                    <query_params>{"company_code":"TRTLMET001","product_type":"simple"}</query_params>
                     <body>{}</body>
                     <path>/api/ext/product</path>
                 </channel_method_2>
@@ -67,7 +67,7 @@
                     <description>PIM API - Product Attribute 2.0</description>
                     <method>GET</method>
                     <headers>{}</headers>
-                    <query_params>{"company_code":"TRTLMRT001"}</query_params>
+                    <query_params>{"company_code":"TRTLMET001"}</query_params>
                     <body>{}</body>
                     <path>/api/ext/attribute</path>
                 </channel_method_4>
@@ -76,7 +76,7 @@
                     <description>PIM API - Product Price 2.0</description>
                     <method>GET</method>
                     <headers>{}</headers>
-                    <query_params>{"company_code":"TRTLMRT001"}</query_params>
+                    <query_params>{"company_code":"TRTLMET001"}</query_params>
                     <body>{}</body>
                     <path>/api/ext/price</path>
                 </channel_method_5>
@@ -85,7 +85,7 @@
                     <description>PIM API - Product Association 1.0</description>
                     <method>GET</method>
                     <headers>{}</headers>
-                    <query_params>{"company_code":"TRTLMRT001"}</query_params>
+                    <query_params>{"company_code":"TRTLMET001"}</query_params>
                     <body>{}</body>
                     <path>/api/ext/association</path>
                 </channel_method_6>
@@ -94,7 +94,7 @@
                     <description>PIM API - Product Promotion 1.0</description>
                     <method>GET</method>
                     <headers>{}</headers>
-                    <query_params>{"company_code":"TRTLMRT001"}</query_params>
+                    <query_params>{"company_code":"TRTLMET001"}</query_params>
                     <body>{}</body>
                     <path>/api/ext/promo</path>
                 </channel_method_7>
@@ -103,7 +103,7 @@
                     <description>PIM API - Product Image 2.0</description>
                     <method>GET</method>
                     <headers>{}</headers>
-                    <query_params>{"company_code":"TRTLMRT001"}</query_params>
+                    <query_params>{"company_code":"TRTLMET001"}</query_params>
                     <body>{}</body>
                     <path>/api/ext/image/product</path>
                 </channel_method_8>
@@ -112,7 +112,7 @@
                     <description>PIM API - Product Brand 2.0</description>
                     <method>GET</method>
                     <headers>{}</headers>
-                    <query_params>{"company_code":"TRTLMRT001"}</query_params>
+                    <query_params>{"company_code":"TRTLMET001"}</query_params>
                     <body>{}</body>
                     <path>/api/ext/brand</path>
                 </channel_method_9>
@@ -122,7 +122,7 @@
                     <description>PIM API - Product Digital 1.0</description>
                     <method>GET</method>
                     <headers>{}</headers>
-                    <query_params>{"company_code":"TRTLMRT001","product_type":"digital"}</query_params>
+                    <query_params>{"company_code":"TRTLMET001","product_type":"digital"}</query_params>
                     <body>{}</body>
                     <path>/api/ext/product</path>
                 </channel_method_10>
@@ -132,7 +132,7 @@
                     <description>PIM API - Product Attribute Set 1.0</description>
                     <method>GET</method>
                     <headers>{}</headers>
-                    <query_params>{"company_code":"TRTLMRT001"}</query_params>
+                    <query_params>{"company_code":"TRTLMET001"}</query_params>
                     <body>{}</body>
                     <path>/api/ext/attribute/in/category</path>
                 </channel_method_11>
