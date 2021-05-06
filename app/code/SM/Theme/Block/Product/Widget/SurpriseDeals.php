@@ -14,15 +14,26 @@ declare(strict_types=1);
 
 namespace SM\Theme\Block\Product\Widget;
 
+use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
+use Magento\Catalog\Model\Product\Visibility;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
+use Magento\CatalogEvent\Model\Category\EventList;
 use Magento\CatalogEvent\Model\Event as SaleEvent;
+use Magento\CatalogInventory\Model\Stock\StockItemRepository;
+use Magento\CatalogWidget\Model\Rule;
+use Magento\Framework\App\Http\Context;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Url\EncoderInterface;
 use Magento\Framework\View\LayoutFactory;
 use Magento\Review\Model\RatingFactory as RatingFactory;
+use Magento\Review\Model\ReviewFactory;
+use Magento\Rule\Model\Condition\Sql\Builder;
+use Magento\Store\Model\StoreManagerInterface;
+use Magento\Widget\Helper\Conditions;
 use SM\Catalog\Block\Product\ProductList\Item\AddTo\Iteminfo;
 use SM\Catalog\Helper\Data as CatalogHelper;
 use Zend_Json_Encoder;
@@ -40,7 +51,7 @@ class SurpriseDeals extends \Magento\CatalogWidget\Block\Product\ProductsList
     const DEFAULT_PRODUCTS_PER_PAGE = 5;
 
     /**
-     * @var \Magento\CatalogInventory\Model\Stock\StockItemRepository
+     * @var StockItemRepository
      */
     protected $_stockItemRepository;
 
@@ -61,11 +72,11 @@ class SurpriseDeals extends \Magento\CatalogWidget\Block\Product\ProductsList
      */
     private $catalogHelper;
     /**
-     * @var \Magento\Review\Model\ReviewFactory
+     * @var ReviewFactory
      */
     private $reviewFactory;
     /**
-     * @var \Magento\Store\Model\StoreManagerInterface
+     * @var StoreManagerInterface
      */
     private $storeManager;
 
@@ -76,47 +87,48 @@ class SurpriseDeals extends \Magento\CatalogWidget\Block\Product\ProductsList
 
     /**
      * SurpriseDeals constructor.
-     * @param CatalogHelper $catalogHelper
-     * @param RatingFactory $rating
-     * @param \Magento\CatalogInventory\Model\Stock\StockItemRepository $stockItemRepository
      * @param \Magento\Catalog\Block\Product\Context $context
-     * @param \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory
-     * @param \Magento\Catalog\Model\Product\Visibility $catalogProductVisibility
-     * @param \Magento\Framework\App\Http\Context $httpContext
-     * @param \Magento\Rule\Model\Condition\Sql\Builder $sqlBuilder
-     * @param \Magento\CatalogWidget\Model\Rule $rule
-     * @param \Magento\Widget\Helper\Conditions $conditionsHelper
-     * @param \Magento\CatalogEvent\Model\Category\EventList $categoryEventList
-     * @param \Magento\Catalog\Model\CategoryRepository $categoryRepository
-     * @param \Magento\Review\Model\ReviewFactory $reviewFactory
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param array $data
+     * @param CollectionFactory $productCollectionFactory
+     * @param Visibility $catalogProductVisibility
+     * @param Context $httpContext
+     * @param Builder $sqlBuilder
+     * @param Rule $rule
+     * @param Conditions $conditionsHelper
+     * @param CategoryRepositoryInterface $categoryRepository
      * @param Json|null $json
      * @param LayoutFactory|null $layoutFactory
      * @param EncoderInterface|null $urlEncoder
+     * @param ProductRepositoryInterface $productRepository
+     * @param CatalogHelper $catalogHelper
+     * @param RatingFactory $rating
+     * @param StockItemRepository $stockItemRepository
      * @param Iteminfo $itemInfo
+     * @param EventList $categoryEventList
+     * @param ReviewFactory $reviewFactory
+     * @param StoreManagerInterface $storeManager
+     * @param array $data
      */
     public function __construct(
-        ProductRepositoryInterface $productRepository,
-        CatalogHelper $catalogHelper,
-        RatingFactory $rating,
-        \Magento\CatalogInventory\Model\Stock\StockItemRepository $stockItemRepository,
         \Magento\Catalog\Block\Product\Context $context,
-        \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory,
-        \Magento\Catalog\Model\Product\Visibility $catalogProductVisibility,
-        \Magento\Framework\App\Http\Context $httpContext,
-        \Magento\Rule\Model\Condition\Sql\Builder $sqlBuilder,
-        \Magento\CatalogWidget\Model\Rule $rule,
-        \Magento\Widget\Helper\Conditions $conditionsHelper,
-        \Magento\CatalogEvent\Model\Category\EventList $categoryEventList,
-        \Magento\Catalog\Model\CategoryRepository $categoryRepository,
-        \Magento\Review\Model\ReviewFactory $reviewFactory,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        array $data = [],
+        CollectionFactory $productCollectionFactory,
+        Visibility $catalogProductVisibility,
+        Context $httpContext,
+        Builder $sqlBuilder,
+        Rule $rule,
+        Conditions $conditionsHelper,
+        CategoryRepositoryInterface $categoryRepository,
         Json $json = null,
         LayoutFactory $layoutFactory = null,
         EncoderInterface $urlEncoder = null,
-        Iteminfo $itemInfo
+        ProductRepositoryInterface $productRepository,
+        CatalogHelper $catalogHelper,
+        RatingFactory $rating,
+        StockItemRepository $stockItemRepository,
+        Iteminfo $itemInfo,
+        EventList $categoryEventList,
+        ReviewFactory $reviewFactory,
+        StoreManagerInterface $storeManager,
+        array $data = []
     ) {
         $this->productRepository = $productRepository;
         $this->rating = $rating;
@@ -135,6 +147,7 @@ class SurpriseDeals extends \Magento\CatalogWidget\Block\Product\ProductsList
             $sqlBuilder,
             $rule,
             $conditionsHelper,
+            $categoryRepository,
             $data,
             $json,
             $layoutFactory,
@@ -386,11 +399,17 @@ class SurpriseDeals extends \Magento\CatalogWidget\Block\Product\ProductsList
         $priceGTM = $this->getPriceGTM($product);
         $initPrice = $this->getGTMInitialProductPrice($product);
         $price = $priceGTM['sale_price'] != 'Not in sale' ? $priceGTM['sale_price'] : $initPrice;
+        if (is_numeric($initPrice) && is_numeric($price)) {
+            $salePrice = $initPrice - $price;
+        } else {
+            $salePrice =  'Not in sale';
+        }
+
         return Zend_Json_Encoder::encode([
             "product_size" => $this->getGTMProductSize($product),
             "product_volume" => $this->getGTMProductVolume($product),
             "product_weight" => $this->getGTMProductWeight($product),
-            "salePrice" => $initPrice - $price,
+            "salePrice" => $salePrice,
             "discountRate" => $priceGTM['discount_rate'],
             "rating" => $this->getGTMProductRating($productBase),
             "type" => $this->getGTMProductType($productBase),
