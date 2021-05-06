@@ -14,13 +14,20 @@ declare(strict_types=1);
 
 namespace SM\Catalog\Block\Product\Widget;
 
+use Magento\Catalog\Api\CategoryRepositoryInterface;
 use Magento\Catalog\Model\Product;
+use Magento\Catalog\Model\Product\Visibility;
+use Magento\Catalog\Model\ResourceModel\Product\CollectionFactory;
 use Magento\CatalogWidget\Block\Product\ProductsList as WidgetProductListDefault;
+use Magento\CatalogWidget\Model\Rule;
+use Magento\Framework\App\Http\Context;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Url\EncoderInterface;
 use Magento\Framework\View\LayoutFactory;
 use Magento\Review\Model\RatingFactory as RatingFactory;
+use Magento\Rule\Model\Condition\Sql\Builder;
+use Magento\Widget\Helper\Conditions;
 use SM\Catalog\Helper\Data as CatalogHelper;
 use Zend_Json_Encoder;
 use Magento\Catalog\Api\ProductRepositoryInterface;
@@ -80,38 +87,40 @@ class ProductsList extends WidgetProductListDefault
 
     /**
      * ProductsList constructor.
-     * @param ProductRepositoryInterface $productRepository
-     * @param CatalogHelper $catalogHelper
      * @param \Magento\Catalog\Block\Product\Context $context
-     * @param \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory
-     * @param Product\Visibility $catalogProductVisibility
-     * @param \Magento\Framework\App\Http\Context $httpContext
-     * @param \Magento\Rule\Model\Condition\Sql\Builder $sqlBuilder
-     * @param \Magento\CatalogWidget\Model\Rule $rule
-     * @param \Magento\Widget\Helper\Conditions $conditionsHelper
-     * @param \SM\Catalog\Block\Product\ProductList\Item\AddTo\Iteminfo $itemInfo
-     * @param RatingFactory $rating
-     * @param array $data
+     * @param CollectionFactory $productCollectionFactory
+     * @param Visibility $catalogProductVisibility
+     * @param Context $httpContext
+     * @param Builder $sqlBuilder
+     * @param Rule $rule
+     * @param Conditions $conditionsHelper
+     * @param CategoryRepositoryInterface $categoryRepository
      * @param Json|null $json
      * @param LayoutFactory|null $layoutFactory
      * @param EncoderInterface|null $urlEncoder
+     * @param ProductRepositoryInterface $productRepository
+     * @param \SM\Catalog\Block\Product\ProductList\Item\AddTo\Iteminfo $itemInfo
+     * @param RatingFactory $rating
+     * @param CatalogHelper $catalogHelper
+     * @param array $data
      */
     public function __construct(
-        ProductRepositoryInterface $productRepository,
-        CatalogHelper $catalogHelper,
         \Magento\Catalog\Block\Product\Context $context,
-        \Magento\Catalog\Model\ResourceModel\Product\CollectionFactory $productCollectionFactory,
-        \Magento\Catalog\Model\Product\Visibility $catalogProductVisibility,
-        \Magento\Framework\App\Http\Context $httpContext,
-        \Magento\Rule\Model\Condition\Sql\Builder $sqlBuilder,
-        \Magento\CatalogWidget\Model\Rule $rule,
-        \Magento\Widget\Helper\Conditions $conditionsHelper,
-        \SM\Catalog\Block\Product\ProductList\Item\AddTo\Iteminfo $itemInfo,
-        RatingFactory $rating,
-        array $data = [],
+        CollectionFactory $productCollectionFactory,
+        Visibility $catalogProductVisibility,
+        Context $httpContext,
+        Builder $sqlBuilder,
+        Rule $rule,
+        Conditions $conditionsHelper,
+        CategoryRepositoryInterface $categoryRepository,
         Json $json = null,
         LayoutFactory $layoutFactory = null,
-        EncoderInterface $urlEncoder = null
+        EncoderInterface $urlEncoder = null,
+        ProductRepositoryInterface $productRepository,
+        \SM\Catalog\Block\Product\ProductList\Item\AddTo\Iteminfo $itemInfo,
+        RatingFactory $rating,
+        CatalogHelper $catalogHelper,
+        array $data = []
     ) {
         $this->productRepository = $productRepository;
         $this->itemInfo = $itemInfo;
@@ -124,6 +133,7 @@ class ProductsList extends WidgetProductListDefault
             $sqlBuilder,
             $rule,
             $conditionsHelper,
+            $categoryRepository,
             $data,
             $json,
             $layoutFactory,
@@ -295,7 +305,7 @@ class ProductsList extends WidgetProductListDefault
     public function getGTMProductRating($product)
     {
         $RatingOb = $this->rating->create()->getEntitySummary($product->getId());
-        return $RatingOb->getSum() ? ($RatingOb->getSum()/$RatingOb->getCount() ? (($RatingOb->getSum()/$RatingOb->getCount())/20) . " Stars" : "Not available") : "Not available";
+        return $RatingOb->getSum() ? ($RatingOb->getSum() / $RatingOb->getCount() ? (($RatingOb->getSum() / $RatingOb->getCount()) / 20) . " Stars" : "Not available") : "Not available";
     }
 
     /**
