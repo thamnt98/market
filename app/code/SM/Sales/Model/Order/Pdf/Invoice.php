@@ -40,7 +40,6 @@ class Invoice extends \Magento\Sales\Model\Order\Pdf\Invoice
 
     /**
      * Invoice constructor.
-     * @param InvoiceRepositoryInterface $invoiceRepository
      * @param Data $paymentData
      * @param StringUtils $string
      * @param ScopeConfigInterface $scopeConfig
@@ -52,25 +51,25 @@ class Invoice extends \Magento\Sales\Model\Order\Pdf\Invoice
      * @param StateInterface $inlineTranslation
      * @param Renderer $addressRenderer
      * @param StoreManagerInterface $storeManager
-     * @param ResolverInterface $localeResolver
+     * @param \Magento\Store\Model\App\Emulation $appEmulation
+     * @param InvoiceRepositoryInterface $invoiceRepository
      * @param BlockFactory $blockFactory
      * @param DirectoryList $directoryList
      * @param array $data
      */
     public function __construct(
+        \Magento\Payment\Helper\Data $paymentData,
+        \Magento\Framework\Stdlib\StringUtils $string,
+        \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
+        \Magento\Framework\Filesystem $filesystem, Config $pdfConfig,
+        \Magento\Sales\Model\Order\Pdf\Total\Factory $pdfTotalFactory,
+        \Magento\Sales\Model\Order\Pdf\ItemsFactory $pdfItemsFactory,
+        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate,
+        \Magento\Framework\Translate\Inline\StateInterface $inlineTranslation,
+        \Magento\Sales\Model\Order\Address\Renderer $addressRenderer,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Store\Model\App\Emulation $appEmulation,
         InvoiceRepositoryInterface $invoiceRepository,
-        Data $paymentData,
-        StringUtils $string,
-        ScopeConfigInterface $scopeConfig,
-        Filesystem $filesystem,
-        Config $pdfConfig,
-        Factory $pdfTotalFactory,
-        ItemsFactory $pdfItemsFactory,
-        TimezoneInterface $localeDate,
-        StateInterface $inlineTranslation,
-        Renderer $addressRenderer,
-        StoreManagerInterface $storeManager,
-        ResolverInterface $localeResolver,
         BlockFactory $blockFactory,
         DirectoryList $directoryList,
         array $data = []
@@ -87,7 +86,7 @@ class Invoice extends \Magento\Sales\Model\Order\Pdf\Invoice
             $inlineTranslation,
             $addressRenderer,
             $storeManager,
-            $localeResolver,
+            $appEmulation,
             $data
         );
         $this->blockFactory = $blockFactory;
@@ -109,7 +108,7 @@ class Invoice extends \Magento\Sales\Model\Order\Pdf\Invoice
 
         $html = $this->getHTML($invoice);
 
-        $rootPath  =  $this->directoryList->getRoot();
+        $rootPath = $this->directoryList->getRoot();
 
         $filepath = $rootPath . '/app/code/SM/Sales/view/frontend/web/css/invoice.css';
         $basePath = $rootPath . '/var/tmp/';
