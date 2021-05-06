@@ -18,7 +18,7 @@
             <oms_integration>
                 <oms_base_url>https://oms-tm-api-stg.ctdigital.id</oms_base_url>
                 <oms_header_dest>omega</oms_header_dest>
-                <oms_merchant_id>TRTLMRT001</oms_merchant_id>
+                <oms_merchant_id>TRTLMET001</oms_merchant_id>
                 <oms_login_path>/login</oms_login_path>
                 <oms_order_path>/v1/orders</oms_order_path>
                 <oms_oar_path>/v1/orderallocation</oms_oar_path>
