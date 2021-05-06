@@ -16,7 +16,9 @@ declare(strict_types = 1);
 
 namespace SM\Promotion\Override\MagentoSalesRule\Model\Coupon;
 
-use Magento\Sales\Model\Order as Order;
+use  Magento\Sales\Api\Data\OrderInterface;
+use Magento\SalesRule\Model\Coupon\Usage\Processor as CouponUsageProcessor;
+use Magento\SalesRule\Model\Coupon\Usage\UpdateInfoFactory;
 
 class UpdateCouponUsages extends \Magento\SalesRule\Model\Coupon\UpdateCouponUsages
 {
@@ -77,6 +79,8 @@ class UpdateCouponUsages extends \Magento\SalesRule\Model\Coupon\UpdateCouponUsa
      * @param \Amasty\RulesPro\Model\ResourceModel\RuleUsageCounter $usageCounter
      */
     public function __construct(
+        CouponUsageProcessor $couponUsageProcessor,
+        UpdateInfoFactory $updateInfoFactory,
         \Amasty\RulesPro\Api\RuleUsageRepositoryInterface $amastyRuleUsageRepository,
         \Amasty\Rules\Model\DiscountRegistry $discountRegistry,
         \Magento\SalesRule\Model\RuleFactory $ruleFactory,
@@ -86,7 +90,7 @@ class UpdateCouponUsages extends \Magento\SalesRule\Model\Coupon\UpdateCouponUsa
         \Magento\SalesRule\Model\ResourceModel\Coupon\CollectionFactory $couponCollectionFactory,
         \Amasty\RulesPro\Model\ResourceModel\RuleUsageCounter $usageCounter
     ) {
-        parent::__construct($ruleFactory, $ruleCustomerFactory, $coupon, $couponUsage);
+        parent::__construct($couponUsageProcessor, $updateInfoFactory);
 
         $this->ruleFactory = $ruleFactory;
         $this->ruleCustomerFactory = $ruleCustomerFactory;
@@ -121,14 +125,14 @@ class UpdateCouponUsages extends \Magento\SalesRule\Model\Coupon\UpdateCouponUsa
     /**
      * Executes the current command.
      *
-     * @param Order $subject
-     * @param bool  $increment
+     * @param OrderInterface $subject
+     * @param bool $increment
      *
-     * @return Order
+     * @return OrderInterface
      * @throws \Exception
      */
-    public function execute(Order $subject, bool $increment)
-    : Order {
+    public function execute(OrderInterface $subject, bool $increment)
+    : OrderInterface {
         if (!$subject || !$subject->getAppliedRuleIds()) {
             return $subject;
         }
@@ -153,14 +157,14 @@ class UpdateCouponUsages extends \Magento\SalesRule\Model\Coupon\UpdateCouponUsa
     /**
      * Update the number of rule usages.
      *
-     * @param bool  $increment
-     * @param int   $ruleId
-     * @param int   $customerId
-     * @param Order $order
+     * @param bool $increment
+     * @param int $ruleId
+     * @param int $customerId
+     * @param OrderInterface $order
      *
      * @throws \Exception
      */
-    protected function updateRuleUsages(bool $increment, int $ruleId, int $customerId, Order $order)
+    protected function updateRuleUsages(bool $increment, int $ruleId, int $customerId, OrderInterface $order)
     {
         /** @var \Magento\SalesRule\Model\Rule $rule */
         $rule = $this->ruleFactory->create();
@@ -216,13 +220,12 @@ class UpdateCouponUsages extends \Magento\SalesRule\Model\Coupon\UpdateCouponUsa
     /**
      * Update the number of coupon usages.
      *
-     * @param Order $subject
-     * @param bool  $increment
-     * @param int   $customerId
+     * @param OrderInterface $subject
+     * @param bool $increment
+     * @param int $customerId
      *
-     * @throws \Exception
      */
-    protected function updateCouponUsages(Order $subject, bool $increment, int $customerId)
+    protected function updateCouponUsages(OrderInterface $subject, bool $increment, int $customerId)
     : void {
         if (empty($subject->getCouponCode())) {
             return;
@@ -251,12 +254,12 @@ class UpdateCouponUsages extends \Magento\SalesRule\Model\Coupon\UpdateCouponUsa
     }
 
     /**
-     * @param Order $order
-     * @param int   $ruleId
+     * @param OrderInterface $order
+     * @param int $ruleId
      *
      * @return bool
      */
-    protected function checkMainSubOrder(Order $order, int $ruleId)
+    protected function checkMainSubOrder(OrderInterface $order, int $ruleId)
     : bool {
         $shippingRuleIds = $order->getData(\SM\Promotion\Model\Data\Rule::SHIPPING_RULE_IDS_FIELD);
 
