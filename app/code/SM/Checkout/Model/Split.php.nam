@@ -253,7 +253,7 @@ class Split
             'data' => [
                 'order_id' => 248.0,
                 "order_id_origin" => 12,
-                "merchant_code" => "TRTLMRT001",
+                "merchant_code" => "TRTLMET001",
                 "destination" => [
                     "address" => "Jalan Pakis",
                     "province" => "DKI Jakarta",
