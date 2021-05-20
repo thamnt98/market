@@ -88,6 +88,7 @@ interface IntegrationOrderInterface {
     const LOGISTIC_COURIER_NAME = 'logistic_courier_name';
     const LOGISTIC_COURIER = 'logistic_courier';
     const SHIPPING_FEE_DISCOUNT = 'shipping_fee_discount';
+    const SPO_TYPE = 'spo_type';
 
 	/**
 	 * Get Oms Order Id
@@ -801,4 +802,15 @@ interface IntegrationOrderInterface {
      * @return int
      */
     public function setShippingFeeDiscount($shippingFeeDiscount);
+
+    /**
+     * @return string
+     */
+    public function getSpoType();
+
+    /**
+     * @param string $spoType
+     * @return string
+     */
+    public function setSpoType($spoType);
 }

@@ -125,6 +125,7 @@ class AllocationRuleIntegration implements OrderAllocationRuleInterface {
 				$dataItem['weight']         = $data['weight'];
 				$dataItem['price']          = $data['price'];
 				$dataItem['is_spo']         = $data['is_spo'];
+				$dataItem['is_price_promo'] = $data['is_price_promo'];
 				$dataItem['is_own_courier'] = $data['is_own_courier']; // means is_fresh
 			}
 			$itemData[]        = $dataItem;

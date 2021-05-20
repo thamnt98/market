@@ -442,4 +442,18 @@ IntegrationOrderItemInterface {
 	public function setPromotionValue($promotionValue) {
 		return $this->setData(IntegrationOrderItemInterface::PROMOTION_VALUE, $promotionValue);
 	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getIsFresh() {
+		return $this->getData(IntegrationOrderItemInterface::IS_FRESH);
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function setIsFresh($isFresh) {
+		return $this->setData(IntegrationOrderItemInterface::IS_FRESH, $isFresh);
+	}
 }
