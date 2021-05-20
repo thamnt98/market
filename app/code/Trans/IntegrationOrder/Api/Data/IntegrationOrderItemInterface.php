@@ -60,6 +60,7 @@ interface IntegrationOrderItemInterface {
 	const GRAND_TOTAL           = 'grand_total';
 	const PROMOTION_TYPE        = 'promotion_type';
 	const PROMOTION_VALUE       = 'promotion_value';
+	const IS_FRESH       		= 'is_fresh';
 
 	/**
 	 * Get Oms Id Order Item
@@ -510,4 +511,19 @@ interface IntegrationOrderItemInterface {
 	 * @return void
 	 */
 	public function setPromotionValue($promotionValue);
+
+	/**
+	 * Get Is Fresh
+	 *
+	 * @return bool
+	 */
+	public function getIsFresh();
+
+	/**
+	 * Set Is Fresh
+	 *
+	 * @param bool $isFresh
+	 * @return bool
+	 */
+	public function setIsFresh($isFresh);
 }

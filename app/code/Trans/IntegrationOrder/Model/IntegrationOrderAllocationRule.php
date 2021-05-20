@@ -318,4 +318,25 @@ IntegrationOrderAllocationRuleInterface {
 	public function setOarOriginOrderId($oarOriginId) {
 		return $this->setData(IntegrationOrderAllocationRuleInterface::OAR_ORIGIN_ORDER_ID, $oarOriginId);
 	}
+
+	/**
+	 * Get is price promo.
+	 *
+	 * @api
+	 * @return bool
+	 */
+	public function getIsPricePromo() {
+		return $this->getData(IntegrationOrderAllocationRuleInterface::IS_PRICE_PROMO);
+	}
+
+	/**
+	 * Set is price promo.
+	 *
+	 * @api
+	 * @param  $isPricePromo
+	 * @return bool
+	 */
+	public function setIsPricePromo($isPricePromo) {
+		return $this->setData(IntegrationOrderAllocationRuleInterface::IS_PRICE_PROMO, $isPricePromo);
+	}
 }

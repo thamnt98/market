@@ -67,4 +67,13 @@ interface OrderStatusInterface {
 	 * @return mixed
 	 */
 	public function checkPaymentStatus($orderId, $status, $action);
+
+	/**
+	 * trigger complete status to OMS
+	 * @param string $orderId
+	 * @param string $referenceNumber
+	 * @param int $status
+	 * @return mixed
+	 */
+	public function completeStatus($orderId, $referenceNumber, $status);
 }

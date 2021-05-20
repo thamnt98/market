@@ -686,5 +686,18 @@ class UpgradeSchema implements UpgradeSchemaInterface {
 			);
 
 		}
+
+		if (version_compare($context->getVersion(), '1.1.9', '<')) {
+			$installer->getConnection()->addColumn(
+				$installer->getTable('integration_oms_order_item'),
+				'is_fresh',
+				[
+					'type' => \Magento\Framework\DB\Ddl\Table::TYPE_BOOLEAN,
+					'nullable' => true,
+					'comment' => 'is_fresh for oms',
+					'after' => 'is_warehouse',
+				]
+			);
+		}
 	}
 }

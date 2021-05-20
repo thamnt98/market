@@ -45,6 +45,7 @@ interface IntegrationOrderAllocationRuleInterface {
 	const WAREHOUSE_SOURCE    = 'warehouse_source';
 	const SPO_DETAIL          = 'spo_detail';
 	const OAR_ORIGIN_ORDER_ID = 'oar_origin_order_id';
+	const IS_PRICE_PROMO      = 'is_price_promo';
 
 	/**
 	 * Get OAR Id
@@ -298,4 +299,19 @@ interface IntegrationOrderAllocationRuleInterface {
 	 * @return string
 	 */
 	public function setOarOriginOrderId($oarOriginId);
+
+	/**
+	 * Get Is Price Promo
+	 *
+	 * @return bool
+	 */
+	public function getIsPricePromo();
+
+	/**
+	 * Set Is Price Promo
+	 *
+	 * @param bool $isPricePromo
+	 * @return bool
+	 */
+	public function setIsPricePromo($isPricePromo);
 }

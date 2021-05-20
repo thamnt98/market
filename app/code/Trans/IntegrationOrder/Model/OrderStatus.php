@@ -716,7 +716,11 @@ class OrderStatus implements OrderStatusInterface {
 		 */
 		$matrixAdjusmentAmount = 0;
 		if ($status == 2 && $action == 2 && $subAction == 7 || $status == 2 && $action == 99 && $subAction == 0) {
-			if ($paymentMethod === 'sprint_bca_va' || $paymentMethod === 'sprint_permata_va' || $paymentMethod === 'trans_mepay_va') {
+			if (
+			    $paymentMethod === 'sprint_bca_va' || 
+			    $paymentMethod === 'sprint_permata_va' || 
+			    $paymentMethod === 'trans_mepay_va'
+			) {
 				$this->loggerOrder->info('=========== refund VA start ===========');
 				foreach ($loadItemByOrderId as $itemOrder) {
 					$paidPriceOrder = $itemOrder->getPaidPrice();
@@ -770,7 +774,17 @@ class OrderStatus implements OrderStatusInterface {
 			}
 			/* End Non CC*/
 
-			if ($paymentMethod === 'sprint_mega_cc' || $paymentMethod === 'sprint_allbankfull_cc' || $paymentMethod === 'sprint_mega_debit' || $paymentMethod === 'trans_mepay_cc' || $paymentMethod === 'trans_mepay_allbankccdebit' || $paymentMethod === 'trans_mepay_debit' || $paymentMethod === 'trans_mepay_qris') {
+			if (
+			    $paymentMethod === 'sprint_mega_cc' || 
+			    $paymentMethod === 'sprint_allbankfull_cc' || 
+			    $paymentMethod === 'sprint_mega_debit' || 
+			    $paymentMethod === 'trans_mepay_cc' || 
+			    $paymentMethod === 'trans_mepay_allbankccdebit' || 
+			    $paymentMethod === 'trans_mepay_debit' || 
+			    $paymentMethod === 'trans_mepay_qris' ||
+			    $paymentMethod === 'trans_mepay_allbank_cc' ||
+			    $paymentMethod === 'trans_mepay_allbank_debit'
+			) {
 				$this->loggerOrder->info('=========== refund CC DEBIT start ===========');
 
 				/**
@@ -787,7 +801,14 @@ class OrderStatus implements OrderStatusInterface {
 					$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
 				}
 
-				if ($paymentMethod === 'trans_mepay_cc' || $paymentMethod === 'trans_mepay_allbankccdebit' || $paymentMethod === 'trans_mepay_debit' || $paymentMethod === 'trans_mepay_qris') {
+				if (
+				    $paymentMethod === 'trans_mepay_cc' || 
+				    $paymentMethod === 'trans_mepay_allbankccdebit' || 
+				    $paymentMethod === 'trans_mepay_debit' || 
+				    $paymentMethod === 'trans_mepay_qris' ||
+				    $paymentMethod === 'trans_mepay_allbank_cc' ||
+			        $paymentMethod === 'trans_mepay_allbank_debit'
+				) {
 					$this->eventManager->dispatch(
 						'refund_with_mega_payment',
 						[
@@ -1144,8 +1165,7 @@ class OrderStatus implements OrderStatusInterface {
 	 * @param object $loadStatusDelivery
 	 * @return void
 	 */
-	protected function saveStatusHistory($orderId, $status, $loadStatusDelivery)
-	{
+	protected function saveStatusHistory($orderId, $status, $loadStatusDelivery) {
 		$saveDataToStatusHistory    = $this->orderStatusHistoryInterfaceFactory->create();
 		$saveDataToStatusHistory->setParentId($orderId);
 		$saveDataToStatusHistory->setStatus($status);
@@ -1531,8 +1551,7 @@ class OrderStatus implements OrderStatusInterface {
 	 * @param string $status
 	 * @return bool
 	 */
-	protected function checkOrderStatus($parentId, $status)
-	{
+	protected function checkOrderStatus($parentId, $status) {
 		$result = false;
 		// $status = 'in_process_waiting_for_pickup';
 		$connection = $this->resource->getConnection();
@@ -1620,5 +1639,86 @@ class OrderStatus implements OrderStatusInterface {
 		$where = ['parent_id = ?' => $orderId, 'entity_name = ?' => 'creditmemo'];
 
 		$connection->update($table, $data, $where);
+	}
+
+	/**
+	 * trigger complete status to OMS
+	 *
+	 * @param string $orderId
+	 * @param string $referenceNumber
+	 * @param int $status
+	 *
+	 */
+	public function completeStatus($orderId, $referenceNumber, $status) {
+		$writer = new \Zend\Log\Writer\Stream(BP . '/var/log/order-status.log');
+		$logger = new \Zend\Log\Logger();
+		$logger->addWriter($writer);
+		$idsOrder = $this->statusRepo->loadByOrderIds($orderId);
+
+		$childOrder     = $this->order->loadByAttribute('reference_order_id', $orderId);
+		$orderData      = $this->statusRepo->loadByOrderIds($orderId);
+		$refNumber      = $orderData->getReferenceNumber();
+		if (!$idsOrder->getOrderId()) {
+			throw new \Magento\Framework\Webapi\Exception(__('Order ID doesn\'t exist, please make sure again.'));
+		}
+		$orderIds = $idsOrder->getOrderId();
+
+		$url            = $this->orderConfig->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
+		$headers        = $this->getHeader();
+		$request = array(
+			'reference_number' => $refNumber,
+			'order_id' => $orderId,
+			'status' => 4,
+		);
+
+		$dataJson = json_encode($request);
+				$this->loggerOrder->info($dataJson);
+				$this->curl->setOption(CURLOPT_RETURNTRANSFER, true);
+				$this->curl->setOption(CURLOPT_CUSTOMREQUEST, 'PATCH');
+				$this->curl->setHeaders($headers);
+				$this->curl->post($url, $dataJson);
+				$responseOrder = $this->curl->getBody();
+				$this->loggerOrder->info('$url : ' . $url);
+				$this->loggerOrder->info('$headers : ' . json_encode($headers));
+				$this->loggerOrder->info('$responseOrder : ' . $responseOrder);
+				$objOrder = json_decode($responseOrder);
+				$this->loggerOrder->info('Body: ' . $dataJson . '. Response: ' . $responseOrder);
+				$json_string = stripcslashes($responseOrder);
+				$this->loggerOrder->info('response = ' . $json_string);
+
+				$configStatus               = $this->orderConfig;
+				$loadDataOrder              = $this->statusRepo->loadDataByRefOrderId($orderId);
+				$entityIdSalesOrder         = $loadDataOrder->getEntityId();
+				$loadDataOrderStatusHistory = $this->statusRepo->loadDataByParentOrderId($entityIdSalesOrder);
+				$saveDataToStatusHistory    = $this->orderStatusHistoryInterfaceFactory->create();
+		
+				/* Updating data status order in core magento table */
+					$loadDataOrder->setStatus('complete');
+					$loadDataOrder->setState('complete');
+					$saveDataToStatusHistory->setParentId($entityIdSalesOrder);
+					$saveDataToStatusHistory->setStatus('complete');
+					$saveDataToStatusHistory->setComment('Order has been completed');
+					$saveDataToStatusHistory->setEntityName('order');
+				
+		
+				$this->orderRepoInterface->save($loadDataOrder);
+				$this->orderStatusHistoryRepoInterface->save($saveDataToStatusHistory);
+		
+				if ($orderIds) {
+					$model = $this->historyInterface->create();
+					$model->setReferenceNumber($idsOrder->getReferenceNumber());
+					$model->setOrderId($orderIds);
+					$model->setFeStatusNo('4');
+					$model->setFeSubStatusNo('0');
+		
+					$this->statusRepo->saveHistory($model);
+				}
+				if ($status == 4) {
+					$result['code'] = 200;
+					$result['message'] = "success";
+				} else {
+					throw new \Magento\Framework\Webapi\Exception(__('Check and try again.'), 400);
+				}
+				return $result;
 	}
 }

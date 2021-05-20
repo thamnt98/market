@@ -780,4 +780,18 @@ IntegrationOrderInterface {
     public function setShippingFeeDiscount($shippingFeeDiscount) {
         return $this->setData(IntegrationOrderInterface::SHIPPING_FEE_DISCOUNT, $shippingFeeDiscount);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getSpoType() {
+        return $this->getData(IntegrationOrderInterface::SPO_TYPE);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setSpoType($spoType) {
+        return $this->setData(IntegrationOrderInterface::SPO_TYPE, $spoType);
+    }
 }

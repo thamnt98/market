@@ -221,6 +221,7 @@ class OmsIntegration implements OmsIntegrationInterface {
 				$dataItem['weight']       = $items['weight'];
 				$dataItem['total_weight'] = $items['total_weight'];
 				$dataItem['is_warehouse'] = $items['is_warehouse'];
+				$dataItem['is_fresh'] 	  = $items['is_fresh'];
 				$orderItem[]              = $dataItem;
 
 				$modelItem->setSku($items['sku']);
@@ -236,6 +237,7 @@ class OmsIntegration implements OmsIntegrationInterface {
 				$modelItem->setPromotionType($dataOrder['promotion_type']);
 				$modelItem->setPromotionValue($dataOrder['promotion_value']);
 				$modelItem->setIsWarehouse($items['is_warehouse']);
+				$modelItem->setIsFresh($items['is_fresh']);
 
 				$orderItemSave = $this->orderItemRepo->save($modelItem);
 
@@ -343,6 +345,7 @@ class OmsIntegration implements OmsIntegrationInterface {
 				"order_id" => $dataOrder['order_id'],
 				"order_id_origin" => $orderOriginId, //new
 				"is_spo" => (int) $isSpo, //new
+                "spo_type" => (string) $dataOrder->getSpoType(), //new
 				"is_own_courier" => (int) $isOwnCourier, //new
 				"warehouse_source" => $warehouseSource, //new
 				"warehouse_code" => $warehouseCode, // added new 26 Oct
