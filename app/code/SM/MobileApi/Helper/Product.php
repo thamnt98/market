@@ -900,6 +900,7 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      */
     protected function _getProductAttribute($product, $attributeName)
     {
+        
         return $this->outputHelper->productAttribute(
             $product,
             $this->appState->emulateAreaCode('frontend', [
@@ -919,6 +920,9 @@ class Product extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getFilteredValue($value)
     {
+        if($value == "" || $value == is_null() || $value == is_empty() || $value == NULL || $value == 'NULL'){
+            $value = "-";
+        }
         return $this->filterProvider->getBlockFilter()->filter($value);
     }
 
