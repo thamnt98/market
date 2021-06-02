@@ -10,7 +10,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
     <menu>
-        <update id="Mirasvit_Blog::blog" title="Inspire Me" module="Mirasvit_Blog" sortOrder="700"
+        <update id="Mirasvit_Blog::blog" title="CURATED FOR YOU" module="Mirasvit_Blog" sortOrder="700"
              resource="Mirasvit_Blog::blog" parent="Magento_Backend::content"/>
 
         <update id="Mirasvit_Blog::blog_post" title="Article" module="Mirasvit_Blog" sortOrder="20"

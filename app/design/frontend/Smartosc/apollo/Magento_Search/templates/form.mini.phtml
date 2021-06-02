@@ -48,7 +48,7 @@ $helper = $this->helper(\Magento\Search\Helper\Data::class);
                            type="text"
                            name="<?= $block->escapeHtmlAttr($helper->getQueryParamName()) ?>"
                            value="<?= /* @noEscape */ htmlentities($helper->getEscapedQueryText(), ENT_QUOTES); ?>"
-                           placeholder="<?= $block->escapeHtmlAttr(__('What would you like to shop?')) ?>"
+                           placeholder="<?= $block->escapeHtmlAttr(__('Find products, brands or styles here')) ?>"
                            class="input-text"
                            maxlength="<?= $block->escapeHtmlAttr($helper->getMaxQueryLength()) ?>"
                            role="combobox"
