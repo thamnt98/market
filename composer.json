@@ -23,15 +23,15 @@
     },
     "require": {
         "ext-json": "*",
-        "amasty/coupons": "^1.4",
+        "amasty/coupons": "1.4.3",
         "amasty/label": "^1.12",
         "amasty/module-special-promo-pro": "^2.8",
         "amasty/product-labels-graphql": "^1.0",
-        "amasty/promo": "^2.9",
-        "amasty/shopby": "^2.13",
+        "amasty/promo": "2.9.3",
+        "amasty/shopby": "2.14.1",
         "endroid/qr-code": "2.5.0",
         "livechat/module-magento-livechat": "^2.3",
-        "magento/magento-cloud-metapackage": ">=2.3.3 <2.3.5",
+        "magento/magento-cloud-metapackage": ">=2.3.6 <2.4.0",
         "mpdf/mpdf": "^8.0"
     },
     "require-dev": {
@@ -100,3 +100,4 @@
         "magento-deploystrategy": "copy"
     }
 }
+
