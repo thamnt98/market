@@ -18,5 +18,6 @@
         <remove src="fonts/opensans/semibold/opensans-600.woff2"/>
         <remove src="fonts/opensans/bold/opensans-700.woff2"/>
         <remove src="fonts/Luma-Icons.woff2"/>
+        <css src="css/metro.css" />
     </head>
 </page>
