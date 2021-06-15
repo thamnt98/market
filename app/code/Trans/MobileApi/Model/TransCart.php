@@ -109,7 +109,6 @@ class TransCart extends SMCart
         Fresh $fresh,
         \Magento\Quote\Api\CartManagementInterface $quoteManagement,
         \Magento\Customer\Api\AddressRepositoryInterface $addressRepository,
-        \SM\ShoppingList\Helper\Data $shoppingListHelper,
 	    SortData $sortData
     ) {
         $this->categoryEventList        = $categoryEventList;
@@ -168,7 +167,6 @@ class TransCart extends SMCart
             $fresh,
             $quoteManagement,
             $addressRepository,
-            $shoppingListHelper,
             $updateCart
         );
     }
