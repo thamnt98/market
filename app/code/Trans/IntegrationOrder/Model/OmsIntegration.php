@@ -221,7 +221,7 @@ class OmsIntegration implements OmsIntegrationInterface {
 				$dataItem['weight']       = $items['weight'];
 				$dataItem['total_weight'] = $items['total_weight'];
 				$dataItem['is_warehouse'] = $items['is_warehouse'];
-				$dataItem['is_fresh'] 	  = $items['is_fresh'];
+				//$dataItem['is_fresh'] 	  = $items['is_fresh'];
 				$orderItem[]              = $dataItem;
 
 				$modelItem->setSku($items['sku']);
@@ -237,7 +237,7 @@ class OmsIntegration implements OmsIntegrationInterface {
 				$modelItem->setPromotionType($dataOrder['promotion_type']);
 				$modelItem->setPromotionValue($dataOrder['promotion_value']);
 				$modelItem->setIsWarehouse($items['is_warehouse']);
-				$modelItem->setIsFresh($items['is_fresh']);
+				//$modelItem->setIsFresh($items['is_fresh']);
 
 				$orderItemSave = $this->orderItemRepo->save($modelItem);
 
