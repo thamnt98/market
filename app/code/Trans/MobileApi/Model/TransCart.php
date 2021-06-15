@@ -166,8 +166,7 @@ class TransCart extends SMCart
             $gtmCart,
             $fresh,
             $quoteManagement,
-            $addressRepository,
-            $updateCart
+            $addressRepository
         );
     }
 
