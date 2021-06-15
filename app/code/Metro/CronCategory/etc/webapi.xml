@@ -1,0 +1,16 @@
+<?xml version="1.0" ?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+	<route url="/V1/metro-croncategory/croncategory" method="GET">
+		<service class="Metro\CronCategory\Api\CronCategoryManagementInterface" method="getCronCategory"/>
+		<resources>
+			<resource ref="anonymous"/>
+		</resources>
+	</route>
+
+	<route url="/V1/metro-croncategory/croncategorydata" method="GET">
+		<service class="Metro\CronCategory\Api\CronCategoryManagementInterface" method="getCronCategoryData"/>
+		<resources>
+			<resource ref="anonymous"/>
+		</resources>
+	</route>
+</routes>
