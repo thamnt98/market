@@ -111,6 +111,53 @@ class Quote extends AbstractHelper
     }
 
     /**
+     * Remove token on tokenlist
+     *
+     * @param array $tokenlist
+     * @param string $token
+     * @return string
+     */
+    public function removeTokenOnTokenlist($tokenlist, $token)
+    {
+        foreach ($tokenlist as $index => $content) {
+            if ($content['token'] == $token) {
+                $flag = true;
+                unset($tokenlist[$index]);
+            }
+        }
+        return $this->serializer->serialize($tokenlist);
+    }
+
+    /**
+     * Save customer tokenlist
+     *
+     * @param \Magento\Customer\Api\Data\CustomerInterface $customer
+     * @param string $method
+     * @param string $tokenlist
+     * @return void
+     */
+    public function saveCustomerTokenlist($customer, $method, $tokenlist)
+    {
+        $customer->setCustomAttribute($method.'_'.CardSavedTokenInterface::CARDTOKEN, $tokenlist);
+        $this->customerRepo->save($customer);
+        return true;
+    }
+
+    /**
+     * Set customer tokenlist
+     *
+     * @param int $customerId
+     * @param string $method
+     * @param string $tokenlist
+     * @return void
+     */
+    public function setCustomerTokenlist($customerId, $method, $tokenlist)
+    {
+        $customer = $this->customerRepo->getById($customerId);
+        $this->saveCustomerTokenlist($customer, $method, $tokenlist);
+    }
+
+    /**
      * Remove customer token
      *
      * @param int $customerId
@@ -123,7 +170,12 @@ class Quote extends AbstractHelper
         foreach (Data::BANK_MEGA_PAYMENT_METHOD as $key => $value) {
             $flag = false;
             if ($list = $customer->getCustomAttribute($value.'_'.CardSavedTokenInterface::CARDTOKEN)) {
-                $data = $this->serializer->unserialize($list->getValue());
+                if (substr($list->getValue(),0,1) == '"') {
+                    $data = $this->serializer->unserialize($list->getValue());
+                    $data = $this->serializer->unserialize($data);
+                } else {
+                    $data = $this->serializer->unserialize($list->getValue());
+                }
                 foreach ($data as $index => $content) {
                     if ($content['token'] == $token) {
                         $flag = true;
@@ -132,9 +184,7 @@ class Quote extends AbstractHelper
                 }
                 if ($flag) {
                     $data = $this->serializer->serialize($data);
-                    $customer->setCustomAttribute($value.'_'.CardSavedTokenInterface::CARDTOKEN, $data);
-                    $this->customerRepo->save($customer);
-                    return true;
+                    return $this->saveCustomerTokenlist($customer, $value, $data);
                 }
             }
         }

@@ -73,11 +73,19 @@ class Callbacks extends AbstractAction
    */
   public function checkOrderCreated($order)
   {
-    $txnColl = $this->transaction->getLastOrderTransaction($order->getId());
-    if ($txnColl->getTxnType() == \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID)
-      return false;
-    if ($order->getStatus() == \Magento\Sales\Model\Order::STATE_CANCELED)
-      return false;
-    return true;
+    // $txnColl = $this->transaction->getLastOrderTransaction($order->getId());
+    // if ($txnColl->getTxnType() == \Magento\Sales\Model\Order\Payment\Transaction::TYPE_VOID)
+    //   return false;
+    // if ($order->getStatus() == \Magento\Sales\Model\Order::STATE_CANCELED)
+    //   return false;
+    // return true;
+      if ($order->getStatus() == \Trans\IntegrationOrder\Api\Data\IntegrationOrderLogInterface::IN_PROCESS) {
+        $txnColl = $this->transaction->getLastOrderTransaction($order->getId());
+        if ($txnColl->getTxnType() == \Magento\Sales\Model\Order\Payment\Transaction::TYPE_AUTH)
+            return true;
+        if ($txnColl->getTxnType() == \Magento\Sales\Model\Order\Payment\Transaction::TYPE_CAPTURE)
+            return true;
+      }
+      return false;;
   }
 }

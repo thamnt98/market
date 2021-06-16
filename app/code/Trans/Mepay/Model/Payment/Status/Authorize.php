@@ -27,6 +27,11 @@ use Trans\Mepay\Logger\LoggerWrite;
 class Authorize
 {
   /**
+    @var array
+   */
+  const FAILED_STATUS = [Status::CANCEL, Status::FAILED, Status::DECLINED, Status::VOID];
+
+  /**
    * @var Config
    */
   protected $config;
@@ -45,6 +50,7 @@ class Authorize
    * @var Invoice
    */
   protected $invoice;
+
 
   /**
    * @var Logger
@@ -90,7 +96,7 @@ class Authorize
         
         if ($payment->getCcType() == PaymentSourceMethodDataBuilder::AUTH_CAPTURE) {
             $forceCapture = true;
-            if ($transaction->getStatus() && ($transaction->getStatus() == Status::DECLINED)) {
+            if ($transaction->getStatus() && in_array($transaction->getStatus(), self::FAILED_STATUS)) {
                 $forceCapture = false;
             }
         }

@@ -412,7 +412,8 @@ class Transaction extends AbstractHelper {
 		$lists = $this->getTxnCriteriaByOrderId($orderId);
 		foreach ($lists as $key => $value) {
 			if($value->getTransMepayInquiry()) {
-				return $value->getTransMepayInquiry();
+				if ($value->getTxnType() <> TransactionInterface::TYPE_VOID)
+					return $value->getTransMepayInquiry();
 			}
 		}
 		return '';

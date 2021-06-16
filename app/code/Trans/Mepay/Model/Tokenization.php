@@ -73,11 +73,22 @@ class Tokenization implements \Trans\Mepay\Api\TokenizationInterface
      */
     public function savetoken(string $token, string $method)
     {
-        $this->logger->writeInfo('==== save token teting ====');
+        $this->logger->writeInfo('==== save token testing ====');
         $this->logger->writeInfo($token);
         $this->builder->setCustomerToken($token, $method);
 
         return $this->buildResponse('', true);
+    }
+
+    /**
+     * {{inheritdoc}}
+     */
+    public function deletetoken(string $token, string $method)
+    {
+        $this->logger->writeInfo('==== save token testing ====');
+        $this->logger->writeInfo($token);
+        $this->builder->deleteCustomerToken($token, $method, $token);
+        return $this->buildResponse('', true, $token);
     }
 
     /**
@@ -86,7 +97,7 @@ class Tokenization implements \Trans\Mepay\Api\TokenizationInterface
      * @param  bool $status
      * @return \ResponseInterface
      */
-    protected function buildResponse($tokenList = '', bool $status)
+    protected function buildResponse($tokenList = '', bool $status, $token = '')
     {
         $response = $this->responseFactory->create();
         $status = '200';
@@ -98,6 +109,13 @@ class Tokenization implements \Trans\Mepay\Api\TokenizationInterface
 
         if($tokenList) {
             $response->setList($tokenList);
+        }
+
+        if ($token)
+        {
+            $token = explode('|', $token);
+            if (isset($token[1]))
+                $response->setToken($token[1]);
         }
         
         $this->logger->writeInfo('status: ' . $status);

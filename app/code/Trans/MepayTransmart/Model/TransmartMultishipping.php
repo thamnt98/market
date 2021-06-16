@@ -23,6 +23,12 @@ class TransmartMultishipping extends MultiShipping
     public function placeOrderMobile($cartId)
     {
         $response = $this->responsePlaceOrderFactory->create();
+        if ($this->connectionDB->isDoubleQuoteBillingAddress($cartId)) {
+            $response->setError(true);
+            $response->setErrorCode('001');
+            $response->setMessage(_('Checkout error. Please try again later!'));
+            return $response;
+        }
         $this->checkoutSession->setArea(\SM\Checkout\Helper\OrderReferenceNumber::AREA_APP);
         try {
             $quote = $this->quoteRepository->get($cartId);

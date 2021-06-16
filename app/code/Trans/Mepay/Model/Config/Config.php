@@ -122,6 +122,11 @@
     */
    const PAYMENT_TRANS_MEPAY_CC_ORDER_STATE = 'payment/trans_mepay_cc/order_state';
 
+  /**
+   * @var string
+   */
+  const PAYMENT_TRANS_MEPAY_CC_DISCOUNT_TEXT = 'payment/trans_mepay_cc/discount_text';
+
    /**
     * @var string
     */
@@ -181,6 +186,11 @@
    * @var string
    */
   const PAYMENT_TRANS_MEPAY_DEBIT_ORDER_STATE = 'payment/trans_mepay_debit/order_state';
+
+  /**
+   * @var string
+   */
+  const PAYMENT_TRANS_MEPAY_DEBIT_DISCOUNT_TEXT = 'payment/trans_mepay_debit/discount_text';
 
    /**
    * @var string
@@ -570,4 +580,21 @@
       }
       return $this->getDevBaseUrl().$captureUrl;
     }
- }
+
+    /**
+     * Get order state
+     * @param  string $paymentCode
+     * @return string
+     */
+    public function getDiscountText($paymentCode)
+    {
+      $discountText = '';
+      switch($paymentCode) {
+        case Cc::CODE_CC : $discountText = $this->getValue(self::PAYMENT_TRANS_MEPAY_CC_DISCOUNT_TEXT);
+          break;
+        case Debit::CODE : $discountText = $this->getValue(self::PAYMENT_TRANS_MEPAY_DEBIT_DISCOUNT_TEXT);
+          break;
+      }
+      return __($discountText);
+    }
+}

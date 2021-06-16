@@ -52,5 +52,9 @@
           <base_url type="media" scope_info="1">logo/paymentmethod</base_url>
           <config_path>payment/trans_mepay_debit/logo</config_path>
       </field>
+      <field id="discount_text" type="text" sortOrder="116" showInDefault="1" showInWebsite="1" showInStore="1">
+          <label>Discount Text</label>
+          <config_path>payment/trans_mepay_debit/discount_text</config_path>
+      </field>
   </group>
 </include>

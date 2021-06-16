@@ -109,6 +109,22 @@ class Response extends DataObject implements ResponseInterface
   }
 
   /**
+   * @inheritdoc
+   */
+  public function setToken($token)
+  {
+    $this->setData(ResponseInterface::TOKEN, $token);
+  }
+
+  /**
+   * @inheritdoc
+   */
+  public function getToken()
+  {
+    return $this->_getData(ResponseInterface::TOKEN);
+  }
+
+  /**
    * Build
    * @param  string $type
    * @param  string $status

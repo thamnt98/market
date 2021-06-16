@@ -113,6 +113,11 @@ class Customer extends AbstractHelper
       return $this->_getCustomerToken($customer, $method);
   }
 
+  /**
+   * Get customer active token
+   * @param int $id
+   * @return string
+   */
   public function getCustomerActiveToken($id)
   {
     $quote = $this->cartrepo->getActiveForCustomer($id);
@@ -120,6 +125,12 @@ class Customer extends AbstractHelper
     return ($payment->getCardToken())?? '';
   }
 
+  /**
+   * removeTokenByOrder
+   *
+   * @param \Magento\Sales\Api\Data\OrderInterface $order
+   * @return void
+   */
   public function removeTokenByOrder($order)
   {
     $this->quoteHelper->removeTokenByQuoteId($order->getCustomerId(), $order->getQuoteId());
@@ -136,8 +147,7 @@ class Customer extends AbstractHelper
     $customer = $this->getCustomer($id);
     $oldToken = $this->_getCustomerToken($customer, $method);
     $newToken = $this->composeNewToken($method, $oldToken, $token);
-    $customer->setCustomAttribute($method.'_'.CardSavedTokenInterface::CARDTOKEN, $newToken);
-    return $this->customerRepo->save($customer);
+    return $this->quoteHelper->saveCustomerTokenlist($customer, $method, $newToken);
   }
 
   /**
@@ -150,7 +160,10 @@ class Customer extends AbstractHelper
   protected function _getCustomerToken($customer, $method)
   {
       $token = $customer->getCustomAttribute($method.'_'.CardSavedTokenInterface::CARDTOKEN);
-      return ($token)? $token->getValue() : '[]';
+      $token = ($token)? $token->getValue() : '[]';
+      if (substr($token,0,1) == '"')
+          $token = $this->serialize->unserialize($token);
+      return $token;
   }
 
   /**

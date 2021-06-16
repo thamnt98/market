@@ -14,6 +14,7 @@ namespace Trans\MepayTransmart\Model\Api;
 
 use SM\Checkout\Helper\Payment;
 use SM\Checkout\Model\Api\PaymentMethods;
+use Trans\Mepay\Model\Config\Config as MepayConfig;
 
 class TransmartPaymentMethods extends PaymentMethods
 {
@@ -61,6 +62,11 @@ class TransmartPaymentMethods extends PaymentMethods
      * @var \SM\Checkout\Api\Data\Checkout\PaymentMethods\InstallmentTermInterfaceFactory
      */
     private $installmentTermFactory;
+
+    /**
+     * @var \Trans\Mepay\Model\Config\Config
+     */
+    private $mepayConfig;
     /**
      * PaymentMethods constructor.
      * @param \Magento\Payment\Api\PaymentMethodListInterface                                 $paymentMethodList
@@ -91,7 +97,8 @@ class TransmartPaymentMethods extends PaymentMethods
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         Payment $paymentHelper,
-        \SM\Checkout\Model\Payment $installmentPayment
+        \SM\Checkout\Model\Payment $installmentPayment,
+        MepayConfig $mepayConfig
     ) {
         $this->paymentMethodList = $paymentMethodList;
         $this->methodInstanceFactory = $methodInstanceFactory;
@@ -108,6 +115,7 @@ class TransmartPaymentMethods extends PaymentMethods
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
         $this->paymentHelper = $paymentHelper;
+        $this->mepayConfig = $mepayConfig;
         parent::__construct(
             $paymentMethodList,
             $methodInstanceFactory,
@@ -154,11 +162,13 @@ class TransmartPaymentMethods extends PaymentMethods
         $debitMethods = [];
         foreach ($this->methods as $key => $value) {
             if (\strpos($key, 'debit')) {
+                $description = $this->mepayConfig->getDiscountText($key);
+                $description = ($description)? $description : $this->scopeConfig->getValue('payment/sprint/sprint_cc_payment/'.$key.'/description');
                 $debitMethods[] = $this->bankInterfaceFactory
                 ->create()
                 ->setCode($key)
                 ->setLogo($this->paymentHelper->getLogoPayment($key,true))
-                ->setDescription($this->scopeConfig->getValue('payment/sprint/sprint_cc_payment/'.$key.'/description'))
+                ->setDescription($description)
                 ->setTitle($this->methods[$key]['title']);
             }
         }
@@ -226,11 +236,13 @@ class TransmartPaymentMethods extends PaymentMethods
         //set original credit card method
         foreach ($this->paymentHelper->getCreditMethods() as $methodCode) {
             if ($this->checkIsSprintMethod($methodCode)) {
+                $description = $this->mepayConfig->getDiscountText($methodCode);
+                $description = ($description)? $description : $this->scopeConfig->getValue('payment/sprint/sprint_cc_payment/'.$methodCode.'/description');
                 $creditMethods[] = $this->bankInterfaceFactory
                     ->create()
                     ->setCode($methodCode)
                     ->setLogo($this->paymentHelper->getLogoPayment($methodCode,true))
-                    ->setDescription($this->scopeConfig->getValue('payment/sprint/sprint_cc_payment/'.$methodCode.'/description'))
+                    ->setDescription($description)
                     ->setTitle($this->methods[$methodCode]['title']);
             }
         }
