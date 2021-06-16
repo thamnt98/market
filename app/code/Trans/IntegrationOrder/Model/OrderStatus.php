@@ -15,6 +15,8 @@ namespace Trans\IntegrationOrder\Model;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Trans\IntegrationOrder\Api\Data\RefundInterface;
 use Trans\IntegrationOrder\Api\OrderStatusInterface;
+use Trans\Mepay\Api\AuthCaptureRepositoryInterface;
+use Trans\Mepay\Model\CaptureResponse;
 use Trans\Sprint\Helper\Config;
 
 /**
@@ -73,6 +75,16 @@ class OrderStatus implements OrderStatusInterface {
 	protected $orderPaymentRepo;
 
 	/**
+	 * @var \Trans\Mepay\Api\AuthCaptureRepositoryInterface
+	 */
+	protected $authCaptureRespo;
+
+	/**
+	 * @var \Trans\Mepay\Model\CaptureResponse
+	 */
+	protected $captureResponse;
+
+	/**
 	 * Order Status Construct Data
 	 * @param \Magento\Framework\App\ResourceConnection $resource
 	 * @param \Magento\Framework\Event\ManagerInterface $eventManager
@@ -99,6 +111,7 @@ class OrderStatus implements OrderStatusInterface {
 	 * @param \Trans\Sprint\Helper\Config $configPg
 	 * @param \Trans\IntegrationOrder\Api\RefundRepositoryInterface $refundRepository
 	 * @param \Trans\IntegrationOrder\Api\RefundInterfaceFactory $refundInterface
+	 * @param \Trans\Mepay\Api\AuthCaptureRepositoryInterface $authCaptureRespo
 	 */
 
 	public function __construct(
@@ -142,7 +155,9 @@ class OrderStatus implements OrderStatusInterface {
 		\Trans\Sprint\Helper\Config $configPg,
 		\Trans\IntegrationOrder\Api\RefundRepositoryInterface $refundRepository,
 		\Trans\IntegrationOrder\Api\Data\RefundInterfaceFactory $refundInterface,
-		\Trans\Mepay\Helper\Payment\Transaction $transactionMegaHelper
+		\Trans\Mepay\Helper\Payment\Transaction $transactionMegaHelper,
+		AuthCaptureRepositoryInterface $authCaptureRespo,
+		CaptureResponse $captureResponse
 	) {
 		$this->eventManager                       = $eventManager;
 		$this->order                              = $order;
@@ -184,6 +199,8 @@ class OrderStatus implements OrderStatusInterface {
 		$this->transaction                        = $transaction;
 		$this->registry                           = $registry;
 		$this->productRepository                  = $productRepository;
+		$this->authCaptureRespo                   = $authCaptureRespo;
+		$this->captureResponse                    = $captureResponse;
 
 		$this->loggerOrder = $helperData->getLogger();
 	}
@@ -496,8 +513,10 @@ class OrderStatus implements OrderStatusInterface {
 					$qty          = (1000 / $weight) * $qty;
 				}
 
-				$itemData['quantity']           = floor($qty);
-				$itemData['quantity_allocated'] = floor($allocatedQty);
+				//$itemData['quantity']           = floor($qty);
+				$itemData['quantity']           = $qty;
+				//$itemData['quantity_allocated'] = floor($allocatedQty);
+				$itemData['quantity_allocated'] = $allocatedQty;
 
 				$orderItem[] = $itemData;
 
@@ -715,6 +734,8 @@ class OrderStatus implements OrderStatusInterface {
 		 * trigger capture - refund by payment method
 		 */
 		$matrixAdjusmentAmount = 0;
+		$this->captureResponse->generateFormat();
+		$captureResponse = $this->captureResponse->getFormat();
 		if ($status == 2 && $action == 2 && $subAction == 7 || $status == 2 && $action == 99 && $subAction == 0) {
 			if (
 			    $paymentMethod === 'sprint_bca_va' || 
@@ -819,6 +840,8 @@ class OrderStatus implements OrderStatusInterface {
 							'adjustment_amount' => $matrixAdjusmentAmount,
 						]
 					);
+					//getting capture response from table
+					$captureResponse = $this->getMegaCaptureResponse($orderId);
 				}
 
 				/* update quantity adjusment */
@@ -831,6 +854,9 @@ class OrderStatus implements OrderStatusInterface {
 					'amount_adjustment' => ceil($matrixAdjusmentAmount),
 
 				);
+
+				$dataAdjustment = array_merge($dataAdjustment, $captureResponse);
+				$result[] = json_encode($captureResponse);
 				$dataJson = json_encode($dataAdjustment);
 				$this->loggerOrder->info($dataJson);
 
@@ -1721,4 +1747,29 @@ class OrderStatus implements OrderStatusInterface {
 				}
 				return $result;
 	}
+
+	/**
+	 * Get mega capture response
+	 * @param  string $refOrderId
+	 * @return array
+	 */
+	public function getMegaCaptureResponse(string $refOrderId)
+	{
+		$data = $this->_getMegaCaptureResponse($refOrderId);
+		$data = ($data)? $data : '[]';
+		$this->captureResponse->setFormat($data);
+		return $this->captureResponse->getFormat();
+	}
+
+	/**
+	 * Get mega capture response
+	 * @param  string $refOrderId
+	 * @return string
+	 */
+	protected function _getMegaCaptureResponse(string $refOrderId)
+	{
+		$response =  $this->authCaptureRespo->getByReferenceOrderId($refOrderId);
+		return $response->getPgResponse();
+	}
+
 }
