@@ -17,22 +17,22 @@ use Magento\Framework\Event\Observer;
 use Magento\Customer\Model\SessionFactory as CustomerSession;
 use Magento\Sales\Api\Data\OrderInterface;
 use Magento\Sales\Model\Order;
+use Trans\IntegrationOrder\Api\Data\IntegrationOrderInterface;
+use Trans\Mepay\Model\CartRecovery\IsValid;
 use Trans\Mepay\Helper\Restore as RestoreHelper;
 use Trans\Mepay\Helper\Order as OrderHelper;
 
 class AutoRecoverCartForPendingPayment implements ObserverInterface
 {
     /**
-     * @var array
-     */
-    const ORDER_RESTORE_CONDITIONS = [
-        OrderInterface::STATUS => Order::STATE_PENDING_PAYMENT
-    ];
-
-    /**
      * @var \Magento\Customer\Model\Session
      */
     protected $customerSession;
+
+    /**
+     * @var \Trans\Mepay\Model\CartRecovery\IsValid
+     */
+    protected $isValid;
 
     /**
      * @var \Trans\Mepay\Helper\Restore
@@ -45,6 +45,11 @@ class AutoRecoverCartForPendingPayment implements ObserverInterface
     protected $orderHelper;
 
     /**
+     * @var \Zend\Log\Logger()
+     */
+    protected $logger;
+
+    /**
      * Constructor
      * @param CustomerSession $customerSession
      * @param RestoreHelper $restoreHelper
@@ -52,12 +57,15 @@ class AutoRecoverCartForPendingPayment implements ObserverInterface
      */
     public function __construct(
         CustomerSession $customerSession,
+        IsValid $isValid,
         RestoreHelper $restoreHelper,
         OrderHelper $orderHelper
     ) {
         $this->customerSession = $customerSession;
+        $this->isValid = $isValid;
         $this->restoreHelper = $restoreHelper;
         $this->orderHelper = $orderHelper;
+        $this->setLogger();
     }
 
     /**
@@ -68,66 +76,30 @@ class AutoRecoverCartForPendingPayment implements ObserverInterface
     public function execute(Observer $observer)
     {
         try {
-            if ($this->restoreHelper->isValid()) {
-                if ($customerId = $this->customerSession->create()->getCustomerId()) {
-                    $order = $this->getCustomerOrder($customerId);
-                    if (is_array($order) && empty($order) === false) {
-                        $this->recoverByLastOrder($customerId, $order);
-                    }
-                }
+            if ($customerId = $this->customerSession->create()->getCustomerId()) {
+                $this->restoreCustomerCartAndClosedPreviousOrder($customerId);
             }
         } catch (\Exception $e) {
-            $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/recover.log');
-            $logger = new \Zend\Log\Logger();
-            $logger->addWriter($writer);
-            $logger->info('RecoverCartStart');
+            $this->logger->info('[RECOVER CART IS FAILED] ==>['.$e->getMessage().']');
         }
         
     }
 
     /**
-     * Recover cart by last order
-     * @param  array  $order
-     * @return void
-     */
-    public function recoverByLastOrder(int $customerId, array $order)
-    {
-        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/recover.log');
-        $logger = new \Zend\Log\Logger();
-        $logger->addWriter($writer);
-        $logger->info('RecoverCartStart');
-        try {
-            foreach (self::ORDER_RESTORE_CONDITIONS as $key => $value) {
-                $logger->info('Status ==> '.$order[$key]);
-                if(isset ($order[$key]) && $order[$key] == $value) {
-                    $orderId = $order[OrderInterface::ENTITY_ID];
-                    $orderDate = $order[OrderInterface::CREATED_AT];
-                    if ($this->orderHelper->isOrderPaymentIsExpired($orderId, $orderDate)) {
-                        $logger->info('Canceling previous order Start ==> ');
-                        $this->cancelOrder($order[OrderInterface::ENTITY_ID]);
-                        $logger->info('Recovering Start ==> ');
-                        $this->restoreCart($customerId, $order[OrderInterface::QUOTE_ID]);
-                        
-                    }
-                }
-            }
-            $logger->info('RecoverCartEnd-Success');
-            return true;
-        } catch (\Exception $e) {
-            //
-        }
-        $logger->info('RecoverCartEnd-Failed');
-        return false;
-    }
-
-    /**
-     * Get customer order
+     * Restore customer cart and closed previous created order
      * @param  int $customerId
-     * @return array|null
+     * @return boolean
      */
-    public function getCustomerOrder($customerId)
+    public function restoreCustomerCartAndClosedPreviousOrder($customerId)
     {
-        return $this->orderHelper->getLastOrderByCustomerId($customerId); 
+        if($this->isValid->isRestoreConditionValid($customerId)) {
+            $order = $this->isValid->getValidLatestOrder();
+            $this->removeDoubleQuote($customerId);
+            $this->restoreCart($order);
+            $this->closeOrderByRefNum($order[IntegrationOrderInterface::REFERENCE_NUMBER]);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -141,16 +113,58 @@ class AutoRecoverCartForPendingPayment implements ObserverInterface
     }
 
     /**
+     * Close the order
+     * @param  int $orderId
+     * @return void
+     */
+    public function closeOrder(int $orderId)
+    {
+        $this->orderHelper->setOrderClosed($orderId);
+    }
+
+    /**
+     * Close order by their reference number
+     * @param  string $refNum
+     * @return void
+     */
+    public function closeOrderByRefNum(string $refNum)
+    {
+        $this->orderHelper->setOrderClosedByReffNumber($refNum);
+    }
+
+
+    /**
      * Restore the cart
      * @param  int $customerId
      * @param  int $quoteIds
      * @return void
      */
-    public function restoreCart(int $customerId, int $quoteId)
+    public function restoreCart($order)
     {
-        $activeCart = $this->restoreHelper->hasActiveCart($customerId);
-        if ($activeCart == false) {
-            $quote = $this->restoreHelper->restoreQuote($quoteId);
+        if ($this->restoreHelper->hasActiveCart() == false) {
+            if (!$this->restoreHelper->restoreQuote()) {
+                $this->restoreHelper->manualRestore($order[OrderInterface::QUOTE_ID]);
+            }
         }
+    }
+
+    /**
+     * Remove double quote happen on place order
+     * @param  int $customerId
+     * @return void
+     */
+    public function removeDoubleQuote($customerId)
+    {
+        $this->restoreHelper->removeDoubleQuote($customerId);
+    }
+
+    /**
+     * Set logger property
+     */
+    public function setLogger()
+    {
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/recover.log');
+        $this->logger = new \Zend\Log\Logger();
+        $this->logger->addWriter($writer);
     }
 }

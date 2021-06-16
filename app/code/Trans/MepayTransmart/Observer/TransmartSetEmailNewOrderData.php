@@ -22,6 +22,7 @@ use Magento\Sales\Model\Order;
 use Magento\Sales\Model\Order\Email\Sender\OrderSender;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Stdlib\DateTime\DateTime;
+use SM\Sales\Helper\Email\Data as EmailHelper;
 use Trans\Sprint\Api\SprintResponseRepositoryInterface;
 use SM\Sales\Observer\SetEmailNewOrderData;
 use Trans\Mepay\Helper\Payment\Transaction as TransactionHelper;
@@ -51,6 +52,11 @@ class TransmartSetEmailNewOrderData extends SetEmailNewOrderData
     protected $timezone;
 
     /**
+     * @var \SM\Sales\Helper\Email\Data
+     */
+    protected $emailHelper;
+
+    /**
      * SetEmailNewOrderData constructor.
      * @param Json $json
      * @param TransactionHelper $transactionHelper
@@ -68,12 +74,14 @@ class TransmartSetEmailNewOrderData extends SetEmailNewOrderData
         UrlInterface $url,
         DateTime $date,
         SprintResponseRepositoryInterface $sprintResponseRepository,
-        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone
+        \Magento\Framework\Stdlib\DateTime\TimezoneInterface $timezone,
+        \SM\Sales\Helper\Email\Data $emailHelper
     ) {
         $this->json = $json;
         $this->logger = $logger;
         $this->transactionHelper = $transactionHelper;
         $this->timezone = $timezone;
+        $this->emailHelper = $emailHelper;
         parent::__construct($priceHelper, $url, $date, $sprintResponseRepository);
     }
 
@@ -113,7 +121,12 @@ class TransmartSetEmailNewOrderData extends SetEmailNewOrderData
                 "expire_time" => '',
                 "expire_time_string" => '',
                 "is_va_mega" => ($paymentMethod == 'trans_mepay_va')? true : false,
-                "is_va_bca" => false
+                "is_va_bca" => false,
+                "store_source" => $this->emailHelper->getStoreSource($order),
+                "logo" => $this->emailHelper->getPaymentLogo($paymentMethod),
+                "how_to_pay" =>
+                    $this->emailHelper->getConfigData(EmailHelper::HOW_TO_PAY_LINK, $order->getStoreId())
+                    ?? $order->getStore()->getUrl()
             ];
 
             if($paymentMethod == 'trans_mepay_va'){
@@ -142,7 +155,12 @@ class TransmartSetEmailNewOrderData extends SetEmailNewOrderData
                 "expire_time" => '',
                 "expire_time_string" => '',
                 "is_va_mega" => false,
-                "is_va_bca" => ($paymentMethod == 'sprint_bca_va')? true : false
+                "is_va_bca" => ($paymentMethod == 'sprint_bca_va')? true : false,
+                "store_source" => $this->emailHelper->getStoreSource($order),
+                "logo" => $this->emailHelper->getPaymentLogo($paymentMethod),
+                "how_to_pay" =>
+                    $this->emailHelper->getConfigData(EmailHelper::HOW_TO_PAY_LINK, $order->getStoreId())
+                    ?? $order->getStore()->getUrl()
             ];
 
             if($paymentMethod == 'sprint_bca_va') {
@@ -281,7 +299,7 @@ class TransmartSetEmailNewOrderData extends SetEmailNewOrderData
      * @param string $methodCodeShort
      * @return bool
      */
-    private function verifyPayment($paymentMethod, $methodCodeShort)
+    public function verifyPayment($paymentMethod, $methodCodeShort)
     {
         $paymentMethodSplit = explode("_", $paymentMethod);
 
@@ -299,7 +317,7 @@ class TransmartSetEmailNewOrderData extends SetEmailNewOrderData
      * @param string $shippingDescription
      * @return \Magento\Framework\Phrase|mixed|string
      */
-    private function getDeliveryMethod($shippingMethod, $shippingDescription)
+    public function getDeliveryMethod($shippingMethod, $shippingDescription)
     {
         if ($shippingMethod == "store_pickup_store_pickup") {
             return __("Pick Up in Store");

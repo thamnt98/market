@@ -55,5 +55,19 @@
     </resources>
   </route>
 
+  <route url="/V1/transmepay/tokenization/deletetoken" method="POST">
+    <service class="Trans\Mepay\Api\TokenizationInterface" method="deletetoken"/>
+    <resources>
+        <resource ref="self"/>
+    </resources>
+  </route>
+
+  <route url="/V1/transmepay/authcapture/send" method="POST">
+    <service class="Trans\Mepay\Api\Data\AuthCaptureInterface" method="send"/>
+    <resources>
+        <resource ref="self"/>
+    </resources>
+  </route>
+
 </routes>
 

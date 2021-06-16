@@ -95,4 +95,12 @@ interface AuthCaptureInterface
    */
   public function setUpdatedAt($updatedAt);
 
+  /**
+   * Send second capture request
+   * @param  string $reffNumber
+   * @param  int $amountAdjustment
+   * @return \Trans\Mepay\Api\Data\ResponseInterface
+   */
+  public function send($reffNumber, $amountAdjustment);
+
 }

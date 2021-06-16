@@ -110,8 +110,6 @@ class Failed
                 $customerId = $order->getCustomerId();
                 $payment = $order->getPayment();
                 $this->customerHelper->setCustomerToken($customerId, $payment->getMethod(), $token);
-            } else {
-              $this->customerHelper->removeTokenByOrder($order);
             }
 
             //change status to void and close transaction

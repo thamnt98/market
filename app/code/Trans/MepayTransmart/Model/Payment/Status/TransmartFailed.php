@@ -23,20 +23,23 @@ use Trans\Mepay\Logger\LoggerWrite;
 use Magento\Quote\Api\CartRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Trans\Mepay\Model\Payment\Status\Failed;
-use Trans\Sprint\Helper\Config as SprintConfig;
 use Trans\Mepay\Helper\Data;
-use Magento\Framework\Event\ManagerInterface as EventManager;
+use Trans\MepayTransmart\Model\TransmartOmni;
 use Magento\Sales\Api\OrderManagementInterface;
 
 class TransmartFailed extends Failed
 {
-  protected $eventManager;
+  protected $omni;
   /**
    * Constructor
-   * @param Config            $config
+   * @param Config $config
    * @param TransactionHelper $transactionHelper
-   * @param Invoice           $invoice
-   * @param LoggerWrite       $logger
+   * @param CustomerHelper $customerHelper
+   * @param Invoice $invoice
+   * @param LoggerWrite $logger
+   * @param CartRepositoryInterface $quoteRepo
+   * @param OrderManagementInterface $orderManagementInterface
+   * @param TransmartOmni $omni
    */
   public function __construct(
     Config $config,
@@ -45,10 +48,11 @@ class TransmartFailed extends Failed
     Invoice $invoice,
     LoggerWrite $logger,
     CartRepositoryInterface $quoteRepo,
-    EventManager $eventManager,
-    OrderManagementInterface $orderManagementInterface
+    OrderManagementInterface $orderManagementInterface,
+    TransmartOmni $omni
+
   ) {
-    $this->eventManager = $eventManager;
+    $this->omni = $omni;
     parent::__construct($config, $transactionHelper, $customerHelper, $invoice, $logger, $quoteRepo, $orderManagementInterface);
   }
 
@@ -73,8 +77,6 @@ class TransmartFailed extends Failed
               $customerId = $order->getCustomerId();
               $payment = $order->getPayment();
               $this->customerHelper->setCustomerToken($customerId, $payment->getMethod(), $token);
-          } else {
-            $this->customerHelper->removeTokenByOrder($order);
           }
 
           //change status to void and close transaction
@@ -87,33 +89,12 @@ class TransmartFailed extends Failed
           $this->transactionHelper->addTransactionData($transactionObj->getTransactionId(), $inquiryTransaction, $transaction);
 
           //cancel order
-          // $order->setState(Order::STATE_CANCELED);
-          // $order->setStatus(Order::STATE_CANCELED);
-          // $order->cancel();
-          // $this->transactionHelper->saveOrder($order);
-          $this->orderManagement->cancel($order->getId());
-          $order->setStatus('order_canceled');
-          $this->transactionHelper->saveOrder($order);
-          $connection = Data::getConnection();
-          $table = $connection->getTableName('sales_order_status_history');
-          $query = "SELECT entity_id FROM ".$table." WHERE parent_id = '".$orderId."' and status = 'canceled'";
-          $exist = $connection->fetchAll($query);
-          if (count($exist)) {
-              $this->logger->log('{{ Update sales order status history cancel exist start }}');
-              $query = "UPDATE ".$table." set status = 'order_canceled' where status = 'canceled' ";
-              $connection->query($query);
-              $this->logger->log('{{ Update sales order status history cancel exist end }}');
-          } else {
-              $this->logger->log('{{ Update sales order status history cancel new start }}');
-              $query = "INSERT INTO ".$table." (parent_id, status, entity_name) VALUES ('".$orderId."','order_canceled','order')";
-              $connection->query($query);
-              $this->logger->log('{{ Update sales order status history cancel new end }}');
-          }
+          //$this->cancelOrder($order);
 
           /**
            * send order to oms
            */
-          $this->sendOrderToOms($order);
+          $this->omni->updateOmsOrder($order, TransmartOmni::OMS_CANCEL_STATUS);
         }
 
     } catch (InputException $e) {
@@ -129,19 +110,30 @@ class TransmartFailed extends Failed
   }
 
   /**
-   * Send order to oms
-   * @param   $order
+   * Canceling the order
+   * @param  $order
    * @return void
    */
-  public function sendOrderToOms($order)
+  public function cancelOrder($order)
   {
-    $this->eventManager->dispatch(
-      'update_payment_oms',
-      [
-        'reference_number' => $order->getReferenceNumber(),
-        'payment_status' => SprintConfig::OMS_CANCEL_PAYMENT_ORDER,
-      ]
-    );
+    $this->orderManagement->cancel($order->getId());
+    $order->setStatus('order_canceled');
+    $this->transactionHelper->saveOrder($order);
+    $connection = Data::getConnection();
+    $table = $connection->getTableName('sales_order_status_history');
+    $query = "SELECT entity_id FROM ".$table." WHERE parent_id = '".$orderId."' and status = 'canceled'";
+    $exist = $connection->fetchAll($query);
+    if (count($exist)) {
+      $this->logger->log('{{ Update sales order status history cancel exist start }}');
+      $query = "UPDATE ".$table." set status = 'order_canceled' where status = 'canceled' ";
+      $connection->query($query);
+      $this->logger->log('{{ Update sales order status history cancel exist end }}');
+    } else {
+      $this->logger->log('{{ Update sales order status history cancel new start }}');
+      $query = "INSERT INTO ".$table." (parent_id, status, entity_name) VALUES ('".$orderId."','order_canceled','order')";
+      $connection->query($query);
+      $this->logger->log('{{ Update sales order status history cancel new end }}');
+    }
   }
 
 }

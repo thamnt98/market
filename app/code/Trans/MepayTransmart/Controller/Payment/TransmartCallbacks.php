@@ -57,7 +57,7 @@ class TransmartCallbacks extends Callbacks
 
       } else {
 
-        $this->checkoutSession->restoreQuote();
+        //$this->checkoutSession->restoreQuote();
         $this->messageManager->addError( __(self::PAYMENT_FAILED_MESSAGES));
         $resultRedirect->setPath('checkout/cart/index');
 
@@ -89,7 +89,7 @@ class TransmartCallbacks extends Callbacks
 
       } else {
 
-        $this->restoreQuoteMobile($order->getQuoteId());
+        //$this->restoreQuoteMobile($order->getQuoteId());
 
       }
 

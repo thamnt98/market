@@ -13,6 +13,8 @@
 namespace Trans\Mepay\Model;
 
 use Magento\Framework\DataObject;
+use Magento\Sales\Api\Data\OrderInterface;
+use Trans\IntegrationOrder\Api\Data\IntegrationOrderInterface;
 use Trans\Mepay\Api\CartRecoveryInterface;
 use Trans\Mepay\Api\Data\CartRecoveryResultInterfaceFactory as ResultFactory;
 use Trans\Mepay\Observer\Magento\Framework\AppInterface\AutoRecoverCartForPendingPayment;
@@ -69,19 +71,19 @@ class CartRecovery extends DataObject implements CartRecoveryInterface
      */
     public function execute(int $id)
     {
-        $result = $this->result->create();
-        $order = $this->recover->getCustomerOrder($id);
         try {
-            if ($this->recover->recoverByLastOrder($id, $order)) {
+            $result = $this->result->create();
+            if ($this->recover->restoreCustomerCartAndClosedPreviousOrder($id)) {
                 $result->setMessage(self::DEFAULT_SUCCESS_MESSAGE);
                 $result->setStatus(self::DEFAULT_SUCCESS_STATUS);
                 return $result;
             }
+
+            if (!$result->getMessage()) {
+                $result->setMessage(self::DEFAULT_FAILED_MESSAGE);
+            }
         } catch (\Exception $e) {
             $result->setMessage($e->getMessage());
-        }
-        if (!$result->getMessage()) {
-            $result->setMessage(self::DEFAULT_FAILED_MESSAGE);
         }
         $result->setStatus(self::DEFAULT_FAILED_STATUS);
         return $result;

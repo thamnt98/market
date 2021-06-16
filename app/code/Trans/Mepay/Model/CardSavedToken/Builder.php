@@ -68,7 +68,6 @@ class Builder
         CardSavedTokenInterfaceFactory $modelFactory,
         QuoteHelper $quoteHelper,
         SerializerInterface $serializer,
-
         CustomerHelper $custHelper
     ) {
         $this->session = $session;
@@ -132,6 +131,13 @@ class Builder
         $this->upadateCardTokenByQuoteId($quote->getId(), $token);
     }
 
+    public function deleteCustomerToken(string $token, string $method)
+    {
+        $tokenlist = $this->_getByMethod($method);
+        $tokenlist = $this->quoteHelper->removeTokenOnTokenlist($tokenlist, $token);
+        $this->quoteHelper->setCustomerTokenlist($this->userContext->getUserId(), $method, $tokenlist);
+    }
+
     /**
      * Update token by quote id
      *
@@ -153,6 +159,8 @@ class Builder
     protected function _getByMethod($method)
     {
         $list = $this->custHelper->getCustomerToken($this->userContext->getUserId(), $method);
+        if (substr($list,0,1) == '"')
+            $this->serializer->unserialize($list);
         return $this->serializer->unserialize($list);
     }
 
@@ -200,13 +208,16 @@ class Builder
     protected function wrap($list)
     {
         $result = [];
-        foreach ($list as $key => $value) {
-            $model = $this->modelFactory->create();
-            $model->setKey($value[CardSavedTokenInterface::KEY]);
-            $model->setMethod($value[CardSavedTokenInterface::METHOD]);
-            $model->setToken($value[TokenDataBuilder::TOKEN]);
-            $result[] = $model;
+        if (is_array($list)) {
+            foreach ($list as $key => $value) {
+                $model = $this->modelFactory->create();
+                $model->setKey($value[CardSavedTokenInterface::KEY]);
+                $model->setMethod($value[CardSavedTokenInterface::METHOD]);
+                $model->setToken($value[TokenDataBuilder::TOKEN]);
+                $result[] = $model;
+            }
         }
+        
         return $result;
     }
 }

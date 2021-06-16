@@ -69,6 +69,11 @@ interface ResponseInterface
    */
   const LIST_DATA = 'list';
 
+    /**
+   * @var string
+   */
+  const TOKEN = 'token';
+
   /**
    * Set status
    * @param string $status
@@ -120,4 +125,17 @@ interface ResponseInterface
    * @return $this
    */
   public function setList($data);
+
+  /**
+   * Set token
+   * @param string $token
+   * @return void
+   */
+  public function setToken($token);
+
+  /**
+   * Get token
+   * @return string
+   */
+  public function getToken();
 }

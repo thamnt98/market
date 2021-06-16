@@ -32,4 +32,12 @@ interface TokenizationInterface
      * @return \Trans\Mepay\Api\Data\ResponseInterface
      */
     public function savetoken(string $token, string $method);
+
+    /**
+     * Delete token
+     * @param string $token
+     * @param string $method
+     * @return \Trans\Mepay\Api\Data\ResponseInterface
+     */
+    public function deletetoken(string $token, string $method);
 }

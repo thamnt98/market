@@ -30,6 +30,7 @@
   <preference for="SM\Sales\Block\Order\Physical\Detail" type="Trans\MepayTransmart\Block\Order\Physical\Detail" />
   <preference for="SM\Checkout\Model\Api\PaymentMethods" type="Trans\MepayTransmart\Model\Api\TransmartPaymentMethods" />
   <preference for="Amasty\Coupons\Plugin\CouponManagement" type="Trans\MepayTransmart\Preference\Amasty\Coupons\Plugin\TransmartCouponManagement" />
+  <preference for="Trans\Mepay\Helper\Order" type="Trans\MepayTransmart\Preference\Trans\Mepay\Helper\TransmartOrder" />
 
     <!-- plugin -->
     <type name="SM\Sales\Model\InvoiceRepository">
@@ -49,5 +50,16 @@
     </type>
     <type name="Trans\Mepay\Model\Webhook">
       <plugin name="TransMepayTransmartPluginTransMepayModelTransmartWebhook" type="Trans\MepayTransmart\Plugin\Trans\Mepay\Model\TransmartWebhook" />
+    </type>
+    <type name="Trans\Mepay\Observer\Magento\Framework\AppInterface\AutoRecoverCartForPendingPayment">
+        <plugin name="TransMepayTransmartPluginTransMepayObserverMagentoFrameworkAppInterfaceTransmartAutoRecoverCartForPendingPayment" type="Trans\MepayTransmart\Plugin\Trans\Mepay\Observer\Magento\Framework\AppInterface\TransmartAutoRecoverCartForPendingPayment" />
+    </type>
+
+    <type name="Magento\Framework\Console\CommandList">
+      <arguments>
+            <argument name="commands" xsi:type="array">
+               <item name="Trans_MepayTransmart_Console_Transaction_Status_Check" xsi:type="object">Trans\MepayTransmart\Console\Transaction\Status\Check</item>
+            </argument>
+        </arguments>
     </type>
 </config>
