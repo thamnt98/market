@@ -16,12 +16,13 @@ use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Http\Context as HttpContext;
+use Magento\Authorization\Model\UserContextInterface;
 use Magento\Framework\App\Request\Http;
 use Magento\Quote\Api\CartRepositoryInterface;
-use Magento\AdvancedCheckout\Model\CartFactory;
 use Magento\Checkout\Model\Cart as CartModel;
 use Magento\Checkout\Helper\Cart;
 use Magento\Checkout\Model\Session;
+use Magento\Framework\Exception\NoSuchEntityException;
 
 class Restore extends AbstractHelper
 {
@@ -41,6 +42,11 @@ class Restore extends AbstractHelper
      * @var \Magento\Framework\App\Http\Context
      */
     protected $httpContext;
+    
+    /**
+     * @var \Magento\Authorization\Model\UserContextInterface
+     */
+    protected $userContext;
 
     /**
      * @var \Magento\Framework\App\Request\Http
@@ -77,6 +83,7 @@ class Restore extends AbstractHelper
         Context $context,
         RequestInterface $request,
         HttpContext $httpContext,
+        UserContextInterface $userContext,
         Http $http,
         CartRepositoryInterface $quoteRepo,
         Cart $cartHelper,
@@ -84,6 +91,7 @@ class Restore extends AbstractHelper
     ) {
         $this->request = $request;
         $this->httpContext = $httpContext;
+        $this->userContext = $userContext;
         $this->http = $http;
         $this->quoteRepo = $quoteRepo;
         $this->cartHelper = $cartHelper;
@@ -103,6 +111,8 @@ class Restore extends AbstractHelper
             return false;
         if($this->isModuleApplicable() == false)
             return false;
+        if($this->hasActiveCart())
+            return false;
         return true;
     }
 
@@ -121,7 +131,14 @@ class Restore extends AbstractHelper
      */
     public function isLogin()
     {
-        return $this->httpContext->getValue(\Magento\Customer\Model\Context::CONTEXT_AUTH);
+        if ($this->httpContext->getValue(\Magento\Customer\Model\Context::CONTEXT_AUTH))
+            return true;
+        if ($this->session->getLastOrderId())
+            return true;
+        if ($this->userContext->getUserId())
+            return true;
+        return false;
+
     }
 
     /**
@@ -130,30 +147,58 @@ class Restore extends AbstractHelper
      */
     public function isModuleApplicable()
     {
-        return \in_array($this->http->getModuleName(), self::APPLICABLE_MODULES);
+        if (\in_array($this->http->getModuleName(), self::APPLICABLE_MODULES))
+            return true;
+         if (\strpos($this->http->getRequestUri(), 'recovercart') !== false)
+            return true;
+        return false;
     }
 
     /**
      * Customer has active cart
-     * @param  int $customerId
      * @return boolean
      */
-    public function hasActiveCart(int $customerId)
+    public function hasActiveCart()
     {
         return ($this->cartHelper->getItemsCount())? true : false;
     }
 
     /**
+     * Remove double quote happen on place order
+     * @param  int $customerId
+     * @return boolean
+     */
+    public function removeDoubleQuote($customerId)
+    {
+        try {
+            $quote = $this->quoteRepo->getActiveForCustomer($customerId);
+            $this->quoteRepo->delete($quote);
+        } catch (NoSuchEntityException $e) {
+            //
+        } catch (\Exception $e) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Restore customer cart
-     * @param  int $quoteId
      * @return \Magento\Quote\Model\Quote
      */
-    public function restoreQuote(int $quoteId)
+    public function restoreQuote()
+    {
+        return $this->session->restoreQuote();
+    }
+
+    /**
+     * Restore customer cart without using session
+     * @return \Magento\Quote\Model\Quote
+     */
+    public function manualRestore($quoteId)
     {
         $quote = $this->quoteRepo->get($quoteId);
-        return $this->session->restoreQuote();
-        //return $this->cartModel->copyQuote($quote, true);
-        //return $this->cart->create()->copyQuote($quote, true);
+        $quote->setIsActive(1)->setReservedOrderId(null);
+        $this->quoteRepo->save($quote);
     }
 
 }

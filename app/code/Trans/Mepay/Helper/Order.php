@@ -278,7 +278,39 @@ class Order extends AbstractHelper
         $connection->update($tableSales, ['status' => $orderStatus, 'state' => $orderState], ['entity_id IN (?)' => $orderIds]);
 
         $historyTable = $connection->getTableName('sales_order_status_history');
-        $connection->insertOnDuplicate($historyTable, $historyData);        
+        $connection->insertOnDuplicate($historyTable, $historyData);
+    }
+
+    /**
+     * Closing order
+     * @param int $orderId
+     * @return void
+     */
+    public function setOrderClosed($orderId)
+    {
+        $order = $this->orderRepo->get($orderId);
+        foreach ($order->getAllItems() as $key => $item) {
+            $item->cancel();
+            $item->save();
+        }
+        $order->setState('processing');
+        $order->setStatus('processing');
+        $order->save();
+    }
+    
+    /**
+     * Closing order by reference number
+     * @param string $refNumber
+     */
+    public function setOrderClosedByReffNumber(string $refNumber)
+    {
+        $connection = $this->orderResource->getConnection();
+        $tableSales = $connection->getTableName('sales_order');
+        $salesData = $connection->select();
+        $salesData->from($tableSales, ['*'])->where('reference_number = ?', $refNumber);
+        $salesData = $connection->fetchAll($salesData);
+        foreach ($salesData as $order) {
+            $this->setOrderClosed($order['entity_id']);
+        }
     }
 }
-

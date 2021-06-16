@@ -798,6 +798,14 @@
     <preference for="Trans\Mepay\Api\CartRecoveryInterface" type="Trans\Mepay\Model\CartRecovery" />
     <preference for="Trans\Mepay\Api\Data\CartRecoveryResultInterface" type="Trans\Mepay\Model\CartRecovery\Result" />
 
+    <type name="Magento\Framework\Console\CommandList">
+      <arguments>
+            <argument name="commands" xsi:type="array">
+               <item name="Trans_Mepay_Console_Transaction_Status" xsi:type="object">Trans\Mepay\Console\Transaction\Status</item>
+            </argument>
+        </arguments>
+    </type>
+
     <!-- @add console command for cron debuging purpose
     <type name="Magento\Framework\Console\CommandList">
       <arguments>

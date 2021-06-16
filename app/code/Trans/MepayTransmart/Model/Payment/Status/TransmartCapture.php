@@ -15,7 +15,6 @@ namespace Trans\MepayTransmart\Model\Payment\Status;
 use Magento\Framework\Exception\InputException;
 use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Sales\Model\Order\Payment\Transaction;
-use Magento\Framework\Event\ManagerInterface as EventManager;
 use Magento\Sales\Api\OrderItemRepositoryInterface;
 use Magento\Sales\Api\Data\OrderItemInterface;
 use Trans\Mepay\Model\Config\Config;
@@ -24,8 +23,8 @@ use Trans\Mepay\Helper\Customer\Customer as CustomerHelper;
 use Trans\Mepay\Model\Invoice;
 use Trans\Mepay\Logger\LoggerWrite;
 use Trans\Mepay\Model\Payment\Status\Capture;
-use Trans\Sprint\Helper\Config as SprintConfig;
 use Trans\Mepay\Helper\Data;
+use Trans\MepayTransmart\Model\TransmartOmni;
 
 class TransmartCapture extends Capture
 {
@@ -35,9 +34,9 @@ class TransmartCapture extends Capture
   protected $itemRepo;
   
   /**
-   * @var \Magento\Framework\Event\ManagerInterface
+   * @var Trans\MepayTransmart\Model\TransmartOmni
    */
-  protected $eventManager;
+  protected $omni;
 
   /**
    * Constructor
@@ -47,7 +46,7 @@ class TransmartCapture extends Capture
    * @param CustomerHelper $customerHelper
    * @param Invoice $invoice
    * @param LoggerWrite $logger
-   * @param EventManager $eventManager
+   * @param TransmartOmni $omni
    */
   public function __construct(
       OrderItemRepositoryInterface $itemRepo,
@@ -56,10 +55,10 @@ class TransmartCapture extends Capture
       CustomerHelper $customerHelper,
       Invoice $invoice,
       LoggerWrite $logger,
-      EventManager $eventManager
+      TransmartOmni $omni
     ) {
       $this->itemRepo = $itemRepo;
-      $this->eventManager = $eventManager;
+      $this->omni = $omni;
       parent::__construct($config, $transactionHelper, $customerHelper,$invoice,$logger);
     }
 
@@ -114,9 +113,7 @@ class TransmartCapture extends Capture
             /**
              * Send order to oms
              */
-            $this->logger->log('{{oms-event-dispatch:start: '.$order->getIncrementId().'}}');
-            $this->sendOrderToOms($order);
-            $this->logger->log('{{oms-event-dispatch:end: '.$order->getIncrementId().'}}');
+            $this->omni->updateOmsOrder($order, TransmartOmni::OMS_PAID_STATUS);
 
         }
 
@@ -129,24 +126,6 @@ class TransmartCapture extends Capture
     } catch (\Exception $e) {
       $this->logger->log($e->getMessage());
       throw $e;
-    }
-  }
-
-  /**
-   * Send order to oms
-   * @param   $order
-   * @return void
-   */
-  public function sendOrderToOms($order)
-  {
-    if ($order->getIsParent()) {
-        $this->eventManager->dispatch(
-            'update_payment_oms',
-            [
-              'reference_number' => $order->getReferenceNumber(),
-              'payment_status' => SprintConfig::OMS_SUCCESS_PAYMENT_OPRDER,
-            ]
-        );
     }
   }
 

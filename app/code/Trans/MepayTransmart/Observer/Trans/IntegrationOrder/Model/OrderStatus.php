@@ -16,7 +16,7 @@ use Trans\Mepay\Api\Data\AuthCaptureInterface;
 use Trans\Mepay\Helper\Gateway\Http\Client\ConnectAuthCapture;
 use Trans\Mepay\Model\Config\Config;
 use Magento\Framework\Event\ObserverInterface;
-
+use Trans\Mepay\Model\Cron\Transaction\Status;
 use Magento\Framework\Exception\NoSuchEntityException;
 
 class OrderStatus implements ObserverInterface
@@ -47,6 +47,11 @@ class OrderStatus implements ObserverInterface
   protected $authCaptureRepository;
 
   /**
+   * @var \Trans\Mepay\Model\Cron\Transaction\Status
+   */
+  protected $status;
+
+  /**
    * @var \Trans\Mepay\Logger\LoggerWrite
    */
   protected $logger;
@@ -63,6 +68,7 @@ class OrderStatus implements ObserverInterface
   public function __construct(
     ConnectAuthCapture $clientHelper,
     Config $config,
+    Status $status,
     \Magento\Framework\App\ResourceConnection $resource,
     \Trans\Mepay\Api\Data\AuthCaptureInterfaceFactory $authCaptureFactory,
     \Trans\Mepay\Api\AuthCaptureRepositoryInterface $authCaptureRepository,
@@ -70,6 +76,7 @@ class OrderStatus implements ObserverInterface
   ) {
     $this->authCaptureFactory = $authCaptureFactory;
     $this->authCaptureRepository = $authCaptureRepository;
+    $this->status = $status;
     $this->resource = $resource;
     $this->clientHelper = $clientHelper;
     $this->config = $config;
@@ -92,7 +99,7 @@ class OrderStatus implements ObserverInterface
 
       $check = $this->checkOrderCapture($refNumber);
       
-      if($check) {
+      if($check && $this->isPgCaptured() == false) {
         try {
           $this->logger->info('== {{Auth Capture Start}} ==');
 
@@ -175,5 +182,26 @@ class OrderStatus implements ObserverInterface
       $data->setStatus($result);
 
       $this->authCaptureRepository->save($data);
+  }
+
+  /**
+   * Is payment has captured on pg
+   * @param  int $orderId
+   * @return boolean
+   */
+  public function isPgCaptured($orderId)
+  {
+    try {
+      if(empty($data = $this->status->checkOrderTransactionStatusById($orderId)) == false) {
+        foreach ($data as $key => $value) {
+          $result = json_decode($value, true);
+          if ($result['id'])
+            return true;
+        }
+      }
+    } catch (\Exception $e) {
+      //
+    }
+    return false;
   }
 }

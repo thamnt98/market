@@ -27,7 +27,7 @@ class Data extends AbstractHelper
   /**
    * @var array
    */
-  const BANK_MEGA_PAYMENT_METHOD = [ Cc::CODE_CC, Qris::CODE_QRIS, Va::CODE_VA, Debit::CODE, CcDebit::CODE, AllbankCc::CODE, AllbankDebit::CODE];
+  const BANK_MEGA_PAYMENT_METHOD = [Cc::CODE_CC, Qris::CODE_QRIS, Va::CODE_VA, Debit::CODE, CcDebit::CODE, AllbankCc::CODE, AllbankDebit::CODE];
 
   /**
    * Constructor

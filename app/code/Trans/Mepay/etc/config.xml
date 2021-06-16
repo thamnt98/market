@@ -50,6 +50,7 @@
                 <can_authorize>1</can_authorize>
                 <can_capture>1</can_capture>
                 <payment_channel>credit_card</payment_channel>
+                <discount_text>discount 10% for selected items *</discount_text>
             </trans_mepay_cc>
 
             <trans_mepay_allbankccdebit>
@@ -85,6 +86,7 @@
                 <can_authorize>1</can_authorize>
                 <can_capture>1</can_capture>
                 <payment_channel>debit</payment_channel>
+                <discount_text>discount 10% for selected items *</discount_text>
             </trans_mepay_debit>
 
             <trans_mepay_va>

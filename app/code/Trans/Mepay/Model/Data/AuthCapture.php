@@ -13,8 +13,13 @@
 
 namespace Trans\Mepay\Model\Data;
 
+use Magento\Framework\Model\Context;
+use Magento\Framework\Registry;
+use Magento\Framework\Model\ResourceModel\AbstractResource;
+use Magento\Framework\Data\Collection\AbstractDb;
 use Trans\Mepay\Api\Data\AuthCaptureInterface;
 use Trans\Mepay\Model\ResourceModel\AuthCapture as AuthCaptureResourceModel;
+use Trans\Mepay\Model\Cron\Transaction\SecondCapture;
 
 /**
  * Class AuthCapture
@@ -43,6 +48,26 @@ class AuthCapture extends \Magento\Framework\Model\AbstractModel implements Auth
 	 * @var string
 	 */
 	protected $_eventPrefix = 'auth_capture_mepay';
+
+	protected $secondCapture;
+
+	public function __construct(
+        Context $context,
+        Registry $registry,
+        SecondCapture $secondCapture,
+        AbstractResource $resource = null,
+        AbstractDb $resourceCollection = null,
+        array $data = []
+	){
+		$this->secondCapture = $secondCapture;
+		parent::__construct(
+	        $context,
+	        $registry,
+	        $resource,
+	        $resourceCollection,
+	        $data
+		);
+	}
 
 	/**
 	 * @return void
@@ -156,4 +181,13 @@ class AuthCapture extends \Magento\Framework\Model\AbstractModel implements Auth
 	public function setUpdatedAt($updatedAt) {
 		return $this->setData(AuthCaptureInterface::UPDATED_AT, $updatedAt);
 	}
+
+   /**
+    * @inheritdoc
+    */
+	 public function send($reffNumber, $adjustmentValue)
+	 {
+	 	$send = $this->secondCapture->captureRequest($reffNumber, $adjustmentValue);
+	 	echo json_encode($send);die();
+	 }
 }
