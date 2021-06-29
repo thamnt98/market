@@ -4,7 +4,7 @@
 .cms-home .banner-metro .row-full-width-inner {max-width: 100%;}
 .cms-home .banner-metro figure a {max-width: 100%;display: flex;width: 100%;}
 .cms-home .banner-metro a img {width: 100%;}
-.cms-home .banner-metro a img[src*="https://dev-magento.techmetroindonesia.com/static/version1624348834/frontend/Smartosc/apollo/en_US/SM_LazyLoad/images/loader.gif"] {display: none;}
+.cms-home .banner-metro a img[src*="/loader.gif"] {display: none;}
 
 .cms-home .page-main .column.main {width: 100%;float: none;padding-bottom: 0px;}
 
@@ -83,7 +83,7 @@
     background: #FFF;
     left: 102% !important;
 }
-.sections .ves-megamenu .navigation .level0 .ves-column1 > .item-content1 > .mega-col.mega-col-level-1 > .level1.subhover > .submenu::before {left: 14%;}
+.sections .ves-megamenu .navigation .level0 .ves-column1 > .item-content1 > .mega-col.mega-col-level-1 > .level1.subhover > .submenu::before {left: 0%;}
 .sections .ves-megamenu.ves-offcanvas .level0 .submenu .nav-item > a:hover, .ves-megamenu.ves-dhorizontal .level0 .submenu .nav-item > a:hover {color: #000;}
 .sections .ves-megamenu .navigation .level0 .submenu-inner .ves-column1 .level1.subhover .submenu ..submenu-inner .item-content .level2 .item-content1 > .mega-col {padding-top: 20px;}
 .sections .ves-megamenu .navigation .level0 .submenu {left: -25px;}
@@ -154,6 +154,10 @@
 .catalog-category-view .page-wrapper .page-main .columns .column.main {width: 100%;}
 .catalog-category-view #amasty-shopby-product-list {float: right;width: 75%;}
 
+.category-default-category .products-grid .product-item-actions .actions-primary button.primary, .products-grid .product-item-actions .actions-primary .view-details {background: #000;border-radius: 0px;}
+
+.category-default-category .products-grid .product-item {border-radius: 0px;}
+
 .page-layout-2columns-left .sidebar-additional, 
 .page-layout-2columns-left .sidebar-main {position: absolute;top: 500px;float: none;}
 
@@ -211,6 +215,12 @@
 .transcheckout-index-index .totals-block .action-primary.disabled {background: #000;text-transform: uppercase;border-radius: 0px;background: #000;background-color: #000;background-image: none;}
 .transcheckout-index-index .totals-block .action-primary {border-radius: 0px;text-transform: uppercase;}
 .transcheckout-index-index .totals-block .action-primary:hover {background: #FFF;background-color: #FFF;background-image: none;color: #000;}
+
+/* Catalog Search */
+
+.catalogsearch-result-index .sidebar-main {top: 12%;}
+.catalogsearch-result-index .products-grid .product-item-actions .actions-primary button.primary, .products-grid .product-item-actions .actions-primary .view-details {background: #000;background-color: #000;background-image: none;border-radius: 0px;}
+.catalogsearch-result-index .products-grid .product-item {border-radius: 0px;}
 
 /* Others */
 
