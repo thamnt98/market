@@ -29,6 +29,26 @@ class Data extends AbstractHelper
     protected $orderRepository;
 
     /**
+     * @var \Magento\Catalog\Helper\Image
+     */
+    protected $imageHelper;
+
+    /**
+     * @var \Magento\Framework\Pricing\Helper\Data
+     */
+    protected $priceHelper;
+
+    /**
+     * @var \Magento\Sales\Model\Order\Address\Renderer
+     */
+    protected $addressRenderer;
+
+    /**
+     * @var \Magento\Catalog\Api\ProductRepositoryInterface
+     */
+    protected $productRepository;
+
+    /**
      * Data constructor.
      *
      * @param \Magento\Sales\Model\OrderRepository      $orderRepository
@@ -42,13 +62,21 @@ class Data extends AbstractHelper
         \Trans\IntegrationOrder\Helper\Config $tranConfig,
         \Magento\Inventory\Model\SourceRepository $sourceRepository,
         TimezoneInterface $timezone,
-        Context $context
+        Context $context,
+        \Magento\Catalog\Helper\Image $imageHelper,
+        \Magento\Framework\Pricing\Helper\Data $priceHelper,
+        \Magento\Sales\Model\Order\Address\Renderer $addressRenderer,
+        \Magento\Catalog\Api\ProductRepositoryInterface $productRepository
     ) {
         $this->timezone = $timezone;
         parent::__construct($context);
         $this->sourceRepository = $sourceRepository;
         $this->tranConfig = $tranConfig;
         $this->orderRepository = $orderRepository;
+        $this->imageHelper = $imageHelper;
+        $this->priceHelper = $priceHelper;
+        $this->addressRenderer= $addressRenderer;
+        $this->productRepository = $productRepository;
     }
 
     /**
@@ -168,5 +196,58 @@ class Data extends AbstractHelper
         } catch (\Exception $e) {
             return null;
         }
+    }
+
+    /**
+     * @param float $value
+     * @return float|string
+     */
+    public function currencyFormat($value)
+    {
+        return $this->priceHelper->currency($value, true, false);
+    }
+
+    /**
+     * Get Thumbnail Product of Order
+     * @param $item
+     * @param $width
+     * @param $height
+     * @return string
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    public function getProductImage($productId, $width = null, $height = null)
+    {
+        /**
+         * @var \Magento\Catalog\Model\Product $product
+         */
+        $product = $this->productRepository->getById($productId);
+
+        return $this->imageHelper->init($product, 'cart_page_product_thumbnail')
+            ->setImageFile($product->getImage())
+            ->resize($width, $height)
+            ->getUrl();
+    }
+
+    public function getReorderUrl($order)
+    {
+        return $order->getStore()->getUrl(
+            'sales/order/submitreorderall',
+            [
+                'parent_order_id' => $order->getId()
+            ]
+        );
+    }
+
+    /**
+     * Render shipping address into html.
+     *
+     * @param $order
+     * @return string|null
+     */
+    public function getFormattedShippingAddress($order)
+    {
+        return $order->getIsVirtual()
+            ? null
+            : $this->addressRenderer->format($order->getShippingAddress(), 'html');
     }
 }
