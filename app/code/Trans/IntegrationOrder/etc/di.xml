@@ -108,6 +108,9 @@
 
     <preference for="Trans\IntegrationOrder\Api\IntegrationOrderReturnRepositoryInterface" 
                 type="Trans\IntegrationOrder\Model\IntegrationOrderReturnRepository"/>
+                
+    <preference for="Trans\IntegrationOrder\Api\ExtendedInterface" 
+                type="Trans\IntegrationOrder\Model\Extended"/>
     <!-- End return --> 
 
 </config>
