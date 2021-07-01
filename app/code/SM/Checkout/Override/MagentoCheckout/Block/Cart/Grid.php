@@ -13,7 +13,7 @@
  * @copyright Copyright SMCommerce (http://smartosc.com/)
  */
 
-namespace SM\Checkout\Override\Magento_Checkout\Block\Cart;
+namespace SM\Checkout\Override\MagentoCheckout\Block\Cart;
 
 class Grid extends \Magento\Checkout\Block\Cart\Grid
 {
