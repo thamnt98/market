@@ -112,7 +112,7 @@ class PostList extends \Magento\Framework\View\Element\Template
                 'link' => $this->_storeManager->getStore()->getBaseUrl()
             ]
         );
-        $breadcrumbsBlock->addCrumb('today_deals', ['label' => __("Today's Deals"), 'title' => __("Today's Deals")]);
+        $breadcrumbsBlock->addCrumb('today_deals', ['label' => __("Curated For You"), 'title' => __("Curated For You")]);
     }
 
     /**
