@@ -106,9 +106,9 @@ class View extends Template
         $breadcrumbsBlock->addCrumb(
             'today_deals',
             [
-                'label' => __("Today's Deals"),
-                'title' => __("Today's Deals"),
-                'link' => $baseUrl . '/todaydeal'
+                'label' => __("Curated For You"),
+                'title' => __("Curated For You"),
+                'link' => $baseUrl . '/curatedforyou'
             ]
         );
 

@@ -50,8 +50,8 @@ class PrependBreadcrumb
         if ($this->isTodayDeal($currentUrl) || $this->isTodayDeal($referrerUrl)) {
             $crumb = [
                 "todaydeal" => [
-                    'label' => __("Today's Deals"),
-                    'link' => $this->url->getUrl("todaydeal")
+                    'label' => __("Curated For You"),
+                    'link' => $this->url->getUrl("curatedforyou")
                 ]
             ];
             return $crumb + $result;
