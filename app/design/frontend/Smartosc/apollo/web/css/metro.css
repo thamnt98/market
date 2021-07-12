@@ -5,18 +5,18 @@
 .cms-home .banner-metro figure a {max-width: 100%;display: flex;width: 100%;}
 .cms-home .banner-metro a img {width: 100%;}
 .cms-home .banner-metro a img[src*="/loader.gif"] {display: none;}
-
-.cms-index-index .block-latest-promo .latest-promo-card {border-radius: 0px;}
-.cms-index-index .curated-text {margin: 0px 0px 0px;padding-bottom: 0px;}
-.cms-index-index .curatedforyou-image-box {padding-top: 0px !important;}
-.cms-index-index .curatedforyou-image-box .pagebuilder-column {padding-top: 0px !important;}
-.cms-index-index .curatedforyou-image-box .section-latest-promo .block-title {margin-top: 0px;margin-bottom: 20px;}
-.cms-index-index .section-latest-promo .block-latest-promo .col-md-4 {max-width: 25%;}
-
+.cms-home .block-latest-promo .latest-promo-card {border-radius: 0px;}
+.cms-home .curated-text {margin: 0px 0px 0px;padding-bottom: 0px;}
+.cms-home .curatedforyou-image-box {padding-top: 0px !important;}
+.cms-home .curatedforyou-image-box .pagebuilder-column {padding-top: 0px !important;}
+.cms-home .curatedforyou-image-box .section-latest-promo .block-title {margin-top: 0px;margin-bottom: 20px;}
+.cms-home .section-latest-promo .block-latest-promo .col-md-4 {max-width: 25%;}
 .cms-home .page-main .column.main {width: 100%;float: none;padding-bottom: 0px;}
+.cms-contact-us .actions-toolbar .primary .action {background: #000;border-radius: 0px;}
 
 .cms-home .sidebar.sidebar-main,
-.cms-index-index .block-latest-promo .latest-promo-card .latest-promo-info,
+.cms-home .block-latest-promo .latest-promo-card .latest-promo-info,
+.block-latest-promo .latest-promo-card .latest-promo-info,
 .catalog-product-view .social-share,
 .catalog-product-view .product-testingsepatu .gallery-placeholder__image,
 .catalog-product-view .product-info-main .product-addto-break .product-social-links, 
