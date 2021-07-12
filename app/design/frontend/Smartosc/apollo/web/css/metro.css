@@ -297,24 +297,31 @@
 .todaydeal-index-index .section-today-deal .col-md-4 {max-width: 25%;}
 
 .block-container-signin .container-signin--right button.primary, 
-.block-container-otp .container-signin--right button.primary {border-radius: 0px;background: #000;}
+.block-container-otp .container-signin--right button.primary {border-radius: 0px !important;background: #000;}
 
-.block-container-signin .container-signin--right .create-account button {color: #000;border-radius: 0px;}
+.block-container-signin .container-signin--right .create-account button {color: #000;border-radius: 0px;border: 2px solid #000;}
+
+.modal-popup-forgot-password .container-signin--left,
+.modal-popup-recovery-password .container-signin--left {display: none;}
+.modal-popup-forgot-password .container-signin--right,
+.modal-popup-recovery-password .container-signin--right {max-width: 100%;flex-basis: 100%;}
+.modal-popup-forgot-password .modal-inner-wrap,
+.modal-popup-recovery-password .modal-inner-wrap {max-width: 30%;}
+.modal-popup-forgot-password .block-container-signin .container-signin--right button.primary,
+.modal-popup-recovery-password .block-container-signin .container-signin--right button.primary {border-radius: 0px;}
+.modal-popup-forgot-password .block-container-signin .container-signin--content .back-to-login button,
+.modal-popup-recovery-password .block-container-signin .container-signin--content .back-to-login button {border: 2px solid #000;border-radius: 0px;color: #000;}
+
+.pp-alcohol-notice .modal-inner-wrap .modal-footer button {background: #000;border-radius: 0px;}
+.pp-alcohol-notice .modal-title {text-align: center;}
 
 /* Responsive */
 
 @media screen and (max-width:768px){
-	.grid-2-res .pagebuilder-column {
-		flex-basis: 33.33%;
-	}
+	.grid-2-res .pagebuilder-column {flex-basis: 33.33%;}
 }
 
 @media only screen and (min-width:768px){
-	.category-cms .pagebuilder-slider.slider-medium.slick-initialized.slick-slider {
-	    min-height: 400px !important;
-	}
-
-	.cms-home .pagebuilder-slider.slider-medium.slick-initialized.slick-slider {
-	    min-height: 510px !important;
-	}
+	.category-cms .pagebuilder-slider.slider-medium.slick-initialized.slick-slider {min-height: 400px !important;}
+	.cms-home .pagebuilder-slider.slider-medium.slick-initialized.slick-slider {min-height: 510px !important;}
 }
