@@ -231,8 +231,17 @@
 .transcheckout-index-index .opc-block-summary .table-totals:last-child {background: #F5F5F5;}
 .transcheckout-index-index .bx-apply-voucher {margin-bottom: 0px;}
 .transcheckout-index-index .totals-block .action-primary,
-.transcheckout-index-index .totals-block .action-primary.disabled {background: #000;text-transform: uppercase;border-radius: 0px;background: #000;background-color: #000;background-image: none;}
+.transcheckout-index-index .totals-block .action-primary.disabled {background: #000 !important;text-transform: uppercase;border-radius: 0px;background: #000;background-color: #000;background-image: none;}
 .transcheckout-index-index .totals-block .action-primary:hover {background: #FFF;background-color: #FFF;background-image: none;color: #000;}
+.transcheckout-index-index .ck-payment .bx-payment.active {border-color: #000;border-radius: 0px;}
+.transcheckout-index-index .ck-payment .bx-payment {border-radius: 0px;}
+.transcheckout-index-index .main .wrapper-payment .check-payment-row a:first-child {border: 2px solid #000;border-radius: 0px;color: #000;}
+.transcheckout-index-index .main .wrapper-payment .check-payment-col .action.primary {background: #000;background-color: #000;background-image: none;border-radius: 0px;}
+
+/* Success Page */
+
+.transcheckout-index-success .page-header {background-color: #FFF;background-image: none;}
+.transcheckout-index-success .page-header .logo img {display: block;}
 
 /* Catalog Search */
 
