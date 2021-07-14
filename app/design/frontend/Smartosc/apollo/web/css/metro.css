@@ -1,7 +1,7 @@
 /* Home */
 
 .cms-home .banner-metro {padding: 0px !important;margin-bottom: 0px !important;}
-.cms-home .banner-metro .row-full-width-inner {max-width: 100%;}
+.cms-home .banner-metro .row-full-width-inner {max-width: 100% !important;}
 .cms-home .banner-metro figure a {max-width: 100%;display: flex;width: 100%;}
 .cms-home .banner-metro a img {width: 100%;}
 .cms-home .banner-metro a img[src*="/loader.gif"] {display: none;}
@@ -51,8 +51,8 @@
 
 .login .header.content .header.links {border-radius: 0px;}
 
-.customer-welcome .customer-menu ul.header.links li.authorization-link>a,
-.customer-welcome .customer-menu ul.header.links li.authorization-link:hover a:hover {color: #FFF !important;background-color: #000;border: 2px solid #000;border-radius: 0px;}
+.customer-welcome .customer-menu ul.header.links li.authorization-link>a {color: #000 !important;background-color: #000 !important;border: 2px solid #000 !important;border-radius: 0px !important;}
+.customer-welcome .customer-menu ul.header.links li.authorization-link:hover a:hover {background-color: #000 !important;color: #000 !important;}
 
 /* Footer */
 
@@ -125,14 +125,7 @@
 /* Product Detail Page */
 
 #maincontent .product-info-main #product_addtocart_form #product-options-wrapper .swatch-opt select {width: 30%;}
-.catalog-product-view .product-add-form .fieldset .actions .action.tocart {
-    background: #FFF;
-    color: #000;
-    border: 1px solid #000;
-    box-shadow: none;
-    margin-right: 15px !important;
-    border-radius: 0px;
-}
+.catalog-product-view .product-add-form .fieldset .actions .action.tocart {background: #FFF;color: #000;border: 1px solid #000;box-shadow: none;margin-right: 15px !important;border-radius: 0px;}
 .catalog-product-view .product-add-form .fieldset .actions .buynow-button button.action {
     background: #29272A;
     color: #FFF;
@@ -161,6 +154,7 @@
 .catalog-product-view .fotorama__img--full {display: block !important;}
 .catalog-product-view .product-add-form .fieldset .actions .action.tocart {margin-bottom: 0px;}
 .catalog-product-view .product-info-main .product-addto-break .fieldset > .actions {float: left;}
+.catalog-product-view .swatch-attribute .wrapper-option-config.active {border-color: #000;border-radius: 0px;}
 
 /* Product List Page */
 
@@ -213,9 +207,9 @@
 
 .checkout-cart-index .cart-empty .action.primary {background: #000;background-color: #000;background-image: none;border-radius: 0px;}
 
-.checkout-cart-index .minicart-wrapper {display: block;}
+.checkout-cart-index .minicart-wrapper {display: block !important;}
 
-.transcheckout-index-index .page-header {background-color: transparent !important;background-image: none !important;}
+.transcheckout-index-index .page-header {background-color: #FFF !important;background-image: none !important;}
 .transcheckout-index-index .page-header .logo {background-image: none;}
 .transcheckout-index-index .page-header .logo img {display: block !important;}
 .transcheckout-index-index .checkout-main-content {box-shadow: none;border-radius: 0px;border: 0px;}
@@ -236,8 +230,8 @@
 .transcheckout-index-index .opc-block-summary > .title {background: #F5F5F5;}
 .transcheckout-index-index .opc-block-summary .table-totals:last-child {background: #F5F5F5;}
 .transcheckout-index-index .bx-apply-voucher {margin-bottom: 0px;}
+.transcheckout-index-index .totals-block .action-primary,
 .transcheckout-index-index .totals-block .action-primary.disabled {background: #000;text-transform: uppercase;border-radius: 0px;background: #000;background-color: #000;background-image: none;}
-.transcheckout-index-index .totals-block .action-primary {border-radius: 0px;text-transform: uppercase;}
 .transcheckout-index-index .totals-block .action-primary:hover {background: #FFF;background-color: #FFF;background-image: none;color: #000;}
 
 /* Catalog Search */
@@ -307,13 +301,18 @@
 .modal-popup-forgot-password .container-signin--left,
 .modal-popup-recovery-password .container-signin--left {display: none;}
 .modal-popup-forgot-password .container-signin--right,
-.modal-popup-recovery-password .container-signin--right {max-width: 100%;flex-basis: 100%;}
+.modal-popup-recovery-password .container-signin--right,
+.modal-popup-signin .container-signin--right
+{max-width: 100%;flex-basis: 100%;}
 .modal-popup-forgot-password .modal-inner-wrap,
-.modal-popup-recovery-password .modal-inner-wrap {max-width: 30%;}
+.modal-popup-recovery-password .modal-inner-wrap,
+.modal-popup-signin .modal-inner-wrap {max-width: 30%;}
 .modal-popup-forgot-password .block-container-signin .container-signin--right button.primary,
 .modal-popup-recovery-password .block-container-signin .container-signin--right button.primary {border-radius: 0px;}
 .modal-popup-forgot-password .block-container-signin .container-signin--content .back-to-login button,
 .modal-popup-recovery-password .block-container-signin .container-signin--content .back-to-login button {border: 2px solid #000;border-radius: 0px;color: #000;}
+
+.modal-popup-ct-apply-voucher-popup .gr-search-ck button.secondary {border: 2px solid #000;border-radius: 0px;color: #000;}
 
 .pp-alcohol-notice .modal-inner-wrap .modal-footer button {background: #000;border-radius: 0px;}
 .pp-alcohol-notice .modal-title {text-align: center;}
