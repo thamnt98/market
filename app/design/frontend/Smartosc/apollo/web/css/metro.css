@@ -332,6 +332,15 @@
 
 @media screen and (max-width:768px){
 	.grid-2-res .pagebuilder-column {flex-basis: 33.33%;}
+    .cms-home .section-latest-promo .block-latest-promo .col-md-4 {max-width: 100%;}
+    .cms-home .curatedforyou-image-box {padding-bottom: 0px !important;margin-bottom: 0px !important;}
+    .cms-home .block-latest-promo .latest-promo-card {margin-bottom: 0px;}
+    .cms-home .pagebuilder-column-group .pagebuilder-column img {width: 50%;}
+    .footer .newsletter-block .never-miss {padding-left: 0px;}
+    .footer .newsletter-form pre .block.newsletter .form.subscribe {margin-left: 0px;}
+    .footer .newsletter-form pre {padding-left: 0px;}
+    .footer .footer-site-list .pagebuilder-column:nth-child(2),
+    .footer .footer-site-list .pagebuilder-column:nth-child(3) {flex-basis: 50%;}
 }
 
 @media only screen and (min-width:768px){
