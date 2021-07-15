@@ -1,0 +1,96 @@
+<div class="bx-payment" data-href="group-methods">
+    <div class="radio-custom">
+        <input data-bind="click: showOptions, attr:{type: 'radio',name: 'payment_method'}" id="cc"/>
+        <label for="cc"></label>
+    </div>
+    <div class="bx-payment-content">
+        <span class="icon-payment-cc">
+                    <img data-bind="attr:{src: require.toUrl('images/icon-credit-card.png'), height: 25, width:37,class:'icon-card'}" />
+        </span>
+        <div class="info-card">
+            <h4 data-bind="i18n: 'Debit / Credit Card'"></h4>
+            <p data-bind="i18n: 'Full payment'"></p>
+            <div class="full-install-payment hidden" data-href="payment-method-options" data-id="payment-method-cc">
+                <a href="javascript:void(0)" class="fullpayment active" data-bind="click:activeMethod,i18n: 'FULL PAYMENT'" data-href="cc-method" data-id="full-payment"></a>
+                <a style="display: none;" href="javascript:void(0)" class="installment" data-bind="click:(data,event)=>{activeMethod(data,event),showInstalmentOptions(data,event)},i18n: 'INSTALLMENT'" data-href="cc-method" data-id="installment"></a>
+            </div>
+
+            <!-- ko if: getListPaymentCreditCard() -->
+            <div class="select-bank hidden" data-href="credit-options" >
+                <!--payment description tooltip-->
+                <!-- ko if: (paymentDescription()) -->
+                <div class="chek-note-desc">
+                     <span class="dpl-tooltip">
+                         <p aria-describedby="tooltip-1" >
+                             <span class="apl-tick-info" ></span>
+                             <span  data-bind="text: paymentDescription"></span>
+                         </p>
+                         <span class="tooltip-content" id="tooltip-1" role="tooltip" data-bind="i18n: paymentTooltipDescription"></span>
+                     </span>
+                </div>
+                <!-- /ko -->
+                <!--end payment description tooltip-->
+                <div class="sortby-dropdown">
+                            <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+                                <span data-bind="i18n: 'Select Bank'" data-id="option-selected-cc"></span>
+                            </span>
+                    <ul class="dropdown">
+                        <!-- ko foreach: { data: getListPaymentCreditCard(), as: 'payment'} -->
+                        <li  data-bind="click: () => {$parent.setPaymentMethod(payment.method); $parent.getPaymentToken(payment.method); $parent.setPaymentToken('', payment.method)}, class: 'item'" >
+                            <img data-bind="attr:{src: $parent.getPaymentLogo(payment.method), width:24,class:'icon-card','data-id':payment.method}"/><span
+                                data-bind="click:$parent.selectOption, text:payment.title,attr:{'data-id':payment.method}" data-href="option-selected-cc"></span></li>
+                        <!-- /ko -->
+                    </ul>
+                </div>
+                <div class="mepay-card-token-section"></div>
+            </div>
+            <!-- /ko -->
+
+            <!-- ko if: getListPaymentInstallment() -->
+            <div class="select-bank hidden" data-href="instalment-options" >
+                <!-- ko if: invalidMinimumAmount('credit_card') -->
+                <p class="payment-valid hidden" data-href="valid-min-amount-cc">
+                    <span data-bind="i18n : 'Sorry, installment is only available for a minimum purchase of'"></span>
+                    <span data-bind="text:formatPrice(invalidMinimumAmount('credit_card'))"></span>
+                </p>
+                <!-- /ko -->
+                <!-- ko ifnot: invalidMinimumAmount('credit_card') -->
+                <div class="sortby-dropdown">
+                            <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
+                                <span data-bind="i18n: 'Select Bank'" data-id="option-selected-instalment"></span>
+                            </span>
+                    <ul class="dropdown">
+                        <!-- ko foreach: { data: getListPaymentInstallment(), as: 'payment'} -->
+                        <li  data-bind="click:function(data, event){$parent.showInstallmentTerms(data, event);}, class: 'item'" >
+                            <img data-bind="attr:{src: $parent.getPaymentLogo(payment.method), height: 24, width:24,class:'icon-card','data-id':payment.method}"/><span
+                                data-bind="click:$parent.selectOption, text:payment.title,attr:{'data-id':payment.method}" data-href="option-selected-instalment"></span></li>
+                        <!-- /ko -->
+                    </ul>
+                </div>
+                <!-- /ko -->
+            </div>
+            <!-- /ko -->
+
+            <div class="choose-payment-options hidden" data-href="instalment-terms">
+                <p data-bind="i18n: 'Please choose one of the payment options'"></p>
+                <!-- ko if: instalmentTerms -->
+                <!-- ko foreach: { data: instalmentTerms, as: 'term'} -->
+                <div class="payment-options-list">
+                    <div class="radio-custom">
+                        <input type="radio" name="sprint_term_channelid" data-bind="attr:{'id':$parent.selectedMethod+'-'+term.value,'data-href':$parent.selectedMethod,'data-count':term.serviceFeeValue},value:term.value,click:(data,event)=>{$parent.selectedInstalmentTerm(data,event);return true;}"/>
+                        <label data-bind="attr:{'for':$parent.selectedMethod+'-'+term.value}"></label>
+                    </div>
+                    <div class="payment-options-info">
+                        <h4 data-bind="i18n: term.serviceFeeValue + '% Installment - ' + term.value +' Months'"></h4>
+                        <p data-bind="i18n: term.serviceFee"></p>
+                    </div>
+                    <div class="payment-options-price">
+                        <h4 data-bind="i18n: term.totalFeePerMonth"></h4>
+                    </div>
+                </div>
+                <!-- /ko -->
+                <!-- /ko -->
+            </div>
+        </div>
+    </div>
+</div>

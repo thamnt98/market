@@ -1,0 +1,68 @@
+& when (@media-common = true) {
+	.select-bank {
+		&[data-href="credit-options"] {
+			.sortby-dropdown {
+				min-width: 275px;
+				box-sizing: border-box;
+			}
+		}
+	}
+	.mepay-card-token-section {
+		li {
+			color: #8d8d8d;
+		    height: 40px;
+		    line-height: 40px;
+		    box-sizing: border-box;
+		    list-style: none;
+		    border-radius: 5px;
+		    box-shadow: 0 1px 4px 0 rgba(152, 152, 152, 0.5);
+		    border: 0.5px solid #e5e5e5;
+		    margin: 10px 0 0 0;
+		    padding: 0 20px 0 20px;
+		    font-family: 'SF UI Display Light';
+		    cursor: pointer;
+		    width: 275px;
+
+		    &.active,
+		    &[data-selected="selected"] {
+		    	border: 2px solid #fb9e0d;
+		    }
+		}
+	}
+}
+
+@media only screen and (max-width: 768px) {
+	.select-bank {
+		&[data-href="credit-options"] {
+			.sortby-dropdown {
+				width: auto;
+				min-width: auto;
+
+				span.action.toggle {
+					height: auto;
+				    line-height: 1.4;
+				    box-sizing: border-box;
+				    padding: 10px 20px 10px 10px;
+
+				    > span {
+				    	height: auto;
+				    	line-height: 1.4;
+				    }
+
+				    &:after {
+				    	top: 50%;
+				    	margin-top: -8px;
+				    }
+				}
+			}
+		}
+	}
+	.mepay-card-token-section {
+		li {
+			width: auto;
+			height: auto;
+			line-height: 1.4;
+			padding: 10px 20px 10px 20px;
+		}
+	}
+}

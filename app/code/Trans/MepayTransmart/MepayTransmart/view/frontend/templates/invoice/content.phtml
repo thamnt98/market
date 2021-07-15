@@ -1,0 +1,243 @@
+<?php
+/**
+ * @var \SM\Sales\Block\Invoice\Content $block;
+ */
+$invoice = $block->getInvoice();
+?>
+<?php if ($invoice):?>
+    <?php
+    $logo = $invoice->getUrlLogo() ? $invoice->getUrlLogo() : $block->getLogo();
+    $logo = str_replace('adminhtml', 'frontend', $logo);
+    $isMepay = $block->isMepay($invoice->getPaymentInfo()->getMethod());
+
+    /** @var \SM\Sales\Api\Data\Invoice\SubInvoiceInterface[] $subInvoices */
+    $subInvoices = $invoice->getSubInvoices();
+    ?>
+    <div class="myorder-invoice">
+        <div class="wr-logo">
+            <span class="logo-company">
+                <a class="logo" href="#" title="" aria-label="store logo">
+                <img src="<?= $block->escapeHtml($logo)?>" title="" alt="" width="231" height="30">
+            </a>
+            </span>
+        </div>
+        <br/>
+        <div class="wrap-inv-number-date">
+            <div class="wrap-invoice-number">
+                <span><?= $block->escapeHtml(__('Invoice Number')) ?></span>
+                <h3><?= $block->escapeHtml($invoice->getReferenceInvoiceNumber())?></h3>
+            </div>
+            <div class="wrap-invoice-date">
+                <span><?= $block->escapeHtml(__('Invoice Date')) ?></span>
+                <h3><?= $block->escapeHtml($invoice->getCreatedAt())?></h3>
+            </div>
+        </div>
+        <div class="wrap-pay-method">
+            <span><?= $block->escapeHtml(__('Payment Method')) ?></span>
+            <?php
+            $paymentMethod = $invoice->getPaymentInfo()->getMethod();
+            $paymentMethodSplit = explode("_", $paymentMethod);
+            $isVA = false;
+            $isCC = false;
+            if (is_array($paymentMethodSplit)) {
+                $methodShort = $paymentMethodSplit[count($paymentMethodSplit) - 1];
+                if ($methodShort == "va") {
+                    $isVA = true;
+                }
+
+                if ($methodShort == "cc") {
+                    $isCC = true;
+                }
+            }
+
+            ?>
+
+            <?php if ($isVA || $isMepay):?>
+                <h3><?= $block->escapeHtml($invoice->getPaymentMethod()); ?></h3>
+            <?php elseif ($isCC):?>
+                <?php $paymentInfo = $invoice->getPaymentInfo()?>
+                <h3><?= $block->escapeHtml(
+                        $paymentInfo->getCardType() . ": " .
+                        $paymentInfo->getCardBrand() . "(" .
+                        $paymentInfo->getCardNo() . ")"
+                    )?></h3>
+            <?php endif;?>
+        </div>
+        <br/>
+        <div class="table-wrapper table-order">
+            <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                <thead>
+                <tr>
+                    <th class="col id"><?= $block->escapeHtml(__('Order ID')) ?></th>
+                    <th class="col item"><?= $block->escapeHtml(__('Total Item(s)')) ?></th>
+                    <th class="col "></th>
+                    <th class="col subtotal"><?= $block->escapeHtml(__('Subtotal')) ?></th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <?php
+                /** @var \SM\Sales\Api\Data\Invoice\SubInvoiceInterface $subInvoice */
+                foreach ($subInvoices as $subInvoice):
+                ?>
+                <tr>
+                    <?php $getSubtotal = explode(" ",$block->currencyFormat($subInvoice->getSubtotal())); ?>
+                    <td class="col id"><?= $block->escapeHtml($subInvoice->getReferenceOrderId())?></td>
+                    <td class="col item"><?= $block->escapeHtml($subInvoice->getItemAmount())?></td>
+                    <td class="col subtotal"><?= $block->escapeHtml($getSubtotal[0])?></td>
+                    <td class="col subtotal"><?= $block->escapeHtml($getSubtotal[1])?></td>
+                </tr>
+                <?php endforeach;?>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <?php $Subtotal = explode(" ",$block->currencyFormat($invoice->getSubTotal())); ?>
+                    <td class="col id"></td>
+                    <td class="col subtotal-text" align="right"><?= $block->escapeHtml(__('Subtotal')) ?></td>
+                    <td class="col subtotal"><?= $block->escapeHtml($Subtotal[0])?></td>
+                    <td class="col subtotal"><?= $block->escapeHtml($Subtotal[1])?></td>
+                </tr>
+                <?php if ($invoice->getServiceFee() > 0): ?>
+                <tr class="">
+                    <?php $ServiceFee = explode(" ",$block->currencyFormat($invoice->getServiceFee())); ?>
+                    <td class="col id"></td>
+                    <td class="col subtotal-text" align="right">
+                        <p><?= $block->escapeHtml(__('Service Fee')) ?></p>
+                    </td>
+                    <td class="col subtotal"><?= $block->escapeHtml($ServiceFee[0])?></td>
+                    <td class="col subtotal"><?= $block->escapeHtml($ServiceFee[1])?></td>
+                </tr>
+                <?php endif;?>
+                <?php if (!$invoice->getIsDigital()): ?>
+                    <tr>
+                        <?php $ShippingAmount = explode(" ",$block->currencyFormat($invoice->getShippingAmount())); ?>
+                        <td class="col id"></td>
+                        <td class="col subtotal-text" align="right"><?= $block->escapeHtml(__('Delivery Fee Subtotal')) ?></td>
+                        <td class="col subtotal"><?= $block->escapeHtml($ShippingAmount[0])?></td>
+                        <td class="col subtotal"><?= $block->escapeHtml($ShippingAmount[1])?></td>
+                    </tr>
+                <?php endif;?>
+                <tr class="discount">
+                    <?php $discountAmount = explode(" ",$block->currencyFormat($invoice->getDiscountAmount())); ?>
+                    <td class="col id"></td>
+                    <td class="col subtotal-text" align="right">
+                        <?= $block->escapeHtml(__('Discount/Promo/Voucher')) ?>
+                    </td>
+                    <td class="col subtotal"><?= $block->escapeHtml($discountAmount[0])?></td>
+                    <td class="col subtotal"><?= $block->escapeHtml($discountAmount[1])?></td>
+                </tr>
+                <tr class="total">
+                    <?php $GrandTotal = explode(" ",$block->currencyFormat($invoice->getGrandTotal())); ?>
+                    <td class="col id"></td>
+                    <td class="col subtotal-text">
+                        <?= $block->escapeHtml(__('Total Payment')) ?>
+                    </td>
+                    <td class="col no-border"><?= $block->escapeHtml($GrandTotal[0])?></td>
+                    <td class="col subtotal"><?= $block->escapeHtml($GrandTotal[1])?></td>
+                </tr>
+                </tfoot>
+
+            </table>
+        </div>
+        <?php
+        /** @var \SM\Sales\Api\Data\SubOrderDataInterface $subOrder */
+        foreach ($subInvoices as $subInvoice):
+        ?>
+        <div class="wrap-pay-method">
+            <h3 class="pay-method-title"><?= $block->escapeHtml(__('PRODUCT LIST')) ?></h3>
+            <span><?= $block->escapeHtml(__('Order ID')) ?></span>
+            <h3><?= $block->escapeHtml($subInvoice->getReferenceOrderId())?></h3>
+        </div>
+        <div class="wrap-pay-method">
+            <?php if (!$invoice->getIsDigital()): ?>
+                <?php if ($subInvoice->getStoreInfo()):?>
+                    <?php
+                    /** @var \SM\MobileApi\Api\Data\Catalog\Product\StoreInfoInterface $storeInfo */
+                    $storeInfo = $subInvoice->getStoreInfo();
+                    $storeAddress = $block->getStoreAddress($storeInfo);
+                    ?>
+                    <span><?= $block->escapeHtml(__('Pick up in Store')) ?></span>
+                    <h3><?= $block->escapeHtml($storeInfo->getName()) ?></h3>
+                    <p><?= $block->escapeHtml($storeAddress) ?></p>
+                <?php endif;?>
+                <?php if ($subInvoice->getDeliveryAddress()):?>
+                    <?php
+                    /** @var \SM\Sales\Api\Data\DeliveryAddressDataInterface $deliveryAddress */
+                    $deliveryAddress = $subInvoice->getDeliveryAddress(); ?>
+                    <span><?= $block->escapeHtml(__('Delivery Address')) ?></span>
+                    <h3><?= $block->escapeHtml($deliveryAddress->getFullName()) ?> (<?= $block->escapeHtml($deliveryAddress->getAddressName()) ?>)</h3>
+                    <p><?= $block->escapeHtml(__($deliveryAddress->getStreet() . " " . $deliveryAddress->getCity())) ?></p>
+                    <p><?= $block->escapeHtml($deliveryAddress->getTelephone()) ?></p>
+                <?php endif;?>
+            <?php endif;?>
+        </div>
+        <div class="table-order table-wrapper tale-order2">
+            <table cellpadding="0" cellspacing="0" border="0" style="page-break-inside: avoid">
+                <thead>
+                <tr>
+                    <th class="col id"><?= $block->escapeHtml(__('Product')) ?></th>
+                    <th class="col item"><?= $block->escapeHtml(__('Quantity')) ?></th>
+                    <th class="col "></th>
+                    <th class="col subtotal"><?= $block->escapeHtml(__('Price')) ?></th>
+                </tr>
+                </thead>
+
+                <tbody>
+                 <?php
+                /** @var \SM\Sales\Api\Data\Invoice\SubInvoiceItemInterface $item */
+                foreach ($subInvoice->getItems() as $item):?>
+                <tr>
+                    <?php $PSRowTotal = explode(" ",$block->currencyFormat($item->getRowTotal()));?>
+                    <td class="col id"><?= $block->escapeHtml($item->getName())?></td>
+                    <td class="col item"><?= $block->escapeHtml(intval($item->getQty()))?></td>
+                    <td class="col subtotal"><?= $block->escapeHtml($PSRowTotal[0])?></td>
+                    <td class="col subtotal"><?= $block->escapeHtml($PSRowTotal[1])?></td>
+                </tr>
+                <?php endforeach; ?>
+                </tbody>
+                <tfoot>
+                <tr>
+                    <?php $PSsubtotal = explode(" ",$block->currencyFormat($subInvoice->getSubtotal()));?>
+                    <td class="col id"></td>
+                    <td class="col subtotal-text"><?= $block->escapeHtml(__('Product Price Subtotal')) ?></td>
+                    <td class="col subtotal"><?= $block->escapeHtml($PSsubtotal[0])?></td>
+                    <td class="col subtotal"><?= $block->escapeHtml($PSsubtotal[1])?></td>
+                </tr>
+                <tr>
+                    <?php $PSshipping = explode(" ",$block->currencyFormat($subInvoice->getShippingAmount()));?>
+                    <td class="col id"></td>
+                    <td class="col subtotal-text">
+                        <?= $block->escapeHtml(__('Delivery Fee Subtotal')) ?>
+                        <span><?= $block->escapeHtml($subInvoice->getShippingMethod()) ?></span>
+                    </td>
+                    <td class="col subtotal"><?= $block->escapeHtml($PSshipping[0])?></td>
+                    <td class="col subtotal"><?= $block->escapeHtml($PSshipping[1])?></td>
+                </tr>
+                <tr>
+                    <?php $PSDiscount = explode(" ",$block->currencyFormat($subInvoice->getDiscountAmount()));?>
+                    <td class="col id"></td>
+                    <td class="col subtotal-text">
+                        <?= $block->escapeHtml(__('Discount/Promo/Voucher')) ?>
+                    </td>
+                    <td class="col subtotal"><?= $block->escapeHtml($PSDiscount[0])?></td>
+                    <td class="col subtotal"><?= $block->escapeHtml($PSDiscount[1])?></td>
+                </tr>
+                <tr class="total-order-id">
+                    <?php $PSGrand = explode(" ",$block->currencyFormat($subInvoice->getGrandTotal()));?>
+                    <td class="col id"></td>
+                    <td class="col subtotal-text">
+                        <?= $block->escapeHtml(__('Subtotal Order ID')) ?>
+                        <?= $block->escapeHtml($subInvoice->getReferenceOrderId()) ?>
+                    </td>
+                    <td class="col subtotal"><?= $block->escapeHtml($PSGrand[0])?></td>
+                    <td class="col subtotal"><?= $block->escapeHtml($PSGrand[1])?></td>
+                </tr>
+                </tfoot>
+
+            </table>
+        </div>
+        <?php endforeach; ?>
+    </div>
+<?php else:?>
+    <h1><?= $block->escapeHtml(__('Your Invoice Can\'t View. Please Try Again Later!'))?></h1>
+<?php endif;?>
