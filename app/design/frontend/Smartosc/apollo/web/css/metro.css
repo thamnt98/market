@@ -240,8 +240,10 @@
 
 /* Success Page */
 
-.transcheckout-index-success .page-header {background-color: #FFF;background-image: none;}
-.transcheckout-index-success .page-header .logo img {display: block;}
+.transcheckout-index-success .page-header {background-color: #FFF !important;background-image: none !important;}
+.transcheckout-index-success .page-header .logo img {display: block !important;}
+.transcheckout-index-success .main .wrapper-payment .check-payment-col a {background: #000;border-radius: 0px;}
+.transcheckout-index-success .main .wrapper-payment .check-payment-row a:first-child {border: 2px solid #000}
 
 /* Catalog Search */
 
