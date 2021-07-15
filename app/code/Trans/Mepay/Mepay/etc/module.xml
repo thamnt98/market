@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_Mepay
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Anan Fauzi <anan.fauzi@transdigital.co.id>
+ *
+ * Copyright © 2020 PT CT Corp Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Module/etc/module.xsd">
+    <module name="Trans_Mepay" setup_version="100.0.0">
+      <sequence>
+        <module name="Magento_Sales"/>
+        <module name="Magento_Payment"/>
+        <module name="Magento_Checkout"/>
+	    </sequence>
+    </module>
+</config>

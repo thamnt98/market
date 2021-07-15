@@ -1,0 +1,65 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_MepayTransmart
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Anan Fauzi <anan.fauzi@transdigital.co.id>
+ *
+ * Copyright © 2020 PT CT Corp Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+  <!-- preference -->
+  <preference for="Trans\Mepay\Gateway\Request\OrderDataBuilder" type="Trans\MepayTransmart\Gateway\Request\TransmartOrderDataBuilder" />
+  <preference for="Trans\Mepay\Controller\Payment\Callbacks" type="Trans\MepayTransmart\Controller\Payment\TransmartCallbacks" />
+  <preference for="Trans\Mepay\Model\Payment\Status\Capture" type="Trans\MepayTransmart\Model\Payment\Status\TransmartCapture" />
+  <preference for="Trans\Mepay\Model\Payment\Status\Failed" type="Trans\MepayTransmart\Model\Payment\Status\TransmartFailed" />
+  <preference for="SM\Checkout\Block\Checkout\Success" type="Trans\MepayTransmart\Block\Checkout\TransmartSuccess" />
+  <!--<preference for="Trans\Mepay\Plugin\Magento\Checkout\Model\PaymentInformationManagement" type="Trans\MepayTransmart\Plugin\Magento\Checkout\Model\TransmartPaymentInformationManagement" /> -->
+  <preference for="Trans\Mepay\Plugin\Magento\Quote\Model\QuoteManagement" type="Trans\MepayTransmart\Plugin\Magento\Quote\Model\TransmartQuoteManagement" />
+  <preference for="SM\Checkout\Model\MultiShipping" type="Trans\MepayTransmart\Model\TransmartMultishipping" />
+  <preference for="SM\Sales\Model\Order\ParentOrder" type="Trans\MepayTransmart\Model\Order\TransmartParentOrder" />
+  <preference for="SM\Checkout\Helper\OrderReferenceNumber" type="Trans\MepayTransmart\Helper\TransmartOrderReferenceNumber" />
+  <preference for="SM\Sales\Observer\SetEmailNewOrderData" type="Trans\MepayTransmart\Observer\TransmartSetEmailNewOrderData" />
+<!--  <preference for="SM\Sales\Model\ParentOrderRepository" type="Trans\MepayTransmart\Model\TransmartParentOrderRepository" />-->
+  <preference for="SM\Checkout\Helper\Payment" type="Trans\MepayTransmart\Helper\TransmartPayment" />
+  <preference for="SM\Sales\Block\Order\Physical\Detail" type="Trans\MepayTransmart\Block\Order\Physical\Detail" />
+  <preference for="SM\Checkout\Model\Api\PaymentMethods" type="Trans\MepayTransmart\Model\Api\TransmartPaymentMethods" />
+  <preference for="Amasty\Coupons\Plugin\CouponManagement" type="Trans\MepayTransmart\Preference\Amasty\Coupons\Plugin\TransmartCouponManagement" />
+  <preference for="Trans\Mepay\Helper\Order" type="Trans\MepayTransmart\Preference\Trans\Mepay\Helper\TransmartOrder" />
+
+    <!-- plugin -->
+    <type name="SM\Sales\Model\InvoiceRepository">
+      <plugin name="TransMepayTransmartPluginSMSalesModelTransmartInvoiceRepository" type="Trans\MepayTransmart\Plugin\SM\Sales\Model\TransmartInvoiceRepository" />
+    </type>
+    <type name="Trans\Mepay\Gateway\Request\OrderDataBuilder">
+      <plugin name="TransMepayTransmartPluginTransMepayGatewayRequestTransmartOrderDataBuilder" type="Trans\MepayTransmart\Plugin\Trans\Mepay\Gateway\Request\TransmartOrderDataBuilder" />
+    </type>
+    <type name="SM\Checkout\Controller\Index\Success">
+      <plugin name="TransMepayTransmartPluginSMCheckoutControllerIndexTransmartSuccess" type="Trans\MepayTransmart\Plugin\SM\Checkout\Controller\Index\TransmartSuccess" />
+    </type>
+    <type name="Trans\Mepay\Gateway\Request\ReferenceUrlDataBuilder">
+      <plugin name="TransMepayTransmartPluginTransMepayGatewayRequestTransmartReferenceUrlDataBuilder" type="Trans\MepayTransmart\Plugin\Trans\Mepay\Gateway\Request\TransmartReferenceUrlDataBuilder" />
+    </type>
+    <type name="Trans\Mepay\Gateway\Http\Client\Connect">
+      <plugin name="TransMepayTransmartPluginTransMepayGatewayHttpClientTransmartConnect" type="Trans\MepayTransmart\Plugin\Trans\Mepay\Gateway\Http\Client\TransmartConnect" />
+    </type>
+    <type name="Trans\Mepay\Model\Webhook">
+      <plugin name="TransMepayTransmartPluginTransMepayModelTransmartWebhook" type="Trans\MepayTransmart\Plugin\Trans\Mepay\Model\TransmartWebhook" />
+    </type>
+    <type name="Trans\Mepay\Observer\Magento\Framework\AppInterface\AutoRecoverCartForPendingPayment">
+        <plugin name="TransMepayTransmartPluginTransMepayObserverMagentoFrameworkAppInterfaceTransmartAutoRecoverCartForPendingPayment" type="Trans\MepayTransmart\Plugin\Trans\Mepay\Observer\Magento\Framework\AppInterface\TransmartAutoRecoverCartForPendingPayment" />
+    </type>
+
+    <type name="Magento\Framework\Console\CommandList">
+      <arguments>
+            <argument name="commands" xsi:type="array">
+               <item name="Trans_MepayTransmart_Console_Transaction_Status_Check" xsi:type="object">Trans\MepayTransmart\Console\Transaction\Status\Check</item>
+            </argument>
+        </arguments>
+    </type>
+</config>

@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_Mepay
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Anan Fauzi <anan.fauzi@transdigital.co.id>
+ *
+ * Copyright © 2020 PT CT Corp Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+  <route url="/V1/transmepay/payment/validate" method="POST">
+    <service class="Trans\Mepay\Api\WebhookInterface" method="validate"/>
+    <resources>
+        <resource ref="anonymous"/>
+    </resources>
+  </route>
+  <route url="/V1/transmepay/payment/received" method="POST">
+    <service class="Trans\Mepay\Api\WebhookInterface" method="received"/>
+    <resources>
+        <resource ref="anonymous"/>
+    </resources>
+  </route>
+  <route url="/V1/transmepay/payment/notif" method="POST">
+    <service class="Trans\Mepay\Api\WebhookInterface" method="notif"/>
+    <resources>
+        <resource ref="anonymous"/>
+    </resources>
+  </route>
+  <route url="/V1/transmepay/recovercart/me" method="POST">
+    <service class="Trans\Mepay\Api\CartRecoveryInterface" method="execute"/>
+    <resources>
+        <resource ref="self"/>
+    </resources>
+    <data>
+        <parameter name="id" force="true">%customer_id%</parameter>
+    </data>
+  </route>
+
+  <route url="/V1/transmepay/tokenization/tokenlist" method="POST">
+    <service class="Trans\Mepay\Api\TokenizationInterface" method="tokenlist"/>
+    <resources>
+        <resource ref="self"/>
+    </resources>
+  </route>
+
+  <route url="/V1/transmepay/tokenization/savetoken" method="POST">
+    <service class="Trans\Mepay\Api\TokenizationInterface" method="savetoken"/>
+    <resources>
+        <resource ref="self"/>
+    </resources>
+  </route>
+
+  <route url="/V1/transmepay/tokenization/deletetoken" method="POST">
+    <service class="Trans\Mepay\Api\TokenizationInterface" method="deletetoken"/>
+    <resources>
+        <resource ref="self"/>
+    </resources>
+  </route>
+
+  <route url="/V1/transmepay/authcapture/send" method="POST">
+    <service class="Trans\Mepay\Api\Data\AuthCaptureInterface" method="send"/>
+    <resources>
+        <resource ref="self"/>
+    </resources>
+  </route>
+
+</routes>
+

@@ -17,12 +17,18 @@ use Trans\IntegrationOrder\Api\Data\RefundInterface;
 use Trans\IntegrationOrder\Api\OrderStatusInterface;
 use Trans\Mepay\Api\AuthCaptureRepositoryInterface;
 use Trans\Mepay\Model\CaptureResponse;
+use Trans\Mepay\Helper\Data;
+use Trans\Mepay\Model\CaptureResponse\Oms;
 use Trans\Sprint\Helper\Config;
 
 /**
  * Class OrderStatus
  */
 class OrderStatus implements OrderStatusInterface {
+	/**
+	 * @var string
+	 */
+	const NO_CREDIT_MEMO_AVAILABLE = 'items should have refund, but no credit memo found';
 
 	/**
 	 * @var \Magento\Framework\App\ResourceConnection
@@ -83,6 +89,11 @@ class OrderStatus implements OrderStatusInterface {
 	 * @var \Trans\Mepay\Model\CaptureResponse
 	 */
 	protected $captureResponse;
+
+	/**
+	 * @var \Magento\Sales\Api\Data\CreditmemoInterface[]
+	 */
+	protected $creditMemoList = [];
 
 	/**
 	 * Order Status Construct Data
@@ -555,15 +566,24 @@ class OrderStatus implements OrderStatusInterface {
 			throw new \Magento\Framework\Webapi\Exception(__('Please re-check status, action and subaction sequence before submit'), 400);
 		}
 
+        $itemOrders = $this->statusRepo->loadByOrderId($orderId);
+        $this->loggerOrder->info('=========== order-items db value before ===========');
+        foreach ($itemOrders as $key => $value) {
+            $this->loggerOrder->info('-----');
+            $this->loggerOrder->info('sku: '.$value->getSku());
+            $this->loggerOrder->info('qty: '.$value->getQty());
+            $this->loggerOrder->info('qty_allocated: '.$value->getQtyAllocated());
+            $this->loggerOrder->info('item_status: '.$value->getItemStatus());
+        }
+        $this->loggerOrder->info('=========== order-items db value before end ===========');
 		foreach ($request['order_items'] as $allocatedItems) {
-			$itemOrders = $this->statusRepo->loadByOrderId($orderId);
 			foreach ($itemOrders as $itemOrder) {
 				if ($itemOrder->getSKU() === $allocatedItems['sku']) {
 					$itemOrder->setQtyAllocated($allocatedItems['quantity_allocated']);
 					$itemOrder->setQty($allocatedItems['quantity']);
 					$itemOrder->setItemStatus($allocatedItems['item_status']);
+                    $itemOrderSave = $this->statusRepo->saveItem($itemOrder);
 				}
-				$itemOrderSave = $this->statusRepo->saveItem($itemOrder);
 			}
 			// if ($itemOrder->getQty() != $qtyOrdered) {
 			//  throw new \Magento\Framework\Webapi\Exception(__('Invalid quantity order. Please checking again.'), 400);
@@ -572,6 +592,16 @@ class OrderStatus implements OrderStatusInterface {
 				throw new \Magento\Framework\Webapi\Exception(__('Quantity allocated is greater than quantity order. Please check again.'), 400);
 			}
 		}
+        $itemOrders = $this->statusRepo->loadByOrderId($orderId);
+        $this->loggerOrder->info('=========== order-items db value after ===========');
+        foreach ($itemOrders as $key => $value) {
+            $this->loggerOrder->info('-----');
+            $this->loggerOrder->info('sku: '.$value->getSku());
+            $this->loggerOrder->info('qty: '.$value->getQty());
+            $this->loggerOrder->info('qty_allocated: '.$value->getQtyAllocated());
+            $this->loggerOrder->info('item_status: '.$value->getItemStatus());
+        }
+        $this->loggerOrder->info('=========== order-items db value after end ===========');
 
 		$configStatus               = $this->orderConfig;
 		$loadDataOrder              = $this->statusRepo->loadDataByRefOrderId($orderId);
@@ -674,6 +704,7 @@ class OrderStatus implements OrderStatusInterface {
 						$this->createInvoice($childOrder); //invoice for child order
 					} catch (\Exception $e) {
 						$this->loggerOrder->info('invoice child order fail : ' . $e->getMessage());
+						throw $e;
 					}
 
 					try {
@@ -683,6 +714,7 @@ class OrderStatus implements OrderStatusInterface {
 						$this->loggerOrder->info('child $creditEncode : ' . $childCreditEncode);
 					} catch (\Exception $e) {
 						$this->loggerOrder->info('child $creditEncode : ' . $e->getMessage());
+						throw $e;
 					}
 
 					try {
@@ -693,6 +725,7 @@ class OrderStatus implements OrderStatusInterface {
 						$this->loggerOrder->info('parent $creditEncode : ' . $creditEncode);
 					} catch (\Exception $e) {
 						$this->loggerOrder->info('parent credit memo : ' . $e->getMessage());
+						throw $e;
 					}
 
 					$this->loggerOrder->info('===== Credit Memo ===== End');
@@ -736,30 +769,20 @@ class OrderStatus implements OrderStatusInterface {
 		$matrixAdjusmentAmount = 0;
 		$this->captureResponse->generateFormat();
 		$captureResponse = $this->captureResponse->getFormat();
+		$matrixAdjusmentAmount = $this->generateAdjustmentValue($loadItemByOrderId);
+
 		if ($status == 2 && $action == 2 && $subAction == 7 || $status == 2 && $action == 99 && $subAction == 0) {
 			if (
 			    $paymentMethod === 'sprint_bca_va' || 
 			    $paymentMethod === 'sprint_permata_va' || 
 			    $paymentMethod === 'trans_mepay_va'
 			) {
-				$this->loggerOrder->info('=========== refund VA start ===========');
-				foreach ($loadItemByOrderId as $itemOrder) {
-					$paidPriceOrder = $itemOrder->getPaidPrice();
-					$qtyOrder       = $itemOrder->getQty();
-					$qtyAllocated   = $itemOrder->getQtyAllocated();
-					$amount         = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
+				$this->loggerOrder->info('=========== refund VA calculation start ===========');
+                $this->loggerOrder->info('Reffnumber: '.$refNumber);
 
-					$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
-
-					// $this->loggerOrder->info('===== Credit Memo ===== Start');
-
-					// $credit       = $this->creditMemos($parentEntityId, $itemId, $qtyAllocated);
-					// $creditEncode = json_encode($credit);
-
-					// $this->loggerOrder->info('$creditEncode : ' . $creditEncode);
-					// $this->loggerOrder->info('===== Credit Memo ===== End');
-
-				}
+                $this->loggerOrder->info('totalAmountAdjustment :'.$matrixAdjusmentAmount);
+                $this->loggerOrder->info('=========== refund VA calculation end ===========');
+                $this->loggerOrder->info('Reffnumber: '.$refNumber);
 
 				/* update quantity adjusment */
 				$url            = $this->orderConfig->getOmsBaseUrl() . $this->orderConfig->getOmsPaymentStatusApi();
@@ -787,9 +810,6 @@ class OrderStatus implements OrderStatusInterface {
 				$objOrder = json_decode($responseOrder);
 				$this->loggerOrder->info('Body: ' . $dataJson . '. Response: ' . $responseOrder);
 				$json_string = stripcslashes($responseOrder);
-				// if ($objOrder->code == 200) {
-				// 	return $result;
-				// }
 				$this->loggerOrder->info('response = ' . $json_string);
 				$this->loggerOrder->info('=========== refund VA end ===========');
 			}
@@ -806,21 +826,15 @@ class OrderStatus implements OrderStatusInterface {
 			    $paymentMethod === 'trans_mepay_allbank_cc' ||
 			    $paymentMethod === 'trans_mepay_allbank_debit'
 			) {
-				$this->loggerOrder->info('=========== refund CC DEBIT start ===========');
-
+				$this->loggerOrder->info('=========== refund CC DEBIT calculation start ===========');
+                $this->loggerOrder->info('Reffnumber: '.$refNumber);
 				/**
 				 * prepare data array refund send to PG
 				 */
 				$refTrxNumber = RefundInterface::PREFIX_REFUND . $this->helperData->genRefNumber() . $orderId;
-				foreach ($loadItemByOrderId as $itemOrder) {
-					$paidPriceOrder = $itemOrder->getPaidPrice();
-					$qtyOrder       = $itemOrder->getQty();
-					$qtyAllocated   = $itemOrder->getQtyAllocated();
-
-					$amount = ($paidPriceOrder / $qtyOrder) * ($qtyOrder - $qtyAllocated);
-
-					$matrixAdjusmentAmount = $matrixAdjusmentAmount + $amount;
-				}
+                $this->loggerOrder->info('totalAmountAdjustment :'.$matrixAdjusmentAmount);
+                $this->loggerOrder->info('=========== refund CC DEBIT calculation end ===========');
+                $this->loggerOrder->info('Reffnumber: '.$refNumber);
 
 				if (
 				    $paymentMethod === 'trans_mepay_cc' || 
@@ -830,18 +844,19 @@ class OrderStatus implements OrderStatusInterface {
 				    $paymentMethod === 'trans_mepay_allbank_cc' ||
 			        $paymentMethod === 'trans_mepay_allbank_debit'
 				) {
+                    $newAmount = $trxAmount - $matrixAdjusmentAmount;
 					$this->eventManager->dispatch(
 						'refund_with_mega_payment',
 						[
 							'order_id' => $orderId,
 							'reference_number' => $refNumber,
 							'amount' => $trxAmount,
-							'new_amount' => $trxAmount - $matrixAdjusmentAmount,
-							'adjustment_amount' => $matrixAdjusmentAmount,
+							'new_amount' => $newAmount,
+							'adjustment_amount' => ceil($matrixAdjusmentAmount),
 						]
 					);
 					//getting capture response from table
-					$captureResponse = $this->getMegaCaptureResponse($orderId);
+					$captureResponse = $this->getMegaCaptureResponse($orderId, $newAmount);
 				}
 
 				/* update quantity adjusment */
@@ -872,19 +887,8 @@ class OrderStatus implements OrderStatusInterface {
 				$this->loggerOrder->info('$responseOrder : ' . $responseOrder);
 				$objOrder = json_decode($responseOrder);
 				$this->loggerOrder->info('Body: ' . $dataJson . '. Response: ' . $responseOrder);
-				// $json_string = stripcslashes($responseOrder);
-				// if ($objOrder->code == 200) {
-				// 	return json_decode($responseOrder, true);
-				// }
 
 				if (!empty($skusRefunded) and !empty($refunded)) {
-					/* save to table sales_order_item */
-					if ($fetchData->getSku()) {
-						$saveOrderItem = $this->orderItemFactory->create();
-					}
-					// $fetchData->setQtyRefunded((float) $itemData['quantity_allocated']);
-					// $this->orderItemRepository->save($fetchData);
-
 					foreach ($refunded as $sku => $refundedItem) {
 						try {
 							/* save to table integration_oms_refund */
@@ -892,11 +896,9 @@ class OrderStatus implements OrderStatusInterface {
 							$saveRefundData->setOrderRefNumber($orderData->getReferenceNumber());
 							$saveRefundData->setRefundTrxNumber($refTrxNumber);
 							$saveRefundData->setOrderId($orderId);
-							// $saveRefundData->setSku($item['sku']);
 							$saveRefundData->setSku($sku);
 							$saveRefundData->setQtyRefund($refundedItem['quantity_allocated']);
 							$saveRefundData->setAmountRefundOrder($matrixAdjusmentAmount);
-
 							$this->refundRepository->save($saveRefundData);
 						} catch (\Exception $e) {
 							continue;
@@ -1252,6 +1254,36 @@ class OrderStatus implements OrderStatusInterface {
 	}
 
 	/**
+	 * Get adjustment calculation on created credit memo
+	 * @param  \Trans\IntegrationOrder\Model\IntegrationOrderItem[] $orderItemsStatus
+	 * @return int
+	 */
+	public function generateAdjustmentValue($orderItemsStatus)
+	{
+		$isRefund = false;
+		foreach($orderItemsStatus as $orderItem){
+			if($orderItem instanceof \Trans\IntegrationOrder\Model\IntegrationOrderItem){
+				if($orderItem->getQty() > $orderItem->getQtyAllocated()) {
+					$isRefund = true;
+					break;
+				}
+			}
+		}
+		
+		$adjustmentValue = 0;
+		if($isRefund) {
+			if(empty($this->creditMemoList)) {
+				throw new \Exception(__(self::NO_CREDIT_MEMO_AVAILABLE));
+			}
+			foreach ($this->creditMemoList as $creditMemo) {
+				$adjustmentValue += intval($creditMemo->getGrandTotal());
+			}
+		}
+
+		return $adjustmentValue;
+	}
+
+	/**
 	 * Prepare store data for Credit Memo
 	 *
 	 * @param Magento\Sales\Model\Order $order
@@ -1357,7 +1389,9 @@ class OrderStatus implements OrderStatusInterface {
 				// $creditmemo->setInvoice($invoiceobj);
 
 				$creditmemoManagement = $this->creditMemoInterfaceFactory->create();
-				$creditmemoManagement->refund($creditmemo, (bool) $creditMemoData['do_offline']);
+				$creditMemoObj = $creditmemoManagement->refund($creditmemo, (bool) $creditMemoData['do_offline']);
+                if ($order->getData('is_parent') && $refOrderId != null)
+                    $this->creditMemoList[] = $creditMemoObj;
 
 				if (!empty($creditMemoData['send_email'])) {
 					$this->creditmemoSender->send($creditmemo);
@@ -1455,18 +1489,23 @@ class OrderStatus implements OrderStatusInterface {
 	 * @param int $orderId
 	 */
 	protected function getSalesOrderItems($skus, $orderId) {
-		$connection = $this->resource->getConnection();
-		$table      = $connection->getTableName('sales_order_item');
+		try {
+			$connection = $this->resource->getConnection();
+			$table      = $connection->getTableName('sales_order_item');
 
-		$query = $connection->select();
-		$query->from(
-			$table,
-			['*']
-		)->where('order_id = ?', $orderId)->where('sku in (?)', $skus);
+			$query = $connection->select();
+			$query->from(
+				$table,
+				['*']
+			)->where('order_id = ?', $orderId)->where('sku in (?)', $skus);
 
-		$collection = $connection->fetchAll($query);
+			$collection = $connection->fetchAll($query);
 
-		return $collection;
+			return $collection;
+		} catch (\Exception $e) {
+			$this->loggerOrder->info('getSalesOrderItems fail : ' . $e->getMessage());
+			throw $e;
+		}
 	}
 
 	/**
@@ -1753,12 +1792,39 @@ class OrderStatus implements OrderStatusInterface {
 	 * @param  string $refOrderId
 	 * @return array
 	 */
-	public function getMegaCaptureResponse(string $refOrderId)
+	public function getMegaCaptureResponse(string $refOrderId, $newAmount)
 	{
 		$data = $this->_getMegaCaptureResponse($refOrderId);
-		$data = ($data)? $data : '[]';
+        if (!$data) {
+			$data = $this->getMegaTransactionResponse($refOrderId, $newAmount);
+		}
 		$this->captureResponse->setFormat($data);
+		$data = $this->captureResponse->getFormat();
+
+		if (is_null($data['bank_mega']['inquiry_id'])) {
+            throw new \Magento\Framework\Webapi\Exception(
+                __('Some error occured on mega payment'), 500, \Magento\Framework\Webapi\Exception::HTTP_INTERNAL_ERROR
+            );
+        }
 		return $this->captureResponse->getFormat();
+	}
+
+	public function getMegaTransactionResponse($refOrderId, $newAmount)
+	{
+		$order = $this->order->loadByAttribute('reference_order_id', $refOrderId);
+		$transaction = Data::getClassInstance('\Trans\Mepay\Helper\Payment\Transaction');
+		$txnData = $transaction->getPgTransaction($order->getId());
+		$txnData = ($txnData)? json_decode($txnData, true) : [];
+		$inqData = $transaction->getPgResponse($order->getId());
+		$inqData = ($inqData)? json_decode($inqData, true) : [];
+		$result = [];
+		$result[Oms::TRANSACTION_ID_KEY] = $txnData['id'];
+        $result[Oms::INQUIRY_ID_KEY] = $inqData['id'];
+        $result[Oms::SECOND_CAPTURE_ID_KEY] = $txnData['id'];
+        $result[Oms::SECOND_CAPTURE_STATUS_KEY] = $txnData['status'];
+        $result[Oms::SECOND_CAPTURE_AMOUNT_KEY] = $newAmount;
+        $result[Oms::SECOND_CAPTURE_STATUS_MESSAGE] = null;
+        return json_encode($result);
 	}
 
 	/**

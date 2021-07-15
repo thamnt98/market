@@ -1,0 +1,27 @@
+{
+    "trans_mepay_pull_status_config": {
+        "column": {
+            "row_id": true,
+            "config_name": true,
+            "config_offset": true,
+            "config_limit": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    },
+    "trans_mepay_auth_capture": {
+        "column": {
+            "id": true,
+            "reference_number": true,
+            "reference_order_id": true,
+            "status": true,
+            "created_at": true,
+            "updated_at": true
+        },
+        "constraint": {
+            "PRIMARY": true
+        }
+    }
+}

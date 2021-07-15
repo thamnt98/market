@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_Mepay
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Anan Fauzi <anan.fauzi@transdigital.co.id>
+ *
+ * Copyright © 2020 PT CT Corp Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<payment xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Payment:etc/payment.xsd">
+    <groups>
+        <group id="trans_mepay">
+            <label>Mepay Mega Payment Gateway</label>
+        </group>
+    </groups>
+    <methods>
+
+        <method name="trans_mepay_cc">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
+
+        <method name="trans_mepay_allbankccdebit">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
+
+        <method name="trans_mepay_debit">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
+
+        <method name="trans_mepay_va">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
+
+        <method name="trans_mepay_qris">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
+
+        <method name="trans_mepay_allbank_cc">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
+
+        <method name="trans_mepay_allbank_debit">
+            <allow_multiple_address>1</allow_multiple_address>
+        </method>
+
+    </methods>
+</payment>
