@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_Mepay
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Anan Fauzi <anan.fauzi@transdigital.co.id>
+ *
+ * Copyright © 2020 PT CT Corp Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="payment">
+            <group id="trans_mepay" translate="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>MePay: Mega Payment Gateway</label>
+                <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/trans_mepay/active</config_path>
+                </field>
+                <field id="environment" translate="label" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="0">
+                  <label>Environment</label>
+                  <source_model>Trans\Mepay\Model\Config\Source\Environment</source_model>
+                  <config_path>payment/trans_mepay/environment</config_path>
+                </field>
+                <field id="merchant_host" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Merchant ID</label>
+                    <config_path>payment/trans_mepay/merchant_host</config_path>
+                    <backend_model>\Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+                <field id="api_key" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Api key</label>
+                    <config_path>payment/trans_mepay/api_key</config_path>
+                    <backend_model>\Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+                <field id="secret_key" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Secret key</label>
+                    <config_path>payment/trans_mepay/secret_key</config_path>
+                    <backend_model>\Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+                </field>
+                <field id="dev_base_url" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Development Base Url</label>
+                    <config_path>payment/trans_mepay/dev_base_url</config_path>
+                </field>
+                <field id="prod_base_url" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Production Base Url</label>
+                    <config_path>payment/trans_mepay/prod_base_url</config_path>
+                </field>
+                <field id="merchant_reference_url" translate="label" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Merchant Reference Url</label>
+                    <config_path>payment/trans_mepay/merchant_reference_url</config_path>
+                </field>
+                <field id="inquiry_url" translate="label" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Inquiry Url</label>
+                    <config_path>payment/trans_mepay/inquiry_url</config_path>
+                </field>
+                <field id="is_authcapture" translate="label" type="text" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Is Authcapture</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/trans_mepay/is_authcapture</config_path>
+                </field>
+                <field id="status_pull_format" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Status Pull Format</label>
+                    <config_path>payment/trans_mepay/status_pull_format</config_path>
+                </field>
+                <field id="status_pull_dynamic" translate="label" type="text" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Status Pull Format Dynamic Value</label>
+                    <config_path>payment/trans_mepay/status_pull_dynamic</config_path>
+                </field>
+                <field id="status_capture_init_url" translate="label" type="text" sortOrder="120" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Status Pull Format</label>
+                    <config_path>payment/trans_mepay/status_capture_init_url</config_path>
+                </field>
+                <field id="status_capture_init" translate="label" type="text" sortOrder="130" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Status Pull Format Dynamic Value</label>
+                    <config_path>payment/trans_mepay/status_capture_init</config_path>
+                </field>
+                <field id="content_type" translate="label" type="text" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Content Type</label>
+                    <config_path>payment/trans_mepay/content_type</config_path>
+                </field>
+                <field id="debug" translate="label" type="select" sortOrder="150" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Debug</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <config_path>payment/trans_mepay/debug</config_path>
+                </field>
+                <include path="Trans_Mepay::methods.xml"/>
+            </group>
+        </section>
+    </system>
+</config>

@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @category Trans
+ * @package  Trans_Mepay
+ * @license  http://opensource.org/licenses/osl-3.0.php  Open Software License (OSL 3.0)
+ *
+ *
+ * @author   Anan Fauzi <anan.fauzi@transdigital.co.id>
+ *
+ * Copyright © 2020 PT CT Corp Digital. All rights reserved.
+ * http://www.ctcorpora.com
+ */
+-->
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+  <table name="trans_mepay_pull_status_config" resource="default" engine="innodb" comment="Trans Mepay pull status cron configuration">
+    <column xsi:type="int" name="row_id" padding="6" unsigned="true" nullable="false" identity="true" comment="row ID"/>
+    <column xsi:type="varchar" length="255" name="config_name" nullable="false" comment="config name"/>
+    <column xsi:type="int" name="config_offset" padding="6" unsigned="true" default="0" nullable="false" comment="config offset"/>
+    <column xsi:type="int" name="config_limit" padding="6" unsigned="true" default="1" nullable="false" comment="config"/>
+    <column xsi:type="timestamp" name="updated_at" comment="config updated_at"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="row_id"/>
+    </constraint>
+  </table>
+
+  <table name="trans_mepay_auth_capture" resource="default" engine="innodb" comment="Trans Mepay Auth Capture Tracking">
+    <column xsi:type="int" name="id" padding="6" unsigned="true" nullable="false" identity="true" comment="ID"/>
+    <column xsi:type="varchar" length="50" name="reference_number" nullable="false" comment="reference number"/>
+    <column xsi:type="varchar" length="50" name="reference_order_id" nullable="false" comment="reference order id"/>
+    <column xsi:type="tinyint" name="status" padding="6" unsigned="true" default="1" nullable="false" comment="status"/>
+    <column xsi:type="timestamp" name="created_at" comment="created at"/>
+    <column xsi:type="timestamp" name="updated_at" comment="updated at"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="id"/>
+    </constraint>
+  </table>
+
+  <table name="quote_payment" resource="default" engine="innodb">
+    <column xsi:type="varchar" name="card_token" nullable="true" length="40" comment="Json card token"/>
+  </table>
+</schema>
