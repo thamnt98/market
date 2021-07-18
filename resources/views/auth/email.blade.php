@@ -2,10 +2,11 @@
 
 @section('content')
 
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-6">
-                <div class="card mx-4">
+        <div class="row">
+            <div class="col-lg-7 col-md-6 col-sm-12 col-xs-12 background">
+            </div>
+            <div class="col-lg-5 col-md-6 col-sm-12 col-xs-12" style="padding: 0 15px 0px 0px">
+                <div class="card justify-content-center" style="height: 100%" >
                     @if ($message = Session::get('error'))
                         <div class="alert alert-danger alert-block" style="margin: 0px 15px 20px 15px">
                             <button type="button" class="close" data-dismiss="alert">×</button>
@@ -18,12 +19,12 @@
                             <strong>{{ $message }}</strong>
                         </div>
                     @endif
-                    <div class="card-body p-4">
+                    <div class="p-4">
                         <form method="POST" action="{{ route('register') }}">
                             @csrf
-                            <h1>{{ __('Register') }}</h1>
+                            <h1 class="text-center">{{ __('Register') }}</h1>
                             <br>
-                            <div class="input-group mb-3">
+                            <div class="input-group mb-4">
                                 <div class="input-group-prepend">
                                 <span class="input-group-text">
                                     <i class="fa fa-envelope"></i>
@@ -52,7 +53,6 @@
                 </div>
             </div>
         </div>
-    </div>
 
 @endsection
 

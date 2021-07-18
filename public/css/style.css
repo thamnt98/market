@@ -7950,6 +7950,10 @@ html:not([dir="rtl"]) .c-header-brand.c-header-brand-xs-up-center {
   *[dir="rtl"] .c-header-brand.c-header-brand-sm-down-center {
     right: 50%;
   }
+  .background{
+    height: 50%;
+    background-size: contain;
+  }
 }
 
 @media (min-width: 576px) {
@@ -14952,7 +14956,7 @@ html:not([dir="rtl"]) .list-inline {
 
 .c-app {
   display: -ms-flexbox;
-  display: flex;
+  display: grid;
   -ms-flex-direction: row;
       flex-direction: row;
   min-height: 100vh;
@@ -22308,4 +22312,9 @@ i {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.3);
+}
+
+.background{
+  background-image: url("../images/background.jpeg");
+  background-size: cover;
 }

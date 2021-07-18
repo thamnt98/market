@@ -30,7 +30,7 @@ class SendOtpViaMail extends Mailable
     public function build()
     {
         return $this->view('mail.otp')
-            ->subject('Xác thực người dùng IB Gemifx')
+            ->subject('Xác thực người dùng IB MarketFinexia')
             ->with([
                 'otp' => $this->otp
             ]);

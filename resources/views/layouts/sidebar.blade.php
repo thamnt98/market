@@ -1,5 +1,5 @@
 <div class="c-sidebar-brand">
-    <a href="https://accounts.gemifx.com">
+    <a href="https://go.marketfinexia.com">
         <img class="c-sidebar-brand-full" src="{{ url('images/logo.png') }}" width="118" height="46" alt="CoreUI Logo">
     </a>
 </div>

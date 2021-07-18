@@ -18,7 +18,7 @@
                     <label>Link Standard Account</label>
                     <div class="input-group mb-3">
                         <input type="text" class="form-control" readonly id="register-link"
-                               value="https://accounts.gemifx.com/register?ib_id={{ $ibId }}">
+                               value="https://go.marketfinexia.com/register?ib_id={{ $ibId }}">
                         <button type="button" onclick="myFunction()" class="btn btn-primary copy-link">Copy link</button>
                     </div>
                 </div>

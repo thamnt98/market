@@ -160,9 +160,9 @@
 											style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:60px; padding-bottom:60px; padding-right: 25px; padding-left: 25px;">
 											<div align="center" class="img-container center fixedwidth"
 												style="padding-right: 0px;padding-left: 0px;"><a
-													href="https://accounts.gemifx.com/" style="outline:none"
+													href="https://go.marketfinexia.com/" style="outline:none"
 													tabindex="-1" target="_blank"> <img align="center"
-														src="https://accounts.gemifx.com/image/logo.png"
+														src="https://go.marketfinexia.com/image/logo.png"
 														style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 166px; display: block;"
 														title="Alternate text" width="166" /></a>
 											</div>
@@ -181,7 +181,7 @@
 														 </p>
 													<p
 														style="text-align: left; line-height: 2; word-break: break-word; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; mso-line-height-alt: 24px; margin: 0;">
-														Thay mặt toàn bộ nhân viên của Gemi Broker, chúng tôi muốn nhân cơ
+														Thay mặt toàn bộ nhân viên của MarketFinexia Broker, chúng tôi muốn nhân cơ
 														hội này để chào đón bạn như một khách hàng mới.</p>
 													<p
 														style="text-align: left; line-height: 2; word-break: break-word; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; mso-line-height-alt: 24px; margin: 0;">
@@ -195,7 +195,7 @@
 														 </p>
 													<p
 														style="text-align: left; line-height: 2; word-break: break-word; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; mso-line-height-alt: 24px; margin: 0;">
-														Tại Gemi Broker, chúng tôi tự hào cung cấp cho khách hàng dịch vụ
+														Tại MarketFinexia Broker, chúng tôi tự hào cung cấp cho khách hàng dịch vụ
 														cạnh tranh và xuất sắc nhất. Khách hàng là phần quan trọng nhất
 														trong hoạt động kinh doanh của chúng tôi và chúng tôi làm việc
 														không mệt mỏi để đảm bảo sự hài lòng hoàn toàn của bạn, ngay bây
@@ -212,7 +212,7 @@
 													<p
 														style="text-align: left; line-height: 2; word-break: break-word; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; mso-line-height-alt: 24px; margin: 0;">
 														Chúng tôi cũng cung cấp một hệ thống <a
-															href="https://gemifx.com"
+															href="https://marketfinexia.com"
 															rel="noopener" style="color: #f61e1e;" target="_blank">quản
 															lý tiền</a>    tiên tiến, kết nối các nhà đầu tư và nhà giao
 														dịch lại với nhau, cho phép các nhà đầu tư kiếm tiền mà không
@@ -224,7 +224,7 @@
 													<p
 														style="text-align: left; line-height: 2; word-break: break-word; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; mso-line-height-alt: 24px; margin: 0;">
 														Trên hết, bất cứ ai đảm nhận vai trò <a
-															href="https://gemifx.com"
+															href="https://marketfinexia.com"
 															rel="noopener" style="color: #f61e1e;" target="_blank">môi
 															giới affiliate</a> sẽ kiếm được tiền mỗi tháng một cách hiệu
 														quả.</p>
@@ -244,29 +244,29 @@
 														Điện thoại: <a style="color: #f61e1e;"> 1-800-123-4567</a></p>
 													<p
 														style="line-height: 2; word-break: break-word; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; mso-line-height-alt: 24px; margin: 0;">
-														Email: <a href="mailto:support@gemifx.com" rel="noopener"
+														Email: <a href="mailto: support@marketfinexia.com" rel="noopener"
 															style="color: #f61e1e;"
-															target="_blank">support@gemifx.com</a></p>
+															target="_blank"> support@marketfinexia.com</a></p>
 													<p
 														style="line-height: 2; word-break: break-word; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; mso-line-height-alt: 24px; margin: 0;">
 														<a data-saferedirecturl="https://www.google.com/url?q=https://www.ambroker.com/vi/%23&amp;source=gmail&amp;ust=1608906118594000&amp;usg=AFQjCNGGxRaYzqcqExZeeiMkiKpGzUrwZw"
-															href="https://gemifx.com" rel="noopener"
+															href="https://marketfinexia.com" rel="noopener"
 															style="color: #f61e1e;" target="_blank">Trò chuyện Trực
 															tuyến</a></p>
 													<p
 														style="line-height: 2; word-break: break-word; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; mso-line-height-alt: 24px; margin: 0;">
-														{{ $firstName .' ' . $lastName}}, cảm ơn bạn một lần nữa vì đã tin tưởng sử dụng Gemi Broker
+														{{ $firstName .' ' . $lastName}}, cảm ơn bạn một lần nữa vì đã tin tưởng sử dụng MarketFinexia Broker
 														với các nhu cầu đầu tư quan trọng nhất của bạn. Chúng tôi rất
 														hân hạnh được phục vụ bạn.</p>
 													<p
 														style="line-height: 2; word-break: break-word; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; mso-line-height-alt: 24px; margin: 0;">
-														Trân trọng,<br />Phòng Dịch vụ Khách hàng<br />Gemi Broker</p>
+														Trân trọng,<br />Phòng Dịch vụ Khách hàng<br />MarketFinexia Broker</p>
 												</div>
 											</div>
 											<div align="center" class="button-container"
 												style="padding-top:10px;padding-right:10px;padding-bottom:50px;padding-left:10px;">
 												<a
-													href="https://gemifx.com"
+													href="https://marketfinexia.com"
 													style="-webkit-text-size-adjust: none; text-decoration: none; display: inline-block; color: #ffffff; background-color: #22c8cc; border-radius: 6px; -webkit-border-radius: 6px; -moz-border-radius: 6px; width: auto; width: auto; border-top: 1px solid #22c8cc; border-right: 1px solid #22c8cc; border-bottom: 1px solid #22c8cc; border-left: 1px solid #22c8cc; padding-top: 10px; padding-bottom: 10px; font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif; text-align: center; mso-border-alt: none; word-break: keep-all;"
 													target="_blank"><span
 														style="padding-left:55px;padding-right:55px;font-size:12px;display:inline-block;"><span
@@ -294,7 +294,7 @@
 													style="line-height: 1.5; font-size: 12px; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; color: #7d7171; mso-line-height-alt: 18px;">
 													<p
 														style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: center; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; mso-line-height-alt: 21px; margin: 0;">
-														<em><span style="font-size: 12px;">Best regards, Gemi
+														<em><span style="font-size: 12px;">Best regards, MarketFinexia
 																Broker.</span></em></p>
 												</div>
 											</div>

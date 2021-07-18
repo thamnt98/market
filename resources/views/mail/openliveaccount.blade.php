@@ -138,9 +138,9 @@
                                     style="border-top:0px solid transparent; border-left:0px solid transparent; border-bottom:0px solid transparent; border-right:0px solid transparent; padding-top:60px; padding-bottom:60px; padding-right: 25px; padding-left: 25px;">
                                     <div align="center" class="img-container center fixedwidth"
                                          style="padding-right: 0px;padding-left: 0px;"><a
-                                            href="https://accounts.gemifx.com/" style="outline:none"
+                                            href="https://go.marketfinexia.com/" style="outline:none"
                                             tabindex="-1" target="_blank"> <img align="center"
-                                                                                src="https://accounts.gemifx.com/image/logo.png"
+                                                                                src="https://go.marketfinexia.com/image/logo.png"
                                                                                 style="text-decoration: none; -ms-interpolation-mode: bicubic; height: auto; border: 0; width: 100%; max-width: 166px; display: block;"
                                                                                 title="Alternate text" width="166" /></a>
                                     </div>
@@ -159,7 +159,7 @@
                                             </p>
                                             <p
                                                 style="text-align: left; line-height: 2; word-break: break-word; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; mso-line-height-alt: 24px; margin: 0;">
-                                                Cảm ơn bạn đã mở một tài khoản giao dịch Real mới với Gemi Broker.</p>
+                                                Cảm ơn bạn đã mở một tài khoản giao dịch Real mới với MarketFinexia Broker.</p>
                                             <p
                                                 style="text-align: left; line-height: 2; word-break: break-word; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; mso-line-height-alt: 24px; margin: 0;">
                                                 <b>Meta Trader 5:</b></p>
@@ -184,7 +184,7 @@
                                             <p
                                                 style="text-align: left; line-height: 2; word-break: break-word; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; mso-line-height-alt: 24px; margin: 0;">
                                                 Để bắt đầu giao dịch, trước tiên bạn nên tải xuống và cài đặt <a
-                                                    href="https://accounts.gemifx.com/file/finexiamarkets5setup.exe"
+                                                    href="https://go.marketfinexia.com/file/finexiamarkets5setup.exe"
                                                     rel="noopener" style="color: #f61e1e;" target="_blank">Meta Trader 5</a></p>
                                             <p
                                                 style="text-align: left; line-height: 2; word-break: break-word; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; mso-line-height-alt: 24px; margin: 0;">
@@ -198,13 +198,13 @@
                                                 Vui lòng liên hệ với bộ phận Dịch vụ khách hàng của chúng tôi để được hỗ trợ thêm nếu cần.</p>
                                             <p
                                                 style="line-height: 2; word-break: break-word; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; mso-line-height-alt: 24px; margin: 0;">
-                                                Trân trọng,<br />Phòng Dịch vụ Khách hàng<br />Gemi Broker</p>
+                                                Trân trọng,<br />Phòng Dịch vụ Khách hàng<br />MarketFinexia Broker</p>
                                         </div>
                                     </div>
                                     <div align="center" class="button-container"
                                          style="padding-top:10px;padding-right:10px;padding-bottom:50px;padding-left:10px;">
                                         <a
-                                            href="https://gemifx.com"
+                                            href="https://marketfinexia.com"
                                             style="-webkit-text-size-adjust: none; text-decoration: none; display: inline-block; color: #ffffff; background-color: #22c8cc; border-radius: 6px; -webkit-border-radius: 6px; -moz-border-radius: 6px; width: auto; width: auto; border-top: 1px solid #22c8cc; border-right: 1px solid #22c8cc; border-bottom: 1px solid #22c8cc; border-left: 1px solid #22c8cc; padding-top: 10px; padding-bottom: 10px; font-family: Open Sans, Helvetica Neue, Helvetica, Arial, sans-serif; text-align: center; mso-border-alt: none; word-break: keep-all;"
                                             target="_blank"><span
                                                 style="padding-left:55px;padding-right:55px;font-size:12px;display:inline-block;"><span
@@ -232,7 +232,7 @@
                                             style="line-height: 1.5; font-size: 12px; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; color: #7d7171; mso-line-height-alt: 18px;">
                                             <p
                                                 style="font-size: 14px; line-height: 1.5; word-break: break-word; text-align: center; font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif; mso-line-height-alt: 21px; margin: 0;">
-                                                <em><span style="font-size: 12px;">Best regards, Gemi
+                                                <em><span style="font-size: 12px;">Best regards, MarketFinexia
 																Broker.</span></em></p>
                                         </div>
                                     </div>
