@@ -3,9 +3,9 @@
 @section('content')
 
     <div class="row">
-        <div class="col-lg-7 col-md-6 col-sm-12 col-xs-12 background">
+        <div class="col-lg-8 col-md-12 col-sm-12 col-xs-12 background">
         </div>
-        <div class="col-lg-5 col-md-6 col-sm-12 col-xs-12" style="padding: 0 15px 0px 0px">
+        <div class="col-lg-4 col-md-12 col-sm-12 col-xs-12" style="padding: 0 15px 0px 0px">
             <div class="card-group justify-content-center "   style="height: 100%">
                 <div class="card p-4 ">
                     @if ($message = Session::get('error'))

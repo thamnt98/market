@@ -7950,11 +7950,16 @@ html:not([dir="rtl"]) .c-header-brand.c-header-brand-xs-up-center {
   *[dir="rtl"] .c-header-brand.c-header-brand-sm-down-center {
     right: 50%;
   }
+}
+
+@media (max-width: 991px) {
   .background{
-    height: 50%;
-    background-size: contain;
+    height: 30%;
+    /*background-size: contain !important;*/
+    background-image: url("../images/photo6314370857866210848.jpg") !important;
   }
 }
+
 
 @media (min-width: 576px) {
   .c-header-brand.c-header-brand-sm-up-center {
