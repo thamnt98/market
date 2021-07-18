@@ -1,0 +1,26 @@
+[
+    {
+        "template_name": "news demo",
+        "template_slug": "newsDemo",
+        "template_description": "news demo",
+        "template_type": "html",
+        "template_view_name": "airmail",
+        "template_skeleton": "ping"
+    },
+    {
+        "template_name": "News Report",
+        "template_slug": "newsReport",
+        "template_description": "News Report",
+        "template_type": "html",
+        "template_view_name": "zenflat",
+        "template_skeleton": "welcome"
+    },
+    {
+        "template_name": "Notification Upgrade",
+        "template_slug": "notificationUpgrade",
+        "template_description": "Notification Upgrade",
+        "template_type": "html",
+        "template_view_name": "zenflat",
+        "template_skeleton": "welcome"
+    }
+]

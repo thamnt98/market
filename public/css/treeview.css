@@ -1,0 +1,77 @@
+.treeview{
+    font-size: 14px;
+}
+/*body {*/
+/*padding: 20px;*/
+/*}*/
+.treeview ul {
+    list-style: none;
+    margin: 5px 5px;
+}
+.treeview-group .tree{
+    display: block;
+}
+li{
+    list-style-type: none;
+}
+.treeview li {
+    margin: 10px 0;
+}
+.treeview input[type=checkbox] {
+    margin-right: 15px;
+}
+.treeview label {
+    margin-left: 15px;
+}
+.treeview .treeview-content{
+    display: grid;
+}
+.treeview .form-group-inner label{
+    font-size: 12px;
+}
+@media (max-width: 1544px) {
+    .treeview input[type=checkbox] {
+        margin-right: 5px;
+    }
+    .treeview label {
+        margin-left: 5px;
+    }
+}
+.treeview .treeview-content .tree {
+max-width: 33%;
+}
+.treeview .treeview-content .tree .level-1 ul {
+    margin-left: 30px;
+}
+.treeview .treeview-content .treeview-group {
+    display: grid;
+    width: 100%;
+}
+@media (min-width: 1200px) and (max-width: 1240px) {
+    .treeview .treeview-content .tree .level-1 ul {
+        margin-left: 20px;
+    }
+}
+@media (max-width: 1075px) {
+    .treeview .treeview-content .tree .level-1 ul {
+        margin-left: 15px;
+    }
+}
+.nested {
+    display: none;
+}
+.fa-caret-right::before {
+    font-size: 15px;
+    color: black;
+    display: inline-block;
+    margin-right: 6px;
+}
+.fa-caret-right-down::before {
+    transform: rotate(90deg);
+}
+.active {
+    display: block;
+}
+.treeview-content label{
+    margin-left: 5px;
+}
