@@ -51,7 +51,7 @@
 
 .login .header.content .header.links {border-radius: 0px;}
 
-.customer-welcome .customer-menu ul.header.links li.authorization-link>a {color: #000 !important;background-color: #000 !important;border: 2px solid #000 !important;border-radius: 0px !important;}
+.customer-welcome .customer-menu ul.header.links li.authorization-link>a {color: #FFF !important;background-color: #000 !important;border: 2px solid #000 !important;border-radius: 0px !important;}
 .customer-welcome .customer-menu ul.header.links li.authorization-link:hover a:hover {background-color: #000 !important;color: #000 !important;}
 
 /* Footer */
@@ -124,7 +124,7 @@
 
 /* Product Detail Page */
 
-#maincontent .product-info-main #product_addtocart_form #product-options-wrapper .swatch-opt select {width: 30%;}
+#maincontent .product-info-main #product_addtocart_form #product-options-wrapper .swatch-opt select {width: 30%;box-shadow: none;border-radius: 0px;border: 1px solid #BABABA;}
 .catalog-product-view .product-add-form .fieldset .actions .action.tocart {background: #FFF;color: #000;border: 1px solid #000;box-shadow: none;margin-right: 15px !important;border-radius: 0px;}
 .catalog-product-view .product-add-form .fieldset .actions .buynow-button button.action {
     background: #29272A;
@@ -150,11 +150,13 @@
 .catalog-product-view .product.info.detailed .item.title.active > .switch:hover {color: #D82C39;}
 .catalog-product-view .product.info.detailed .item.content {padding: 0px 0;}
 .catalog-product-view .subtract-cart-item.decrease-qty,
-.catalog-product-view .add-cart-item.increase-qty {background: #000 !important; border-radius: 0px;}
+.catalog-product-view .add-cart-item.increase-qty {background: #000 !important; border-radius: 0px !important;}
+.catalog-product-view .decrease-qty[disabled] {background: #FFF !important; color: #000 !important;}
 .catalog-product-view .fotorama__img--full {display: block !important;}
 .catalog-product-view .product-add-form .fieldset .actions .action.tocart {margin-bottom: 0px;}
 .catalog-product-view .product-info-main .product-addto-break .fieldset > .actions {float: left;}
 .catalog-product-view .swatch-attribute .wrapper-option-config.active {border-color: #000;border-radius: 0px;}
+.catalog-product-view .product-info-main .product-add-form .swatch-opt .swatch-attribute.selling_unit {display: none;}
 
 /* Product List Page */
 
