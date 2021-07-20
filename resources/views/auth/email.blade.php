@@ -43,10 +43,9 @@
                     </div>
                     <div class="card-footer p-4">
                         <div class="row">
-                            <div class="col-5"></div>
-                            <div class="col-7 text-rightl">
-                                <span>Did you have an account?</span>
-                                <a href="{{ route('login') }}">Login here</a>
+                            <div class="col-12 text-right">
+                                <span>Did you have an account? <a href="{{ route('login') }}">Login here</a> </span>
+
                             </div>
                         </div>
                     </div>
