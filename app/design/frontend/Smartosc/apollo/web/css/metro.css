@@ -33,6 +33,8 @@
 .page-wrapper .header.links li .register-link {background-color: #FFFFFF;background-image: none;}
 .page-wrapper .header.links li .register-link {background: #FFFFFF;box-shadow: none;}
 .page-wrapper .header.content .header.links li .register-link {color: #000000;}
+.page-wrapper .header.links li .register-link:focus, 
+.page-wrapper .header.links li .register-link:active {background: transparent;background-color: transparent;background-image: none;border: 1px solid #000;border-radius: 0px;}
 
 /* Header */
 
@@ -312,14 +314,15 @@
 .block-container-signin .container-signin--right .create-account button {color: #000;border-radius: 0px;border: 2px solid #000;}
 
 .modal-popup-forgot-password .container-signin--left,
-.modal-popup-recovery-password .container-signin--left {display: none;}
+.modal-popup-recovery-password .container-signin--left,
+.modal-popup-otp-verification .container-signin--left {display: none;}
 .modal-popup-forgot-password .container-signin--right,
 .modal-popup-recovery-password .container-signin--right,
 .modal-popup-signin .container-signin--right
-{max-width: 100%;flex-basis: 100%;}
+{max-width: 100% !important;flex-basis: 100% !important; margin: 0 auto;}
 .modal-popup-forgot-password .modal-inner-wrap,
 .modal-popup-recovery-password .modal-inner-wrap,
-.modal-popup-signin .modal-inner-wrap {max-width: 30%;}
+.modal-popup-signin .modal-inner-wrap {max-width: 30% !important;}
 .modal-popup-forgot-password .block-container-signin .container-signin--right button.primary,
 .modal-popup-recovery-password .block-container-signin .container-signin--right button.primary {border-radius: 0px;}
 .modal-popup-forgot-password .block-container-signin .container-signin--content .back-to-login button,
