@@ -12,6 +12,7 @@
 .cms-home .curatedforyou-image-box .section-latest-promo .block-title {margin-top: 0px;margin-bottom: 20px;}
 .cms-home .section-latest-promo .block-latest-promo .col-md-4 {max-width: 25%;}
 .cms-home .page-main .column.main {width: 100%;float: none;padding-bottom: 0px;}
+.cms-home .section-latest-promo .section-link {color: #000}
 .cms-contact-us .actions-toolbar .primary .action {background: #000;border-radius: 0px;}
 
 .cms-home .sidebar.sidebar-main,
@@ -254,6 +255,30 @@
 .catalogsearch-result-index .sidebar-main {top: 12%;}
 .catalogsearch-result-index .products-grid .product-item-actions .actions-primary button.primary, .products-grid .product-item-actions .actions-primary .view-details {background: #000;background-color: #000;background-image: none;border-radius: 0px;}
 .catalogsearch-result-index .products-grid .product-item {border-radius: 0px;}
+
+/* My Account */
+
+.customer-account-index .block-dashboard-info {box-shadow: none;border: 1px solid rgb(128 127 127 / 50%);border-radius: 0px;}
+.customer-account-index .block-dashboard-info .block-title {background: transparent;border-bottom: 1px solid rgb(128 127 127 / 50%);}
+.customer-account-index .block-dashboard-info .block-title a.edit {box-shadow: none;border: 1px solid rgb(128 127 127 / 50%);border-radius: 0px;}
+
+.sales-order-history .my-order #tab-completed button {background: #000;border-radius: 0px;}
+
+.customer-address-index .block-addresses-list button {border: 2px solid #000;border-radius: 0px;color: #000;}
+.customer-address-index .block-addresses-list .block-content {box-shadow: none;border: 1px solid;border-radius: 0px;}
+
+.review-customer-list .product.data .to_be_reviewed_empty_page button {box-shadow: none;background: #000;border-radius: 0px;}
+
+.notification-setting-index .block-notification-setting .block-item-title {background-color: transparent;border-bottom: 1px solid rgb(128 127 127 / 50%);}
+
+.notification-setting-index .block-notification-setting .block-item-content .checkbox-custom input:checked+label:before {border: 2px solid #000;background: #000;}
+.notification-setting-index .block-notification-setting .block-item {border-radius: 0px;box-shadow: none;border: 1px solid rgb(128 127 127 / 50%);}
+button {border-radius: 0px;border: 2px solid #000;color: #000;}
+
+.account.page-layout-2columns-left .sidebar-main .block {box-shadow: none;border: none;}
+
+.account.page-layout-2columns-left .block-collapsible-nav .item.active, 
+.account.page-layout-2columns-left .block-collapsible-nav .item.current {    background: #F5F5F5 !important;}
 
 /* Others */
 
