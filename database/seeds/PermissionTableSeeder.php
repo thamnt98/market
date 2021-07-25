@@ -108,6 +108,13 @@ class PermissionTableSeeder extends Seeder
             ],
             [
                 'guard_name' => 'web',
+                'name' => 'account.password.change',
+                'display_name' => 'Thay đổi investoor p',
+                'parent_id' => 7,
+                'level' => 2
+            ],
+            [
+                'guard_name' => 'web',
                 'name' => 'agent.*',
                 'display_name' => 'Quản lý agent ',
 
@@ -119,7 +126,7 @@ class PermissionTableSeeder extends Seeder
                 'name' => 'agent.show',
                 'display_name' => 'Xem danh sách agent',
 
-                'parent_id' => 11,
+                'parent_id' => 12,
                 'level' => 2
             ],
             [
@@ -127,7 +134,7 @@ class PermissionTableSeeder extends Seeder
                 'name' => 'agent.edit',
                 'display_name' => 'Chỉnh sửa agent',
 
-                'parent_id' => 11,
+                'parent_id' => 12,
                 'level' => 2
             ],
             [
@@ -135,14 +142,14 @@ class PermissionTableSeeder extends Seeder
                 'name' => 'agent.approve',
                 'display_name' => 'Xác nhận agent',
 
-                'parent_id' => 11,
+                'parent_id' => 12,
                 'level' => 2
             ],
             [
                 'guard_name' => 'web',
                 'name' => 'agent.link',
                 'display_name' => 'Cung cấp link giới thiệu cho agent ',
-                'parent_id' => 11,
+                'parent_id' => 12,
                 'level' => 2
             ],
             [
@@ -158,7 +165,7 @@ class PermissionTableSeeder extends Seeder
                 'name' => 'deposit.show',
                 'display_name' => 'Xem danh sách nạp tiền ',
 
-                'parent_id' => 16,
+                'parent_id' => 17,
                 'level' => 2
             ],
             [
@@ -166,7 +173,7 @@ class PermissionTableSeeder extends Seeder
                 'name' => 'deposit.create',
                 'display_name' => 'Nạp tiền ',
 
-                'parent_id' => 16,
+                'parent_id' => 17,
                 'level' => 2
             ],
             [
@@ -174,7 +181,7 @@ class PermissionTableSeeder extends Seeder
                 'name' => 'deposit.approve',
                 'display_name' => 'Xác thực nạp tiền cho khách ',
 
-                'parent_id' => 16,
+                'parent_id' => 17,
                 'level' => 2
             ],
             [
@@ -190,7 +197,7 @@ class PermissionTableSeeder extends Seeder
                 'name' => 'withdrawal.show',
                 'display_name' => 'Xem danh sách rút tiền ',
 
-                'parent_id' => 20,
+                'parent_id' => 21,
                 'level' => 2
             ],
             [
@@ -198,7 +205,7 @@ class PermissionTableSeeder extends Seeder
                 'name' => 'withdrawal.create',
                 'display_name' => 'Rút tiền ',
 
-                'parent_id' => 20,
+                'parent_id' => 21,
                 'level' => 2
             ],
             [
@@ -206,7 +213,7 @@ class PermissionTableSeeder extends Seeder
                 'name' => 'withdrawal.approve',
                 'display_name' => 'Xác thực rút tiền cho khách ',
 
-                'parent_id' => 20,
+                'parent_id' => 21,
                 'level' => 2
             ],
             [
@@ -230,14 +237,14 @@ class PermissionTableSeeder extends Seeder
                 'name' => 'email.create',
                 'display_name' => 'Tạo mới email marketing',
 
-                'parent_id' => 25,
+                'parent_id' => 26,
                 'level' => 2
             ],
             [
                 'guard_name' => 'web',
                 'name' => 'email.send',
                 'display_name' => 'Gửi email marketing ',
-                'parent_id' => 25,
+                'parent_id' => 26,
                 'level' => 2
             ],
             [
@@ -251,28 +258,28 @@ class PermissionTableSeeder extends Seeder
                 'guard_name' => 'web',
                 'name' => 'role.show',
                 'display_name' => 'Xem danh sách role ',
-                'parent_id' => 28,
+                'parent_id' => 29,
                 'level' => 2
             ],
             [
                 'guard_name' => 'web',
                 'name' => 'role.create',
                 'display_name' => 'Tạo mới môt role ',
-                'parent_id' => 28,
+                'parent_id' => 29,
                 'level' => 2
             ],
             [
                 'guard_name' => 'web',
                 'name' => 'role.edit',
                 'display_name' => 'Chỉnh sửa role ',
-                'parent_id' => 28,
+                'parent_id' => 29,
                 'level' => 2
             ],
             [
                 'guard_name' => 'web',
                 'name' => 'role.delete',
                 'display_name' => 'Xóa role',
-                'parent_id' => 28,
+                'parent_id' => 29,
                 'level' => 2
             ],
             [
@@ -286,28 +293,28 @@ class PermissionTableSeeder extends Seeder
                 'guard_name' => 'web',
                 'name' => 'all.user.show',
                 'display_name' => 'Xem toàn bộ khách hàng',
-                'parent_id' => 33,
+                'parent_id' => 34,
                 'level' => 2
             ],
             [
                 'guard_name' => 'web',
                 'name' => 'all.account.show',
                 'display_name' => 'Xem toàn bộ tài khoản',
-                'parent_id' => 33,
+                'parent_id' => 34,
                 'level' => 2
             ],
             [
                 'guard_name' => 'web',
                 'name' => 'all.withdrawal.show',
                 'display_name' => 'Xem toàn bộ WD',
-                'parent_id' => 33,
+                'parent_id' => 34,
                 'level' => 2
             ],
             [
                 'guard_name' => 'web',
                 'name' => 'all.deposit.show',
                 'display_name' => 'Xem toàn bộ Deposit',
-                'parent_id' => 33,
+                'parent_id' => 34,
                 'level' => 2
             ],
         ];

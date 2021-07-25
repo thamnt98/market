@@ -31,6 +31,12 @@
                        aria-controls="withdrawal-md" aria-selected="false">Withdrawal</a>
                 </li>
             @endcan
+            @can('account.password.change')
+                <li class="nav-item waves-effect waves-light">
+                    <a class="nav-link" id="withdrawal-tab-md" data-toggle="tab" href="#investor-password" role="tab"
+                       aria-controls="withdrawal-md" aria-selected="false">Change investor Password</a>
+                </li>
+            @endcan
         </ul>
         <div class="tab-content card pt-5" id="myTabContentMD">
             <div class="tab-pane fade show active" id="information-md" role="tabpanel"
@@ -187,6 +193,33 @@
                     </table>
                 </div>
             </div>
+            @endcan
+            @can('account.password.change')
+                <div class="tab-pane fade show active" id="investor-password" role="tabpanel"
+                     aria-labelledby="information-tab-md" style="margin:40px">
+                    <form method="post" action="{{ route('account.password.change') }}">
+                        @csrf
+                        <input type="text" class="hidden" name="login" value="{{ $account->login }}" >
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label>New Password</label>
+                                <input class="form-control" type="password" name="password">
+                                @if($errors->has('password'))
+                                    <span class="text-danger text-md-left">{{ $errors->first('password') }}</span>
+                                @endif
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label>Confirm New Password</label>
+                                <input class="form-control" type="password"   name="password_confirmation">
+                                @if($errors->has('password_confirmation'))
+                                    <span class="text-danger text-md-left">{{ $errors->first('password_confirmation') }}</span>
+                                @endif
+                            </div>
+                        </div>
+                            <button type="submit" class="btn btn-primary">Update Password</button>
+                    </form>
+                </div>
+
             @endcan
         </div>
     </section>

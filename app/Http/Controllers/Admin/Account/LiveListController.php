@@ -45,6 +45,9 @@ class LiveListController extends Controller
     {
         $data = $request->except('_token');
         $accountList = $this->liveAccountRepository->getAccountListBySearch($data);
+        $accountList->map(function($account){
+            return $account['mt5'] = MT5Helper::getAccountInfo($account->login);
+        });
         $isAdmin = Auth::user()->role == config('role.admin');
         return view('admin.account.livelist', compact('accountList', 'data', 'isAdmin'));
     }
@@ -198,5 +201,30 @@ class LiveListController extends Controller
         $result = explode('&', $result);
         $resultCode = explode('=', $result[0])[1];
         return $resultCode;
+    }
+
+    public function changeInvertorPassword(Request  $request){
+        $data = $request->except('_token');
+        $validator =  Validator::make(
+            $data,
+            [
+                'login' => 'required',
+                'password' => 'required|regex:/[A-z0-9]{8,}/',
+                'password_confirmation' => 'required|same:password'
+            ]
+        );
+        if ($validator->fails()) {
+            return redirect()->back()->withErrors($validator->errors())->withInput();
+        }
+        try {
+            $result = $this->mT5Helper->changeInvestorPassword($data);
+            if ($result->MSG_USER == null) {
+                return redirect()->back()->with('success', "You changed MT Password succesffully");
+            } else {
+                return redirect()->back()->with('error', "Change MT Password failed");
+            }
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', "Something went wrong. Please try again");
+        }
     }
 }

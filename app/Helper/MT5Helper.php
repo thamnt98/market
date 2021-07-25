@@ -182,4 +182,14 @@ class MT5Helper
     public static function getMT5Connect(){
         return MT5Connect::first();
     }
+
+    public static function changeInvestorPassword($data)
+    {
+        $mt5 = self::getMT5Connect();
+        $endpoint = self::$mt5Url . 'CHANGE_INVESTOR_PASSWORD?Session=' . $mt5->session .  '&ManagerIndex=' . $mt5->manager_index .'&Account=' . $data['login'] . '&Password=' . $data['password'];
+        $client = new Client();
+        $response = $client->request('GET', $endpoint);
+        $result = json_decode($response->getBody());
+        return $result;
+    }
 }

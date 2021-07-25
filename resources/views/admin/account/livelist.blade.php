@@ -58,6 +58,10 @@
                     <th scope="col">#</th>
                     <th scope="col">Login</th>
                     <th scope="col">IB ID</th>
+                    @if(\Illuminate\Support\Facades\Auth::user()->hasAnyRole('admin', 'superAdmin'))
+                        <th scope="col">Balance</th>
+                        <th scope="col">Equity</th>
+                    @endif
                     <th scope="col">Email</th>
                     <th scope="col">Full Name</th>
                     <th scope="col">Group</th>
@@ -67,10 +71,14 @@
                 </thead>
                 <tbody>
                 @foreach($accountList as $key => $account)
-                    <tr>
+F                    <tr>
                         <th scope="row">{{ $key + 1 }}</th>
                         <td>{{ $account->login }}</td>
                         <td>{{ $account->ib_id }}</td>
+                        @if(\Illuminate\Support\Facades\Auth::user()->hasAnyRole('admin', 'superAdmin'))
+                            <td>{{ $account->mt5->oAccount->Balance }}</td>
+                            <td>{{ $account->mt5->oAccount->Equity }}</td>
+                        @endif
                         <td>{{ $account->user ? $account->user->email : 'Người dùng này đã bị xóa' }}</td>
                         <td>{{ $account->user ? $account->user->full_name   : "Người dùng này đã bị xóa" }}</td>
                         <td>{{ $account->group }}</td>

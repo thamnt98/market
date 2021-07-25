@@ -58,6 +58,8 @@ Route::group([
         Route::get('/create-deposit', 'LiveListController@createDeposit')->name('account.create_deposit')->middleware('permission:deposit.create');
         Route::post('/create-deposit', 'LiveListController@createDepositPost')->name('account.create.deposit')->middleware('permission:deposit.create');
         Route::post('/get-list-login', 'LiveListController@listLogin')->name('account.list.login')->middleware('permission:deposit.create|permission:withdrawal.create');
+        Route::post('/password/investor', 'LiveListController@changeInvertorPassword')->name('account.password.change')->middleware('permission:account.password.change');
+
     });
     Route::group([
         'namespace' => 'Deposit',
