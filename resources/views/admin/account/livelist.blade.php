@@ -76,8 +76,8 @@ F                    <tr>
                         <td>{{ $account->login }}</td>
                         <td>{{ $account->ib_id }}</td>
                         @if(\Illuminate\Support\Facades\Auth::user()->hasAnyRole('admin', 'superAdmin'))
-                            <td>{{ $account->mt5->oAccount->Balance }}</td>
-                            <td>{{ $account->mt5->oInfo->Equity }}</td>
+                            <td>{{ $account->mt5->oInfo->Balance }}</td>
+                            <td>{{ $account->mt5->oAccount->Equity }}</td>
                         @endif
                         <td>{{ $account->user ? $account->user->email : 'Người dùng này đã bị xóa' }}</td>
                         <td>{{ $account->user ? $account->user->full_name   : "Người dùng này đã bị xóa" }}</td>
