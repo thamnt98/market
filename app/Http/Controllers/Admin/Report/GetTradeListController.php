@@ -26,6 +26,7 @@ class GetTradeListController extends Controller
     {
         $closeTime = $request->close_time;
         $ibId = $request->ib_id;
+        $login = $request->login;
         $lots = 0;
         $commission = 0;
         $trades = [];
@@ -36,7 +37,11 @@ class GetTradeListController extends Controller
             $data['from'] = trim($time[0]);
             $data['to'] = trim($time[1]);
         }
-        $logins = $this->liveAccountRepository->getLoginsByAdmin(Auth::user(), $ibId);
+        if ($data['login']) {
+            $logins = [$login];
+        } else {
+            $logins = $this->liveAccountRepository->getLoginsByAdmin(Auth::user(), $ibId);
+        }
         if (!empty($logins)) {
             $data['startTm'] = date('Y-m-d H:i:s', strtotime($data['from'] . ' 00:00:00'));
             $data['EndTm']  = date('Y-m-d H:i:s', strtotime($data['to'] . ' 23:59:59'));
@@ -44,7 +49,10 @@ class GetTradeListController extends Controller
             $trades = $result[0];
             $lots = $result[1];
             $commission = $result[2];
+            $profit = $result[3];
+            $deposit = $result[5];
+            $withdrawal = $result[4];
         }
-        return view('admin.report.list', compact('closeTime', 'ibId', 'trades', 'lots', 'commission'));
+        return view('admin.report.list', compact('closeTime', 'ibId', 'trades', 'lots', 'commission', 'login', 'deposit', 'profit', 'withdrawal'));
     }
 }

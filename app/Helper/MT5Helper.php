@@ -144,14 +144,20 @@ class MT5Helper
     {
         $lots = 0;
         $commission = 0;
+        $deposit = 0;
+        $withdrawal = 0;
+        $profit = 0;
         $trades = [];
         foreach ($logins as $login => $commissionValue) {
             $data['Account'] = $login;
             $tradeByLogin = self::getClosedAll($data);
+            $deposit += $tradeByLogin->Depoist;
+            $withdrawal += $tradeByLogin->Withdraw;
             $trades = array_merge($trades, $tradeByLogin);
             foreach ($tradeByLogin as $key => $trade) {
                 if (strtotime($trade->Close_Time) - strtotime($trade->Open_Time) > 180) {
                     $lots += $trade->Lot;
+                    $profit += $trade->Profit;
                     $symbol = $trade->Symbol;
                     if (in_array($symbol, config('trader_type.USStocks'))) {
                         $commission += round($trade->Lot * $commissionValue[0], 2);
@@ -163,7 +169,7 @@ class MT5Helper
                 }
             }
         }
-        return [$trades, $lots, $commission];
+        return [$trades, $lots, $commission, $profit, $withdrawal, $deposit];
     }
 
     public static function getClosedAll($data)

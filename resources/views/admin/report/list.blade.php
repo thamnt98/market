@@ -24,13 +24,17 @@
                 <form method="get" action="{{ route('report.trade') }}">
                     @csrf
                     <div class="form-row">
-                        <div class="form-group col-md-5">
+                        <div class="form-group col-md-4">
                             <label for="dates">Close time</label>
                             <input type="text" class="form-control" name="close_time" value="{{ $closeTime }}" id="dates"/>
                         </div>
-                        <div class="form-group col-md-5">
+                        <div class="form-group col-md-4">
                             <label for="">IB ID</label>
                             <input type="text" class="form-control" name="ib_id" value="{{ $ibId }}" />
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="">Login</label>
+                            <input type="text" class="form-control" name="login" value="{{ $login }}" />
                         </div>
                     </div>
                     <button type="submit" class="btn btn-primary" style="margin-top: 10px">Search</button>
@@ -46,6 +50,17 @@
                 <div>
                     <b>Commision: {{ $commission }} </b>
                 </div>
+                @if(\Illuminate\Support\Facades\Auth::user()->hasAnyRole('admin', 'superAdmin'))
+                    <div>
+                        <b>Profit: {{ $profit }} </b>
+                    </div>
+                    <div>
+                        <b>Deposit: {{ $deposit }} </b>
+                    </div>
+                    <div>
+                        <b>Withdrawal: {{ $withdrawal }} </b>
+                    </div>
+                @endif
                 <br>
                 <thead>
                 <tr>
