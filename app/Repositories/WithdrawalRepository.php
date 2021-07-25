@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use Illuminate\Container\Container as Application;
 use \Prettus\Repository\Eloquent\BaseRepository as EloquentBaseRepository;
 use Prettus\Repository\Contracts\RepositoryInterface;
 use App\Models\WithdrawalFund;
@@ -20,6 +21,13 @@ class WithdrawalRepository extends EloquentBaseRepository implements RepositoryI
         return WithdrawalFund::class;
     }
 
+    protected $liveAccountRepository;
+
+    public function __construct(Application $app, LiveAccountRepository $liveAccountRepository)
+    {
+        parent::__construct($app);
+        $this->liveAccountRepository = $liveAccountRepository;
+    }
     public function getWithdrawalByLogin($login)
     {
         return $this->where('login', $login)->get();
@@ -27,6 +35,8 @@ class WithdrawalRepository extends EloquentBaseRepository implements RepositoryI
 
     public function getWithdrawalListBySearch($search){
         $query = $this;
+        $logins = $this->liveAccountRepository->getAccountListBySearch([], false);
+        $query = $this->whereIn('login', $logins);
         if (isset($search['email']) && !is_null($search['email'])) {
             $query = $query->join('users', 'withdrawal_funds.user_id', '=', 'users.id')
                 ->where('users.email', 'like', '%' . $search['email'] . '%');

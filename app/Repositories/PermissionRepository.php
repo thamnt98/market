@@ -50,6 +50,9 @@ class PermissionRepository extends EloquentBaseRepository implements RepositoryI
         if ($mode == 1) {
             return Permission::whereNotIn('name', ['agent.link', 'user.link'])->get();
         }
+        if($mode == 4){
+            return Permission::whereNotIn('name', ['agent.link', 'user.link', 'role.*', 'role.show', 'role.create', 'role.edit', 'role.delete'])->get();
+        }
         $permissions = ['user.show', 'user.link', 'account.show', 'deposit.show', 'withdrawal.show', 'report.*'];
         if ($mode == 2) {
             $permissions = array_merge($permissions, ['agent.link', 'agent.show']);
@@ -143,10 +146,10 @@ class PermissionRepository extends EloquentBaseRepository implements RepositoryI
         $html = '';
         foreach ($childs as $child) {
             $html .= '<li>';
-             if (count($child->childs)) {
-                 $html .= '<i class="fa fa-caret-right" fold-button="1" style="visibility: visible;
+            if (count($child->childs)) {
+                $html .= '<i class="fa fa-caret-right" fold-button="1" style="visibility: visible;
                  color:black; margin-right:7px"></i>';
-             }
+            }
             $html .='<input type="checkbox" name="permissions[]"
                 class="permission level-'.$child->level.'"
                 value="'.$child->id.'"

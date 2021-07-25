@@ -1,6 +1,6 @@
 <div class="c-sidebar-brand">
     <a href="https://go.marketfinexia.com">
-        <img class="c-sidebar-brand-full" src="{{ url('images/logo.png') }}" width="118" height="46" alt="CoreUI Logo">
+        <img class="c-sidebar-brand-full" src="{{ url('images/logo.png') }}"  style="height: 80%; width: 80%; margin-left: 10%"  alt="CoreUI Logo">
     </a>
 </div>
 <ul class="c-sidebar-nav ps">
@@ -18,22 +18,22 @@
             </a>
         </li>
     @endcan
-    @can('user.show')
+    @canany(['user.show', 'all.user.show'])
         <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ route('user.list') }}">
                 <i class="fa fa-users"></i>
                 Khách hàng
             </a>
         </li>
-    @endcan
-    @can('account.show')
+    @endcanany
+    @canany(['account.show', 'all.account.show'])
         <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ route('account.live') }}">
                 <i class="fa fa-home"></i>
                 Tài khoản
             </a>
         </li>
-    @endcan
+    @endcanany
     @can('role.show')
         <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ route('role.list') }}">
@@ -42,22 +42,22 @@
             </a>
         </li>
     @endcan
-    @can('deposit.create')
+    @canany(['deposit.show', 'all.deposit.show'])
         <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ route('deposit.list') }}">
                 <i class="fa fa-credit-card"></i>
                 Deposit
             </a>
         </li>
-    @endcan
-    @can('withdrawal.create')
+    @endcanany
+    @canany(['withdrawal.show', 'all.withdrawal.show'])
         <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ route('withdrawal.list') }}">
                 <i class="fa fa-credit-card"></i>
                 Withdrawal
             </a>
         </li>
-    @endcan
+    @endcanany
     @can('email.send')
         <li class="c-sidebar-nav-item">
             <a class="c-sidebar-nav-link" href="{{ route('email.marketing') }}">

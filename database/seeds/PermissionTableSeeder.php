@@ -275,6 +275,41 @@ class PermissionTableSeeder extends Seeder
                 'parent_id' => 28,
                 'level' => 2
             ],
+            [
+                'guard_name' => 'web',
+                'name' => 'all.*',
+                'display_name' => 'Tất cả khách hàng',
+                'parent_id' => null,
+                'level' => 1
+            ],
+            [
+                'guard_name' => 'web',
+                'name' => 'all.user.show',
+                'display_name' => 'Xem toàn bộ khách hàng',
+                'parent_id' => 33,
+                'level' => 2
+            ],
+            [
+                'guard_name' => 'web',
+                'name' => 'all.account.show',
+                'display_name' => 'Xem toàn bộ tài khoản',
+                'parent_id' => 33,
+                'level' => 2
+            ],
+            [
+                'guard_name' => 'web',
+                'name' => 'all.withdrawal.show',
+                'display_name' => 'Xem toàn bộ WD',
+                'parent_id' => 33,
+                'level' => 2
+            ],
+            [
+                'guard_name' => 'web',
+                'name' => 'all.deposit.show',
+                'display_name' => 'Xem toàn bộ Deposit',
+                'parent_id' => 33,
+                'level' => 2
+            ],
         ];
         $this->permissionRepository->createMultiplePermission($data);
     }

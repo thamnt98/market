@@ -36,6 +36,17 @@ class AdminRoleSeeder extends Seeder
         $permissions = $this->permissionRepository->getAllPermission(1);
         $role->syncPermissions($permissions);
 
+        $roleData = [
+            'guard_name' => 'web',
+            'name' => 'admin',
+            'display_name' => 'Admin',
+            'allowed_scope' => 2,
+        ];
+        $role = $this->permissionRepository->createOrUpdateSuperAdminRole($roleData);
+        $permissions = $this->permissionRepository->getAllPermission(4);
+        $role->syncPermissions($permissions);
+        $this->permissionRepository->syncPermisionAndRoleForUsers($staff, $permissions, 'admin');
+
         $this->permissionRepository->syncPermisionAndRoleForUsers([$superAdmin], $permissions, 'superAdmin');
         $roleData = [
             'guard_name' => 'web',

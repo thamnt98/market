@@ -3,6 +3,8 @@
 namespace App\Repositories;
 
 use App\Models\Order;
+use Illuminate\Container\Container as Application;
+use Illuminate\Support\Facades\Auth;
 use Prettus\Repository\Contracts\RepositoryInterface;
 use Prettus\Repository\Eloquent\BaseRepository as EloquentBaseRepository;
 
@@ -21,9 +23,19 @@ class DepositRepository extends EloquentBaseRepository implements RepositoryInte
         return Order::class;
     }
 
+    protected $liveAccountRepository;
+
+    public function __construct(Application $app, LiveAccountRepository $liveAccountRepository)
+    {
+        parent::__construct($app);
+        $this->liveAccountRepository = $liveAccountRepository;
+    }
+
     public function getDepositListBySearch($search)
     {
         $query = $this;
+        $logins = $this->liveAccountRepository->getAccountListBySearch([], false);
+        $query = $this->whereIn('login', $logins);
         if (isset($search['email']) && !is_null($search['email'])) {
             $query = $query->join('users', 'orders.user_id', '=', 'users.id')
                 ->where('email', 'like', '%' . $search['email'] . '%');

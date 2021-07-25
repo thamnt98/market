@@ -88,16 +88,16 @@ class LiveAccountRepository extends EloquentBaseRepository implements Repository
             $result = MT5Helper::updateAccount('CHANGE_LEVERAGE', $data['login'], $param);
             if(!$result->Result) return false;
         }
-            $data['phone_number'] = $data['phone'];
-            $this->update($data, $id);
+        $data['phone_number'] = $data['phone'];
+        $this->update($data, $id);
         return true;
     }
 
-    public function getAccountListBySearch($search)
+    public function getAccountListBySearch($search, $paginate = true)
     {
         $query = $this;
         $user = Auth::user();
-        if ($user->role == config('role.staff')) {
+        if ($user->role == config('role.staff') && !$user->hasAnyDirectPermission(['all.account.show', 'all.deposit.show', 'all.withdrawal.show'])) {
             $ibIds = [$user->ib_id];
             if (is_null($user->admin_id)) {
                 $ibIdsOfStaff = Admin::where('admin_id', $user->id)->pluck('ib_id')->toArray();
@@ -118,14 +118,17 @@ class LiveAccountRepository extends EloquentBaseRepository implements Repository
                     ->where('users.email', 'like', '%' . $search['email'] . '%');
             }
         }
-        return $query->orderBy('live_accounts.created_at', 'desc')->paginate(20, [
-            'live_accounts.id',
-            'live_accounts.login',
-            'live_accounts.group',
-            'live_accounts.leverage',
-            'live_accounts.ib_id',
-            'live_accounts.user_id',
-        ]);
+        if($paginate){
+            return $query->orderBy('live_accounts.created_at', 'desc')->paginate(20, [
+                'live_accounts.id',
+                'live_accounts.login',
+                'live_accounts.group',
+                'live_accounts.leverage',
+                'live_accounts.ib_id',
+                'live_accounts.user_id',
+            ]);
+        }
+        return $query->get('live_accounts.login');
     }
 
     public function getLoginsByAdmin($admin, $search = null)

@@ -37,10 +37,10 @@ Route::group([
         'namespace' => 'User',
         'prefix' => 'user',
     ], function () {
-        Route::get('/list', 'ListController@main')->name('user.list')->middleware('permission:user.show');
+        Route::get('/list', 'ListController@main')->name('user.list')->middleware('permission:user.show|all.user.show');
         Route::get('/create', 'CreateController@main')->name('user.create')->middleware('permission:user.create');
         Route::post('/create', 'StoreController@main')->name('user.store')->middleware('permission:user.create');
-        Route::get('/detail/{id}', 'DetailController@main')->name('user.detail')->middleware('permission:user.show');
+        Route::get('/detail/{id}', 'DetailController@main')->name('user.detail')->middleware('permission:user.show|all.user.show');
         Route::post('/update/{id}', 'UpdateController@main')->name('user.update')->middleware('permission:user.edit');
         Route::post('/delete/{id}', 'DeleteController@main')->name('user.delete')->middleware('permission:user.edit');
     });
@@ -48,10 +48,10 @@ Route::group([
         'namespace' => 'Account',
         'prefix' => 'account',
     ], function () {
-        Route::get('/live', 'LiveListController@main')->name('account.live')->middleware('permission:account.show');
+        Route::get('/live', 'LiveListController@main')->name('account.live')->middleware('permission:account.show|all.account.show');
         Route::get('/create/{id}', 'CreateLiveAccountController@main')->name('account.live.create')->middleware('permission:account.create');
         Route::post('/create', 'OpenLiveAccountController@main')->name('account.live.open')->middleware('permission:account.create');
-        Route::get('/detail/{id}', 'DetailLiveAccountController@main')->name('account.live.detail')->middleware('permission:account.show');;
+        Route::get('/detail/{id}', 'DetailLiveAccountController@main')->name('account.live.detail')->middleware('permission:account.show|all.account.show');;
         Route::post('/detail/{id}', 'UpdateLiveAccountController@main')->name('account.live.update')->middleware('permission:account.edit');
         Route::get('/create-withdrawal', 'LiveListController@createWithdrawal')->name('account.create_withdrawal')->middleware('permission:withdrawal.create');
         Route::post('/create-withdrawal', 'LiveListController@createWithdrawalPost')->name('account.create.withdrawal')->middleware('permission:withdrawal.create');
@@ -62,18 +62,16 @@ Route::group([
     Route::group([
         'namespace' => 'Deposit',
         'prefix' => 'deposit',
-        'middleware' => 'role.admin'
     ], function () {
-        Route::get('/list', 'ListController@main')->name('deposit.list')->middleware('permission:deposit.show');
+        Route::get('/list', 'ListController@main')->name('deposit.list')->middleware('permission:deposit.show|all.deposit.show');
         Route::post('/approve/{id}', 'ApproveController@main')->name('deposit.approve')->middleware('permission:deposit.approve');
         Route::post('/reject/{id}', 'RejectController@main')->name('deposit.reject')->middleware('permission:deposit.approve');;
     });
     Route::group([
         'namespace' => 'Withdrawal',
         'prefix' => 'withdrawal',
-        'middleware' => 'role.admin'
     ], function () {
-        Route::get('/list', 'ListController@main')->name('withdrawal.list')->middleware('permission:withdrawal.show');
+        Route::get('/list', 'ListController@main')->name('withdrawal.list')->middleware('permission:withdrawal.show|all.withdrawal.show');
         Route::post('/approve/{id}', 'ApproveController@main')->name('withdrawal.approve')->middleware('permission:withdrawal.approve');
         Route::post('/reject/{id}', 'RejectController@main')->name('deposit.reject')->middleware('permission:withdrawal.approve');;
     });

@@ -159,7 +159,7 @@
                     @endif
                 </form>
             </div>
-            @can('account.show')
+            @canany(['account.show', 'all.account.show'])
                 <div class="tab-pane fade" id="account-md" role="tabpanel" aria-labelledby="account-tab-md"
                 style="margin:40px">
                 @if(count($user->liveAccounts) <2)
@@ -199,7 +199,7 @@
                     </table>
                 </div>
             </div>
-            @endcan
+            @endcanany
             @can('deposit.show')
                 <div class="tab-pane fade" id="deposit-md" role="tabpanel" aria-labelledby="deposit-tab-md"
                 style="margin:40px">

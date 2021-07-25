@@ -98,7 +98,7 @@ class UserRepository extends EloquentBaseRepository implements RepositoryInterfa
     {
         $query = $this;
         $user = Auth::user();
-        if ($user->role == config('role.staff')) {
+        if ($user->role == config('role.staff') && !$user->hasPermissionTo('all.user.show')) {
             $ibIds = [$user->ib_id];
             if(is_null($user->admin_id)){
                 $ibIdsOfStaff = Admin::where('admin_id', $user->id)->pluck('ib_id')->toArray();
