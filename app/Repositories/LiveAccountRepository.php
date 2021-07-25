@@ -119,7 +119,7 @@ class LiveAccountRepository extends EloquentBaseRepository implements Repository
             }
         }
         if($paginate){
-            return $query->orderBy('live_accounts.created_at', 'desc')->paginate(20, [
+            return $query->orderBy('live_accounts.created_at', 'desc')->get([
                 'live_accounts.id',
                 'live_accounts.login',
                 'live_accounts.group',
