@@ -71,7 +71,7 @@
                 </thead>
                 <tbody>
                 @foreach($accountList as $key => $account)
-F                    <tr>
+                    <tr>
                         <th scope="row">{{ $key + 1 }}</th>
                         <td>{{ $account->login }}</td>
                         <td>{{ $account->ib_id }}</td>
