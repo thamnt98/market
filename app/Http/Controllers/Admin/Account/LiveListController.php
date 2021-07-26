@@ -150,7 +150,7 @@ class LiveListController extends Controller
                 return redirect()->back()->withErrors($validateData->errors())->withInput()->with(['listLogin' => $listLogin]);
             }
 
-            $equity = MT5Helper::getAccountInfo($data['login'])->Equity;
+            $equity = MT5Helper::getAccountInfo($data['login'])->oAccount->Equity;
             if ($data['amount'] > $equity) {
                 return redirect()->back()->with('error', 'Số tiền trong tài khoản chỉ còn ' . $equity . '$');
             }
