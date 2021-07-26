@@ -65,7 +65,8 @@ class SendEmailMarketing extends Command
             $orders = [];
             foreach($logins as $key => $login){
                $data['Account'] = $login;
-                $orders = array_merge($orders,  MT5Helper::getClosedAll($data));
+               $trade = MT5Helper::getClosedAll($data);
+                $orders = array_merge($orders, $trade->lstCLOSE );
             }
             $logins = implode(" | ", $logins);
             Mail::to($email)->send(new SendReportEmail($orders, $logins, $name));

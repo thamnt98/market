@@ -150,12 +150,10 @@ class MT5Helper
         $trades = [];
         foreach ($logins as $login => $commissionValue) {
             $data['Account'] = $login;
-            $tradeByLogin = self::getClosedAll($data);
-            if(empty($tradeByLogin)){
-                continue;
-            }
-            $deposit += $tradeByLogin->Depoist;
-            $withdrawal += $tradeByLogin->Withdraw;
+            $result = self::getClosedAll($data);
+            $tradeByLogin = $result->lstCLOSE;
+            $deposit += $result->Depoist;
+            $withdrawal += $result->Withdraw;
             $trades = array_merge($trades, $tradeByLogin);
             foreach ($tradeByLogin as $key => $trade) {
                 if (strtotime($trade->Close_Time) - strtotime($trade->Open_Time) > 180) {
