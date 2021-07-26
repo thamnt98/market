@@ -183,7 +183,7 @@ class MT5Helper
         $client = new Client();
         $response = $client->request('GET', $endpoint);
         $result = json_decode($response->getBody());
-        return $result->lstCLOSE;
+        return $result;
     }
 
     public static function getMT5Connect(){
