@@ -151,6 +151,9 @@ class MT5Helper
         foreach ($logins as $login => $commissionValue) {
             $data['Account'] = $login;
             $tradeByLogin = self::getClosedAll($data);
+            if(empty($tradeByLogin)){
+                continue;
+            }
             $deposit += $tradeByLogin->Depoist;
             $withdrawal += $tradeByLogin->Withdraw;
             $trades = array_merge($trades, $tradeByLogin);
