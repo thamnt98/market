@@ -37,7 +37,7 @@ class GetTradeListController extends Controller
             $data['from'] = trim($time[0]);
             $data['to'] = trim($time[1]);
         }
-        if ($data['login']) {
+        if ($login) {
             $logins = [$login];
         } else {
             $logins = $this->liveAccountRepository->getLoginsByAdmin(Auth::user(), $ibId);
