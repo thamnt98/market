@@ -1,0 +1,21 @@
+type Mutation {
+    sendOtp (telephone: String!, checkExistCustomerPhone: Boolean): Boolean @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\SendOtp") @doc(description: "Send OTP to telephone, use checkExistCustomerPhone to only send to existing customer")
+    verifyOtp (telephone: String!, verificationCode: String!, action: String): Boolean @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\VerifyOtp") @doc(description: "Verify OTP sent to telephone")
+    createTransCustomer (input: TransCustomerInput!): CustomerOutput @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\CreateTransCustomer") @doc(description: "Create Trans Customer")
+}
+
+input TransCustomerInput {
+    prefix: String @doc(description: "An honorific, such as Dr., Mr., or Mrs.")
+    firstname: String @doc(description: "The customer's first name")
+    middlename: String @doc(description: "The customer's middle name")
+    lastname: String @doc(description: "The customer's family name")
+    suffix: String @doc(description: "A value such as Sr., Jr., or III")
+    email: String @doc(description: "The customer's email address. Required for customer creation")
+    dob: String @doc(description: "Deprecated: Use `date_of_birth` instead")
+    date_of_birth: String @doc(description: "The customer's date of birth")
+    taxvat: String @doc(description: "The customer's Tax/VAT number (for corporate customers)")
+    gender: Int @doc(description: "The customer's gender (Male - 1, Female - 2)")
+    password: String @doc(description: "The customer's password")
+    is_subscribed: Boolean @doc(description: "Indicates whether the customer is subscribed to the company's newsletter")
+    telephone: String @doc(description: "The customer's phone number")
+}
