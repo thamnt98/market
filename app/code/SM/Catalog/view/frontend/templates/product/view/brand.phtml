@@ -1,0 +1,5 @@
+<?php
+$product = $block->getProduct();
+if ($product->getAttributeText('shop_by_brand')) { ?>
+    <b style="font-size: 32px"><?= strtoupper($product->getAttributeText('shop_by_brand')) ?></b>
+<?php } ?>

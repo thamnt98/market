@@ -17,8 +17,12 @@
         <css src="SM_Catalog::css/jssocials-theme-flat.css"/>
     </head>
     <body>
-
-
+        <referenceContainer name="product.info.main">
+            <block class="Magento\Catalog\Block\Product\View"
+                   name="product.info.brand"
+                   template="SM_Catalog::product/view/brand.phtml" before="-"/>
+        </referenceContainer>
+        <move element="product.info.brand" destination="product.info.main" before="page.main.title"/>
         <referenceBlock name="product.info.addtocart">
             <block class="Magento\Catalog\Block\Product\View"
                    name="product.buynow"
