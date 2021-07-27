@@ -35,6 +35,10 @@ class Integration extends \Magento\Framework\App\Helper\AbstractHelper
      * @var \Magento\Framework\HTTP\Client\Curl
      */
     protected $curl;
+    /**
+     * @var \Magento\Framework\Json\Helper\Data
+     */
+    private $jsonHelper;
 
     /**
      * @var \Trans\IntegrationOrder\Helper\Config
@@ -45,17 +49,20 @@ class Integration extends \Magento\Framework\App\Helper\AbstractHelper
      * @param \Magento\Framework\App\Helper\Context $context
      * @param \Magento\Framework\HTTP\Client\Curl $curl
      * @param \Trans\IntegrationOrder\Helper\Config $configHelper
+     * @param \Magento\Framework\Json\Helper\Data $jsonHelper
      */ 
    public function __construct(
         \Magento\Framework\App\Helper\Context $context,
         \Magento\Framework\HTTP\Client\Curl $curl,
         \Trans\IntegrationOrder\Helper\Config $configHelper,
+        \Magento\Framework\Json\Helper\Data $jsonHelper,
         \Trans\IntegrationOrder\Helper\Data $dataHelper
     )
     {
         parent::__construct($context);
 
         $this->curl = $curl;
+        $this->jsonHelper = $jsonHelper;
         $this->configHelper = $configHelper;
         $this->logger = $dataHelper->getLogger();
     }
@@ -67,33 +74,52 @@ class Integration extends \Magento\Framework\App\Helper\AbstractHelper
      */
     public function getToken()
     {
-        $token = $this->configHelper->getOmsToken();
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/test.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+
+        //$token = $this->configHelper->getOmsToken();
         
-        if($token) {
-            return $token;
-        }
+        // if($token) {
+        //     $logger->info("Token dari configHelper");
+        //     return $token;
+        // }
+
+
+    try {
+
+        //===== add by @nurakhiri 2021-07-26
 
         $url = $this->configHelper->getOmsBaseUrl() . $this->configHelper->getOmsLoginApi();
+
         
-        $body['username'] = 'admin@ct.co.id';
-        $body['password'] = 'admin';
-        
-        try {
-            $headers = ['dest' => $this->configHelper->getOmsDest()];
+        $requestUrl = $this->configHelper->getOmsBaseUrl() . $this->configHelper->getOmsLoginApi();
+        $params =
+            [
+                'username' => "bismar@metroindonesia.com",
+                'password' => "Admin123!"
+            ];
+        $this->curl->setHeaders([
+            'Content-Type' => 'application/json',
+            'Accept' => 'application/json',
+            'X-ExperimentalApi' => 'opt-in',
+            'dest' => 'omega',
+        ]);
+        $this->curl->post($requestUrl, $this->jsonHelper->jsonEncode($params));
+        $response = $this->curl->getBody();
+        //$response = json_decode($response, true);
             
-            $this->curl->setOption(CURLOPT_RETURNTRANSFER, true);
-            $this->curl->setHeaders($headers);
-            $this->curl->post($url, $body);
-            $response = $this->curl->getBody();
-            $this->logger->info($response);
-            
-            $obj = json_decode($response);
+            $obj = json_decode($response);            
             if($obj->code == 200) {
                 $token = $obj->content->token;
+                $logger->info("===>> Nurakhiri getToken Baru OMS <<=======");
+                $logger->info($token);
                 return $token;
             }
             
         } catch (\Exception $e) {
+            $logger->info("===>> Nurakhiri getToken Baru ERROR OMS <<=======");
+            $logger->info($e);
             $this->logger->info($e);
         }
 
