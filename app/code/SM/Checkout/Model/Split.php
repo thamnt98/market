@@ -144,7 +144,15 @@ class Split
      */
     protected function getHeader()
     {
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/test.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+
+
         $token = $this->integrationHelper->getToken();
+        $logger->info("===>> Nurakhiri TOKEN OMS <<=======");
+        $logger->info($token);
+
         $headers['dest'] = $this->configHelper->getOmsDest();
         $headers['Content-Type'] = 'application/json';
         $headers['Authorization'] = 'Bearer ' . $token;
@@ -490,10 +498,19 @@ class Split
      */
     protected function sendOAR($data)
     {
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/test.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+
+
         $isEnableOarLog = (bool)$this->scopeConfig->getValue('sm_checkout/oar_log/active');
         $response = [];
         $url = $this->configHelper->getOmsBaseUrl() . $this->configHelper->getOmsOarApi();
+        $logger->info("===>> Nurakhiri URL OMS <<=======");
+        $logger->info($url);
         $header = $this->getHeader();
+        $logger->info("===>> Nurakhiri Header OMS <<=======");
+        $logger->info($header);
         if ($isEnableOarLog) {
             $flagLog = 'Quote ID and Quote Address ID:';
             foreach ($data as $key => $row) {
@@ -504,6 +521,8 @@ class Split
             }
         }
         $dataJson = $this->serializer->serialize($data);
+        $logger->info("===>> Nurakhiri Body OMS <<=======");
+        $logger->info($dataJson);
         $dataJsonLog = $dataJson;
         for ($x = 0; $x <= 2; $x++) {
             try {
@@ -524,12 +543,14 @@ class Split
                 }
                 break;
             } catch (\Exception $e) {
-                $result = $this->handleException($e);
+                $result = $this->handleException($e);                
                 if ($result['status'] == 'success') {
                     if (is_string($result['response'])) {
                         $response = $this->serializer->unserialize($result['response']);
+                        $logger->info($response);
                     } else {
                         $response = $result['response'];
+                        $logger->info($response);
                     }
                     if ($isEnableOarLog) {
                         $this->writeSuccessLog($flagLog, $dataJsonLog, $result['response']);
@@ -543,6 +564,8 @@ class Split
                 }
             }
         }
+
+        $logger->info($response);
         return $response;
     }
 
