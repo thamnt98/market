@@ -22,6 +22,8 @@
                 type="SM\Catalog\Block\Product\View\Attributes"/>
     <preference for="Magento\Catalog\Model\Product"
                 type="SM\Catalog\Override\MagentoCatalog\Model\Product"/>
+    <preference for="Magento\Catalog\Pricing\Price\RegularPrice"
+                type="SM\Catalog\Override\MagentoCatalog\Pricing\Price\RegularPrice"/>
 
     <type name="Magento\Catalog\Model\ResourceModel\Product">
         <plugin name="trans_eav_abstract_entity"
