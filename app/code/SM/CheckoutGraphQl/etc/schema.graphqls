@@ -6,3 +6,7 @@ input CartItemIsActive {
     item_id: String @doc(description: "Cart Item ID")
     is_active: Int @doc(description: "is_active value (Active - 1, Inactive - 0)")
 }
+
+interface CartItemInterface {
+    is_active: Int
+}
