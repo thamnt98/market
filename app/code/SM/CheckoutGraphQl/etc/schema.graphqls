@@ -1,0 +1,8 @@
+type Mutation {
+    updateCartItemIsActive (cart_hash: String, cart_id: Int, input: [CartItemIsActive]!): Boolean @resolver(class: "SM\\CheckoutGraphQl\\Model\\Resolver\\UpdateCartItemIsActive") @doc(description: "Update cart item is_active attribute")
+}
+
+input CartItemIsActive {
+    item_id: String @doc(description: "Cart Item ID")
+    is_active: Int @doc(description: "is_active value (Active - 1, Inactive - 0)")
+}
