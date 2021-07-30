@@ -151,6 +151,10 @@ class UpdateCartItemIsActive implements ResolverInterface
             throw new GraphQlInputException(__($e->getMessage()));
         }
 
-        return true;
+        return [
+            'cart' => [
+                'model' => $cart,
+            ],
+        ];
     }
 }
