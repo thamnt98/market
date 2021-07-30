@@ -5,6 +5,7 @@ type Mutation {
 input CartItemIsActive {
     item_id: String @doc(description: "Cart Item ID")
     is_active: Int @doc(description: "is_active value (Active - 1, Inactive - 0)")
+    qty: Float @doc(description: "qty value")
 }
 
 interface CartItemInterface {

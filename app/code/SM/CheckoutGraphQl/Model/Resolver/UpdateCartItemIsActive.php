@@ -126,10 +126,21 @@ class UpdateCartItemIsActive implements ResolverInterface
         try {
             foreach ($cartItems as $item) {
                 if ($quoteItem = $cart->getItemById($item['item_id'])) {
-                    $isActive = (int) $item['is_active'];
-                    $quoteItem->setData('is_active', $isActive);
-                    foreach ($quoteItem->getChildren() as $child) {
-                        $child->setData('is_active', $isActive);
+                    if (isset($item['is_active'])) {
+                        $isActive = (int)$item['is_active'];
+                        $quoteItem->setData('is_active', $isActive);
+                        foreach ($quoteItem->getChildren() as $child) {
+                            $child->setData('is_active', $isActive);
+                        }
+                    }
+
+                    if (isset($item['qty'])) {
+                        $qty = (double)$item['qty'];
+                        $quoteItem->setQty($qty);
+
+                        if ($quoteItem->getHasError()) {
+                            throw new \Exception(__($quoteItem->getMessage()));
+                        }
                     }
                 }
             }
