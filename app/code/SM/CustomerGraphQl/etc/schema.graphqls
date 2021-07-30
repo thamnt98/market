@@ -19,3 +19,7 @@ input TransCustomerInput {
     is_subscribed: Boolean @doc(description: "Indicates whether the customer is subscribed to the company's newsletter")
     telephone: String @doc(description: "The customer's phone number")
 }
+
+type Customer {
+    profile_picture: String @doc(description: "The customer's profile picture url")
+}
