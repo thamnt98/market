@@ -1,0 +1,18 @@
+type Query {
+    brands (
+        search: String @doc(description: "Search for brands contain the characters")
+    ): Brands @resolver(class: "SM\\CategoryGraphQl\\Model\\Resolver\\Brands")
+    favoriteBrands: Brands @resolver(class: "SM\\CategoryGraphQl\\Model\\Resolver\\FavoriteBrands")
+    topBrands: Brands @resolver(class: "SM\\CategoryGraphQl\\Model\\Resolver\\TopBrands")
+}
+
+type Brands @doc(description: "The top-level object returned in a brand search.") {
+    items: [Brand] @doc(description: "An array of brands that match the specified search criteria.")
+    total_count: Int @doc(description: "The number of brands returned.")
+}
+
+type Brand @doc(description: "The Brand object.") {
+    id: Int @doc(description: "The Brand/Category id")
+    name: String @doc(description: "The Brand/Category name")
+    logo: String @doc(description: "The Brand/Category logo url")
+}
