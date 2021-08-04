@@ -62,8 +62,9 @@ class TopBrands implements ResolverInterface
             ->addFieldToSelect('logo')
             ->addFieldToFilter('category_type', CategoryType::TYPE_BRAND)
             ->addFieldToFilter('is_active', 1)
-            ->addIdFilter($topBrandIds)
-            ->setOrder('name', Collection::SORT_ORDER_ASC);
+            ->addIdFilter($topBrandIds);
+
+        $collection->getSelect()->order(new \Zend_Db_Expr("FIELD(e.entity_id, " . $topBrandIds . ")"));
 
         $brandArray = [];
         /** @var Category $brand */

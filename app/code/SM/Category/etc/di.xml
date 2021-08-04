@@ -7,4 +7,11 @@
                 type="SM\Category\Controller\Adminhtml\Category\Save"/>
     <preference for="SM\Category\Api\Data\Catalog\CategoryMetaDataInterface"
                 type="SM\Category\Model\Data\Catalog\CategoryMetaData"/>
+
+    <!-- Plugin -->
+    <type name="Magento\Catalog\Model\Category\Attribute\Backend\Image">
+        <plugin name="Amasty_Shopby::fix_magento_bug_with_image_save" disabled="true" />
+        <plugin name="SM_Category::FixMagentoSaveImage"
+                type="SM\Category\Plugin\Magento\Catalog\Model\Category\Attribute\Backend\Image" />
+    </type>
 </config>

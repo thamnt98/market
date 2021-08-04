@@ -62,8 +62,9 @@ class FavoriteBrands implements ResolverInterface
             ->addFieldToSelect('logo')
             ->addFieldToFilter('category_type', CategoryType::TYPE_BRAND)
             ->addFieldToFilter('is_active', 1)
-            ->addIdFilter($favoriteBrandIds)
-            ->setOrder('name', Collection::SORT_ORDER_ASC);
+            ->addIdFilter($favoriteBrandIds);
+
+        $collection->getSelect()->order(new \Zend_Db_Expr("FIELD(e.entity_id, " . $favoriteBrandIds . ")"));
 
         $brandArray = [];
         /** @var Category $brand */
