@@ -15,6 +15,7 @@ use Magento\Framework\Exception\NoSuchEntityException;
 use Magento\Framework\View\Element\Template;
 use Magento\MultipleWishlist\Helper\Data;
 use Magento\Wishlist\Block\Customer\Wishlist\Items;
+use SM\Customer\Plugin\Magento\Framework\App\Action\AbstractAction;
 use SM\ShoppingList\Api\Data\ShoppingListDataInterface;
 use SM\ShoppingList\Api\Data\ShoppingListItemDataInterface;
 use SM\ShoppingList\Model\ShoppingListItemRepository;
@@ -77,6 +78,11 @@ class View extends Template
     protected $customerSession;
 
     /**
+     * @var \Magento\Framework\App\Http\Context
+     */
+    protected $httpContext;
+
+    /**
      * View constructor.
      * @param ShoppingListRepository $shoppingListRepository
      * @param Template\Context $context
@@ -89,6 +95,7 @@ class View extends Template
      * @param SortOrderBuilder $sortOrderBuilder
      * @param ProductRepository $productRepository
      * @param Session $customerSession
+     * @param \Magento\Framework\App\Http\Context $httpContext
      * @param array $data
      */
     public function __construct(
@@ -103,8 +110,10 @@ class View extends Template
         SortOrderBuilder $sortOrderBuilder,
         ProductRepository $productRepository,
         Session $customerSession,
+        \Magento\Framework\App\Http\Context $httpContext,
         array $data = []
     ) {
+        $this->httpContext = $httpContext;
         $this->customerSession = $customerSession;
         $this->productRepository = $productRepository;
         $this->shoppingListRepository = $shoppingListRepository;
@@ -133,7 +142,6 @@ class View extends Template
         }
 
         $this->initShoppingList($shoppingListId);
-        $this->initItems($shoppingListId);
     }
 
     /**
@@ -141,25 +149,14 @@ class View extends Template
      * @throws NoSuchEntityException
      */
     private function initShoppingList($shoppingListId) {
-        $shoppingList = $this->customerSession->getData("current_shoppinglist_detail");
-        if (!$shoppingList) {
-            $shoppingList = $this->shoppingListRepository->getById($shoppingListId);
-        }
-
+        $shoppingList = $this->shoppingListRepository->getById($shoppingListId);
 
         if ($shoppingList->getWishlistId()) {
             $this->setShoppingList($shoppingList);
+            $this->setItems($shoppingList->getItems());
         } else {
             $this->setShoppingList(0);
         }
-    }
-
-    /**
-     * @param int $shoppingListId
-     */
-    private function initItems($shoppingListId) {
-        $searchResult = $this->getListItems($shoppingListId);
-        $this->setItems($searchResult);
     }
 
     /**
@@ -178,56 +175,6 @@ class View extends Template
     {
         $this->items = $items;
         return $this;
-    }
-
-    /**
-     * @param $shoppingListId
-     * @return ShoppingListItemDataInterface[]
-     */
-    public function getListItems($shoppingListId)
-    {
-        $filterGroups[] = $this->filterGroupBuilder->addFilter($this->filterBuilder
-                ->setField("wishlist_id")
-                ->setValue($shoppingListId)
-                ->setConditionType("eq")
-                ->create())
-            ->create();
-
-        if ($keyWord = $this->getRequest()->getParam("key")) {
-            $filterGroups[] = $this->filterGroupBuilder
-                ->addFilter($this->filterBuilder
-                    ->setField("product_name")
-                    ->setValue("%" . $keyWord . "%")
-                    ->setConditionType("like")
-                    ->create())
-                ->addFilter($this->filterBuilder
-                    ->setField("sku")
-                    ->setValue("%" . $keyWord . "%")
-                    ->setConditionType("like")
-                    ->create())
-                ->create();
-        }
-        $this->searchCriteriaBuilder->setFilterGroups($filterGroups);
-
-        if ($order = $this->getRequest()->getParam("sort")) {
-            $this->searchCriteriaBuilder->setSortOrders([
-                $this->sortOrderBuilder
-                    ->setField('wishlist_item_id')
-                    ->setDirection(strtoupper($order))->create()
-            ]);
-        } else {
-            $this->searchCriteriaBuilder->setSortOrders([
-                $this->sortOrderBuilder
-                    ->setField('wishlist_item_id')
-                    ->setDirection("DESC")->create()
-            ]);
-        }
-        $criteria = $this->searchCriteriaBuilder->create();
-        try {
-            return $this->itemRepository->getList($criteria)->getItems();
-        } catch (Exception $e) {
-            return [];
-        }
     }
 
     /**
@@ -287,14 +234,6 @@ class View extends Template
      */
     public function getShoppingLists()
     {
-        $criteria = $this->searchCriteriaBuilder->create();
-        try {
-            return $this->shoppingListRepository->getList(
-                $criteria,
-                $this->currentCustomer->getCustomerId()
-            )->getItems();
-        } catch (NoSuchEntityException $e) {
-            return [];
-        }
+        return [];
     }
 }
