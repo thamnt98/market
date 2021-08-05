@@ -1,0 +1,3 @@
+interface ProductInterface {
+    shop_by_brand: String @doc(description: "The Product Brand attribute.") @resolver(class: "SM\\CatalogGraphQl\\Model\\Resolver\\ProductBrand")
+}
