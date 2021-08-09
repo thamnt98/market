@@ -29,10 +29,13 @@ class Highlighter
      * @param string $str
      * @return string
      */
-    public function highlightSearchText(string $str): string
+    public function highlightSearchText(string $str, $searchText = null): string
     {
-        $query = $this->queryFactory->get();
-        $pattern = "/{$query->getQueryText()}/i";
+        if (is_null($searchText)){
+            $query = $this->queryFactory->get();
+            $searchText = $query->getQueryText();
+        }
+        $pattern = "/{$searchText}/i";
         $replacement = "<strong>$0</strong>";
         return preg_replace($pattern, $replacement, $str);
     }

@@ -76,7 +76,7 @@ class Suggest extends BaseController implements ResolverInterface
             $pageSize = $args['page_size'] ?? null;
             $currentPage = $args['current_page'] ?? null;
             $results = $this->search->suggestByKeyword($args['keyword'], $catId, $pageSize, $currentPage);
-            $products = $this->productPreparator->prepareProducts($results->getProducts(), $catId == 0);
+            $products = $this->productPreparator->prepareProducts($results->getProducts(), $catId == 0, $args['keyword']);
             if ($catId != 0) {
                 $_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
                 $category = $_objectManager->create('Magento\Catalog\Model\Category')
