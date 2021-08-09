@@ -9,6 +9,7 @@ use Magento\Framework\App\Response\Http;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
+use SM\Customer\Plugin\Magento\Framework\App\Action\AbstractAction;
 use SM\ShoppingList\Api\Data\ShoppingListDataInterface;
 use SM\ShoppingList\Model\ShoppingListRepository;
 
@@ -38,6 +39,10 @@ class Listing extends Template
      * @var CurrentCustomer
      */
     protected $currentCustomer;
+    /**
+     * @var \Magento\Framework\App\Http\Context
+     */
+    protected $httpContext;
 
     /**
      * Listing constructor.
@@ -47,6 +52,7 @@ class Listing extends Template
      * @param Context $context
      * @param CurrentCustomer $currentCustomer
      * @param Http $response
+     * @param \Magento\Framework\App\Http\Context $httpContext
      * @param array $data
      */
     public function __construct(
@@ -56,8 +62,10 @@ class Listing extends Template
         Context $context,
         CurrentCustomer $currentCustomer,
         Http $response,
+        \Magento\Framework\App\Http\Context $httpContext,
         array $data = []
     ) {
+        $this->httpContext = $httpContext;
         $this->currentCustomer = $currentCustomer;
         $this->shoppingListRepository = $shoppingListRepository;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
@@ -77,7 +85,6 @@ class Listing extends Template
 
     /**
      * @return ShoppingListDataInterface[]
-     * @throws LocalizedException
      */
     public function getShoppingLists()
     {
@@ -85,12 +92,9 @@ class Listing extends Template
             $navigationBlock->setActive('shoppinglist');
         }
 
-        $searchCriteria = $this->searchCriteriaBuilder->create();
-        $searchResults = $this->shoppingListRepository->getList(
-            $searchCriteria,
-            $this->currentCustomer->getCustomerId()
+        return $this->shoppingListRepository->getMyList(
+            $this->httpContext->getValue(AbstractAction::KEY_SESSION_CUSTOMER_ID)
         );
-        return $searchResults->getItems();
     }
 
     /**

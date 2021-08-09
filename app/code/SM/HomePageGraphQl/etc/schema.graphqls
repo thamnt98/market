@@ -1,0 +1,16 @@
+type Query {
+    homePageSlider: Slider @resolver(class: "SM\\HomePageGraphQl\\Model\\Resolver\\Slider")
+    homePageCurated: Slider @resolver(class: "SM\\HomePageGraphQl\\Model\\Resolver\\Curated")
+    homePageLocalFeatures: Slider @resolver(class: "SM\\HomePageGraphQl\\Model\\Resolver\\LocalFeatures")
+    homePageOfflineBanner: Banner @resolver(class: "SM\\HomePageGraphQl\\Model\\Resolver\\OfflineBanner")
+}
+
+type Slider @doc(description: "Home Page Slider") {
+    items: [Banner] @doc(description: "The Slider's items")
+}
+
+type Banner @doc(description: "Home Page Banner") {
+    title: String @doc(description: "The Banner title")
+    content: String @doc(description: "The Banner content")
+    image: String @doc(description: "The Banner image url")
+}

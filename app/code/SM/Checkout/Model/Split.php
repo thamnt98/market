@@ -547,10 +547,10 @@ class Split
                 if ($result['status'] == 'success') {
                     if (is_string($result['response'])) {
                         $response = $this->serializer->unserialize($result['response']);
-                        $logger->info($response);
+                        //$logger->info($response);
                     } else {
                         $response = $result['response'];
-                        $logger->info($response);
+                        //$logger->info($response);
                     }
                     if ($isEnableOarLog) {
                         $this->writeSuccessLog($flagLog, $dataJsonLog, $result['response']);
@@ -565,7 +565,7 @@ class Split
             }
         }
 
-        $logger->info($response);
+        //$logger->info($response);
         return $response;
     }
 

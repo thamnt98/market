@@ -21,4 +21,9 @@
         <plugin name="sm_store_redirect"
                 type="SM\Customer\Plugin\Store\Redirect" sortOrder="30"/>
     </type>
+
+    <type name="Magento\Framework\App\Action\AbstractAction">
+        <plugin name="customer_session_data_context"
+                type="SM\Customer\Plugin\Magento\Framework\App\Action\AbstractAction"/>
+    </type>
 </config>

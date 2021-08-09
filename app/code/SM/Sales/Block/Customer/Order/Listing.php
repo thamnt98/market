@@ -19,6 +19,7 @@ use Magento\Framework\Api\SortOrder;
 use Magento\Framework\Api\SortOrderBuilder;
 use Magento\Framework\View\Element\Template;
 use Magento\Framework\View\Element\Template\Context;
+use SM\Customer\Plugin\Magento\Framework\App\Action\AbstractAction;
 use SM\Sales\Api\Data\ParentOrderDataInterface;
 use SM\Sales\Api\Data\ParentOrderSearchResultsInterface;
 use SM\Sales\Model\ParentOrderRepository;
@@ -70,6 +71,11 @@ class Listing extends Template
     protected $orders;
 
     /**
+     * @var \Magento\Framework\App\Http\Context
+     */
+    protected $httpContext;
+
+    /**
      * Listing constructor.
      * @param Context $context
      * @param ParentOrderRepository $ParentOrderRepository
@@ -79,6 +85,7 @@ class Listing extends Template
      * @param FilterBuilder $filterBuilder
      * @param CurrentCustomer $currentCustomer
      * @param SubOrderRepository $subOrderRepository
+     * @param \Magento\Framework\App\Http\Context $httpContext
      * @param array $data
      */
     public function __construct(
@@ -90,8 +97,10 @@ class Listing extends Template
         FilterBuilder $filterBuilder,
         CurrentCustomer $currentCustomer,
         SubOrderRepository $subOrderRepository,
+        \Magento\Framework\App\Http\Context $httpContext,
         array $data = []
     ) {
+        $this->httpContext = $httpContext;
         $this->subOrderRepository = $subOrderRepository;
         $this->currentCustomer = $currentCustomer;
         $this->filterGroupBuilder = $filterGroupBuilder;
@@ -151,7 +160,21 @@ class Listing extends Template
      */
     public function getOrderList($tab)
     {
-        if ($customerId = $this->currentCustomer->getCustomerId()) {
+
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/test2.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+        $logger->info('=====Nurakhiri-myorderHistory-6=====');
+        $logger->info($tab);
+        $custID = $this->httpContext->getValue(AbstractAction::KEY_SESSION_CUSTOMER_ID);
+        $custID2 = $this->currentCustomer->getCustomerId();
+        $logger->info('=====Nurakhiri-myorderHistory-custID-6=====');
+        $logger->info($custID);
+        $logger->info($custID2);
+        
+
+        //if ($customerId = $this->currentCustomer->getCustomerId()) {
+        if ($customerId = $this->httpContext->getValue(AbstractAction::KEY_SESSION_CUSTOMER_ID)) {
             try {
                 /** @var SearchCriteriaInterface $searchCriteria */
                 $searchCriteria = $this->searchCriteriaBuilder->create();
@@ -179,11 +202,14 @@ class Listing extends Template
 
                 /** @var ParentOrderSearchResultsInterface $results */
                 $results = $this->parentOrderRepository->getList($searchCriteria, $customerId);
+                $logger->info("testing2");
                 $this->setOrders($results->getItems());
             } catch (\Exception $e) {
+                $logger->info("testing23");
                 $this->setOrders([]);
             }
         } else {
+            $logger->info("testing19");
             $this->setOrders([]);
         }
     }
@@ -307,6 +333,13 @@ class Listing extends Template
      */
     public function setOrders($orders)
     {
+
+        $writer = new \Zend\Log\Writer\Stream(BP . '/var/log/test2.log');
+        $logger = new \Zend\Log\Logger();
+        $logger->addWriter($writer);
+        $logger->info('=====Nurakhiri-myorderHistory-setOrders=====');
+        
+
         $this->orders = $orders;
         return $this;
     }
