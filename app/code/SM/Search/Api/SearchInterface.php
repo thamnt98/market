@@ -32,7 +32,7 @@ interface SearchInterface
      * @return SuggestionSearchResultInterface
      * @throws \Magento\Framework\Exception\LocalizedException
      */
-    public function suggestByKeyword(string $suggestKeyword, int $catId): SuggestionSearchResultInterface;
+    public function suggestByKeyword(string $suggestKeyword, int $catId, $pageSize = null, $currentPage = null): SuggestionSearchResultInterface;
 
     /**
      * @param int $p

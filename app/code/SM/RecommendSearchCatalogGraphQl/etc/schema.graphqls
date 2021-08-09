@@ -1,0 +1,25 @@
+type Query {
+    recommend_products(
+        keyword: String @doc(description: "keyword when search"),
+        category_id: Int,
+        page_size: Int,
+        current_page: Int,
+    ): RecommendProducts
+@resolver(class:"SM\\RecommendSearchCatalogGraphQl\\Model\\Resolver\\Suggest")
+@doc(description:
+    "The recommend_products query returns suggestion product list")
+@cache(cacheable: false)
+}
+
+type RecommendProducts @doc(description: "RecommendProduct defines the customer name and other details") {
+    type: String,
+    typo_suggest_keyword: String
+    products: [Products],
+    total_count: Int
+}
+
+type Products @doc(description: "Represents a product matching keyword.") {
+    name: String,
+    url: String,
+    category_names: [String]
+}
