@@ -11,14 +11,14 @@ type Query {
 @cache(cacheable: false)
 }
 
-type RecommendProducts @doc(description: "RecommendProduct defines the customer name and other details") {
+type RecommendProducts @doc(description: "RecommendProduct defines the products list and total account") {
     type: String,
     typo_suggest_keyword: String
-    products: [Products],
+    products: [RecommendItems],
     total_count: Int
 }
 
-type Products @doc(description: "Represents a product matching keyword.") {
+type RecommendItems @doc(description: "Represents a product matching keyword.") {
     name: String,
     url: String,
     category_names: [String]

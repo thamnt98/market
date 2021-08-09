@@ -7,4 +7,6 @@
             </argument>
         </arguments>
     </type>
+    <preference for="SM\RecommendSearchCatalogGraphQl\Api\RecommendProductInterface"
+                type="SM\RecommendSearchCatalogGraphQl\Model\RecommendProductRepository"/>
 </config>

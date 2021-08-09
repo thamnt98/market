@@ -8,6 +8,7 @@ use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\Search\Model\AutocompleteInterface;
 use Magento\Search\Model\QueryFactory;
+use SM\RecommendSearchCatalogGraphQl\Api\RecommendProductInterface;
 use SM\Search\Api\Data\Response\SuggestionSearchResultInterface;
 use SM\Search\Api\SearchInterface;
 use SM\Search\Helper\Config;
@@ -36,6 +37,11 @@ class Suggest extends BaseController implements ResolverInterface
     protected $productPreparator;
 
     /**
+     * @var RecommendProductInterface
+     */
+    protected $recommendProductRepository;
+
+    /**
      * Suggest constructor.
      * @param Context $context
      * @param AutocompleteInterface $autocomplete
@@ -48,13 +54,15 @@ class Suggest extends BaseController implements ResolverInterface
         AutocompleteInterface $autocomplete,
         SearchInterface $search,
         QueryFactory $queryFactory,
-        ProductPreparator $productPreparator
+        ProductPreparator $productPreparator,
+        RecommendProductInterface $recommendProductRepository
     )
     {
         parent::__construct($context, $autocomplete);
         $this->search = $search;
         $this->queryFactory = $queryFactory;
         $this->productPreparator = $productPreparator;
+        $this->recommendProductRepository = $recommendProductRepository;
     }
 
     /**
@@ -65,7 +73,7 @@ class Suggest extends BaseController implements ResolverInterface
         if (!isset($args['keyword']) || empty($args['keyword'])) {
             return [
                 SuggestionSearchResultInterface::TYPE => '',
-                SuggestionSearchResultInterface::TYPO_SUGGEST_KEYWORD => $args['keyword'],
+                SuggestionSearchResultInterface::TYPO_SUGGEST_KEYWORD => $args['keyword'] ?? '',
                 SuggestionSearchResultInterface::PRODUCTS => [],
                 SuggestionSearchResultInterface::TOTAL_COUNT => 0,
             ];
@@ -78,10 +86,7 @@ class Suggest extends BaseController implements ResolverInterface
             $results = $this->search->suggestByKeyword($args['keyword'], $catId, $pageSize, $currentPage);
             $products = $this->productPreparator->prepareProducts($results->getProducts(), $catId == 0, $args['keyword']);
             if ($catId != 0) {
-                $_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-                $category = $_objectManager->create('Magento\Catalog\Model\Category')
-                    ->load($catId);
-                $categoryName = $category->getName();
+                $categoryName = $this->recommendProductRepository->getCategoryNameByCategoryId($catId);
                 foreach ($products as $key => $product) {
                     $products[$key]['category_names'] = [$categoryName];
                 }
