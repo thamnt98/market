@@ -11,6 +11,4 @@
                 type="SM\SuggestProductWhenSearchGraphQl\Model\Autocomplete\DataProvider"/>
     <preference for="SM\SuggestProductWhenSearchGraphQl\Api\AutocompleteInterface"
                 type="SM\SuggestProductWhenSearchGraphQl\Model\Autocomplete"/>
-    <preference for="Magento\Search\Model\Query"
-                type="SM\SuggestProductWhenSearchGraphQl\Model\Query"/>
 </config>

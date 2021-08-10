@@ -2,6 +2,7 @@
 
 namespace SM\RecommendSearchCatalogGraphQl\Model\Resolver;
 
+use Magento\Catalog\Model\CategoryRepository;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
@@ -39,7 +40,7 @@ class Suggest extends BaseController implements ResolverInterface
     /**
      * @var RecommendProductInterface
      */
-    protected $recommendProductRepository;
+    protected $categoryRepository;
 
     /**
      * Suggest constructor.
@@ -55,14 +56,14 @@ class Suggest extends BaseController implements ResolverInterface
         SearchInterface $search,
         QueryFactory $queryFactory,
         ProductPreparator $productPreparator,
-        RecommendProductInterface $recommendProductRepository
+        CategoryRepository $categoryRepository
     )
     {
         parent::__construct($context, $autocomplete);
         $this->search = $search;
         $this->queryFactory = $queryFactory;
         $this->productPreparator = $productPreparator;
-        $this->recommendProductRepository = $recommendProductRepository;
+        $this->categoryRepository = $categoryRepository;
     }
 
     /**
@@ -86,7 +87,7 @@ class Suggest extends BaseController implements ResolverInterface
             $results = $this->search->suggestByKeyword($args['keyword'], $catId, $pageSize, $currentPage);
             $products = $this->productPreparator->prepareProducts($results->getProducts(), $catId == 0, $args['keyword']);
             if ($catId != 0) {
-                $categoryName = $this->recommendProductRepository->getCategoryNameByCategoryId($catId);
+                $categoryName = $this->categoryRepository->get($catId)->getName();
                 foreach ($products as $key => $product) {
                     $products[$key]['category_names'] = [$categoryName];
                 }

@@ -3,7 +3,7 @@
 namespace SM\SuggestProductWhenSearchGraphQl\Model\Autocomplete;
 
 use Magento\Search\Model\ResourceModel\Query\Collection;
-use Magento\Search\Model\QueryFactory;
+use SM\SuggestProductWhenSearchGraphQl\Model\QueryFactory;
 use SM\SuggestProductWhenSearchGraphQl\Api\Autocomplete\DataProviderInterface;
 use Magento\Search\Model\Autocomplete\ItemFactory;
 use Magento\Framework\App\Config\ScopeConfigInterface as ScopeConfig;

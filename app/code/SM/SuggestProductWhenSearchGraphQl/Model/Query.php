@@ -106,20 +106,6 @@ class Query extends AbstractModel
     }
 
     /**
-     * Load Query object by query string
-     *
-     * @param string $text
-     * @return $this
-     * @throws \Magento\Framework\Exception\LocalizedException
-     * @deprecated 100.1.0 "synonym for" feature has been removed
-     */
-    public function loadByQuery($text)
-    {
-        $this->loadByQueryText($text);
-        return $this;
-    }
-
-    /**
      * Load Query object only by query text
      *
      * @param string $text
