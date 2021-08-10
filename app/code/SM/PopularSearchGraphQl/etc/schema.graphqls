@@ -1,0 +1,15 @@
+type Query {
+    popular_products(
+        current_page: Int,
+        page_size: Int
+    ): [PopularProducts]
+    @resolver(class:"SM\\PopularSearchGraphQl\\Model\\Resolver\\Popular")
+    @doc(description:
+        "The popular_products query returns popular product list")
+    @cache(cacheable: false)
+}
+
+type PopularProducts {
+   title: String,
+   url: String
+}
