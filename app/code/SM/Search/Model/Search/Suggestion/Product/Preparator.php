@@ -72,13 +72,12 @@ class Preparator
      * @return array
      * @throws LocalizedException
      */
-    public function prepareProducts(array $products, bool $includeCategoryNames): array
+    public function prepareProducts(array $products, bool $includeCategoryNames, $keyword = null): array
     {
         $productData = [];
-
         foreach ($products as $product) {
             $productData[] = [
-                Config::PRODUCT_NAME_FIELD_NAME => $this->highlighter->highlightSearchText($product->getName()),
+                Config::PRODUCT_NAME_FIELD_NAME => $this->highlighter->highlightSearchText($product->getName(), $keyword),
                 Config::PRODUCT_URL_FIELD_NAME => $product->getProductUrl(),
                 Config::CATEGORY_NAMES_ATTRIBUTE_CODE => $includeCategoryNames ? $this->prepareCategoryNames($product) : '',
             ];

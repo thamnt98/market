@@ -223,9 +223,9 @@ class Search implements SearchInterface
     /**
      * @inheritDoc
      */
-    public function suggestByKeyword(string $suggestKeyword, int $catId): SuggestionSearchResultInterface
+    public function suggestByKeyword(string $suggestKeyword, int $catId, $pageSize = null, $currentPage = null): SuggestionSearchResultInterface
     {
-        $searchCriteria = $this->suggestionPreparator->prepareSearchCriteriaForSuggestion($suggestKeyword, $catId);
+        $searchCriteria = $this->suggestionPreparator->prepareSearchCriteriaForSuggestion($suggestKeyword, $catId, $pageSize, $currentPage);
 
         return $this->suggest($searchCriteria);
     }
@@ -267,11 +267,11 @@ class Search implements SearchInterface
     {
         $this->registry->register(Config::IS_QUICK_SUGGESTION_REQUEST, true);
         $result = $this->baseSearch($searchCriteria);
-        
+
         if ($result->getTotalCount()) {
             return $result;
         }
-        
+
         try {
             $query = $this->createQuery($searchCriteria);
         } catch (\Exception $e) {

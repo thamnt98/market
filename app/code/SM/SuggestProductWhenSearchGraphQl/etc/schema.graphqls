@@ -1,0 +1,15 @@
+type Query {
+    suggest_products(
+        keyword: String @doc(description: "keyword when search"),
+    ): [SuggestProducts]
+@resolver(class:"SM\\SuggestProductWhenSearchGraphQl\\Model\\Resolver\\Suggest")
+@doc(description:
+    "The suggest_products query returns suggestion product list when searching")
+@cache(cacheable: false)
+}
+
+type SuggestProducts @doc(description: "SuggestProducts defines the matching title and amount of result") {
+   title: String,
+   num_results: Int
+}
+

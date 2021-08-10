@@ -72,7 +72,7 @@ class Preparator
      * @param int $catId
      * @return SearchCriteriaInterface
      */
-    public function prepareSearchCriteriaForSuggestion(string $suggestKeyword, int $catId): SearchCriteriaInterface
+    public function prepareSearchCriteriaForSuggestion(string $suggestKeyword, int $catId, $pageSize, $currentPage): SearchCriteriaInterface
     {
         $filterQuery = $this->filterBuilder
                             ->setField(Config::SEARCH_PARAM_SEARCH_TEXT_FIELD_NAME)
@@ -90,7 +90,8 @@ class Preparator
 
         $searchCriteria = $this->searchCriteriaBuilder
 //            ->addSortOrder(Config::PRODUCT_NAME_FIELD_NAME, SortOrder::SORT_ASC)
-            ->setPageSize($this->config->getSearchAutocompleteLimit())
+            ->setPageSize(is_null($pageSize) ? $this->config->getSearchAutocompleteLimit() : $pageSize)
+            ->setCurrentPage(is_null($currentPage) ? 0 : $currentPage)
             ->create();
 
         $searchCriteria->setRequestName(Config::QUICK_SEARCH_CONTAINER);

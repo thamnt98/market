@@ -1,0 +1,95 @@
+<?php
+
+namespace SM\SuggestProductWhenSearchGraphQl\Model\Autocomplete;
+
+use Magento\Search\Model\ResourceModel\Query\Collection;
+use SM\SuggestProductWhenSearchGraphQl\Model\QueryFactory;
+use SM\SuggestProductWhenSearchGraphQl\Api\Autocomplete\DataProviderInterface;
+use Magento\Search\Model\Autocomplete\ItemFactory;
+use Magento\Framework\App\Config\ScopeConfigInterface as ScopeConfig;
+use Magento\Store\Model\ScopeInterface;
+
+/**
+ * Catalog search auto-complete data provider.
+ */
+class DataProvider implements DataProviderInterface
+{
+    /**
+     * Autocomplete limit
+     */
+    const CONFIG_AUTOCOMPLETE_LIMIT = 'catalog/search/autocomplete_limit';
+
+    /**
+     * Query factory
+     *
+     * @var QueryFactory
+     */
+    protected $queryFactory;
+
+    /**
+     * Autocomplete result item factory
+     *
+     * @var ItemFactory
+     */
+    protected $itemFactory;
+
+    /**
+     * Limit
+     *
+     * @var int
+     */
+    protected $limit;
+
+    /**
+     * @param QueryFactory $queryFactory
+     * @param ItemFactory $itemFactory
+     * @param ScopeConfig $scopeConfig
+     */
+
+    public function __construct(
+        QueryFactory $queryFactory,
+        ItemFactory $itemFactory,
+        ScopeConfig $scopeConfig
+    )
+    {
+        $this->queryFactory = $queryFactory;
+        $this->itemFactory = $itemFactory;
+        $this->limit = (int)$scopeConfig->getValue(
+            self::CONFIG_AUTOCOMPLETE_LIMIT,
+            ScopeInterface::SCOPE_STORE
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getItems($keyword)
+    {
+        $collection = $this->getSuggestCollection($keyword);
+        $query = $keyword;
+        $result = [];
+        foreach ($collection as $item) {
+            $resultItem = $this->itemFactory->create([
+                'title' => $item->getQueryText(),
+                'num_results' => $item->getNumResults(),
+            ]);
+            if ($resultItem->getTitle() == $query) {
+                array_unshift($result, $resultItem);
+            } else {
+                $result[] = $resultItem;
+            }
+        }
+        return ($this->limit) ? array_splice($result, 0, $this->limit) : $result;
+    }
+
+    /**
+     * Retrieve suggest collection for query
+     *
+     * @return Collection
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
+     */
+    private function getSuggestCollection($keyword)
+    {
+        return $this->queryFactory->get()->getSuggestCollection($keyword);
+    }
+}
