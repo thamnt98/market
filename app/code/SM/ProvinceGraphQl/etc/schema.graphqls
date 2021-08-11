@@ -1,0 +1,24 @@
+type Query {
+    province: [Provinces]
+    @resolver(class:"SM\\ProvinceGraphQl\\Model\\Resolver\\Province")
+    @doc(description:
+        "The popular_products query returns popular product list")
+    @cache(cacheable: false)
+}
+
+type Provinces {
+   id: Int,
+   name: String,
+   city: [Cities]
+}
+
+type Cities {
+    id: Int,
+    name: String,
+    district: [Districts]
+}
+
+type Districts {
+    id: Int,
+    name: String,
+}
