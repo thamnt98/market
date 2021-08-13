@@ -1,0 +1,63 @@
+type Query {
+    notificationTypes: [NotificationType] @resolver(class: "SM\\NotificationGraphQl\\Model\\Resolver\\NotificationTypes")
+    notificationList (
+        pageSize: Int @doc(description: "The maximum number of results to return at once"),
+        currentPage: Int @doc(description: "Specifies which page of results to return"),
+        type: String @doc(description: "Filter by event type"),
+    ): NotificationList @resolver(class: "SM\\NotificationGraphQl\\Model\\Resolver\\NotificationList")
+    notificationUnreadCount: Int @resolver(class: "SM\\NotificationGraphQl\\Model\\Resolver\\NotificationUnreadCount")
+}
+
+type Mutation {
+    notificationSaveDevice (device: DeviceInput!): Device @resolver(class: "SM\\NotificationGraphQl\\Model\\Resolver\\NotificationSaveDevice")
+    notificationMarkAsRead (message_ids: [Int], type: String): ResultCount @resolver(class: "SM\\NotificationGraphQl\\Model\\Resolver\\NotificationMarkAsRead")
+    notificationMarkAllAsRead: ResultCount @resolver(class: "SM\\NotificationGraphQl\\Model\\Resolver\\NotificationMarkAllAsRead")
+    notificationDelete (message_ids: [Int]): ResultCount @resolver(class: "SM\\NotificationGraphQl\\Model\\Resolver\\NotificationDelete")
+    notificationDeleteAll: ResultCount @resolver(class: "SM\\NotificationGraphQl\\Model\\Resolver\\NotificationDeleteAll")
+}
+
+input DeviceInput @doc(description: "Device information input") {
+    device_id: String!
+    token: String!
+    type: String!
+}
+
+type NotificationType @doc(description: "Enabled Notification Event") {
+    name: String
+    value: String
+}
+
+type NotificationList @doc(description: "List of customer notifications") {
+    total_count: Int
+    items: [Notification]
+}
+
+type Notification @doc(description: "Notification information") {
+    message_id: Int
+    title: String
+    content: String
+    is_read: Int
+    event: String
+    event_label: String
+    image: String
+    redirect_type: String
+    redirect_id: String
+    created_at: String
+    start_date: String
+    end_date: String
+    highlight_title: String
+    highlight_content: String
+}
+
+type Device @doc(description: "Device information") {
+    customer_id: Int
+    device_id: String
+    token: String
+    type: String
+    status: String
+}
+
+type ResultCount @doc(description: "Mutation Result Count") {
+    success_count: Int
+    failure_count: Int
+}
