@@ -3,7 +3,7 @@ type Query {
     notificationList (
         pageSize: Int @doc(description: "The maximum number of results to return at once"),
         currentPage: Int @doc(description: "Specifies which page of results to return"),
-        type: String @doc(description: "Filter by event type"),
+        type: [String] @doc(description: "Filter by event type"),
     ): NotificationList @resolver(class: "SM\\NotificationGraphQl\\Model\\Resolver\\NotificationList")
     notificationUnreadCount: Int @resolver(class: "SM\\NotificationGraphQl\\Model\\Resolver\\NotificationUnreadCount")
 }
