@@ -73,7 +73,7 @@ class NotificationList implements ResolverInterface
             ->addSortOrder($sortOrder);
 
         if ($type) {
-            $searchCriteriaBuilder->addFilter('event', $type);
+            $searchCriteriaBuilder->addFilter('event', $type, 'in');
         }
 
         $result = $this->customerMessageRepository->getList($customerId, $searchCriteriaBuilder->create());
