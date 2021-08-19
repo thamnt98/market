@@ -5,6 +5,10 @@ namespace SM\ShoppingList\Model\Data;
 use Magento\Framework\DataObject;
 use SM\ShoppingList\Api\Data\ShoppingListDataInterface;
 
+/**
+ * Class ShoppingList
+ * @package SM\ShoppingList\Model\Data
+ */
 class ShoppingList extends DataObject implements ShoppingListDataInterface
 {
 
@@ -102,5 +106,37 @@ class ShoppingList extends DataObject implements ShoppingListDataInterface
     public function getIsDefault()
     {
         return $this->getData(self::IS_DEFAULT);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getLeft()
+    {
+        return $this->getData(self::LEFT);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setLeft($value)
+    {
+        return $this->setData(self::LEFT, $value);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getIsExist()
+    {
+        return $this->getData(self::IS_EXIST);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setIsExist($value)
+    {
+        return $this->setData(self::IS_EXIST, $value);
     }
 }

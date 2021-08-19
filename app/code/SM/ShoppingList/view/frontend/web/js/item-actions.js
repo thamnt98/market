@@ -2,18 +2,25 @@ define(
     [
         'jquery',
         'Magento_Ui/js/modal/modal',
-        'SM_ShoppingList/js/alert'
+        'mage/url'
     ],
-    function ($, modal, alertModal) {
+    function ($, modal, urlBuilder) {
         'use strict';
 
         $.widget('vendor.mod', {
             _create: function () {
                 this._initElement();
+                this._initErrorMessageSection()
             },
+
+            _initErrorMessageSection: function () {
+                $('footer.modal-footer').prepend(
+                    '<div class="error-message" style="display: none"> </div>'
+                )
+            },
+
             _initElement: function () {
-                var that = this;
-                window.clickFirst = true;
+                var self = this;
                 var options = {
                     type: 'popup',
                     title: $.mage.__('Move Product to'),
@@ -23,79 +30,70 @@ define(
                         text: jQuery.mage.__('Cancel'),
                         class: 'action secondary move-product-cancel',
                         click: function () {
-                            $("#shoppinglist-name-" + that.options.item_id).val("");
-                            $('input[type=checkbox][name="selected-' + that.options.item_id + '[]"]').prop('checked', false);
-                            $("#create-to-move-" + that.options.item_id).hide();
                             this.closeModal();
                         }
                     }, {
                         text: jQuery.mage.__('Move'),
                         class: 'action primary move-product',
                         click: function () {
-                            var selected = $('input[type=checkbox][name="selected-' + that.options.item_id + '[]"]:checked');
-                            if (window.clickFirst) {
-                                $('footer.modal-footer').prepend(
-                                    '<div class="error-message"> </div>'
-                                )
-                            }
-                            window.clickFirst = false;
-                            $('footer.modal-footer .error-message').text('');
+                            var selected = $('input[type=checkbox][name="selected[]"]:checked');
+                            $('footer.modal-footer .error-message').hide();
                             if (!selected.length) {
-                                that.showErrorMessage("Please select a shopping list to continue");
+                                self.showErrorMessage("Please select a shopping list to continue");
                             } else {
                                 var data = [];
                                 selected.each(function () {
                                     data.push(Number(this.value));
                                 });
 
-                                that.moveItem(data, that.options.product_id, this);
+                                self.moveItem(data, $("input[name='item_id']").val(), this);
                             }
-
                         }
                     }]
                 };
 
-                modal(options, $('#move-shoppinglist-modal-' + this.options.item_id));
+                /**
+                 * Init modal move item with options above
+                 */
+                $(".moveotherlist-content").each(function (index, item) {
+                    modal(options, $(item));
+                })
 
-                $("#button-open-move-" + this.options.item_id).on('click', function () {
-                    $('#move-shoppinglist-modal-' + that.options.item_id).modal('openModal');
-                    $('footer.modal-footer .error-message').text('');
+                /**
+                 * Handle open model when click button "Move Item"
+                 */
+                $(".moveotherlist").on("click", function () {
+                    var itemId = $(this).data("item-id");
+                    $("input[name='item_id']").val(itemId)
+
+                    $(".input-list-name").val("");
+                    $(".create-list-section").hide();
+                    $(".wishlist-checkbox").prop("checked", false);
+                    $("footer.modal-footer .error-message").hide();
+                    $(self.generateSelector("moveotherlist-content", itemId)).modal('openModal');
                 });
 
-                $("#open-create-to-move-" + this.options.item_id).on('click', function () {
-                    $("#create-to-move-" + that.options.item_id).show();
+                /**
+                 *  Handle show create list section
+                 */
+                $(".btn-create-list").on('click', function () {
+                    var itemId = $(this).data("item-id");
+
+                    $(self.generateSelector("create-list-section", itemId)).show();
                 });
 
-                $("#submit-create-" + this.options.item_id).on('click', function () {
+                /**
+                 * Handle action submit create list
+                 */
+                $(".submit-create-list").on('click', function () {
+                    var itemId = $(this).data("item-id");
 
-                    var shoppinglist_name = $("#shoppinglist-name-" + that.options.item_id).val();
-                    that.createShoppingList(shoppinglist_name);
+                    var listName = $(self.generateSelector("input-list-name", itemId)).val();
+                    self.createShoppingList(listName);
 
                 });
 
-                var remove_options = {
-                    type : 'popup',
-                    title : $.mage.__('Settings'),
-                    modalClass: 'pp-shopping-list',
-                    responsive: true,
-                    buttons: [{
-                        text: jQuery.mage.__('Cancel'),
-                        class: 'action secondary',
-                        click: function () {
-                            this.closeModal();
-                        }
-                    }, {
-                        text: jQuery.mage.__('Delete'),
-                        class: 'action primary',
-                        click: function () {
-                            window.location.href = that.options.remove_item_url
-                        }
-                    }]
-                };
-
-                modal(remove_options, $('#confirm-delete-item-modal-' + this.options.item_id));
-
-                $("#button-remove-item-" + this.options.item_id).on('click', function () {
+                $(".btn-remove").on("click", function () {
                     if (typeof dataLayerSourceObjects !== 'undefined') {
                         let dt = new Date();
                         let time = $.datepicker.formatDate('dd/mm/yy', dt) + ' ' + dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
@@ -113,8 +111,12 @@ define(
                             'shoppingList_name': $.trim($('.shopping-lists .product.data.items .item.title.active').text())
                         })
                     }
-                    window.location.href = that.options.remove_item_url;
-                });
+                    window.location.href = $(this).data("remove-url")
+                })
+            },
+
+            generateSelector : function (className, itemId) {
+                return "." + className + "[data-item-id=" + itemId + "]"
             },
 
             /**
@@ -122,83 +124,83 @@ define(
              * @param name
              */
             createShoppingList : function (name) {
-                var that = this;
+                var self = this;
                 if (name === '') {
-                    that.showErrorMessage("Shopping List name is empty!");
+                    self.showErrorMessage("Shopping List name is empty!");
                 } else {
                     var data = {
                         shopping_list_name : name
                     };
+
+                    $("footer.modal-footer .error-message").hide();
                     $.ajax({
-                        url: this.options.create_list_url,
+                        url: urlBuilder.build("wishlist/ajax/createlist"),
                         type: "POST",
                         data: data,
                         dataType: 'json',
                         showLoader: true,
                         success: function (response) {
-                            if (response.status == 1) {
+                            if (Number(response.status) === 1) {
                                 data = response.result;
-                                var item_ids = that.options.item_ids.split(",");
-                                item_ids.forEach(myFunction);
-                                $("#shoppinglist-name-" + that.options.item_id).val("");
-                                $("#create-to-move-" + that.options.item_id).hide();
-                                function myFunction(item_id, index)
-                                {
-                                    $('<li/>', {
-                                        "class": 'checkbox-custom'
-                                    }).append($('<input/>', {
-                                        type : "checkbox",
-                                        name : "selected-" + item_id + "[]",
-                                        value : data.list_id,
-                                        checked : true
-                                    })).append($('<label/>', {
-                                        text : data.name
-                                    })).appendTo("#list-choice-" + item_id);
+                                $(".input-list-name").val("");
+                                $(".create-list-section").hide();
 
-                                }
+                                $('<li/>', {
+                                    "class": "checkbox-custom"
+                                }).append($('<input/>', {
+                                    type : "checkbox",
+                                    class : "wishlist-checkbox",
+                                    name : "selected[]",
+                                    value : data.list_id,
+                                    checked : true
+                                })).append($('<label/>', {
+                                    text : data.name
+                                })).appendTo(".list-choice");
+
                             } else {
-                                that.showErrorMessage(response.result);
+                                self.showErrorMessage(response.result);
                             }
                         },
                         error: function () {
-                            that.showErrorMessage("An error occurred. Please refresh page and try again");
+                            self.showErrorMessage("An error occurred. Please refresh page and try again");
                         }
                     });
                 }
             },
 
-            moveItem : function (selected, product_id, add_modal) {
-                var that = this;
+            moveItem : function (selected, itemId, moveModal) {
+                var self = this;
 
                 var data = {
                     shopping_list_ids: selected,
-                    item_id: this.options.item_id
+                    item_id: itemId
                 };
 
+                $("footer.modal-footer .error-message").hide();
                 $.ajax({
-                    url: this.options.move_item_url,
+                    url: urlBuilder.build("wishlist/ajax/moveitem"),
                     type: "POST",
                     data: data,
                     dataType: 'json',
                     showLoader: true,
                     success: function (response) {
-                        if (response.status == 1) {
-                            that.showSuccess(response.result);
-                            $("#list-item-" + that.options.item_id).remove();
-                            add_modal.closeModal();
+                        if (Number(response.status) === 1) {
+                            self.showSuccess(response.result, itemId);
+                            $("#item_" + itemId).remove();
+                            moveModal.closeModal();
                         } else {
-                            that.showErrorMessage(response.result);
+                            self.showErrorMessage(response.result);
                         }
                     },
                     error: function () {
-                        that.showErrorMessage("An error occurred. Please refresh page and try again");
+                        self.showErrorMessage("An error occurred. Please refresh page and try again");
                     }
                 });
 
             },
 
-            showSuccess : function (data) {
-                var that = this;
+            showSuccess : function (data, itemId) {
+                var self = this;
                 var options = {
                     type: 'popup',
                     responsive: true,
@@ -209,21 +211,22 @@ define(
                         class: 'action primary',
                         click: function () {
                             this.closeModal();
-                            $('input[type=checkbox][name="selected-' + that.options.item_id + '[]"]').prop('checked', false);
-                            $("#destination-list-" + that.options.item_id).empty();
+                            $(".wishlist-checkbox").prop("checked", false);
+                            $(".destination-list").empty();
                         }
                     }]
                 };
 
                 jQuery.each(data, function (key, val) {
                     var element = '<li><a href="' + val.url + '">' + val.name + '</a></li>';
-                    $("#destination-list-" + that.options.item_id).append(element);
+                    $(self.generateSelector("destination-list", itemId)).append(element);
                 });
 
-                $("#success-alert-modal-" + that.options.item_id).modal(options).modal('openModal');
+                $(self.generateSelector("success-modal", itemId)).modal(options).modal('openModal');
             },
+
             showErrorMessage: function (message) {
-                $('footer.modal-footer .error-message').text($.mage.__(message))
+                $('footer.modal-footer .error-message').show().text($.mage.__(message))
             }
 
         });

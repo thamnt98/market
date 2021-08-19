@@ -50,31 +50,5 @@ class Toolbar extends Template
         return strtok($this->getUrl('*/*/*', ['_current' => true, '_use_rewrite' => true]), "?");
     }
 
-    /**
-     * @return string
-     */
-    public function getUpdateUrl()
-    {
-        return $this->getUrl("shoppinglist/ajax/updatelist");
-    }
 
-    /**
-     * @param int $listId
-     * @return string
-     */
-    public function getRemoveListUrl($listId)
-    {
-        return $this->getUrl("shoppinglist/action/removelist", ["id" => $listId]);
-    }
-
-    /**
-     * @return string
-     */
-    public function getShareUrl()
-    {
-        return $this->getUrl(
-            "shoppinglist/shared/index",
-            ["code" => $this->getShoppingList()->getSharingCode()]
-        );
-    }
 }

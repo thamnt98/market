@@ -3,6 +3,7 @@
     <!-- repositories -->
     <preference for="SM\ShoppingList\Api\ShoppingListRepositoryInterface" type="SM\ShoppingList\Model\ShoppingListRepository" />
     <preference for="SM\ShoppingList\Api\ShoppingListItemRepositoryInterface" type="SM\ShoppingList\Model\ShoppingListItemRepository" />
+    <preference for="SM\ShoppingList\Api\ItemManagementInterface" type="SM\ShoppingList\Model\ItemManagement" />
 
     <!-- data models -->
     <preference for="SM\ShoppingList\Api\Data\ShoppingListDataInterface" type="SM\ShoppingList\Model\Data\ShoppingList" />
@@ -14,7 +15,9 @@
 
     <preference for="SM\ShoppingList\Api\Data\ResultDataInterface" type="SM\ShoppingList\Model\Data\ResultData" />
 
-    <type name="Magento\MultipleWishlist\Helper\Data">
-        <plugin type="SM\ShoppingList\Plugin\WishlistData" name="wishlist_data"/>
-    </type>
+    <preference for="Magento\Wishlist\Model\Wishlist" type="SM\ShoppingList\Model\Wishlist"/>
+
+    <preference for="Magento\Wishlist\Block\Customer\Wishlist" type="SM\ShoppingList\Block\Customer\Wishlist"/>
+
+    <preference for="Magento\Wishlist\Controller\Index\Cart" type="SM\ShoppingList\Controller\Index\Cart"/>
 </config>

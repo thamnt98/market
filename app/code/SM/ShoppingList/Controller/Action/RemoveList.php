@@ -7,6 +7,7 @@ use Exception;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Webapi\Exception as WebapiException;
 use SM\ShoppingList\Api\Data\ShoppingListDataInterface;
 use SM\ShoppingList\Controller\ListAction;
 
@@ -21,7 +22,7 @@ class RemoveList extends ListAction
      */
     public function execute()
     {
-        $shoppingListId = $this->getRequest()->getParam("id");
+        $shoppingListId = $this->getRequest()->getParam("wishlist_id");
         /** @var ShoppingListDataInterface $shoppingList */
         try {
             $shoppingList = $this->shoppingListRepository->getById($shoppingListId);
@@ -29,20 +30,10 @@ class RemoveList extends ListAction
             $this->messageManager->addSuccessMessage(
                 __("%1 has been successfully deleted.", $shoppingList->getName())
             );
-        } catch (NoSuchEntityException $e) {
-            $this->messageManager->addErrorMessage(
-                __('Shopping list with id "%1" does not exist.', $shoppingList->getWishlistId())
-            );
-        } catch (BadMethodCallException $e) {
-            $this->messageManager->addErrorMessage(
-                __("You can not delete " . $this->shoppingListRepository->getDefaultShoppingListName())
-            );
-        } catch (Exception $e) {
-            $this->messageManager->addErrorMessage(
-                __("Unable to delete " . $shoppingList->getName())
-            );
+        } catch (WebapiException $e) {
+            $this->messageManager->addErrorMessage($e->getMessage());
         }
 
-        return $this->_redirect("shoppinglist/mylist");
+        return $this->_redirect("wishlist/mylist");
     }
 }

@@ -5,42 +5,34 @@
  */
 
 /** @var \Magento\Wishlist\Block\Catalog\Product\View\AddTo\Wishlist $block */
-/** @var \SM\ShoppingList\ViewModel\PDPViewModel $viewModel */
+/** @var \SM\ShoppingList\ViewModel\ItemViewModel $viewModel */
 $product = $block->getProduct();
-$viewModel = $block->getData('shoppingListPDPViewModel');
-$shoppingLists = $viewModel->getShoppingLists();
+$viewModel = $block->getData('viewModel');
 $productImage = $viewModel->getProductImage($product);
 $productId = $product->getId();
-$isAddedShoppingList = $viewModel->isAddedShoppingList($productId)? 'true':'false';
-$getAddedItemIdInList = $viewModel->getAddedItemIdInList($productId);
-$shoppingListHelper = $this->helper('SM\ShoppingList\Helper\Data');
-
+/** @var \SM\ShoppingList\Helper\Data $shoppingListHelper */
+$shoppingListHelper = $this->helper(\SM\ShoppingList\Helper\Data::class);
 ?>
 <?php if ($shoppingListHelper->isActiveShoppingList()):?>
 <a class="action towishlist"
    id="btn-open-add-item"
+   data-product-id="<?= $block->escapeHtml($productId)?>"
    style="cursor: pointer;">
     <span id="additem-title"><?= $block->escapeHtml(__('Add to Shopping List')) ?></span>
 </a>
-<a class="action towishlist"
-   id="btn-open-remove-item"
-   style="cursor: pointer; display: none;">
-    <span><?= $block->escapeHtml(__('Remove from Shopping List')) ?></span>
-</a>
-
 <div id = "add-item-modal" class="content" style="display: none">
     <div class="product-info">
-        <img src="<?= $productImage ?>" width="124px" alt="<?= $product->getName()?>"/>
+        <img src="<?= $block->escapeUrl($productImage) ?>" width="124px" alt="<?= $block->escapeHtml($product->getName()) ?>"/>
         <span class="product-name"><?= $block->escapeHtml($product->getName()) ?></span>
     </div>
     <form id="form-add-item">
         <ul class="list-choice" id="list-choice-pdp">
             <?php
-            /** @var \SM\ShoppingList\Api\Data\ShoppingListDataInterface $list */
-            foreach ($viewModel->getShoppingLists() as $list) :?>
+            /** @var \Magento\Wishlist\Model\Wishlist $wishlist */
+            foreach ($viewModel->getShoppingLists() as $wishlist) :?>
                 <li class="checkbox-custom">
-                    <input type="checkbox" name="selected[]" value="<?= $list->getWishlistId() ?>">
-                    <label><?= $block->escapeHtml($list->getName()) ?></label>
+                    <input type="checkbox" name="selected[]" value="<?= $block->escapeHtml($wishlist->getId()) ?>">
+                    <label><?= $block->escapeHtml($wishlist->getName()) ?></label>
                 </li>
             <?php endforeach;?>
         </ul>
@@ -64,7 +56,7 @@ $shoppingListHelper = $this->helper('SM\ShoppingList\Helper\Data');
 </div>
 <div id="success-alert-modal" class="content add-success-modal" style="display:none;">
     <div class="product-info">
-        <img src="<?= $productImage?>" width="124px"  alt="<?= $product->getName() ?>"/>
+        <img src="<?= $block->escapeUrl($productImage) ?>" width="124px"  alt="<?= $block->escapeHtml($product->getName()) ?>"/>
         <div class="success-content">
             <span class="product-name"><?= $block->escapeHtml($product->getName()) ?></span>
             <h3><?= $block->escapeHtml(__("This item has been added to"))?></h3>
@@ -78,16 +70,7 @@ $shoppingListHelper = $this->helper('SM\ShoppingList\Helper\Data');
 <script type="text/x-magento-init">
     {
         "*": {
-            "ItemAdd": {
-                "create_list_url":"<?= $block->getUrl("shoppinglist/ajax/createlist") ?>",
-                "product_id":"<?= $productId ?>",
-                "add_item_url":"<?= $block->getUrl("shoppinglist/ajax/additems") ?>",
-                "store_id":"<?= $viewModel->getStoreId() ?>",
-                "remove_item_url":"<?= $block->getUrl("shoppinglist/ajax/removeitem")?>",
-                "is_added_shopping_list":"<?php echo $isAddedShoppingList ?>",
-                "store_id":"<?= $viewModel->getStoreId() ?>",
-                "my_favorite_id": "<?= $shoppingListHelper->getMyFavoritesListDefaultId(); ?>"
-            }
+            "ItemAdd": {}
         }
     }
 </script>

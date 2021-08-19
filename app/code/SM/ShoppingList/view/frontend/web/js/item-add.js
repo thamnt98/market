@@ -3,16 +3,14 @@ define(
         'jquery',
         'Magento_Ui/js/modal/modal',
         'Magento_Customer/js/customer-data',
-        'SM_ShoppingList/js/alert'
+        'SM_ShoppingList/js/alert',
+        'mage/url'
     ],
-    function ($, modal, customerData, alertModal) {
+    function ($, modal, customerData, alertModal, urlBuilder) {
         'use strict';
 
         $.widget('vendor.mod', {
             _create: function () {
-                if (!this.options.my_favorite_id) {
-                    return
-                }
                 this._initElement();
             },
             _initElement: function () {
@@ -32,6 +30,7 @@ define(
                             $('input[type=checkbox][name="selected[]"]').prop('checked', false);
                             $("#create-to-add").hide();
                             this.closeModal();
+                            $('footer.modal-footer .error-message').hide().text('')
                         }
                     }, {
                         text: jQuery.mage.__('Add'),
@@ -41,7 +40,7 @@ define(
                             var data = [];
                             if (window.clickFirst) {
                                 $('footer.modal-footer').prepend(
-                                    '<div class="error-message"> </div>'
+                                    '<div class="error-message" style="display: none"> </div>'
                                 )
                             }
                             window.clickFirst = false;
@@ -58,19 +57,11 @@ define(
                                 });
                             }
                             if (data.length) {
-                                that.addItems(data, that.options.product_id, this);
+                                that.addItems(data, Number($("#btn-open-add-item").data("product-id")), this);
                             }
                         }
                     }]
                 };
-
-                /** check item has added*/
-                that.checkItemHasAdded(that.options.product_id, that.options.is_added_shopping_list);
-                var selectorRemove = "#btn-open-remove-item";
-                //remove item
-                $(selectorRemove).click(function (e) {
-                    that.removeItemFromPLP(that.options.product_id);
-                });
 
                 modal(options, $('#add-item-modal'));
 
@@ -86,7 +77,13 @@ define(
                 });
 
                 $("#submit-create-pdp").on('click', function () {
-
+                    if (window.clickFirst) {
+                        $('footer.modal-footer').prepend(
+                            '<div class="error-message" style="display: none"> </div>'
+                        )
+                    }
+                    window.clickFirst = false;
+                    $('footer.modal-footer .error-message').text('');
                     var shoppinglist_name = $("#shoppinglist-name-pdp").val();
                     that.createShoppingList(shoppinglist_name);
 
@@ -104,8 +101,9 @@ define(
                     var data = {
                         shopping_list_name : name
                     };
+                    $('footer.modal-footer .error-message').hide()
                     $.ajax({
-                        url: this.options.create_list_url,
+                        url: urlBuilder.build("wishlist/ajax/createlist"),
                         type: "POST",
                         data: data,
                         dataType: 'json',
@@ -126,6 +124,7 @@ define(
 
                                 $("#create-to-add").hide();
                                 $("#shoppinglist-name-pdp").val("");
+                                $('footer.modal-footer .error-message').hide().text('')
                             } else {
                                 that.showErrorMessage(response.result);
                             }
@@ -141,28 +140,21 @@ define(
 
             addItems : function (selected, product_id, add_modal) {
                 var that = this;
-                var itemAdd = $('#btn-open-add-item'),
-                    itemRemove = $('#btn-open-remove-item');
 
                 var data = {
                     shopping_list_ids: selected,
                     product_id: product_id,
-                    store_id: this.options.store_id,
                     show_toast: false
                 };
-
+                $('footer.modal-footer .error-message').hide()
                 $.ajax({
-                    url: this.options.add_item_url,
+                    url: urlBuilder.build("wishlist/ajax/additems"),
                     type: "POST",
                     data: data,
                     dataType: 'json',
                     showLoader: true,
                     success: function (data) {
                         if (data.status == 1) {
-                            if (selected.includes(parseInt(data.myFavoriteListId))) {
-                                itemAdd.hide();
-                                itemRemove.show();
-                            }
                             that.showSuccess(data.result);
                             add_modal.closeModal();
 
@@ -233,7 +225,7 @@ define(
 
                 var data = {product_id: productId};
                 $.ajax({
-                    url: self.options.remove_item_url,
+                    url: urlBuilder.build("wishlist/ajax/removeitem"),
                     data: data,
                     type: 'post',
                     dataType: 'json',
@@ -247,7 +239,7 @@ define(
                 });
             },
             showErrorMessage: function (message) {
-                $('footer.modal-footer .error-message').text($.mage.__(message))
+                $('footer.modal-footer .error-message').show().text($.mage.__(message))
             }
 
         });

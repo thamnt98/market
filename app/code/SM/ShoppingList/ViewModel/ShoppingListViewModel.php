@@ -14,11 +14,7 @@ use Magento\Catalog\Helper\Image;
 use Magento\Catalog\Model\Product;
 use Magento\Checkout\Model\Cart;
 use Magento\Customer\Helper\Session\CurrentCustomer;
-use Magento\Framework\Api\SearchCriteria;
 use Magento\Framework\Api\SearchCriteriaBuilder;
-use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Store\Model\StoreManagerInterface;
-use SM\ShoppingList\Api\Data\ShoppingListDataInterface;
 use SM\ShoppingList\Model\ShoppingListRepository;
 use Magento\Framework\View\Element\Block\ArgumentInterface;
 use SM\ShoppingList\Helper\Data;
@@ -29,10 +25,7 @@ abstract class ShoppingListViewModel implements ArgumentInterface
      * @var CurrentCustomer
      */
     protected $currentCustomer;
-    /**
-     * @var StoreManagerInterface
-     */
-    protected $storeManager;
+
     /**
      * @var Image
      */
@@ -54,52 +47,43 @@ abstract class ShoppingListViewModel implements ArgumentInterface
      * @var Data
      */
     protected $shoppingListHelper;
+    /**
+     * @var \Magento\MultipleWishlist\Helper\Data
+     */
+    protected $wishlistData;
 
     /**
      * ShoppingListViewModel constructor.
      * @param CurrentCustomer $currentCustomer
-     * @param StoreManagerInterface $storeManager
      * @param Image $imageHelper
      * @param ShoppingListRepository $shoppingListRepository
      * @param SearchCriteriaBuilder $searchCriteriaBuilder
      * @param Cart $cart
      * @param Data $shoppingListHelper
+     * @param \Magento\MultipleWishlist\Helper\Data $wishlistData
      */
     public function __construct(
         CurrentCustomer $currentCustomer,
-        StoreManagerInterface $storeManager,
         Image $imageHelper,
         ShoppingListRepository $shoppingListRepository,
         SearchCriteriaBuilder $searchCriteriaBuilder,
         Cart $cart,
-        Data $shoppingListHelper
+        Data $shoppingListHelper,
+        \Magento\MultipleWishlist\Helper\Data $wishlistData
     ) {
+        $this->wishlistData = $wishlistData;
         $this->cart = $cart;
         $this->searchCriteriaBuilder = $searchCriteriaBuilder;
         $this->shoppingListRepository = $shoppingListRepository;
         $this->imageHelper = $imageHelper;
         $this->currentCustomer = $currentCustomer;
-        $this->storeManager = $storeManager;
         $this->shoppingListHelper = $shoppingListHelper;
     }
 
-    /**
-     * @return ShoppingListDataInterface[]
-     */
     public function getShoppingLists()
     {
-        $this->searchCriteriaBuilder->addFilter("customer_id", $this->currentCustomer->getCustomerId());
-        /** @var SearchCriteria $searchCriteria */
-        $searchCriteria = $this->searchCriteriaBuilder->create();
-        try {
-            $searchResults = $this->shoppingListRepository->getList(
-                $searchCriteria,
-                $this->currentCustomer->getCustomerId()
-            );
-            return $searchResults->getItems();
-        } catch (NoSuchEntityException $e) {
-            return [];
-        }
+        $customerId = $this->currentCustomer->getCustomerId();
+        return $this->wishlistData->getCustomerWishlists($customerId)->getItems();
     }
 
     /**
@@ -109,14 +93,5 @@ abstract class ShoppingListViewModel implements ArgumentInterface
     public function getProductImage($product)
     {
         return $this->imageHelper->init($product, 'product_base_image')->getUrl();
-    }
-
-    /**
-     * @return int
-     * @throws NoSuchEntityException
-     */
-    public function getStoreId()
-    {
-        return $this->storeManager->getStore()->getId();
     }
 }

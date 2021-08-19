@@ -29,7 +29,7 @@ define(
                         text: jQuery.mage.__('Save'),
                         class: 'action primary',
                         click: function () {
-                            that.updateList($("#input-wishlist-name").val(), that.options.list_id, this);
+                            that.updateList($("#input-wishlist-name").val(), that.options.wishlist_id, this);
                         }
                     }]
                 };
@@ -54,7 +54,7 @@ define(
                         text: jQuery.mage.__('Delete'),
                         class: 'action primary',
                         click: function () {
-                            window.location.href = that.options.remove_list_url ;
+                            window.location.href = $("#button-confirm-delete-list-modal").data("remove-url");
                         }
                     }]
                 };
@@ -70,27 +70,23 @@ define(
 
                 });
 
-                $('input[type=radio][name="sort"]').change(function () {
-                    $("#form-sort-item").submit();
-                });
+                // var options_share = {
+                //     type : 'popup',
+                //     title : $.mage.__('Share "') + this.options.shoppinglist_name + '"',
+                //     modalClass: 'pp-shopping-list share-shoplist',
+                //     responsive: true
+                // };
 
-                var options_share = {
-                    type : 'popup',
-                    title : $.mage.__('Share "') + this.options.shoppinglist_name + '"',
-                    modalClass: 'pp-shopping-list share-shoplist',
-                    responsive: true
-                };
+                // modal(options_share, $('#share-shoppinglist-modal'));
 
-                modal(options_share, $('#share-shoppinglist-modal'));
-
-                $("#btn-share-list").on('click', function () {
-                    $('#share-shoppinglist-modal').modal('openModal');
-                });
-
-                $("#btn-copy-share-url").on("click", function () {
-                    $("#value-share-url").select();
-                    document.execCommand("copy");
-                });
+                // $("#btn-share-list").on('click', function () {
+                //     $('#share-shoppinglist-modal').modal('openModal');
+                // });
+                //
+                // $("#btn-copy-share-url").on("click", function () {
+                //     $("#value-share-url").select();
+                //     document.execCommand("copy");
+                // });
 
             },
             /**
@@ -99,7 +95,7 @@ define(
              * @param list_id
              * @param modal_settings
              */
-            updateList : function (name, list_id, modal_settings) {
+            updateList : function (name, wishlist_id, modal_settings) {
                 if (name === '') {
                     alertModal.showError("Shopping List name is empty");
                 } else if (name === this.options.shoppinglist_name) {
@@ -107,17 +103,17 @@ define(
                 } else {
                     var data = {
                         update_list_name : name,
-                        list_id : list_id
+                        wishlist_id : wishlist_id
                     };
                     $.ajax({
-                        url: this.options.update_list_url,
+                        url: this.options.update_url,
                         type: "POST",
                         data: data,
                         dataType: 'json',
                         showLoader: true,
                         success: function (response) {
                             if (response.status == 1) {
-                                $("#form-update-list").submit();
+                                window.location.reload();
                             } else {
                                 alertModal.showError(response.result);
                             }

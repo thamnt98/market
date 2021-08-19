@@ -13,7 +13,7 @@
                 <block class="Magento\Wishlist\Block\Catalog\Product\View\AddTo\Wishlist" name="view.addto.shoppinglist"
                        template="SM_ShoppingList::catalog/product/view/addto/wishlist.phtml" after="-">
                     <arguments>
-                        <argument name="shoppingListPDPViewModel" xsi:type="object">SM\ShoppingList\ViewModel\PDPViewModel</argument>
+                        <argument name="viewModel" xsi:type="object">SM\ShoppingList\ViewModel\ItemViewModel</argument>
                     </arguments>
                 </block>
             </referenceContainer>

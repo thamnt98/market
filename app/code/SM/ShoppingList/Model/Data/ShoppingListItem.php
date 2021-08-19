@@ -3,13 +3,14 @@
 namespace SM\ShoppingList\Model\Data;
 
 use Magento\Framework\DataObject;
-use SM\ShoppingList\Api\Data\ShoppingListItemDataExtensionInterface;
 use SM\ShoppingList\Api\Data\ShoppingListItemDataInterface;
 
+/**
+ * Class ShoppingListItem
+ * @package SM\ShoppingList\Model\Data
+ */
 class ShoppingListItem extends DataObject implements ShoppingListItemDataInterface
 {
-    use CustomAttributeAware;
-
     /**
      * @inheritdoc
      */
@@ -88,5 +89,37 @@ class ShoppingListItem extends DataObject implements ShoppingListItemDataInterfa
     public function setAddedAt($value)
     {
         return $this->setData(self::ADDED_AT, $value);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getProduct()
+    {
+        return $this->getData(self::PRODUCT);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setProduct($value)
+    {
+        return $this->setData(self::PRODUCT, $value);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getImage()
+    {
+        return $this->getData(self::IMAGE);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function setImage($value)
+    {
+        return $this->setData(self::IMAGE, $value);
     }
 }

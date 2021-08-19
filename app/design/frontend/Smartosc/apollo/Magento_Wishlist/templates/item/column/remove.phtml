@@ -1,0 +1,19 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/* @var \Magento\Wishlist\Block\Customer\Wishlist\Item\Column\Remove $block */
+
+/** @var \Magento\Wishlist\Model\Item $item */
+$item = $block->getItem();
+?>
+<a style="cursor: pointer" data-role="remove"
+   title="<?= $block->escapeHtmlAttr(__('Remove Item')) ?>"
+   class="btn-remove action delete"
+   data-item-id="<?= $block->escapeHtml($item->getId()) ?>"
+   data-product-id="<?= $block->escapeHtml($item->getProduct()->getId()) ?>"
+   data-remove-url="<?= $block->escapeHtml($block->getUrl("wishlist/action/removeitem", ["id" => $item->getId()])) ?>">
+    <span><?= $block->escapeHtml(__('Remove item')) ?></span>
+</a>

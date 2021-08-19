@@ -2,41 +2,19 @@
 
 namespace SM\ShoppingList\Model;
 
-use BadMethodCallException;
 use Exception;
-use LengthException;
-use Magento\Catalog\Helper\Image;
-use Magento\Catalog\Model\Product;
-use Magento\Catalog\Model\ProductRepository;
+use Magento\Framework\Webapi\Exception as WebapiException;
 use Magento\Framework\Api\DataObjectHelper;
-use Magento\Framework\Api\Search\SearchCriteriaInterfaceFactory;
-use Magento\Framework\Api\SearchCriteria\CollectionProcessorInterface;
-use Magento\Framework\Api\SearchCriteriaInterface;
-use Magento\Framework\App\Area;
-use Magento\Framework\App\Config\ScopeConfigInterface;
-use Magento\Framework\DB\Adapter\DuplicateException;
 use Magento\Framework\Exception\AlreadyExistsException;
-use Magento\Framework\Exception\CouldNotSaveException;
-use Magento\Framework\Exception\NoSuchEntityException;
-use Magento\Framework\Pricing\Helper\Data;
-use Magento\Framework\Stdlib\DateTime;
-use Magento\Review\Model\ReviewFactory;
-use Magento\Store\Model\App\Emulation;
-use Magento\Store\Model\ScopeInterface;
 use Magento\Wishlist\Model\Item;
 use Magento\Wishlist\Model\ItemFactory;
 use Magento\Wishlist\Model\ResourceModel\Item\Collection as ItemCollection;
 use Magento\Wishlist\Model\Wishlist;
 use Magento\Wishlist\Model\WishlistFactory as ShoppingListFactory;
-use SM\ShoppingList\Api\Data\ResultDataInterfaceFactory;
 use SM\ShoppingList\Api\Data\ShoppingListDataInterface;
 use SM\ShoppingList\Api\Data\ShoppingListDataInterfaceFactory;
-use SM\ShoppingList\Api\Data\ShoppingListItemDataInterface;
-use SM\ShoppingList\Api\Data\ShoppingListItemDataInterfaceFactory;
-use SM\ShoppingList\Api\Data\ShoppingListSearchResultsInterface;
-use SM\ShoppingList\Api\Data\ShoppingListSearchResultsInterfaceFactory;
 use SM\ShoppingList\Api\ShoppingListRepositoryInterface;
-use SM\ShoppingList\Model\ResourceModel\Item\Collection as ShoppingListItemCollection;
+use SM\ShoppingList\Helper\Converter;
 use SM\ShoppingList\Model\ResourceModel\Item\CollectionFactory as ShoppingListItemCollectionFactory;
 use SM\ShoppingList\Model\ResourceModel\ShareHistory\Collection as HistoryCollection;
 use SM\ShoppingList\Model\ResourceModel\ShareHistory\CollectionFactory as HistoryCollectionFactory;
@@ -50,10 +28,6 @@ use SM\ShoppingList\Model\ResourceModel\Wishlist\CollectionFactory as ShoppingLi
 class ShoppingListRepository implements ShoppingListRepositoryInterface
 {
     /**
-     * @var SearchCriteriaInterfaceFactory
-     */
-    protected $searchResultsFactory;
-    /**
      * @var ShoppingListCollectionFactory
      */
     protected $shoppingListCollectionFactory;
@@ -65,58 +39,21 @@ class ShoppingListRepository implements ShoppingListRepositoryInterface
      * @var ShoppingListItemCollectionFactory
      */
     protected $itemCollectionFactory;
-    /**
-     * @var ShoppingListItemDataInterfaceFactory
-     */
-    protected $shoppingListItemDataInterfaceFactory;
+
     /**
      * @var DataObjectHelper
      */
     protected $dataObjectHelper;
-    /**
-     * @var ShoppingListItemDataInterfaceFactory
-     */
-    protected $shoppingListItemDataFactory;
+
     /**
      * @var ShoppingListFactory
      */
-    protected $shoppingListFactory;
+    protected $wishlistFactory;
     /**
      * @var HistoryCollectionFactory
      */
     protected $historyCollectionFactory;
-    /**
-     * @var ScopeConfigInterface
-     */
-    protected $scopeConfig;
-    /**
-     * @var ResultDataInterfaceFactory
-     */
-    protected $resultDataFactory;
-    /**
-     * @var Data
-     */
-    protected $priceHelper;
-    /**
-     * @var ReviewFactory
-     */
-    protected $reviewFactory;
-    /**
-     * @var ProductRepository
-     */
-    protected $productRepository;
-    /**
-     * @var Image
-     */
-    protected $imageHelper;
-    /**
-     * @var Emulation
-     */
-    protected $appEmulation;
-    /**
-     * @var CollectionProcessorInterface
-     */
-    protected $collectionProcessor;
+
     /**
      * @var ItemFactory
      */
@@ -129,185 +66,82 @@ class ShoppingListRepository implements ShoppingListRepositoryInterface
     protected $historyResource;
 
     /**
+     * @var \SM\ShoppingList\Helper\Data
+     */
+    protected $shoppingListHelper;
+
+    /**
+     * @var Converter
+     */
+    protected $converter;
+
+    /**
+     * @var \Magento\MultipleWishlist\Helper\Data
+     */
+    protected $wishlistData;
+
+    /**
      * ShoppingListRepository constructor.
-     * @param ShoppingListSearchResultsInterfaceFactory $searchCriteriaInterfaceFactory
      * @param ShoppingListDataInterfaceFactory $shoppingListDataInterfaceFactory
      * @param ShoppingListCollectionFactory $shoppingListCollectionFactory
      * @param ShoppingListItemCollectionFactory $itemCollectionFactory
-     * @param ShoppingListItemDataInterfaceFactory $shoppingListItemDataInterfaceFactory
      * @param DataObjectHelper $dataObjectHelper
-     * @param ShoppingListItemDataInterfaceFactory $shoppingListItemDataFactory
      * @param ShoppingListFactory $shoppingListFactory
      * @param HistoryCollectionFactory $historyCollectionFactory
-     * @param ScopeConfigInterface $scopeConfig
-     * @param ResultDataInterfaceFactory $resultDataFactory
-     * @param Data $priceHelper
-     * @param ReviewFactory $reviewFactory
-     * @param ProductRepository $productRepository
-     * @param Image $imageHelper
-     * @param Emulation $appEmulation
-     * @param CollectionProcessorInterface $processor
      * @param ItemFactory $itemFactory
      * @param ShareHistoryFactory $historyFactory
      * @param ResourceModel\ShareHistory $historyResource
+     * @param \SM\ShoppingList\Helper\Data $shoppingListHelper
+     * @param Converter $converter
+     * @param \Magento\MultipleWishlist\Helper\Data $wishlistData
      */
     public function __construct(
-        ShoppingListSearchResultsInterfaceFactory $searchCriteriaInterfaceFactory,
         ShoppingListDataInterfaceFactory $shoppingListDataInterfaceFactory,
         ShoppingListCollectionFactory $shoppingListCollectionFactory,
         ShoppingListItemCollectionFactory $itemCollectionFactory,
-        ShoppingListItemDataInterfaceFactory $shoppingListItemDataInterfaceFactory,
         DataObjectHelper $dataObjectHelper,
-        ShoppingListItemDataInterfaceFactory $shoppingListItemDataFactory,
         ShoppingListFactory $shoppingListFactory,
         HistoryCollectionFactory $historyCollectionFactory,
-        ScopeConfigInterface $scopeConfig,
-        ResultDataInterfaceFactory $resultDataFactory,
-        Data $priceHelper,
-        ReviewFactory $reviewFactory,
-        ProductRepository $productRepository,
-        Image $imageHelper,
-        Emulation $appEmulation,
-        CollectionProcessorInterface $processor,
         ItemFactory $itemFactory,
         ShareHistoryFactory $historyFactory,
-        \SM\ShoppingList\Model\ResourceModel\ShareHistory $historyResource
+        \SM\ShoppingList\Model\ResourceModel\ShareHistory $historyResource,
+        \SM\ShoppingList\Helper\Data $shoppingListHelper,
+        Converter $converter,
+        \Magento\MultipleWishlist\Helper\Data $wishlistData
     ) {
+        $this->wishlistData = $wishlistData;
+        $this->converter = $converter;
+        $this->shoppingListHelper = $shoppingListHelper;
         $this->historyResource = $historyResource;
         $this->historyFactory = $historyFactory;
         $this->itemFactory = $itemFactory;
-        $this->collectionProcessor = $processor;
-        $this->appEmulation = $appEmulation;
-        $this->imageHelper = $imageHelper;
-        $this->reviewFactory = $reviewFactory;
-        $this->productRepository = $productRepository;
-        $this->priceHelper = $priceHelper;
-        $this->resultDataFactory = $resultDataFactory;
-        $this->scopeConfig = $scopeConfig;
-        $this->searchResultsFactory = $searchCriteriaInterfaceFactory;
         $this->shoppingListCollectionFactory = $shoppingListCollectionFactory;
         $this->shoppingListDataFactory = $shoppingListDataInterfaceFactory;
         $this->itemCollectionFactory = $itemCollectionFactory;
-        $this->shoppingListItemDataInterfaceFactory = $shoppingListItemDataInterfaceFactory;
         $this->dataObjectHelper = $dataObjectHelper;
-        $this->shoppingListItemDataFactory = $shoppingListItemDataFactory;
-        $this->shoppingListFactory = $shoppingListFactory;
+        $this->wishlistFactory = $shoppingListFactory;
         $this->historyCollectionFactory = $historyCollectionFactory;
-    }
-
-    /**
-     * @param SearchCriteriaInterface $searchCriteria
-     * @param int $customerId
-     * @return ShoppingListSearchResultsInterface
-     * @throws NoSuchEntityException
-     */
-    public function getList(SearchCriteriaInterface $searchCriteria, $customerId)
-    {
-        /** @var ShoppingListSearchResultsInterface $searchResults */
-        $searchResults = $this->searchResultsFactory->create();
-        $searchResults->setSearchCriteria($searchCriteria);
-
-        $listCollection = $this->shoppingListCollectionFactory->create();
-        $this->collectionProcessor->process($searchCriteria, $listCollection);
-        $listCollection
-            ->addFieldToFilter("customer_id", ["eq" => $customerId])
-            ->setCurPage($searchCriteria->getCurrentPage())
-            ->setPageSize($searchCriteria->getPageSize());
-        $searchResults->setTotalCount($listCollection->getSize());
-        $shoppingLists = [];
-        /** @var Wishlist $shoppingList */
-        foreach ($listCollection as $shoppingList) {
-            $shoppingLists[] = $this->listProcess($shoppingList);
-        }
-
-        $searchResults->setTotalCount($listCollection->getSize());
-        $searchResults->setItems($shoppingLists);
-        return $searchResults;
-    }
-
-    /**
-     * @param Wishlist $shoppingList
-     * @return ShoppingListDataInterface
-     * @throws NoSuchEntityException
-     */
-    public function listProcess($shoppingList)
-    {
-        /** @var ShoppingListDataInterface $shoppingListData */
-        $shoppingListData = $this->shoppingListDataFactory->create();
-
-        $this->dataObjectHelper->populateWithArray(
-            $shoppingListData,
-            $shoppingList->getData(),
-            "SM\ShoppingList\Api\Data\ShoppingListDataInterface"
-        );
-
-        $items = [];
-        /** @var ShoppingListItemCollection $itemCollection */
-        $itemCollection = $this->itemCollectionFactory->create();
-        $itemCollection->addFieldToFilter("wishlist_id", ["eq" => $shoppingList->getId()]);
-        foreach ($itemCollection->getData() as $item) {
-            /** @var ShoppingListItemDataInterface $itemData */
-            $itemData = $this->shoppingListItemDataFactory->create();
-            $this->dataObjectHelper->populateWithArray(
-                $itemData,
-                $item,
-                "SM\ShoppingList\Api\Data\ShoppingListDataInterface"
-            );
-
-            /** @var ShoppingListItemDataInterface $itemData */
-            $items[] = $this->getProductInfo($item, $itemData);
-        }
-        if (is_null($shoppingList->getData("name"))) {
-            $shoppingListData->setName($this->getDefaultShoppingListName());
-            $shoppingListData->setIsDefault(1);
-        } else {
-            $shoppingListData->setIsDefault(0);
-        }
-        $shoppingListData->setItems($items);
-        return $shoppingListData;
-    }
-
-    /**
-     * @param $item
-     * @param ShoppingListItemDataInterface $itemData
-     * @return ShoppingListItemDataInterface
-     * @throws NoSuchEntityException
-     */
-    protected function getProductInfo($item, $itemData)
-    {
-        $this->appEmulation->startEnvironmentEmulation(
-            $item["store_id"],
-            Area::AREA_FRONTEND,
-            true
-        );
-        /** @var Product $product */
-        $product = $this->productRepository->getById($item["product_id"]);
-        $itemData->setCustomAttribute(
-            "product_image",
-            $this->imageHelper->init($product, "product_base_image")->getUrl()
-        );
-
-        $this->appEmulation->stopEnvironmentEmulation();
-        return $itemData;
     }
 
     /**
      * @param ShoppingListDataInterface $shoppingList
      * @param int $customerId
      * @return ShoppingListDataInterface
-     * @throws DuplicateException
-     * @throws LengthException
-     * @throws Exception
+     * @throws WebapiException
      */
     public function create(ShoppingListDataInterface $shoppingList, $customerId)
     {
         $currentNumber = $this->getCurrentShoppingListsNumber($customerId);
-        $limit = $this->getLimitShoppingListNumber();
+        $limit = $this->shoppingListHelper->getLimitShoppingListNumber();
         if ($limit - $currentNumber <= 0) {
-            throw new LengthException(__("You have reached maximum shopping list number"));
+            throw new WebapiException(
+                __("Sorry, you have reached the maximum number of shopping lists"),
+                0,
+                WebapiException::HTTP_BAD_REQUEST
+            );
         } elseif (!$this->isNameExist($shoppingList, $customerId)) {
             /** @var Wishlist $shoppingListModel */
-            $shoppingListModel = $this->shoppingListFactory->create();
+            $shoppingListModel = $this->wishlistFactory->create();
             $shoppingListModel->setData([
                 "customer_id" => $customerId,
                 "name" => $shoppingList->getName(),
@@ -320,30 +154,19 @@ class ShoppingListRepository implements ShoppingListRepositoryInterface
             if ($shoppingListModel->getId()) {
                 return $this->prepareDataToReturn($shoppingListModel);
             } else {
-                throw new Exception(__("Unable to create shopping list"));
+                throw new WebapiException(
+                    __("Unable to create shopping list"),
+                    0,
+                    WebapiException::HTTP_BAD_REQUEST
+                );
             }
         } else {
-            throw new DuplicateException(__("Shopping list name is already exist. Please try again"));
+            throw new WebapiException(
+                __("That shopping list name already exists. Please try again with another name"),
+                0,
+                WebapiException::HTTP_BAD_REQUEST
+            );
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getDefaultShoppingListName()
-    {
-        return __("My Favorites");
-    }
-
-    /**
-     * @return int
-     */
-    public function getLimitShoppingListNumber()
-    {
-        return $this->scopeConfig->getValue(
-            'shoppinglist/general/shopping_list_number',
-            ScopeInterface::SCOPE_STORE
-        );
     }
 
     /**
@@ -382,7 +205,7 @@ class ShoppingListRepository implements ShoppingListRepositoryInterface
      */
     protected function isNameExist(ShoppingListDataInterface $shoppingList, $customerId)
     {
-        if ($shoppingList->getName() == $this->getDefaultShoppingListName()) {
+        if ($shoppingList->getName() == $this->shoppingListHelper->getDefaultShoppingListName()) {
             return true;
         }
 
@@ -404,23 +227,23 @@ class ShoppingListRepository implements ShoppingListRepositoryInterface
     /**
      * @param int $shoppingListId
      * @return ShoppingListDataInterface
-     * @throws NoSuchEntityException
+     * @throws WebapiException
      */
     public function getById($shoppingListId)
     {
         /** @var ShoppingListDataInterface $shoppingListData */
         $shoppingListData = $this->shoppingListDataFactory->create();
-        /** @var Wishlist $shoppingList */
-        $shoppingList = $this->validateShoppingList($shoppingListId);
+        /** @var Wishlist $wishlist */
+        $wishlist = $this->validateShoppingList($shoppingListId);
         $this->dataObjectHelper->populateWithArray(
             $shoppingListData,
-            $shoppingList->getData(),
-            'SM\ShoppingList\Api\Data\ShoppingListDataInterface'
+            $wishlist->getData(),
+            ShoppingListDataInterface::class
         );
 
-        if ($shoppingList->getData("name") == null) {
+        if ($wishlist->getData("name") == null) {
             $shoppingListData->setIsDefault(1);
-            $shoppingListData->setName($this->getDefaultShoppingListName());
+            $shoppingListData->setName($this->shoppingListHelper->getDefaultShoppingListName());
         } else {
             $shoppingListData->setIsDefault(0);
         }
@@ -432,20 +255,30 @@ class ShoppingListRepository implements ShoppingListRepositoryInterface
      * Delete shopping list by ID.
      * @param int $shoppingListId
      * @return bool true on success
-     * @throws BadMethodCallException
-     * @throws Exception
+     * @throws WebapiException
      */
     public function delete($shoppingListId)
     {
-        /** @var Wishlist $shoppinglistModel */
-        $shoppinglistModel = $this->shoppingListFactory->create()->load($shoppingListId);
-        if ($shoppinglistModel->getId()) {
-            if (is_null($shoppinglistModel->getData("name"))) {
-                throw new BadMethodCallException(__("You can not delete " . $this->getDefaultShoppingListName()));
+        /** @var Wishlist $wishlist */
+        $wishlist = $this->wishlistFactory->create()->load($shoppingListId);
+        if ($wishlist->getId()) {
+            if (is_null($wishlist->getData("name"))) {
+                throw new WebapiException(
+                    __("You can not delete " . $this->shoppingListHelper->getDefaultShoppingListName()),
+                    0,
+                    WebapiException::HTTP_BAD_REQUEST
+                );
             } else {
-                $this->updateHistory($shoppinglistModel->getSharingCode(), $shoppinglistModel->getCustomerId());
-                $shoppinglistModel->delete();
-                return true;
+                try {
+                    $wishlist->delete();
+                    return true;
+                } catch (\Exception $e) {
+                    throw new WebapiException(
+                        __($e->getMessage()),
+                        0,
+                        WebapiException::HTTP_BAD_REQUEST
+                    );
+                }
             }
         }
         return false;
@@ -454,14 +287,18 @@ class ShoppingListRepository implements ShoppingListRepositoryInterface
     /**
      * @param int $shoppingListId
      * @return Wishlist
-     * @throws NoSuchEntityException
+     * @throws WebapiException
      */
     public function validateShoppingList($shoppingListId)
     {
         /** @var Wishlist $shoppingListModel */
-        $shoppingListModel = $this->shoppingListFactory->create()->load($shoppingListId);
+        $shoppingListModel = $this->wishlistFactory->create()->load($shoppingListId);
         if (!$shoppingListModel->getId()) {
-            throw new NoSuchEntityException(__('Shopping list with id "%1" does not exist.', $shoppingListId));
+            throw new WebapiException(
+                __('Shopping list with id "%1" does not exist.', $shoppingListId),
+                0,
+                WebapiException::HTTP_BAD_REQUEST
+            );
         }
         return $shoppingListModel;
     }
@@ -487,9 +324,7 @@ class ShoppingListRepository implements ShoppingListRepositoryInterface
      * @param int $shoppingListId
      * @param int $customerId
      * @return ShoppingListDataInterface
-     * @throws CouldNotSaveException
-     * @throws DuplicateException
-     * @throws NoSuchEntityException
+     * @throws WebapiException
      */
     public function share($shoppingListId, $customerId)
     {
@@ -500,9 +335,17 @@ class ShoppingListRepository implements ShoppingListRepositoryInterface
         $historyCollection->addFieldToFilter("customer_id", ["eq" => $customerId]);
         $historyCollection->addFieldToFilter("sharing_code", ["eq" => $listData->getSharingCode()]);
         if ($historyCollection->getSize()) {
-            throw new DuplicateException(__("This list has already been in your shopping list"));
+            throw new WebapiException(
+                __("This list has already been in your shopping list"),
+                0,
+                WebapiException::HTTP_BAD_REQUEST
+            );
         } elseif ($listData->getCustomerId() == $customerId) {
-            throw new DuplicateException(__("This list has already been in your shopping list"));
+            throw new WebapiException(
+                __("This list has already been in your shopping list"),
+                0,
+                WebapiException::HTTP_BAD_REQUEST
+            );
         } else {
             /** @var ShoppingListDataInterface $newListData */
             $newListData = $this->shoppingListDataFactory->create();
@@ -514,13 +357,7 @@ class ShoppingListRepository implements ShoppingListRepositoryInterface
             }
 
             /** @var ShoppingListDataInterface $newListData */
-            try {
-                $newListData = $this->create($newListData, $customerId);
-            } catch (LengthException $e) {
-                throw new LengthException(__("You have reached maximum shopping list number"));
-            } catch (DuplicateException|Exception $e) {
-                throw new CouldNotSaveException(__("Some thing went wrong while saving this list"));
-            }
+            $newListData = $this->create($newListData, $customerId);
 
             /** @var ItemCollection $itemCollection */
             $itemCollection = $this->itemCollectionFactory->create();
@@ -529,7 +366,7 @@ class ShoppingListRepository implements ShoppingListRepositoryInterface
             /** @var Item $item */
             foreach ($itemCollection->getData() as $item) {
                 $item = $this->itemFactory->create()->setData($item);
-                $this->addItem($item, $newListData->getWishlistId());
+//                $this->addItem($item, $newListData->getWishlistId());
             }
 
             try {
@@ -541,31 +378,14 @@ class ShoppingListRepository implements ShoppingListRepositoryInterface
                     ->setShoppinglistId($newListData->getWishlistId());
                 $this->historyResource->save($history);
             } catch (AlreadyExistsException|Exception $e) {
-                throw new CouldNotSaveException(__("Some thing went wrong while saving this list"));
+                throw new WebapiException(
+                    __($e->getMessage()),
+                    0,
+                    WebapiException::HTTP_BAD_REQUEST
+                );
             }
 
             return $newListData;
-        }
-    }
-
-    /**
-     * @param Item $item
-     * @param int $shoppingListId
-     * @return bool
-     */
-    private function addItem($item, $shoppingListId)
-    {
-        try {
-            $this->itemFactory->create()
-                ->setProductId($item->getProductId())
-                ->setWishlistId($shoppingListId)
-                ->setAddedAt((new \DateTime())->format(DateTime::DATETIME_PHP_FORMAT))
-                ->setStoreId($item->getStoreId())
-                ->setQty(1)
-                ->save();
-            return true;
-        } catch (Exception $e) {
-            return false;
         }
     }
 
@@ -580,8 +400,8 @@ class ShoppingListRepository implements ShoppingListRepositoryInterface
         $index = 1;
         $shoppingListName = $shoppingListData->getName();
 
-        if ($shoppingListName == $this->getDefaultShoppingListName()) {
-            $shoppingListData->setName($this->getDefaultShoppingListName() . " (1)");
+        if ($shoppingListName == $this->shoppingListHelper->getDefaultShoppingListName()) {
+            $shoppingListData->setName($this->shoppingListHelper->getDefaultShoppingListName() . " (1)");
         }
 
         do {
@@ -596,8 +416,7 @@ class ShoppingListRepository implements ShoppingListRepositoryInterface
      * @param ShoppingListDataInterface $shoppingList
      * @param int $customerId
      * @return ShoppingListDataInterface
-     * @throws NoSuchEntityException
-     * @throws Exception
+     * @throws WebapiException
      */
     public function update(ShoppingListDataInterface $shoppingList, $customerId)
     {
@@ -605,12 +424,83 @@ class ShoppingListRepository implements ShoppingListRepositoryInterface
             /** @var Wishlist $listModel */
             $listModel = $this->validateShoppingList($shoppingList->getWishlistId());
             $listModel->setData("name", $shoppingList->getName());
-            $this->updateHistory($listModel->getSharingCode());
-            $listModel->generateSharingCode()->save();
+            try {
+                $listModel->save();
+            } catch (Exception $e) {
+                throw new WebapiException(
+                    __($e->getMessage()),
+                    0,
+                    WebapiException::HTTP_BAD_REQUEST
+                );
+            }
 
             return $this->prepareDataToReturn($listModel);
         } else {
-            throw new Exception(__("Shopping list name is already exist. Please try again"));
+            throw new WebapiException(
+                __("Shopping list name is already exist. Please try again"),
+                0,
+                WebapiException::HTTP_BAD_REQUEST
+            );
         }
+    }
+
+
+    /**
+     * @inheritDoc
+     * @throws WebapiException
+     */
+    public function getFavorites($customerId)
+    {
+        $wishlist = $this->wishlistData->getDefaultWishlist($customerId);
+        if ($wishlist->getId()) {
+            $listData = $this->converter->convertModelToResponse($wishlist);
+            $listData->setName($this->shoppingListHelper->getDefaultShoppingListName());
+            return $listData;
+        } else {
+            throw new WebapiException(
+                __('Internal Error: User does not have default list'),
+                0,
+                WebapiException::HTTP_INTERNAL_ERROR
+            );
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getMyList($customerId)
+    {
+        $collection = $this->wishlistData->getCustomerWishlists($customerId);
+        $defaultId = $this->wishlistData->getDefaultWishlist($customerId)->getId();
+        $collection->removeItemByKey($defaultId);
+
+        return $this->converter->convertCollectionToResponse($collection);
+    }
+
+    /**
+     * @inheritDoc
+     * @throws WebapiException
+     */
+    public function getListDetail($listId)
+    {
+        $wishlist = $this->wishlistFactory->create()->load($listId);
+        if ($wishlist->getId()) {
+            return $this->converter->convertModelToResponse($wishlist);
+        } else {
+            throw new WebapiException(
+                __('Shopping list with ID %1 is not exists', $listId),
+                0,
+                WebapiException::HTTP_BAD_REQUEST
+            );
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function getAll($productId, $customerId)
+    {
+        $collection = $this->wishlistData->getCustomerWishlists($customerId);
+        return $this->converter->convertCollectionToMinimalResponse($collection, $productId);
     }
 }

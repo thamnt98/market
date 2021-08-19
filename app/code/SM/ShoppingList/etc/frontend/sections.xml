@@ -1,20 +1,16 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Customer:etc/sections.xsd">
-    <action name="shoppinglist/action/cart">
-        <section name="cart"/>
+    <action name="wishlist/action/removeitem">
         <section name="wishlist"/>
     </action>
-    <action name="shoppinglist/action/removeitem">
+    <action name="wishlist/action/removelist">
         <section name="wishlist"/>
     </action>
-    <action name="shoppinglist/action/removelist">
+    <action name="wishlist/ajax/additems">
         <section name="wishlist"/>
     </action>
-    <action name="shoppinglist/ajax/additems">
-        <section name="wishlist"/>
-    </action>
-    <action name="shoppinglist/ajax/moveitem">
+    <action name="wishlist/ajax/moveitem">
         <section name="wishlist"/>
     </action>
 </config>

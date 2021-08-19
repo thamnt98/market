@@ -14,6 +14,8 @@ interface ShoppingListDataInterface extends \Magento\Framework\Api\ExtensibleDat
     const SHARING_CODE = 'sharing_code';
     const ITEMS = 'items';
     const IS_DEFAULT = "is_default";
+    const LEFT = "left";
+    const IS_EXIST = "is_exist";
 
     /**
      * @param int $value
@@ -22,32 +24,42 @@ interface ShoppingListDataInterface extends \Magento\Framework\Api\ExtensibleDat
     public function setIsDefault($value);
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getIsDefault();
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getWishlistId();
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getCustomerId();
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getName();
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getSharingCode();
 
     /**
-     * @return \SM\ShoppingList\Api\Data\ShoppingListItemDataInterface[]
+     * @return int|null
+     */
+    public function getLeft();
+
+    /**
+     * @return bool|null
+     */
+    public function getIsExist();
+
+    /**
+     * @return \SM\ShoppingList\Api\Data\ShoppingListItemDataInterface[]|null
      */
     public function getItems();
 
@@ -79,4 +91,16 @@ interface ShoppingListDataInterface extends \Magento\Framework\Api\ExtensibleDat
      * @return $this
      */
     public function setItems($items);
+
+    /**
+     * @param int $value
+     * @return $this
+     */
+    public function setLeft($value);
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function setIsExist($value);
 }

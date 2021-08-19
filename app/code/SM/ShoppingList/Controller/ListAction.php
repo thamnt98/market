@@ -2,12 +2,11 @@
 
 namespace SM\ShoppingList\Controller;
 
+use Magento\Customer\Controller\AbstractAccount;
 use Magento\Customer\Helper\Session\CurrentCustomer;
 use Magento\Customer\Model\Session;
-use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
-use Magento\Framework\View\Result\PageFactory;
 use Magento\Wishlist\Controller\Shared\WishlistProvider;
 use SM\ShoppingList\Api\Data\ShoppingListDataInterfaceFactory;
 use SM\ShoppingList\Model\ShoppingListRepository;
@@ -16,7 +15,7 @@ use SM\ShoppingList\Model\ShoppingListRepository;
  * Class ListAction
  * @package SM\ShoppingList\Controller
  */
-abstract class ListAction extends Action
+abstract class ListAction extends AbstractAccount
 {
     /**
      * @var ShoppingListRepository

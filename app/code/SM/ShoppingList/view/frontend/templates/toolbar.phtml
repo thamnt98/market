@@ -1,48 +1,13 @@
 <?php
-/** @var \SM\ShoppingList\Block\Toolbar $block */
+/** @var \Magento\MultipleWishlist\Block\Customer\Wishlist\Management $block */
 
-/** @var \SM\ShoppingList\Api\Data\ShoppingListDataInterface $shoppingList */
-$shoppingList = $block->getShoppingList();
+/** @var \Magento\Wishlist\Model\Wishlist $wishlist */
+$wishlist = $block->getCurrentWishlist();
+$defaultWishlistId = $block->getDefaultWishlist()->getId();
+$isDefault = $wishlist->getId() == $defaultWishlistId;
 ?>
 <div class="headtab-toolbar">
-    <h4 class="title-tab"><?= $block->escapeHtml($shoppingList->getName()) ?></h4>
-    <div class="shoplist-search">
-        <div class="control">
-            <a id="btn-search-item" href="#"><span class="apl-ic_search"></span></a>
-            <form></form>
-            <form id="form-search-list-item" action="<?= $block->getCurrentUrl()?>" method="get">
-                <input id="input-search" type="text" name="key" value="<?= ($block->getRequest()->getParam("key")) ? $block->getRequest()->getParam("key") : ""?>"
-                       placeholder="<?= $block->escapeHtml(__('Search product in this list'))?>"
-                       class="input-text" maxlength="128" role="combobox" aria-haspopup="false"
-                       aria-autocomplete="both" autocomplete="off" aria-expanded="true"
-                />
-                <?php if ($sort = $block->getRequest()->getParam("sort")):?>
-                    <input type="hidden" value="<?= $sort ?>" name="sort"/>
-                <?php endif;?>
-            </form>
-        </div>
-    </div>
-    <div class="sortby-dropdown shoplist-sortby">
-        <span class="action toggle" data-mage-init='{"dropdown":{}}' data-toggle="dropdown" aria-haspopup="true">
-            <span><?= $block->escapeHtml(__('Sort by')) ?></span>
-        </span>
-        <form id="form-sort-item" action="<?= $block->getCurrentUrl() ?>" method="get">
-            <ul class="dropdown">
-                <li class="item radio-custom">
-                    <input type="radio" value="desc" name="sort" <?= ($block->getRequest()->getParam("sort") == "desc" || !$block->getRequest()->getParam("sort")) ? "checked" : ""?>/>
-                    <label for="recent"><?= $block->escapeHtml(__('Recent')) ?></label>
-                </li>
-                <li class="item radio-custom">
-                    <input type="radio" value="asc" name="sort" <?= ($block->getRequest()->getParam("sort") == "asc") ? "checked" : ""?>/>
-                    <label for="previous"><?= $block->escapeHtml(__('Previous')) ?></label>
-                </li>
-            </ul>
-            <?php if ($key = $block->getRequest()->getParam("key")):?>
-                <input type="hidden" value="<?= $key ?>" name="key"/>
-            <?php endif;?>
-        </form>
-    </div>
-    <a id="btn-share-list" href="#" class="share-list"><?= $block->escapeHtml(__('Share this list')) ?></a>
+    <h4 class="title-tab"><?= $block->escapeHtml($wishlist->getName()) ?></h4>
     <a href="#" class="setting" id="button-open-settings-modal">
         <?= $block->escapeHtml(__('Settings')) ?>
     </a>
@@ -50,11 +15,13 @@ $shoppingList = $block->getShoppingList();
         <label class="label" for="input-wishlist-name">
             <span><?= $block->escapeHtml(__("List Name"))?></span>
         </label>
-        <form id="form-update-list" action="<?= $block->getUrl("*/action/updatelist")?>" method="post">
-            <input type="text" class="wishlist-name" id="input-wishlist-name" name="shoppinglist_name" value="<?= $shoppingList->getName()?>" placeholder="<?= $block->escapeHtml(__('Type the list name here'))?>" <?= ($shoppingList->getIsDefault() ? "readonly" : "") ?>/>
-            <input type="hidden" name="shoppinglist_id" value="<?= $shoppingList->getWishlistId()?>"/>
+        <form id="form-update-list" action="<?= $block->getUrl("wishlist/action/updatelist")?>" method="post">
+            <input type="text" class="wishlist-name" id="input-wishlist-name" name="shoppinglist_name" value="<?= $wishlist->getName()?>" placeholder="<?= $block->escapeHtml(__('Type the list name here'))?>" <?= ($isDefault ? "readonly" : "") ?>/>
+            <input type="hidden" name="shoppinglist_id" value="<?= $wishlist->getId()?>"/>
         </form>
-        <a href="#" class="action remove-list" id="button-confirm-delete-list-modal">
+        <a href="#" class="action remove-list"
+           data-remove-url="<?= $block->escapeHtml($block->getUrl("wishlist/action/removelist", ["wishlist_id" => $wishlist->getId()]))?>"
+           id="button-confirm-delete-list-modal">
             <?= $block->escapeHtml(__('Delete List'))?>
         </a>
     </div>
@@ -62,39 +29,21 @@ $shoppingList = $block->getShoppingList();
     <div id="confirm-delete-list-modal" class="content" style="display:none;">
         <span class="remove-wishlist-verify">
             <span><?= $block->escapeHtml(__('Are you sure you want to delete'))?></span>
-            <b><?=$shoppingList->getName()?></b>
+            <b><?= $block->escapeHtml($wishlist->getName()) ?></b>
             <span><?=$block->escapeHtml(__('from shopping list?'))?></span>
         </span>
         <input type="hidden" id="list-id-delete-modal">
     </div>
 </div>
-<div id="share-shoppinglist-modal" class="content" style="display: none">
-    <div class="title-social-share link-title"><?= $block->escapeHtml(__("Share this list and let people know about your favorite products.")) ?></div>
-    <div class="share-shoppinglist-modal">
-        <input id="value-share-url" type="text" class="create-list-name" value="<?= $block->getShareUrl() ?>" readonly/>
-    <button id="btn-copy-share-url" class="btn-copy-share-url"><?= $block->escapeHtml(__("Copy"))?></button>
-    </div>
-    <div class="social-share">
-        <div class="title-social-share"><?= $block->escapeHtml(__('Or share it on your social media')) ?></div>
-        <div id="social-btn-<?= $shoppingList->getWishlistId() ?>"></div>
-    </div>
-</div>
-
-
 
 <script type="text/x-magento-init">
 {
     "*": {
         "ShoppingListSettings":{
-                "remove_list_url":"<?= $block->getRemoveListUrl($shoppingList->getWishlistId()) ?>",
-                "update_list_url":"<?= $block->getUpdateUrl() ?>",
-                "list_id":"<?= $shoppingList->getWishlistId()?>",
-                "shoppinglist_name":"<?= $shoppingList->getName() ?>",
-                "is_default":"<?= $shoppingList->getIsDefault() ?>"
-        },
-        "SocialShare": {
-            "list_id":"<?= $shoppingList->getWishlistId() ?>",
-            "share_url":""
+                "update_url":"<?= $block->escapeUrl($block->getUrl("wishlist/ajax/updatelist"))?>",
+                "wishlist_id":"<?= $block->escapeHtml($wishlist->getId())?>",
+                "shoppinglist_name":"<?= $wishlist->getName() ?>",
+                "is_default":"<?= $block->escapeHtml($isDefault)?>"
         }
     }
 }

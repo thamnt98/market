@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <title>My Wish Lists</title>
+    </head>
+    <body>
+        <attribute name="class" value="page-multiple-wishlist"/>
+        <referenceBlock name="page.main.title">
+            <action method="setPageTitle" ifconfig="wishlist/general/multiple_enabled">
+                <argument translate="true" name="title" xsi:type="string">My Wish Lists</argument>
+            </action>
+        </referenceBlock>
+        <referenceBlock name="customer.wishlist">
+            <block class="Magento\MultipleWishlist\Block\Customer\Wishlist\Management" name="customer.wishlist.management" as="top" template="Magento_MultipleWishlist::view/management.phtml" cacheable="false">
+                <block class="SM\ShoppingList\Block\MyList\Listing" name="wishlist.header" template="SM_ShoppingList::header.phtml"/>
+            </block>
+        </referenceBlock>
+    </body>
+</page>

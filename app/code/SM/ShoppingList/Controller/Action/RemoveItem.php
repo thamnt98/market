@@ -6,6 +6,7 @@ use Exception;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Webapi\Exception as WebapiException;
 use SM\ShoppingList\Api\Data\ShoppingListItemDataInterface;
 use SM\ShoppingList\Controller\ItemAction;
 
@@ -23,9 +24,9 @@ class RemoveItem extends ItemAction
         $itemId = $this->getRequest()->getParam("id");
 
         try {
-            /** @var ShoppingListItemDataInterface $item */
-            $item = $this->shoppingListItemRepository->getById($itemId);
-            $productName = $item->getCustomAttribute("product_name")->getValue();
+            /** @var \Magento\Wishlist\Model\Item $item */
+            $item = $this->itemFactory->create()->load($itemId);
+            $productName = $item->getProduct()->getName();
             if ($this->shoppingListItemRepository->deleteById($itemId)) {
                 if ($this->wishlistData->getDefaultWishlist()->getId() == $item->getWishlistId()) {
                     $this->messageManager->addSuccessMessage(
@@ -39,8 +40,8 @@ class RemoveItem extends ItemAction
             } else {
                 $this->messageManager->addErrorMessage(__("Unable to delete item"));
             }
-        } catch (NoSuchEntityException|Exception $e) {
-            $this->messageManager->addErrorMessage(__("Unable to delete item"));
+        } catch (WebapiException $e) {
+            $this->messageManager->addErrorMessage($e->getMessage());
         }
 
         $urlReferer = $this->_redirect->getRefererUrl();
