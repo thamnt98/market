@@ -137,21 +137,21 @@ class UpdateSampleDataTopic implements \Magento\Framework\Setup\Patch\DataPatchI
                 'topic_id'    => 7,
                 'name'        => 'Buying Guide',
                 'status'      => 1,
-                'description' => 'Let us help you shop in Transmart',
+                'description' => 'Let us help you shop in METRO',
             ],
             [
                 'store_id'    => $storeId,
                 'topic_id'    => 8,
                 'name'        => 'About Us',
                 'status'      => 1,
-                'description' => 'Learn more about Transmart',
+                'description' => 'Learn more about METRO',
             ],
             [
                 'store_id'    => $storeId,
                 'topic_id'    => 9,
                 'name'        => 'Delivery & Pick Up in Store',
                 'status'      => 1,
-                'description' => 'Know our delivery options in Transmart',
+                'description' => 'Know our delivery options in METRO',
             ],
         ];
     }

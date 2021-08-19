@@ -227,7 +227,7 @@ class SaveAfter implements \Magento\Framework\Event\ObserverInterface
         }
 
         $title = 'Order %1 has been completed!';
-        $content = 'Hope you love your shopping experience with Transmart.';
+        $content = 'Hope you love your shopping experience with METRO.';
         $params = [
             'title' => [
                 $order->getData('reference_order_id'),

@@ -12,7 +12,7 @@ See LICENSE.txt for license details.
             <resource id="Magento_Backend::admin">
                 <resource id="Magento_Backend::content">
                     <resource id="SM_Setup::configuration">
-                        <resource id="SM_Catalog::configuration" title="Transmart Catalog general" sortOrder="10" />
+                        <resource id="SM_Catalog::configuration" title="METRO Catalog general" sortOrder="10" />
                     </resource>
                 </resource>
             </resource>

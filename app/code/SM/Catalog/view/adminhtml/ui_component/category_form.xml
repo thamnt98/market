@@ -15,7 +15,7 @@
                     <item name="default" xsi:type="number">0</item>
                     <item name="notice" xsi:type="string" translate="true">
                         It's take a long time. Before change this option, please check Config in "Store ->
-                        Configuration -> Transmart -> Catalog -> Update CTA buttons by Cron Job".
+                        Configuration -> METRO -> Catalog -> Update CTA buttons by Cron Job".
                     </item>
                 </item>
             </argument>
