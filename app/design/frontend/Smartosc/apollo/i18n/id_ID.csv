@@ -1,5 +1,5 @@
 "We are very sorry to inform you that we had to cancel order %order_id. Our courier failed to deliver your oder.","Kami mohon maaf karena harus membatalkan order %order_id. Kurir kami tidak berhasil melakukan pengiriman."
-"Please find more information about this order by contacting <a href='%contact_us'>Transmart Customer Service</a>. Thank you so much for your understanding.","Silakan hubungi <a href='%contact_us'>Transmart Customer Service</a>. untuk mengetahui info lebih lanjut mengenai order ini. Kami berterima kasih atas pengertian Anda."
+"Please find more information about this order by contacting <a href='%contact_us'>METRO Customer Service</a>. Thank you so much for your understanding.","Silakan hubungi <a href='%contact_us'>METRO Customer Service</a>. untuk mengetahui info lebih lanjut mengenai order ini. Kami berterima kasih atas pengertian Anda."
 "Sorry, we had to cancel order %1.","Maaf, kami harus membatalkan order %1."
 "Your order delivery is unsuccessful. Find more info here.","Pengiriman order tidak berhasil dilakukan. Cek info lebih lanjut di sini."
 "%1, order %2 has been cancelled.","%1, order %2 telah dibatalkan."
@@ -12,7 +12,7 @@
 "%1, you've got new vouchers.","%1, Anda mendapatkan beberapa voucher baru."
 "Check them out and shop now!","Cek vouchernya dan langsung belanja!"
 "There is something new for you.","Ada yang baru untuk Anda"
-"Check out the new T&C/policy from Transmart","Cek T&C/kebijakan terbaru dari Transmart"
+"Check out the new T&C/policy from METRO","Cek T&C/kebijakan terbaru dari METRO"
 "%1, we have a voucher for you.","%1, kami punya voucher untuk Anda."
 "Find it on My Voucher!","Cek yang satu ini dan langsung belanja!"
 "Not you? Consider changing your password.","Bukan Anda? Ganti kata sandi untuk keamanan akun."
@@ -16505,7 +16505,7 @@ Footer,Footer
 "You left something...","Anda lupa sesuatu..."
 "The items in your cart are waiting. Don't leave them hanging, continue shopping.","Barang-barang dalam troli Anda menunggu. Jangan tinggalkan mereka, lanjut belanja."
 "Notification Settings", "Pengaturan Notifikasi"
-"Transmart Updates", "Update dari Transmart"
+"METRO Updates", "Update dari METRO"
 "Promos & Events", "Promo & Acara"
 "Information", "Informasi"
 "My Order", "Order Saya"
@@ -16525,7 +16525,7 @@ Footer,Footer
 "Your payment is successful!", "Pembayaran Anda berhasil!"
 "Order %1 is now being processed. Check out the progress in My Order.", "Order %1 kini sedang diproses. Cek statusnya di Order Saya."
 "Order %1 has been completed!","Order %1 telah selesai!"
-"Hope you love your shopping experience with Transmart.","Semoga pengalaman belanja Anda bersama Transmart menyenangkan."
+"Hope you love your shopping experience with METRO.","Semoga pengalaman belanja Anda bersama METRO menyenangkan."
 "%1, you haven't picked your order up.", "%1, Anda belum mengambil order."
 "Please visit %1 to collect order %2 before %3.", "Silakan kunjungi %1 untuk mendapatkan order %2 sebelum %3."
 "%1, order %2 has been delivered to your address","%1, order %2 sampai di tujuan."
@@ -16545,9 +16545,9 @@ Footer,Footer
 "Your order is cancelled (Reference number: %order_id)","Order Anda telah dibatalkan (Nomor referensi: %order_id))"
 "Hello","Halo"
 "Sincerely","Salam hangat"
-"You can always try ordering again with your Transmart app or transmart.co.id.","Anda masih bisa mencoba order kembali dengan aplikasi Transmart atau transmart.co.id."
+"You can always try ordering again with your METRO app or metro.co.id.","Anda masih bisa mencoba order kembali dengan aplikasi METRO atau metro.co.id."
 "Don't worry, you are not charged for this order.","Jangan khawatir, Anda tidak dikenai biaya untuk order ini."
-"But don't worry. you can always shop again with your Transmart app or transmart.co.id.","Tapi jangan khawatir, Anda masih bisa berbalanja lagi dengan aplikasi Transmart atau transmart.co.id."
+"But don't worry. you can always shop again with your METRO app or metro.co.id.","Tapi jangan khawatir, Anda masih bisa berbalanja lagi dengan aplikasi METRO atau metro.co.id."
 "Reason: payment expired.","Alasan: melewati batas waktu pembayaran."
 "Reason: system failure.","Alasan: sistem tidak berhasil memproses pembayaran."
 "Reason: declined by bank.","Alasan: ditolak oleh bank."
@@ -16614,7 +16614,7 @@ Confirm New Password,Konfirmasi Kata Sandi Baru
 Your passwords don't match,Kata sandi Anda tidak sama
 Change Password,Ubah Kata Sandi
 Your reliable on stop shopping destination is now online.,Destinasi belanja andalan Anda kini hadir secara online.
-"Join now to enjoy Transmart's delightful shopping experience, promotions, loyalty program, rewards and so much more!","Gabung sekarang untuk menikmati pengalaman belanja menyenangkan, promosi, program loyalti Transmart, dan banyak lainnya!"
+"Join now to enjoy METRO's delightful shopping experience, promotions, loyalty program, rewards and so much more!","Gabung sekarang untuk menikmati pengalaman belanja menyenangkan, promosi, program loyalti METRO, dan banyak lainnya!"
 Your email has already been registered,Email Anda telah terdaftar
 Your mobile number has already been registered,Nomor ponsel Anda telah terdaftar
 City,Kota
@@ -16644,7 +16644,7 @@ Maybe Next Time,Lain Kali Saja
 All,Semua
 What would you like to shop?,Mau belanja apa hari ini?
 The simplest way to find what you need. Search any product here.,Cara termudah menemukan kebutuhan Anda. Cari produk apa saja di sini.
-What's fresh in our Promos & Events? Discover all things new here.,Apa saja yang seru dan terbaru dari Transmart? Temukan semua Promo & Acara di sini.
+What's fresh in our Promos & Events? Discover all things new here.,Apa saja yang seru dan terbaru dari METRO? Temukan semua Promo & Acara di sini.
 All Categories,Semua Kategori
 "When you feel like browsing and shopping by categories, simply click here.","Saat Anda ingin mencari produk dan berbelanja berdasarkan kategori, klik di sini."
 "From setting your profile, addresses and cards to checking your order status. This is the place to go!","Mulai dari menyimpan profil, alamat, dan kartu Anda, hingga mencari status order. Di sini tempatnya!"
@@ -16665,7 +16665,7 @@ Have your order delivered to 2 different addresses.,Kirim order Anda ke 2 alamat
 Voucher,Voucher
 Apply your vouchers,Gunakan voucher Anda
 Use one or more vouchers while you shop.,Gunakan satu atau beberapa voucher sekaligus saat belanja.
-Download Transmart App,Download Aplikasi Transmart
+Download METRO App,Download Aplikasi METRO
 What would you like to shop?,Mau belanja apa hari ini?
 Find a store,Cari gerai
 Register,Daftar
@@ -16677,13 +16677,13 @@ Shop online,Belanja online
 pickup today,ambil hari ini juga
 Shop Now,Belanja Sekarang
 
-"Transmart Cempaka Putih
+"METRO Cempaka Putih
 Jl. Jenderal Jend. Ahmad Yani No. 83 Jakpus Jakarta","Gratis Ambil di Gerai
 Belanja online, ambil hari ini juga
 
 Belanja Sekarang
 
-Transmart Cempaka Putih
+METRO Cempaka Putih
 Jl. Jend. Ahmad Yani No. 83 Jakarta"
 "Selected Categories","Kategori Pilihan"
 "Special Picks for You","Spesial untuk Anda"
@@ -16727,15 +16727,15 @@ Track Your Order,Lacak Pesanan
 Return & Exchanges,Retur & Penukaran Produk
 Terms & Conditions,Syarat & Ketentuan
 Promotion Terms & Conditions,Syarat & Ketentuan Promo
-"Transmart Reward","Transmart Reward"
+"METRO Reward","METRO Reward"
 
 "Discover More","JELAJAHI"
 Find a Store,Temukan Gerai
 Buying Guide,Panduan Pembelian
 Vouchers,Voucher
-Transmart App,Aplikasi Transmart
+METRO App,Aplikasi METRO
 
-About Transmart,TENTANG TRANSMART
+About METRO,TENTANG METRO
 Corporate Information,Informasi Perusahaan
 Privacy & Cookies Policy,Kebijakan Privasi & Cookies
 
@@ -16762,7 +16762,8 @@ CTcash,CTcash
 My Wishlist,Wishlist Saya
 My Reviews,Ulasan Saya
 Sign Out,Keluar
-© 2020 Transmart. All Rights Reserved.,© 2020 Transmart. All Rights Reserved.
+© 2020 METRO. All Rights Reserved.,© 2020 METRO. All Rights Reserved.
+© 2021 METRO. All Rights Reserved.,© 2021 METRO. All Rights Reserved.
 Latest Search,Pencarian Terakhir
 Delete All,Hapus Semua
 Popular Search,Pencarian Terpopuler
@@ -16796,58 +16797,58 @@ PDAM Water,Air PDAM
 BPJS,BPJS
 Mobile Postpaid,Pascabayar
 Telkom,Telkom
-Easy Top Up by Transmart,Isi Pulsa Praktis di Transmart
+Easy Top Up by METRO,Isi Pulsa Praktis di METRO
 Your mobile number or the number used for your modem.,Nomor ponsel atau nomor yang Anda gunakan pada modem.
 Example: 0812345678XXX,Contoh: 0812345678XXX
 Please enter your mobile number,Isi nomor ponsel terlebih dahulu
 We cannot find this number. Make sure you enter the correct mobile number,Kami tidak dapat menemukan nomor ini. Pastikan Anda memasukkan nomor ponsel yang tepat
 Buy,Beli
-How to Top Up with Transmart,Cara Beli Pulsa di Transmart
-"Top up your mobile number and stay connected with dearest family and friends. In Transmart, you can top up mobile number of all operators with various nominal options. Anytime you want and wherever you are, Transmart can provide the easist online top up and payment method. Top up your mobile number with these simple steps.
+How to Top Up with METRO,Cara Beli Pulsa di METRO
+"Top up your mobile number and stay connected with dearest family and friends. In METRO, you can top up mobile number of all operators with various nominal options. Anytime you want and wherever you are, METRO can provide the easist online top up and payment method. Top up your mobile number with these simple steps.
 
-1. Go to www.transmart.co.id.
+1. Go to www.metro.co.id.
 2. Find Top Up & Billings category.
 3. Go to Top Up menu.
 4. Enter your mobile number or modem number, then choose an amount.
 5. Click the ""Buy"" button.
 6. Select your payment method and please make the payment.
 
-In Transmart, you can also opt to buy mobile package, electricity token, as well as paying your postpaid, PLN electricity, PDAM, BPJS and Telkom bills. Make your life easier by doing your transactions through Transmart!","Supaya komunikasi dengan keluarga dan orang-orang tedekat tetap lancar, pastikan handphone Anda selalu terisi pulsa. Butuh pulsa? Di Transmart, Anda bisa beli pulsa berbagai operator dengan semua pilihan nominal pulsa. Kapan pun dan di mana pun Anda berada, Transmart selalu menghadirkan cara beli pulsa online dan metode pembayaran yang praktis. Dapatkan pulsa all operator dengan langkah-langkah mudah ini.
+In METRO, you can also opt to buy mobile package, electricity token, as well as paying your postpaid, PLN electricity, PDAM, BPJS and Telkom bills. Make your life easier by doing your transactions through METRO!","Supaya komunikasi dengan keluarga dan orang-orang tedekat tetap lancar, pastikan handphone Anda selalu terisi pulsa. Butuh pulsa? Di METRO, Anda bisa beli pulsa berbagai operator dengan semua pilihan nominal pulsa. Kapan pun dan di mana pun Anda berada, METRO selalu menghadirkan cara beli pulsa online dan metode pembayaran yang praktis. Dapatkan pulsa all operator dengan langkah-langkah mudah ini.
 
-1. Masuk ke www.transmart.co.id.
+1. Masuk ke www.metro.co.id.
 2. Cari kategori Top Up & Tagihan.
 3. Masuk ke menu Pulsa.
 4. Masukkan nomor ponsel atau modem Anda, kemudian pilih nominal.
 5. Klik tombol ""Beli"".
 6. Pilih metode pembayaran yang Anda inginkan dan lakukan pembayaran.
 
-Selain pulsa, Transmart juga menyediakan pembelian kuota paket data, token listrik, serta pembayaran tagihan pascabayar, listrik PLN, PDAM, BPJS, dan Telkom. Jadikan hidup Anda lebih mudah dengan melakukan transaksi pembelian dan pembayaran tagihan di Transmart!"
+Selain pulsa, METRO juga menyediakan pembelian kuota paket data, token listrik, serta pembayaran tagihan pascabayar, listrik PLN, PDAM, BPJS, dan Telkom. Jadikan hidup Anda lebih mudah dengan melakukan transaksi pembelian dan pembayaran tagihan di METRO!"
 Your mobile number or the number used for your modem.,Nomor ponsel atau nomor yang Anda gunakan pada modem.
 Amount,Nominal
 Top Up Details,Detail Pulsa
 Validity period of ## days,Masa berlaku ## hari
 Price,Harga
 Buy Mobile Package for Any Operator,Beli Paket Data Berbagai Operator
-How to Buy Mobile Package Through Transmart,Cara Beli Paket Data di Transmart
-"There is no day without internet! From updating social media, chatting, reading online news, to online shopping, mobile package is your daily need. Make sure you always have internet connection by purchasing your online quota from Transmart. You can get every internet package from all operators here. Choose your data plan and get it with easy steps.
+How to Buy Mobile Package Through METRO,Cara Beli Paket Data di METRO
+"There is no day without internet! From updating social media, chatting, reading online news, to online shopping, mobile package is your daily need. Make sure you always have internet connection by purchasing your online quota from METRO. You can get every internet package from all operators here. Choose your data plan and get it with easy steps.
 
-1. Go to www.transmart.co.id.
+1. Go to www.metro.co.id.
 2. Find Top Up & Billings category.
 3. Go to Mobile Package menu.
 4. Enter your mobile number or modem number, then choose a package.
 5. Click the ""Buy"" button.
 6. Select your payment method and please make the payment.
 
-Need to top up your mobile number for an important call? Or do you need to pay PLN electricity, PDAM water, BPJS, postpaid and Telkom bills? You can do it all with Transmart. Entrust your transactions with us. With secure and easy payment, we will make your life easier.","Tiada hari tanpa internet! Mulai dari eksis di media sosial, chatting, update berita online, sampai belanja online, Anda butuh paket internet untuk kegiatan sehari-hari. Pastikan Anda selalu lancar berinternet dengan membeli kuota murah di Transmart. Berbagai paket data internet dari semua provider bisa Anda temukan di sini. Pilih paket data pilihan Anda dan dapatkan dengan metode pembayaran yang mudah.
+Need to top up your mobile number for an important call? Or do you need to pay PLN electricity, PDAM water, BPJS, postpaid and Telkom bills? You can do it all with METRO. Entrust your transactions with us. With secure and easy payment, we will make your life easier.","Tiada hari tanpa internet! Mulai dari eksis di media sosial, chatting, update berita online, sampai belanja online, Anda butuh paket internet untuk kegiatan sehari-hari. Pastikan Anda selalu lancar berinternet dengan membeli kuota murah di METRO. Berbagai paket data internet dari semua provider bisa Anda temukan di sini. Pilih paket data pilihan Anda dan dapatkan dengan metode pembayaran yang mudah.
 
-1. Masuk ke www.transmart.co.id.
+1. Masuk ke www.metro.co.id.
 2. Pilih kategori Top Up & Tagihan.
 3. Masuk ke menu Paket Data.
 4. Masukkan nomor ponsel atau modem Anda, kemudian pilih paket.
 5. Klik tombol ""Beli"".
 6. Pilih metode pembayaran yang Anda inginkan dan lakukan pembayaran.
 
-Butuh pulsa all operator untuk teleponan? Atau ingin membayar berbagai macam tagihan seperti tagihan listrik PLN, tagihan PDAM, tagihan BPJS, tagihan pascabayar, dan tagihan Telkom? Semuanya bisa Anda lakukan di Transmart. Percayakan semua transaksi Anda pada kami. Dengan cara yang mudah dan pilihan metode pembayaran yang aman, hidup Anda jadi lebih mudah."
+Butuh pulsa all operator untuk teleponan? Atau ingin membayar berbagai macam tagihan seperti tagihan listrik PLN, tagihan PDAM, tagihan BPJS, tagihan pascabayar, dan tagihan Telkom? Semuanya bisa Anda lakukan di METRO. Percayakan semua transaksi Anda pada kami. Dengan cara yang mudah dan pilihan metode pembayaran yang aman, hidup Anda jadi lebih mudah."
 Packages,Paket
 Mobile Package Details,Detail Paket Data
 Buy Token or Pay Electricity Bill,Beli Token atau Bayar Tagihan Listrik Anda
@@ -16864,11 +16865,11 @@ Information,Informasi
 - You will receive your token number within 1x24 hours.","- Token listrik & pembayaran tagihan PLN tidak tersedia pada waktu cut off/perbaikan (23.00 - 01.00).
 - Anda akan mendapatkan nomor token Anda dalam waktu # x 24 jam."
 How to Buy Electricity Token or Pay PLN Bill,Cara Beli Token Listrik atau Membayar Tagihan PLN
-"When it comes to paying your electricity bills or buying electricity token, no one wants to do it with too much hassle. Transmart gives you the solution! We offer a simplicity to provide your daily need.
+"When it comes to paying your electricity bills or buying electricity token, no one wants to do it with too much hassle. METRO gives you the solution! We offer a simplicity to provide your daily need.
 
 Buying PLN Electricity Token
-You can find various nominal options for your electricity token. This prepaid electricity purchase can be done anywhere and anytime from Transmart's website and app. Follow these steps to buy electricity token.
-1. Go to www.transmart.co.id.
+You can find various nominal options for your electricity token. This prepaid electricity purchase can be done anywhere and anytime from METRO's website and app. Follow these steps to buy electricity token.
+1. Go to www.metro.co.id.
 2. Find Top Up & Billings category.
 3. Go to PLN Electricity menu and choose ""Electricity Token"".
 4. Enter your meter number, then choose an amount.
@@ -16876,20 +16877,20 @@ You can find various nominal options for your electricity token. This prepaid el
 6. Select your payment method and please make the payment.
 
 Paying Your PLN Electricity Bill
-Paying your electricity bill is now hassle free, do it online! Get it done conveniently and on time with Transmart. Follow these steps to pay your electricity bill.
-1. Go to www.transmart.co.id.
+Paying your electricity bill is now hassle free, do it online! Get it done conveniently and on time with METRO. Follow these steps to pay your electricity bill.
+1. Go to www.metro.co.id.
 2. Find Top Up & Billings category.
 3. Go to PLN Electricity menu and choose ""Electricity Bill"".
 4. Enter your customer ID. Your bill information will appear after.
 5. Click the ""Buy"" button.
 6. Select your payment method and please make the payment.
 
-Paying other bills is just as easy! Transmart allows you to pay your PDAM water bill, BPJS bill, mobile postpaid and Telkom bill. You can also enjoy the easy way to top up your mobile number and to buy mobile package.
-","Mau bayar tagihan listrik PLN dengan mudah? Atau butuh beli token listrik secepatnya? Solusinya ada di Transmart! Kami menghadirkan kemudahan untuk memenuhi kebutuhan listrik Anda.
+Paying other bills is just as easy! METRO allows you to pay your PDAM water bill, BPJS bill, mobile postpaid and Telkom bill. You can also enjoy the easy way to top up your mobile number and to buy mobile package.
+","Mau bayar tagihan listrik PLN dengan mudah? Atau butuh beli token listrik secepatnya? Solusinya ada di METRO! Kami menghadirkan kemudahan untuk memenuhi kebutuhan listrik Anda.
 
 Membeli Token Listrik PLN
-Transmart menyediakan berbagai nominal token listrik PLN untuk Anda. Pembelian listrik prabayar ini bisa Anda lakukan kapan pun dan di mana pun melalui situs dan aplikasi Transmart. Ikuti langkah-langkah berikut untuk membeli token listrik.
-1. Masuk ke www.transmart.co.id.
+METRO menyediakan berbagai nominal token listrik PLN untuk Anda. Pembelian listrik prabayar ini bisa Anda lakukan kapan pun dan di mana pun melalui situs dan aplikasi METRO. Ikuti langkah-langkah berikut untuk membeli token listrik.
+1. Masuk ke www.metro.co.id.
 2. Cari kategori Top Up & Tagihan.
 3. Masuk ke menu Listrik PLN dan pilih ""Token Listrik"".
 4. Masukkan nomor meter, kemudian pilih nominal.
@@ -16897,15 +16898,15 @@ Transmart menyediakan berbagai nominal token listrik PLN untuk Anda. Pembelian l
 6. Pilih metode pembayaran yang Anda inginkan dan lakukan pembayaran.
 
 Membayar Tagihan Listrik PLN
-Kini Anda bisa bayar tagihan listrik online dan tanpa repot. Bayar tagihan PLN jadi lebih mudah dan tepat waktu karena Transmart siap membantu. Lakukan langkah-langkah di bawah ini untuk bayar tagihan PLN Anda.
-1. Masuk ke www.transmart.co.id.
+Kini Anda bisa bayar tagihan listrik online dan tanpa repot. Bayar tagihan PLN jadi lebih mudah dan tepat waktu karena METRO siap membantu. Lakukan langkah-langkah di bawah ini untuk bayar tagihan PLN Anda.
+1. Masuk ke www.metro.co.id.
 2. Cari kategori Top Up & Tagihan.
 3. Masuk ke menu Listrik PLN dan pilih ""Tagihan Listrik"".
 4. Masukkan ID Pelanggan. Informasi tagihan Anda akan muncul kemudian.
 5. Klik tombol ""Lanjut ke Pembayaran"".
 6. Pilih metode pembayaran yang Anda inginkan dan lakukan pembayaran.
 
-Ingin bayar tagihan lainnya melalui Transmart? Tentu bisa! Transmart memberikan Anda kemudahan untuk membayar tagihan PDAM, tagihan BPJS, tagihan pascabayar, dan tagihan Telkom. Nikmati juga cara praktis pembelian pulsa dan paket data,."
+Ingin bayar tagihan lainnya melalui METRO? Tentu bisa! METRO memberikan Anda kemudahan untuk membayar tagihan PDAM, tagihan BPJS, tagihan pascabayar, dan tagihan Telkom. Nikmati juga cara praktis pembelian pulsa dan paket data,."
 Customer Information,Informasi Pelanggan
 Customer ID,Nomor Pelanggan
 [Customer ID],[Customer ID]
@@ -16930,25 +16931,25 @@ The number on your water bill.,Nomor pada tagihan air Anda.
 Please enter your customer ID,Isi nomor ID pelanggan terlebih dahulu
 Make sure you enter the correct customer ID,Pastikan Anda memasukkan ID pelanggan yang tepat
 How to Pay PDAM Water Bill,Cara Membayar Tagihan Air PDAM
-"You can entrust yout PDAM water bill payment to Transmart. You can get many benefits by paying your water bill online: easy water bill checking, paying without queuing in line and you can do it anywhere anytime. No more hassle in getting your bill payment done, just do these steps:
+"You can entrust yout PDAM water bill payment to METRO. You can get many benefits by paying your water bill online: easy water bill checking, paying without queuing in line and you can do it anywhere anytime. No more hassle in getting your bill payment done, just do these steps:
 
-1. Go to www.transmart.co.id.
+1. Go to www.metro.co.id.
 2. Find Top Up & Billings category.
 3. Go to PDAM Water menu.
 4. Select your region and enter your Customer ID. Your bill information will appear after.
 5. Click the ""Go to Payment"" button.
 6. Select your payment method and please make the payment.
 
-You can also enjoy this easy payment while paying your PLN bill, BPJS bill, mobile postpaid bill and Telkom bill. Your transaction is made convenient with secure payment options from Transmart. Make sure you also top up your mobile number, mobile package and PLN electricity token through Transmart to make your life easier.","Percayakan urusan pembayaran tagihan air PDAM Anda hanya pada Transmart. Begitu banyak keuntungan yang bisa Anda dapatkan dengan membayar tagihan air secara online: bisa cek tagihan air dengan mudah, bayar tanpa antri, serta bisa dilakukan kapan pun dan di mana pun. Penuhi kebutuhan air bersih Anda tanpa repot dengan cara ini.
+You can also enjoy this easy payment while paying your PLN bill, BPJS bill, mobile postpaid bill and Telkom bill. Your transaction is made convenient with secure payment options from METRO. Make sure you also top up your mobile number, mobile package and PLN electricity token through METRO to make your life easier.","Percayakan urusan pembayaran tagihan air PDAM Anda hanya pada METRO. Begitu banyak keuntungan yang bisa Anda dapatkan dengan membayar tagihan air secara online: bisa cek tagihan air dengan mudah, bayar tanpa antri, serta bisa dilakukan kapan pun dan di mana pun. Penuhi kebutuhan air bersih Anda tanpa repot dengan cara ini.
 
-1. Masuk ke www.transmart.co.id.
+1. Masuk ke www.metro.co.id.
 2. Cari kategori Top Up & Tagihan.
 3. Masuk ke menu Air PDAM.
 4. Pilih wilayah Anda dan masukkan ID Pelanggan. Informasi tagihan Anda akan muncul kemudian.
 5. Klik tombol ""Lanjut ke Pembayaran"".
 6. Pilih metode pembayaran yang Anda inginkan dan lakukan pembayaran.
 
-Kemudahan membayar tagihan air PDAM juga bisa Anda rasakan untuk membayar tagihan PLN, tagihan BPJS, tagihan pascabayar, dan tagihan Telkom. Transaksi pun jadi lebih nyaman dengan pilihan pembayaran yang aman dari Transmart, mulai dari pembayaran dengan virtual account, kartu kredit, kartu debit, hingga instant payment. Pastikan juga Anda melakukan pembelian pulsa, paket data, dan token listrik PLN di Transmart untuk menjadikan pemenuhan kebutuhan sehari-hari jadi lebih praktis."
+Kemudahan membayar tagihan air PDAM juga bisa Anda rasakan untuk membayar tagihan PLN, tagihan BPJS, tagihan pascabayar, dan tagihan Telkom. Transaksi pun jadi lebih nyaman dengan pilihan pembayaran yang aman dari METRO, mulai dari pembayaran dengan virtual account, kartu kredit, kartu debit, hingga instant payment. Pastikan juga Anda melakukan pembelian pulsa, paket data, dan token listrik PLN di METRO untuk menjadikan pemenuhan kebutuhan sehari-hari jadi lebih praktis."
 Period,Periode
 Penalty,Denda
 Admin Fee,Biaya Admin
@@ -16962,10 +16963,10 @@ Pay untuk,Bayar hingga
 Select Month,Pilih Bulan
 Please select billing month,Silakan pilih bulan tagihan
 How to Pay Your BPJS Premium,Cara Membayar Iuran BPJS
-"Transmart now serves you with an option to pay yout BPJS premium. Only with your internet connection and an access to Transmart website or application, you can do your BPJS Kesehatan or BPJS Ketenagakerjaan payment in seconds. No more queuing to do this transaction, you just need to follow these steps.
+"METRO now serves you with an option to pay yout BPJS premium. Only with your internet connection and an access to METRO website or application, you can do your BPJS Kesehatan or BPJS Ketenagakerjaan payment in seconds. No more queuing to do this transaction, you just need to follow these steps.
 
 Pay BPJS Kesehatan Online
-1. Go to www.transmart.co.id.
+1. Go to www.metro.co.id.
 2. Find Top Up & Billings category.
 3. Go to BPJS menu and choose ""Kesehatan"".
 4. Enter your Virtual Account Number and select the billing period. Your bill information will appear after.
@@ -16973,17 +16974,17 @@ Pay BPJS Kesehatan Online
 6. Select your payment method and please make the payment.
 
 Pay BPJS Ketenagakerjaan Online
-1. Go to www.transmart.co.id.
+1. Go to www.metro.co.id.
 2. Find Top Up & Billings category.
 3. Go to BPJS menu and choose ""Ketenagakerjaan"".
 4. Enter your KTP number and select the billing period. Your bill information will appear after.
 5. Click the ""Go to Payment"" button.
 6. Select your payment method and please make the payment.
 
-Don't miss the chance to do other bill transactions through Transmart. Here you can pay your PLN electricity bill, PDAM water bill, mobile postpaid bill, Telkom bill and top up your mobile number, mobile package and electricity token. Make your life convenient by doing your transactions through Transmart website and application. Secure payment options are available for you to choose.","Transmart hadir dengan layanan pembayaran iuran BPJS untuk Anda yang menginginkan cara pembayaran praktis. Hanya dengan akses internet dan mengunjungi situs atau aplikasi Transmart, Anda bisa langsung melakukan pembayaran BPJS Kesehatan maupun BPJS Ketenagakerjaan. Tidak perlu lagi mengantri untuk bayar BPJS Kesehatan dan Ketenegakerjaan karena semuanya bisa langsung beres dengan mengikuti langkah simpel berikut.
+Don't miss the chance to do other bill transactions through METRO. Here you can pay your PLN electricity bill, PDAM water bill, mobile postpaid bill, Telkom bill and top up your mobile number, mobile package and electricity token. Make your life convenient by doing your transactions through METRO website and application. Secure payment options are available for you to choose.","METRO hadir dengan layanan pembayaran iuran BPJS untuk Anda yang menginginkan cara pembayaran praktis. Hanya dengan akses internet dan mengunjungi situs atau aplikasi METRO, Anda bisa langsung melakukan pembayaran BPJS Kesehatan maupun BPJS Ketenagakerjaan. Tidak perlu lagi mengantri untuk bayar BPJS Kesehatan dan Ketenegakerjaan karena semuanya bisa langsung beres dengan mengikuti langkah simpel berikut.
 
 Bayar BPJS Kesehatan Online
-1. Masuk ke www.transmart.co.id.
+1. Masuk ke www.metro.co.id.
 2. Cari kategori Top Up & Tagihan.
 3. Masuk ke menu BPJS dan pilih ""Kesehatan"".
 4. Masukkan nomor virtual account dan periode pembayaran. Informasi tagihan Anda akan muncul kemudian.
@@ -16991,14 +16992,14 @@ Bayar BPJS Kesehatan Online
 6. Pilih metode pembayaran yang Anda inginkan dan lakukan pembayaran.
 
 Bayar BPJS Ketenagakerjaan Online
-1. Masuk ke www.transmart.co.id.
+1. Masuk ke www.metro.co.id.
 2. Cari kategori Top Up & Tagihan.
 3. Masuk ke menu BPJS dan pilih ""Ketenagakerjaan"".
 4. Masukkan nomor KTP Anda dan periode pembayaran. Informasi tagihan Anda akan muncul kemudian.
 5. Klik tombol ""Lanjut ke Pembayaran"".
 6. Pilih metode pembayaran yang Anda inginkan dan lakukan pembayaran.
 
-Jangan lupa untuk membayar tagihan lainnya di Transmart. Di sini Anda bisa melunasi tagihan listrik PLN, tagihan air PDAM, tagihan pascabayar, tagihan Telkom, serta membeli pulsa, paket data, dan token listrik. Buat hidup Anda lebih nyaman dan mudah dengan melakukan transaksi di situs dan aplikasi Transmart. Semuanya dapat dilakukan dengan pilihan metode pembayaran yang aman."
+Jangan lupa untuk membayar tagihan lainnya di METRO. Di sini Anda bisa melunasi tagihan listrik PLN, tagihan air PDAM, tagihan pascabayar, tagihan Telkom, serta membeli pulsa, paket data, dan token listrik. Buat hidup Anda lebih nyaman dan mudah dengan melakukan transaksi di situs dan aplikasi METRO. Semuanya dapat dilakukan dengan pilihan metode pembayaran yang aman."
 Pay Until,Bayar Hingga
 Number of Members,Jumlah Anggota
 Premium,Premi
@@ -17008,48 +17009,48 @@ Select Operator,Pilih Operator
 Please select an operator,Silakan pilih operator
 "Sorry, we are unable to process your request. Please try again later.","Maaf, kami belum bisa memproses permintaan Anda. Silakan coba beberapa saat lagi."
 How to Pay Mobile Postpaid Bill,Cara Membayar Tagihan Pascabayar
-"Mobile postpaid payment is now safer and more convenient with Transmart. Do your mobile postpaid payment online and stay connected. Below are the steps to do this transaction.
+"Mobile postpaid payment is now safer and more convenient with METRO. Do your mobile postpaid payment online and stay connected. Below are the steps to do this transaction.
 
-1. Go to www.transmart.co.id.
+1. Go to www.metro.co.id.
 2. Find Top Up & Billings category.
 3. Go to Mobile Postpaid menu.
 4. Select your operator and enter your mobile or modem number. Your bill information will appear after.
 5. Click the ""Go to Payment"" button.
 6. Select your payment method and please make the payment.
 
-You can pay your other bills through Transmart. From PLN electricity bill, PDAM water bill, BPJS bill, to Telkom bill; these payments can be done online. Try topping up you mobile number, mobile package and electricity online too in our Top Up & Bills menu.","Lebih tenang dan nyaman bayar tagihan pascabayar dengan Transmart. Dengan mudahnya bayar tagihan pascabayar berbagai operator secara online, komunikasi Anda tetap lancar dan tanpa hambatan. Lakukan transaksi pembayaran Anda dengan panduan berikut.
+You can pay your other bills through METRO. From PLN electricity bill, PDAM water bill, BPJS bill, to Telkom bill; these payments can be done online. Try topping up you mobile number, mobile package and electricity online too in our Top Up & Bills menu.","Lebih tenang dan nyaman bayar tagihan pascabayar dengan METRO. Dengan mudahnya bayar tagihan pascabayar berbagai operator secara online, komunikasi Anda tetap lancar dan tanpa hambatan. Lakukan transaksi pembayaran Anda dengan panduan berikut.
 
-1. Masuk ke www.transmart.co.id.
+1. Masuk ke www.metro.co.id.
 2. Cari kategori Top Up & Tagihan.
 3. Masuk ke menu Pascabayar.
 4. Pilih operator kemudian masukkan nomor ponsel atau modem Anda. Informasi tagihan Anda akan muncul kemudian.
 5. Klik tombol ""Lanjut ke Pembayaran"".
 6. Pilih metode pembayaran yang Anda inginkan dan lakukan pembayaran.
 
-Tagihan lainnya juga dapat Anda lakukan pembayarannya di Transmart. Mulai dari tagihan listrik PLN, tagihan air PDAM, tagihan BPJS, hingga tagihan Telkom bisa dilunasi secara online. Dapatkan pula kebutuhan pulsa, paket data, dan token listrik di menu Top Up & Tagihan kami."
+Tagihan lainnya juga dapat Anda lakukan pembayarannya di METRO. Mulai dari tagihan listrik PLN, tagihan air PDAM, tagihan BPJS, hingga tagihan Telkom bisa dilunasi secara online. Dapatkan pula kebutuhan pulsa, paket data, dan token listrik di menu Top Up & Tagihan kami."
 Pay Telkom Bill,Bayar Tagihan Telkom
 Your area code and telephone number.,Kode area dan nomor telepon Anda.
 Telkom bill payment takes up to #x24 hours.,Pembayaran tagihan Telkom membutuhkan waktu maksimum #x24 jam.
 How to Pay Telkom Bill,Cara Membayar Tagihan Telkom
-"Tired of going back and forth to pay your monthly bills? Now you only need Transmart to do it all, including your Telkom bill payment. With online transaction, all payments can be done anywhere and anytime. Follow these steps to pay your Telkom bill.
+"Tired of going back and forth to pay your monthly bills? Now you only need METRO to do it all, including your Telkom bill payment. With online transaction, all payments can be done anywhere and anytime. Follow these steps to pay your Telkom bill.
 
-1. Go to www.transmart.co.id.
+1. Go to www.metro.co.id.
 2. Find Top Up & Billings category.
 3. Go to Telkom menu.
 4. Enter your location and phone number (including area code). Your bill information will appear after.
 5. Click the ""Go to Payment"" button.
 6. Select your payment method and please make the payment.
 
-Paying other bills is also made easy by Transmart. Find our service to pay your PLN electricity bill, PDAM water bill, BPJS bill and mobile postpaid bill with secure payment. You can also top up your mobile number, mobile package and electricity token through us. Have Transmart as your transaction solution and the ultimate choice to fulfill your daily needs.","Bosan harus bolak-balik membayar berbagai tagihan tiap bulan? Kini Anda hanya perlu Transmart untuk melunasi semuanya, termasuk tagihan Telkom Anda. Dengan transaksi online, pembayaran dapat dilakukan secara praktis kapan pun dan di mana pun. Ikuti langkah-langkah pembayaran tagihan Telkom di bawah ini.
+Paying other bills is also made easy by METRO. Find our service to pay your PLN electricity bill, PDAM water bill, BPJS bill and mobile postpaid bill with secure payment. You can also top up your mobile number, mobile package and electricity token through us. Have METRO as your transaction solution and the ultimate choice to fulfill your daily needs.","Bosan harus bolak-balik membayar berbagai tagihan tiap bulan? Kini Anda hanya perlu METRO untuk melunasi semuanya, termasuk tagihan Telkom Anda. Dengan transaksi online, pembayaran dapat dilakukan secara praktis kapan pun dan di mana pun. Ikuti langkah-langkah pembayaran tagihan Telkom di bawah ini.
 
-1. Masuk ke www.transmart.co.id.
+1. Masuk ke www.metro.co.id.
 2. Cari kategori Top Up & Tagihan.
 3. Masuk ke menu Telkom.
 4. Masukkan lokasi dan nomor telepon Anda (termasuk kode wilayah). Informasi tagihan Anda akan muncul kemudian.
 5. Klik tombol ""Lanjut ke Pembayaran"".
 6. Pilih metode pembayaran yang Anda inginkan dan lakukan pembayaran.
 
-Bayar tagihan lainnya pun jadi lebih cepat dan mudah dengan Transmart. Temukan layanan pembayaran tagihan listrik PLN, tagihan air PDAM, tagihan BPJS, dan tagihan pascabayar dengan pilihan metode bayar yang aman. Tidak hanya itu, pembelian pulsa, paket data, dan token listrik pun bisa dilakukan di sini. Jadikan Transmart sebagai solusi transaksi dan kebutuhan sehari-hari Anda."
+Bayar tagihan lainnya pun jadi lebih cepat dan mudah dengan METRO. Temukan layanan pembayaran tagihan listrik PLN, tagihan air PDAM, tagihan BPJS, dan tagihan pascabayar dengan pilihan metode bayar yang aman. Tidak hanya itu, pembelian pulsa, paket data, dan token listrik pun bisa dilakukan di sini. Jadikan METRO sebagai solusi transaksi dan kebutuhan sehari-hari Anda."
 Location,Lokasi
 Your bill has already been paid.,Tagihan Anda sudah dibayar.
 We can't proceed with this transaction. You have reached the maximum number of unpaid bills (3 months).,Kami tidak dapat memproses transaksi ini. Anda telah mencapai jumlah maksimal tunggakan tagihan (3 bulan).
@@ -17179,7 +17180,7 @@ Shop Now,Belanja Sekarang
 We found some out of stock items in your cart. We've removed the items for you.,Beberapa produk dalam keranjang sudah kehabisan stok. Kami telah menghapusnya untuk Anda.
 "Pick Up in Store","Ambil di gerai"
 or do both,atau lakukan keduanya
-"Sometimes you want to have a part of your order delivered and pick up the rest. Yes, you can do both with Transmart!",Terkadang Anda ingin mengirimkan sebagian order ke alamat dan mengambil sisanya di gerai. Anda bisa melakukan keduanya sekaligus di Transmart!
+"Sometimes you want to have a part of your order delivered and pick up the rest. Yes, you can do both with METRO!",Terkadang Anda ingin mengirimkan sebagian order ke alamat dan mengambil sisanya di gerai. Anda bisa melakukan keduanya sekaligus di METRO!
 Change,Ganti Alamat
 Send to 2 addresses,Kirim ke 2 alamat
 Delivery Method,Metode Pengiriman
@@ -17204,8 +17205,8 @@ Your Pick Up Store,Gerai Pilihan Anda
 Store List,Daftar Gerai
 Pick Up from This Store,Ambil Order di Gerai Ini
 "We can't find any stores here.
-Please update your location to see Transmart stores around you.","Kami tidak menemukan gerai di sini.
-Silakan ubah lokasi Anda untuk menemukan Transmart terdekat."
+Please update your location to see METRO stores around you.","Kami tidak menemukan gerai di sini.
+Silakan ubah lokasi Anda untuk menemukan METRO terdekat."
 Find promos and discounts,Temukan promo dan diskon
 Use,Gunakan
 You have ## voucher(s),Anda memiliki ## voucher
@@ -17437,7 +17438,7 @@ Completed,Selesai
 "No order is currently in progress.","Tidak ada order yang sedang diproses."
 "Start shopping and check your order status here.","Yuk, mulai belanja dan cek status ordernya di sini."
 You haven't completed any order.,Anda belum menyelesaikan order apapun.
-What are you waiting for? Get all you need in Transmart.,Tunggu apa lagi? Dapatkan semua kebutuhan Anda di Transmart.
+What are you waiting for? Get all you need in METRO.,Tunggu apa lagi? Dapatkan semua kebutuhan Anda di METRO.
 "Pay before [dd Month 2020], ##.##.## AM/PM","Bayar sebelum [dd Month 2020], ##.##.## WIB"
 Reorder,Order Lagi
 "Oops! We can't find it.","Maaf, kami tidak menemukannya."
@@ -17624,7 +17625,7 @@ At least 20 characters,Minimum 20 karakter
 Submit,Kirim
 Thank you for reviewing [product name]!,Terima kasih telah mengulas [product name]!
 Notification Settings,Pengaturan Notifikasi
-Transmart Updates,Update dari Transmart
+METRO Updates,Update dari METRO
 Promos & Events,Promo & Acara
 Order Status When Signed Out,Status Order Saat Keluar Akun
 Services,Layanan
@@ -17698,7 +17699,7 @@ Find a wide selection of gifts for your wedding, birthday, baby showers and othe
 Temukan ragam produk terbaik untuk hadiah pernikahan, ulang tahun, baby shower, atau hari spesial lainnya."
 "Get Inspired
 We give insightful recommendations for any occasions. We want the best for you!","Dapatkan Inspirasi
-Transmart hadirkan rekomendasi terbaik sesuai perayaan Anda. Kami ingin berikan yang terbaik!"
+METRO hadirkan rekomendasi terbaik sesuai perayaan Anda. Kami ingin berikan yang terbaik!"
 "Easy Share
 Share your gift list publicly or privately in a few simple steps.","Mudah Dibagikan
 Bagikan daftar hadiah secara publik atau privat dengan langkah mudah."
@@ -17796,7 +17797,7 @@ Read our payment guide & solutions,Baca panduan & solusi pembayaran dari kami
 Vouchers & Promos,Voucher & Promo
 Discover all about vouchers & promos,Ketahui semua tentang voucher & promosi
 Buying Guide,Cara Belanja
-Find complete instructions to shop in Transmart,Dapatkan instruksi lengkap untuk berbelanja
+Find complete instructions to shop in METRO,Dapatkan instruksi lengkap untuk berbelanja
 About Us,Tentang Kami
 Get to know us & our services,Pelajari tentang kami & layanan kami
 Delivery & Pick Up in Store,Pengiriman & Ambil di Gerai
@@ -17818,7 +17819,7 @@ Home > Help Center > [Topic],Home > Pusat Bantuan > [Topic]
 Help Center,Pusat Bantuan
 Type to search topic (example: refund),Ketik untuk mencari topik (contoh: retur)
 Need more information?,Butuh info lebih lanjut?
-Send your questions to Transmart Customer Service,Kirim pertanyaan Anda ke Transmart Customer Service
+Send your questions to METRO Customer Service,Kirim pertanyaan Anda ke METRO Customer Service
 How can we help you?,Ada yang bisa kami bantu?
 Please complete the details to help us understand your problem.,Silakan lengkapi detail berikut agar kami dapat memberikan solusi terbaik.
 Tell us your concerns,Ceritakan kendala Anda
@@ -17848,7 +17849,7 @@ Select Store,Pilih Toko
 Select Order,Pilih Order
 "You have selected ","Anda telah memilih "
 Everything you need at your fingertips,Semua kebutuhan Anda dalam genggaman
-We bring you the new way of shopping from Transmart. Enjoy the easy and delightful experience!,Nikmati cara baru berbelanja dari Transmart. Pengalaman belanja Anda makin mudah dan menyenangkan!
+We bring you the new way of shopping from METRO. Enjoy the easy and delightful experience!,Nikmati cara baru berbelanja dari METRO. Pengalaman belanja Anda makin mudah dan menyenangkan!
 We are Now Online,Kami Hadir Secara Online
 Shop anytime because your one stop shopping destination is now ready to serve you online,"Belanja kapan saja, karena destinasi belanja favorit Anda kini siap melayani secara online."
 We Have All You Need,Semua Kebutuhan Anda Dijamin Ada
@@ -17856,15 +17857,15 @@ We Have All You Need,Semua Kebutuhan Anda Dijamin Ada
 We Let You Shop the Way You Want,Belanja Sesuka Anda
 "Deliver your order, pick it up in store, or do both at the same time. We make every way possible for you!","Kirim order Anda, ambil di gerai, atau lakukan keduanya sekaligus. Kami hadirkan berbagai cara agar belanja jadi nyaman."
 Download the app now!,Download aplikasinya sekarang!
-"PT Trans Retail Indonesia is commited to bring you a better quality of life everyday. This is what underlies each of our steps to become the best retailer in Indonesia. We are doing it as the ultimate choice of shopping destination that serves excellent services and products.
+"METRO is commited to bring you a better quality of life everyday. This is what underlies each of our steps to become the best retailer in Indonesia. We are doing it as the ultimate choice of shopping destination that serves excellent services and products.
 
-Through the brands Transmart, Carrefour and Groserindo, we keep on innovating in providing the world class service in Indonesia's retail industry. More than 100 multiformat stores are spread throughout the country, letting us lead the change and make dreams happen. Our hybrid business concept is the first ever in Indonesia and it was developed to embody the innovation and transformation of Trans Retail Indonesia.
+Through the brands METRO, Carrefour and Groserindo, we keep on innovating in providing the world class service in Indonesia's retail industry. More than 100 multiformat stores are spread throughout the country, letting us lead the change and make dreams happen. Our hybrid business concept is the first ever in Indonesia and it was developed to embody the innovation and transformation of Trans Retail Indonesia.
 
-Transmart transformation is driven by entrepreneurship spirit that has always been a DNA of our company. Here is where the retail best leaders assemble to deliver genuine service, tangible change and better future. Despite our passion for transformation, there are things that never change: our dedication to you and our dream to create a better Indonesia.","PT Trans Retail Indonesia berkomitmen untuk menghadirkan bagi Anda sebuah kualitas hidup yang lebih baik setiap harinya. Hal inilah yang melandasi setiap langkah kami untuk menjadi retailer terbaik di Indonesia. Kami melakukannya sebagai destinasi belanja pilihan keluarga yang memberikan pelayanan dan produk berkualitas.
+METRO transformation is driven by entrepreneurship spirit that has always been a DNA of our company. Here is where the retail best leaders assemble to deliver genuine service, tangible change and better future. Despite our passion for transformation, there are things that never change: our dedication to you and our dream to create a better Indonesia.","METRO berkomitmen untuk menghadirkan bagi Anda sebuah kualitas hidup yang lebih baik setiap harinya. Hal inilah yang melandasi setiap langkah kami untuk menjadi retailer terbaik di Indonesia. Kami melakukannya sebagai destinasi belanja pilihan keluarga yang memberikan pelayanan dan produk berkualitas.
 
-Melalui brand Transmart, Carrefour, dan Groserindo, kami terus berinovasi dalam menyajikan layanan kelas dunia di industri ritel Indonesia. Lebih dari 100 gerai multiformat kami tersebar di seluruh penjuru negeri, membuat PT Trans Retail Indonesia terus memimpin perubahan dan mewujudkan mimpi. Konsep hybrid business kami adalah yang pertama di Indonesia, dikembangkan untuk mewujudkan inovasi dan transformasi Trans Retail Indonesia.
+Melalui brand METRO, Carrefour, dan Groserindo, kami terus berinovasi dalam menyajikan layanan kelas dunia di industri ritel Indonesia. Lebih dari 100 gerai multiformat kami tersebar di seluruh penjuru negeri, membuat METRO terus memimpin perubahan dan mewujudkan mimpi. Konsep hybrid business kami adalah yang pertama di Indonesia, dikembangkan untuk mewujudkan inovasi dan transformasi Trans Retail Indonesia.
 
-Transformasi Transmart didorong oleh spirit entrepreneurship yang merupakan bagian dari DNA perusahaan. Di sinilah para pemimpin ritel yang unggul berkumpul demi memberikan pelayanan dari hati, perubahan nyata, dan masa depan yang lebih baik. Meskipun didorong oleh semangat transformasi, ada hal tidak pernah berubah: dedikasi kami untuk Anda dan mimpi untuk mewujudkan Indonesia yang lebih baik."
+Transformasi METRO didorong oleh spirit entrepreneurship yang merupakan bagian dari DNA perusahaan. Di sinilah para pemimpin ritel yang unggul berkumpul demi memberikan pelayanan dari hati, perubahan nyata, dan masa depan yang lebih baik. Meskipun didorong oleh semangat transformasi, ada hal tidak pernah berubah: dedikasi kami untuk Anda dan mimpi untuk mewujudkan Indonesia yang lebih baik."
 Make sure you follow the format.,Pastikan sesuai dengan format.
 Minimum of 7 characters with combination of number & uppercase,Minimum 7 karakter dengan kombinasi angka & huruf kapital
 Make sure the format is 08xxxxxxxxxx,Pastikan mengikuti format 08xxxxxxxxxx
@@ -17933,8 +17934,8 @@ Maximum size 1 MB. You can upload up to 3 photos.,Maksimum 1 MB. Anda dapat uplo
 "Category","Kategori"
 "Yes (full/partially)","Ya (semua produk/hanya sebagian)"
 "Product with problems","Produk bermasalah"
-Your message has been delivered to Transmart Team.,Terima kasih telah menghubungi kami.
-Transmart Team will respond your message in 24 hours. ,Pesan ini telah diterima dan kami akan menghubungi Anda kembali dalam 24 jam.
+Your message has been delivered to METRO Team.,Terima kasih telah menghubungi kami.
+METRO Team will respond your message in 24 hours. ,Pesan ini telah diterima dan kami akan menghubungi Anda kembali dalam 24 jam.
 Kids Zone,Pakaian Anak
 "Brands You'll Love","Brand Favorit"
 "Today’s Deals","Deal Hari Ini"
@@ -17973,7 +17974,7 @@ Thank you for reviewing %1,Terima kasih telah mengulas %1
 " Store info (%1 Store)","Info gerai (%1 Gerai)"
 "Free","gratis"
 "Product","Produk"
-"Sometimes you want to have a part of your order delivered and picked up the rest. Yes, you can do both with Transmart!","Terkadang Anda ingin mengirimkan sebagian order ke alamat dan mengambil sisanya di gerai. Anda bisa melakukan keduanya sekaligus di Transmart!"
+"Sometimes you want to have a part of your order delivered and picked up the rest. Yes, you can do both with METRO!","Terkadang Anda ingin mengirimkan sebagian order ke alamat dan mengambil sisanya di gerai. Anda bisa melakukan keduanya sekaligus di METRO!"
 "Regular (2-7 days)","Reguler (2-7 hari)"
 "Same day (3 hours)","Hari yang sama (3 jam)"
 "Next day (1 day)","Esok hari (1 hari)"
@@ -18074,4 +18075,4 @@ Thank you for reviewing,Terima kasih telah mengulas
 "Are you sure you want to add this product to compare? Products that belong to different category will be removed from comparison list.","Anda yakin ingin membandingkan produk ini? Produk dengan kategori berbeda akan dihapus dari daftar perbandingan."
 "Continue","Lanjutkan"
 "Cancel","Batalkan"
-"Thank you for shopping at Transmart. We have received your order. Please complete your payment for this order.","Terima kasih telah berbelanja di Transmart. Kami telah menerima order Anda. Silakan melakukan pembayaran untuk order berikut."
+"Thank you for shopping at METRO. We have received your order. Please complete your payment for this order.","Terima kasih telah berbelanja di METRO. Kami telah menerima order Anda. Silakan melakukan pembayaran untuk order berikut."

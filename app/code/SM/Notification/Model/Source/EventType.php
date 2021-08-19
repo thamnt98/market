@@ -24,7 +24,7 @@ class EventType implements \Magento\Framework\Data\OptionSourceInterface
     {
         return [
             Notification::EVENT_UPDATE => [
-                'label' => __('Transmart Updates'),
+                'label' => __('METRO Updates'),
                 'value' => [
                     [
                         'label' => __('Promo & Event'),

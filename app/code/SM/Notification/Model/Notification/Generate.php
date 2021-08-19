@@ -211,7 +211,7 @@ class Generate
     public function termAndPolicy($helpId, $storeId)
     {
         $title = 'There is something new for you.';
-        $message = 'Check out the new T&C/policy from Transmart';
+        $message = 'Check out the new T&C/policy from METRO';
 
         $this
             ->initNotification([], $title, $message)

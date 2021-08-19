@@ -280,7 +280,7 @@ class CheckoutProviderHandle
             $this->checkoutSession->setDigital(true);
         }
         if ($this->helperConfig->isActiveFulfillmentStore()) {
-            $data['shipping_support'] = __('Transmart now delivers only to Jabodetabek area.');
+            $data['shipping_support'] = __('METRO now delivers only to Jabodetabek area.');
             $data['shipping_address_notify'] = __('Please change your delivery address to %1.', '<strong>Jabodetabek area</strong>');
         }
         $data['is_address_each_items'] = $this->isAddressEachItem;
