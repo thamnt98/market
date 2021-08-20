@@ -2,7 +2,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <tab id="mirasvit" translate="label" sortOrder="550">
-            <label>Mirasvit Extensions</label>
+            <label>BLOG</label>
         </tab>
 
         <section id="blog" showInDefault="1" showInWebsite="1" showInStore="1" type="text" translate="label" sortOrder="100">
