@@ -1,0 +1,21 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<?php
+/* @var $block \Magento\MultipleWishlist\Block\Customer\Wishlist\Management */
+$defaultWishlistId = $block->getDefaultWishlist()->getId();
+$currentWishlistId = $block->getCurrentWishlist()->getId();
+$isDefault = $currentWishlistId == $defaultWishlistId;
+?>
+<?php if ($block->getCurrentWishlist()) : ?>
+    <?= $block->getChildHtml("wishlist.header")?>
+    <div id="my-favorites-sp" class="item title <?= ($isDefault ? "active":"")?>">
+        <a class="switch" href="<?= $block->getUrl("wishlist/index/index", ['wishlist_id' => $defaultWishlistId]) ?>"><?= $block->escapeHtml(__('My Favorites')) ?></a>
+    </div>
+    <div id="my-list-sp" class="item title <?= (!$isDefault ? "active":"")?>">
+        <a class="switch" href="<?= $block->getUrl("wishlist/mylist") ?>"><?= $block->escapeHtml(__('My Lists')) ?></a>
+    </div>
+<?php endif; ?>

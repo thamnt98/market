@@ -1,57 +1,67 @@
 <?php
-/** @var \SM\ShoppingList\Block\MyList\Listing $block */
-$shoppingLists = $block->getShoppingLists();
+/** @var \Magento\MultipleWishlist\Block\Customer\Wishlist\Management $block */
+
+/** @var \Magento\Wishlist\Model\Wishlist[] $wishlists */
+$wishlists = $block->getWishlists()->getItems();
+$defaultId = $block->getDefaultWishlist()->getId();
+/** @var \SM\ShoppingList\ViewModel\MyListViewModel $viewModel */
+$viewModel = $block->getData("viewModel");
+if (isset($wishlists[$defaultId])) {
+    unset($wishlists[$defaultId]);
+}
 ?>
 <div class="shopping-lists">
     <div class="product data items">
         <div class="item title">
-            <a class="switch" href="<?= $block->getUrl("*") ?>"><?= $block->escapeHtml(__('My Favorites')) ?></a>
+            <a class="switch" href="<?= $block->getUrl("wishlist/index/index", ['wishlist_id' => $defaultId]) ?>"><?= $block->escapeHtml(__('My Favorites')) ?></a>
         </div>
         <div class="item title active">
             <a class="switch"><?= $block->escapeHtml(__('My Lists')) ?></a>
         </div>
+        <input name="form_key" type="hidden" value="<?= $block->escapeHtml($block->getFormKey()) ?>" />
         <div id="tab-mylists" class="item content" data-role="content">
-            <?php if (count($shoppingLists) > 1): ?>
+            <?php if (count($wishlists) > 0): ?>
                 <div class="mylists-grid wishlist">
                     <ol class="mylists-items" id="mylists-lists">
                         <?php
-                        /** @var \SM\ShoppingList\Api\Data\ShoppingListDataInterface $list */
-                        foreach ($shoppingLists as $list): ?>
-                        <?php if (!$list->getIsDefault()) :?>
-                        <li class="mylists-item" id="item_<?= $block->escapeHtmlAttr($list->getWishlistId()) ?>">
+                        /** @var \Magento\Wishlist\Model\Wishlist $wishlist */
+                        foreach ($wishlists as $wishlist): ?>
+                        <li class="mylists-item" id="item_<?= $block->escapeHtmlAttr($wishlist->getId()) ?>">
                             <div class="mylists-item-info">
                                 <div class=mylists-item-header">
-                                    <h5 class="mylists-title"><?= $list->getName() ?></h5>
+                                    <h5 class="mylists-title"><?= $wishlist->getName() ?></h5>
 
                                     <?php /** @var \SM\ShoppingList\Block\Toolbar $settingBlock */
                                     $settingBlock = $block->getChildBlock("customer.shoppinglist.mylists.settings")
                                     ?>
-                                    <?= $settingBlock->setShoppingList($list)->toHtml() ?>
+                                    <?= $settingBlock->setShoppingList($wishlist)->toHtml() ?>
 
                                 </div>
                             </div>
                             <div class="mylists-item-content">
-                                <a class="mylists preview-product" href="<?= $block->getUrl("*/*/detail", ["id" => $list->getWishlistId()])?>">
+                                <a class="mylists preview-product" href="<?= $block->getUrl("wishlist/index/index", ["wishlist_id" => $wishlist->getId()])?>">
+                                    <?php $n = 1; $left = 0;?>
                                     <?php
-                                    foreach ($list->getItems() as $key => $item): ?>
-                                    <?php
-                                        if ($key > 3) {
-                                            break;
-                                        }
-                                        ?>
-                                        <img src="<?= $item->getCustomAttribute('product_image')->getValue()?>" height="80px"  alt="<?= $list->getName()?>">
+                                    /** @var \Magento\Wishlist\Model\Item $item */
+                                    foreach ($wishlist->getItemCollection()->getItems() as $item): ?>
+                                        <?php if ($n <= 4): ?>
+                                            <img class="" loading="lazy" src="<?= $viewModel->getImageUrl($item->getProduct()) ?>" height="80px"  alt="<?= $block->escapeHtml('item ' . $n)?>">
+                                        <?php else:?>
+                                            <?php $left++; ?>
+                                        <?php endif;?>
+                                        <?php $n++;?>
                                     <?php endforeach; ?>
 
-                                    <?php if (count($list->getItems()) == 0): ?>
-                                        <img src="<?= $block->getViewFileUrl('images/shopping-list-empty.png')?>" height="80px"/>
+                                    <?php if ($wishlist->getItemCollection()->count() == 0): ?>
+                                        <img loading="lazy" src="<?= $block->getViewFileUrl('images/shopping-list-empty.png')?>" height="80px"/>
                                         <h4 style="display: inline-flex; align-items: center;"><?= $block->escapeHtml(__('This list is still empty'))?></h4>
-                                    <?php elseif (count($list->getItems()) > 4): ?>
-                                        <span class="extra-product-count"><?= $block->escapeHtml(__('+ ' . (count($list->getItems()) - 4) . ' more products')) ?></span>
+                                    <?php endif;?>
+                                    <?php if ($left  > 0): ?>
+                                        <span class="extra-product-count"><?= $block->escapeHtml(__('+ ' . $left . ' more products')) ?></span>
                                     <?php endif;?>
                                 </a>
                             </div>
                         </li>
-                        <?php endif;?>
                         <?php endforeach; ?>
                     </ol>
                 </div>

@@ -2,42 +2,42 @@
 
 namespace SM\ShoppingList\Api\Data;
 
-use Magento\Framework\Api\CustomAttributesDataInterface;
-
 /**
  * Interface ShoppingListItemDataInterface
  * @package SM\ShoppingList\Api\Data
  */
-interface ShoppingListItemDataInterface extends CustomAttributesDataInterface
+interface ShoppingListItemDataInterface
 {
     const SHOPPING_LIST_ITEM_ID = 'wishlist_item_id';
     const SHOPPING_LIST_ID = 'wishlist_id';
     const PRODUCT_ID = 'product_id';
     const STORE_ID = 'store_id';
     const ADDED_AT = 'added_at';
+    const IMAGE = "image";
+    const PRODUCT = "product";
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getWishlistItemId();
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getWishlistId();
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getProductId();
 
     /**
-     * @return int
+     * @return int|null
      */
     public function getStoreId();
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getAddedAt();
 
@@ -71,4 +71,26 @@ interface ShoppingListItemDataInterface extends CustomAttributesDataInterface
      * @return $this
      */
     public function setAddedAt($addedAt);
+
+    /**
+     * @return \SM\MobileApi\Api\Data\Product\ListItemInterface|null
+     */
+    public function getProduct();
+
+    /**
+     * @param \SM\MobileApi\Api\Data\Product\ListItemInterface $value
+     * @return $this
+     */
+    public function setProduct($value);
+
+    /**
+     * @return string|null
+     */
+    public function getImage();
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setImage($value);
 }

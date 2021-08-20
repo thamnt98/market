@@ -8,6 +8,7 @@ use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Webapi\Exception as WebapiException;
 use SM\ShoppingList\Api\Data\ShoppingListDataInterface;
 use SM\ShoppingList\Controller\ListAction;
 
@@ -23,7 +24,7 @@ class UpdateList extends ListAction
         /** @var ShoppingListDataInterface $listData */
         $listData = $this->listDataFactory->create();
         $listData->setName($data["update_list_name"]);
-        $listData->setWishlistId($data["list_id"]);
+        $listData->setWishlistId($data["wishlist_id"]);
         $customerId = $this->currentCustomer->getCustomerId();
 
         try {
@@ -32,19 +33,15 @@ class UpdateList extends ListAction
                 $listData,
                 $customerId
             );
+            $this->messageManager->addSuccessMessage(__("You have successfully renamed this list."));
             return $this->jsonFactory->create()->setData([
                 "status" => 1,
                 "result" => $result
             ]);
-        } catch (NoSuchEntityException $e) {
+        } catch (WebapiException $e) {
             return $this->jsonFactory->create()->setData([
                 "status" => 0,
-                "result" => __('Shopping list with id "%1" does not exist', $listData->getWishlistId())
-            ]);
-        } catch (Exception $e) {
-            return $this->jsonFactory->create()->setData([
-                "status" => 0,
-                "result" => __("Shopping list name is already exist. Please try again")
+                "result" => $e->getMessage()
             ]);
         }
     }

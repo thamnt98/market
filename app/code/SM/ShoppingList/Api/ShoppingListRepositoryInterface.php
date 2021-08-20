@@ -10,14 +10,6 @@ use SM\ShoppingList\Api\Data\ShoppingListDataInterface;
  */
 interface ShoppingListRepositoryInterface
 {
-
-    /**
-     * @param \Magento\Framework\Api\SearchCriteriaInterface $searchCriteria
-     * @param int $customerId
-     * @return \SM\ShoppingList\Api\Data\ShoppingListSearchResultsInterface
-     */
-    public function getList(\Magento\Framework\Api\SearchCriteriaInterface $searchCriteria, $customerId);
-
     /**
      * @param int $shoppingListId
      * @return \SM\ShoppingList\Api\Data\ShoppingListDataInterface
@@ -53,12 +45,27 @@ interface ShoppingListRepositoryInterface
     public function update(\SM\ShoppingList\Api\Data\ShoppingListDataInterface $shoppingList, $customerId);
 
     /**
-     * @return string
+     * @param int $customerId
+     * @return \SM\ShoppingList\Api\Data\ShoppingListDataInterface
      */
-    public function getDefaultShoppingListName();
+    public function getFavorites($customerId);
 
     /**
-     * @return int
+     * @param int $customerId
+     * @return \SM\ShoppingList\Api\Data\ShoppingListDataInterface[]
      */
-    public function getLimitShoppingListNumber();
+    public function getMyList($customerId);
+
+    /**
+     * @param int $listId
+     * @return \SM\ShoppingList\Api\Data\ShoppingListDataInterface
+     */
+    public function getListDetail($listId);
+
+    /**
+     * @param int $productId
+     * @param int $customerId
+     * @return \SM\ShoppingList\Api\Data\ShoppingListDataInterface[]
+     */
+    public function getAll($productId, $customerId);
 }

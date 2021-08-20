@@ -1,0 +1,51 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+?>
+<?php
+/** @var \Magento\Wishlist\Block\Customer\Wishlist\Items $block */
+$columns = $block->getColumns();
+?>
+<div class="products-grid wishlist">
+    <?php
+    /** @var \SM\ShoppingList\Block\Toolbar $toolbarBlock */
+    $toolbarBlock = $block->getChildBlock('customer.list.item.toolbar');
+    $toolbarBlock->setShoppingList($block->getWishlist());
+    ?>
+    <?= $toolbarBlock->toHtml() ?>
+    <?php if (count($block->getItems())) : ?>
+    <ol class="product-items">
+        <?php foreach ($block->getItems() as $item) : ?>
+            <li data-row="product-item" class="product-item" id="item_<?= $block->escapeHtmlAttr($item->getId()) ?>">
+                <div class="product-item-info" data-container="product-grid">
+                    <?php foreach ($columns as $column) : ?>
+                        <?= $column->setItem($item)->toHtml();?>
+                    <?php endforeach; ?>
+                </div>
+            </li>
+        <?php endforeach; ?>
+    </ol>
+    <?php else : ?>
+        <div class="no-route shopping-list-empty"
+            <?php if ($block->getWishlist()) : ?>
+                data-gtm-list-name="<?= $block->getWishlist()->getName() ?>"
+            <?php endif; ?>>
+            <div class="no-route-info">
+                <img src="<?=$block->getViewFileUrl('images/shopping-list-empty.png')?>" alt="<?= __('Your list is still empty') ?>" width="401"/>
+                <h4><?= $block->escapeHtml(__('Your list is still empty.')) ?><br/>
+                    <?= $block->escapeHtml(__('Save your favorite products simply with the Shopping List button!')) ?></h4>
+                <button type="button" name="do"
+                        title="<?= $block->escapeHtml(__('Browse Products')) ?>"
+                        class="action primary browse-products"
+                        onclick="location.href = '<?= $block->getUrl()?>'">
+                    <span><?= $block->escapeHtml(__('Browse Products')) ?></span>
+                </button>
+            </div>
+        </div>
+    <?php endif; ?>
+</div>
+<?php foreach ($columns as $column) : ?>
+    <?= $column->getAdditionalHtml() ?>
+<?php endforeach; ?>

@@ -8,6 +8,7 @@ use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\Result\Json;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\DB\Adapter\DuplicateException;
+use Magento\Framework\Webapi\Exception as WebapiException;
 use SM\ShoppingList\Api\Data\ShoppingListDataInterface;
 use SM\ShoppingList\Controller\ListAction;
 
@@ -34,6 +35,7 @@ class CreateList extends ListAction
                 $listData,
                 $this->currentCustomer->getCustomerId()
             );
+            $this->messageManager->addSuccessMessage(__("You have successfully created %1.", $result->getName()));
             return $this->jsonFactory->create()->setData([
                 "status" => 1,
                 "result" => [
@@ -41,20 +43,10 @@ class CreateList extends ListAction
                     "list_id" => $result->getWishlistId(),
                 ]
             ]);
-        } catch (DuplicateException $e) {
+        } catch (WebapiException $e) {
             return $this->jsonFactory->create()->setData([
                 "status" => 0,
-                "result" => __("Shopping list name is already exist. Please try again")
-            ]);
-        } catch (LengthException $e) {
-            return $this->jsonFactory->create()->setData([
-                "status" => 0,
-                "result" => __("You have reached maximum shopping list number")
-            ]);
-        } catch (Exception $e) {
-            return $this->jsonFactory->create()->setData([
-                "status" => 0,
-                "result" => __("Unable to create shopping list")
+                "result" => $e->getMessage()
             ]);
         }
     }

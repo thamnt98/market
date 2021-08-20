@@ -7,6 +7,15 @@
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="2columns-left" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd" label="Customer My Account (All Pages)" design_abstraction="custom">
     <body>
-        <referenceBlock name="sidebar.additional" remove="true"/>
+        <referenceBlock name="customer_account_navigation">
+            <block class="Magento\Customer\Block\Account\SortLinkInterface" name="sm-customer-account-navigation-product-wishlist">
+            <arguments>
+                <argument name="label" xsi:type="string" translate="true">Shopping List</argument>
+                <argument name="path" xsi:type="string">wishlist</argument>
+                <argument name="css_class" xsi:type="string">my-shopping-list</argument>
+                <argument name="sortOrder" xsi:type="number">700</argument>
+            </arguments>
+            </block>
+        </referenceBlock>
     </body>
 </page>

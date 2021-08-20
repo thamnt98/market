@@ -1,0 +1,33 @@
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <update handle="customer_account"/>
+    <body>
+        <referenceBlock name="breadcrumbs">
+            <action method="addCrumb">
+                <argument name="crumbName" xsi:type="string">Shopping List</argument>
+                <argument name="crumbInfo" xsi:type="array">
+                    <item name="title" xsi:type="string">Shopping List</item>
+                    <item name="label" xsi:type="string" translate="true">Shopping List</item>
+                    <item name="link" xsi:type="string">/wishlist</item>
+                </argument>
+            </action>
+            <action method="addCrumb">
+                <argument name="crumbName" xsi:type="string">My Lists</argument>
+                <argument name="crumbInfo" xsi:type="array">
+                    <item name="title" xsi:type="string">My Lists</item>
+                    <item name="label" xsi:type="string" translate="true">My Lists</item>
+                </argument>
+            </action>
+        </referenceBlock>
+        <referenceContainer name="content">
+            <referenceBlock name="page.main.title" remove="true"/>
+            <block class="SM\ShoppingList\Block\MyList\Listing" name="shoppinglist.header" template="SM_ShoppingList::header.phtml"/>
+            <block class="Magento\MultipleWishlist\Block\Customer\Wishlist\Management" name="customer.shoppinglist.mylists" template="SM_ShoppingList::tab/mylists.phtml" cacheable="false">
+                <block class="SM\ShoppingList\Block\Toolbar" name="customer.shoppinglist.mylists.settings" template="SM_ShoppingList::tab/mylist/settings.phtml"/>
+                <arguments>
+                    <argument name="viewModel" xsi:type="object">SM\ShoppingList\ViewModel\MyListViewModel</argument>
+                </arguments>
+            </block>
+        </referenceContainer>
+    </body>
+</page>

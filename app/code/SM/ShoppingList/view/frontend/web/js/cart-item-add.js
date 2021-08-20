@@ -30,6 +30,7 @@ define(
                             $('input[type=checkbox][name="selected-' + that.options.item_id + '[]"]').prop('checked', false);
                             $("#create-to-add-" + that.options.item_id).hide();
                             this.closeModal();
+                            $('footer.modal-footer .error-message').hide()
                         }
                     }, {
                         text: jQuery.mage.__('Add'),
@@ -39,7 +40,7 @@ define(
                             var data = [];
                             if (window.clickFirst) {
                                 $('footer.modal-footer').prepend(
-                                    '<div class="error-message"> </div>'
+                                    '<div class="error-message" style="display: none"> </div>'
                                 )
                             }
                             window.clickFirst = false;
@@ -77,7 +78,13 @@ define(
                 });
 
                 $("#submit-create-cart-" + that.options.item_id).on('click', function () {
-
+                    if (window.clickFirst) {
+                        $('footer.modal-footer').prepend(
+                            '<div class="error-message" style="display: none"> </div>'
+                        )
+                    }
+                    window.clickFirst = false;
+                    $('footer.modal-footer .error-message').text('');
                     var shoppinglist_name = $("#shoppinglist-name-" + that.options.item_id).val();
                     that.createShoppingList(shoppinglist_name);
 
@@ -96,8 +103,10 @@ define(
                     var data = {
                         shopping_list_name : name
                     };
+
+                    $('footer.modal-footer .error-message').hide()
                     $.ajax({
-                        url: this.options.create_list_url,
+                        url: urlBuilder.build("wishlist/ajax/createlist"),
                         type: "POST",
                         data: data,
                         dataType: 'json',
@@ -140,12 +149,13 @@ define(
                 var data = {
                     shopping_list_ids: selected,
                     product_id: product_id,
-                    store_id: this.options.store_id,
                     show_toast: false
                 };
                 var shoppingLists = "";
+
+                $('footer.modal-footer .error-message').hide()
                 $.ajax({
-                    url: this.options.add_item_url,
+                    url: urlBuilder.build("wishlist/ajax/additems"),
                     type: "POST",
                     data: data,
                     dataType: 'json',
@@ -230,7 +240,7 @@ define(
 
             showErrorMessage: function (message) {
                 $('footer.modal-footer .error-message').text('');
-                $('footer.modal-footer .error-message').text($.mage.__(message))
+                $('footer.modal-footer .error-message').show().text($.mage.__(message))
             }
 
         });

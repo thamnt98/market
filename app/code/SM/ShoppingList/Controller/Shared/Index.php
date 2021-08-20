@@ -2,13 +2,9 @@
 
 namespace SM\ShoppingList\Controller\Shared;
 
-use LengthException;
 use Magento\Framework\App\ResponseInterface;
-use Magento\Framework\Controller\ResultFactory;
 use Magento\Framework\Controller\ResultInterface;
-use Magento\Framework\DB\Adapter\DuplicateException;
-use Magento\Framework\Exception\CouldNotSaveException;
-use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Webapi\Exception as WebapiException;
 use Magento\Wishlist\Model\Wishlist;
 use SM\ShoppingList\Api\Data\ShoppingListDataInterface;
 use SM\ShoppingList\Controller\ListAction;
@@ -24,13 +20,6 @@ class Index extends ListAction
      */
     public function execute()
     {
-        if (!$this->customerSession->isLoggedIn()) {
-            $this->customerSession->setAfterAuthUrl(
-                $this->_url->getUrl('*/*/*', ['_current' => true, '_use_rewrite' => true])
-            );
-            return $this->resultFactory->create(ResultFactory::TYPE_PAGE);
-        }
-
         /** @var Wishlist $shoppingList */
         $shoppingList = $this->wishlistProvider->getWishlist();
         if ($shoppingList->getId()) {
@@ -41,14 +30,8 @@ class Index extends ListAction
                 $this->messageManager->addSuccessMessage(
                     __($result->getName() . " has been shared with you")
                 );
-            } catch (DuplicateException $e) {
-                $this->messageManager->addErrorMessage(__("This list has already been in your shopping list"));
-            } catch (NoSuchEntityException $e) {
-                $this->messageManager->addErrorMessage(__("Unable to find this list"));
-            } catch (CouldNotSaveException $e) {
-                $this->messageManager->addErrorMessage(__("Something went wrong while saving this list"));
-            } catch (LengthException $e) {
-                $this->messageManager->addErrorMessage(__("You have reached maximum shopping list number"));
+            } catch (WebapiException $e) {
+                $this->messageManager->addErrorMessage($e->getMessage());
             }
         } else {
             $this->messageManager->addErrorMessage(__("Unable to find this list"));

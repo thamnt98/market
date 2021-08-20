@@ -3,11 +3,13 @@
 
 namespace SM\ShoppingList\Modifier;
 
+use Magento\MultipleWishlist\Block\Link;
+
 /**
  * Class ShoppingListLink
  * @package SM\ShoppingList\Modifier
  */
-class ShoppingListLink extends \Magento\MultipleWishlist\Block\Link
+class ShoppingListLink extends Link
 {
     /**
      * @return \Magento\Framework\Phrase
@@ -15,13 +17,5 @@ class ShoppingListLink extends \Magento\MultipleWishlist\Block\Link
     public function getLabel()
     {
         return (__("Shopping List"));
-    }
-
-    /**
-     * @return string
-     */
-    public function getHref()
-    {
-        return $this->getUrl('shoppinglist');
     }
 }

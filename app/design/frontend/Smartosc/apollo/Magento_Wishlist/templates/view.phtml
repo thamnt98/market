@@ -1,0 +1,52 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/** @var \SM\ShoppingList\Block\Customer\Wishlist $block */
+$items = $block->getAllItems();
+?>
+<?php if ($this->helper(\Magento\Wishlist\Helper\Data::class)->isAllow()) : ?>
+<div class="shopping-lists">
+    <div class="product data items">
+        <?= $block->getChildHtml('top') ?>
+        <div class="item content" data-role="content" id="tab-myfavorites">
+        <?php if (sizeof($items) > 0) : ?>
+            <?= $block->getBlockHtml('formkey') ?>
+            <?php $block->getChildBlock('items')
+                ->setItems($items)
+                ->setWishlist($block->getWishlistInstance()); ?>
+            <?= $block->getChildHtml('items') ?>
+        <?php else : ?>
+            <div class="no-route shopping-list-empty"
+                <?php if ($block->getWishlistInstance()) : ?>
+                    data-gtm-list-name="<?= $block->getWishlistInstance()->getName() ?>"
+                <?php endif; ?>>
+                <div class="no-route-info">
+                    <img src="<?=$block->getViewFileUrl('images/shopping-list-empty.png')?>" alt="<?= __('Your list is still empty') ?>" width="401"/>
+                    <h4><?= $block->escapeHtml(__('Your list is still empty.')) ?><br/>
+                        <?= $block->escapeHtml(__('Save your favorite products simply with the Shopping List button!')) ?></h4>
+                    <button type="button" name="do"
+                            title="<?= $block->escapeHtml(__('Browse Products')) ?>"
+                            class="action primary browse-products"
+                            onclick="location.href = '<?= $block->getUrl()?>'">
+                        <span><?= $block->escapeHtml(__('Browse Products')) ?></span>
+                    </button>
+                </div>
+            </div>
+        <?php endif ?>
+        </div>
+        <?= $block->getChildHtml('bottom') ?>
+    </div>
+</div>
+<div class="toolbar wishlist-toolbar"><br><?= $block->getChildHtml('wishlist_item_pager'); ?></div>
+<input type="hidden" name="item_id" value=""/>
+<script type="text/x-magento-init">
+{
+    "*": {
+        "SM_ShoppingList/js/item-actions": {}
+    }
+}
+</script>
+<?php endif ?>

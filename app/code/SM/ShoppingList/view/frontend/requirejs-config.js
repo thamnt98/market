@@ -2,7 +2,6 @@ var config = {
     map: {
         '*': {
             ItemAdd: 'SM_ShoppingList/js/item-add',
-            ItemActions: 'SM_ShoppingList/js/item-actions',
             ShoppingListCreate: 'SM_ShoppingList/js/shoppinglist-create',
             ShoppingListSettings: 'SM_ShoppingList/js/shoppinglist-settings',
             ListSettings: 'SM_ShoppingList/js/list-settings',

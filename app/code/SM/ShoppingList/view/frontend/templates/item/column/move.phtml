@@ -1,0 +1,69 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+/* @var \SM\ShoppingList\Block\Customer\Wishlist\Item\Column\Move $block */
+/** @var \SM\ShoppingList\ViewModel\ItemViewModel $viewModel */
+$viewModel = $block->getData("viewModel");
+/** @var \Magento\Wishlist\Model\Item $item */
+$item = $block->getItem();
+$productImage = $viewModel->getProductImage($item->getProduct());
+?>
+<?php if ($viewModel->isDefaultWishlist()): ?>
+<a class="action move moveotherlist" data-item-id="<?= $block->escapeHtml($item->getId())?>" style="cursor: pointer"><?= $block->escapeHtml(__('Move to')) ?></a>
+<div class="content moveotherlist-content" data-item-id="<?= $block->escapeHtml($item->getId()) ?>" style="display: none">
+    <div class="product-info">
+        <img src="<?= $block->escapeUrl($productImage) ?>" width="124px" alt="<?= $block->escapeHtml($item->getProduct()->getName()) ?>"/>
+        <span class="product-name"><?= $block->escapeHtml($item->getProduct()->getName()) ?></span>
+    </div>
+    <form>
+        <ul class="list-choice" data-item-id="<?= $block->escapeHtml($item->getId())?>">
+            <?php if (count($viewModel->getShoppingLists())): ?>
+                <?php
+                /** @var \Magento\Wishlist\Model\Wishlist $list */
+                foreach ($viewModel->getShoppingLists() as $list) :?>
+                    <?php if ($list->getId() != $item->getWishlistId()): ?>
+                        <li class="checkbox-custom">
+                            <input type="checkbox" class="wishlist-checkbox" name="selected[]" value="<?= $block->escapeHtml($list->getId())?>">
+                            <label><?= $block->escapeHtml($list->getName()) ?></label>
+                        </li>
+                    <?php endif;?>
+                <?php endforeach;?>
+            <?php endif;?>
+        </ul>
+        <div class="add-new-wishlist">
+            <a class="remove-list btn-create-list" style="cursor: pointer" data-item-id="<?= $block->escapeHtml($item->getId())?>">
+                <span><?= $block->escapeHtml(__('Create a List')) ?></span>
+            </a>
+
+            <div class="bx-addition-wishlist-name create-list-section" style="display: none" data-item-id="<?= $block->escapeHtml($item->getId())?>">
+                <label class="label">
+                    <?= $block->escapeHtml(__('List Name')) ?>
+                </label>
+                <div class="wrap">
+                    <input type="text" class="addition-wishlist-name input-list-name" name="addition_wishlist_name" data-item-id="<?= $block->escapeHtml($item->getId())?>"
+                           placeholder="<?= $block->escapeHtml(__('Type the list name here')) ?>"/>
+                    <button type="button" class="add-wishlist-name submit-create-list" data-item-id="<?= $block->escapeHtml($item->getId())?>">
+                        <span class="apl-ic_plus"><?= $block->escapeHtml('Plus') ?></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<div class="content add-success-modal success-modal" data-item-id="<?= $block->escapeHtml($item->getId())?>" style="display:none;">
+    <div class="product-info">
+        <img src="<?= $block->escapeUrl($productImage) ?>" width="124px"  alt="<?= $block->escapeHtml($item->getProduct()->getName())?>"/>
+        <div class="success-content">
+            <span class="product-name">
+                <?= $block->escapeHtml($item->getProduct()->getName())?>
+            </span>
+            <h3><?= $block->escapeHtml(__("This item has been moved to"))?></h3>
+            <ul class="destination-list" data-item-id="<?= $block->escapeHtml($item->getId())?>" style="list-style-type: none;">
+            </ul>
+        </div>
+    </div>
+</div>
+<?php endif;?>

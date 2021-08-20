@@ -6,6 +6,7 @@ use Exception;
 use Magento\Framework\App\ResponseInterface;
 use Magento\Framework\Controller\ResultInterface;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Magento\Framework\Webapi\Exception as WebapiException;
 use SM\ShoppingList\Api\Data\ResultDataInterface;
 use SM\ShoppingList\Api\Data\ShoppingListDataInterface;
 use SM\ShoppingList\Controller\ItemAction;
@@ -26,9 +27,8 @@ class MoveItem extends ItemAction
         $selected = $data["shopping_list_ids"];
 
         try {
-            $itemData = $this->shoppingListItemRepository->getById($itemId);
             /** @var ResultDataInterface $result */
-            $result = $this->shoppingListItemRepository->move($itemData, $selected);
+            $result = $this->shoppingListItemRepository->move($itemId, $selected);
             if ($result->getStatus()) {
                 $data = [];
                 /** @var ShoppingListDataInterface $list */
@@ -36,8 +36,8 @@ class MoveItem extends ItemAction
                     $data[] = [
                         "name" => $list->getName(),
                         "url" => $this->_url->getUrl(
-                            "shoppinglist/mylist/detail",
-                            ["id" => $list->getWishlistId()]
+                            "wishlist/index/index",
+                            ["wishlist_id" => $list->getWishlistId()]
                         ),
                     ];
                 }
@@ -51,12 +51,11 @@ class MoveItem extends ItemAction
                     "result" => $result->getMessage()
                 ]);
             }
-        } catch (NoSuchEntityException $e) {
+        } catch (WebapiException $e) {
             return $this->jsonFactory->create()->setData([
                 "status" => 0,
                 "result" => __("Item with '%1' does not exist", $itemId)
             ]);
-        } catch (Exception $e) {
         }
     }
 }

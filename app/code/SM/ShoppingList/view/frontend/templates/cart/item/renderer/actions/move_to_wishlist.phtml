@@ -13,7 +13,8 @@ $product = $block->getItem()->getProduct();
 $item = $block->getItem();
 $itemId = $item->getId();
 $productImage = $viewModel->getProductImage($product);
-
+/** @var \SM\ShoppingList\Helper\Data $shoppingListHelper */
+$shoppingListHelper = $this->helper(\SM\ShoppingList\Helper\Data::class);
 if (is_null($item->getParentItem())) {
     $productId = $product->getId();
 } else {
@@ -21,6 +22,7 @@ if (is_null($item->getParentItem())) {
 }
 
 ?>
+<?php if ($shoppingListHelper->isActiveShoppingList()): ?>
 <?php if ($block->isAllowInCart() && $block->isProductVisibleInSiteVisibility()) : ?>
     <a style="cursor: pointer"
        class="use-ajax action towishlist action-towishlist"
@@ -32,58 +34,56 @@ if (is_null($item->getParentItem())) {
     {
         "*": {
             "CartItemAdd": {
-                "create_list_url":"<?= $block->getUrl("shoppinglist/ajax/createlist") ?>",
-                "product_id":"<?= $productId ?>",
-                "add_item_url":"<?= $block->getUrl("shoppinglist/ajax/additems") ?>",
-                "item_id":"<?= $itemId ?>",
-                "item_ids":"<?= implode(",", $viewModel->getItemIds()) ?>",
-                "store_id":"<?= $viewModel->getStoreId()?>"
+                "product_id":"<?= $block->escapeHtml($productId) ?>",
+                "item_id":"<?= $block->escapeHtml($itemId) ?>",
+                "item_ids":"<?= implode(",", $viewModel->getItemIds()) ?>"
             }
         }
     }
 
 </script>
 <form></form>
-<div id = "add-item-modal-<?= $itemId ?>" class="content" style="display: none">
+<div id = "add-item-modal-<?= $block->escapeHtml($itemId) ?>" class="content" style="display: none">
     <div class="product-info">
-        <img src="<?= $productImage?>" width="124px" alt="product's img"/>
+        <img src="<?= $block->escapeUrl($productImage)?>" width="124px" alt="<?= $block->escapeHtml($product->getName()) ?>"/>
         <span class="product-name"><?= $block->escapeHtml($product->getName()) ?></span>
     </div>
-    <form id="form-add-item-<?= $itemId ?>">
-        <ul class="list-choice" id="list-choice-<?= $block->getItem()->getId()?>">
+    <form id="form-add-item-<?= $block->escapeHtml($itemId) ?>">
+        <ul class="list-choice" id="list-choice-<?= $block->escapeHtml($block->getItem()->getId())?>">
             <?php foreach ($viewModel->getShoppingLists() as $list) :?>
                 <li class="checkbox-custom">
-                    <input type="checkbox" name="selected-<?= $itemId?>[]" class="shopping-item" value="<?= $list->getWishlistId() ?>">
+                    <input type="checkbox" name="selected-<?= $itemId?>[]" class="shopping-item" value="<?= $block->escapeHtml($list->getWishlistId()) ?>">
                     <label><?= $block->escapeHtml($list->getName()) ?></label>
                 </li>
             <?php endforeach;?>
         </ul>
 
         <div class="add-new-wishlist">
-            <a id="open-create-to-add-<?= $itemId ?>" class="remove-list" style="cursor: pointer">
+            <a id="open-create-to-add-<?= $block->escapeHtml($itemId) ?>" class="remove-list" style="cursor: pointer">
                 <span><?= $block->escapeHtml(__('Create a List')) ?></span>
             </a>
 
-            <div id="create-to-add-<?= $itemId ?>" class="bx-addition-wishlist-name" style="display: none">
-                <label class="label" for="shoppinglist-name-cart-<?= $itemId ?>"><?= $block->escapeHtml(__('List Name')) ?></label>
+            <div id="create-to-add-<?= $block->escapeHtml($itemId) ?>" class="bx-addition-wishlist-name" style="display: none">
+                <label class="label" for="shoppinglist-name-cart-<?= $block->escapeHtml($itemId) ?>"><?= $block->escapeHtml(__('List Name')) ?></label>
                 <div class="wrap">
-                <input type="text" class="addition-wishlist-name" id="shoppinglist-name-<?= $block->getItem()->getId()?>" name="addition_wishlist_name"
+                <input type="text" class="addition-wishlist-name" id="shoppinglist-name-<?= $block->escapeHtml($block->getItem()->getId())?>" name="addition_wishlist_name"
                        placeholder="<?= $block->escapeHtml(__('Type the list name here')) ?>"/>
-                <button type="button" class="add-wishlist-name" id="submit-create-cart-<?= $block->getItem()->getId()?>"><span class="apl-ic_plus"><?= $block->escapeHtml(__('Plus')) ?></span></button>
+                <button type="button" class="add-wishlist-name" id="submit-create-cart-<?= $block->escapeHtml($block->getItem()->getId())?>"><span class="apl-ic_plus"><?= $block->escapeHtml(__('Plus')) ?></span></button>
                 </div>
             </div>
         </div>
 
     </form>
 </div>
-<div id="success-alert-modal-<?= $itemId?>" class="content add-success-modal" style="display:none;">
+<div id="success-alert-modal-<?= $block->escapeHtml($itemId) ?>" class="content add-success-modal" style="display:none;">
     <div class="product-info">
-        <img src="<?= $productImage ?>" width="124px"  alt="product's img"/>
+        <img src="<?= $block->escapeUrl($productImage) ?>" width="124px"  alt="product's img"/>
         <div class="success-content">
             <span class="product-name"><?= $block->escapeHtml($product->getName()) ?></span>
             <h3><?= $block->escapeHtml(__("This item has been added to"))?></h3>
-            <ul id="destination-list-<?= $itemId?>" style="list-style-type: none;">
+            <ul id="destination-list-<?= $block->escapeHtml($itemId) ?>" style="list-style-type: none;">
             </ul>
         </div>
     </div>
 </div>
+<?php endif;?>

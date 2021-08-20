@@ -10,11 +10,13 @@
 
 namespace SM\ShoppingList\Controller;
 
+use Magento\Customer\Controller\AbstractAccount;
 use Magento\Customer\Helper\Session\CurrentCustomer;
-use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\Action\Context;
 use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Escaper;
 use Magento\MultipleWishlist\Helper\Data;
+use Magento\Wishlist\Model\ItemFactory;
 use SM\ShoppingList\Model\ShoppingListItemRepository;
 use SM\ShoppingList\Helper\Data as ShoppingListHelper;
 
@@ -22,7 +24,7 @@ use SM\ShoppingList\Helper\Data as ShoppingListHelper;
  * Class ItemAction
  * @package SM\ShoppingList\Controller
  */
-abstract class ItemAction extends Action
+abstract class ItemAction extends AbstractAccount
 {
     /**
      * @var ShoppingListItemRepository
@@ -46,6 +48,16 @@ abstract class ItemAction extends Action
     protected $shoppinglistHelper;
 
     /**
+     * @var ItemFactory
+     */
+    protected $itemFactory;
+
+    /**
+     * @var Escaper
+     */
+    protected $escaper;
+
+    /**
      * ItemAction constructor.
      * @param Data $wishlistData
      * @param ShoppingListItemRepository $shoppingListItemRepository
@@ -53,6 +65,8 @@ abstract class ItemAction extends Action
      * @param Context $context
      * @param CurrentCustomer $currentCustomer
      * @param ShoppingListHelper $shoppinglistHelper
+     * @param ItemFactory $itemFactory
+     * @param Escaper $escaper
      */
     public function __construct(
         Data $wishlistData,
@@ -60,8 +74,12 @@ abstract class ItemAction extends Action
         JsonFactory $jsonFactory,
         Context $context,
         CurrentCustomer $currentCustomer,
-        ShoppingListHelper $shoppinglistHelper
+        ShoppingListHelper $shoppinglistHelper,
+        ItemFactory $itemFactory,
+        Escaper $escaper
     ) {
+        $this->escaper = $escaper;
+        $this->itemFactory = $itemFactory;
         $this->currentCustomer = $currentCustomer;
         $this->jsonFactory = $jsonFactory;
         $this->shoppingListItemRepository = $shoppingListItemRepository;

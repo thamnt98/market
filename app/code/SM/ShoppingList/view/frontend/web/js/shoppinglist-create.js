@@ -3,9 +3,10 @@ define(
         'jquery',
         'Magento_Ui/js/modal/modal',
         'Magento_Customer/js/customer-data',
-        'SM_ShoppingList/js/alert'
+        'SM_ShoppingList/js/alert',
+        'mage/url'
     ],
-    function ($, modal, customerData, alertModal) {
+    function ($, modal, customerData, alertModal, urlBuilder) {
         'use strict';
 
         $.widget('vendor.mod', {
@@ -44,6 +45,11 @@ define(
                     $("#create-list-name").val("");
                     $('#create-wishlist-modal').modal('openModal');
                 });
+
+                $("#form-create-list").on("submit", function (e) {
+                    e.preventDefault();
+                    $(".create-list-submit").click()
+                })
             },
             /**
              *
@@ -57,7 +63,7 @@ define(
                         shopping_list_name : name
                     };
                     $.ajax({
-                        url: this.options.create_list_url,
+                        url: urlBuilder.build("wishlist/ajax/createlist"),
                         type: "POST",
                         data: data,
                         dataType: 'json',
@@ -81,7 +87,12 @@ define(
                                         'shoppingList_name': response.result.name
                                     })
                                 }
-                                $("#form-create-list").submit();
+                                var currentUrl = window.location.href;
+                                if (!currentUrl.includes("mylist")) {
+                                    window.location.href = urlBuilder.build("wishlist/mylist")
+                                } else {
+                                    window.location.reload();
+                                }
                             } else {
                                 alertModal.showError(response.result);
                             }

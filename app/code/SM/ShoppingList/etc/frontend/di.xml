@@ -2,18 +2,13 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <!-- modifier   -->
     <preference for="Magento\MultipleWishlist\Block\Link" type="SM\ShoppingList\Modifier\ShoppingListLink" />
-    <preference for="Magento\Wishlist\Model\Wishlist" type="SM\ShoppingList\Modifier\ShoppingListLoad" />
 
     <type name="Magento\Wishlist\Helper\Data">
         <plugin type="SM\ShoppingList\Plugin\ShoppingListData" name="wishlist_data_plugin"/>
     </type>
 
-    <type name="Magento\MultipleWishlist\Helper\Data">
-        <plugin type="SM\ShoppingList\Plugin\WishlistData" name="wishlist_data"/>
-    </type>
-
-    <type name="Magento\Wishlist\Block\Link">
-        <plugin type="SM\ShoppingList\Plugin\Link" name="link_plugin"/>
+    <type name="Magento\Wishlist\Controller\Index\Index">
+        <plugin type="SM\ShoppingList\Plugin\Magento\MultipleWishlist\Controller\Index\Index" name="breadcrumb_wishlist_detail"/>
     </type>
 
     <type name="Magento\Framework\View\Element\Message\MessageConfigurationsPool">
