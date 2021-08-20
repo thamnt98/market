@@ -1,0 +1,32 @@
+type Query {
+    my_list: MyList
+    @resolver(class:"SM\\ShoppingListGraphQl\\Model\\Resolver\\MyList\\Index")
+    @doc(description:
+        "The popular_products query returns popular product list")
+    @cache(cacheable: false)
+}
+
+type MyList {
+    total_records: Int,
+    items: [MyListItem]
+}
+
+type MyListItem {
+    wishlist_id: Int,
+    shared: Int,
+    sharing_code: String,
+    updated_at: String,
+    name: String,
+    visibility: Int,
+    total_product: Int,
+    products: [ProductInItem]
+}
+
+type ProductInItem {
+     id: Int @doc(description: "The wish list item ID")
+     qty: Float @doc(description: "The quantity of this wish list item"),
+     description: String @doc(description: "The customer's comment about this item"),
+     added_at: String @doc(description: "The time when the customer added the item to the wish list"),
+     product: ProductInterface @resolver(class: "\\Magento\\WishlistGraphQl\\Model\\Resolver\\ProductResolver")
+}
+
