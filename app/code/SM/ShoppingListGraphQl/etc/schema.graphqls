@@ -6,6 +6,15 @@ type Query {
     @cache(cacheable: false)
 }
 
+type Mutation {
+    add_product_to_my_favorite (product_id: Int): AddToProductToMyFavoriteOutput @resolver(class: "SM\\ShoppingListGraphQl\\Model\\Resolver\\MyFavorite\\AddItem")
+}
+
+type AddToProductToMyFavoriteOutput {
+    status: Int
+    message: String
+}
+
 type MyList {
     total_records: Int,
     items: [MyListItem]
