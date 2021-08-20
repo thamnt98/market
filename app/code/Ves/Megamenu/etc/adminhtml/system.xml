@@ -23,7 +23,7 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../Config/etc/system_file.xsd">
 	<system>
 		<tab id="vesalltab" translate="label" sortOrder="400">
-			<label>Venustheme.com</label>
+			<label>MEGAMENU</label>
 		</tab>
 		<section id="vesmegamenu" translate="label" type="text" showInDefault="1" showInWebsite="1" showInStore="1">
 			<class>separator-top</class>
