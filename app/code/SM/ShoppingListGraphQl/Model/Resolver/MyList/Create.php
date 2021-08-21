@@ -31,7 +31,7 @@ class Create implements ResolverInterface
 
     /**
      * Create constructor.
-     * @param ShoppingListItemRepository $shoppingListItemRepository
+     * @param ShoppingListRepository $shoppingListRepository
      * @param ShoppingListDataInterfaceFactory $listDataFactory
      */
     public function __construct(
