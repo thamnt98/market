@@ -1,3 +1,11 @@
 interface ProductInterface {
     shop_by_brand: String @doc(description: "The Product Brand attribute.") @resolver(class: "SM\\CatalogGraphQl\\Model\\Resolver\\ProductBrand")
 }
+
+type Products @doc(description: "The Products object is the top-level object returned in a product search.") {
+    aggregations: [Aggregation] @doc(description: "Layered navigation aggregations.") @resolver(class: "SM\\CatalogGraphQl\\Model\\Resolver\\AddCategoryParentToAggregation")
+}
+
+interface AggregationOptionInterface {
+    parent: String
+}
