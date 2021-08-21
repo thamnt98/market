@@ -25,10 +25,8 @@ class MoveItem implements ResolverInterface
     protected $shoppingListItemRepository;
 
     /**
-     * @param \Magento\Framework\View\Element\Template\Context $context
-     * @param \Magento\MultipleWishlist\Helper\Data $wishlistData
-     * @param \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer
-     * @param array $data
+     * MoveItem constructor.
+     * @param ShoppingListItemRepository $shoppingListItemRepository
      */
     public function __construct(
         ShoppingListItemRepository $shoppingListItemRepository
@@ -58,11 +56,11 @@ class MoveItem implements ResolverInterface
         if (!isset($args['item_id'])) {
             throw new GraphQlInputException(__('"item id" value should be specified'));
         }
-        if (!isset($args['wish_list_ids'])) {
-            throw new GraphQlInputException(__('"wish list id" array should be specified'));
+        if (!isset($args['my_list_ids'])) {
+            throw new GraphQlInputException(__('"my list id" array should be specified'));
         }
         $itemId = $args["item_id"];
-        $selected = $args["wish_list_ids"];
+        $selected = $args["my_list_ids"];
         try {
             /** @var ResultDataInterface $result */
             $result = $this->shoppingListItemRepository->move($itemId, $selected);

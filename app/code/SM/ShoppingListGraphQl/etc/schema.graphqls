@@ -7,18 +7,25 @@ type Query {
 }
 
 type Mutation {
-    add_product_to_my_favorite (product_id: Int): AddToProductToMyFavoriteOutput @resolver(class: "SM\\ShoppingListGraphQl\\Model\\Resolver\\MyFavorite\\AddItem")
-    move_product_to_my_list (item_id: Int, wish_list_ids: [Int]): MoveProductToMyList @resolver(class: "SM\\ShoppingListGraphQl\\Model\\Resolver\\MyFavorite\\MoveItem")
+    add_product_to_my_favorite (product_id: Int): ShoppingListOutput @resolver(class: "SM\\ShoppingListGraphQl\\Model\\Resolver\\MyFavorite\\AddItem")
+    move_product_to_my_list (item_id: Int, my_list_ids: [Int]): ShoppingListOutput @resolver(class: "SM\\ShoppingListGraphQl\\Model\\Resolver\\MyFavorite\\MoveItem")
+    create_my_list (my_list_name: String): CreateMyListOutPut @resolver(class:"SM\\ShoppingListGraphQl\\Model\\Resolver\\MyList\\Create")
 }
 
-type AddToProductToMyFavoriteOutput {
+type ShoppingListOutput {
     status: Int
     message: String
 }
 
-type MoveProductToMyList {
-    status: String,
+type CreateMyListOutPut {
+    status: Int,
     message: String,
+    result: AddedMyList
+}
+
+type AddedMyList {
+    name: String,
+    my_list_id: Int
 }
 
 type MyList {

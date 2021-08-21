@@ -21,10 +21,7 @@ class Index implements ResolverInterface
     protected $_wishlistData = null;
 
     /**
-     * @param \Magento\Framework\View\Element\Template\Context $context
      * @param \Magento\MultipleWishlist\Helper\Data $wishlistData
-     * @param \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer
-     * @param array $data
      */
     public function __construct(
         \Magento\MultipleWishlist\Helper\Data $wishlistData

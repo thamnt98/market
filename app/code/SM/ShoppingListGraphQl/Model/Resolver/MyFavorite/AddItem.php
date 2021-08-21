@@ -28,10 +28,9 @@ class AddItem implements ResolverInterface
     protected $shoppingListItemRepository;
 
     /**
-     * @param \Magento\Framework\View\Element\Template\Context $context
+     * AddItem constructor.
      * @param \Magento\MultipleWishlist\Helper\Data $wishlistData
-     * @param \Magento\Customer\Helper\Session\CurrentCustomer $currentCustomer
-     * @param array $data
+     * @param ShoppingListItemRepository $shoppingListItemRepository
      */
     public function __construct(
         \Magento\MultipleWishlist\Helper\Data $wishlistData,
