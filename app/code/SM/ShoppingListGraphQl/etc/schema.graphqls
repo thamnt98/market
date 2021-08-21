@@ -11,6 +11,7 @@ type Mutation {
     move_product_to_my_list (item_id: Int, my_list_ids: [Int]): ShoppingListOutput @resolver(class: "SM\\ShoppingListGraphQl\\Model\\Resolver\\MyFavorite\\MoveItem")
     create_my_list (my_list_name: String): CreateOrUpdateMyListOutPut @resolver(class:"SM\\ShoppingListGraphQl\\Model\\Resolver\\MyList\\Create")
     update_my_list (update_list_name: String, my_list_id: Int): CreateOrUpdateMyListOutPut @resolver(class:"SM\\ShoppingListGraphQl\\Model\\Resolver\\MyList\\Update")
+    delete_my_list (my_list_id: Int): ShoppingListOutput @resolver(class:"SM\\ShoppingListGraphQl\\Model\\Resolver\\MyList\\Delete")
 }
 
 type ShoppingListOutput {
