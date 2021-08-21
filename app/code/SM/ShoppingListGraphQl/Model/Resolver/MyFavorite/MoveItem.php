@@ -5,22 +5,19 @@ namespace SM\ShoppingListGraphQl\Model\Resolver\MyFavorite;
 use Magento\Framework\GraphQl\Config\Element\Field;
 use Magento\Framework\GraphQl\Exception\GraphQlAuthorizationException;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
+use Magento\Framework\GraphQl\Query\Resolver\ContextInterface;
 use Magento\Framework\GraphQl\Query\ResolverInterface;
 use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
+use Magento\Framework\Webapi\Exception as WebapiException;
+use SM\ShoppingList\Api\Data\ResultDataInterface;
 use SM\ShoppingList\Model\ShoppingListItemRepository;
 
 /**
- * Class AddItem
+ * Class MoveItem
  * @package SM\ShoppingListGraphQl\Model\Resolver\MyFavorite
  */
-class AddItem implements ResolverInterface
+class MoveItem implements ResolverInterface
 {
-    /**
-     * Wishlist data
-     *
-     * @var \Magento\MultipleWishlist\Helper\Data
-     */
-    protected $wishlistData = null;
 
     /**
      * @var ShoppingListItemRepository
@@ -34,17 +31,15 @@ class AddItem implements ResolverInterface
      * @param array $data
      */
     public function __construct(
-        \Magento\MultipleWishlist\Helper\Data $wishlistData,
         ShoppingListItemRepository $shoppingListItemRepository
     )
     {
-        $this->wishlistData = $wishlistData;
         $this->shoppingListItemRepository = $shoppingListItemRepository;
     }
 
     /**
      * @param Field $field
-     * @param \Magento\Framework\GraphQl\Query\Resolver\ContextInterface $context
+     * @param ContextInterface $context
      * @param ResolveInfo $info
      * @param array|null $value
      * @param array|null $args
@@ -59,18 +54,34 @@ class AddItem implements ResolverInterface
         if (!$customerId && 0 === $customerId) {
             throw new GraphQlAuthorizationException(__('The current user cannot perform operations on wishlist'));
         }
-        if (!isset($args['product_id'])) {
-            throw new GraphQlInputException(__('"product id" value should be specified'));
+
+        if (!isset($args['item_id'])) {
+            throw new GraphQlInputException(__('"item id" value should be specified'));
         }
-        $productId = $args['product_id'];
-        $shoppingListIds = [$this->wishlistData->getDefaultWishlist($customerId)->getId()];
-        $result = $this->shoppingListItemRepository->add($shoppingListIds, $productId);
-        $data = [
-            'status' => $result->getStatus(),
-            'message' => __("Product has been added to My Favorites.")
-        ];
-        if (!$result->getStatus()) {
-            $data['message'] = $result->getMessage();
+        if (!isset($args['wish_list_ids'])) {
+            throw new GraphQlInputException(__('"wish list id" array should be specified'));
+        }
+        $itemId = $args["item_id"];
+        $selected = $args["wish_list_ids"];
+        try {
+            /** @var ResultDataInterface $result */
+            $result = $this->shoppingListItemRepository->move($itemId, $selected);
+            $data['status'] = $result->getStatus();
+            if ($result->getStatus()) {
+                $data['message'] = 'This item has been moved to ';
+                $wishlistNames = [];
+                foreach ($result->getResult() as $item) {
+                    $wishlistNames[] = $item->getName();
+                }
+                $data['message'] .= implode(", ", $wishlistNames);
+            } else {
+                $data['message'] = $result->getMessage();
+            }
+        } catch (WebapiException $e) {
+            $data = [
+                'status' => 0,
+                'message' => __("Item with '%1' does not exist", $itemId)
+            ];
         }
         return $data;
     }

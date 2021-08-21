@@ -8,11 +8,17 @@ type Query {
 
 type Mutation {
     add_product_to_my_favorite (product_id: Int): AddToProductToMyFavoriteOutput @resolver(class: "SM\\ShoppingListGraphQl\\Model\\Resolver\\MyFavorite\\AddItem")
+    move_product_to_my_list (item_id: Int, wish_list_ids: [Int]): MoveProductToMyList @resolver(class: "SM\\ShoppingListGraphQl\\Model\\Resolver\\MyFavorite\\MoveItem")
 }
 
 type AddToProductToMyFavoriteOutput {
     status: Int
     message: String
+}
+
+type MoveProductToMyList {
+    status: String,
+    message: String,
 }
 
 type MyList {
