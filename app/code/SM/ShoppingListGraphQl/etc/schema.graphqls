@@ -9,7 +9,8 @@ type Query {
 type Mutation {
     add_product_to_my_favorite (product_id: Int): ShoppingListOutput @resolver(class: "SM\\ShoppingListGraphQl\\Model\\Resolver\\MyFavorite\\AddItem")
     move_product_to_my_list (item_id: Int, my_list_ids: [Int]): ShoppingListOutput @resolver(class: "SM\\ShoppingListGraphQl\\Model\\Resolver\\MyFavorite\\MoveItem")
-    create_my_list (my_list_name: String): CreateMyListOutPut @resolver(class:"SM\\ShoppingListGraphQl\\Model\\Resolver\\MyList\\Create")
+    create_my_list (my_list_name: String): CreateOrUpdateMyListOutPut @resolver(class:"SM\\ShoppingListGraphQl\\Model\\Resolver\\MyList\\Create")
+    update_my_list (update_list_name: String, my_list_id: Int): CreateOrUpdateMyListOutPut @resolver(class:"SM\\ShoppingListGraphQl\\Model\\Resolver\\MyList\\Update")
 }
 
 type ShoppingListOutput {
@@ -17,13 +18,13 @@ type ShoppingListOutput {
     message: String
 }
 
-type CreateMyListOutPut {
+type CreateOrUpdateMyListOutPut {
     status: Int,
     message: String,
-    result: AddedMyList
+    result: AddedOrUpdatedMyList
 }
 
-type AddedMyList {
+type AddedOrUpdatedMyList {
     name: String,
     my_list_id: Int
 }

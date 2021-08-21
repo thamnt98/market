@@ -14,10 +14,10 @@ use SM\ShoppingList\Model\ShoppingListItemRepository;
 use SM\ShoppingList\Model\ShoppingListRepository;
 
 /**
- * Class Create
+ * Class Update
  * @package SM\ShoppingListGraphQl\Model\Resolver\MyList
  */
-class Create implements ResolverInterface
+class Update implements ResolverInterface
 {
     /**
      * @var ShoppingListDataInterfaceFactory
@@ -49,7 +49,7 @@ class Create implements ResolverInterface
      * @param ResolveInfo $info
      * @param array|null $value
      * @param array|null $args
-     * @return array|\Magento\Framework\Controller\Result\Json|\Magento\Framework\GraphQl\Query\Resolver\Value|mixed
+     * @return array
      * @throws GraphQlAuthorizationException
      * @throws GraphQlInputException
      */
@@ -60,35 +60,40 @@ class Create implements ResolverInterface
         if (!$customerId && 0 === $customerId) {
             throw new GraphQlAuthorizationException(__('The current user cannot perform operations on wishlist'));
         }
-        if (!isset($args['my_list_name'])) {
-            throw new GraphQlInputException(__('"my list name" value should be specified'));
+        if (!isset($args['update_list_name'])) {
+            throw new GraphQlInputException(__('"update list name" value should be specified'));
+        }
+        if (!isset($args['my_list_id'])) {
+            throw new GraphQlInputException(__('"my list id" value should be specified'));
         }
 
-        $myListName = $args['my_list_name'];
+        $updateListName = $args['update_list_name'];
+        $myListId = $args['my_list_id'];
 
         /** @var ShoppingListDataInterface $listData */
         $listData = $this->listDataFactory->create();
-        $listData->setName($myListName);
+        $listData->setName($updateListName);
+        $listData->setWishlistId($myListId);
 
         try {
             /** @var ShoppingListDataInterface $result */
-            $result = $this->shoppingListRepository->create(
+            $result = $this->shoppingListRepository->update(
                 $listData,
                 $customerId
             );
             return [
-                'status' => 1,
-                'message' => __("You have successfully created %1.", $result->getName()),
-                'result' => [
-                    'name' => $result->getName(),
-                    'my_list_id' => $result->getWishlistId(),
+                "status" => 1,
+                "message" => __("You have successfully renamed this list."),
+                "result" => [
+                    "name" => $result->getName(),
+                    "my_list_id" => $result->getWishlistId()
                 ]
             ];
         } catch (WebapiException $e) {
             return [
-                'status' => 0,
-                'message' => $e->getMessage(),
-                'result' => []
+                "status" => 0,
+                "message" => $e->getMessage(),
+                "result" => []
             ];
         }
     }
