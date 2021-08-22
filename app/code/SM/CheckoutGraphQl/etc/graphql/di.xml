@@ -1,4 +1,7 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Magento\QuoteGraphQl\Model\Resolver\CartItems" type="SM\CheckoutGraphQl\Preference\Model\Resolver\CartItems"/>
+
+    <preference for="SM\Checkout\Api\Data\CartItem\InstallationInterface"
+                type="SM\Checkout\Model\Cart\Item\Data\Installation"/>
 </config>

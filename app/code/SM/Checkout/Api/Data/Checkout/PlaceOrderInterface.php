@@ -20,7 +20,7 @@ interface PlaceOrderInterface
     const TRANSACTION_ID = 'transaction_id';
     const TOTAL_PAYMENT = 'total_payment';
 
-    const PAYMENT_METHOD = 'method_method';
+    const PAYMENT_METHOD = 'payment_method';
     const BANK_TYPE = 'bank_type';
     const SHIPPING_METHOD = 'shipping_method';
 

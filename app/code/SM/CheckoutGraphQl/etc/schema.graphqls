@@ -1,12 +1,26 @@
 type Mutation {
     updateCartItemIsActive (cart_hash: String, cart_id: Int, input: [CartItemIsActive]!): UpdateCartItemIsActiveOutput @resolver(class: "SM\\CheckoutGraphQl\\Model\\Resolver\\UpdateCartItemIsActive") @doc(description: "Update cart item is_active attribute")
     emptyCustomerCart (cart_hash: String, cart_id: Int): EmptyCustomerCartOutput @resolver(class: "SM\\CheckoutGraphQl\\Model\\Resolver\\EmptyCustomerCart") @doc(description: "Remove all items from cart")
+    updateItemAddressAndShippingMethod (items: [CheckoutUpdateItemInput]): CheckoutOutput @resolver(class: "SM\\CheckoutGraphQl\\Model\\Resolver\\UpdateItemAddressAndShippingMethod") @doc(description: "Update chosen shipping address and shipping method for the items")
+    savePaymentMethod (payment_method: String): CheckoutTotal @resolver(class: "SM\\CheckoutGraphQl\\Model\\Resolver\\SavePaymentMethod") @doc(description: "Choose payment method for order")
+    checkoutPlaceOrder: PlaceOrderOutput @resolver(class: "SM\\CheckoutGraphQl\\Model\\Resolver\\CheckoutPlaceOrder") @doc(description: "Place order")
+}
+
+type Query {
+    initCheckout: CheckoutOutput @resolver(class: "SM\\CheckoutGraphQl\\Model\\Resolver\\InitCheckout") @doc(description: "Init checkout for mobile")
+    getCheckoutTotal: CheckoutTotal @resolver(class: "SM\\CheckoutGraphQl\\Model\\Resolver\\GetCheckoutTotal") @doc(description: "Get current checkout total")
 }
 
 input CartItemIsActive {
-    item_id: String @doc(description: "Cart Item ID")
+    item_id: Int @doc(description: "Cart Item ID")
     is_active: Int @doc(description: "is_active value (Active - 1, Inactive - 0)")
     qty: Float @doc(description: "qty value")
+}
+
+input CheckoutUpdateItemInput {
+    item_id: Int
+    address_id: Int
+    shipping_method: String
 }
 
 type UpdateCartItemIsActiveOutput {
@@ -20,4 +34,106 @@ type EmptyCustomerCartOutput {
 
 interface CartItemInterface {
     is_active: Int
+}
+
+type CheckoutOutput @doc(description: "Full checkout object data for mobile") {
+    shipping_address: [CustomerAddress]
+    items: [CheckoutItem]
+    items_message: String
+    checkout_total: CheckoutTotal
+    is_store_ful_fill: Boolean
+    is_split_order: Boolean
+    is_address_complete: Boolean
+    is_error_checkout: Boolean
+    payment_methods: [CheckoutPaymentMethod]
+    currency_symbol: String
+}
+
+type CheckoutItem {
+    item_id: Int
+    sku: String
+    name: String
+    url: String
+    weight: Float
+    weight_unit: String
+    qty: Int
+    thumbnail: String
+    row_total: Float
+    base_row_total_by_location: Float
+    currency_symbol: String
+    product_type: String
+    product_option: [CheckoutProductOption]
+    shipping_method: [CheckoutShippingMethod]
+    shipping_address_id: Int
+    shipping_method_selected: String
+    disable: String
+    message: String
+}
+
+type CheckoutProductOption {
+    label: String
+    value: String
+}
+
+type CheckoutShippingMethod {
+    value: String
+    label: String
+    disabled: Boolean
+}
+
+type CheckoutTotal {
+    grand_total: Float
+    subtotal: Float
+    discount_amount: Float
+    subtotal_with_discount: Float
+    shipping_amount: Float
+    shipping_discount_amount: Float
+    tax_amount: Float
+    shipping_tax_amount: Float
+    subtotal_incl_tax: Float
+    shipping_incl_tax: Float
+    quote_currency_code: String
+    items_qty: Int
+    total_segments: [CheckoutTotalSegment]
+}
+
+type CheckoutTotalSegment {
+    code: String
+    title: String
+    value: Float
+    area: String
+}
+
+type CheckoutPaymentMethod {
+    title: String
+    description: String
+    card_type: String
+    methods: [CheckoutPaymentMethodMethod]
+}
+
+type CheckoutPaymentMethodMethod {
+    title: String
+    description: String
+    minimum_amount: String
+    type: String
+    banks: [CheckoutPaymentMethodBank]
+}
+
+type CheckoutPaymentMethodBank {
+    title: String
+    description: String
+    code: String
+    logo: String
+    minimum_amount: String
+    content: [String]
+}
+
+type PlaceOrderOutput {
+    error: Boolean
+    message: String
+    orderIds: String
+    transaction_id: String
+    total_payment: String
+    payment_method: String
+    bank_type: String
 }
