@@ -1,0 +1,57 @@
+type Query {
+    my_list: MyList
+    @resolver(class:"SM\\ShoppingListGraphQl\\Model\\Resolver\\MyList\\Index")
+    @doc(description:
+        "The popular_products query returns popular product list")
+    @cache(cacheable: false)
+}
+
+type Mutation {
+    add_product_to_my_favorite (product_id: Int): ShoppingListOutput @resolver(class: "SM\\ShoppingListGraphQl\\Model\\Resolver\\MyFavorite\\AddItem")
+    move_product_to_my_list (item_id: Int, my_list_ids: [Int]): ShoppingListOutput @resolver(class: "SM\\ShoppingListGraphQl\\Model\\Resolver\\MyFavorite\\MoveItem")
+    remove_product_from_shopping_list (item_id: Int): ShoppingListOutput @resolver(class: "SM\\ShoppingListGraphQl\\Model\\Resolver\\RemoveItem")
+    create_my_list (my_list_name: String): CreateOrUpdateMyListOutPut @resolver(class:"SM\\ShoppingListGraphQl\\Model\\Resolver\\MyList\\Create")
+    update_my_list (update_list_name: String, my_list_id: Int): CreateOrUpdateMyListOutPut @resolver(class:"SM\\ShoppingListGraphQl\\Model\\Resolver\\MyList\\Update")
+    delete_my_list (my_list_id: Int): ShoppingListOutput @resolver(class:"SM\\ShoppingListGraphQl\\Model\\Resolver\\MyList\\Delete")
+}
+
+type ShoppingListOutput {
+    status: Int
+    message: String
+}
+
+type CreateOrUpdateMyListOutPut {
+    status: Int,
+    message: String,
+    result: AddedOrUpdatedMyList
+}
+
+type AddedOrUpdatedMyList {
+    name: String,
+    my_list_id: Int
+}
+
+type MyList {
+    total_records: Int,
+    items: [MyListItem]
+}
+
+type MyListItem {
+    wishlist_id: Int,
+    shared: Int,
+    sharing_code: String,
+    updated_at: String,
+    name: String,
+    visibility: Int,
+    total_product: Int,
+    products: [ProductInItem]
+}
+
+type ProductInItem {
+     id: Int @doc(description: "The wish list item ID")
+     qty: Float @doc(description: "The quantity of this wish list item"),
+     description: String @doc(description: "The customer's comment about this item"),
+     added_at: String @doc(description: "The time when the customer added the item to the wish list"),
+     product: ProductInterface @resolver(class: "\\Magento\\WishlistGraphQl\\Model\\Resolver\\ProductResolver")
+}
+
