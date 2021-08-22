@@ -4,6 +4,7 @@
         <sequence>
             <module name="SM_Catalog"/>
             <module name="Magento_CatalogGraphQl"/>
+            <module name="Magento_Catalog"/>
         </sequence>
     </module>
 </config>
