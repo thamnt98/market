@@ -26,6 +26,13 @@ input TransCustomerInput {
     telephone: String @doc(description: "The customer's phone number")
 }
 
+input CustomerInput {
+    occupancy: String @doc(description: "The customer's occupancy")
+    marital_status: Int @doc(description: "The customer's marital status")
+}
+
 type Customer {
     profile_picture: String @doc(description: "The customer's profile picture url")
+    occupancy: String @doc(description: "The customer's occupancy")
+    marital_status: Int @doc(description: "The customer's marital status")
 }

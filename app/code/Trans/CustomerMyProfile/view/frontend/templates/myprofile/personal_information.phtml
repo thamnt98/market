@@ -79,6 +79,12 @@
             <div class="box-content">
                 <p data-gtm="ktp_no"><?= $block->escapeHtml($block->getNik()) ?></p>
             </div>
+            <div class="box-title">
+                <span><?= $block->escapeHtml(__('Occupancy')) ?></span>
+            </div>
+            <div class="box-content">
+                <p data-gtm="ktp_no"><?= $block->escapeHtml($block->getOccupancy()) ?></p>
+            </div>
             <?php
             if (isset($_GET['omni'])) {
             ?>

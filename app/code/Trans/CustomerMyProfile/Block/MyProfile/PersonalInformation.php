@@ -221,4 +221,17 @@ class PersonalInformation extends \Magento\Framework\View\Element\Template
         }
         return null;
     }
+
+    /**
+     * @return mixed|string
+     */
+    public function getOccupancy()
+    {
+        $occupancy = '-';
+        $customer = $this->getCustomer();
+        if ($customer->getCustomAttribute('occupancy')) {
+            $occupancy = $customer->getCustomAttribute('occupancy')->getValue();
+        }
+        return $occupancy;
+    }
 }
