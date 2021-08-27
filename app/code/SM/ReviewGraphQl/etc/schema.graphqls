@@ -1,0 +1,34 @@
+type Query {
+    review(
+        filter: ReviewFilterInput @doc(description: "Filter review")
+        pageSize: Int = 5 @doc(description: "How many items should show on the page")
+        currentPage: Int = 1 @doc(description: "Allows to ussing paging it start with 1")
+    ): reviewOutput @resolver( class: "SM\\ReviewGraphQl\\Model\\Resolver\\Reviews") @doc(description: "Review data")
+}
+
+input ReviewFilterInput {
+    product_id: FilterTypeInput @doc(description: "Filter by product id")
+    rating: FilterTypeInput @doc(description: "Filter by rating")
+    status_id: FilterTypeInput @doc(description: "Filter by status")
+}
+
+type reviewOutput {
+    total_count: Int
+    items: [ReviewItem]
+}
+
+type ReviewItem {
+    review_id: String
+    created_at: String
+    title: String
+    detail: String
+    nickname:String
+    images: [images]
+    rating: String
+    status_id: String
+    product_id: String
+}
+
+type images {
+    url: String
+}
