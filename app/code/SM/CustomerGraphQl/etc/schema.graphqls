@@ -3,6 +3,8 @@ type Mutation {
     verifyOtp (telephone: String!, verificationCode: String!, action: String): Boolean @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\VerifyOtp") @doc(description: "Verify OTP sent to telephone")
     createTransCustomer (input: TransCustomerInput!): CustomerOutput @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\CreateTransCustomer") @doc(description: "Create Trans Customer")
     loginByPhone (telephone: String!, password: String!): CustomerToken @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\LoginByPhone") @doc(description: "Generate customer token by telephone and password")
+    createCustomerAddress(input: CustomerAddressInput!): CustomerAddress @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\CreateCustomerAddress") @doc(description: "Create customer address")
+    updateCustomerAddress(id: Int!, input: CustomerAddressInput!): CustomerAddress @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\UpdateCustomerAddress") @doc(description: "Update customer address")
 }
 
 type Query {
@@ -35,4 +37,16 @@ type Customer {
     profile_picture: String @doc(description: "The customer's profile picture url")
     occupancy: String @doc(description: "The customer's occupancy")
     marital_status: Int @doc(description: "The customer's marital status")
+}
+
+input CustomerAddressInput {
+    address_tag: String,
+    district: String,
+    recipient_name: String
+}
+
+type CustomerAddress {
+    address_tag: String,
+    district: String,
+    recipient_name: String
 }
