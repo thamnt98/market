@@ -837,7 +837,7 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
             ->setAddressSupport("");
         if ($this->checkoutHelperConfig->isActiveFulfillmentStore()) {
             $this->supportShippingData->setUse(true)
-                ->setMessage(__('Transmart now delivers only to Jabodetabek area.'))
+                ->setMessage(__('METRO now delivers only to Jabodetabek area.'))
                 ->setAddressMessage(__('Please change your delivery address to the Jabodetabek area.'));
             $addressListSupport = [];
 

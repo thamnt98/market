@@ -18,7 +18,7 @@
                 <label>Header</label>
                 <field id="transmart_app_url" type="text" translate="label comment" sortOrder="1" canRestore="1"
                        showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Transmart App URL</label>
+                    <label>METRO App URL</label>
                 </field>
             </group>
         </section>

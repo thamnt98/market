@@ -4,19 +4,19 @@
 
 <?php if (is_null($block->getHowToBuyIdentifier())):?>
     <p><?= $block->escapeHtml(__("Top up your mobile number and stay connected with dearest family and friends.
-                        In Transmart, you can top up mobile number of all operators with various nominal options.
-                        Anytime you want and wherever you are, Transmart can provide the easist online top up and payment method.
+                        In METRO, you can top up mobile number of all operators with various nominal options.
+                        Anytime you want and wherever you are, METRO can provide the easist online top up and payment method.
                         Top up your mobile number with these simple steps."))?></p>
     <ol>
-        <li><?= $block->escapeHtml(__("Go to Transmart website."))?></li>
+        <li><?= $block->escapeHtml(__("Go to METRO website."))?></li>
         <li><?= $block->escapeHtml(__("Choose Top Up & Bills category on the homepage."))?></li>
         <li><?= $block->escapeHtml(__("Go to Top Up menu."))?></li>
         <li><?= $block->escapeHtml(__("Enter your mobile number or modem number, then choose the nominal."))?></li>
         <li><?= $block->escapeHtml(__('Tap or click "Buy" button.'))?></li>
         <li><?= $block->escapeHtml(__("Select your payment method and please make the payment. "))?></li>
     </ol>
-    <p><?= $block->escapeHtml(__("In Transmart, you can also opt to buy mobile package, electricity token, as well as paying your postpaid, PLN electricity, PDAM, BPJS and Telkom bills.
-                        Make your life easier by doing your transactions through Transmart!"))?></p>
+    <p><?= $block->escapeHtml(__("In METRO, you can also opt to buy mobile package, electricity token, as well as paying your postpaid, PLN electricity, PDAM, BPJS and Telkom bills.
+                        Make your life easier by doing your transactions through METRO!"))?></p>
 <?php else:?>
     <?= $block->getLayout()->createBlock(\Magento\Cms\Block\Block::class)->setBlockId($block->getHowToBuyIdentifier())->toHtml();?>
 <?php endif;?>
