@@ -136,6 +136,20 @@ $customerData = ['profile_picture' => $profilePicture, 'fullname' => $name, 'dob
                            data-msg-minlength="<?= $block->escapeHtml(__("Must be 16 digits long"))?>">
                 </div>
             </div>
+            <div class="field field-occupancy" style="margin-top: 40px">
+                <label class="label" for="occupancy"><span><?= $block->escapeHtml(__("Occupancy"))?></span></label>
+                <div class="control">
+                    <?php
+                    $occupancyAttribute = $block->getCustomer()->getCustomAttribute("occupancy");
+                    $occupancyValue = $occupancyAttribute? $occupancyAttribute->getValue():"";
+                    ?>
+                    <input type="text" id="occupancy" name="occupancy"
+                           value="<?= $occupancyValue ?>"
+                           class="input-text"
+                           data-validate="{'maxlength':255}"
+                           data-msg-minlength="<?= $block->escapeHtml(__("Must be less than or equal to 255 characters"))?>">
+                </div>
+            </div>
         </div>
         <div class="profile-picture">
             <label for="profile_picture" class="image-photo-profile">
