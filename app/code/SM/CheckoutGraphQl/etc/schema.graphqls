@@ -132,8 +132,29 @@ type PlaceOrderOutput {
     error: Boolean
     message: String
     orderIds: String
+    payment: CheckoutPaymentOutput
     transaction_id: String
     total_payment: String
     payment_method: String
     bank_type: String
+}
+
+type CheckoutPaymentOutput {
+    payment_method: String
+    status: String
+    message: String
+    redirectUrl: String
+    account_number: String
+    expired_time: String
+    total_amount: String
+    reference_number: String
+    relate_url: String
+    bank: CheckoutPaymentMethodBank
+    how_to_pay: String
+    how_to_pay_object: [HowToPayObject]
+}
+
+type HowToPayObject {
+    block_title: String
+    block_content: String
 }
