@@ -156,5 +156,5 @@ type CheckoutPaymentOutput {
 
 type HowToPayObject {
     block_title: String
-    block_content: String
+    block_content: [String]
 }
