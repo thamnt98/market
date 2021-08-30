@@ -1,0 +1,23 @@
+type Query {
+    stores (
+        search: String @doc(description: "Performs a full-text search using the specified key words."),
+    ): Stores
+    @resolver(class: "SM\\StoreGraphQl\\Model\\Resolver\\Stores") @doc(description: "The stores query searches for stores that match the criteria specified in the search ")
+}
+
+type Stores {
+    total_count: Int
+    items: [StoreItem]
+}
+
+type StoreItem {
+    store_name: String,
+    store_address: String,
+    store_province: String,
+    store_city: String,
+    store_district: String,
+    store_zipcode: String,
+    store_latitude: String,
+    store_longitude: String,
+    store_phone: String
+}
