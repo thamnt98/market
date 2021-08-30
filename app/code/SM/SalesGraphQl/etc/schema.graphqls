@@ -69,7 +69,7 @@ type TransSubOrder {
     shipping_method: String
     shipping_method_code: String
     status: String
-    items: TransSubOrderItem
+    items: [TransSubOrderItem]
     delivery_address: TransOrderDeliveryAddress
     tracking_number: String
     tracking_link: String
