@@ -5,6 +5,7 @@ type Mutation {
     loginByPhone (telephone: String!, password: String!): CustomerToken @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\LoginByPhone") @doc(description: "Generate customer token by telephone and password")
     createCustomerAddress(input: CustomerAddressInput!): CustomerAddress @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\CreateCustomerAddress") @doc(description: "Create customer address")
     updateCustomerAddress(id: Int!, input: CustomerAddressInput!): CustomerAddress @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\UpdateCustomerAddress") @doc(description: "Update customer address")
+    resetPassword (telephone: String!, new_password: String!): ResetPasswordOutput @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\ResetPassword") @doc(description: "Reset password")
 }
 
 type Query {
@@ -49,4 +50,9 @@ type CustomerAddress {
     address_tag: String,
     district: String,
     recipient_name: String
+}
+
+type ResetPasswordOutput {
+    status: Int
+    message: String
 }
