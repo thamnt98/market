@@ -432,9 +432,17 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         $checkoutSession->setQuote($quote);
         $checkoutSession->setCustomer($customer->getDataModel());
         $defaultShippingAddress = $customer->getDefaultShippingAddress();
-        $defaultShippingAddressId = $defaultShippingAddress->getId();
-        $isAddressComplete = ($defaultShippingAddress->getStreetFull() == 'N/A'
-            && $defaultShippingAddress->getPostcode() == '*****') ? false : true;
+        if ($defaultShippingAddress) {
+            $defaultShippingAddressId = $defaultShippingAddress->getId();
+            $isAddressComplete = ($defaultShippingAddress->getStreetFull() == 'N/A'
+                && $defaultShippingAddress->getPostcode() == '*****') ? false : true;
+            $defaultShippingMethod = \SM\Checkout\Model\MultiShippingHandle::DEFAULT_METHOD;
+        } else {
+            // For case when customer init checkout with no default address
+            $defaultShippingAddressId = 0;
+            $isAddressComplete = false;
+            $defaultShippingMethod = \SM\Checkout\Model\MultiShippingHandle::STORE_PICK_UP;
+        }
         $weightUnit = $this->checkoutHelperConfig->getWeightUnit();
         $storeId = $quote->getStoreId();
         $currencySymbol = $this->checkoutHelperConfig->getCurrencySymbol();
@@ -443,10 +451,15 @@ class MultiShippingMobile implements \SM\Checkout\Api\MultiShippingMobileInterfa
         $addressSelectedId = [$defaultShippingAddressId];
         $this->itemSelectShippingAddressId = $addressSelectedId;
         $addressesList = $this->getAddressSelectedList($customerId, $addressSelectedId);
-        $defaultShippingMethod = \SM\Checkout\Model\MultiShippingHandle::DEFAULT_METHOD;
         $orderToSendOar['order_id'] = $quote->getCustomerId();
         $orderToSendOar['merchant_code'] = $this->split->getMerchantCode();
-        $this->getSkuListForPickUp($quote, $defaultShippingAddress);
+
+        if ($defaultShippingAddress) {
+            $this->getSkuListForPickUp($quote, $defaultShippingAddress);
+        } else {
+            $this->notSpoList = [];
+        }
+
         foreach ($allVisibleItems as $quoteItem) {
             $this->buildItemsInit($quoteItem, $quote, $defaultShippingMethod, $weightUnit, $currencySymbol, $storeId, $defaultShippingAddressId);
         }

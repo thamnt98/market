@@ -271,7 +271,10 @@ class MultiShippingHandle
         $data['split']  = $this->orderIsSplit;
         $message = 'SM\Checkout\Model\MultiShippingHandle. Thoi gian tap quote address - quoteID ' . $checkoutSession->getQuote()->getId() . ': ';
         $dateStart = microtime(true); // log_time
-        $this->reBuildQuoteAddress($splitOrderData['data'], $checkoutSession);
+        // Stop cart item getting removed if customer have no address
+        if ($customer->getDefaultShippingAddress()) {
+            $this->reBuildQuoteAddress($splitOrderData['data'], $checkoutSession);
+        }
         $dateEnd = microtime(true); // log_time
         $this->writeTimeLog($dateEnd, $dateStart, $message);
         $addressShippingMethod = [];
@@ -486,7 +489,7 @@ class MultiShippingHandle
         $message = 'SM\Checkout\Model\MultiShippingHandle. Thoi gian xu ly check out stock cho quoteID ' . $checkoutSession->getQuote()->getId() . ': ';
         $dateStart = microtime(true); // log_time
         $data                   = ['reload' => false, 'error' => false, 'data' => [], 'split' => false];
-        $defaultShippingAddress = $customer->getDefaultShippingAddress()->getId();
+        $defaultShippingAddress = $customer->getDefaultShippingAddress() ? $customer->getDefaultShippingAddress()->getId() : 0;
         $quoteItemIdSku         = [];
         $order                  = [];
         $addressIds             = [];
