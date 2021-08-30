@@ -1,0 +1,144 @@
+type Query {
+    transOrders (
+        filter: TransOrdersFilterInput,
+        currentPage: Int = 1,
+        pageSize: Int = 10
+    ): TransOrders @resolver(class: "SM\\SalesGraphQl\\Model\\Resolver\\TransOrders") @cache(cacheable: false)
+}
+
+input TransOrdersFilterInput {
+    name: String
+    list_type: String
+}
+
+type TransOrders {
+    items: [TransOrder]!
+    page_info: SearchResultPageInfo
+    total_count: Int
+}
+
+type TransOrder @doc(description: "Contains details about each of the customer's orders") {
+    parent_order_id: Int
+    reference_number: String
+    order_date: String
+    total_payment: Float
+    total_refund: Float
+    has_creditmemo: Boolean
+    refund_message: String
+    grand_total: Float
+    sub_orders: [TransSubOrder]
+    payment_method: String
+    total_shipping_amount: Float
+    subtotal: Float
+    status: String
+    invoice_number: String
+    payment_info: TransOrderPaymentInfo
+    is_digital: Boolean
+    voucher_detail: [TransOrderVoucherDetail]
+    convert_date: String
+    pdf_link: String
+    discount_amount: Float
+    cancel_message: String
+    cancel_message_mobile: String
+    transaction_ID: String
+}
+
+type TransOrderPaymentInfo {
+    transaction_id: String
+    method: String
+    bank_issuer: String
+    card_brand: String
+    card_type: String
+    card_no: String
+    expire_date: String
+    virtual_account: String
+    redirect_url: String
+    how_to_pay: String
+    how_to_pay_objects: [HowToPayObject]
+    logo: String
+}
+
+type TransOrderVoucherDetail {
+    rule_name: String
+    rule_amount: String
+}
+
+type TransSubOrder {
+    id: Int
+    sub_order_id: String
+    shipping_method: String
+    shipping_method_code: String
+    status: String
+    items: TransSubOrderItem
+    delivery_address: TransOrderDeliveryAddress
+    tracking_number: String
+    tracking_link: String
+    delivery_fee: Float
+    subtotal: Float
+    total_payment: Float
+    total_refund: Float
+    refund_message: String
+    grand_total: Float
+    created_at: String
+    invoice_link: String
+    status_label: String
+    status_history: [TransOrderStatusHistory]
+    shipping_service_type: String
+    shipping_driver: String
+    shipping_plate_number: String
+    discount_amount: Float
+    cancel_type: String
+    creditmemo_id: String
+    has_creditmemo: Boolean
+    can_creditmemo: Boolean
+    show_refund_button: Boolean
+    enable_refund_button: Boolean
+}
+
+type TransOrderDeliveryAddress {
+    full_name: String
+    address: String
+    street: String
+    province: String
+    city: String
+    country: String
+    address_name: String
+    postcode: String
+    telephone: String
+    district: String
+}
+
+type TransOrderStatusHistory {
+    status: String
+    label: String
+    comment: String
+    created_at: String
+    icon: String
+    icon_class: String
+    is_active: Boolean
+    raw_created_at: String
+}
+
+type TransSubOrderItem {
+    item_id: Int
+    product_name: String
+    quantity: Int
+    price: Float
+    total: Float
+    image_url: String
+    url: String
+    sku: String
+    has_options: Int
+    options: [TransSubOrderItemOption]
+    buy_request: String
+    product_type: String
+    is_available: Boolean
+    message: String
+}
+
+type TransSubOrderItemOption {
+    option_type: String
+    option_label: String
+    option_value: String
+    option_selection: String
+}
