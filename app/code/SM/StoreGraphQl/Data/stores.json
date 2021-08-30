@@ -1,0 +1,114 @@
+{
+    "data": [
+        {
+            "store_name": "METRO PONDOK INDAH",
+            "store_address": "METRO PONDOK INDAH BLK IIIB",
+            "store_province": "DKI Jakarta",
+            "store_city": "Kota Jakarta Selatan",
+            "store_district": "Kebayoran Lama",
+            "store_zipcode": "12310",
+            "store_latitude": "-6.2655",
+            "store_longitude": "106.784302",
+            "store_phone": "021-7564785"
+        },
+        {
+            "store_name": "METRO SENAYAN SQUARE",
+            "store_address": "ASIA AFRIKA STREET",
+            "store_province": "DKI JAKARTA",
+            "store_city": "Kota Jakarta Pusat",
+            "store_district": "Tanah Abang",
+            "store_zipcode": "10270",
+            "store_latitude": "-6.2264",
+            "store_longitude": "106.798698",
+            "store_phone": "021-5725428"
+        },
+        {
+            "store_name": "METRO TAMAN ANGGREK",
+            "store_address": "MALL TAMAN ANGGREK",
+            "store_province": "DKI JAKARTA",
+            "store_city": "Kota Jakarta Barat",
+            "store_district": "Grogol Pertamburan",
+            "store_zipcode": "11470",
+            "store_latitude": "-6.1784",
+            "store_longitude": "106.792",
+            "store_phone": "021-5656767"
+        },
+        {
+            "store_name": "METRO GANDARIA CITY",
+            "store_address": "GANDARIA CITY",
+            "store_province": "DKI JAKARTA",
+            "store_city": "Kota Jakarta Selatan",
+            "store_district": "Kebayoran Lama",
+            "store_zipcode": "12240",
+            "store_latitude": "-6.2438",
+            "store_longitude": "106.783699",
+            "store_phone": "021-29008015"
+        },
+        {
+            "store_name": "METRO PURI MALL",
+            "store_address": "PURI INDAH MALL",
+            "store_province": "DKI JAKARTA",
+            "store_city": "Kota Jakarta Barat",
+            "store_district": "Kembangan",
+            "store_zipcode": "11610",
+            "store_latitude": "-6.1882",
+            "store_longitude": "106.7342",
+            "store_phone": "021-5826116"
+        },
+        {
+            "store_name": "METRO TRANS PARK CIBUBUR",
+            "store_address": "JL. ALTERNATIF RAYA CIBUBUR",
+            "store_province": "JAWA BARAT",
+            "store_city": "Kota Depok",
+            "store_district": "Cimanggis",
+            "store_zipcode": "16454",
+            "store_latitude": "-6.3756",
+            "store_longitude": "106.902496",
+            "store_phone": "021-39715501"
+        },
+        {
+            "store_name": "METRO BANDUNG SUPERMALL",
+            "store_address": "BANDUNG SUPERMAL",
+            "store_province": "JAWA BARAT",
+            "store_city": "Kota Bandung",
+            "store_district": "Batununggal",
+            "store_zipcode": "40273",
+            "store_latitude": "-6.9246",
+            "store_longitude": "107.636703",
+            "store_phone": "022-91091888"
+        },
+        {
+            "store_name": "METRO PARK SOLO",
+            "store_address": "SOLO",
+            "store_province": "JAWA TENGAH",
+            "store_city": "Kota Sukoharjo",
+            "store_district": "Grogol",
+            "store_zipcode": "57552",
+            "store_latitude": "-7.5985",
+            "store_longitude": "110.816101",
+            "store_phone": "0271-7891221"
+        },
+        {
+            "store_name": "METRO CIPUTRA WORLD SURABAYA",
+            "store_address": "CIPUTRA WORLD SURABAYA",
+            "store_province": "JAWA TIMUR",
+            "store_city": "Kota Surabaya",
+            "store_district": "Dukuh Pakis",
+            "store_zipcode": "60224",
+            "store_latitude": "-7.2923",
+            "store_longitude": "112.718697",
+            "store_phone": "031-51200025"
+        },
+        {
+            "store_name": "METRO TRANS MAKASAR",
+            "store_address": "KAWASAN TERPADU TRANS STUDIO",
+            "store_province": "SULAWESI SELATAN",
+            "store_city": "Kota Makasar",
+            "store_district": "Tamalate",
+            "store_zipcode": "90134",
+            "store_latitude": "-5.1591",
+            "store_longitude": "119.394897",
+            "store_phone": "0411-8117050"
+        }
+    ]
+}
