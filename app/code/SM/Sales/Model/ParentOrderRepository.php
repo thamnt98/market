@@ -326,7 +326,8 @@ class ParentOrderRepository implements ParentOrderRepositoryInterface
             ->create()
             ->selectParent()
             ->itemSort($searchCriteria)
-            ->addFieldToFilter("main_table.entity_id", ["in" => $listParentOrders]);
+            ->addFieldToFilter("main_table.entity_id", ["in" => $listParentOrders])
+            ->addFieldToSelect('order_currency_code');
 
         $orderCollection
             ->setCurPage(

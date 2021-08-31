@@ -41,6 +41,7 @@ type TransOrder @doc(description: "Contains details about each of the customer's
     cancel_message: String
     cancel_message_mobile: String
     transaction_ID: String
+    currency: String
 }
 
 type TransOrderPaymentInfo {
@@ -134,6 +135,7 @@ type TransSubOrderItem {
     product_type: String
     is_available: Boolean
     message: String
+    brand: String
 }
 
 type TransSubOrderItemOption {
