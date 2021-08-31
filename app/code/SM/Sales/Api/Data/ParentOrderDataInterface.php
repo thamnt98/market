@@ -39,6 +39,7 @@ interface ParentOrderDataInterface
     const CANCEL_MESSAGE = "cancel_message";
     const CANCEL_MESSAGE_MB = "cancel_message_mobile";
     const TRANSACTION_ID = "transaction_ID";
+    const CURRENCY = "currency";
 
     /**
      * @return int
@@ -292,5 +293,16 @@ interface ParentOrderDataInterface
      * @return string
      */
     public function getRefundMessage();
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setCurrency($value);
+
+    /**
+     * @return string
+     */
+    public function getCurrency();
 
 }

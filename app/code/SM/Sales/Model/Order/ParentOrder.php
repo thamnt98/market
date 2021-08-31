@@ -159,6 +159,7 @@ class ParentOrder
             ->setSubOrders($subOrders)
             ->setConvertDate($this->convertDate($parentOrder->getCreatedAt()));
 
+        $parentOrderData->setCurrency($parentOrder->getOrderCurrencyCode());
 
         if ($parentOrder->getReferenceInvoiceNumber()) {
             $parentOrderData->setInvoiceLink(current($subOrders)->getInvoiceLink());

@@ -24,6 +24,7 @@ interface DetailItemDataInterface
     const FRESH_PRODUCT = "fresh_product";
     const IS_AVAILABLE = "is_available";
     const MESSAGE = "message";
+    const BRAND = "brand";
 
     /**
      * @param int $value
@@ -207,4 +208,16 @@ interface DetailItemDataInterface
      * @return string
      */
     public function getMessage();
+
+    /**
+     * @param string $value
+     * @return $this
+     */
+    public function setBrand($value);
+
+
+    /**
+     * @return string
+     */
+    public function getBrand();
 }

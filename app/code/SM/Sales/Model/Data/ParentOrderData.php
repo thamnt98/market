@@ -363,4 +363,20 @@ class ParentOrderData extends DataObject implements ParentOrderDataInterface
     {
         return $this->getData(self::REFUND_MESSAGE);
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function setCurrency($value)
+    {
+        return $this->setData(self::CURRENCY, $value);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCurrency()
+    {
+        return $this->getData(self::CURRENCY);
+    }
 }

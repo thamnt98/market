@@ -622,6 +622,7 @@ class SubOrder
                     ->setIsAvailable($this->getIsItemIsAvailable($subOrderModel, $orderItem))
                     ->setMessage($this->getItemMessage($orderItem));
 
+                $itemData->setBrand($orderItem->getProduct()->getAttributeText('shop_by_brand'));
                 $itemData->setImageUrl(
                     $this->imageHelper->init($orderItem->getProduct(), 'product_base_image')->getUrl()
                 );
