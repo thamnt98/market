@@ -9,3 +9,9 @@ type Products @doc(description: "The Products object is the top-level object ret
 interface AggregationOptionInterface {
     parent: String
 }
+
+input ProductAttributeSortInput {
+    discount_percent: SortEnum
+    best_sellers: SortEnum
+    entity_id: SortEnum
+}
