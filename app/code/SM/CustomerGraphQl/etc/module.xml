@@ -4,6 +4,8 @@
         <sequence>
             <module name="SM_Customer"/>
             <module name="SM_AndromedaApi"/>
+            <module name="SM_FileManagement"/>
+            <module name="Trans_CustomerMyProfile"/>
         </sequence>
     </module>
 </config>
