@@ -74,8 +74,7 @@ class UpdateCustomerAddress
             // Split Recipient's name to firstname and lastname
             $recipientName = explode(" ", $data['recipient_name']);
             if (count($recipientName) == 1) {
-                $data['firstname'] = $recipientName;
-                $data['lastname'] = $recipientName;
+                $data['firstname'] = $data['lastname'] = $recipientName[0];
             } else {
                 foreach ($recipientName as $key => $text) {
                     if ($key == 0) {
