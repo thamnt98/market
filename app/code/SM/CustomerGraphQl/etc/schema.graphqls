@@ -8,6 +8,8 @@ type Mutation {
     resetPassword (telephone: String!, new_password: String!): ResetPasswordOutput @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\ResetPassword") @doc(description: "Reset password")
     uploadCustomerAvatar (imageContent: ImageContent!): Boolean @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\UploadCustomerAvatar") @doc(description: "Upload customer avatar")
     updateCustomer (input: CustomerInput!): CustomerOutput @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\UpdateCustomer") @doc(description:"Update the customer's personal information")
+    updateCustomerEmailPhone (input: CustomerEmailPhoneInput!): CustomerOutput @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\UpdateCustomerEmailPhone") @doc(description:"Update the customer's email/phone, require OTP")
+    changeCustomerPassword (currentPassword: String!, newPassword: String!): CustomerOutput @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\UpdateCustomerPassword") @doc(description:"Update the customer's email/phone, require OTP")
 }
 
 type Query {
@@ -37,10 +39,16 @@ input CustomerInput {
     fullname: String @doc(description: "The customer's full name")
 }
 
+input CustomerEmailPhoneInput {
+    email: String
+    telephone: String
+}
+
 type Customer {
     profile_picture: String @doc(description: "The customer's profile picture url")
     occupancy: String @doc(description: "The customer's occupancy")
     marital_status: Int @doc(description: "The customer's marital status")
+    telephone: String @doc(description: "The customer's telephone")
 }
 
 input CustomerAddressInput {
