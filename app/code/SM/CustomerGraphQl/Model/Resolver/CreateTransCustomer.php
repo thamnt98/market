@@ -20,6 +20,7 @@ use Magento\Framework\GraphQl\Schema\Type\ResolveInfo;
 use Magento\Framework\GraphQl\Exception\GraphQlInputException;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\Exception\NoSuchEntityException;
+use Trans\Core\Helper\Customer as CustomerHelper;
 
 /**
  * Class CreateTransCustomer
@@ -83,6 +84,11 @@ class CreateTransCustomer implements ResolverInterface
     protected $extractCustomerData;
 
     /**
+     * @var CustomerHelper 
+     */
+    protected $customerHelper;
+
+    /**
      * CreateTransCustomer constructor.
      * @param Validator $validator
      * @param CustomerRepositoryInterface $customerRepository
@@ -95,6 +101,7 @@ class CreateTransCustomer implements ResolverInterface
      * @param DataObjectHelper $dataObjectHelper
      * @param ValidateCustomerData $validateCustomerData
      * @param ExtractCustomerData $extractCustomerData
+     * @param CustomerHelper $customerHelper
      */
     public function __construct(
         Validator $validator,
@@ -107,7 +114,8 @@ class CreateTransCustomer implements ResolverInterface
         CustomerInterfaceFactory $customerFactory,
         DataObjectHelper $dataObjectHelper,
         ValidateCustomerData $validateCustomerData,
-        ExtractCustomerData $extractCustomerData
+        ExtractCustomerData $extractCustomerData,
+        CustomerHelper $customerHelper
     ) {
         $this->validator = $validator;
         $this->customerRepository = $customerRepository;
@@ -120,6 +128,7 @@ class CreateTransCustomer implements ResolverInterface
         $this->dataObjectHelper = $dataObjectHelper;
         $this->validateCustomerData = $validateCustomerData;
         $this->extractCustomerData = $extractCustomerData;
+        $this->customerHelper = $customerHelper;
     }
 
     /**
@@ -195,6 +204,13 @@ class CreateTransCustomer implements ResolverInterface
 
         if (isset($args['input']['date_of_birth'])) {
             $args['input']['dob'] = $args['input']['date_of_birth'];
+        }
+
+        if (isset($args['input']['fullname'])) {
+            $fullName = $args['input']['fullname'];
+            $name = $this->customerHelper->generateFirstnameLastname($fullName);
+            $args['input']['firstname'] = $name['firstname'];
+            $args['input']['lastname'] = $name['lastname'];
         }
 
         try {

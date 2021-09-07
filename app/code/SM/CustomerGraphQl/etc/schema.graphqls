@@ -18,6 +18,7 @@ type Query {
 }
 
 input TransCustomerInput {
+    fullname: String @doc(description: "The customer's full name")
     prefix: String @doc(description: "An honorific, such as Dr., Mr., or Mrs.")
     firstname: String @doc(description: "The customer's first name")
     middlename: String @doc(description: "The customer's middle name")
