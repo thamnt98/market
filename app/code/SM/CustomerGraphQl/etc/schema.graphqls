@@ -6,6 +6,7 @@ type Mutation {
     createCustomerAddress(input: CustomerAddressInput!): CustomerAddress @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\CreateCustomerAddress") @doc(description: "Create customer address")
     updateCustomerAddress(id: Int!, input: CustomerAddressInput!): CustomerAddress @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\UpdateCustomerAddress") @doc(description: "Update customer address")
     resetPassword (telephone: String!, new_password: String!): ResetPasswordOutput @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\ResetPassword") @doc(description: "Reset password")
+    uploadCustomerAvatar (imageContent: ImageContent!): Boolean @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\UploadCustomerAvatar") @doc(description: "Upload customer avatar")
 }
 
 type Query {
@@ -55,4 +56,10 @@ type CustomerAddress {
 type ResetPasswordOutput {
     status: Int
     message: String
+}
+
+input ImageContent {
+    base64_encoded_data: String!
+    name: String!
+    type: String!
 }
