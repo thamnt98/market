@@ -7,6 +7,7 @@ type Mutation {
     updateCustomerAddress(id: Int!, input: CustomerAddressInput!): CustomerAddress @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\UpdateCustomerAddress") @doc(description: "Update customer address")
     resetPassword (telephone: String!, new_password: String!): ResetPasswordOutput @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\ResetPassword") @doc(description: "Reset password")
     uploadCustomerAvatar (imageContent: ImageContent!): Boolean @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\UploadCustomerAvatar") @doc(description: "Upload customer avatar")
+    updateCustomer (input: CustomerInput!): CustomerOutput @resolver(class: "SM\\CustomerGraphQl\\Model\\Resolver\\UpdateCustomer") @doc(description:"Update the customer's personal information")
 }
 
 type Query {
@@ -33,6 +34,7 @@ input TransCustomerInput {
 input CustomerInput {
     occupancy: String @doc(description: "The customer's occupancy")
     marital_status: Int @doc(description: "The customer's marital status")
+    fullname: String @doc(description: "The customer's full name")
 }
 
 type Customer {
