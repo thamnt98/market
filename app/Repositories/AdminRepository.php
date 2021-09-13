@@ -75,8 +75,12 @@ class AdminRepository extends EloquentBaseRepository implements RepositoryInterf
         if ($data['role'] == 'standardStaff') {
             $this->where('admin_id', $user->id)->update(['admin_id' => $data['admin_id']]);
         }
-        if ($data['role'] == 'standardManager') {
+        if (in_array($data['role'], ['standardManager', 'superManager', 'admin'])) {
             $data['admin_id'] = null;
+        }
+        else{
+            Admin::where('admin_id', $id)->update(['admin_id' => 1]);
+            Admin::where('super_manager_id', $id)->update(['super_manager_id' => null]);
         }
         $role = $data['role'];
         unset($data['role']);
@@ -142,10 +146,12 @@ class AdminRepository extends EloquentBaseRepository implements RepositoryInterf
         $admin = Auth::user();
         if ($admin->role == config('role.admin')) {
             if (empty($search)) {
-                $query = $query->where('admin_id', null);
+                $query = $query->where('admin_id', null)->orWhere('id', 1);
             }
         } else {
-            $query = $query->where('admin_id', $admin->id);
+            $query = $query->where(function ($q) use ($admin){
+                return $q->orWhere('admin_id', $admin->id)->orWhere('super_manager_id', $admin->id);
+            });
         }
         $query = $query->orderBy('created_at', 'desc');
         return $query->paginate(20);
@@ -163,7 +169,17 @@ class AdminRepository extends EloquentBaseRepository implements RepositoryInterf
                 $q->where('role', config('role.staff'));
             })
             ->get();
-        return count($agentManagers);
+            return count($agentManagers);
+    }
+
+    public function countManager($superManagerId)
+    {
+        $managers = $this->where('super_manager_id', $superManagerId)
+            ->where(function ($q) {
+                $q->where('role', config('role.staff'));
+            })
+            ->get();
+        return count($managers);
     }
 
     /**
@@ -181,10 +197,11 @@ class AdminRepository extends EloquentBaseRepository implements RepositoryInterf
                 })
                 ->get();
         } else {
-            $agentNoActive = $this->where('admin_id', $admin_id)
-                ->where(function ($q) {
-                    $q->where('status', self::STATUS_NO_ACTIVE);
-                    $q->where('role', config('role.staff'));
+            $agentNoActive = $this->where(function ($q) use ($admin_id) {
+                    return $q->where('status', self::STATUS_NO_ACTIVE)
+                        ->where('role', config('role.staff'))
+                        ->orWhere('admin_id', $admin_id)
+                        ->orWhere('super_manager_id', $admin_id);
                 })
                 ->get();
         }
@@ -202,7 +219,8 @@ class AdminRepository extends EloquentBaseRepository implements RepositoryInterf
         } else {
             $totalAgents = $this->where('role', config('role.staff'))
                 ->where(function ($q) use ($admin) {
-                    $q->where('admin_id', $admin->id);
+                   return $q->orWhere('admin_id', $admin->id)
+                    ->orWhere('super_manager_id', $admin->id);
                 })
                 ->get();
         }

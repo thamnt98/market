@@ -71,9 +71,11 @@ class PermissionRepository extends EloquentBaseRepository implements RepositoryI
 
     public function syncPermisionAndRoleForUsers($users, $permissions, $roleName)
     {
-        foreach ($users as $user) {
-            $user->syncPermissions($permissions);
-            $user->syncRoles($roleName);
+        if (count($users)){
+            foreach ($users as $user) {
+                $user->syncPermissions($permissions);
+                $user->syncRoles($roleName);
+            }
         }
     }
 
@@ -226,5 +228,11 @@ class PermissionRepository extends EloquentBaseRepository implements RepositoryI
         });
     }
 
-
+    public function getUsersByRoleName($roleName){
+        return Admin::whereHas(
+            'roles', function($q) use ($roleName){
+            $q->where('name', $roleName);
+        }
+        )->get();
+    }
 }

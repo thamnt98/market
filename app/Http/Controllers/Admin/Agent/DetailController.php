@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\AdminCommission;
 use App\Models\Role;
 use App\Repositories\AdminRepository;
+use App\Repositories\PermissionRepository;
 
 class DetailController extends Controller
 {
@@ -13,14 +14,16 @@ class DetailController extends Controller
      * @var AdminRepository
      */
     private $adminRepository;
+    private $permissionRepository;
 
     /**
      * LiveListController constructor.
      * @param \App\Repositories\AdminRepository $adminRepository
      */
-    public function __construct(AdminRepository $adminRepository)
+    public function __construct(AdminRepository $adminRepository, PermissionRepository $permissionRepository)
     {
         $this->adminRepository = $adminRepository;
+        $this->permissionRepository = $permissionRepository;
     }
 
     public function main($id)
@@ -34,6 +37,7 @@ class DetailController extends Controller
         }
         $managers = $this->adminRepository->getManagerList();
         $roles = Role::where('name', '!=', 'superAdmin')->get();
-        return view('admin.agent.detail', compact('agent', 'managers', 'commission', 'roles'));
+        $superManagers = $this->permissionRepository->getUsersByRoleName('superManager');
+        return view('admin.agent.detail', compact('agent', 'managers', 'commission', 'roles', 'superManagers'));
     }
 }

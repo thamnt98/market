@@ -43,7 +43,6 @@ class UpdateController extends Controller
             DB::commit();
             return redirect()->back()->with('success', 'Bạn đã cập nhật thành công');
         } catch (\Exception $e) {
-            dd($e->getMessage());
             DB::rollBack();
             return redirect()->back()->with('error', 'Cập nhật thất bại');
         }
@@ -59,9 +58,10 @@ class UpdateController extends Controller
                 'us_stock_commission' => 'required|numeric|min:0',
                 'forex_commission' => 'required|numeric|min:0',
                 'other_commission' => 'required|numeric|min:0',
-                'staff_us_stock_commission' => 'required_if:role,manager|nullable|numeric|min:0',
-                'staff_forex_commission' => 'required_if:role,manager|nullable|numeric|min:0',
-                'staff_other_commission' => 'required_if:role,manager|nullable|numeric|min:0',
+                'staff_us_stock_commission' => 'required_if:role,superManager,standardManager,admin|nullable|numeric|min:0',
+                'staff_forex_commission' => 'required_if:role,superManager,standardManager,admin|nullable|numeric|min:0',
+                'staff_other_commission' => 'required_if:role,superManager,standardManager,admin|nullable|numeric|min:0',
+                'super_manager_id' => 'required_if:role,standardManager,admin|nullable',
                 'ib_id' => 'bail|required|regex:/[0-9]{6}/|unique:admins,ib_id,'. $id,
                 'ib_id'
             ]

@@ -23,7 +23,7 @@ class AdminRoleSeeder extends Seeder
          *
          * @return void
          */
-        $superAdmin = \App\Models\Admin::where('role', 1)->first();
+        $superAdmin = \App\Models\Admin::where('role', 2)->first();
         $manager = \App\Models\Admin::where('role', 2)->whereNull('admin_id')->get();
         $staff = \App\Models\Admin::where('role', 2)->whereNotNull('admin_id')->get();
         $roleData = [
@@ -35,6 +35,7 @@ class AdminRoleSeeder extends Seeder
         $role = $this->permissionRepository->createOrUpdateSuperAdminRole($roleData);
         $permissions = $this->permissionRepository->getAllPermission(1);
         $role->syncPermissions($permissions);
+        $this->permissionRepository->syncPermisionAndRoleForUsers([$superAdmin], $permissions, 'superAdmin');
 
         $roleData = [
             'guard_name' => 'web',
@@ -45,9 +46,17 @@ class AdminRoleSeeder extends Seeder
         $role = $this->permissionRepository->createOrUpdateSuperAdminRole($roleData);
         $permissions = $this->permissionRepository->getAllPermission(4);
         $role->syncPermissions($permissions);
-        $this->permissionRepository->syncPermisionAndRoleForUsers($staff, $permissions, 'admin');
 
-        $this->permissionRepository->syncPermisionAndRoleForUsers([$superAdmin], $permissions, 'superAdmin');
+        $roleData = [
+            'guard_name' => 'web',
+            'name' => 'superManager',
+            'display_name' => 'Super Manager',
+            'allowed_scope' => 2,
+        ];
+        $role = $this->permissionRepository->createOrUpdateSuperAdminRole($roleData);
+        $permissions = $this->permissionRepository->getAllPermission(2);
+        $role->syncPermissions($permissions);
+
         $roleData = [
             'guard_name' => 'web',
             'name' => 'standardManager',

@@ -79,6 +79,20 @@
                 </div>
             </div>
             <div class="form-row">
+                <div class="super-manager form-group col-md-6">
+                    <label>Super Manager</label>
+                    <select class="form-control" name="super_manager_id">
+                        <option value="">Select one super manager</option>
+                        @foreach($superManagers as $superManager)
+                            <option value="{{ $superManager->id }}" @if(old('super_manager_id', $agent->super_manager_id) == $superManager->id) selected @endif>{{ $superManager->name }}</option>
+                        @endforeach
+                    </select>
+                    @if($errors->has('super_manager_id'))
+                        <span class="text-danger text-md-left">{{ $errors->first('super_manager_id') }}</span>
+                    @endif
+                </div>
+            </div>
+            <div class="form-row">
                 <div class="form-group col-md-4">
                     <label>US Stock Commsion ($/lots)</label>
                     <input class="form-control" type="text" value="{{ old('us_stock_commission', $commission->us_stock_commission) }}"
@@ -137,20 +151,32 @@
 @section('javascript')
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script>
-        if ($('#role').val() == 'standardManager') {
+        if ($('#role').val() == 'standardManager' || $('#role').val() == 'admin') {
+            $('.staff-commission').removeClass('hidden');
+            $('.super-manager').removeClass('hidden');
+            $('.belong-manager').addClass('hidden');
+        } else if($('#role').val() == 'superManager'){
             $('.staff-commission').removeClass('hidden');
             $('.belong-manager').addClass('hidden');
-        } else {
+            $('.super-manager').addClass('hidden');
+        } else{
             $('.staff-commission').addClass('hidden');
             $('.belong-manager').removeClass('hidden');
+            $('.super-manager').addClass('hidden');
         }
         $('#role').on('change', function () {
-            if ($('#role').val() == 'standardManager') {
+            if ($('#role').val() == 'standardManager' || $('#role').val() == 'admin') {
+                $('.staff-commission').removeClass('hidden');
+                $('.super-manager').removeClass('hidden');
+                $('.belong-manager').addClass('hidden');
+            } else if($('#role').val() == 'superManager'){
                 $('.staff-commission').removeClass('hidden');
                 $('.belong-manager').addClass('hidden');
-            } else {
+                $('.super-manager').addClass('hidden');
+            } else{
                 $('.staff-commission').addClass('hidden');
                 $('.belong-manager').removeClass('hidden');
+                $('.super-manager').addClass('hidden');
             }
         })
     </script>
